@@ -5,7 +5,7 @@ android {
     buildToolsVersion "20.0.0"
 
     defaultConfig {
-        applicationId "ws1415.skatenightapp"
+        applicationId "ws1415.ps1415"
         minSdkVersion 15
         targetSdkVersion 20
         versionCode 1

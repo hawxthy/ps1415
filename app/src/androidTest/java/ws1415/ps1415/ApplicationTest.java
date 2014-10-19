@@ -1,4 +1,4 @@
-package ws1415.skatenightapp;
+package ws1415.ps1415;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
