@@ -1,5 +1,7 @@
 package ws1415.SkatenightBackend;
 
+import com.google.appengine.api.datastore.Text;
+
 /**
  * Created by Bernd Eissing, Martin Wrodarczyk on 21.10.2014.
  */
@@ -8,7 +10,7 @@ public class Event {
     private String date;
     private String fee;
     private String location;
-    private String description;
+    private Text description;
 
     public String getTitle() {
         return title;
@@ -42,11 +44,11 @@ public class Event {
         this.location = location;
     }
 
-    public String getDescription() {
+    public Text getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(Text description) {
         this.description = description;
     }
 }
