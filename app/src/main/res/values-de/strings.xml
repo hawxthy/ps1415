@@ -7,10 +7,10 @@
     <string name="action_settings">Settings</string>
 
     <!--Strings zu activity_showinformation-->
-    <string name="show_info_header_date">Time and date</string>
-    <string name="show_info_header_location">Location</string>
-    <string name="show_info_header_fee">Participation fee</string>
-    <string name="show_info_header_description">Description</string>
+    <string name="show_info_header_date">Datum und Uhrzeit</string>
+    <string name="show_info_header_location">Ort</string>
+    <string name="show_info_header_fee">Teilnahmegebür</string>
+    <string name="show_info_header_description">Beschreibung</string>
 
 
 </resources>
