@@ -27,7 +27,7 @@ public class QuerEventTask extends AsyncTask<TextView, Void, Event> {
     @Override
     protected void onPostExecute(Event e) {
         if (e != null) {
-            view.setText(e.getName());
+            view.setText(e.getTitle());
         } else {
             view.setText("null");
         }
