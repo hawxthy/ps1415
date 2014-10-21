@@ -17,7 +17,7 @@
         android:paddingLeft="0dp" />
 
     <TextView
-        android:text="21. Oktober 2014 10:00 Uhr"
+        android:text="@string/downloading"
         android:id="@+id/show_info_date_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
         android:paddingLeft="0dp"/>
 
     <TextView
-        android:text="Schlossplatz"
+        android:text="@string/downloading"
         android:id="@+id/show_info_location_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
         android:paddingLeft="0dp"/>
 
     <TextView
-        android:text="2 Euro"
+        android:text="@string/downloading"
         android:id="@+id/show_info_fee_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
         android:paddingLeft="0dp" />
 
     <TextView
-        android:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+        android:text="@string/downloading"
         android:id="@+id/show_info_description_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

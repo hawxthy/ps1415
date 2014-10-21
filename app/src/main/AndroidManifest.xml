@@ -8,8 +8,8 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ExampleActivity"
-            android:label="@string/title_activity_example" >
+            android:name=".ShowInformationActivity"
+            android:label="@string/title_activity_showinformation" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" >
                 </action>

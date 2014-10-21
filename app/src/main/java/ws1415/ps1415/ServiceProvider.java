@@ -1,6 +1,6 @@
 package ws1415.ps1415;
 
-import com.appspot.myapplicationid.skatenightAPI.SkatenightAPI;
+import com.appspot.skatenight_ms.skatenightAPI.SkatenightAPI;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 

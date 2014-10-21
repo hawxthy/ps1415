@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">ps1415</string>
-    <string name="title_activity_example">ExampleActivity</string>
+    <string name="title_activity_showinformation">Wird abgerufen...</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
@@ -11,6 +11,7 @@
     <string name="show_info_header_location">Location</string>
     <string name="show_info_header_fee">Participation fee</string>
     <string name="show_info_header_description">Description</string>
+    <string name="downloading">Wird abgerufen...</string>
 
 
 </resources>
