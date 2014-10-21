@@ -15,7 +15,7 @@ public abstract class ServiceProvider {
             SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
                     AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null);
-            builder.setRootUrl("http://192.168.178.21:8080/_ah/api");
+            builder.setRootUrl("http://10.66.26.88:8080/_ah/api");
             service = builder.build();
         }
         return service;
