@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/SkatenightBackend/SkatenightBackend.iml" filepath="$PROJECT_DIR$/SkatenightBackend/SkatenightBackend.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/ps1415.iml" filepath="$PROJECT_DIR$/ps1415.iml" />
     </modules>
