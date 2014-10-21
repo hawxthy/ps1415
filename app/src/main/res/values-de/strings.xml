@@ -2,15 +2,16 @@
 <resources>
 
     <string name="app_name">ps1415</string>
-    <string name="title_activity_example">ExampleActivity</string>
+    <string name="title_activity_showinformation">Wird abgerufen...</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
     <!--Strings zu activity_showinformation-->
     <string name="show_info_header_date">Datum und Uhrzeit</string>
     <string name="show_info_header_location">Ort</string>
-    <string name="show_info_header_fee">Teilnahmegebür</string>
+    <string name="show_info_header_fee">Teilnahmegebühr</string>
     <string name="show_info_header_description">Beschreibung</string>
+    <string name="downloading">Wird abgerufen...</string>
 
 
 </resources>
