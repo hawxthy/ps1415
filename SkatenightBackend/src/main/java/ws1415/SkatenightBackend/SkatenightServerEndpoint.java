@@ -62,4 +62,50 @@ public class SkatenightServerEndpoint {
         datastore.put(event);
     }
 
+    /**
+     * Liefert das aktuell auf dem Server hinterlegte Event-Objekt.
+     * @return Das aktuelle Event-Objekt.
+     */
+    public Member getMember() {
+        Key key = KeyFactory.createKey("Member", "root_event");
+        Entity m = null;
+        try {
+            m = datastore.get(key);
+        } catch (EntityNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        Member member = null;
+        if (m != null) {
+            member = new Member();
+            member.setName((String) m.getProperty("name"));
+            member.setUpdatedAt((String) m.getProperty("updatedAt"));
+            member.setLoaction((String) m.getProperty("location"));
+        }
+        return member;
+    }
+
+    /**
+     * Aktualisiert das auf dem Server gespeicherte Member-Objekt.
+     * @param m Das neue Member-Objekt.
+     */
+    public void setMember(Member m) {
+        Entity member = new Entity("Member", "root_event");
+        member.setProperty("name", m.getName());
+        member.setProperty("updatedAt", m.getUpdatedAt());
+        member.setProperty("location", m.getLoaction());
+        datastore.put(member);
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
