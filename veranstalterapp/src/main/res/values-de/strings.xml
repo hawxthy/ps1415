@@ -19,5 +19,6 @@
     <string name="announce_info_map">Map:</string>
     <string name="announce_info_choose_map">Wähle Map</string>
     <string name="announce_info_description">Beschreibung:</string>
+    <string name="login_button">Login</string>
 
 </resources>

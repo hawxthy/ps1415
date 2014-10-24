@@ -1,9 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">VeranstalterApp</string>
     <string name="action_settings">Settings</string>
 
-    <!-- Annoucne Information xml-->
+    <!-- Annoucne Information xml -->
     <string name="title_activity_announce_information">AnnounceInformationActivity</string>
     <string name="announce_info_apply_button">Apply</string>
     <string name="announce_info_cancel_button">Cancel</string>
@@ -11,13 +12,16 @@
     <string name="announce_info_title_hint">Enter a title</string>
     <string name="announce_info_fee">Fee:</string>
     <string name="announce_info_fee_hint">Enter a fee</string>
-    <string name="announce_info_date">Date:</string>#
-    <string name="announce_info_time">Time:</string>
+    <string name="announce_info_date">Date:</string>
+#    <string name="announce_info_time">Time:</string>
     <string name="announce_info_set_time">Set time</string>
     <string name="announce_info_location">Location:</string>
     <string name="announce_info_location_hint">Enter a location</string>
     <string name="announce_info_map">Map:</string>
     <string name="announce_info_choose_map">Setup a map</string>
     <string name="announce_info_description">Description:</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="login_button">Login</string>
 
 </resources>
