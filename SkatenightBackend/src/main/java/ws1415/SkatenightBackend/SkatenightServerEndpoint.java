@@ -5,10 +5,16 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Text;
+import com.google.appengine.api.oauth.OAuthRequestException;
+import com.google.appengine.api.users.User;
 
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -16,12 +22,25 @@ import java.util.Date;
  * @author Richard, Daniel
  */
 @Api(name = "skatenightAPI",
-    version = "v1")
+    version = "v1",
+    clientIds = {Constants.ANDROID_CLIENT_ID, Constants.WEB_CLIENT_ID,
+            com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID},
+    audiences = {Constants.ANDROID_AUDIENCE})
 public class SkatenightServerEndpoint {
+    private Key hostRootKey;
     private DatastoreService datastore;
 
     public SkatenightServerEndpoint() {
         datastore = DatastoreServiceFactory.getDatastoreService();
+
+        // Veranstalter definieren
+        Entity root = new Entity("HostRoot", "root");
+        datastore.put(root);
+        hostRootKey = root.getKey();
+
+        Entity e = new Entity("Host", "example", hostRootKey);
+        e.setProperty("email", "example@example.com");
+        datastore.put(e);
     }
 
     /**
@@ -50,16 +69,31 @@ public class SkatenightServerEndpoint {
 
     /**
      * Aktualisiert das auf dem Server gespeicherte Event-Objekt.
+     * @param user Der User, der das Event-Objekt aktualisieren möchte.
      * @param e Das neue Event-Objekt.
      */
-    public void setEvent(Event e) {
-        Entity event = new Entity("Event", "root_event");
-        event.setProperty("title", e.getTitle());
-        event.setProperty("date", e.getDate());
-        event.setProperty("fee", e.getFee());
-        event.setProperty("location", e.getLocation());
-        event.setProperty("description", e.getDescription());
-        datastore.put(event);
+    public void setEvent(User user, Event e)throws OAuthRequestException, IOException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        Query.Filter mailFilter = new Query.FilterPredicate("email", Query.FilterOperator.EQUAL,
+                user.getEmail());
+        Query q = new Query("Host", hostRootKey);
+        q.setFilter(mailFilter);
+        PreparedQuery pq = datastore.prepare(q);
+        boolean isHost = (pq.countEntities(FetchOptions.Builder.withLimit(1)) == 1);
+
+        if (isHost) {
+            Entity event = new Entity("Event", "root_event");
+            event.setProperty("title", e.getTitle());
+            event.setProperty("date", e.getDate());
+            event.setProperty("fee", e.getFee());
+            event.setProperty("location", e.getLocation());
+            event.setProperty("description", e.getDescription());
+            datastore.put(event);
+        } else {
+            throw new OAuthRequestException("user is not a host");
+        }
     }
 
     /**

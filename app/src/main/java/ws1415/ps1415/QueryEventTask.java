@@ -15,9 +15,8 @@ public class QueryEventTask extends AsyncTask<ShowInformationActivity, Void, Eve
 
     /**
      * Ruft das aktuelle Event-Objekt vom Server ab und schreibt die Informationen in die
-     * übergebenen Views.
-     * @param params Die zu befüllenden Views in der Reihenfolge: Datum, Ort, Gebühr, Beschreibung
-     * @return Das abgerufene Event-Objekt
+     * übergebene View.
+     * @param params Die zu befüllende View
      */
     @Override
     protected Event doInBackground(ShowInformationActivity... params) {
