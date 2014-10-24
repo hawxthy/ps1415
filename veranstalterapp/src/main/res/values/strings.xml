@@ -3,7 +3,7 @@
     <string name="app_name">VeranstalterApp</string>
     <string name="action_settings">Settings</string>
 
-    <!-- Annoucne Information xml-->
+    <!-- Announce Information xml-->
     <string name="title_activity_announce_information">AnnounceInformationActivity</string>
     <string name="announce_info_apply_button">Apply</string>
     <string name="announce_info_cancel_button">Cancel</string>
@@ -19,5 +19,9 @@
     <string name="announce_info_map">Map:</string>
     <string name="announce_info_choose_map">Setup a map</string>
     <string name="announce_info_description">Description:</string>
+    <string name="areyousure">Are you sure?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="eventcreated">Event was created</string>
 
 </resources>

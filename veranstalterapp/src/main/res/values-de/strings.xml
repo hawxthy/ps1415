@@ -19,5 +19,8 @@
     <string name="announce_info_map">Map:</string>
     <string name="announce_info_choose_map">Wähle Map</string>
     <string name="announce_info_description">Beschreibung:</string>
-
+    <string name="areyousure">Sind Sie sicher?</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="eventcreated">Veranstaltung wurde erstellt</string>
 </resources>

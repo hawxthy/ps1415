@@ -1,11 +1,13 @@
 package ws1415.veranstalterapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +16,8 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
+import android.widget.Toast;
+
 import java.util.Calendar;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
@@ -42,6 +46,9 @@ public class AnnounceInformationActivity extends Activity{
     // Attribute für die Zeit
     private int hour;
     private int minute;
+
+    // das neu erstellte Event
+    private Event event;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,7 +167,7 @@ public class AnnounceInformationActivity extends Activity{
         Text description = new Text();
         description.setValue(editTextDescription.getText().toString());
 
-        Event event = new Event();
+        event = new Event();
 
         event.setTitle(title);
         event.setFee(fee);
@@ -168,7 +175,23 @@ public class AnnounceInformationActivity extends Activity{
         event.setLocation(location);
         event.setDescription(description);
 
-        new CreateEventTask().execute(event);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.areyousure);
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                new CreateEventTask().execute(event);
+                Toast.makeText(AnnounceInformationActivity.this,
+                        getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG);
+                finish();
+            }
+        });
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                finish();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
 
 
     }
