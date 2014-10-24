@@ -12,10 +12,10 @@ public class ExampleActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_example);
+        setContentView(R.layout.activity_announce_information);
 
         TextView textView = (TextView) findViewById(R.id.text);
-        new QuerEventTask().execute(textView);
+        //new QuerEventTask().execute(textView);
     }
 
 

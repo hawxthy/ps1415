@@ -3,7 +3,6 @@
 
     <string name="app_name">ps1415</string>
     <string name="title_activity_example">ExampleActivity</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
     <!--Strings zu activity_showinformation-->

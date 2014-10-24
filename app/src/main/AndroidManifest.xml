@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ws1415.ps1415" >
 
+    <uses-sdk
+        android:minSdkVersion="15"
+        android:targetSdkVersion="20"/>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -10,11 +14,8 @@
         <activity
             android:name=".ExampleActivity"
             android:label="@string/title_activity_example" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" >
-                </action>
-            </intent-filter>
         </activity>
+
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
