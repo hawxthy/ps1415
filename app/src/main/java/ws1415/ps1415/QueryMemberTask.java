@@ -8,7 +8,7 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 import java.io.IOException;
 
 /**
- * Created by Richard on 21.10.2014.
+ * Created by Tristan on 21.10.2014.
  */
 public class QueryMemberTask extends AsyncTask<ShowInformationActivity, Void, Member> {
     private ShowInformationActivity view;
@@ -33,6 +33,6 @@ public class QueryMemberTask extends AsyncTask<ShowInformationActivity, Void, Me
 
     @Override
     protected void onPostExecute(Member m) {
-        
+
     }
 }
