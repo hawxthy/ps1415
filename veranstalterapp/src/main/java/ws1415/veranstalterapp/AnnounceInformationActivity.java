@@ -17,13 +17,15 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
-
 import java.util.Calendar;
-
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 import com.appspot.skatenight_ms.skatenightAPI.model.Text;
 
-
+/**
+ * Klasse zum veröffentlichen von neuen Veranstaltungen.
+ *
+ * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
+ */
 public class AnnounceInformationActivity extends Activity{
     // Die Viewelemente für das Event
     private EditText editTextTitle;
@@ -69,7 +71,11 @@ public class AnnounceInformationActivity extends Activity{
         setCurrentDateOnView();
     }
 
-
+    /**
+     * ... später
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -77,6 +83,11 @@ public class AnnounceInformationActivity extends Activity{
         return true;
     }
 
+    /**
+     * ... später
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -89,13 +100,27 @@ public class AnnounceInformationActivity extends Activity{
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Die onClick Methode welche aufgerufen wird, wenn der datePickerButton gedrückt wird.
+     * @param view View, von dem aus der Button gedrückt wurde
+     */
     public void showDatePickerDialog(View view){
         showDialog(DATE_DIALOG_ID);
     }
+
+    /**
+     * Die onClick Methode welche aufgerufen wird, wenn der datePickerButton gedrückt wird.
+     * @param view View, von dem aus der Button gedrückt wurde
+     */
     public void showTimePickerDialog(View view){
         showDialog(TIME_DIALOG_ID);
     }
 
+    /**
+     * Erstellt je nach id ein DatePicker- oder TimePicker Dialog.
+     * @param id DatePickerDialog falls id = 1, TimePickerDialog falls id = 2
+     * @return Dialog Fenster
+     */
     @Override
     protected Dialog onCreateDialog(int id){
         switch(id){
@@ -109,6 +134,9 @@ public class AnnounceInformationActivity extends Activity{
         return null;
     }
 
+    /**
+     * Setzt das angegebene Datum bei einer Änderung als Text auf den datePickerButton.
+     */
     private OnDateSetListener datePickerListener = new OnDateSetListener(){
 
         // when dialog box is closed, below method will be called.
@@ -122,7 +150,9 @@ public class AnnounceInformationActivity extends Activity{
         }
     };
 
-    // disaplay current date
+    /**
+     * Setzt das aktuelle Datum als Text auf den datePickerButton.
+     */
     public void setCurrentDateOnView(){
         final Calendar c = Calendar.getInstance();
         year = c.get(Calendar.YEAR);
@@ -133,6 +163,10 @@ public class AnnounceInformationActivity extends Activity{
         datePickerButton.setText(day +"."+ (month+1) +"."+year);
     }
 
+    /**
+     * Setzt einen Listener, welcher die ausgewählte Uhrzeit bei einer Änderung setzt und auf
+     * den timePickerButton setzt.
+     */
     private OnTimeSetListener timePickerListener = new OnTimeSetListener(){
 
         @Override
@@ -156,38 +190,40 @@ public class AnnounceInformationActivity extends Activity{
     }
 
     /**
-     * sdfdfsdfdfd
+     * Liest die eingegebenen Informationen aus, erstellt ause diesen ein Event und fügt dieses
+     * Event dem Server hinzu. Momentan wir noch das alte Event überschrieben.
      */
     public void applyInfo(View view){
-        // Weise die Werte aus den Feldern Variablen zu, um damit dann das Event zu setzen.
-        String title = editTextTitle.getText().toString();
-        String fee = editTextFee.getText().toString();
-        String date = day+ "." +month+ "." +year+ " " +hour+ ":" +minute+ " Uhr";
-        String location =editTextLocation.getText().toString();
-        Text description = new Text();
-        description.setValue(editTextDescription.getText().toString());
 
-        event = new Event();
-
-        event.setTitle(title);
-        event.setFee(fee);
-        event.setDate(date);
-        event.setLocation(location);
-        event.setDescription(description);
-
+        // Zeige einen Alert Dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.areyousure);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                // Weise die Werte aus den Feldern Variablen zu, um damit dann das Event zu setzen.
+                String title = editTextTitle.getText().toString();
+                String fee = editTextFee.getText().toString();
+                String date = day+ "." +month+ "." +year+ " " +hour+ ":" +minute+ " Uhr";
+                String location =editTextLocation.getText().toString();
+                Text description = new Text();
+                description.setValue(editTextDescription.getText().toString());
+
+                // Erstelle ein neue Event
+                event = new Event();
+
+                // Setze die Attribute vom Event
+                event.setTitle(title);
+                event.setFee(fee);
+                event.setDate(date);
+                event.setLocation(location);
+                event.setDescription(description);
                 new CreateEventTask().execute(event);
                 Toast.makeText(AnnounceInformationActivity.this,
                         getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG);
-                finish();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                finish();
             }
         });
         AlertDialog dialog = builder.create();

@@ -7,6 +7,8 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 import java.io.IOException;
 
 /**
+ * Klasse welche mit SkatenightBackend kommuniziert um auf den Server zu zugreifen.
+ *
  * Created by Bernd Eissing, Marting Wrodarczyk on 24.10.2014.
  */
 public class CreateEventTask extends AsyncTask<Event, Void, Void> {
