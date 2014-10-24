@@ -7,7 +7,7 @@ public class Member {
 
     private String name;
     private String updatedAt;
-    private String loaction;
+    private String location;
 
     public String getName() {return name;}
 
@@ -17,8 +17,8 @@ public class Member {
 
     public void setUpdatedAt(String updatedAt) {this.updatedAt = updatedAt;}
 
-    public String getLoaction() {return loaction;}
+    public String getLocation() {return location;}
 
-    public void setLoaction(String location) {this.loaction = location;}
+    public void setLocation(String location) {this.location = location;}
 
 }

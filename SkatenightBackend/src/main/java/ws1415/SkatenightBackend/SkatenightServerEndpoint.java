@@ -79,7 +79,7 @@ public class SkatenightServerEndpoint {
             member = new Member();
             member.setName((String) m.getProperty("name"));
             member.setUpdatedAt((String) m.getProperty("updatedAt"));
-            member.setLoaction((String) m.getProperty("location"));
+            member.setLocation((String) m.getProperty("location"));
         }
         return member;
     }
@@ -92,7 +92,7 @@ public class SkatenightServerEndpoint {
         Entity member = new Entity("Member", "root_event");
         member.setProperty("name", m.getName());
         member.setProperty("updatedAt", m.getUpdatedAt());
-        member.setProperty("location", m.getLoaction());
+        member.setProperty("location", m.getLocation());
         datastore.put(member);
     }
 
