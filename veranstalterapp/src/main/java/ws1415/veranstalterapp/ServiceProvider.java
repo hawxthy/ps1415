@@ -19,7 +19,7 @@ public abstract class ServiceProvider {
             SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
                     AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null);
-            builder.setRootUrl("https://skatenight-ms.apspot.com/_ah/api");
+            builder.setRootUrl("https://skatenight-ms.appspot.com/_ah/api");
             service = builder.build();
         }
         return service;
