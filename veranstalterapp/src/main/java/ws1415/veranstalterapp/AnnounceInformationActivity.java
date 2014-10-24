@@ -12,12 +12,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TimePicker;
-
+import com.google.appengine.api.datastore.Text;
 import java.util.Calendar;
 
 
 public class AnnounceInformationActivity extends Activity{
+    // Die Viewelemente für das Event
+    private EditText editTextTitle;
+    private EditText editTextFee;
+    private EditText editTextLocation;
+    private EditText editTextDescription;
+
     // Die Buttons für Zeit und Datum
     private Button datePickerButton;
     private Button timePickerButton;
@@ -38,6 +45,9 @@ public class AnnounceInformationActivity extends Activity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_announce_information);
+
+        // Initialisiere die View Elemente
+
 
         // Initialisiere die Buttons
         timePickerButton = (Button) findViewById(R.id.announce_info_time_button);
@@ -124,4 +134,16 @@ public class AnnounceInformationActivity extends Activity{
             }
         }
     };
+
+    /**
+     * Hier soll was passieren wenn der Versanstalter den Prozess abbricht!
+     */
+    public void cancelInfo(){
+       // TODO Muss noch implementiert werden
+    }
+
+    public void applyInfo(){
+
+    }
+
 }
