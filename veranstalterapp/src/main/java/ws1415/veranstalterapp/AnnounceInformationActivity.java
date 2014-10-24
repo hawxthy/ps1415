@@ -14,8 +14,10 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
-import com.google.appengine.api.datastore.Text;
 import java.util.Calendar;
+
+import com.appspot.skatenight_ms.skatenightAPI.model.Event;
+import com.appspot.skatenight_ms.skatenightAPI.model.Text;
 
 
 public class AnnounceInformationActivity extends Activity{
@@ -47,7 +49,10 @@ public class AnnounceInformationActivity extends Activity{
         setContentView(R.layout.activity_announce_information);
 
         // Initialisiere die View Elemente
-
+        editTextTitle = (EditText) findViewById(R.id.announce_info_title_edittext);
+        editTextFee = (EditText) findViewById(R.id.announce_info_fee_edittext);
+        editTextLocation = (EditText) findViewById(R.id.announce_info_location_edittext);
+        editTextDescription = (EditText) findViewById(R.id.announce_info_description_edittext);
 
         // Initialisiere die Buttons
         timePickerButton = (Button) findViewById(R.id.announce_info_time_button);
@@ -128,7 +133,8 @@ public class AnnounceInformationActivity extends Activity{
             hour = selectedHour;
             minute = selectedMinute;
             if(minute < 10){
-                timePickerButton.setText(hour +":"+0+minute+" Uhr");
+                minute = 0+ selectedMinute;
+                timePickerButton.setText(hour +":"+minute+" Uhr");
             }else{
                 timePickerButton.setText(hour +":"+minute+" Uhr");
             }
@@ -138,12 +144,32 @@ public class AnnounceInformationActivity extends Activity{
     /**
      * Hier soll was passieren wenn der Versanstalter den Prozess abbricht!
      */
-    public void cancelInfo(){
+    public void cancelInfo(View view){
        // TODO Muss noch implementiert werden
     }
 
-    public void applyInfo(){
+    /**
+     * sdfdfsdfdfd
+     */
+    public void applyInfo(View view){
+        // Weise die Werte aus den Feldern Variablen zu, um damit dann das Event zu setzen.
+        String title = editTextTitle.getText().toString();
+        String fee = editTextFee.getText().toString();
+        String date = day+ "." +month+ "." +year+ " " +hour+ ":" +minute+ " Uhr";
+        String location =editTextLocation.getText().toString();
+        Text description = new Text();
+        description.setValue(editTextDescription.getText().toString());
+
+        Event event = new Event();
+
+        event.setTitle(title);
+        event.setFee(fee);
+        event.setDate(date);
+        event.setLocation(location);
+        event.setDescription(description);
+
+        new CreateEventTask().execute(event);
+
 
     }
-
 }
