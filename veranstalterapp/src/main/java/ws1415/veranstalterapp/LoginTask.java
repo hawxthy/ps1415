@@ -33,7 +33,7 @@ public class LoginTask extends AsyncTask<LoginActivity, Void, Boolean> {
         if (result) {
             // Activity starten
             Intent i = new Intent(activity.getApplicationContext(),
-                    AnnounceInformationActivity.class);
+                    HoldTabsActivity.class);
             activity.startActivity(i);
         } else {
             // Fehler anzeigen
