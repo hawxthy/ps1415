@@ -199,7 +199,12 @@ public class AnnounceInformationFragment extends Fragment {
                 // Weise die Werte aus den Feldern Variablen zu, um damit dann das Event zu setzen.
                 String title = editTextTitle.getText().toString();
                 String fee = editTextFee.getText().toString();
-                String date = day+ "." +month+ "." +year+ " " +hour+ ":" +minute+ " Uhr";
+                String date;
+                if(minute<10) {
+                    date = day + "." + month + "." + year + " " + hour + ":0" + minute + " Uhr";
+                } else {
+                    date = day + "." + month + "." + year + " " + hour + ":" + minute + " Uhr";
+                }
                 String location =editTextLocation.getText().toString();
                 Text description = new Text();
                 description.setValue(editTextDescription.getText().toString());
