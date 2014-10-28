@@ -102,6 +102,9 @@ public final class LocationUtils {
      * @return String der codierten Location.
      */
     public static String encodeLocation(Location location) {
+        if (location == null)
+            throw new NullPointerException();
+
         StringBuffer buffer = new StringBuffer();
         buffer.append(encodeDouble(location.getLatitude()));
         buffer.append(encodeDouble(location.getLongitude()));
