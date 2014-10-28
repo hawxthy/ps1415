@@ -27,6 +27,7 @@ public class ShowRouteActivity extends Activity {
 
     private GoogleMap googleMap;
     private PolylineOptions route;
+    private Intent service;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,6 @@ public class ShowRouteActivity extends Activity {
 
         Intent intent;
         if (savedInstanceState != null && savedInstanceState.containsKey(MEMBER_ROUTE)) {
-
             route = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_ROUTE);
             googleMap.addPolyline(route);
         }
@@ -73,12 +73,22 @@ public class ShowRouteActivity extends Activity {
                 e.printStackTrace();
             }
         }
+    }
 
-        Intent service = new Intent(getBaseContext(), LocationTransmitterService.class);
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        service = new Intent(getBaseContext(), LocationTransmitterService.class);
         service.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startService(service);
-        stopService(service);
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        stopService(service);
     }
 
     @Override
