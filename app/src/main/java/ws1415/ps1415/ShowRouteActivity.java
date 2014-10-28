@@ -25,8 +25,8 @@ public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE = "show_route_extra_route";
     private static final String MEMBER_ROUTE = "show_route_member_route";
 
-    GoogleMap googleMap;
-    PolylineOptions route;
+    private GoogleMap googleMap;
+    private PolylineOptions route;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +73,12 @@ public class ShowRouteActivity extends Activity {
                 e.printStackTrace();
             }
         }
+
+        Intent service = new Intent(getBaseContext(), LocationTransmitterService.class);
+        service.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startService(service);
+        stopService(service);
+
     }
 
     @Override
