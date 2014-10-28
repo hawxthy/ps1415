@@ -26,5 +26,6 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="eventcreated">Event was created</string>
+    <string name="not_authorized">Not authorized</string>
 
 </resources>

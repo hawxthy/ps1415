@@ -1,6 +1,7 @@
 package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.Api;
+import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -23,8 +24,8 @@ import java.util.Date;
  */
 @Api(name = "skatenightAPI",
     version = "v1",
-    clientIds = {Constants.ANDROID_CLIENT_ID, Constants.WEB_CLIENT_ID,
-            com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID},
+    clientIds = {Constants.ANDROID_USER_CLIENT_ID, Constants.ANDROID_HOST_CLIENT_ID,
+            Constants.WEB_CLIENT_ID, com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID},
     audiences = {Constants.ANDROID_AUDIENCE})
 public class SkatenightServerEndpoint {
     private Key hostRootKey;
@@ -41,6 +42,39 @@ public class SkatenightServerEndpoint {
         Entity e = new Entity("Host", "example", hostRootKey);
         e.setProperty("email", "example@example.com");
         datastore.put(e);
+    }
+
+    /**
+     * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
+     * @param mail Die hinzuzufügende Mail-Adresse
+     */
+    public void addHost(@Named("mail") String mail) {
+        Entity e = new Entity("Host", mail, hostRootKey);
+        e.setProperty("email", mail);
+        datastore.put(e);
+    }
+
+    /**
+     * Entfernt die angegebene Mail-Adresse aus den Veranstaltern.
+     * @param mail Die zu entfernende Mail-Adresse
+     */
+    public void removeHost(@Named("mail") String mail) {
+        datastore.delete(KeyFactory.createKey("Host", mail));
+    }
+
+    /**
+     * Prüft, ob die angegebene Mail-Adresse zu einem authorisierten Veranstalter-Account gehört.
+     * @param mail Die zu prüfende Mail
+     * @return true, wenn der Account ein authorisierter Veranstalter ist, false sonst
+     */
+    public BooleanWrapper isHost(@Named("mail") String mail) {
+        Query.Filter mailFilter = new Query.FilterPredicate("email", Query.FilterOperator.EQUAL,
+                mail);
+        Query q = new Query("Host", hostRootKey);
+        q.setFilter(mailFilter);
+        PreparedQuery pq = datastore.prepare(q);
+        boolean isHost = (pq.countEntities(FetchOptions.Builder.withLimit(1)) == 1);
+        return new BooleanWrapper(isHost);
     }
 
     /**

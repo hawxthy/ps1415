@@ -25,4 +25,5 @@
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="eventcreated">Veranstaltung wurde erstellt</string>
+    <string name="not_authorized">Nicht authorisiert</string>
 </resources>
