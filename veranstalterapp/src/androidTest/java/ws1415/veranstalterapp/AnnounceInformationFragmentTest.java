@@ -5,11 +5,11 @@ import android.test.ActivityInstrumentationTestCase2;
 /**
  * Created by Bernd Eissing on 24.10.2014.
  */
-public class AnnounceInformationActivityTest extends ActivityInstrumentationTestCase2<AnnounceInformationActivity>{
-    private AnnounceInformationActivity activity;
+public class AnnounceInformationFragmentTest extends ActivityInstrumentationTestCase2<AnnounceInformationFragment>{
+    private AnnounceInformationFragment activity;
 
-    public AnnounceInformationActivityTest(){
-        super(AnnounceInformationActivity.class);
+    public AnnounceInformationFragmentTest(){
+        super(AnnounceInformationFragment.class);
     }
 
     public void setUp() throws Exception {

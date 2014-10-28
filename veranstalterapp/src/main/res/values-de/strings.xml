@@ -1,10 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">VeranstalterApp</string>
+    <string name="app_name">Veranstalte Skatenight</string>
     <string name="action_settings">Settings</string>
 
+    <!--Activity Hold Tabs xml-->
+    <string name="title_activity_start_page">Veranstalte Skatenight</string>
+
     <!-- Annoucne Information xml-->
-    <string name="title_activity_announce_information">AnnounceInformationActivity</string>
+    <string name="title_fragment_announce_information">Informationen veröffentlichen</string>
     <string name="announce_info_apply_button">Erstellen</string>
     <string name="announce_info_cancel_button">Cancel</string>
     <string name="announce_info_title">Titel:</string>
@@ -23,4 +27,16 @@
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="eventcreated">Veranstaltung wurde erstellt</string>
+
+    <!--Manage Routes xml-->
+    <string name="title_fragment_manage_routes">Verwalte Strecken</string>
+    <string name="hello_blank_fragment">Hallo blank Fragment</string>
+
+    <!--Strings zu activity_showinformation-->
+    <string name="title_fragment_show_information">Zeige Informationen</string>
+    <string name="show_info_header_date">Datum und Uhrzeit</string>
+    <string name="show_info_header_location">Ort</string>
+    <string name="show_info_header_fee">Teilnahmegebühr</string>
+    <string name="show_info_header_description">Beschreibung</string>
+    <string name="downloading">Wird abgerufen...</string>
 </resources>

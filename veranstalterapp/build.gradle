@@ -20,6 +20,7 @@ android {
 }
 
 dependencies {
+    compile "com.android.support:support-v4:20.0.+"
     compile project(path: ':SkatenightBackend', configuration: 'android-endpoints')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
