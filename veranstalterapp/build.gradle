@@ -20,7 +20,6 @@ android {
 }
 
 dependencies {
-    compile 'com.google.appengine:appengine-endpoints:1.9.8'
     compile project(path: ':SkatenightBackend', configuration: 'android-endpoints')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

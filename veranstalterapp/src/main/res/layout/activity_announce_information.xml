@@ -24,7 +24,7 @@
                     android:text="@string/announce_info_title" />
 
                 <EditText
-                    android:id="@+id/announce_info_date_edittext"
+                    android:id="@+id/announce_info_title_edittext"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -126,6 +126,7 @@
                     android:text="@string/announce_info_description" />
 
                 <EditText
+                    android:id="@+id/announce_info_description_edittext"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
