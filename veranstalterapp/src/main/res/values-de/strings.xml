@@ -21,4 +21,8 @@
     <string name="announce_info_description">Beschreibung:</string>
     <string name="login_button">Login</string>
 
+    <string name="areyousure">Sind Sie sicher?</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="eventcreated">Veranstaltung wurde erstellt</string>
 </resources>
