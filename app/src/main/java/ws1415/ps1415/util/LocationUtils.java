@@ -1,5 +1,7 @@
 package ws1415.ps1415.util;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import java.text.ParseException;
@@ -69,7 +71,7 @@ public final class LocationUtils {
     /**
      * Decodiert den gegebenen String als Liste von Koordinaten.
      *
-     * @param encoded Zu decodierender Wert.
+     * @param encoded Zu decodierende Werte.
      * @return Liste der decodierten Koordinaten.
      * @throws ParseException Falls kein gültiger String übergeben wurde.
      */
@@ -93,6 +95,33 @@ public final class LocationUtils {
         return line;
     }
 
+    /**
+     * Codiert die gegebene Location als String.
+     *
+     * @param location Zu codierende Location.
+     * @return String der codierten Location.
+     */
+    public static String encodeLocation(Location location) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(encodeDouble(location.getLatitude()));
+        buffer.append(encodeDouble(location.getLongitude()));
+        return buffer.toString();
+    }
+
+    /**
+     * Decodiet den gegebenen String als Location.
+     *
+     * @param encoded Zu decodierende Location als String.
+     * @return Decodierte Location.
+     * @throws ParseException Falls kein gültiger String übergeben wurde.
+     */
+    public static Location decodeLocation(String encoded) throws ParseException {
+        StringBuffer buffer = new StringBuffer(encoded);
+        Location location = new Location(LocationUtils.class.getSimpleName());
+        location.setLatitude(((double)decodeValue(buffer))/1e5);
+        location.setLongitude(((double)decodeValue(buffer))/1e5);
+        return location;
+    }
 
     /**
      * Codiert den gegebenen Wert und gibt ihn als String zurück.
