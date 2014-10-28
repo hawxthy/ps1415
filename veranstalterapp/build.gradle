@@ -20,5 +20,6 @@ android {
 }
 
 dependencies {
+    compile project(path: ':SkatenightBackend', configuration: 'android-endpoints')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
