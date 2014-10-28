@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">Host Skatenight</string>
@@ -23,6 +22,9 @@
     <string name="announce_info_map">Map:</string>
     <string name="announce_info_choose_map">Setup a map</string>
     <string name="announce_info_description">Description:</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="login_button">Login</string>
     <string name="areyousure">Are you sure?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
