@@ -27,11 +27,13 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        LocationRequest locationRequest = LocationRequest.create();
-//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//        locationRequest.setFastestInterval(1000);
-//
-//        LocationServices.FusedLocationApi.requestLocationUpdates(gac, locationRequest, this);
+        gac = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        gac.connect();
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -39,29 +41,23 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     @Override
     public void onCreate() {
         super.onCreate();
-
-        Toast.makeText(getApplicationContext(), "onCreate hier aufgerufen", Toast.LENGTH_LONG).show();
-
-        gac = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
-
-        gac.connect();
+        Toast.makeText(getApplicationContext(), "onCreate", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onDestroy() {
-        Toast.makeText(getApplicationContext(), "onCreate hier destroyed", Toast.LENGTH_LONG).show();
-        gac.disconnect();
+        Toast.makeText(getApplicationContext(), "onDestroy", Toast.LENGTH_LONG).show();
+        if (gac != null) gac.disconnect();
         super.onDestroy();
     }
 
     @Override
     public void onConnected(Bundle bundle) {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setFastestInterval(1000);
 
+        LocationServices.FusedLocationApi.requestLocationUpdates(gac, locationRequest, this);
     }
 
     @Override
@@ -71,7 +67,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
     @Override
     public void onLocationChanged(Location location) {
-        System.out.print("onLocationChanged Methode aufgerufen.");
+        Toast.makeText(getApplicationContext(), "onLocationChanged", Toast.LENGTH_LONG).show();
     }
 
     @Override
