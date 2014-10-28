@@ -11,18 +11,27 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 
 public class LoginActivity extends Activity {
 
+    static final int REQUEST_ACCOUNT_PICKER = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Inside your Activity class onCreate method
-        SharedPreferences settings = getSharedPreferences("Skatenight", 0);
         GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(this,
-                "server:client_id:1-web-app.apps.googleusercontent.com");
-        setSelectedAccountName(settings.getString(PREF_ACCOUNT_NAME, null));
+                "server:client_id:"+Constants.WEB_CLIENT_ID);
+
+        // Kein accountName gesetzt, also AccountPicker aufrufen
+        if (credential.getSelectedAccountName() == null) {
+            startActivityForResult(credential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
+        }
+
+        // AccountName mit den Hosts vergleichen
+        System.out.println(credential.getSelectedAccountName());
 
     }
+
+
 
 
     @Override
