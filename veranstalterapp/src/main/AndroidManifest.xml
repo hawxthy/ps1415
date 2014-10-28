@@ -14,7 +14,8 @@
 
         <activity
             android:name=".HoldTabsActivity"
-            android:label="@string/title_activity_start_page" >
+            android:label="@string/title_activity_start_page"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" >
                 </action>
@@ -23,7 +24,8 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
         </activity>
 
         <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
