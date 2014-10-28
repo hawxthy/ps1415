@@ -1,0 +1,28 @@
+<resources>
+
+    <string name="app_name">VeranstalterApp</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Annoucne Information xml-->
+    <string name="title_activity_announce_information">AnnounceInformationActivity</string>
+    <string name="announce_info_apply_button">Erstellen</string>
+    <string name="announce_info_cancel_button">Cancel</string>
+    <string name="announce_info_title">Titel:</string>
+    <string name="announce_info_title_hint">Gib einen Titel an</string>
+    <string name="announce_info_fee">Gebühr:</string>
+    <string name="announce_info_fee_hint">Gib eine Gebühr an</string>
+    <string name="announce_info_date">Datum:</string>#
+    <string name="announce_info_time">Uhrzeit:</string>
+    <string name="announce_info_set_time">Wähle die Uhrzeit</string>
+    <string name="announce_info_location">Ort:</string>
+    <string name="announce_info_location_hint">Gib einen Ort an</string>
+    <string name="announce_info_map">Map:</string>
+    <string name="announce_info_choose_map">Wähle Map</string>
+    <string name="announce_info_description">Beschreibung:</string>
+    <string name="login_button">Login</string>
+
+    <string name="areyousure">Sind Sie sicher?</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="eventcreated">Veranstaltung wurde erstellt</string>
+</resources>
