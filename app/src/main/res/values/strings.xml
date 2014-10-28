@@ -3,15 +3,15 @@
 
     <string name="app_name">ps1415</string>
     <string name="title_activity_showinformation">Downloading...</string>
+    <string name="title_activity_show_route">Strecke</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
-    <!--Strings zu activity_showinformation-->
+    <!-- Strings zu activity_showinformation -->
     <string name="show_info_header_date">Time and date</string>
     <string name="show_info_header_location">Location</string>
     <string name="show_info_header_fee">Participation fee</string>
     <string name="show_info_header_description">Description</string>
     <string name="downloading">Downloading...</string>
-
 
 </resources>
