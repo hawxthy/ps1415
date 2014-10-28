@@ -26,7 +26,7 @@ public final class LocationUtils {
     public static String encodeDouble(double value) {
         value = Math.round(value * 1e5);
         if (value > Integer.MAX_VALUE || value < Integer.MIN_VALUE)
-            throw new IllegalArgumentException("Value out of bounds. Must be between " + Integer.MIN_VALUE + " and " + Integer.MAX_VALUE + ".");
+            throw new IllegalArgumentException("Value out of bounds. Must be between 1e5 * 2³¹-1 and 1e5 * -2³¹.");
 
         return encodeValue((int) value);
     }
@@ -157,7 +157,7 @@ public final class LocationUtils {
             if (encoded.length() <= 0) {
                 // Es gibt keine weiteren Zeichen mehr und es wurde noch kein Block
                 // mit End-Bit gefunden.
-                throw new ParseException("Latitude end block not found.", length);
+                throw new ParseException("End block not found.", length);
             }
 
             // Dem codierten Zeichen werden die zuvor addierten 63 abgezogen
