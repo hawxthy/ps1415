@@ -22,11 +22,11 @@ import ws1415.ps1415.util.LocationUtils;
 
 
 public class ShowRouteActivity extends Activity {
-    public static final String EXTRA_PATH = "show_route_extra_path";
-    private static final String MEMBER_PATH = "show_route_member_path";
+    public static final String EXTRA_ROUTE = "show_route_extra_route";
+    private static final String MEMBER_ROUTE = "show_route_member_route";
 
     GoogleMap googleMap;
-    PolylineOptions path;
+    PolylineOptions route;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,33 +37,33 @@ public class ShowRouteActivity extends Activity {
         googleMap.setMyLocationEnabled(true);
 
         Intent intent;
-        if (savedInstanceState != null && savedInstanceState.containsKey(MEMBER_PATH)) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(MEMBER_ROUTE)) {
 
-            path = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_PATH);
-            googleMap.addPolyline(path);
+            route = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_ROUTE);
+            googleMap.addPolyline(route);
         }
-        else if ((intent = getIntent()) != null && intent.hasExtra(EXTRA_PATH)) {
-            String encodedPath = intent.getStringExtra(EXTRA_PATH);
+        else if ((intent = getIntent()) != null && intent.hasExtra(EXTRA_ROUTE)) {
+            String encodedPath = intent.getStringExtra(EXTRA_ROUTE);
             try {
                 List<LatLng> line = LocationUtils.decodePolyline(encodedPath);
 
-                path = new PolylineOptions()
+                route = new PolylineOptions()
                         .addAll(line)
                         .color(Color.BLUE);
 
                 googleMap.clear();
-                googleMap.addPolyline(path);
+                googleMap.addPolyline(route);
 
                 googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                     @Override
                     public void onMapLoaded() {
-                        if (path != null) {
+                        if (route != null) {
                             // Grenzwerte der Strecke berechnen und Karte zentrieren
                             LatLngBounds.Builder builder = LatLngBounds.builder();
-                            for (LatLng point : path.getPoints()) {
+                            for (LatLng point : route.getPoints()) {
                                 builder.include(point);
                             }
-                            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 20));
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 50));
                         }
                     }
                 });
@@ -77,8 +77,8 @@ public class ShowRouteActivity extends Activity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if (path != null) {
-            outState.putParcelable(MEMBER_PATH, path);
+        if (route != null) {
+            outState.putParcelable(MEMBER_ROUTE, route);
         }
 
         super.onSaveInstanceState(outState);

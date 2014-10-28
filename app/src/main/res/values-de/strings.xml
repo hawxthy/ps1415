@@ -3,6 +3,7 @@
 
     <string name="app_name">ps1415</string>
     <string name="title_activity_showinformation">Wird abgerufen...</string>
+    <string name="title_activity_show_route">Strecke</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
@@ -11,6 +12,7 @@
     <string name="show_info_header_location">Ort</string>
     <string name="show_info_header_fee">Teilnahmegebühr</string>
     <string name="show_info_header_description">Beschreibung</string>
+    <string name="show_info_button_map">Karte</string>
     <string name="downloading">Wird abgerufen...</string>
 
 
