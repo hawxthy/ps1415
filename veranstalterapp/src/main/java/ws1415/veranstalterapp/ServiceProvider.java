@@ -20,7 +20,7 @@ public abstract class ServiceProvider {
             SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
                     AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), credential);
-            builder.setRootUrl("https://skatenight-ms.apspot.com/_ah/api");
+            builder.setRootUrl("https://skatenight-ms.appspot.com/_ah/api");
             service = builder.build();
         }
         return service;
@@ -31,7 +31,11 @@ public abstract class ServiceProvider {
     }
 
     public static void login(GoogleAccountCredential credential) {
-        getService(credential);
+        SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                new AndroidJsonFactory(), credential);
+        builder.setRootUrl("https://skatenight-ms.appspot.com/_ah/api");
+        service = builder.build();
     }
 
 }

@@ -1,17 +1,20 @@
 <resources>
 
-    <string name="app_name">VeranstalterApp</string>
+    <string name="app_name">Host Skatenight</string>
     <string name="action_settings">Settings</string>
 
-    <!-- Annoucne Information xml-->
-    <string name="title_activity_announce_information">AnnounceInformationActivity</string>
+    <!--Activity Hold Tabs xml-->
+    <string name="title_activity_start_page">Host Skatenight</string>
+
+    <!-- Announce Information xml -->
+    <string name="title_fragment_announce_information">Announce Information</string>
     <string name="announce_info_apply_button">Apply</string>
     <string name="announce_info_cancel_button">Cancel</string>
     <string name="announce_info_title">Title:</string>
     <string name="announce_info_title_hint">Enter a title</string>
     <string name="announce_info_fee">Fee:</string>
     <string name="announce_info_fee_hint">Enter a fee</string>
-    <string name="announce_info_date">Date:</string>#
+    <string name="announce_info_date">Date:</string>
     <string name="announce_info_time">Time:</string>
     <string name="announce_info_set_time">Set time</string>
     <string name="announce_info_location">Location:</string>
@@ -26,5 +29,17 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="eventcreated">Event was created</string>
+    <string name="not_authorized">Not authorized</string>
 
+    <!--Manage Routes xml-->
+    <string name="title_activity_manage_routes">Manage Routes</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!--Strings zu activity_showinformation-->
+    <string name="title_fragment_show_information">Show Information</string>
+    <string name="show_info_header_date">Time and date</string>
+    <string name="show_info_header_location">Location</string>
+    <string name="show_info_header_fee">Participation fee</string>
+    <string name="show_info_header_description">Description</string>
+    <string name="downloading">Downloading...</string>
 </resources>
