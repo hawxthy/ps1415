@@ -67,7 +67,10 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(getApplicationContext(), "onLocationChanged", Toast.LENGTH_LONG).show();
+
+
+
+        Toast.makeText(getApplicationContext(), location.toString(), Toast.LENGTH_LONG).show();
     }
 
     @Override
