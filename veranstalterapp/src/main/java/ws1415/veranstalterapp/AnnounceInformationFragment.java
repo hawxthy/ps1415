@@ -1,6 +1,5 @@
 package ws1415.veranstalterapp;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -9,9 +8,10 @@ import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -26,7 +26,7 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Text;
  *
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
-public class AnnounceInformationActivity extends Activity{
+public class AnnounceInformationFragment extends Fragment {
     // Die Viewelemente für das Event
     private EditText editTextTitle;
     private EditText editTextFee;
@@ -36,6 +36,10 @@ public class AnnounceInformationActivity extends Activity{
     // Die Buttons für Zeit und Datum
     private Button datePickerButton;
     private Button timePickerButton;
+
+    // Die Buttons für Cancel und Apply
+    private Button applyButton;
+    private Button cancelButton;
 
     // Attribute für das Datum
     private int year;
@@ -53,67 +57,66 @@ public class AnnounceInformationActivity extends Activity{
     private Event event;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_announce_information);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_announce_information, container, false);
+
 
         // Initialisiere die View Elemente
-        editTextTitle = (EditText) findViewById(R.id.announce_info_title_edittext);
-        editTextFee = (EditText) findViewById(R.id.announce_info_fee_edittext);
-        editTextLocation = (EditText) findViewById(R.id.announce_info_location_edittext);
-        editTextDescription = (EditText) findViewById(R.id.announce_info_description_edittext);
+        editTextTitle = (EditText) view.findViewById(R.id.announce_info_title_edittext);
+        editTextFee = (EditText) view.findViewById(R.id.announce_info_fee_edittext);
+        editTextLocation = (EditText) view.findViewById(R.id.announce_info_location_edittext);
+        editTextDescription = (EditText) view.findViewById(R.id.announce_info_description_edittext);
 
         // Initialisiere die Buttons
-        timePickerButton = (Button) findViewById(R.id.announce_info_time_button);
-        datePickerButton = (Button) findViewById(R.id.announce_info_date_button);
+        timePickerButton = (Button) view.findViewById(R.id.announce_info_time_button);
+        datePickerButton = (Button) view.findViewById(R.id.announce_info_date_button);
+        applyButton = (Button) view.findViewById(R.id.announce_info_apply_button);
+        cancelButton = (Button) view.findViewById(R.id.announce_info_cancel_button);
+
+        // Setze die Listener für die Buttons
+        setButtonListener();
+
 
         // Setze die aktuelle Zeit und das Datum
         setCurrentDateOnView();
+        return view;
     }
 
-    /**
-     * ... später
-     * @param menu
-     * @return
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.announce_information, menu);
-        return true;
-    }
+    private void setButtonListener() {
+        // Setze die Listener für Cancel und Apply Buttons
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cancelInfo();
+            }
+        });
 
-    /**
-     * ... später
-     * @param item
-     * @return
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+        applyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                applyInfo();
+            }
+        });
 
-    /**
-     * Die onClick Methode welche aufgerufen wird, wenn der datePickerButton gedrückt wird.
-     * @param view View, von dem aus der Button gedrückt wurde
-     */
-    public void showDatePickerDialog(View view){
-        showDialog(DATE_DIALOG_ID);
-    }
+        timePickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /**
+                 * Die onClick Methode welche aufgerufen wird, wenn der datePickerButton gedrückt wird.
+                 */
+                showDialog(TIME_DIALOG_ID).show();
+            }
+        });
 
-    /**
-     * Die onClick Methode welche aufgerufen wird, wenn der datePickerButton gedrückt wird.
-     * @param view View, von dem aus der Button gedrückt wurde
-     */
-    public void showTimePickerDialog(View view){
-        showDialog(TIME_DIALOG_ID);
+        datePickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /**
+                 * Die onClick Methode welche aufgerufen wird, wenn der datePickerButton gedrückt wird.
+                 */
+                showDialog(DATE_DIALOG_ID).show();
+            }
+        });
     }
 
     /**
@@ -121,15 +124,14 @@ public class AnnounceInformationActivity extends Activity{
      * @param id DatePickerDialog falls id = 1, TimePickerDialog falls id = 2
      * @return Dialog Fenster
      */
-    @Override
-    protected Dialog onCreateDialog(int id){
+    protected Dialog showDialog(int id){
         switch(id){
             case DATE_DIALOG_ID:
                 // setze das Datum des Pickers als das angegebene Datum für das Event
-                return new DatePickerDialog(this, datePickerListener,  year, month, day);
+                return new DatePickerDialog(getActivity(), datePickerListener,  year, month, day);
             case TIME_DIALOG_ID:
                 // setze die Zeit des Picker als angegebene Zeit für das Event
-                return new TimePickerDialog(this, timePickerListener, hour, minute, true);
+                return new TimePickerDialog(getActivity(), timePickerListener, hour, minute, true);
         }
         return null;
     }
@@ -174,29 +176,23 @@ public class AnnounceInformationActivity extends Activity{
             hour = selectedHour;
             minute = selectedMinute;
             if(minute < 10){
-                minute = 0+ selectedMinute;
-                timePickerButton.setText(hour +":"+minute+" Uhr");
+                //minute = 0+ selectedMinute;
+                timePickerButton.setText(hour +":0"+minute+" Uhr");
             }else{
                 timePickerButton.setText(hour +":"+minute+" Uhr");
             }
         }
     };
 
-    /**
-     * Hier soll was passieren wenn der Versanstalter den Prozess abbricht!
-     */
-    public void cancelInfo(View view){
-       // TODO Muss noch implementiert werden
-    }
 
     /**
      * Liest die eingegebenen Informationen aus, erstellt ause diesen ein Event und fügt dieses
      * Event dem Server hinzu. Momentan wir noch das alte Event überschrieben.
      */
-    public void applyInfo(View view){
+    public void applyInfo(){
 
         // Zeige einen Alert Dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(R.string.areyousure);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -218,8 +214,11 @@ public class AnnounceInformationActivity extends Activity{
                 event.setLocation(location);
                 event.setDescription(description);
                 new CreateEventTask().execute(event);
-                Toast.makeText(AnnounceInformationActivity.this,
-                        getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG);
+                Toast.makeText(getActivity(),
+                        getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
+
+                // Update die Informationen in ShowInformationFragment
+                HoldTabsActivity.updateInformation();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -228,7 +227,19 @@ public class AnnounceInformationActivity extends Activity{
         });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
 
-
+    /**
+     * Gibt momentan einen Toast aus, wenn der Benutzer auf den Cancel Button drückt
+     * und löscht alle Eingeben in den Text Feldern.
+     */
+    public void cancelInfo(){
+        Toast.makeText(getActivity(), "Wurde noch nicht erstellt", Toast.LENGTH_LONG).show();
+        editTextTitle.setText("");
+        editTextFee.setText("");
+        editTextLocation.setText("");
+        editTextDescription.setText("");
+        setCurrentDateOnView();
+        timePickerButton.setText(getResources().getString(R.string.announce_info_set_time));
     }
 }
