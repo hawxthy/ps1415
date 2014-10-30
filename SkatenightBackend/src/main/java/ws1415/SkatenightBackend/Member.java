@@ -14,7 +14,7 @@ public class Member {
 
     public void setName(String name) {this.name = name;}
 
-    public String getUpdatedAt() {return name;}
+    public String getUpdatedAt() {return updatedAt;}
 
     public void setUpdatedAt(String updatedAt) {this.updatedAt = updatedAt;}
 

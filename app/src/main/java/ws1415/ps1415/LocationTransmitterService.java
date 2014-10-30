@@ -13,6 +13,13 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.text.ParseException;
+
+import ws1415.ps1415.util.LocationUtils;
+
+/**
+ * Created by Tristan Rust on 28.10.2014.
+ */
 public class LocationTransmitterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private GoogleApiClient gac;
@@ -68,9 +75,16 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     @Override
     public void onLocationChanged(Location location) {
 
+        String locString = LocationUtils.encodeLocation(location);
+        Location locDecodec = null;
+        try {
+            locDecodec = LocationUtils.decodeLocation(locString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
 
-        Toast.makeText(getApplicationContext(), location.toString(), Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), location.toString() + " - " + locString + " - " + locDecodec, Toast.LENGTH_LONG).show();
     }
 
     @Override
