@@ -38,7 +38,7 @@ public class ShowInformationFragment extends Fragment {
         TextView descriptionView = (TextView) view.findViewById(R.id.show_info_description_textview);
         if (e != null) {
             actionBar.getTabAt(0).setText(e.getTitle());
-            dateView.setText(e.getDate());
+            dateView.setText(e.getDate().toString());
             locationView.setText(e.getLocation());
             feeView.setText(e.getFee());
             descriptionView.setText(e.getDescription().getValue());

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.format.DateFormat;
 import android.widget.Toast;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
@@ -15,6 +16,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import ws1415.ps1415.util.LocationUtils;
 
@@ -81,9 +84,13 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // Erstelle einen neuen Member
         Member bob = new Member();
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date date = new Date();
+
         // Setze die Attribute vom Member
         bob.setName("Bob");
-        bob.setUpdatedAt("6.10.2014 19:00 Uhr ");
+        // bob.setUpdatedAt("6.10.2014 19:00 Uhr ");
+        bob.setUpdatedAt("TEST DATUM & HÖR AUF BOB ZU SEIN");
         bob.setLocation(locString);
 
         new CreateMemberTask().execute(bob);

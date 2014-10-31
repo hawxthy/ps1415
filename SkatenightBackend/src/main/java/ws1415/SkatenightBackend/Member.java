@@ -11,6 +11,7 @@ public class Member {
     private String name;
     private String updatedAt;
     private String location;
+    private String email;
 
     public String getName() {return name;}
 
@@ -23,5 +24,9 @@ public class Member {
     public String getLocation() {return location;}
 
     public void setLocation(String location) {this.location = location;}
+
+    public void setEmail(String email) {this.email = email;}
+
+    public String getEmail() {return email;}
 
 }

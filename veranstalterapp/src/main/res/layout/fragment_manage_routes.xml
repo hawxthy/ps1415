@@ -5,5 +5,22 @@
     android:layout_height="match_parent"
     tools:context="ws1415.veranstalterapp.ManageRoutesFragment">
 
+    <!--<fragment
+        android:layout_margin="15dp"
+        android:id="@+id/manage_routes_map_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        class="com.google.android.gms.maps.MapFragment"/>-->
 
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="0dp">
+
+        </ListView>
 </LinearLayout>
