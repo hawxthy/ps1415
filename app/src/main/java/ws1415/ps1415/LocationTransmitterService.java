@@ -89,7 +89,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // Date date = new Date();
 
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd:MMMM:yyyy HH:mm:ss ");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss ");
         String strDate = sdf.format(c.getTime());
 
         // Setze die Attribute vom Member
