@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -30,7 +31,7 @@ public class LoginActivity extends Activity {
 
         // Kein accountName gesetzt, also AccountPicker aufrufen
         if (credential.getSelectedAccountName() == null) {
-            startActivityForResult(credential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
+            login(null);
         }
     }
 
@@ -50,6 +51,11 @@ public class LoginActivity extends Activity {
                 }
                 break;
         }
+    }
+
+
+    public void login(View view) {
+        startActivityForResult(credential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
     }
 
     @Override
