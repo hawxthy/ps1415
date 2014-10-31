@@ -9,7 +9,7 @@ import java.util.Date;
 public class Member {
 
     private String name;
-    private String updatedAt;
+    private Date updatedAt;
     private String location;
     private String email;
 
@@ -17,9 +17,9 @@ public class Member {
 
     public void setName(String name) {this.name = name;}
 
-    public String getUpdatedAt() {return updatedAt;}
+    public Date getUpdatedAt() {return updatedAt;}
 
-    public void setUpdatedAt(String updatedAt) {this.updatedAt = updatedAt;}
+    public void setUpdatedAt(Date updatedAt) {this.updatedAt = updatedAt;}
 
     public String getLocation() {return location;}
 
