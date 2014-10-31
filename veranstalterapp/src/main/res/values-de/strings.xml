@@ -39,4 +39,7 @@
     <string name="show_info_header_description">Beschreibung</string>
     <string name="downloading">Wird abgerufen...</string>
     <string name="not_authorized">Nicht authorisiert</string>
+
+    <!--Strings zu list_view_item_layout-->
+    <string name="list_view_item_layout_length">Länge:</string>
 </resources>

@@ -81,6 +81,7 @@ public class ShowRouteActivity extends Activity {
             }
         }
 
+        // Ruft die aktuellen Memberinformationen ab
         new QueryMemberTask().execute((ShowRouteActivity) this);
     }
 
@@ -88,6 +89,7 @@ public class ShowRouteActivity extends Activity {
     protected void onStart() {
         super.onStart();
 
+        // Starten des Hintergrundservices zur Standortermittlung
         service = new Intent(getBaseContext(), LocationTransmitterService.class);
         service.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startService(service);
@@ -130,7 +132,7 @@ public class ShowRouteActivity extends Activity {
 
 
     /**
-     * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte
+     * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte.
      * @param m Das neue Event-Objekt.
      */
     public void setMemberInformation(Member m) {
@@ -138,12 +140,14 @@ public class ShowRouteActivity extends Activity {
             try {
                 // googleMap.clear();
 
+                // Dekodiert den Positionsstring vom Server zu LatLng
                 location = LocationUtils.decodeLocation(m.getLocation());
                 LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
 
                 float markerColor;
-                markerColor = BitmapDescriptorFactory.HUE_ROSE;
+                markerColor = BitmapDescriptorFactory.HUE_GREEN;
 
+                // Fügt den aktuellen Membermarker auf die Karte ein
                 googleMap.addMarker(new MarkerOptions()
                         .position(pos)
                         .title("Skater " + m.getName())

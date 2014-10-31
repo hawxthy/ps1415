@@ -41,4 +41,7 @@
     <string name="show_info_header_fee">Participation fee</string>
     <string name="show_info_header_description">Description</string>
     <string name="downloading">Downloading...</string>
+
+    <!--Strings zu list_view_item_layout-->
+    <string name="list_view_item_layout_length">Length:</string>
 </resources>
