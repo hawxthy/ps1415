@@ -16,7 +16,7 @@ import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
 import java.io.IOException;
-import java.util.Date;
+
 
 /**
  * Die ServerAPI, die alle Zugriffe auf den Server für die Skatenight-App entgegen nimmt.
@@ -131,7 +131,7 @@ public class SkatenightServerEndpoint {
     }
 
     /**
-     * Liefert das aktuell auf dem Server hinterlegte Event-Objekt.
+     * Liefert das aktuell auf dem Server hinterlegte Member-Objekt.
      * @return Das aktuelle Member-Objekt.
      */
     public Member getMember() {
@@ -161,6 +161,7 @@ public class SkatenightServerEndpoint {
         member.setProperty("name", m.getName());
         member.setProperty("updatedAt", m.getUpdatedAt());
         member.setProperty("location", m.getLocation());
+
         datastore.put(member);
     }
 

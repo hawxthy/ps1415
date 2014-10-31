@@ -83,23 +83,13 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
         // Setze die Attribute vom Member
         bob.setName("Bob");
-        bob.setUpdatedAt("30.10.2014");
+        bob.setUpdatedAt("6.10.2014 19:00 Uhr ");
         bob.setLocation(locString);
 
         new CreateMemberTask().execute(bob);
 
-
-        Location locDecodec = null;
-        try {
-            locDecodec = LocationUtils.decodeLocation(locString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        // new QueryMemberTask().execute();
-
-
         // Toast.makeText(getApplicationContext(), location.toString() + " - " + locString + " - " + locDecodec, Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), bob.getUpdatedAt(), Toast.LENGTH_LONG).show();
     }
 
     @Override

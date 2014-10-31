@@ -1,6 +1,7 @@
 package ws1415.ps1415;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 import java.io.IOException;
