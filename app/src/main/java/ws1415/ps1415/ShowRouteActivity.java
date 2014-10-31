@@ -1,8 +1,11 @@
 package ws1415.ps1415;
 
+import com.appspot.skatenight_ms.skatenightAPI.model.Member;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,8 +14,10 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.text.ParseException;
@@ -28,6 +33,8 @@ public class ShowRouteActivity extends Activity {
     private GoogleMap googleMap;
     private PolylineOptions route;
     private Intent service;
+
+    private Location location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +80,8 @@ public class ShowRouteActivity extends Activity {
                 e.printStackTrace();
             }
         }
+
+        new QueryMemberTask().execute((ShowRouteActivity) this);
     }
 
     @Override
@@ -118,4 +127,41 @@ public class ShowRouteActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    /**
+     * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte
+     * @param m Das neue Event-Objekt.
+     */
+    public void setMemberInformation(Member m) {
+        if (m != null) {
+            try {
+                // googleMap.clear();
+
+                location = LocationUtils.decodeLocation(m.getLocation());
+                LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
+
+                float markerColor;
+                markerColor = BitmapDescriptorFactory.HUE_YELLOW;
+
+                googleMap.addMarker(new MarkerOptions()
+                        .position(pos)
+                        .title(m.getName() + " the Skater")
+                        .snippet("" + m.getUpdatedAt())
+                        .icon(BitmapDescriptorFactory
+                                .defaultMarker(markerColor)));
+
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "Error: Couldn't decode the location.", Toast.LENGTH_LONG).show();
+                location = null;
+            }
+
+        } else {
+            location = null;
+        }
+        // updateGUI();
+    }
+
 }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.widget.Toast;
 
+import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -76,6 +77,18 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     public void onLocationChanged(Location location) {
 
         String locString = LocationUtils.encodeLocation(location);
+
+        // Erstelle einen neuen Member
+        Member bob = new Member();
+
+        // Setze die Attribute vom Member
+        bob.setName("Bob");
+        bob.setUpdatedAt("30.10.2014");
+        bob.setLocation(locString);
+
+        new CreateMemberTask().execute(bob);
+
+
         Location locDecodec = null;
         try {
             locDecodec = LocationUtils.decodeLocation(locString);
@@ -83,8 +96,10 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             e.printStackTrace();
         }
 
+        // new QueryMemberTask().execute();
 
-        Toast.makeText(getApplicationContext(), location.toString() + " - " + locString + " - " + locDecodec, Toast.LENGTH_LONG).show();
+
+        // Toast.makeText(getApplicationContext(), location.toString() + " - " + locString + " - " + locDecodec, Toast.LENGTH_LONG).show();
     }
 
     @Override

@@ -132,7 +132,7 @@ public class SkatenightServerEndpoint {
 
     /**
      * Liefert das aktuell auf dem Server hinterlegte Event-Objekt.
-     * @return Das aktuelle Event-Objekt.
+     * @return Das aktuelle Member-Objekt.
      */
     public Member getMember() {
         Key key = KeyFactory.createKey("Member", "root_event");
