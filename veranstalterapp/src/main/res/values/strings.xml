@@ -7,7 +7,7 @@
     <string name="title_activity_start_page">Host Skatenight</string>
 
     <!-- Announce Information xml -->
-    <string name="title_fragment_announce_information">Announce Information</string>
+    <string name="title_fragment_announce_information">Create Event</string>
     <string name="announce_info_apply_button">Apply</string>
     <string name="announce_info_cancel_button">Cancel</string>
     <string name="announce_info_title">Title:</string>
