@@ -11,6 +11,11 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.SimpleCursorAdapter;
 
+import com.appspot.skatenight_ms.skatenightAPI.model.Route;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import ws1415.veranstalterapp.Adaper.MapsCursorAdapter;
 
 /**
@@ -38,7 +43,7 @@ public class ManageRoutesFragment extends Fragment {
 
 
     private ArrayList<Route> getRoutes(){
-        List<Route> tmpList = new ArrayList<Route>();
+        ArrayList<Route> tmpList = new ArrayList<Route>();
         // Erstelle test Routes
         Route route1 = new Route();
         Route route2 = new Route();
@@ -46,9 +51,9 @@ public class ManageRoutesFragment extends Fragment {
         route1.setName("Route 1");
         route2.setName("Route 2");
         route3.setName("Route 3");
-        route1.setLength(10);
-        route2.setLength(11);
-        route3.setLength(12);
+        route1.setLength("10");
+        route2.setLength("11");
+        route3.setLength("12");
 
         tmpList.add(route1);
         tmpList.add(route2);

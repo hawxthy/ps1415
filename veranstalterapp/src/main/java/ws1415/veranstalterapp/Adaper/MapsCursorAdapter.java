@@ -6,6 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.appspot.skatenight_ms.skatenightAPI.model.Route;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import ws1415.veranstalterapp.R;
 
 /**
@@ -59,7 +65,7 @@ public class MapsCursorAdapter extends BaseAdapter {
 
         if(convertView == null){
             holder = new Holder();
-            convertView = inflater.inflate(R.layout.list_view_item_layout, viewGroup, true);
+            convertView = inflater.inflate(R.layout.list_view_item_layout, viewGroup, false);
             holder.routeName = (TextView) convertView.findViewById(R.id.list_view_item_layout_map_name_TextView);
             holder.routeLength = (TextView) convertView.findViewById(R.id.list_view_item_layout_map_length_TextView);
             convertView.setTag(holder);
