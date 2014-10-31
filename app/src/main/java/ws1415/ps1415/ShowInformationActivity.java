@@ -10,6 +10,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class ShowInformationActivity extends Activity {
     private static final String MEMBER_TITLE = "show_infomation_member_title";
@@ -26,10 +29,15 @@ public class ShowInformationActivity extends Activity {
     private String description;
     private String route;
 
+    // Erstellen eines SimpleDateFormats, damit das Datum und die Uhrzeit richtig angezeigt werden
+    private SimpleDateFormat dateFormat;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_showinformation);
+
+        dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
         Button mapButton = (Button) findViewById(R.id.show_info_map_button);
         mapButton.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +103,7 @@ public class ShowInformationActivity extends Activity {
     public void setEventInformation(Event e) {
         if (e != null) {
             title =  e.getTitle();
-            date = e.getDate().toString();
+            date = dateFormat.format(new Date(e.getDate().getValue()));
             location = e.getLocation();
             fee = e.getFee().toString();
             description = e.getDescription().getValue();

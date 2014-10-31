@@ -11,14 +11,20 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class ShowInformationFragment extends Fragment {
     private ActionBar actionBar;
     private View view;
+    private SimpleDateFormat dateFormat;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_show_information, container, false);
+
+        dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
         actionBar = getActivity().getActionBar();
 
@@ -38,7 +44,7 @@ public class ShowInformationFragment extends Fragment {
         TextView descriptionView = (TextView) view.findViewById(R.id.show_info_description_textview);
         if (e != null) {
             actionBar.getTabAt(0).setText(e.getTitle());
-            dateView.setText(e.getDate().toString());
+            dateView.setText(dateFormat.format(new Date(e.getDate().getValue())));
             locationView.setText(e.getLocation());
             feeView.setText(e.getFee());
             descriptionView.setText(e.getDescription().getValue());
