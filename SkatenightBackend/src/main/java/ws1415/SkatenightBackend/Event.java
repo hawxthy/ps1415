@@ -12,6 +12,7 @@ public class Event {
     private String fee;
     private String location;
     private Text description;
+    private Route route;
 
     public String getTitle() {
         return title;
@@ -51,5 +52,13 @@ public class Event {
 
     public void setDescription(Text description) {
         this.description = description;
+    }
+
+    public Route getRoute() {
+        return route;
+    }
+
+    public void setRoute(Route route) {
+        this.route = route;
     }
 }
