@@ -89,9 +89,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
         // Setze die Attribute vom Member
         bob.setName("Bob");
-        // bob.setUpdatedAt("6.10.2014 19:00 Uhr ");
-        bob.setUpdatedAt("TEST DATUM & HÖR AUF BOB ZU SEIN");
+        bob.setUpdatedAt(date.toString());
         bob.setLocation(locString);
+        bob.setEmail("bob@test.com");
 
         new CreateMemberTask().execute(bob);
 
