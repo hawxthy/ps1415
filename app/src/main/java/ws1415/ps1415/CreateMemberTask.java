@@ -19,9 +19,30 @@ public class CreateMemberTask extends AsyncTask<Member, Void, Void> {
     protected Void doInBackground(Member... params){
         try{
             ServiceProvider.getService().skatenightServerEndpoint().setMember(params[0]).execute();
+            Log.i("XXXXXXXXXX", params[0].getUpdatedAt());
         }catch(IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
