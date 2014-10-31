@@ -161,7 +161,6 @@ public class ShowRouteActivity extends Activity {
         } else {
             location = null;
         }
-        // updateGUI();
     }
 
 }
