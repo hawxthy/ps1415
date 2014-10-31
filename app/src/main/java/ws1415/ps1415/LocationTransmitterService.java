@@ -7,12 +7,20 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.widget.Toast;
 
+import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.text.ParseException;
+
+import ws1415.ps1415.util.LocationUtils;
+
+/**
+ * Created by Tristan Rust on 28.10.2014.
+ */
 public class LocationTransmitterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private GoogleApiClient gac;
@@ -68,9 +76,20 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     @Override
     public void onLocationChanged(Location location) {
 
+        String locString = LocationUtils.encodeLocation(location);
 
+        // Erstelle einen neuen Member
+        Member bob = new Member();
 
-        Toast.makeText(getApplicationContext(), location.toString(), Toast.LENGTH_LONG).show();
+        // Setze die Attribute vom Member
+        bob.setName("Bob");
+        bob.setUpdatedAt("6.10.2014 19:00 Uhr ");
+        bob.setLocation(locString);
+
+        new CreateMemberTask().execute(bob);
+
+        // Toast.makeText(getApplicationContext(), location.toString() + " - " + locString + " - " + locDecodec, Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), bob.getUpdatedAt(), Toast.LENGTH_LONG).show();
     }
 
     @Override

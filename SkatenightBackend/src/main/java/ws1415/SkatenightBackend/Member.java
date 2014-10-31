@@ -1,8 +1,10 @@
 package ws1415.SkatenightBackend;
 
+import java.util.Date;
+
 /**
  * Created by Tristan Rust on 24.10.2014.
- * @TODO Referenz auf die google mail Adresse setzten als _owerner
+ * @TODO Referenz auf die google mail Adresse setzten als _owner
  */
 public class Member {
 
@@ -14,7 +16,7 @@ public class Member {
 
     public void setName(String name) {this.name = name;}
 
-    public String getUpdatedAt() {return name;}
+    public String getUpdatedAt() {return updatedAt;}
 
     public void setUpdatedAt(String updatedAt) {this.updatedAt = updatedAt;}
 

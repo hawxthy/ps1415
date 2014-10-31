@@ -1,32 +1,36 @@
 package ws1415.ps1415;
 
 import android.os.AsyncTask;
-import android.widget.TextView;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 
 import java.io.IOException;
 
 /**
- * Created by Tristan on 21.10.2014.
+ * Created by Tristan Rust on 21.10.2014.
  */
-public class QueryMemberTask extends AsyncTask<Member, Void, Void> {
-    private ShowInformationActivity view;
+public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> {
+     private ShowRouteActivity view;
 
     /**
-     * Ruft das aktuelle Member-Objekt vom Server ab und schreibt die Informationen in die
-     * übergebenen Views.
-     * @param params Die zu befüllenden Views in der Reihenfolge: Datum, Ort, Gebühr, Beschreibung
-     * @return Das abgerufene Member-Objekt
+     * Ruft das aktuelle Member-Objekt vom Server ab.
+     * @param params Die zu befüllende Views
+     * @return Das Member-Objekt
      */
     @Override
-    protected Void doInBackground(Member... params) {
-        // try {
-            // return ServiceProvider.getService().skatenightServerEndpoint().getMember().execute();
-        // } catch (IOException e) {
-           //  e.printStackTrace();
-        // }
+    protected Member doInBackground(ShowRouteActivity... params) {
+        view = params[0];
+
+        try {
+            return ServiceProvider.getService().skatenightServerEndpoint().getMember().execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
+    @Override
+    protected void onPostExecute(Member m) {
+        view.setMemberInformation(m);
+    }
 }
