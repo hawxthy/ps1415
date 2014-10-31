@@ -31,6 +31,9 @@
     <!--Manage Routes xml-->
     <string name="title_fragment_manage_routes">Verwalte Strecken</string>
     <string name="hello_blank_fragment">Hallo blank Fragment</string>
+    <string-array name="selections_menu">
+        <item name="delete">Löschen</item>
+    </string-array>
 
     <!--Strings zu activity_showinformation-->
     <string name="title_fragment_show_information">Zeige Informationen</string>
