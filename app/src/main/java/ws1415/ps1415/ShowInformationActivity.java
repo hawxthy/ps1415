@@ -1,5 +1,6 @@
 package ws1415.ps1415;
 
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,9 +10,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 
 public class ShowInformationActivity extends Activity {
+    static final int REQUEST_ACCOUNT_PICKER = 2;
+    private GoogleAccountCredential credential;
+    public static final String WEB_CLIENT_ID = "37947570052-dk3rjhgran1s38gscv6va2rmmv2bei8r.apps.googleusercontent.com";
+
+
     private static final String MEMBER_TITLE = "show_infomation_member_title";
     private static final String MEMBER_DATE = "show_infomation_member_date";
     private static final String MEMBER_LOCATION = "show_infomation_member_location";
@@ -54,6 +61,29 @@ public class ShowInformationActivity extends Activity {
         }
         else {
             new QueryEventTask().execute(this);
+        }
+
+        credential = GoogleAccountCredential.usingAudience(this,
+                "server:client_id:"+this.WEB_CLIENT_ID);
+
+        // Kein accountName gesetzt, also AccountPicker aufrufen
+        if (credential.getSelectedAccountName() == null) {
+            startActivityForResult(credential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_ACCOUNT_PICKER:
+                if (data != null && data.getExtras() != null) {
+                    String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
+                    if (accountName != null) {
+                        credential.setSelectedAccountName(accountName);
+                    }
+                }
+                break;
         }
     }
 
