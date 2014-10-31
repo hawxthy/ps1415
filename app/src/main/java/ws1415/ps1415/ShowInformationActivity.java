@@ -2,7 +2,9 @@ package ws1415.ps1415;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +21,7 @@ import java.util.Date;
 public class ShowInformationActivity extends Activity {
     static final int REQUEST_ACCOUNT_PICKER = 2;
     private GoogleAccountCredential credential;
+    private SharedPreferences prefs;
     public static final String WEB_CLIENT_ID = "37947570052-dk3rjhgran1s38gscv6va2rmmv2bei8r.apps.googleusercontent.com";
 
 
@@ -71,8 +74,15 @@ public class ShowInformationActivity extends Activity {
             new QueryEventTask().execute(this);
         }
 
-        credential = GoogleAccountCredential.usingAudience(this,
-                "server:client_id:"+this.WEB_CLIENT_ID);
+
+        // SharePreferences skatenight.app laden
+        prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+        credential = GoogleAccountCredential.usingAudience(this,"server:client_id:"+this.WEB_CLIENT_ID);
+
+        // accountName aus SharedPreferences laden
+        if (prefs.contains("accountName")) {
+            credential.setSelectedAccountName(prefs.getString("accountName", null));
+        }
 
         // Kein accountName gesetzt, also AccountPicker aufrufen
         if (credential.getSelectedAccountName() == null) {
@@ -89,6 +99,11 @@ public class ShowInformationActivity extends Activity {
                     String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
                         credential.setSelectedAccountName(accountName);
+
+                        // accountName in den SharedPreferences speichern
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("accountName", accountName);
+                        editor.commit();
                     }
                 }
                 break;
