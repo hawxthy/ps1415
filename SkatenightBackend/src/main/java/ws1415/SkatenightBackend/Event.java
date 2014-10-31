@@ -2,13 +2,15 @@ package ws1415.SkatenightBackend;
 
 import com.google.appengine.api.datastore.Text;
 
+import java.util.Date;
+
 /**
  * Created by Bernd Eissing, Martin Wrodarczyk on 21.10.2014.
  */
 public class Event {
     private String title;
-    private String date;
-    private String fee;
+    private Date date;
+    private int fee;
     private String location;
     private Text description;
 
@@ -20,19 +22,19 @@ public class Event {
         this.title = title;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
-    public String getFee() {
+    public int getFee() {
         return fee;
     }
 
-    public void setFee(String fee) {
+    public void setFee(int fee) {
         this.fee = fee;
     }
 
