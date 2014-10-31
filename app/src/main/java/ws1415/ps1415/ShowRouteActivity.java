@@ -142,7 +142,7 @@ public class ShowRouteActivity extends Activity {
                 LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
 
                 float markerColor;
-                markerColor = BitmapDescriptorFactory.HUE_ROSE;
+                markerColor = BitmapDescriptorFactory.HUE_GREEN;
 
                 googleMap.addMarker(new MarkerOptions()
                         .position(pos)
