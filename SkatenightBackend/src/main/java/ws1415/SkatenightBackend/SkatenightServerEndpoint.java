@@ -135,8 +135,8 @@ public class SkatenightServerEndpoint {
      * Liefert das aktuell auf dem Server hinterlegte Member-Objekt.
      * @return Das aktuelle Member-Objekt.
      */
-    public Member getMember() {
-        Key key = KeyFactory.createKey("Member", "root_event");
+    public Member getMember(@Named("email") String email) {
+        Key key = KeyFactory.createKey("Member", "bob@test.com");
         Entity m = null;
         try {
             m = datastore.get(key);
@@ -159,7 +159,7 @@ public class SkatenightServerEndpoint {
      * @param m Das neue Member-Objekt.
      */
     public void setMember(Member m) {
-        Entity member = new Entity("Member", "root_event");
+        Entity member = new Entity("Member", m.getEmail());
         member.setProperty("name", m.getName());
         member.setProperty("updatedAt", m.getUpdatedAt());
         member.setProperty("location", m.getLocation());
