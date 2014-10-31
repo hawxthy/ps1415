@@ -30,10 +30,10 @@ public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> 
             // SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(view);
             // String email = prefs.getString("accountName", null);
 
-            // SharedPreferences prefs = view.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
-            // String email = prefs.getString("accountName", null);
+            SharedPreferences prefs = view.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+            String email = prefs.getString("accountName", null);
 
-            return ServiceProvider.getService().skatenightServerEndpoint().getMember("tristan.rust@googlemail.com").execute();
+            return ServiceProvider.getService().skatenightServerEndpoint().getMember(email).execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
