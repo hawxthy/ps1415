@@ -18,11 +18,13 @@ import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import java.util.Calendar;
+import java.util.Date;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 import com.appspot.skatenight_ms.skatenightAPI.model.Text;
+import com.google.api.client.util.DateTime;
 
 /**
- * Klasse zum veröffentlichen von neuen Veranstaltungen.
+ * Fragment zum veröffentlichen von neuen Veranstaltungen.
  *
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
@@ -198,13 +200,21 @@ public class AnnounceInformationFragment extends Fragment {
             public void onClick(DialogInterface dialog, int id) {
                 // Weise die Werte aus den Feldern Variablen zu, um damit dann das Event zu setzen.
                 String title = editTextTitle.getText().toString();
-                String fee = editTextFee.getText().toString();
-                String date;
-                if(minute<10) {
-                    date = day + "." + month + "." + year + " " + hour + ":0" + minute + " Uhr";
-                } else {
-                    date = day + "." + month + "." + year + " " + hour + ":" + minute + " Uhr";
-                }
+                int fee = Integer.parseInt(editTextFee.getText().toString());
+                Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.YEAR, year);
+                cal.set(Calendar.MONTH, month);
+                cal.set(Calendar.DAY_OF_MONTH, day);
+                cal.set(Calendar.HOUR, hour);
+                cal.set(Calendar.MINUTE, minute);
+
+                Date date =  cal.getTime();
+                DateTime dTime = new DateTime(date);
+                //if(minute<10) {
+                  //  date = day + "." + month + "." + year + " " + hour + ":0" + minute + " Uhr";
+                //} else {
+                  // date = day + "." + month + "." + year + " " + hour + ":" + minute + " Uhr";
+                //}
                 String location =editTextLocation.getText().toString();
                 Text description = new Text();
                 description.setValue(editTextDescription.getText().toString());
@@ -215,7 +225,7 @@ public class AnnounceInformationFragment extends Fragment {
                 // Setze die Attribute vom Event
                 event.setTitle(title);
                 event.setFee(fee);
-                event.setDate(date);
+                event.setDate(dTime);
                 event.setLocation(location);
                 event.setDescription(description);
                 new CreateEventTask().execute(event);

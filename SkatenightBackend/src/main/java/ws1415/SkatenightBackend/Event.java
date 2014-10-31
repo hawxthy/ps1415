@@ -1,7 +1,6 @@
 package ws1415.SkatenightBackend;
 
 import com.google.appengine.api.datastore.Text;
-
 import java.util.Date;
 
 /**

@@ -48,8 +48,14 @@
                     android:layout_weight="1"
                     android:hint="@string/announce_info_fee_hint"
                     android:maxLength="30"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:inputType="numberSigned"/>
 
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="Euro"/>
             </TableRow>
 
             <TableRow>
