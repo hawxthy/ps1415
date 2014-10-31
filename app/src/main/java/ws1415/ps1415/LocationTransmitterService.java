@@ -80,17 +80,16 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     @Override
     public void onLocationChanged(Location location) {
 
+        // Kodiert die Locationdaten als String zur Speicherung auf dem Server
         String locString = LocationUtils.encodeLocation(location);
 
-        // Erstelle einen neuen Member
-        Member bob = new Member();
-
-        // SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        // Date date = new Date();
-
+        // Ermitteln der aktuellen Zeit
         Calendar c = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss ");
         String strDate = sdf.format(c.getTime());
+
+        // Erstelle einen neuen Member
+        Member bob = new Member();
 
         // Setze die Attribute vom Member
         bob.setName("Bob");
@@ -98,10 +97,10 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         bob.setLocation(locString);
         bob.setEmail("bob@test.com");
 
+        // Sendet die nutzer Daten an den Server
         new CreateMemberTask().execute(bob);
 
-        // Toast.makeText(getApplicationContext(), location.toString() + " - " + locString + " - " + locDecodec, Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(), bob.getUpdatedAt(), Toast.LENGTH_LONG).show();
+        // Toast.makeText(getApplicationContext(), bob.getUpdatedAt(), Toast.LENGTH_LONG).show();
     }
 
     @Override

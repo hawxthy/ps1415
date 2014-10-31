@@ -4,14 +4,16 @@ import java.util.Date;
 
 /**
  * Created by Tristan Rust on 24.10.2014.
- * @TODO Referenz auf die google mail Adresse setzten als _owner
+ *
+ * Stellt einen User innerhalb der Anwendung dar.
+ *
  */
 public class Member {
 
-    private String name;
-    private String updatedAt;
-    private String location;
-    private String email;
+    private String name;      // Angegebener Name
+    private String updatedAt; // Zeitpunkt der letzten Standortaktualisierung
+    private String location;  // Die aktuelle Location als String kodiert
+    private String email;     // Einzigartige google Email, zum identifizieren eines Nutzers
 
     public String getName() {return name;}
 
