@@ -1,12 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
-        android:text="Hallo"
+        android:id="@+id/list_view_item_layout_map_name_TextView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Haloooooo"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/list_view_item_layout_length"
+            android:textSize="13sp" />
+
+        <TextView
+            android:text="10000000000mil km"
+            android:id="@+id/list_view_item_layout_map_length_TextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+    </LinearLayout>
 
 </LinearLayout>
