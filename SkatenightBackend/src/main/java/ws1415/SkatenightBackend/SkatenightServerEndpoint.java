@@ -16,6 +16,7 @@ import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
 import java.io.IOException;
+import java.util.Date;
 
 
 /**
@@ -94,7 +95,7 @@ public class SkatenightServerEndpoint {
             event = new Event();
             event.setTitle((String) e.getProperty("title"));
             event.setDate((Date) e.getProperty("date"));
-            event.setFee((Integer) e.getProperty("fee"));
+            event.setFee((String) e.getProperty("fee"));
             event.setLocation((String) e.getProperty("location"));
             event.setDescription((Text) e.getProperty("description"));
         }

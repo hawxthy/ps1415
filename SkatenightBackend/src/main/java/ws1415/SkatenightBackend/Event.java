@@ -9,7 +9,7 @@ import java.util.Date;
 public class Event {
     private String title;
     private Date date;
-    private int fee;
+    private String fee;
     private String location;
     private Text description;
 
@@ -29,11 +29,11 @@ public class Event {
         this.date = date;
     }
 
-    public int getFee() {
+    public String getFee() {
         return fee;
     }
 
-    public void setFee(int fee) {
+    public void setFee(String fee) {
         this.fee = fee;
     }
 

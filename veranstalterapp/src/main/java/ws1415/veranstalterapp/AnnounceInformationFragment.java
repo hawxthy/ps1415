@@ -200,7 +200,7 @@ public class AnnounceInformationFragment extends Fragment {
             public void onClick(DialogInterface dialog, int id) {
                 // Weise die Werte aus den Feldern Variablen zu, um damit dann das Event zu setzen.
                 String title = editTextTitle.getText().toString();
-                int fee = Integer.parseInt(editTextFee.getText().toString());
+                String fee = editTextFee.getText().toString();
                 Calendar cal = Calendar.getInstance();
                 cal.set(Calendar.YEAR, year);
                 cal.set(Calendar.MONTH, month);
