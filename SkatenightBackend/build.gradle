@@ -29,6 +29,7 @@ dependencies {
   compile 'javax.jdo:jdo-api:3.0.1'
   compile 'org.datanucleus:datanucleus-core:3.1.3'
   compile 'org.datanucleus:datanucleus-api-jdo:3.1.3'
+  compile 'com.google.appengine.orm:datanucleus-appengine:2.1.2'
 }
 
 appengine {
@@ -41,4 +42,9 @@ appengine {
     getClientLibsOnBuild = true
     getDiscoveryDocsOnBuild = true
   }
+  enhancer {
+    version = "v2"
+    enhanceOnBuild = true
+  }
 }
+war.dependsOn appengineEnhance

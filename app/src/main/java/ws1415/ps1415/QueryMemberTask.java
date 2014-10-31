@@ -1,6 +1,9 @@
 package ws1415.ps1415;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 
@@ -24,7 +27,13 @@ public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> 
         view = params[0];
 
         try {
-            return ServiceProvider.getService().skatenightServerEndpoint().getMember().execute();
+            // SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(view);
+            // String email = prefs.getString("accountName", null);
+
+            SharedPreferences prefs = view.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+            String email = prefs.getString("accountName", null);
+
+            return ServiceProvider.getService().skatenightServerEndpoint().getMember(email).execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
