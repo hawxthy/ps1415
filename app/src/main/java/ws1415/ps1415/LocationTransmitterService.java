@@ -82,7 +82,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     @Override
     public void onLocationChanged(Location location) {
 
-        SharedPreferences prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE); prefs.getString("accountName", null);
+        SharedPreferences prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+        String email = prefs.getString("accountName", null);
 
         // Kodiert die Locationdaten als String zur Speicherung auf dem Server
         String locString = LocationUtils.encodeLocation(location);
@@ -99,7 +100,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         bob.setName("Bob");
         bob.setUpdatedAt(strDate);
         bob.setLocation(locString);
-        bob.setEmail("bob@test.com");
+        bob.setEmail(email);
 
         // Sendet die nutzer Daten an den Server
         new CreateMemberTask().execute(bob);

@@ -136,7 +136,8 @@ public class SkatenightServerEndpoint {
      * @return Das aktuelle Member-Objekt.
      */
     public Member getMember(@Named("email") String email) {
-        Key key = KeyFactory.createKey("Member", "bob@test.com");
+    // public Member getMember() {
+        Key key = KeyFactory.createKey("Member", email);
         Entity m = null;
         try {
             m = datastore.get(key);

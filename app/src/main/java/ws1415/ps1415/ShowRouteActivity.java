@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -145,7 +146,7 @@ public class ShowRouteActivity extends Activity {
                 LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
 
                 float markerColor;
-                markerColor = BitmapDescriptorFactory.HUE_GREEN;
+                markerColor = BitmapDescriptorFactory.HUE_ORANGE;
 
                 // Fügt den aktuellen Membermarker auf die Karte ein
                 googleMap.addMarker(new MarkerOptions()

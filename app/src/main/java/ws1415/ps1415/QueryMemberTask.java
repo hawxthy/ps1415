@@ -24,7 +24,7 @@ public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> 
         view = params[0];
 
         try {
-            return ServiceProvider.getService().skatenightServerEndpoint().getMember("bob@test.com").execute();
+            return ServiceProvider.getService().skatenightServerEndpoint().getMember().execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
