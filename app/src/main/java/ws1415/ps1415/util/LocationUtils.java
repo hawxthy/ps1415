@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * Beinhaltet einige Hilfsfunktionen zum codieren und decodieren von Positionsdaten.
+ * https://developers.google.com/maps/documentation/utilities/polylinealgorithm
  */
 public final class LocationUtils {
     private static final String LOG_TAG = LocationUtils.class.getSimpleName();
@@ -41,6 +42,9 @@ public final class LocationUtils {
      * @throws ParseException Falls kein gültiger String übergeben wurde.
      */
     public static double decodeDouble(String encoded) throws ParseException {
+        if (encoded == null)
+            throw new IllegalArgumentException("String may not be null.");
+
         return ((double) decodeValue(new StringBuffer(encoded))) / 1e5;
     }
 
@@ -52,7 +56,7 @@ public final class LocationUtils {
      */
     public static String encodePolyline(List<LatLng> line) {
         if (line == null || line.size() <= 0)
-            throw new IllegalArgumentException("Line must contain at least 1 coordinate.");
+            throw new IllegalArgumentException("List must contain at least one coordinate.");
 
         StringBuffer buffer = new StringBuffer();
         LatLng previous = line.get(0);
@@ -76,9 +80,15 @@ public final class LocationUtils {
      * @throws ParseException Falls kein gültiger String übergeben wurde.
      */
     public static List<LatLng> decodePolyline(String encoded) throws ParseException {
+        if (encoded == null)
+            throw new IllegalArgumentException("String may not be null.");
+
         List<LatLng> line = new ArrayList<LatLng>();
 
         StringBuffer buffer = new StringBuffer(encoded);
+
+        if (buffer.length() == 0)
+            throw new ParseException("End block not found.", 0);
 
         while (buffer.length() > 0) {
             double lat;
@@ -103,7 +113,7 @@ public final class LocationUtils {
      */
     public static String encodeLocation(Location location) {
         if (location == null)
-            throw new NullPointerException();
+            throw new IllegalArgumentException("Location may not be null.");
 
         StringBuffer buffer = new StringBuffer();
         buffer.append(encodeDouble(location.getLatitude()));
@@ -119,6 +129,9 @@ public final class LocationUtils {
      * @throws ParseException Falls kein gültiger String übergeben wurde.
      */
     public static Location decodeLocation(String encoded) throws ParseException {
+        if (encoded == null)
+            throw new IllegalArgumentException("String may not be null.");
+
         StringBuffer buffer = new StringBuffer(encoded);
         Location location = new Location(LocationUtils.class.getSimpleName());
         location.setLatitude(((double)decodeValue(buffer))/1e5);
@@ -186,10 +199,10 @@ public final class LocationUtils {
         // folgt noch ein weiteres Zeichen, sonst war das soeben gelesene das
         // Letzte.
         do {
-            if (encoded.length() <= 0) {
+            if (encoded.length() <= 0 || length-encoded.length() > 6) {
                 // Es gibt keine weiteren Zeichen mehr und es wurde noch kein Block
                 // mit End-Bit gefunden.
-                throw new ParseException("End block not found.", length);
+                throw new ParseException("End block not found.", length-encoded.length());
             }
 
             // Dem codierten Zeichen werden die zuvor addierten 63 abgezogen
