@@ -146,7 +146,7 @@ public class ShowRouteActivity extends Activity {
 
                 googleMap.addMarker(new MarkerOptions()
                         .position(pos)
-                        .title(m.getName() + " the Skater")
+                        .title("Skater " + m.getName())
                         .snippet("" + m.getUpdatedAt())
                         .icon(BitmapDescriptorFactory
                                 .defaultMarker(markerColor)));
