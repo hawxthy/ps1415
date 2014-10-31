@@ -12,6 +12,9 @@ import android.widget.TextView;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class ShowInformationActivity extends Activity {
     static final int REQUEST_ACCOUNT_PICKER = 2;
@@ -33,10 +36,15 @@ public class ShowInformationActivity extends Activity {
     private String description;
     private String route;
 
+    // Erstellen eines SimpleDateFormats, damit das Datum und die Uhrzeit richtig angezeigt werden
+    private SimpleDateFormat dateFormat;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_showinformation);
+
+        dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
         Button mapButton = (Button) findViewById(R.id.show_info_map_button);
         mapButton.setOnClickListener(new View.OnClickListener() {
@@ -125,7 +133,7 @@ public class ShowInformationActivity extends Activity {
     public void setEventInformation(Event e) {
         if (e != null) {
             title =  e.getTitle();
-            date = e.getDate().toString();
+            date = dateFormat.format(new Date(e.getDate().getValue()));
             location = e.getLocation();
             fee = e.getFee().toString();
             description = e.getDescription().getValue();

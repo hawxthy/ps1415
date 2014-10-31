@@ -149,6 +149,7 @@ public class SkatenightServerEndpoint {
             member.setName((String) m.getProperty("name"));
             member.setUpdatedAt((String) m.getProperty("updatedAt"));
             member.setLocation((String) m.getProperty("location"));
+            member.setEmail((String) m.getProperty("email"));
         }
         return member;
     }
@@ -162,6 +163,7 @@ public class SkatenightServerEndpoint {
         member.setProperty("name", m.getName());
         member.setProperty("updatedAt", m.getUpdatedAt());
         member.setProperty("location", m.getLocation());
+        member.setProperty("email", m.getEmail());
 
         datastore.put(member);
     }
