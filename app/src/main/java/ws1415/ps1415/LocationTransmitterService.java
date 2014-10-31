@@ -26,10 +26,15 @@ import ws1415.ps1415.util.LocationUtils;
 
 /**
  * Created by Tristan Rust on 28.10.2014.
+ *
+ * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient.
+ *
  */
 public class LocationTransmitterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private GoogleApiClient gac;
+
+    private Member mSelf;
 
     public LocationTransmitterService() {
     }
@@ -80,10 +85,23 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     }
 
     @Override
+    /**
+     * Wird aufgerufen, wenn sich die Position ändert.
+     * @param location Die aktuell ermittelt Position
+     */
     public void onLocationChanged(Location location) {
 
+        // Holt sich die Google Mail Adresse aus den SharedPreferences, die beim Einloggen angegeben werden mussten
         SharedPreferences prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
         String email = prefs.getString("accountName", null);
+
+        // TODO: Prüfen ob der Nutzer bereits einen Datensatzbesitzt der geupdatet werden kann oder nicht, anonsten einen neuen anlegen
+        // TODO: Richert wollte hier JDO Methode einfügen, um den dies zu Prüfen
+        if (mSelf == null) {
+            // TODO createMember und updateLocation
+        } else {
+            // TODO updateLocation
+        }
 
         // Kodiert die Locationdaten als String zur Speicherung auf dem Server
         String locString = LocationUtils.encodeLocation(location);
@@ -102,10 +120,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         bob.setLocation(locString);
         bob.setEmail(email);
 
-        // Sendet die nutzer Daten an den Server
+        // Sendet die Nutzerdaten an den Server
         new CreateMemberTask().execute(bob);
 
-        Toast.makeText(getApplicationContext(), bob.getUpdatedAt(), Toast.LENGTH_LONG).show();
     }
 
     @Override
