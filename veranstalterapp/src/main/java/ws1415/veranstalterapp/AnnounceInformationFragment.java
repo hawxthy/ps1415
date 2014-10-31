@@ -201,6 +201,7 @@ public class AnnounceInformationFragment extends Fragment {
                 // Weise die Werte aus den Feldern Variablen zu, um damit dann das Event zu setzen.
                 String title = editTextTitle.getText().toString();
                 String fee = editTextFee.getText().toString();
+                // Erstelle einen Calendar zum Speichern des Datums und der Uhrzeit
                 Calendar cal = Calendar.getInstance();
                 cal.set(Calendar.YEAR, year);
                 cal.set(Calendar.MONTH, month);
@@ -208,14 +209,13 @@ public class AnnounceInformationFragment extends Fragment {
                 cal.set(Calendar.HOUR, hour);
                 cal.set(Calendar.MINUTE, minute);
 
+                // Weise die Daten aus Calendar dem Datentyp Date zu
                 Date date =  cal.getTime();
+                // Mache aus dem Date ein DateTime, da dies von ServerBackend benötigt wird.
                 DateTime dTime = new DateTime(date);
-                //if(minute<10) {
-                  //  date = day + "." + month + "." + year + " " + hour + ":0" + minute + " Uhr";
-                //} else {
-                  // date = day + "." + month + "." + year + " " + hour + ":" + minute + " Uhr";
-                //}
-                String location =editTextLocation.getText().toString();
+
+
+                String location = editTextLocation.getText().toString();
                 Text description = new Text();
                 description.setValue(editTextDescription.getText().toString());
 
