@@ -13,7 +13,6 @@
     <string name="announce_info_title">Titel:</string>
     <string name="announce_info_title_hint">Gib einen Titel an</string>
     <string name="announce_info_fee">Gebühr:</string>
-    <string name="announce_info_fee_hint">Gib eine Gebühr an</string>
     <string name="announce_info_date">Datum:</string>#
     <string name="announce_info_time">Uhrzeit:</string>
     <string name="announce_info_set_time">Wähle die Uhrzeit</string>
