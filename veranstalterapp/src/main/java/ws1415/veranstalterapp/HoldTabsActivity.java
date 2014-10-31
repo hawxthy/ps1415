@@ -5,8 +5,10 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import ws1415.veranstalterapp.Adaper.TabsPagerAdapter;
 
@@ -15,6 +17,8 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
     private ViewPager viewPager;
     private static TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
+    private MenuItem menuItem;
+    private boolean menuCreated;
 
     private String[] tabs;
 
@@ -22,6 +26,7 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hold_tabs);
+
 
         // Beschrifte die Tabs
         tabs = new String[]{
@@ -73,7 +78,8 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.start_page, menu);
+        getMenuInflater().inflate(R.menu.hold_tabs, menu);
+        menuItem = menu.findItem(R.id.action_add_route);
         return true;
     }
 
@@ -85,14 +91,23 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
+        }else if(id == R.id.action_add_route){
+            // TODO Methode addRoute() muss hier aufgerufen werden
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
         // Zeige aktuell gewählten Tab an
         viewPager.setCurrentItem(tab.getPosition());
+        if(tab.getPosition()== 2){
+            //menuItem.setVisible(true);
+        } else{
+            //menuItem.setVisible(false);
+        }
     }
 
     @Override
