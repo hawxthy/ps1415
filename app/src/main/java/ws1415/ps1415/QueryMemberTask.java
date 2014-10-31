@@ -8,6 +8,8 @@ import java.io.IOException;
 
 /**
  * Created by Tristan Rust on 21.10.2014.
+ * Dient zum Abrufen der Nutzerinformationen.
+ *
  */
 public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> {
      private ShowRouteActivity view;
