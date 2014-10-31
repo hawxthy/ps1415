@@ -146,7 +146,7 @@ public class ShowRouteActivity extends Activity {
                 LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
 
                 float markerColor;
-                markerColor = BitmapDescriptorFactory.HUE_MAGENTA;
+                markerColor = BitmapDescriptorFactory.HUE_YELLOW;
 
                 // Fügt den aktuellen Membermarker auf die Karte ein
                 googleMap.addMarker(new MarkerOptions()
