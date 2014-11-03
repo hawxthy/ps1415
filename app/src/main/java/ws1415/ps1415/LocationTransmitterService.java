@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.text.format.DateFormat;
 import android.widget.Toast;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
@@ -16,11 +15,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 import ws1415.ps1415.util.LocationUtils;
 
@@ -90,39 +84,15 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
      * @param location Die aktuell ermittelt Position
      */
     public void onLocationChanged(Location location) {
-
         // Holt sich die Google Mail Adresse aus den SharedPreferences, die beim Einloggen angegeben werden mussten
         SharedPreferences prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
         String email = prefs.getString("accountName", null);
 
-        // TODO: Prüfen ob der Nutzer bereits einen Datensatzbesitzt der geupdatet werden kann oder nicht, anonsten einen neuen anlegen
-        // TODO: Richert wollte hier JDO Methode einfügen, um den dies zu Prüfen
-        if (mSelf == null) {
-            // TODO createMember und updateLocation
-        } else {
-            // TODO updateLocation
-        }
-
         // Kodiert die Locationdaten als String zur Speicherung auf dem Server
         String locString = LocationUtils.encodeLocation(location);
 
-        // Ermitteln der aktuellen Zeit
-        Calendar c = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss ");
-        String strDate = sdf.format(c.getTime());
-
-        // Erstelle einen neuen Member
-        Member bob = new Member();
-
-        // Setze die Attribute vom Member
-        bob.setName("Bob");
-        bob.setUpdatedAt(strDate);
-        bob.setLocation(locString);
-        bob.setEmail(email);
-
         // Sendet die Nutzerdaten an den Server
-        new CreateMemberTask().execute(bob);
-
+        new UpdateLocationTask().execute(email, locString);
     }
 
     @Override

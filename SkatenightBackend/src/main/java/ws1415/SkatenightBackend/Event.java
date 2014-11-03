@@ -1,18 +1,42 @@
 package ws1415.SkatenightBackend;
 
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 import java.util.Date;
+
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 /**
  * Created by Bernd Eissing, Martin Wrodarczyk on 21.10.2014.
  */
+@PersistenceCapable
 public class Event {
+    @PrimaryKey
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    private Key key;
+    @Persistent
     private String title;
+    @Persistent
     private Date date;
+    @Persistent
     private String fee;
+    @Persistent
     private String location;
+    @Persistent
     private Text description;
+    @Persistent
     private Route route;
+
+    public Key getKey() {
+        return key;
+    }
+
+    public void setKey(Key key) {
+        this.key = key;
+    }
 
     public String getTitle() {
         return title;

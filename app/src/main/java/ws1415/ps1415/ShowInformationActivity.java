@@ -148,10 +148,15 @@ public class ShowInformationActivity extends Activity {
     public void setEventInformation(Event e) {
         if (e != null) {
             title =  e.getTitle();
-            date = dateFormat.format(new Date(e.getDate().getValue()));
+            if (e.getDate() != null) {
+                date = dateFormat.format(new Date(e.getDate().getValue()));
+            } else {
+                date = "";
+            }
             location = e.getLocation();
             fee = e.getFee().toString();
             description = e.getDescription().getValue();
+            // TODO: Route aus dem Event-Objekt abrufen
             route = "qcpaGr|upL~AfAH]t@{D^}BVyAWUYQHi@FuA?oEgBZsGlAoDn@iE|@wBpAyAnAKLy@mDM_@ISYg@c@QqAbBsBhBg@h@MNu@BEBaBJ}GVcA@gAn@_BbAm@^sHvEkD|BmAvAYXQJUFQA_AyAwA_CoEcHcE_FoDyEsBsDk@o@_BeBKVKR?@EFmAfCc@tAo@bDwFfUqBlIm@lBaKjWwIpTiD`Jg@Pc@ViA|@oAOm@RWf@E^Dj@HTLZ`AZRn@?LaAtCcA~Ck@dAqDjEwBdCcB`CuKzOyExGiAnAgA`A}BjBeF~EgBfCo@dAaCbEyBlDgCxD}RzXqDbEyEjEkMzKiMvK{JzIyBnBQAiBj@uBf@qAD}DUaFYo@FoA`@_Ar@gA~AYv@aCpLq@bC_BxCgIxMiArC_AnEaAnDiB`DqA~FeB|D_@xBKrFm@ra@NvG@vHXlCh@zBx@|An@t@f@N`@^t@xCrBpEnAjB~BlCbEzDr@lAPTTBJOXQ`@Qp@BxABXA~@KpA_@|BWzEFjAO~Dw@~@?d@LjAx@d@h@tAvCzBjEj@x@xD|CbCv@zIA|CA|@Lv@\\z@v@`BfBzC`CdCvCt@lBb@xDZhGh@`CjBvCrAfAv@`Av@pC@h@}@nFQx@_FlUeHb]oA|E}FbOwAdDiEfIqBrEq@jCcEvTs@vD}@lEaCfJqFhSsDpO_EpU_Dl[qAtIsGtXaDfLkE`NqCnK{D|SyB~M}@|Hy@dMe@fWUfO]hIg@lHaApJ_B~JiAjF}CdLsCpJaBjJi@fHOtEIpF?|AQd@Gn@{@tMOp@[`@YLuAF{@@eBQ}Fe@wBM{Iq@qBEs@JsGzBsPzJsAj@kBd@sKtBkC`@wCTuDPmAe@kFcFeDkAcC}As@y@oD}EuD}Dy@s@dAcBTo@Un@eAbB|CtCrDtElAbB\\b@U`@q@bA{BtCiLpNgDtDsBz@qBTsAGcFkAgDWyCFhBtOl@xF|@tEn@lDDnD@~DZlCpAhHFrAEbFVtDCzF`@|Ki@rI@`BVvDXrCb@dBhBjFXxAFzBe@|JAz@RrBZv@Xd@\\h@wAtBu@dAmD`Fw@~BgAbJa@bF{B`Z{@`]|@`LHh^?dH{@jEcA`DiChFgBdEsAvEg@pDsAlQqEfo@qBpg@ChAQ`@kApEmEdJyBzGmAhCyF`KcAfCy@~C]fGUrBw@bDmD|LeAbFInAF~BN|CU|KTdM`BbSPpIjA~HZxKl@|Ka@tJw@dIaAzEmDvF_BjE[x@Wb@a@Jk@h@kBtAi@`@Tx@jBmAlAeA";
         } else {
             title = null;
