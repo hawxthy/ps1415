@@ -1,8 +1,11 @@
 package ws1415.veranstalterapp;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,17 +41,36 @@ public class ManageRoutesFragment extends Fragment {
 
         routeList = (ListView) view.findViewById(R.id.manage_routes_route_list);
         routeList.setAdapter(new MapsCursorAdapter(getActivity(), getRoutes()));
-        routeList.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+        routeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
             }
         });
 
+        routeList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                createSelectionsMenu(i);
+                return true;
+            }
+        });
         return view;
     }
 
-
+    private void createSelectionsMenu(int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getRoutes().get(position).getName())
+                .setItems(R.array.selections_menu, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int index) {
+                        if(index == 0){
+                            // TODO deleteRoute(id) erstellen und hier aufrufen
+                            Log.d("Test", "deleteRoute");
+                        }
+                    }
+                });
+        builder.create();
+        builder.show();
+    }
 
     private ArrayList<Route> getRoutes(){
         ArrayList<Route> tmpList = new ArrayList<Route>();
