@@ -13,6 +13,7 @@ import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
@@ -75,7 +76,9 @@ public class ShowInformationActivity extends Activity {
                     });
 
                     AlertDialog dialog = builder.create();
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                    // WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+                    // lp.alpha = 0.9f;
+                    // dialog.getWindow().setAttributes(lp);
                     dialog.show();
                 }
             }
