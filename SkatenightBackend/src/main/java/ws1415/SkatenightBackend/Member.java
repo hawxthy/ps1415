@@ -17,7 +17,7 @@ public class Member {
     @Persistent
     private String name;      // Angegebener Name
     @Persistent
-    private Date updatedAt; // Zeitpunkt der letzten Standortaktualisierung
+    private Date updatedAt;   // Zeitpunkt der letzten Standortaktualisierung
     @Persistent
     private String location;  // Die aktuelle Location als String kodiert
     @PrimaryKey

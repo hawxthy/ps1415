@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.widget.Toast;
 
+import com.appspot.skatenight_ms.skatenightAPI.SkatenightAPI;
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -27,8 +28,6 @@ import ws1415.ps1415.util.LocationUtils;
 public class LocationTransmitterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     private GoogleApiClient gac;
-
-    private Member mSelf;
 
     public LocationTransmitterService() {
     }
@@ -93,6 +92,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
         // Sendet die Nutzerdaten an den Server
         new UpdateLocationTask().execute(email, locString);
+
     }
 
     @Override

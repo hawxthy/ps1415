@@ -3,7 +3,9 @@ package ws1415.ps1415;
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -83,7 +86,9 @@ public class ShowRouteActivity extends Activity {
         }
 
         // Ruft die aktuellen Memberinformationen ab
-        new QueryMemberTask().execute((ShowRouteActivity) this);
+        // new QueryMemberTask().execute((ShowRouteActivity) this);
+
+        drawMembers();
     }
 
     @Override
@@ -94,6 +99,7 @@ public class ShowRouteActivity extends Activity {
         service = new Intent(getBaseContext(), LocationTransmitterService.class);
         service.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startService(service);
+
     }
 
     @Override
@@ -131,6 +137,18 @@ public class ShowRouteActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte.
+     */
+    public void drawMembers() {
+        SharedPreferences prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+        String email = prefs.getString("accountName", null);
+        Member member = null;
+
+        // Ruft die aktuellen Memberinformationen ab
+        new QueryMemberTask().execute((ShowRouteActivity) this);
+
+    }
 
     /**
      * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte.
@@ -164,6 +182,7 @@ public class ShowRouteActivity extends Activity {
             }
 
         } else {
+            Log.i("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "Member ist null");
             location = null;
         }
     }
