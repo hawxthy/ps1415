@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Bernd Eissing on 04.11.2014.
+ * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.
+ *
+ * Created by Bernd Eissing, Martin Wrodarczyk on 04.11.2014.
  */
 public class QueryRouteTask extends AsyncTask<ManageRoutesFragment, Void, List<Route>> {
     private ManageRoutesFragment view;
@@ -34,3 +36,5 @@ public class QueryRouteTask extends AsyncTask<ManageRoutesFragment, Void, List<R
         view.setRoutesToListView((ArrayList<Route>) results);
     }
 }
+
+

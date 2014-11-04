@@ -91,8 +91,10 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
-        }else if(id == R.id.action_add_route){
-            // TODO Methode addRoute() muss hier aufgerufen werden
+        }else if(id == R.id.action_add_route) {
+            // TODO Warten, bis der Map Editor fertig ist!!!!!!
+            //Intent intent = new Intent(getActivity(), RouteEditorActivity.class);
+            //startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);

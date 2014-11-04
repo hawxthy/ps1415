@@ -194,7 +194,13 @@ public class SkatenightServerEndpoint {
         Member member = null;
         PersistenceManager pm = pmf.getPersistenceManager();
         try {
-            member = (Member) pm.getObjectById(email);
+            Query q = pm.newQuery(Member.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Member> results = (List<Member>) q.execute(email);
+            if (!results.isEmpty()) {
+                member = results.get(0);
+            }
         } catch(JDOObjectNotFoundException e) {
             // Wird geworfen, wenn kein Objekt mit dem angegebenen Schlüssel existiert
             // In diesem Fall null zurückgeben
@@ -205,6 +211,20 @@ public class SkatenightServerEndpoint {
         return member;
     }
 
+    /**
+     * Speichert die angegebene Route auf dem Server
+     * @param route zu speichernde Route
+     */
+    public void addRoute(Route route){
+        PersistenceManager pm = pmf.getPersistenceManager();
+        if(route != null){
+            try{
+                pm.makePersistent(route);
+            }finally {
+                pm.close();
+            }
+        }
+    }
 
     /**
      *  Gibt eine Liste von allen gespeicherten Routen zurück
@@ -231,19 +251,16 @@ public class SkatenightServerEndpoint {
      */
     public void deleteRoute(Route route){
         PersistenceManager pm = pmf.getPersistenceManager();
-        //Transaction tx = pm.currentTransaction();
-        //tx.begin();
         try{
             pm.makePersistent(route);
-            //tx.commit();
-            pm.deletePersistent(pm.newQuery(Route.class).equals(route));
+            pm.deletePersistent(route);
+
         }finally{
-            //if(tx.isActive()){
-              //  tx.rollback();
-            //}
             pm.close();
         }
     }
+
+
 
 }
 

@@ -1,10 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">Host Skatenight</string>
     <string name="action_settings">Settings</string>
     <string name="action_add_route">Create Route</string>
 
-    <!--Activity Hold Tabs xml-->
+    <!-- Activity Hold Tabs xml -->
     <string name="title_activity_start_page">Host Skatenight</string>
 
     <!-- Announce Information xml -->
@@ -31,14 +32,15 @@
     <string name="eventcreated">Event was created</string>
     <string name="not_authorized">Not authorized</string>
 
-    <!--Manage Routes xml-->
+    <!-- Manage Routes xml -->
     <string name="title_activity_manage_routes">Manage Routes</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string-array name="selections_menu">
         <item name="delete">Delete</item>
     </string-array>
 
-    <!--Strings zu activity_showinformation-->
+    <!-- Strings zu activity_showinformation -->
     <string name="title_fragment_show_information">Show Information</string>
     <string name="show_info_header_date">Time and date</string>
     <string name="show_info_header_location">Location</string>
@@ -46,6 +48,8 @@
     <string name="show_info_header_description">Description</string>
     <string name="downloading">Downloading...</string>
 
-    <!--Strings zu list_view_item_layout-->
+    <!-- Strings zu list_view_item_layout -->
     <string name="list_view_item_layout_length">Length:</string>
+    <string name="title_activity_choose_route">ChooseRouteActivity</string>
+
 </resources>

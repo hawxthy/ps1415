@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -34,6 +35,9 @@ public class AnnounceInformationFragment extends Fragment {
     private EditText editTextFee;
     private EditText editTextLocation;
     private EditText editTextDescription;
+
+    // Der Button für die Route
+    private Button routePickerButton;
 
     // Die Buttons für Zeit und Datum
     private Button datePickerButton;
@@ -82,6 +86,7 @@ public class AnnounceInformationFragment extends Fragment {
         datePickerButton = (Button) view.findViewById(R.id.announce_info_date_button);
         applyButton = (Button) view.findViewById(R.id.announce_info_apply_button);
         cancelButton = (Button) view.findViewById(R.id.announce_info_cancel_button);
+        routePickerButton = (Button) view.findViewById(R.id.announce_info_choose_route);
 
         // Setze die Listener für die Buttons
         setButtonListener();
@@ -125,6 +130,14 @@ public class AnnounceInformationFragment extends Fragment {
                  * Die onClick Methode welche aufgerufen wird, wenn der datePickerButton gedrückt wird.
                  */
                 showDialog(DATE_DIALOG_ID).show();
+            }
+        });
+
+        routePickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), ChooseRouteActivity.class);
+                startActivity(intent);
             }
         });
     }
