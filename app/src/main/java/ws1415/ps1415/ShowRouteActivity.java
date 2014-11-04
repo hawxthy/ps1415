@@ -86,9 +86,7 @@ public class ShowRouteActivity extends Activity {
         }
 
         // Ruft die aktuellen Memberinformationen ab
-        // new QueryMemberTask().execute((ShowRouteActivity) this);
-
-        drawMembers();
+        new QueryMemberTask().execute((ShowRouteActivity) this);
     }
 
     @Override
@@ -139,28 +137,9 @@ public class ShowRouteActivity extends Activity {
 
     /**
      * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte.
-     */
-    public void drawMembers() {
-        SharedPreferences prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
-        String email = prefs.getString("accountName", null);
-        Member member = null;
-
-        // Ruft die aktuellen Memberinformationen ab
-        // new QueryMemberTask().execute((ShowRouteActivity) this);
-        //try {
-          //  member = ServiceProvider.getService().skatenightServerEndpoint().getMember(email).execute();
-            //Log.i("test", member.getName());
-        //} catch (IOException e) {
-          //  e.printStackTrace();
-        //}
-
-    }
-
-    /**
-     * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte.
      * @param m Das neue Event-Objekt.
      */
-    public void setMemberInformation(Member m) {
+    public void drawMembers(Member m) {
         if (m != null) {
             try {
                 // googleMap.clear();
