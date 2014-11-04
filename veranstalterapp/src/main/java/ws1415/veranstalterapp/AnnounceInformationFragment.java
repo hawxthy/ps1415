@@ -48,6 +48,12 @@ public class AnnounceInformationFragment extends Fragment {
     private int month;
     private int day;
 
+    // Attribute für die Eingabe felder
+    private String title;
+    private String fee;
+    private String location;
+    private Text description;
+
     static final int DATE_DIALOG_ID = 1;
     static final int TIME_DIALOG_ID = 2;
 
@@ -89,7 +95,7 @@ public class AnnounceInformationFragment extends Fragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                cancelInfo();
+                cancelInfo(true);
             }
         });
 
@@ -198,9 +204,10 @@ public class AnnounceInformationFragment extends Fragment {
         builder.setMessage(R.string.areyousure);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+
                 // Weise die Werte aus den Feldern Variablen zu, um damit dann das Event zu setzen.
-                String title = editTextTitle.getText().toString();
-                String fee = editTextFee.getText().toString();
+                title = editTextTitle.getText().toString();
+                fee = editTextFee.getText().toString();
                 // Erstelle einen Calendar zum Speichern des Datums und der Uhrzeit
                 Calendar cal = Calendar.getInstance();
                 cal.set(Calendar.YEAR, year);
@@ -215,25 +222,30 @@ public class AnnounceInformationFragment extends Fragment {
                 DateTime dTime = new DateTime(date);
 
 
-                String location = editTextLocation.getText().toString();
-                Text description = new Text();
+                location = editTextLocation.getText().toString();
+                description = new Text();
                 description.setValue(editTextDescription.getText().toString());
+                // Überprüfen ob wirklich alle daten des Events gesetzt sind
+                if (title != null && fee != null && dTime != null && location != null && description != null) {
+                    // Erstelle ein neue Event
+                    event = new Event();
 
-                // Erstelle ein neue Event
-                event = new Event();
+                    // Setze die Attribute vom Event
+                    event.setTitle(title);
+                    event.setFee(fee);
+                    event.setDate(dTime);
+                    event.setLocation(location);
+                    event.setDescription(description);
+                    new CreateEventTask().execute(event);
+                    Toast.makeText(getActivity(),
+                            getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
 
-                // Setze die Attribute vom Event
-                event.setTitle(title);
-                event.setFee(fee);
-                event.setDate(dTime);
-                event.setLocation(location);
-                event.setDescription(description);
-                new CreateEventTask().execute(event);
-                Toast.makeText(getActivity(),
-                        getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
+                    // Update die Informationen in ShowInformationFragment
+                    HoldTabsActivity.updateInformation();
+                } else {
+                    cancelInfo(false);
+                }
 
-                // Update die Informationen in ShowInformationFragment
-                HoldTabsActivity.updateInformation();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -248,13 +260,23 @@ public class AnnounceInformationFragment extends Fragment {
      * Gibt momentan einen Toast aus, wenn der Benutzer auf den Cancel Button drückt
      * und löscht alle Eingeben in den Text Feldern.
      */
-    public void cancelInfo(){
-        Toast.makeText(getActivity(), "Wurde noch nicht erstellt", Toast.LENGTH_LONG).show();
-        editTextTitle.setText("");
-        editTextFee.setText("");
-        editTextLocation.setText("");
-        editTextDescription.setText("");
-        setCurrentDateOnView();
+    public void cancelInfo(boolean allSet){
+        if (allSet) {
+            Toast.makeText(getActivity(), "Wurde noch nicht erstellt", Toast.LENGTH_LONG).show();
+            editTextTitle.setText("");
+            editTextFee.setText("");
+            editTextLocation.setText("");
+            editTextDescription.setText("");
+            setCurrentDateOnView();
+        } else {
+            Toast.makeText(getActivity(), "Nicht alle Felder Ausgefüllt", Toast.LENGTH_LONG).show();
+            editTextTitle.setText(title);
+            editTextFee.setText(fee);
+            editTextLocation.setText(location);
+            editTextDescription.setText(description.toString());
+            setCurrentDateOnView();
+        }
+
         timePickerButton.setText(getResources().getString(R.string.announce_info_set_time));
     }
 }
