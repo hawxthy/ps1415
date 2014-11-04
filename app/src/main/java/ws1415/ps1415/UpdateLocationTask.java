@@ -2,6 +2,8 @@ package ws1415.ps1415;
 
 import android.os.AsyncTask;
 
+import com.appspot.skatenight_ms.skatenightAPI.model.Member;
+
 import java.io.IOException;
 
 import ws1415.ps1415.ServiceProvider;
@@ -19,11 +21,11 @@ public class UpdateLocationTask extends AsyncTask<String, Void, Void> {
     @Override
     protected Void doInBackground(String... params) {
         try {
-            ServiceProvider.getService().skatenightServerEndpoint().updateMemberLocation(params[0],
-                    params[1]).execute();
+            ServiceProvider.getService().skatenightServerEndpoint().updateMemberLocation(params[0], params[1]).execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
+
 }
