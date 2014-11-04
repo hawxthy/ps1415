@@ -73,9 +73,13 @@ public class MapsCursorAdapter extends BaseAdapter {
             holder = (Holder)convertView.getTag();
         }
         holder.routeName.setText(routeList.get(position).getName());
-        holder.routeLength.setText(String.valueOf(routeList.get(position).getLength()));
+        holder.routeLength.setText(routeList.get(position).getLength());
 
         return convertView;
     }
 
+    public void removeListItem(int i){
+        routeList.remove(i);
+        notifyDataSetChanged();
+    }
 }
