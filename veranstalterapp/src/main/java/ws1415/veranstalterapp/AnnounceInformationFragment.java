@@ -54,6 +54,8 @@ public class AnnounceInformationFragment extends Fragment {
     private String location;
     private Text description;
 
+    private Calendar cal;
+
     static final int DATE_DIALOG_ID = 1;
     static final int TIME_DIALOG_ID = 2;
 
@@ -209,7 +211,7 @@ public class AnnounceInformationFragment extends Fragment {
                 title = editTextTitle.getText().toString();
                 fee = editTextFee.getText().toString();
                 // Erstelle einen Calendar zum Speichern des Datums und der Uhrzeit
-                Calendar cal = Calendar.getInstance();
+                cal = Calendar.getInstance();
                 cal.set(Calendar.YEAR, year);
                 cal.set(Calendar.MONTH, month);
                 cal.set(Calendar.DAY_OF_MONTH, day);
@@ -226,7 +228,7 @@ public class AnnounceInformationFragment extends Fragment {
                 description = new Text();
                 description.setValue(editTextDescription.getText().toString());
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (title != null && fee != null && dTime != null && location != null && description != null) {
+                if (!title.isEmpty() && !fee.isEmpty() && dTime != null && !location.isEmpty() && !description.isEmpty()) {
                     // Erstelle ein neue Event
                     event = new Event();
 
@@ -273,8 +275,7 @@ public class AnnounceInformationFragment extends Fragment {
             editTextTitle.setText(title);
             editTextFee.setText(fee);
             editTextLocation.setText(location);
-            editTextDescription.setText(description.toString());
-            //setCurrentDateOnView();
+            editTextDescription.setText(editTextDescription.getText().toString());
         }
 
         timePickerButton.setText(getResources().getString(R.string.announce_info_set_time));
