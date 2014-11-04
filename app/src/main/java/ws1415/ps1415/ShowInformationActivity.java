@@ -164,7 +164,6 @@ public class ShowInformationActivity extends Activity {
             } else {
                 description = "";
             }
-            // TODO: Route aus dem Event-Objekt abrufen
             if (e.getRoute() != null && e.getRoute().getRouteData() != null) {
                 route = e.getRoute().getRouteData().getValue();
             }
