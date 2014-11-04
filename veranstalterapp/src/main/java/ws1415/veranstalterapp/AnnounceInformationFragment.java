@@ -258,7 +258,7 @@ public class AnnounceInformationFragment extends Fragment {
 
     /**
      * Gibt momentan einen Toast aus, wenn der Benutzer auf den Cancel Button drückt
-     * und löscht alle Eingeben in den Text Feldern.
+     * (löscht alle Eingaben) oder wenn der Benutze ein unvollständiges Event hinzufügen will
      */
     public void cancelInfo(boolean allSet){
         if (allSet) {
@@ -274,7 +274,7 @@ public class AnnounceInformationFragment extends Fragment {
             editTextFee.setText(fee);
             editTextLocation.setText(location);
             editTextDescription.setText(description.toString());
-            setCurrentDateOnView();
+            //setCurrentDateOnView();
         }
 
         timePickerButton.setText(getResources().getString(R.string.announce_info_set_time));
