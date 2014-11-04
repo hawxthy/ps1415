@@ -39,6 +39,6 @@ public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> 
 
      @Override
      protected void onPostExecute(Member m) {
-         view.setMemberInformation(m);
+         view.drawMembers(m);
      }
 }
