@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <string name="app_name">Veranstalte Skatenight</string>
     <string name="action_settings">Settings</string>
@@ -34,6 +34,13 @@
     <string-array name="selections_menu">
         <item name="delete">Löschen</item>
     </string-array>
+
+    <!-- Route Editor xml -->
+    <string name="title_activity_route_editor">Streckeneditor</string>
+    <string name="title_fragment_route_editor_map">Karte</string>
+    <string name="title_fragment_route_editor_waypoints">Wegpunkte</string>
+    <string name="route_editor_waypoint_name_format">Wegpunkt <xliff:g id="number">%1$d</xliff:g></string>
+    <string name="route_editor_error_load_route">Strecke kann nicht geladen werden.</string>
 
     <!--Strings zu activity_showinformation-->
     <string name="title_fragment_show_information">Zeige Informationen</string>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <string name="app_name">Host Skatenight</string>
     <string name="action_settings">Settings</string>
@@ -35,10 +35,16 @@
     <!-- Manage Routes xml -->
     <string name="title_activity_manage_routes">Manage Routes</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <string-array name="selections_menu">
         <item name="delete">Delete</item>
     </string-array>
+
+    <!-- Route Editor xml -->
+    <string name="title_activity_route_editor">Route Editor</string>
+    <string name="title_fragment_route_editor_map">Map</string>
+    <string name="title_fragment_route_editor_waypoints">Waypoints</string>
+    <string name="route_editor_waypoint_name_format">Waypoint <xliff:g id="number">%1$d</xliff:g></string>
+    <string name="route_editor_error_load_route">Unable to load route.</string>
 
     <!-- Strings zu activity_showinformation -->
     <string name="title_fragment_show_information">Show Information</string>
@@ -48,8 +54,6 @@
     <string name="show_info_header_description">Description</string>
     <string name="downloading">Downloading...</string>
 
-    <!-- Strings zu list_view_item_layout -->
+    <!--Strings zu list_view_item_layout-->
     <string name="list_view_item_layout_length">Length:</string>
-    <string name="title_activity_choose_route">ChooseRouteActivity</string>
-
 </resources>
