@@ -1,6 +1,7 @@
 package ws1415.SkatenightBackend;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Text;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -22,7 +23,7 @@ public class Route {
      * Speichert die Koordinaten der Route als komprimierten String ab.
      */
     @Persistent
-    private String routeData;
+    private Text routeData;
     @Persistent
     private String length;
 
@@ -38,11 +39,11 @@ public class Route {
         return key;
     }
 
-    public String getRouteData() {
+    public Text getRouteData() {
         return routeData;
     }
 
-    public void setRouteData(String routeData) {
+    public void setRouteData(Text routeData) {
         this.routeData = routeData;
     }
 
