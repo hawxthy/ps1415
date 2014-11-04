@@ -2,24 +2,35 @@ package ws1415.SkatenightBackend;
 
 import java.util.Date;
 
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 /**
  * Created by Tristan Rust on 24.10.2014.
- * @TODO Referenz auf die google mail Adresse setzten als _owner
+ *
+ * Stellt einen User innerhalb der Anwendung dar.
+ *
  */
+@PersistenceCapable
 public class Member {
-
-    private String name;
-    private String updatedAt;
-    private String location;
-    private String email;
+    @Persistent
+    private String name;      // Angegebener Name
+    @Persistent
+    private Date updatedAt;   // Zeitpunkt der letzten Standortaktualisierung
+    @Persistent
+    private String location;  // Die aktuelle Location als String kodiert
+    @PrimaryKey
+    @Persistent
+    private String email;     // Einzigartige google Email, zum identifizieren eines Nutzers
 
     public String getName() {return name;}
 
     public void setName(String name) {this.name = name;}
 
-    public String getUpdatedAt() {return updatedAt;}
+    public Date getUpdatedAt() {return updatedAt;}
 
-    public void setUpdatedAt(String updatedAt) {this.updatedAt = updatedAt;}
+    public void setUpdatedAt(Date updatedAt) {this.updatedAt = updatedAt;}
 
     public String getLocation() {return location;}
 

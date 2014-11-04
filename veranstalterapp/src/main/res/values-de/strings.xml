@@ -2,12 +2,13 @@
 
     <string name="app_name">Veranstalte Skatenight</string>
     <string name="action_settings">Settings</string>
+    <string name="action_add_route">Erstelle Strecke</string>
 
     <!--Activity Hold Tabs xml-->
     <string name="title_activity_start_page">Veranstalte Skatenight</string>
 
     <!-- Annoucne Information xml-->
-    <string name="title_fragment_announce_information">Informationen veröffentlichen</string>
+    <string name="title_fragment_announce_information">Veranstaltung erstellen</string>
     <string name="announce_info_apply_button">Erstellen</string>
     <string name="announce_info_cancel_button">Cancel</string>
     <string name="announce_info_title">Titel:</string>
@@ -30,6 +31,9 @@
     <!--Manage Routes xml-->
     <string name="title_fragment_manage_routes">Verwalte Strecken</string>
     <string name="hello_blank_fragment">Hallo blank Fragment</string>
+    <string-array name="selections_menu">
+        <item name="delete">Löschen</item>
+    </string-array>
 
     <!-- Route Editor xml -->
     <string name="title_activity_route_editor">Streckeneditor</string>
@@ -46,4 +50,7 @@
     <string name="show_info_header_description">Beschreibung</string>
     <string name="downloading">Wird abgerufen...</string>
     <string name="not_authorized">Nicht authorisiert</string>
+
+    <!--Strings zu list_view_item_layout-->
+    <string name="list_view_item_layout_length">Länge:</string>
 </resources>

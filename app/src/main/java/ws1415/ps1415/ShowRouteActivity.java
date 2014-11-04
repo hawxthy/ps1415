@@ -3,10 +3,13 @@ package ws1415.ps1415;
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -20,6 +23,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -81,6 +85,7 @@ public class ShowRouteActivity extends Activity {
             }
         }
 
+        // Ruft die aktuellen Memberinformationen ab
         new QueryMemberTask().execute((ShowRouteActivity) this);
     }
 
@@ -88,9 +93,11 @@ public class ShowRouteActivity extends Activity {
     protected void onStart() {
         super.onStart();
 
+        // Starten des Hintergrundservices zur Standortermittlung
         service = new Intent(getBaseContext(), LocationTransmitterService.class);
         service.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startService(service);
+
     }
 
     @Override
@@ -128,25 +135,26 @@ public class ShowRouteActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-
     /**
-     * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte
+     * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte.
      * @param m Das neue Event-Objekt.
      */
-    public void setMemberInformation(Member m) {
+    public void drawMembers(Member m) {
         if (m != null) {
             try {
                 // googleMap.clear();
 
+                // Dekodiert den Positionsstring vom Server zu LatLng
                 location = LocationUtils.decodeLocation(m.getLocation());
                 LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
 
                 float markerColor;
                 markerColor = BitmapDescriptorFactory.HUE_YELLOW;
 
+                // Fügt den aktuellen Membermarker auf die Karte ein
                 googleMap.addMarker(new MarkerOptions()
                         .position(pos)
-                        .title(m.getName() + " the Skater")
+                        .title("Skater " + m.getName())
                         .snippet("" + m.getUpdatedAt())
                         .icon(BitmapDescriptorFactory
                                 .defaultMarker(markerColor)));

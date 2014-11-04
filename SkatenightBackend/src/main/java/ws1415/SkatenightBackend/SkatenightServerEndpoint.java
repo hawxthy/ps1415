@@ -4,19 +4,21 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.PersistenceManager;
+import javax.jdo.PersistenceManagerFactory;
+import javax.jdo.Query;
+import javax.jdo.Transaction;
 
 
 /**
@@ -31,18 +33,21 @@ import java.util.Date;
 public class SkatenightServerEndpoint {
     private Key hostRootKey;
     private DatastoreService datastore;
+    private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
+            "transactions-optional");
 
     public SkatenightServerEndpoint() {
         datastore = DatastoreServiceFactory.getDatastoreService();
 
-        // Veranstalter definieren
-        Entity root = new Entity("HostRoot", "root");
-        datastore.put(root);
-        hostRootKey = root.getKey();
-
-        Entity e = new Entity("Host", "example", hostRootKey);
-        e.setProperty("email", "example@example.com");
-        datastore.put(e);
+        // Standard-Veranstalter definieren
+        Host h = new Host();
+        h.setEmail("example@example.com");
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            pm.makePersistent(h);
+        } finally {
+            pm.close();
+        }
     }
 
     /**
@@ -50,9 +55,20 @@ public class SkatenightServerEndpoint {
      * @param mail Die hinzuzufügende Mail-Adresse
      */
     public void addHost(@Named("mail") String mail) {
-        Entity e = new Entity("Host", mail, hostRootKey);
-        e.setProperty("email", mail);
-        datastore.put(e);
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            Query q = pm.newQuery(Host.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Host> results = (List<Host>) q.execute(mail);
+            if (results.isEmpty()) {
+                Host h = new Host();
+                h.setEmail(mail);
+                pm.makePersistent(h);
+            }
+        } finally {
+            pm.close();
+        }
     }
 
     /**
@@ -60,7 +76,18 @@ public class SkatenightServerEndpoint {
      * @param mail Die zu entfernende Mail-Adresse
      */
     public void removeHost(@Named("mail") String mail) {
-        datastore.delete(KeyFactory.createKey("Host", mail));
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            Query q = pm.newQuery(Host.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Host> results = (List<Host>) q.execute(mail);
+            if (!results.isEmpty()) {
+                pm.deletePersistentAll(results);
+            }
+        } finally {
+            pm.close();
+        }
     }
 
     /**
@@ -69,13 +96,16 @@ public class SkatenightServerEndpoint {
      * @return true, wenn der Account ein authorisierter Veranstalter ist, false sonst
      */
     public BooleanWrapper isHost(@Named("mail") String mail) {
-        Query.Filter mailFilter = new Query.FilterPredicate("email", Query.FilterOperator.EQUAL,
-                mail);
-        Query q = new Query("Host", hostRootKey);
-        q.setFilter(mailFilter);
-        PreparedQuery pq = datastore.prepare(q);
-        boolean isHost = (pq.countEntities(FetchOptions.Builder.withLimit(1)) == 1);
-        return new BooleanWrapper(isHost);
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            Query q = pm.newQuery(Host.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Host> results = (List<Host>) q.execute(mail);
+            return new BooleanWrapper(!results.isEmpty());
+        } finally {
+            pm.close();
+        }
     }
 
     /**
@@ -83,23 +113,17 @@ public class SkatenightServerEndpoint {
      * @return Das aktuelle Event-Objekt.
      */
     public Event getEvent() {
-        Key key = KeyFactory.createKey("Event", "root_event");
-        Entity e = null;
+        PersistenceManager pm = pmf.getPersistenceManager();
         try {
-            e = datastore.get(key);
-        } catch (EntityNotFoundException ex) {
-            ex.printStackTrace();
+            List<Event> results = (List<Event>) pm.newQuery(Event.class).execute();
+            if (results.isEmpty()) {
+                return null;
+            } else {
+                return results.get(0);
+            }
+        } finally {
+            pm.close();
         }
-        Event event = null;
-        if (e != null) {
-            event = new Event();
-            event.setTitle((String) e.getProperty("title"));
-            event.setDate((Date) e.getProperty("date"));
-            event.setFee((String) e.getProperty("fee"));
-            event.setLocation((String) e.getProperty("location"));
-            event.setDescription((Text) e.getProperty("description"));
-        }
-        return event;
     }
 
     /**
@@ -111,59 +135,114 @@ public class SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        Query.Filter mailFilter = new Query.FilterPredicate("email", Query.FilterOperator.EQUAL,
-                user.getEmail());
-        Query q = new Query("Host", hostRootKey);
-        q.setFilter(mailFilter);
-        PreparedQuery pq = datastore.prepare(q);
-        boolean isHost = (pq.countEntities(FetchOptions.Builder.withLimit(1)) == 1);
-
-        if (isHost) {
-            Entity event = new Entity("Event", "root_event");
-            event.setProperty("title", e.getTitle());
-            event.setProperty("date", e.getDate());
-            event.setProperty("fee", e.getFee());
-            event.setProperty("location", e.getLocation());
-            event.setProperty("description", e.getDescription());
-            datastore.put(event);
-        } else {
+        if (!isHost(user.getEmail()).value) {
             throw new OAuthRequestException("user is not a host");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            // Altes Event-Objekt löschen
+            List<Event> events = (List<Event>) pm.newQuery(
+                    "select from " + Event.class.getName()).execute();
+            pm.deletePersistentAll(events);
+            if (e != null) {
+                pm.makePersistent(e);
+            }
+        } finally {
+            pm.close();
         }
     }
 
     /**
-     * Liefert das aktuell auf dem Server hinterlegte Member-Objekt.
+     * Aktualisiert die für die angegebene Mail-Adresse gespeicherte Position auf dem Server. Falls
+     * kein Member-Objekt für die Mail-Adresse existiert, so wird ein neues Objekt angelegt.
+     * @param mail Die Mail-Adresse des zu aktualisierenden Member-Objekts.
+     * @param location Die neue Position.
+     */
+    public void updateMemberLocation(@Named("mail") String mail,
+                                     @Named("location") String location) {
+        if (mail != null) {
+            Member m = getMember(mail);
+            if (m == null) {
+                // Neuen Member anlegen
+                m = new Member();
+                m.setEmail(mail);
+                /**
+                 * TODO:Als Name wird zurzeit die Mail-Adresse verwendet, da noch keine Eingabe-
+                 * möglichkeit für den Namen besteht.
+                 */
+                m.setName(mail);
+            }
+            m.setLocation(location);
+            m.setUpdatedAt(new Date());
+
+            PersistenceManager pm = pmf.getPersistenceManager();
+            try {
+                pm.makePersistent(m);
+            } finally {
+                pm.close();
+            }
+        }
+    }
+
+    /**
+     * Liefert das auf dem Server hinterlegte Member-Objekt mit der angegebenen Mail.
+     * @param email Die Mail-Adresse des Member-Objekts, das abgerufen werden soll.
      * @return Das aktuelle Member-Objekt.
      */
-    public Member getMember() {
-        Key key = KeyFactory.createKey("Member", "root_event");
-        Entity m = null;
-        try {
-            m = datastore.get(key);
-        } catch (EntityNotFoundException ex) {
-            ex.printStackTrace();
-        }
+    public Member getMember(@Named("email") String email) {
         Member member = null;
-        if (m != null) {
-            member = new Member();
-            member.setName((String) m.getProperty("name"));
-            member.setUpdatedAt((String) m.getProperty("updatedAt"));
-            member.setLocation((String) m.getProperty("location"));
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            member = (Member) pm.getObjectById(email);
+        } catch(JDOObjectNotFoundException e) {
+            // Wird geworfen, wenn kein Objekt mit dem angegebenen Schlüssel existiert
+            // In diesem Fall null zurückgeben
+            return null;
+        } finally {
+            pm.close();
         }
         return member;
     }
 
-    /**
-     * Aktualisiert das auf dem Server gespeicherte Member-Objekt.
-     * @param m Das neue Member-Objekt.
-     */
-    public void setMember(Member m) {
-        Entity member = new Entity("Member", "root_event");
-        member.setProperty("name", m.getName());
-        member.setProperty("updatedAt", m.getUpdatedAt());
-        member.setProperty("location", m.getLocation());
 
-        datastore.put(member);
+    /**
+     *  Gibt eine Liste von allen gespeicherten Routen zurück
+     *  @return Liste der Routen, null falls keine existieren.
+     */
+    public List<Route> getRoutes(){
+        PersistenceManager pm = pmf.getPersistenceManager();
+
+        try{
+            List<Route> result = (List<Route>) pm.newQuery(Route.class).execute();
+            if(result.isEmpty()){
+                return new ArrayList<Route>();
+            }else{
+                return result;
+            }
+        }finally{
+            pm.close();
+        }
+    }
+
+    /**
+     * Lösche Route vom Server
+     * @param route die Route, die gelöscht werden soll
+     */
+    public void deleteRoute(Route route){
+        PersistenceManager pm = pmf.getPersistenceManager();
+        //Transaction tx = pm.currentTransaction();
+        //tx.begin();
+        try{
+            pm.makePersistent(route);
+            //tx.commit();
+            pm.deletePersistent(pm.newQuery(Route.class).equals(route));
+        }finally{
+            //if(tx.isActive()){
+              //  tx.rollback();
+            //}
+            pm.close();
+        }
     }
 
 }

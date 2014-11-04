@@ -1,6 +1,10 @@
 package ws1415.ps1415;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 
@@ -8,13 +12,15 @@ import java.io.IOException;
 
 /**
  * Created by Tristan Rust on 21.10.2014.
+ * Dient zum Abrufen der Nutzerinformationen.
+ *
  */
 public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> {
      private ShowRouteActivity view;
 
     /**
      * Ruft das aktuelle Member-Objekt vom Server ab.
-     * @param params Die zu befüllende Views
+     * @param params Die zu befüllenden Views
      * @return Das Member-Objekt
      */
     @Override
@@ -22,15 +28,17 @@ public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> 
         view = params[0];
 
         try {
-            return ServiceProvider.getService().skatenightServerEndpoint().getMember().execute();
+            SharedPreferences prefs = view.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+            String email = prefs.getString("accountName", null);
+            return ServiceProvider.getService().skatenightServerEndpoint().getMember(email).execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    @Override
-    protected void onPostExecute(Member m) {
-        view.setMemberInformation(m);
-    }
+     @Override
+     protected void onPostExecute(Member m) {
+         view.drawMembers(m);
+     }
 }

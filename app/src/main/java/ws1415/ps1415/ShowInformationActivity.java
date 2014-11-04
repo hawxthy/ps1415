@@ -1,20 +1,35 @@
 package ws1415.ps1415;
 
+import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
 public class ShowInformationActivity extends Activity {
+    static final int REQUEST_ACCOUNT_PICKER = 2;
+    private GoogleAccountCredential credential;
+    private SharedPreferences prefs;
+    public static final String WEB_CLIENT_ID = "37947570052-dk3rjhgran1s38gscv6va2rmmv2bei8r.apps.googleusercontent.com";
+
+
     private static final String MEMBER_TITLE = "show_infomation_member_title";
     private static final String MEMBER_DATE = "show_infomation_member_date";
     private static final String MEMBER_LOCATION = "show_infomation_member_location";
@@ -44,9 +59,27 @@ public class ShowInformationActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (route != null) {
-                    Intent intent = new Intent(ShowInformationActivity.this, ShowRouteActivity.class);
-                    intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, route);
-                    startActivity(intent);
+                    // Erstellt den Dialog, ob die Position gespeichert werden soll und auf der Karte angezeigt wird
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ShowInformationActivity.this);
+                    builder.setMessage("Deine Position wird gespeichert & auf der Karte angezeigt.");
+                    builder.setPositiveButton(Html.fromHtml("<font color='#1FB1FF'>Ok</font>"), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent(ShowInformationActivity.this, ShowRouteActivity.class);
+                            intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, route);
+                            startActivity(intent);
+                        }
+                    });
+                    builder.setNegativeButton(Html.fromHtml("<font color='#1FB1FF'>Abbrechen</font>"), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // Tue nichts
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    // WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+                    // lp.alpha = 0.9f;
+                    // dialog.getWindow().setAttributes(lp);
+                    dialog.show();
                 }
             }
         });
@@ -62,6 +95,41 @@ public class ShowInformationActivity extends Activity {
         }
         else {
             new QueryEventTask().execute(this);
+        }
+
+
+        // SharePreferences skatenight.app laden
+        prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+        credential = GoogleAccountCredential.usingAudience(this,"server:client_id:"+this.WEB_CLIENT_ID);
+
+        // accountName aus SharedPreferences laden
+        if (prefs.contains("accountName")) {
+            credential.setSelectedAccountName(prefs.getString("accountName", null));
+        }
+
+        // Kein accountName gesetzt, also AccountPicker aufrufen
+        if (credential.getSelectedAccountName() == null) {
+            startActivityForResult(credential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_ACCOUNT_PICKER:
+                if (data != null && data.getExtras() != null) {
+                    String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
+                    if (accountName != null) {
+                        credential.setSelectedAccountName(accountName);
+
+                        // accountName in den SharedPreferences speichern
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("accountName", accountName);
+                        editor.commit();
+                    }
+                }
+                break;
         }
     }
 
@@ -103,11 +171,25 @@ public class ShowInformationActivity extends Activity {
     public void setEventInformation(Event e) {
         if (e != null) {
             title =  e.getTitle();
-            date = dateFormat.format(new Date(e.getDate().getValue()));
+            if (e.getDate() != null) {
+                date = dateFormat.format(new Date(e.getDate().getValue()));
+            } else {
+                date = "";
+            }
             location = e.getLocation();
-            fee = e.getFee().toString();
-            description = e.getDescription().getValue();
-            route = "qcpaGr|upL~AfAH]t@{D^}BVyAWUYQHi@FuA?oEgBZsGlAoDn@iE|@wBpAyAnAKLy@mDM_@ISYg@c@QqAbBsBhBg@h@MNu@BEBaBJ}GVcA@gAn@_BbAm@^sHvEkD|BmAvAYXQJUFQA_AyAwA_CoEcHcE_FoDyEsBsDk@o@_BeBKVKR?@EFmAfCc@tAo@bDwFfUqBlIm@lBaKjWwIpTiD`Jg@Pc@ViA|@oAOm@RWf@E^Dj@HTLZ`AZRn@?LaAtCcA~Ck@dAqDjEwBdCcB`CuKzOyExGiAnAgA`A}BjBeF~EgBfCo@dAaCbEyBlDgCxD}RzXqDbEyEjEkMzKiMvK{JzIyBnBQAiBj@uBf@qAD}DUaFYo@FoA`@_Ar@gA~AYv@aCpLq@bC_BxCgIxMiArC_AnEaAnDiB`DqA~FeB|D_@xBKrFm@ra@NvG@vHXlCh@zBx@|An@t@f@N`@^t@xCrBpEnAjB~BlCbEzDr@lAPTTBJOXQ`@Qp@BxABXA~@KpA_@|BWzEFjAO~Dw@~@?d@LjAx@d@h@tAvCzBjEj@x@xD|CbCv@zIA|CA|@Lv@\\z@v@`BfBzC`CdCvCt@lBb@xDZhGh@`CjBvCrAfAv@`Av@pC@h@}@nFQx@_FlUeHb]oA|E}FbOwAdDiEfIqBrEq@jCcEvTs@vD}@lEaCfJqFhSsDpO_EpU_Dl[qAtIsGtXaDfLkE`NqCnK{D|SyB~M}@|Hy@dMe@fWUfO]hIg@lHaApJ_B~JiAjF}CdLsCpJaBjJi@fHOtEIpF?|AQd@Gn@{@tMOp@[`@YLuAF{@@eBQ}Fe@wBM{Iq@qBEs@JsGzBsPzJsAj@kBd@sKtBkC`@wCTuDPmAe@kFcFeDkAcC}As@y@oD}EuD}Dy@s@dAcBTo@Un@eAbB|CtCrDtElAbB\\b@U`@q@bA{BtCiLpNgDtDsBz@qBTsAGcFkAgDWyCFhBtOl@xF|@tEn@lDDnD@~DZlCpAhHFrAEbFVtDCzF`@|Ki@rI@`BVvDXrCb@dBhBjFXxAFzBe@|JAz@RrBZv@Xd@\\h@wAtBu@dAmD`Fw@~BgAbJa@bF{B`Z{@`]|@`LHh^?dH{@jEcA`DiChFgBdEsAvEg@pDsAlQqEfo@qBpg@ChAQ`@kApEmEdJyBzGmAhCyF`KcAfCy@~C]fGUrBw@bDmD|LeAbFInAF~BN|CU|KTdM`BbSPpIjA~HZxKl@|Ka@tJw@dIaAzEmDvF_BjE[x@Wb@a@Jk@h@kBtAi@`@Tx@jBmAlAeA";
+            if (e.getFee() != null) {
+                fee = e.getFee().toString();
+            } else {
+                fee = "";
+            }
+            if (e.getDescription() != null) {
+                description = e.getDescription().getValue();
+            } else {
+                description = "";
+            }
+            if (e.getRoute() != null && e.getRoute().getRouteData() != null) {
+                route = e.getRoute().getRouteData().getValue();
+            }
         } else {
             title = null;
             date = null;

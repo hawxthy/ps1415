@@ -1,13 +1,15 @@
 package ws1415.ps1415;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.text.format.DateFormat;
 import android.widget.Toast;
 
+import com.appspot.skatenight_ms.skatenightAPI.SkatenightAPI;
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -15,14 +17,13 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import ws1415.ps1415.util.LocationUtils;
 
 /**
  * Created by Tristan Rust on 28.10.2014.
+ *
+ * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient.
+ *
  */
 public class LocationTransmitterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -77,26 +78,21 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     }
 
     @Override
+    /**
+     * Wird aufgerufen, wenn sich die Position ändert.
+     * @param location Die aktuell ermittelt Position
+     */
     public void onLocationChanged(Location location) {
+        // Holt sich die Google Mail Adresse aus den SharedPreferences, die beim Einloggen angegeben werden mussten
+        SharedPreferences prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+        String email = prefs.getString("accountName", null);
 
+        // Kodiert die Locationdaten als String zur Speicherung auf dem Server
         String locString = LocationUtils.encodeLocation(location);
 
-        // Erstelle einen neuen Member
-        Member bob = new Member();
+        // Sendet die Nutzerdaten an den Server
+        new UpdateLocationTask().execute(email, locString);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        Date date = new Date();
-
-        // Setze die Attribute vom Member
-        bob.setName("Bob");
-        // bob.setUpdatedAt("6.10.2014 19:00 Uhr ");
-        bob.setUpdatedAt("TEST DATUM & HÖR AUF BOB ZU SEIN");
-        bob.setLocation(locString);
-
-        new CreateMemberTask().execute(bob);
-
-        // Toast.makeText(getApplicationContext(), location.toString() + " - " + locString + " - " + locDecodec, Toast.LENGTH_LONG).show();
-        Toast.makeText(getApplicationContext(), bob.getUpdatedAt(), Toast.LENGTH_LONG).show();
     }
 
     @Override
