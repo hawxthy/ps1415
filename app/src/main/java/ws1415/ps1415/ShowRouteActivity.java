@@ -146,7 +146,13 @@ public class ShowRouteActivity extends Activity {
         Member member = null;
 
         // Ruft die aktuellen Memberinformationen ab
-        new QueryMemberTask().execute((ShowRouteActivity) this);
+        // new QueryMemberTask().execute((ShowRouteActivity) this);
+        //try {
+          //  member = ServiceProvider.getService().skatenightServerEndpoint().getMember(email).execute();
+            //Log.i("test", member.getName());
+        //} catch (IOException e) {
+          //  e.printStackTrace();
+        //}
 
     }
 
@@ -182,7 +188,6 @@ public class ShowRouteActivity extends Activity {
             }
 
         } else {
-            Log.i("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", "Member ist null");
             location = null;
         }
     }
