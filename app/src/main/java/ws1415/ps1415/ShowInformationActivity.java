@@ -58,8 +58,8 @@ public class ShowInformationActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (route != null) {
+                    // Erstellt den Dialog, ob die Position gespeichert werden soll und auf der Karte angezeigt wird
                     AlertDialog.Builder builder = new AlertDialog.Builder(ShowInformationActivity.this);
-                    // builder.setMessage("Deine Position wird gespeichert & auf der Karte angezeigt."); // .setTitle("Positionsübertragung!");
                     builder.setMessage("Deine Position wird gespeichert & auf der Karte angezeigt.");
                     builder.setPositiveButton(Html.fromHtml("<font color='#1FB1FF'>Ok</font>"), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
@@ -70,7 +70,7 @@ public class ShowInformationActivity extends Activity {
                     });
                     builder.setNegativeButton(Html.fromHtml("<font color='#1FB1FF'>Abbrechen</font>"), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            //
+                            // Tue nichts
                         }
                     });
 
