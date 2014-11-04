@@ -47,7 +47,9 @@ public class ShowInformationFragment extends Fragment {
             dateView.setText(dateFormat.format(new Date(e.getDate().getValue())));
             locationView.setText(e.getLocation());
             feeView.setText(e.getFee());
-            descriptionView.setText(e.getDescription().getValue());
+            if (e.getDescription() != null) {
+                descriptionView.setText(e.getDescription().getValue());
+            }
         } else {
             dateView.setText("leer");
             locationView.setText("leer");
