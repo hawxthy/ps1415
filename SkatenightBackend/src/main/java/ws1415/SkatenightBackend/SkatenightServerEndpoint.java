@@ -203,6 +203,26 @@ public class SkatenightServerEndpoint {
         return member;
     }
 
+
+    /**
+     *  Gibt eine Liste von allen gespeicherten Routen zurück
+     *  @return Liste der Routen, null falls keine existieren.
+     */
+    public List<Route> getRoutes(){
+        PersistenceManager pm = pmf.getPersistenceManager();
+
+        try{
+            List<Route> result = (List<Route>) pm.newQuery(Route.class).execute();
+            if(result.isEmpty()){
+                return null;
+            }else{
+                return result;
+            }
+        }finally{
+            pm.close();
+        }
+    }
+
 }
 
 

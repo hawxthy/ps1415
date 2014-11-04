@@ -40,7 +40,7 @@ public class ManageRoutesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_manage_routes, container, false);
 
         routeList = (ListView) view.findViewById(R.id.manage_routes_route_list);
-        routeList.setAdapter(new MapsCursorAdapter(getActivity(), getRoutes()));
+        new QueryRouteTask().execute(this);
         routeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -55,6 +55,10 @@ public class ManageRoutesFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    public void setRoutesToListView(ArrayList<Route> results) {
+        routeList.setAdapter(new MapsCursorAdapter(getActivity(), results));
     }
 
     private void createSelectionsMenu(int position){
