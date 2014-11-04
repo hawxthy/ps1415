@@ -1,9 +1,10 @@
-<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <string name="app_name">Host Skatenight</string>
     <string name="action_settings">Settings</string>
 
-    <!--Activity Hold Tabs xml-->
+    <!-- Activity Hold Tabs xml -->
     <string name="title_activity_start_page">Host Skatenight</string>
 
     <!-- Announce Information xml -->
@@ -30,11 +31,18 @@
     <string name="eventcreated">Event was created</string>
     <string name="not_authorized">Not authorized</string>
 
-    <!--Manage Routes xml-->
+    <!-- Manage Routes xml -->
     <string name="title_activity_manage_routes">Manage Routes</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <!--Strings zu activity_showinformation-->
+    <!-- Route Editor xml -->
+    <string name="title_activity_route_editor">Route Editor</string>
+    <string name="title_fragment_route_editor_map">Map</string>
+    <string name="title_fragment_route_editor_waypoints">Waypoints</string>
+    <string name="route_editor_waypoint_name_format">Waypoint <xliff:g id="number">%1$d</xliff:g></string>
+    <string name="route_editor_error_load_route">Unable to load route.</string>
+
+    <!-- Strings zu activity_showinformation -->
     <string name="title_fragment_show_information">Show Information</string>
     <string name="show_info_header_date">Time and date</string>
     <string name="show_info_header_location">Location</string>
