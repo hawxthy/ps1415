@@ -2,7 +2,9 @@ package ws1415.ps1415;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -54,9 +56,23 @@ public class ShowInformationActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (route != null) {
-                    Intent intent = new Intent(ShowInformationActivity.this, ShowRouteActivity.class);
-                    intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, route);
-                    startActivity(intent);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ShowInformationActivity.this);
+                    builder.setMessage("Ihre Position wird gespeichert und auf der Karte angezeigt").setTitle("Positionsübertragung");
+                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent(ShowInformationActivity.this, ShowRouteActivity.class);
+                            intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, route);
+                            startActivity(intent);
+                        }
+                    });
+                    builder.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
             }
         });
