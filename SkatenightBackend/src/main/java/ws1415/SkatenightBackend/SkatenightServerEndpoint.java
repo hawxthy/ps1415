@@ -9,6 +9,7 @@ import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
+import javax.jdo.Transaction;
 
 
 /**
@@ -214,11 +216,31 @@ public class SkatenightServerEndpoint {
         try{
             List<Route> result = (List<Route>) pm.newQuery(Route.class).execute();
             if(result.isEmpty()){
-                return null;
+                return new ArrayList<Route>();
             }else{
                 return result;
             }
         }finally{
+            pm.close();
+        }
+    }
+
+    /**
+     * Lösche Route vom Server
+     * @param route die Route, die gelöscht werden soll
+     */
+    public void deleteRoute(Route route){
+        PersistenceManager pm = pmf.getPersistenceManager();
+        //Transaction tx = pm.currentTransaction();
+        //tx.begin();
+        try{
+            pm.makePersistent(route);
+            //tx.commit();
+            pm.deletePersistent(pm.newQuery(Route.class).equals(route));
+        }finally{
+            //if(tx.isActive()){
+              //  tx.rollback();
+            //}
             pm.close();
         }
     }
