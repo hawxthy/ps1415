@@ -27,7 +27,7 @@ public class Event {
     private String location;
     @Persistent
     private Text description;
-    @Persistent
+    @Persistent(defaultFetchGroup = "true")
     private Route route;
 
     public Key getKey() {
