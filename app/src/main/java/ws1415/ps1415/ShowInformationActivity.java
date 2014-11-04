@@ -57,7 +57,7 @@ public class ShowInformationActivity extends Activity {
             public void onClick(View v) {
                 if (route != null) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(ShowInformationActivity.this);
-                    builder.setMessage("Deine Position wird gespeichert und auf der Karte angezeigt.").setTitle("Positionsübertragung!");
+                    builder.setMessage("Deine Position wird gespeichert & auf der Karte angezeigt."); // .setTitle("Positionsübertragung!");
                     builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             Intent intent = new Intent(ShowInformationActivity.this, ShowRouteActivity.class);
