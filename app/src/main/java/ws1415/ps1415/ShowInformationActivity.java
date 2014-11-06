@@ -27,7 +27,6 @@ public class ShowInformationActivity extends Activity {
     static final int REQUEST_ACCOUNT_PICKER = 2;
     private GoogleAccountCredential credential;
     private SharedPreferences prefs;
-    public static final String WEB_CLIENT_ID = "37947570052-dk3rjhgran1s38gscv6va2rmmv2bei8r.apps.googleusercontent.com";
 
 
     private static final String MEMBER_TITLE = "show_infomation_member_title";
@@ -100,7 +99,7 @@ public class ShowInformationActivity extends Activity {
 
         // SharePreferences skatenight.app laden
         prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
-        credential = GoogleAccountCredential.usingAudience(this,"server:client_id:"+this.WEB_CLIENT_ID);
+        credential = GoogleAccountCredential.usingAudience(this,"server:client_id:"+Constants.WEB_CLIENT_ID);
 
         // accountName aus SharedPreferences laden
         if (prefs.contains("accountName")) {

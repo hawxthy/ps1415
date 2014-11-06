@@ -1,25 +1,32 @@
 package ws1415.ps1415;
 
+import android.accounts.Account;
+import android.test.ActivityInstrumentationTestCase2;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 import com.appspot.skatenight_ms.skatenightAPI.model.Text;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.DateTime;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 /**
+ * TestCase für QueryEventTask, der die ShowInformationActivity für einen gültigen ApplicationContext
+ * nutzt.
  * Created by Richard on 06.11.2014.
  */
-public class QueryEventTaskTest extends AndroidTestCase {
+public class QueryEventTaskTest extends ActivityInstrumentationTestCase2<ShowInformationActivity> {
+    private ShowInformationActivity activity;
     private Event testEvent;
     private Route testRoute;
 
-    public QueryEventTaskTest() {
-        // Verbindung zum lokalen Testserver herstellen
-        ServiceProvider.setupTestServerConnection();
+    public QueryEventTaskTest() throws IOException {
+        super(ShowInformationActivity.class);
 
         // Testdaten erstellen
         testEvent = new Event();
@@ -56,6 +63,9 @@ public class QueryEventTaskTest extends AndroidTestCase {
 
     public void setUp() throws Exception {
         super.setUp();
+
+        ServiceProvider.setupTestServerConnection(null);
+        ServiceProvider.getService().skatenightServerEndpoint().addHost("example@example.com").execute();
 
         // Test-Event setzen
         ServiceProvider.getService().skatenightServerEndpoint().setEvent(testEvent).execute();
