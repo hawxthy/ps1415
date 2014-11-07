@@ -23,7 +23,7 @@ import ws1415.veranstalterapp.Adaper.TabsPagerAdapter;
 public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabListener {
     private static ViewPager viewPager;
     private static TabsPagerAdapter mAdapter;
-    private ActionBar actionBar;
+    private static ActionBar actionBar;
     private MenuItem menuItem;
     private boolean menuCreated;
 
@@ -171,5 +171,9 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
      */
     public static ViewPager getViewPager(){
         return viewPager;
+    }
+
+    public static ActionBar getActionBar2(){
+        return actionBar;
     }
 }
