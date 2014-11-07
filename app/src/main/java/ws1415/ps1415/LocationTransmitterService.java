@@ -22,7 +22,8 @@ import ws1415.ps1415.util.LocationUtils;
 /**
  * Created by Tristan Rust on 28.10.2014.
  *
- * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient.
+ * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient und diese auf den
+ * Server senden und falls der Nutzer noch nicht existiert wird er angelegt, ansonsten geupdatet.
  *
  */
 public class LocationTransmitterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
