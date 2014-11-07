@@ -14,6 +14,7 @@ import java.io.IOException;
 public class CreateEventTask extends AsyncTask<Event, Void, Void> {
     /**
      * Schreibt die neuen Informationen in das Event.
+     *
      * @param params Das in der Activity erstelle Event
      */
     protected Void doInBackground(Event... params){

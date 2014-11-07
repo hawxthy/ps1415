@@ -18,8 +18,10 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
 import java.util.Calendar;
 import java.util.Date;
+
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 import com.appspot.skatenight_ms.skatenightAPI.model.Text;
@@ -27,7 +29,7 @@ import com.google.api.client.util.DateTime;
 
 /**
  * Fragment zum veröffentlichen von neuen Veranstaltungen.
- *
+ * <p/>
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
 public class AnnounceInformationFragment extends Fragment {
@@ -74,10 +76,17 @@ public class AnnounceInformationFragment extends Fragment {
     // das neu erstellte Event
     private Event event;
 
+    /**
+     * Erstellt die View, initialisiert die Attribute, setzt die Listener für die Buttons.
+     *
+     * @param inflater           Übersetzt die xml Datei in View Elemente
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_announce_information, container, false);
-
 
         // Initialisiere die View Elemente
         editTextTitle = (EditText) view.findViewById(R.id.announce_info_title_edittext);
@@ -101,6 +110,10 @@ public class AnnounceInformationFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Methode zum setzen der Listener für die Buttons "timePickerButton", "datePickerButton",
+     * "applyButton", "cancelButton", "routePickerButton".
+     */
     private void setButtonListener() {
         // Setze die Listener für Cancel und Apply Buttons
         cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -148,14 +161,15 @@ public class AnnounceInformationFragment extends Fragment {
 
     /**
      * Erstellt je nach id ein DatePicker- oder TimePicker Dialog.
+     *
      * @param id DatePickerDialog falls id = 1, TimePickerDialog falls id = 2
      * @return Dialog Fenster
      */
-    protected Dialog showDialog(int id){
-        switch(id){
+    protected Dialog showDialog(int id) {
+        switch (id) {
             case DATE_DIALOG_ID:
                 // setze das Datum des Pickers als das angegebene Datum für das Event
-                return new DatePickerDialog(getActivity(), datePickerListener,  year, month, day);
+                return new DatePickerDialog(getActivity(), datePickerListener, year, month, day);
             case TIME_DIALOG_ID:
                 // setze die Zeit des Picker als angegebene Zeit für das Event
                 return new TimePickerDialog(getActivity(), timePickerListener, hour, minute, true);
@@ -166,47 +180,47 @@ public class AnnounceInformationFragment extends Fragment {
     /**
      * Setzt das angegebene Datum bei einer Änderung als Text auf den datePickerButton.
      */
-    private OnDateSetListener datePickerListener = new OnDateSetListener(){
+    private OnDateSetListener datePickerListener = new OnDateSetListener() {
 
         // when dialog box is closed, below method will be called.
-        public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay){
+        public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
             year = selectedYear;
             month = selectedMonth;
             day = selectedDay;
 
             // set selected date into Button
-            datePickerButton.setText(day +"."+ (month+1) +"."+year);
+            datePickerButton.setText(day + "." + (month + 1) + "." + year);
         }
     };
 
     /**
      * Setzt das aktuelle Datum als Text auf den datePickerButton.
      */
-    public void setCurrentDateOnView(){
+    public void setCurrentDateOnView() {
         final Calendar c = Calendar.getInstance();
         year = c.get(Calendar.YEAR);
         month = c.get(Calendar.MONTH);
         day = c.get(Calendar.DAY_OF_MONTH);
 
         // set selected date into Button
-        datePickerButton.setText(day +"."+ (month+1) +"."+year);
+        datePickerButton.setText(day + "." + (month + 1) + "." + year);
     }
 
     /**
      * Setzt einen Listener, welcher die ausgewählte Uhrzeit bei einer Änderung setzt und auf
      * den timePickerButton setzt.
      */
-    private OnTimeSetListener timePickerListener = new OnTimeSetListener(){
+    private OnTimeSetListener timePickerListener = new OnTimeSetListener() {
 
         @Override
         public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
             hour = selectedHour;
             minute = selectedMinute;
-            if(minute < 10){
+            if (minute < 10) {
                 //minute = 0+ selectedMinute;
-                timePickerButton.setText(hour +":0"+minute+" Uhr");
-            }else{
-                timePickerButton.setText(hour +":"+minute+" Uhr");
+                timePickerButton.setText(hour + ":0" + minute + " Uhr");
+            } else {
+                timePickerButton.setText(hour + ":" + minute + " Uhr");
             }
         }
     };
@@ -216,7 +230,7 @@ public class AnnounceInformationFragment extends Fragment {
      * Liest die eingegebenen Informationen aus, erstellt ause diesen ein Event und fügt dieses
      * Event dem Server hinzu. Momentan wir noch das alte Event überschrieben.
      */
-    public void applyInfo(){
+    public void applyInfo() {
 
         // Zeige einen Alert Dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -236,7 +250,7 @@ public class AnnounceInformationFragment extends Fragment {
                 cal.set(Calendar.MINUTE, minute);
 
                 // Weise die Daten aus Calendar dem Datentyp Date zu
-                Date date =  cal.getTime();
+                Date date = cal.getTime();
                 // Mache aus dem Date ein DateTime, da dies von ServerBackend benötigt wird.
                 DateTime dTime = new DateTime(date);
 
@@ -259,6 +273,13 @@ public class AnnounceInformationFragment extends Fragment {
                     new CreateEventTask().execute(event);
                     Toast.makeText(getActivity(),
                             getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
+                    editTextTitle.setText("");
+                    editTextFee.setText("");
+                    timePickerButton.setText(getString(R.string.announce_info_set_time));
+                    editTextLocation.setText("");
+                    routePickerButton.setText(getString(R.string.announce_info_choose_map));
+                    editTextDescription.setText("");
+                    setCurrentDateOnView();
 
                     // Update die Informationen in ShowInformationFragment
                     HoldTabsActivity.updateInformation();
@@ -280,7 +301,7 @@ public class AnnounceInformationFragment extends Fragment {
      * Gibt momentan einen Toast aus, wenn der Benutzer auf den Cancel Button drückt
      * (löscht alle Eingaben) oder wenn der Benutze ein unvollständiges Event hinzufügen will
      */
-    public void cancelInfo(boolean allSet){
+    public void cancelInfo(boolean allSet) {
         if (allSet) {
             Toast.makeText(getActivity(), "Wurde noch nicht erstellt", Toast.LENGTH_LONG).show();
             editTextTitle.setText("");
@@ -301,7 +322,7 @@ public class AnnounceInformationFragment extends Fragment {
      *
      * @param selectedRoute Die Route für das Event
      */
-    public void setRoute(Route selectedRoute){
+    public void setRoute(Route selectedRoute) {
         route = selectedRoute;
         routePickerButton.setText(selectedRoute.getName());
     }

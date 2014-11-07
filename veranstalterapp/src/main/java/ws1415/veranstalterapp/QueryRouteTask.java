@@ -31,6 +31,12 @@ public class QueryRouteTask extends AsyncTask<ManageRoutesFragment, Void, List<R
         return null;
     }
 
+    /**
+     * Erhält die Liste von Routen vom Server und setzt diese mit setRouteToListView(...)
+     * in die ListView in ManageRoutesActivity.
+     *
+     * @param results Liste mit Routen vom Server
+     */
     @Override
     protected void onPostExecute(List<Route> results){
         view.setRoutesToListView((ArrayList<Route>) results);

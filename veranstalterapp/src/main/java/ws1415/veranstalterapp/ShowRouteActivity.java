@@ -20,7 +20,11 @@ import java.util.List;
 
 import ws1415.veranstalterapp.util.LocationUtils;
 
-
+/**
+ * Activity zum Anzeigen einer Route in einer Map.
+ *
+ * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
+ */
 public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE = "show_route_extra_route";
     private static final String MEMBER_ROUTE = "show_route_member_route";
@@ -28,6 +32,11 @@ public class ShowRouteActivity extends Activity {
     private GoogleMap googleMap;
     private PolylineOptions route;
 
+    /**
+     * Zeigt die Route, die über einen Intent verschickt wurde, an.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -1,12 +1,11 @@
 package ws1415.veranstalterapp;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 
 import java.io.IOException;
-import java.util.List;
+
 
 /**
  * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.
@@ -17,6 +16,7 @@ public class DeleteRouteTask extends AsyncTask<Route, Void, Void> {
 
     /**
      * Löscht die Route vom Server
+     *
      * @param params Die Route die gelöscht werden soll
      */
     @Override
