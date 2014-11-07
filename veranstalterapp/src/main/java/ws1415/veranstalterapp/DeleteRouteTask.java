@@ -1,6 +1,7 @@
 package ws1415.veranstalterapp;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 
@@ -19,7 +20,8 @@ public class DeleteRouteTask extends AsyncTask<Route, Void, Void> {
     @Override
     protected Void doInBackground(Route... params) {
         try {
-            return ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(params[0]).execute();
+            return ServiceProvider.getService().skatenightServerEndpoint().setRoute(
+                    params[0].getName()).execute();
         }catch(IOException e){
             e.printStackTrace();
         }

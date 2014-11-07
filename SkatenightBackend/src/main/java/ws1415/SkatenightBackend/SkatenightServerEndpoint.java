@@ -2,9 +2,6 @@ package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.Named;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -18,7 +15,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
-import javax.jdo.Transaction;
 
 
 /**
@@ -31,14 +27,10 @@ import javax.jdo.Transaction;
             Constants.WEB_CLIENT_ID, com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID},
     audiences = {Constants.ANDROID_AUDIENCE})
 public class SkatenightServerEndpoint {
-    private Key hostRootKey;
-    private DatastoreService datastore;
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
 
     public SkatenightServerEndpoint() {
-        datastore = DatastoreServiceFactory.getDatastoreService();
-
         // Standard-Veranstalter definieren
         Host h = new Host();
         h.setEmail("example@example.com");
@@ -194,7 +186,13 @@ public class SkatenightServerEndpoint {
         Member member = null;
         PersistenceManager pm = pmf.getPersistenceManager();
         try {
-            member = (Member) pm.getObjectById(email);
+            Query q = pm.newQuery(Member.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Member> results = (List<Member>) q.execute(email);
+            if (!results.isEmpty()) {
+                member = results.get(0);
+            }
         } catch(JDOObjectNotFoundException e) {
             // Wird geworfen, wenn kein Objekt mit dem angegebenen Schlüssel existiert
             // In diesem Fall null zurückgeben
@@ -208,7 +206,7 @@ public class SkatenightServerEndpoint {
 
     /**
      *  Gibt eine Liste von allen gespeicherten Routen zurück
-     *  @return Liste der Routen, null falls keine existieren.
+     *  @return Liste der Routen.
      */
     public List<Route> getRoutes(){
         PersistenceManager pm = pmf.getPersistenceManager();
@@ -227,20 +225,16 @@ public class SkatenightServerEndpoint {
 
     /**
      * Lösche Route vom Server
-     * @param route die Route, die gelöscht werden soll
+     * @param name Der Name der zu löschenden Route.
      */
-    public void deleteRoute(Route route){
+    public void setRoute(@Named("name") String name){
         PersistenceManager pm = pmf.getPersistenceManager();
-        //Transaction tx = pm.currentTransaction();
-        //tx.begin();
         try{
-            pm.makePersistent(route);
-            //tx.commit();
-            pm.deletePersistent(pm.newQuery(Route.class).equals(route));
+            Query q = pm.newQuery(Route.class);
+            q.setFilter("name == nameParam");
+            q.declareParameters("String nameParam");
+            q.deletePersistentAll(name);
         }finally{
-            //if(tx.isActive()){
-              //  tx.rollback();
-            //}
             pm.close();
         }
     }

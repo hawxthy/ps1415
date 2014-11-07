@@ -15,8 +15,6 @@ import javax.jdo.annotations.PrimaryKey;
 @PersistenceCapable
 public class Route {
     @PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-    private Key key;
     @Persistent
     private String name;
     /**
@@ -33,10 +31,6 @@ public class Route {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Key getKey() {
-        return key;
     }
 
     public Text getRouteData() {
