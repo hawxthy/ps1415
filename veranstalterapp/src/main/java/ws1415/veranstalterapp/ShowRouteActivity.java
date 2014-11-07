@@ -42,6 +42,8 @@ public class ShowRouteActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_route);
 
+        setTitle(getIntent().getStringExtra("routeName"));
+
         googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.show_route_map_fragment)).getMap();
         googleMap.setMyLocationEnabled(true);
 
