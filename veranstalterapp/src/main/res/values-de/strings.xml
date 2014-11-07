@@ -62,5 +62,11 @@
     <string name="title_activity_choose_route">Wähle Route</string>
 
     <!--Strings zu activity_show_route-->
-    <string name="title_activity_show_route">Route 3</string>
+    <string name="title_activity_show_route">Route</string>
+
+    <!--Strings zu activtiy_add_route_dialog-->
+    <string name="title_activity_add_route_dialog">Erstelle Route</string>
+    <string name="title_activity_add_route_dialog_routename">Routename: </string>
+    <string name="activity_add_route_dialog_cancel">Abbrechen</string>
+    <string name="activity_add_route_dialog_apply">Ok</string>
 </resources>
