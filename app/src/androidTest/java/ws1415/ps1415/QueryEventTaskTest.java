@@ -8,6 +8,7 @@ import android.util.Log;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 import com.appspot.skatenight_ms.skatenightAPI.model.Text;
+import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.DateTime;
 
@@ -20,19 +21,18 @@ import java.util.concurrent.ExecutionException;
  * nutzt.
  * Created by Richard on 06.11.2014.
  */
-public class QueryEventTaskTest extends ActivityInstrumentationTestCase2<ShowInformationActivity> {
-    private ShowInformationActivity activity;
+public class QueryEventTaskTest extends AndroidTestCase {
     private Event testEvent;
     private Route testRoute;
 
-    public QueryEventTaskTest() throws IOException {
-        super(ShowInformationActivity.class);
+    public QueryEventTaskTest() {
+        ServiceProvider.setupTestServerConnection();
 
         // Testdaten erstellen
         testEvent = new Event();
         testEvent.setTitle("Testtitel");
         testEvent.setDate(new DateTime(new Date()));
-        testEvent.setFee("3,-- €");
+        testEvent.setFee("3");
         testEvent.setLocation("Testort");
         testEvent.setDescription(new Text().setValue("Lorem ipsum dolor sit amet, consetetur " +
                 "sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore " +
@@ -64,25 +64,30 @@ public class QueryEventTaskTest extends ActivityInstrumentationTestCase2<ShowInf
     public void setUp() throws Exception {
         super.setUp();
 
-        ServiceProvider.setupTestServerConnection(null);
-        ServiceProvider.getService().skatenightServerEndpoint().addHost("example@example.com").execute();
-
         // Test-Event setzen
-        ServiceProvider.getService().skatenightServerEndpoint().setEvent(testEvent).execute();
+        ServiceProvider.getService().skatenightServerEndpoint().setEventTestMethod(testEvent).execute();
     }
 
     public void testTask() throws ExecutionException, InterruptedException {
         QueryEventTask task = new QueryEventTask();
-        Event event = task.execute(new ShowInformationActivity()).get();
+        Event event = task.execute(new ShowInformationActivity() {
+            @Override
+            public void setEventInformation(Event e) {
+                // Methode mit leerem Rumpf überschreiben, da der Callback für den Test nicht relevant ist
+            }
+        }).get();
         assertNotNull("event is null", event);
         assertEquals("wrong title", testEvent.getTitle(), event.getTitle());
         assertEquals("wrong date", testEvent.getDate(), event.getDate());
         assertEquals("wrong fee", testEvent.getFee(), event.getFee());
         assertEquals("wrong location", testEvent.getLocation(), event.getLocation());
+        assertNotNull("event description is null", event.getDescription());
         assertEquals("wrong description", testEvent.getDescription().getValue(),
                 event.getDescription().getValue());
+        assertNotNull("route is null", event.getRoute());
         assertEquals("wrong route name", testRoute.getName(), event.getRoute().getName());
         assertEquals("wrong route length", testRoute.getLength(), event.getRoute().getLength());
-        assertEquals("wrong route data", testRoute.getRouteData(), event.getRoute().getRouteData());
+        assertNotNull("route data is null", event.getRoute().getRouteData());
+        assertEquals("wrong route data", testRoute.getRouteData().getValue(), event.getRoute().getRouteData().getValue());
     }
 }

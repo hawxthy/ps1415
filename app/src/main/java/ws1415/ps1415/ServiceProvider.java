@@ -23,16 +23,14 @@ public abstract class ServiceProvider {
     }
 
     /**
-     * Erstellt ein Skatenight-API Objekt, das eine Verbindung zum Test-Server aufbaut. Die URL
-     * des Testservers wird über die Umgebungsvariable "test_server" übergeben.
+     * Erstellt ein Skatenight-API Objekt, das eine Verbindung zum Test-Server aufbaut.
      * Kann für Testklassen benutzt werden.
-     * @param credential Die zu verwendenden Credentials
      */
-    public static void setupTestServerConnection(GoogleAccountCredential credential) {
+    public static void setupTestServerConnection() {
         SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
                 AndroidHttp.newCompatibleTransport(),
-                new AndroidJsonFactory(), credential);
-        builder.setRootUrl("http://192.168.178.21:8080/_ah/api");
+                new AndroidJsonFactory(), null);
+        builder.setRootUrl("http://10.66.56.83:8080/_ah/api");
         service = builder.build();
     }
 

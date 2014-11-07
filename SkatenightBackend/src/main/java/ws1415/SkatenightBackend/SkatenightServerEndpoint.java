@@ -103,6 +103,8 @@ public class SkatenightServerEndpoint {
             if (results.isEmpty()) {
                 return null;
             } else {
+                // Name abrufen, damit die Daten gefetcht werden
+                results.get(0).getRoute().getName();
                 return results.get(0);
             }
         } finally {
@@ -123,6 +125,30 @@ public class SkatenightServerEndpoint {
             throw new OAuthRequestException("user is not a host");
         }
 
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            // Altes Event-Objekt löschen
+            List<Event> events = (List<Event>) pm.newQuery(Event.class).execute();
+            pm.deletePersistentAll(events);
+            if (e != null) {
+                Query q = pm.newQuery(Route.class);
+                q.setFilter("name == nameParam");
+                q.declareParameters("String nameParam");
+                List<Route> results = (List<Route>) q.execute(e.getRoute().getName());
+                if (!results.isEmpty()) {
+                    e.setRoute(results.get(0));
+                }
+                pm.makePersistent(e);
+            }
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Dient Testzwecken, damit das Event ohne credentials gesetzt werden kann.
+     */
+    public void setEventTestMethod(Event e) {
         PersistenceManager pm = pmf.getPersistenceManager();
         try {
             // Altes Event-Objekt löschen
