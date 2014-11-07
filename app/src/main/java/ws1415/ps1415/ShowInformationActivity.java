@@ -64,7 +64,7 @@ public class ShowInformationActivity extends Activity {
                     builder.setMessage("Deine Position wird gespeichert & auf der Karte angezeigt.");
                     builder.setPositiveButton(Html.fromHtml("<font color='#1FB1FF'>Ok</font>"), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            // Leite weiter auf die Karte
+                            // Leite wieter auf die Karte
                             Intent intent = new Intent(ShowInformationActivity.this, ShowRouteActivity.class);
                             intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, route);
                             startActivity(intent);
