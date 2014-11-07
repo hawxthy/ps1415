@@ -48,6 +48,22 @@
     <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:text="@string/show_info_header_route"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:paddingLeft="0dp"/>
+
+    <TextView
+        android:text="@string/downloading"
+        android:id="@+id/show_info_route_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingLeft="5dp" />
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
         android:text="@string/show_info_header_fee"
         style="?android:attr/listSeparatorTextViewStyle"
         android:paddingLeft="0dp"

@@ -2,6 +2,8 @@ package ws1415.SkatenightBackend;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
+import com.google.appengine.datanucleus.annotations.Unowned;
+
 import java.util.Date;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -28,6 +30,7 @@ public class Event {
     @Persistent
     private Text description;
     @Persistent(defaultFetchGroup = "true")
+    @Unowned
     private Route route;
 
     public Key getKey() {

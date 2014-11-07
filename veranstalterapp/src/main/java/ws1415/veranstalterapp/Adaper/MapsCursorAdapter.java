@@ -29,7 +29,11 @@ public class MapsCursorAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return routeList.size();
+        if(routeList == null){
+            return 0;
+        }else{
+            return routeList.size();
+        }
     }
 
     @Override
