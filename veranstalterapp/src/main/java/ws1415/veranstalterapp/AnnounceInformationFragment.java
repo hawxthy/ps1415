@@ -21,6 +21,7 @@ import android.widget.Toast;
 import java.util.Calendar;
 import java.util.Date;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
+import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 import com.appspot.skatenight_ms.skatenightAPI.model.Text;
 import com.google.api.client.util.DateTime;
 
@@ -66,6 +67,9 @@ public class AnnounceInformationFragment extends Fragment {
     // Attribute für die Zeit
     private int hour;
     private int minute;
+
+    // Das Attribut Route
+    private Route route;
 
     // das neu erstellte Event
     private Event event;
@@ -241,7 +245,7 @@ public class AnnounceInformationFragment extends Fragment {
                 description = new Text();
                 description.setValue(editTextDescription.getText().toString());
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (!title.isEmpty() && !fee.isEmpty() && dTime != null && !location.isEmpty() && !description.isEmpty()) {
+                if (!title.isEmpty() && !fee.isEmpty() && dTime != null && !location.isEmpty() && !description.isEmpty() && route != null) {
                     // Erstelle ein neue Event
                     event = new Event();
 
@@ -250,6 +254,7 @@ public class AnnounceInformationFragment extends Fragment {
                     event.setFee(fee);
                     event.setDate(dTime);
                     event.setLocation(location);
+                    event.setRoute(route);
                     event.setDescription(description);
                     new CreateEventTask().execute(event);
                     Toast.makeText(getActivity(),
@@ -281,16 +286,23 @@ public class AnnounceInformationFragment extends Fragment {
             editTextTitle.setText("");
             editTextFee.setText("");
             editTextLocation.setText("");
+            routePickerButton.setText(getString(R.string.announce_info_choose_map));
             editTextDescription.setText("");
             setCurrentDateOnView();
         } else {
-            Toast.makeText(getActivity(), "Nicht alle Felder Ausgefüllt", Toast.LENGTH_LONG).show();
-            editTextTitle.setText(title);
-            editTextFee.setText(fee);
-            editTextLocation.setText(location);
-            editTextDescription.setText(editTextDescription.getText().toString());
+            Toast.makeText(getActivity(), "Nicht alle Felder ausgefüllt", Toast.LENGTH_LONG).show();
         }
 
         timePickerButton.setText(getResources().getString(R.string.announce_info_set_time));
+    }
+
+    /**
+     * Dies Methode setzt die Route für das Event
+     *
+     * @param selectedRoute Die Route für das Event
+     */
+    public void setRoute(Route selectedRoute){
+        route = selectedRoute;
+        routePickerButton.setText(selectedRoute.getName());
     }
 }

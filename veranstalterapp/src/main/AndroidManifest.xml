@@ -40,6 +40,21 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.veranstalterapp.HoldTabsActivity" />
         </activity>
+
+        <activity
+            android:name=".ChooseRouteActivity"
+            android:label="@string/title_activity_choose_route"
+            android:theme="@android:style/Theme.Holo.Dialog">
+        </activity>
+
+        <activity
+            android:name=".ShowRouteActivity"
+            android:label="@string/title_activity_show_route"
+            android:parentActivityName=".HoldTabsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.HoldTabsActivity" />
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
