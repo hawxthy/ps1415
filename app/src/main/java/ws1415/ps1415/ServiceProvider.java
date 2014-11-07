@@ -34,4 +34,15 @@ public abstract class ServiceProvider {
         service = builder.build();
     }
 
+    /**
+     * Erstellt ein Skatenight-API Objekt, das eine Verbindung zum Production-Server aufbaut.
+     */
+    public static void setupProductionServerConnection() {
+        SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                new AndroidJsonFactory(), null);
+        builder.setRootUrl("https://skatenight-ms.appspot.com/_ah/api");
+        service = builder.build();
+    }
+
 }

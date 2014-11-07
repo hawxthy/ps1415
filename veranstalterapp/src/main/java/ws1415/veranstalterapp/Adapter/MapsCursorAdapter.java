@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Adaper;
+package ws1415.veranstalterapp.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
