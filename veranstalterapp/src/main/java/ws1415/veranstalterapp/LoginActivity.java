@@ -31,7 +31,7 @@ public class LoginActivity extends Activity {
 
         // Kein accountName gesetzt, also AccountPicker aufrufen
         if (credential.getSelectedAccountName() == null) {
-            login(null);
+            login();
         }
     }
 
@@ -53,8 +53,10 @@ public class LoginActivity extends Activity {
         }
     }
 
-
-    public void login(View view) {
+    /**
+     * Führt die StartActivityForResult aus
+     */
+    public void login() {
         startActivityForResult(credential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
     }
 
