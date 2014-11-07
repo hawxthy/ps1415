@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +19,7 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.veranstalterapp.Adaper.MapsCursorAdapter;
+import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
 
 /**
  * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.

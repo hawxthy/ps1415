@@ -6,12 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import ws1415.veranstalterapp.Adaper.TabsPagerAdapter;
+import ws1415.veranstalterapp.Adapter.TabsPagerAdapter;
 
 /**
  * Die Activity, welche beim starten der Veranstalter App ausgeführt wird. Diese Activity
