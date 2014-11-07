@@ -65,8 +65,7 @@ public class ManageRoutesFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int index) {
                         if(index == 0){
                             deleteRoute(routeList.get(position));
-                            //routeList.remove(position);
-                            //mAdapter.removeListItem(position);
+                            mAdapter.removeListItem(position);
                         }
                     }
                 });

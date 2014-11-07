@@ -20,8 +20,8 @@ public class DeleteRouteTask extends AsyncTask<Route, Void, Void> {
     @Override
     protected Void doInBackground(Route... params) {
         try {
-            return ServiceProvider.getService().skatenightServerEndpoint().setRoute(
-                    params[0].getName()).execute();
+            return ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(
+                    params[0].getKey().getId()).execute();
         }catch(IOException e){
             e.printStackTrace();
         }

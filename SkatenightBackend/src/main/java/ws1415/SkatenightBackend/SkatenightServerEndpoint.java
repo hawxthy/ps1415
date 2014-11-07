@@ -30,18 +30,6 @@ public class SkatenightServerEndpoint {
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
 
-    public SkatenightServerEndpoint() {
-        // Standard-Veranstalter definieren
-        Host h = new Host();
-        h.setEmail("example@example.com");
-        PersistenceManager pm = pmf.getPersistenceManager();
-        try {
-            pm.makePersistent(h);
-        } finally {
-            pm.close();
-        }
-    }
-
     /**
      * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
      * @param mail Die hinzuzufügende Mail-Adresse
@@ -134,10 +122,16 @@ public class SkatenightServerEndpoint {
         PersistenceManager pm = pmf.getPersistenceManager();
         try {
             // Altes Event-Objekt löschen
-            List<Event> events = (List<Event>) pm.newQuery(
-                    "select from " + Event.class.getName()).execute();
+            List<Event> events = (List<Event>) pm.newQuery(Event.class).execute();
             pm.deletePersistentAll(events);
             if (e != null) {
+                Query q = pm.newQuery(Route.class);
+                q.setFilter("name == nameParam");
+                q.declareParameters("String nameParam");
+                List<Route> results = (List<Route>) q.execute(e.getRoute().getName());
+                if (!results.isEmpty()) {
+                    e.setRoute(results.get(0));
+                }
                 pm.makePersistent(e);
             }
         } finally {
@@ -225,15 +219,17 @@ public class SkatenightServerEndpoint {
 
     /**
      * Lösche Route vom Server
-     * @param name Der Name der zu löschenden Route.
+     * @param id Die ID der zu löschenden Route.
      */
-    public void setRoute(@Named("name") String name){
+    public void deleteRoute(@Named("id") long id){
         PersistenceManager pm = pmf.getPersistenceManager();
         try{
-            Query q = pm.newQuery(Route.class);
-            q.setFilter("name == nameParam");
-            q.declareParameters("String nameParam");
-            q.deletePersistentAll(name);
+            for (Route r : (List<Route>) pm.newQuery(Route.class).execute()) {
+                if (r.getKey().getId() == id) {
+                    pm.deletePersistent(r);
+                    break;
+                }
+            }
         }finally{
             pm.close();
         }
