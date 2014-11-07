@@ -164,6 +164,11 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
         return mAdapter;
     }
 
+    /**
+     * Gibt den ViewPager zurück.
+     *
+     * @return
+     */
     public static ViewPager getViewPager(){
         return viewPager;
     }
