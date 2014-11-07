@@ -25,6 +25,14 @@ public class ShowInformationFragment extends Fragment {
     private View view;
     private SimpleDateFormat dateFormat;
 
+    /**
+     * Erstellt die View und updatet die Informationen in dem ShowInformationFragment.
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -41,6 +49,7 @@ public class ShowInformationFragment extends Fragment {
 
     /**
      * Übernimmt die Informationen aus dem übergebenen Event-Objekt in die GUI-Elemente.
+     *
      * @param e Das neue Event-Objekt.
      */
     public void setEventInformation(Event e) {

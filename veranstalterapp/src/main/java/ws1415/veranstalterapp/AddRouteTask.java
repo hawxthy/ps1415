@@ -12,6 +12,13 @@ import java.io.IOException;
  * Created by Bernd Eissing, Martin Wrodarczyk on 04.11.2014.
  */
 public class AddRouteTask extends AsyncTask<Route, Void, Void> {
+
+    /**
+     * Erstellt eine neue Route auf dem Server.
+     *
+     * @param params Route, die erstellt werden soll
+     * @return NULL
+     */
     @Override
     protected Void doInBackground(Route... params) {
         try{
