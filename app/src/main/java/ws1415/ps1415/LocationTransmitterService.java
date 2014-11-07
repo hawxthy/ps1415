@@ -65,7 +65,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
     @Override
     public void onConnected(Bundle bundle) {
-        // Sendet die Location Requests senkündlich
+        // Sendet die Location Requests sekündlich
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setFastestInterval(1000);
