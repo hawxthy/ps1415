@@ -12,8 +12,10 @@ public abstract class ServiceProvider {
     private static SkatenightAPI service;
 
     /**
-     * Stellt eine Instanz der SkatenightAPI zur verfügung
+     * Stellt eine Instanz der SkatenightAPI zur verfügung.
+     *
      * @return die Instanz der SkatenightAPI
+     * @param credential der Berechtigungsnachweis
      */
     public static SkatenightAPI getService(GoogleAccountCredential credential){
         if(service == null){
@@ -26,10 +28,20 @@ public abstract class ServiceProvider {
         return service;
     }
 
+    /**
+     * Stellt eine Instanz der SkatenightAPI zur verfügung, ohne credentials
+     *
+     * @return die SkatenightAPI
+     */
     public static SkatenightAPI getService(){
         return getService(null);
     }
 
+    /**
+     * Loggt den Veranstalter in die Veranstalterapp ein.
+     *
+     * @param credential der Berechtigungsnachweis
+     */
     public static void login(GoogleAccountCredential credential) {
         SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
                 AndroidHttp.newCompatibleTransport(),

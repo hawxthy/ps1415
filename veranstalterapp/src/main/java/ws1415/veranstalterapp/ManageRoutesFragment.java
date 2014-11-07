@@ -23,7 +23,9 @@ import java.util.List;
 import ws1415.veranstalterapp.Adaper.MapsCursorAdapter;
 
 /**
+ * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.
  *
+ * Created by Bernd Eissing, Martin Wrodarczyk.
  */
 public class ManageRoutesFragment extends Fragment {
     private ListView routeListView;
@@ -31,12 +33,25 @@ public class ManageRoutesFragment extends Fragment {
     private MapsCursorAdapter mAdapter;
     private MenuItem addRouteItem;
 
+    /**
+     * Ruft Methode auf, um das add_route_item in der ActionBar zu setzen.
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
+    /**
+     * Ruft die Routen von Server ab, setzt die Listener für die List Items.
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_manage_routes, container, false);
@@ -44,6 +59,14 @@ public class ManageRoutesFragment extends Fragment {
         routeListView = (ListView) view.findViewById(R.id.manage_routes_route_list);
         new QueryRouteTask().execute(this);
         routeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            /**
+             * Ruft die showRouteActivity auf, die die ausgewählte Route anzeigt.
+             *
+             * @param adapterView
+             * @param view
+             * @param i Index der ausgewählten Route in der ListView
+             * @param l
+             */
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(), ShowRouteActivity.class);
@@ -53,6 +76,15 @@ public class ManageRoutesFragment extends Fragment {
         });
 
         routeListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            /**
+             * Läscht die Route vom Server und von der ListView
+             *
+             * @param adapterView
+             * @param view
+             * @param i Position der Route in der ListView
+             * @param l
+             * @return
+             */
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 createSelectionsMenu(i);
@@ -62,12 +94,24 @@ public class ManageRoutesFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Füllt die ListView mit den Routen vom Server.
+     *
+     * @param results ArrayList von Routen
+     */
     public void setRoutesToListView(ArrayList<Route> results) {
         routeList = results;
         mAdapter = new MapsCursorAdapter(getActivity(), results);
         routeListView.setAdapter(mAdapter);
     }
 
+    /**
+     * Erstellt einen Dialog, welcher aufgerufen wird, wenn ein Item in der ListView lange
+     * ausgewählt wird. In diesem Dialog kann man dann auswählen, ob man die ausgewählte
+     * Route löschen möchte.
+     *
+     * @param position
+     */
     private void createSelectionsMenu(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(routeList.get(position).getName())
@@ -83,30 +127,21 @@ public class ManageRoutesFragment extends Fragment {
         builder.show();
     }
 
+    /**
+     * Löscht die Route vom Server.
+     *
+     * @param route die zu löschende Route
+     */
     private void deleteRoute(Route route) {
         new DeleteRouteTask().execute(route);
     }
 
-    private ArrayList<Route> getRoutes() {
-        ArrayList<Route> tmpList = new ArrayList<Route>();
-        // Erstelle test Routes
-        Route route1 = new Route();
-        Route route2 = new Route();
-        Route route3 = new Route();
-        route1.setName("Route 1");
-        route2.setName("Route 2");
-        route3.setName("Route 3");
-        route1.setLength("10");
-        route2.setLength("11");
-        route3.setLength("12");
-
-        tmpList.add(route1);
-        tmpList.add(route2);
-        tmpList.add(route3);
-
-        return tmpList;
-    }
-
+    /**
+     * Erstellt das ActionBar Menu
+     *
+     * @param menu
+     * @param menuInflater
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
