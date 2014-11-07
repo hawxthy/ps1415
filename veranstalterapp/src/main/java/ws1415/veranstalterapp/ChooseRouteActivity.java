@@ -12,6 +12,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Route;
@@ -35,6 +38,13 @@ public class ChooseRouteActivity extends Activity {
         setContentView(R.layout.activity_choose_route);
 
         lv = (ListView) findViewById(R.id.choose_routes_list);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ((AnnounceInformationFragment)HoldTabsActivity.getAdapter().getItem(1)).setRoute(routeList.get(i));
+                finish();
+            }
+        });
         new QueryRouteTask2().execute(this);
     }
 
