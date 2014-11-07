@@ -120,7 +120,6 @@ public class ManageRoutesFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int index) {
                         if (index == 0) {
                             deleteRoute(routeList.get(position));
-                            mAdapter.removeListItem(position);
                         }
                     }
                 });
@@ -129,12 +128,21 @@ public class ManageRoutesFragment extends Fragment {
     }
 
     /**
+     * Löscht Route aus der Liste.
+     *
+     * @param route zu löschende Route
+     */
+    public void deleteRouteFromList(Route route){
+        mAdapter.removeListItem(routeList.indexOf(route));
+        routeList.remove(route);
+    }
+    /**
      * Löscht die Route vom Server.
      *
      * @param route die zu löschende Route
      */
     private void deleteRoute(Route route) {
-        new DeleteRouteTask().execute(route);
+        new DeleteRouteTask(this).execute(route);
     }
 
     /**
