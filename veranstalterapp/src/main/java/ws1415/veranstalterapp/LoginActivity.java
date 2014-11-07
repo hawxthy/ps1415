@@ -26,8 +26,7 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        credential = GoogleAccountCredential.usingAudience(this,
-                "server:client_id:"+Constants.WEB_CLIENT_ID);
+        credential = GoogleAccountCredential.usingAudience(this,"server:client_id:"+Constants.WEB_CLIENT_ID);
 
         // Kein accountName gesetzt, also AccountPicker aufrufen
         if (credential.getSelectedAccountName() == null) {
