@@ -9,6 +9,7 @@
         android:id="@+id/manage_routes_route_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        style="@style/TextColor">
     </ListView>
 </LinearLayout>

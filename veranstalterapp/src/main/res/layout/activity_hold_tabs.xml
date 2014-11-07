@@ -4,5 +4,6 @@
     android:layout_height="match_parent"
     android:scaleType="fitCenter"
     android:background="@drawable/background"
+
     />
 
