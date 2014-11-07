@@ -22,7 +22,7 @@ public class Member {
     private String location;  // Die aktuelle Location als String kodiert
     @PrimaryKey
     @Persistent
-    private String email;     // Einzigartige google Email, zum identifizieren eines Nutzers
+    private String email;     // Einzigartige google Email, zum identifizieren eines Nutzers (Primary Key)
 
     public String getName() {return name;}
 
