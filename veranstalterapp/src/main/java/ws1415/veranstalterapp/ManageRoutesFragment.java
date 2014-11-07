@@ -46,6 +46,9 @@ public class ManageRoutesFragment extends Fragment {
         routeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(getActivity(), ShowRouteActivity.class);
+                intent.putExtra("show_route_extra_route", routeList.get(i).getRouteData().getValue());
+                startActivity(intent);
             }
         });
 
@@ -72,8 +75,7 @@ public class ManageRoutesFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int index) {
                         if (index == 0) {
                             deleteRoute(routeList.get(position));
-                            //routeList.remove(position);
-                            //mAdapter.removeListItem(position);
+                            mAdapter.removeListItem(position);
                         }
                     }
                 });

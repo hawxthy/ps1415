@@ -31,24 +31,8 @@ import javax.jdo.Transaction;
             Constants.WEB_CLIENT_ID, com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID},
     audiences = {Constants.ANDROID_AUDIENCE})
 public class SkatenightServerEndpoint {
-    private Key hostRootKey;
-    private DatastoreService datastore;
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
-
-    public SkatenightServerEndpoint() {
-        datastore = DatastoreServiceFactory.getDatastoreService();
-
-        // Standard-Veranstalter definieren
-        Host h = new Host();
-        h.setEmail("example@example.com");
-        PersistenceManager pm = pmf.getPersistenceManager();
-        try {
-            pm.makePersistent(h);
-        } finally {
-            pm.close();
-        }
-    }
 
     /**
      * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
@@ -142,10 +126,16 @@ public class SkatenightServerEndpoint {
         PersistenceManager pm = pmf.getPersistenceManager();
         try {
             // Altes Event-Objekt löschen
-            List<Event> events = (List<Event>) pm.newQuery(
-                    "select from " + Event.class.getName()).execute();
+            List<Event> events = (List<Event>) pm.newQuery(Event.class).execute();
             pm.deletePersistentAll(events);
             if (e != null) {
+                Query q = pm.newQuery(Route.class);
+                q.setFilter("name == nameParam");
+                q.declareParameters("String nameParam");
+                List<Route> results = (List<Route>) q.execute(e.getRoute().getName());
+                if (!results.isEmpty()) {
+                    e.setRoute(results.get(0));
+                }
                 pm.makePersistent(e);
             }
         } finally {
@@ -228,7 +218,7 @@ public class SkatenightServerEndpoint {
 
     /**
      *  Gibt eine Liste von allen gespeicherten Routen zurück
-     *  @return Liste der Routen, null falls keine existieren.
+     *  @return Liste der Routen.
      */
     public List<Route> getRoutes(){
         PersistenceManager pm = pmf.getPersistenceManager();
@@ -247,20 +237,21 @@ public class SkatenightServerEndpoint {
 
     /**
      * Lösche Route vom Server
-     * @param route die Route, die gelöscht werden soll
+     * @param id Die ID der zu löschenden Route.
      */
-    public void deleteRoute(Route route){
+    public void deleteRoute(@Named("id") long id){
         PersistenceManager pm = pmf.getPersistenceManager();
         try{
-            pm.makePersistent(route);
-            pm.deletePersistent(route);
-
+            for (Route r : (List<Route>) pm.newQuery(Route.class).execute()) {
+                if (r.getKey().getId() == id) {
+                    pm.deletePersistent(r);
+                    break;
+                }
+            }
         }finally{
             pm.close();
         }
     }
-
-
 
 }
 

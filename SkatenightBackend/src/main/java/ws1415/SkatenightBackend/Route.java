@@ -3,6 +3,7 @@ package ws1415.SkatenightBackend;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 
+import javax.annotation.Generated;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -35,10 +36,6 @@ public class Route {
         this.name = name;
     }
 
-    public Key getKey() {
-        return key;
-    }
-
     public Text getRouteData() {
         return routeData;
     }
@@ -53,5 +50,9 @@ public class Route {
 
     public void setLength(String length) {
         this.length = length;
+    }
+
+    public Key getKey() {
+        return key;
     }
 }
