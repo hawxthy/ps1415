@@ -33,7 +33,7 @@
     <string name="not_authorized">Not authorized</string>
 
     <!-- Manage Routes xml -->
-    <string name="title_activity_manage_routes">Manage Routes</string>
+    <string name="title_fragment_manage_routes">Manage Routes</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string-array name="selections_menu">
         <item name="delete">Delete</item>
