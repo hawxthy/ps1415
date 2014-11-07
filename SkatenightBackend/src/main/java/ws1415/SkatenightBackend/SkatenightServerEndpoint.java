@@ -159,7 +159,7 @@ public class SkatenightServerEndpoint {
                 m.setEmail(mail);
                 /**
                  * TODO:Als Name wird zurzeit die Mail-Adresse verwendet, da noch keine Eingabe-
-                 * möglichkeit für den Namen besteht.
+                 * möglichkeit für den Namen besteht. (sollte im nächsten Sprint übernommen werden)
                  */
                 m.setName(mail);
             }
