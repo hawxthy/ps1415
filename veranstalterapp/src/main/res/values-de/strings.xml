@@ -35,6 +35,7 @@
     <string-array name="selections_menu">
         <item name="delete">Löschen</item>
     </string-array>
+    <string name="route_delete_failed">Route ist aktueller Veranstaltung zugewiesen</string>
 
     <!-- Route Editor xml -->
     <string name="title_activity_route_editor">Streckeneditor</string>

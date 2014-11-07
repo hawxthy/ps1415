@@ -38,6 +38,7 @@
     <string-array name="selections_menu">
         <item name="delete">Delete</item>
     </string-array>
+    <string name="route_delete_failed">Route is associated with current event</string>
 
     <!-- Route Editor xml -->
     <string name="title_activity_route_editor">Route Editor</string>
