@@ -38,6 +38,9 @@ public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> 
     }
 
      @Override
+     /**
+      * Ruft den Befehl zum zeichnen des Members auf die Karte auf
+      */
      protected void onPostExecute(Member m) {
          view.drawMembers(m);
      }
