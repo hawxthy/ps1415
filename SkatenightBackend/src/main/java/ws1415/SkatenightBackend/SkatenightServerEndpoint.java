@@ -2,6 +2,9 @@ package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.Named;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -15,6 +18,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
+import javax.jdo.Transaction;
 
 
 /**
@@ -197,6 +201,20 @@ public class SkatenightServerEndpoint {
         return member;
     }
 
+    /**
+     * Speichert die angegebene Route auf dem Server
+     * @param route zu speichernde Route
+     */
+    public void addRoute(Route route){
+        PersistenceManager pm = pmf.getPersistenceManager();
+        if(route != null){
+            try{
+                pm.makePersistent(route);
+            }finally {
+                pm.close();
+            }
+        }
+    }
 
     /**
      *  Gibt eine Liste von allen gespeicherten Routen zurück

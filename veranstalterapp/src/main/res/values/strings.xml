@@ -1,10 +1,11 @@
-<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <string name="app_name">Host Skatenight</string>
     <string name="action_settings">Settings</string>
     <string name="action_add_route">Create Route</string>
 
-    <!--Activity Hold Tabs xml-->
+    <!-- Activity Hold Tabs xml -->
     <string name="title_activity_start_page">Host Skatenight</string>
 
     <!-- Announce Information xml -->
@@ -20,7 +21,7 @@
     <string name="announce_info_location">Location:</string>
     <string name="announce_info_location_hint">Enter a location</string>
     <string name="announce_info_map">Map:</string>
-    <string name="announce_info_choose_map">Setup a map</string>
+    <string name="announce_info_choose_map">Choose Route</string>
     <string name="announce_info_description">Description:</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="hello_world">Hello world!</string>
@@ -31,21 +32,36 @@
     <string name="eventcreated">Event was created</string>
     <string name="not_authorized">Not authorized</string>
 
-    <!--Manage Routes xml-->
-    <string name="title_activity_manage_routes">Manage Routes</string>
+    <!-- Manage Routes xml -->
+    <string name="title_fragment_manage_routes">Manage Routes</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string-array name="selections_menu">
         <item name="delete">Delete</item>
     </string-array>
 
-    <!--Strings zu activity_showinformation-->
+    <!-- Route Editor xml -->
+    <string name="title_activity_route_editor">Route Editor</string>
+    <string name="title_fragment_route_editor_map">Map</string>
+    <string name="title_fragment_route_editor_waypoints">Waypoints</string>
+    <string name="route_editor_waypoint_name_format">Waypoint <xliff:g id="number">%1$d</xliff:g></string>
+    <string name="route_editor_error_load_route">Unable to load route.</string>
+
+    <!-- Strings zu activity_showinformation -->
     <string name="title_fragment_show_information">Show Information</string>
     <string name="show_info_header_date">Time and date</string>
     <string name="show_info_header_location">Location</string>
+    <string name="show_info_header_route">Route</string>
     <string name="show_info_header_fee">Participation fee</string>
     <string name="show_info_header_description">Description</string>
     <string name="downloading">Downloading...</string>
+    <string name="show_info_empty_text">N/A</string>
 
     <!--Strings zu list_view_item_layout-->
     <string name="list_view_item_layout_length">Length:</string>
+
+    <!--Strings zu activity_choose_route-->
+    <string name="title_activity_choose_route">Wähle Route</string>
+
+    <!--Strings zu activity_show_route-->
+    <string name="title_activity_show_route">Route</string>
 </resources>

@@ -2,13 +2,18 @@ package ws1415.ps1415;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
@@ -54,9 +59,26 @@ public class ShowInformationActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (route != null) {
-                    Intent intent = new Intent(ShowInformationActivity.this, ShowRouteActivity.class);
-                    intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, route);
-                    startActivity(intent);
+                    // Erstellt den Dialog, ob die Position gespeichert werden soll und auf der Karte angezeigt wird
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ShowInformationActivity.this);
+                    builder.setMessage("Deine Position wird gespeichert & auf der Karte angezeigt.");
+                    builder.setPositiveButton(Html.fromHtml("<font color='#1FB1FF'>Ok</font>"), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // Leite wieter auf die Karte
+                            Intent intent = new Intent(ShowInformationActivity.this, ShowRouteActivity.class);
+                            intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, route);
+                            startActivity(intent);
+                        }
+                    });
+                    builder.setNegativeButton(Html.fromHtml("<font color='#1FB1FF'>Abbrechen</font>"), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // Tue nichts
+                        }
+                    });
+
+                    // Zeigt den Dialog
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
             }
         });

@@ -1,4 +1,4 @@
-package ws1415.ps1415.util;
+package ws1415.veranstalterapp.util;
 
 import android.location.Location;
 
@@ -39,7 +39,7 @@ public final class LocationUtils {
      *
      * @param encoded Zu decodierender Wert.
      * @return Decodierter Wert.
-     * @throws ParseException Falls kein gültiger String übergeben wurde.
+     * @throws java.text.ParseException Falls kein gültiger String übergeben wurde.
      */
     public static double decodeDouble(String encoded) throws ParseException {
         if (encoded == null)
@@ -78,7 +78,7 @@ public final class LocationUtils {
      *
      * @param encoded Zu decodierende Werte.
      * @return Liste der decodierten Koordinaten.
-     * @throws ParseException Falls kein gültiger String übergeben wurde.
+     * @throws java.text.ParseException Falls kein gültiger String übergeben wurde.
      */
     public static List<LatLng> decodePolyline(String encoded) throws ParseException {
         if (encoded == null)
@@ -127,7 +127,7 @@ public final class LocationUtils {
      *
      * @param encoded Zu decodierende Location als String.
      * @return Decodierte Location.
-     * @throws ParseException Falls kein gültiger String übergeben wurde.
+     * @throws java.text.ParseException Falls kein gültiger String übergeben wurde.
      */
     public static Location decodeLocation(String encoded) throws ParseException {
         if (encoded == null)
@@ -186,7 +186,7 @@ public final class LocationUtils {
      *
      * @param encoded Codierter String als StringBuffer.
      * @return Decodierter Wert als int.
-     * @throws ParseException Falls nicht genügend Zeichen zum parsen vorhanden sind.
+     * @throws java.text.ParseException Falls nicht genügend Zeichen zum parsen vorhanden sind.
      */
     private static int decodeValue(StringBuffer encoded) throws ParseException {
         int length = encoded.length();

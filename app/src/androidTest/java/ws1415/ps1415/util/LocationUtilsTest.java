@@ -201,11 +201,11 @@ public class LocationUtilsTest extends TestCase {
             List<LatLng> decoded = LocationUtils.decodePolyline(encoded);
             assertEquals(line.size(), decoded.size());
             for (int i = 0; i < line.size(); i++) {
-                assertEquals(line.get(i).latitude, decoded.get(i).latitude, 0.00002);
-                assertEquals(line.get(i).longitude, decoded.get(i).longitude, 0.00002);
+                assertEquals(line.get(i).latitude, decoded.get(i).latitude, 0.00001);
+                assertEquals(line.get(i).longitude, decoded.get(i).longitude, 0.00001);
             }
         }
-        catch (Throwable t) {
+        catch (Exception t) {
             fail("Decoding should not throw an exception.");
         }
 

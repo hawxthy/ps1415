@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import java.util.Calendar;
 import java.util.Date;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
+import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 import com.appspot.skatenight_ms.skatenightAPI.model.Text;
 import com.google.api.client.util.DateTime;
 
@@ -34,6 +36,9 @@ public class AnnounceInformationFragment extends Fragment {
     private EditText editTextFee;
     private EditText editTextLocation;
     private EditText editTextDescription;
+
+    // Der Button für die Route
+    private Button routePickerButton;
 
     // Die Buttons für Zeit und Datum
     private Button datePickerButton;
@@ -63,6 +68,9 @@ public class AnnounceInformationFragment extends Fragment {
     private int hour;
     private int minute;
 
+    // Das Attribut Route
+    private Route route;
+
     // das neu erstellte Event
     private Event event;
 
@@ -82,6 +90,7 @@ public class AnnounceInformationFragment extends Fragment {
         datePickerButton = (Button) view.findViewById(R.id.announce_info_date_button);
         applyButton = (Button) view.findViewById(R.id.announce_info_apply_button);
         cancelButton = (Button) view.findViewById(R.id.announce_info_cancel_button);
+        routePickerButton = (Button) view.findViewById(R.id.announce_info_choose_route);
 
         // Setze die Listener für die Buttons
         setButtonListener();
@@ -125,6 +134,14 @@ public class AnnounceInformationFragment extends Fragment {
                  * Die onClick Methode welche aufgerufen wird, wenn der datePickerButton gedrückt wird.
                  */
                 showDialog(DATE_DIALOG_ID).show();
+            }
+        });
+
+        routePickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), ChooseRouteActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -228,7 +245,7 @@ public class AnnounceInformationFragment extends Fragment {
                 description = new Text();
                 description.setValue(editTextDescription.getText().toString());
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (!title.isEmpty() && !fee.isEmpty() && dTime != null && !location.isEmpty() && !description.isEmpty()) {
+                if (!title.isEmpty() && !fee.isEmpty() && dTime != null && !location.isEmpty() && !description.isEmpty() && route != null) {
                     // Erstelle ein neue Event
                     event = new Event();
 
@@ -237,6 +254,7 @@ public class AnnounceInformationFragment extends Fragment {
                     event.setFee(fee);
                     event.setDate(dTime);
                     event.setLocation(location);
+                    event.setRoute(route);
                     event.setDescription(description);
                     new CreateEventTask().execute(event);
                     Toast.makeText(getActivity(),
@@ -268,16 +286,23 @@ public class AnnounceInformationFragment extends Fragment {
             editTextTitle.setText("");
             editTextFee.setText("");
             editTextLocation.setText("");
+            routePickerButton.setText(getString(R.string.announce_info_choose_map));
             editTextDescription.setText("");
             setCurrentDateOnView();
         } else {
-            Toast.makeText(getActivity(), "Nicht alle Felder Ausgefüllt", Toast.LENGTH_LONG).show();
-            editTextTitle.setText(title);
-            editTextFee.setText(fee);
-            editTextLocation.setText(location);
-            editTextDescription.setText(editTextDescription.getText().toString());
+            Toast.makeText(getActivity(), "Nicht alle Felder ausgefüllt", Toast.LENGTH_LONG).show();
         }
 
         timePickerButton.setText(getResources().getString(R.string.announce_info_set_time));
+    }
+
+    /**
+     * Dies Methode setzt die Route für das Event
+     *
+     * @param selectedRoute Die Route für das Event
+     */
+    public void setRoute(Route selectedRoute){
+        route = selectedRoute;
+        routePickerButton.setText(selectedRoute.getName());
     }
 }

@@ -2,6 +2,7 @@ package ws1415.veranstalterapp;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -91,8 +92,9 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
-        }else if(id == R.id.action_add_route){
-            // TODO Methode addRoute() muss hier aufgerufen werden
+        }else if(id == R.id.action_add_route) {
+            Intent intent = new Intent(this, RouteEditorActivity.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -122,5 +124,9 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
 
     public static void updateInformation(){
         new QueryEventTask().execute((ShowInformationFragment) mAdapter.getItem(0));
+    }
+
+    public static TabsPagerAdapter getAdapter(){
+        return mAdapter;
     }
 }
