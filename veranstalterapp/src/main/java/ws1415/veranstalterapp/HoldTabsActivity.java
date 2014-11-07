@@ -21,7 +21,7 @@ import ws1415.veranstalterapp.Adaper.TabsPagerAdapter;
  * Created by Bernd Eissing, Martin Wrodarczyk.
  */
 public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabListener {
-    private ViewPager viewPager;
+    private static ViewPager viewPager;
     private static TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
     private MenuItem menuItem;
@@ -118,7 +118,7 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
         if (id == R.id.action_settings) {
             return true;
         }else if(id == R.id.action_add_route) {
-            Intent intent = new Intent(this, RouteEditorActivity.class);
+            Intent intent = new Intent(this, AddRouteDialog.class);
             startActivity(intent);
             return true;
         }
@@ -162,5 +162,14 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
      */
     public static TabsPagerAdapter getAdapter(){
         return mAdapter;
+    }
+
+    /**
+     * Gibt den ViewPager zurück.
+     *
+     * @return
+     */
+    public static ViewPager getViewPager(){
+        return viewPager;
     }
 }
