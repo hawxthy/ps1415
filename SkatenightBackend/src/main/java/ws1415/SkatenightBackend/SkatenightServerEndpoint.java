@@ -264,19 +264,25 @@ public class SkatenightServerEndpoint {
     /**
      * Lösche Route vom Server
      * @param id Die ID der zu löschenden Route.
+     * @return true, wenn die Route gelöscht wurde, sonst false
      */
-    public void deleteRoute(@Named("id") long id){
+    public BooleanWrapper deleteRoute(@Named("id") long id) {
+        Event event = getEvent();
+        if (event.getRoute().getKey().getId() == id) {
+            return new BooleanWrapper(false);
+        }
         PersistenceManager pm = pmf.getPersistenceManager();
         try{
             for (Route r : (List<Route>) pm.newQuery(Route.class).execute()) {
                 if (r.getKey().getId() == id) {
                     pm.deletePersistent(r);
-                    break;
+                    return new BooleanWrapper(true);
                 }
             }
         }finally{
             pm.close();
         }
+        return new BooleanWrapper(false);
     }
 
 }
