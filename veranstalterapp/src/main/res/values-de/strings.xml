@@ -22,6 +22,7 @@
     <string name="announce_info_map">Map:</string>
     <string name="announce_info_choose_map">Wähle Route</string>
     <string name="announce_info_description">Beschreibung:</string>
+    <string name="title_activity_login">Login</string>
     <string name="login_button">Login</string>
     <string name="areyousure">Sind Sie sicher?</string>
     <string name="yes">Ja</string>
@@ -60,5 +61,5 @@
     <string name="title_activity_choose_route">Wähle Route</string>
 
     <!--Strings zu activity_show_route-->
-    <string name="title_activity_show_route">Route</string>
+    <string name="title_activity_show_route">Route 3</string>
 </resources>
