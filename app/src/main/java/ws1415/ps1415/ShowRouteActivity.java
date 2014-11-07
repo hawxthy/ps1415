@@ -38,7 +38,7 @@ public class ShowRouteActivity extends Activity {
     private PolylineOptions route;
     private Intent service;
 
-    private Location location;
+    private Location location; // Enthält die aktuelle Position, die vom Server runtergeladen wurde
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +148,7 @@ public class ShowRouteActivity extends Activity {
                 location = LocationUtils.decodeLocation(m.getLocation());
                 LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
 
+                // Markerfarbe
                 float markerColor;
                 markerColor = BitmapDescriptorFactory.HUE_YELLOW;
 
