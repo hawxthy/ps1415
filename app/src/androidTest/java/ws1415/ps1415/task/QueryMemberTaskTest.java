@@ -1,15 +1,17 @@
-package ws1415.ps1415;
+package ws1415.ps1415.task;
 
 import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
-import com.google.api.client.util.DateTime;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+
+import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.ShowRouteActivity;
+import ws1415.ps1415.task.QueryMemberTask;
 
 /**
  * ACHTUNG: Test läuft über den normalen Google-Server, da das @-Zeichen bei einer Anfrage an den
@@ -22,6 +24,11 @@ public class QueryMemberTaskTest extends AndroidTestCase {
     private static final String testMail = "max@mustermann.de";
     private static final String testLocation = "{rd|Ha`lm@";
 
+    /**
+     * Stellt sicher, dass auf dem Server ein Member-Objekt mit der angegebenen Mail und Position
+     * existiert.
+     * @throws Exception
+     */
     public void setUp() throws Exception {
         super.setUp();
 
@@ -32,6 +39,11 @@ public class QueryMemberTaskTest extends AndroidTestCase {
                 testLocation).execute();
     }
 
+    /**
+     * Prüft, ob das durch den QueryMemberTask abgerufene Member-Objekt die Testdaten enthält.
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     public void testTask() throws ExecutionException, InterruptedException {
         QueryMemberTask task = new QueryMemberTask();
         Member m = task.execute(new ShowRouteActivity() {
@@ -92,6 +104,8 @@ public class QueryMemberTaskTest extends AndroidTestCase {
         }).get();
         assertNotNull("member is null", m);
         assertEquals("wrong member email", testMail, m.getEmail());
+        // Nach Implementierung des Backends wird als Name die Mail-Adresse verwendet:
+        assertEquals("wrong name", testMail, m.getName());
         assertEquals("wrong member location", testLocation, m.getLocation());
     }
 }

@@ -7,13 +7,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
@@ -21,6 +19,8 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import ws1415.ps1415.task.QueryEventTask;
 
 
 public class ShowInformationActivity extends Activity {
@@ -111,6 +111,9 @@ public class ShowInformationActivity extends Activity {
         }
     }
 
+    /**
+     * Callback-Methode für den Account-Picker.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

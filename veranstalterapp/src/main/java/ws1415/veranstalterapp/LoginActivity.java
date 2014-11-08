@@ -3,19 +3,21 @@ package ws1415.veranstalterapp;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
-import java.io.IOException;
+import ws1415.veranstalterapp.task.LoginTask;
 
-
+/**
+ * Zeigt einen Login-Bildschirm an, mit dem sich ein Veranstalter einloggen muss, bevor er Zugriff
+ * auf die Event-Informationen hat.
+ *
+ * @author Richard, Daniel
+ */
 public class LoginActivity extends Activity {
     static final int REQUEST_ACCOUNT_PICKER = 2;
 
@@ -34,7 +36,10 @@ public class LoginActivity extends Activity {
         }
     }
 
-
+    /**
+     * Callback-Methode für den Account-Picker, die den gewählten Account in die Credentials über-
+     * nimmt.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -53,7 +58,7 @@ public class LoginActivity extends Activity {
     }
 
     /**
-     * Führt die StartActivityForResult aus
+     * Führt die StartActivityForResult aus, um den AccountPicker anzuzeigen.
      */
     public void login(View view) {
         startActivityForResult(credential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
@@ -78,6 +83,10 @@ public class LoginActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Gibt die GoogleAccountCredentials zurück, die in dieser Activity verwaltet werden.
+     * @return
+     */
     public GoogleAccountCredential getCredential() {
         return credential;
     }

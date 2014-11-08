@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
+import ws1415.veranstalterapp.task.DeleteRouteTask;
+import ws1415.veranstalterapp.task.QueryRouteTask;
 
 /**
  * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.

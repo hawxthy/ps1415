@@ -22,7 +22,7 @@ import javax.jdo.Transaction;
 
 
 /**
- * Die ServerAPI, die alle Zugriffe auf den Server für die Skatenight-App entgegen nimmt.
+ * Die ServerAPI, die Api-Methoden zur Verfügung stellt.
  * @author Richard, Daniel
  */
 @Api(name = "skatenightAPI",

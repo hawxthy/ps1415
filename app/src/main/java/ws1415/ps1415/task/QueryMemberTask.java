@@ -1,4 +1,4 @@
-package ws1415.ps1415;
+package ws1415.ps1415.task;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,6 +10,9 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 
 import java.io.IOException;
 
+import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.ShowRouteActivity;
+
 /**
  * Created by Tristan Rust on 21.10.2014.
  * Dient zum Abrufen der Nutzerinformationen.
@@ -20,7 +23,7 @@ public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> 
 
     /**
      * Ruft das aktuelle Member-Objekt vom Server ab.
-     * @param params Die zu befüllenden Views
+     * @param params Die zu befüllende Activity
      * @return Das Member-Objekt
      */
     @Override

@@ -1,10 +1,12 @@
-package ws1415.veranstalterapp;
+package ws1415.veranstalterapp.task;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 import java.io.IOException;
+
+import ws1415.veranstalterapp.ServiceProvider;
 
 /**
  * Klasse welche mit SkatenightBackend kommuniziert um auf den Server zu zugreifen.

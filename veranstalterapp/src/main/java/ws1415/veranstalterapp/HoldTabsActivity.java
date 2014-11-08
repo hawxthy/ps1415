@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import ws1415.veranstalterapp.Adapter.TabsPagerAdapter;
+import ws1415.veranstalterapp.task.QueryEventTask;
 
 /**
  * Die Activity, welche beim starten der Veranstalter App ausgeführt wird. Diese Activity

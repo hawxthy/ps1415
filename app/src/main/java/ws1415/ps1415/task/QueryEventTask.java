@@ -1,4 +1,4 @@
-package ws1415.ps1415;
+package ws1415.ps1415.task;
 
 import android.os.AsyncTask;
 import android.widget.TextView;
@@ -7,6 +7,9 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 
 import java.io.IOException;
 
+import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.ShowInformationActivity;
+
 /**
  * Created by Richard on 21.10.2014.
  */
@@ -14,9 +17,9 @@ public class QueryEventTask extends AsyncTask<ShowInformationActivity, Void, Eve
     private ShowInformationActivity view;
 
     /**
-     * Ruft das aktuelle Event-Objekt vom Server ab und schreibt die Informationen in die
-     * übergebene View.
-     * @param params Die zu befüllende View
+     * Ruft das aktuelle Event-Objekt vom Server ab.
+     * @param params Die zu befüllende Activity
+     * @return Das abgerufene Event-Objekt.
      */
     @Override
     protected Event doInBackground(ShowInformationActivity... params) {
@@ -29,6 +32,10 @@ public class QueryEventTask extends AsyncTask<ShowInformationActivity, Void, Eve
         return null;
     }
 
+    /**
+     * Übergibt das abgerufene Event-Objekt an die View.
+     * @param e Das abgerufene Event-Objekt.
+     */
     @Override
     protected void onPostExecute(Event e) {
         view.setEventInformation(e);

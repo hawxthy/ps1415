@@ -12,7 +12,8 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
- * Created by Bernd Eissing, Martin Wrodarczyk on 21.10.2014.
+ * Datenmodell für eine Veranstaltung.
+ * Created by Richard Schulze, Bernd Eissing, Martin Wrodarczyk on 21.10.2014.
  */
 @PersistenceCapable
 public class Event {

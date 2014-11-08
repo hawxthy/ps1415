@@ -27,6 +27,8 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 import com.appspot.skatenight_ms.skatenightAPI.model.Text;
 import com.google.api.client.util.DateTime;
 
+import ws1415.veranstalterapp.task.CreateEventTask;
+
 /**
  * Fragment zum veröffentlichen von neuen Veranstaltungen.
  * <p/>

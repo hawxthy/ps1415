@@ -1,4 +1,4 @@
-package ws1415.ps1415;
+package ws1415.ps1415.task;
 
 import android.os.AsyncTask;
 

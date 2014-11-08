@@ -1,30 +1,30 @@
-package ws1415.ps1415;
+package ws1415.ps1415.task;
 
-import android.accounts.Account;
-import android.test.ActivityInstrumentationTestCase2;
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 import com.appspot.skatenight_ms.skatenightAPI.model.Text;
-import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.DateTime;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
+import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.ShowInformationActivity;
+import ws1415.ps1415.task.QueryEventTask;
+
 /**
- * TestCase für QueryEventTask, der die ShowInformationActivity für einen gültigen ApplicationContext
- * nutzt.
+ * TestCase für QueryEventTask.
  * Created by Richard on 06.11.2014.
  */
 public class QueryEventTaskTest extends AndroidTestCase {
     private Event testEvent;
     private Route testRoute;
 
+    /**
+     * Stellt eine Verbindung zum Testserver her und bereitet die Testdaten vor.
+     */
     public QueryEventTaskTest() {
         ServiceProvider.setupTestServerConnection();
 
@@ -61,6 +61,10 @@ public class QueryEventTaskTest extends AndroidTestCase {
         testEvent.setRoute(testRoute);
     }
 
+    /**
+     * Überträgt die Testdaten auf den Server.
+     * @throws Exception
+     */
     public void setUp() throws Exception {
         super.setUp();
 
@@ -68,12 +72,18 @@ public class QueryEventTaskTest extends AndroidTestCase {
         ServiceProvider.getService().skatenightServerEndpoint().setEventTestMethod(testEvent).execute();
     }
 
+    /**
+     * Prüft, ob das durch den QueryEventTask abgerufene Event die korrekten Daten enthält.
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     public void testTask() throws ExecutionException, InterruptedException {
         QueryEventTask task = new QueryEventTask();
         Event event = task.execute(new ShowInformationActivity() {
             @Override
             public void setEventInformation(Event e) {
-                // Methode mit leerem Rumpf überschreiben, da der Callback für den Test nicht relevant ist
+                // Methode mit leerem Rumpf überschreiben,
+                // da der Callback für den Test nicht relevant ist
             }
         }).get();
         assertNotNull("event is null", event);
@@ -88,6 +98,7 @@ public class QueryEventTaskTest extends AndroidTestCase {
         assertEquals("wrong route name", testRoute.getName(), event.getRoute().getName());
         assertEquals("wrong route length", testRoute.getLength(), event.getRoute().getLength());
         assertNotNull("route data is null", event.getRoute().getRouteData());
-        assertEquals("wrong route data", testRoute.getRouteData().getValue(), event.getRoute().getRouteData().getValue());
+        assertEquals("wrong route data", testRoute.getRouteData().getValue(),
+                event.getRoute().getRouteData().getValue());
     }
 }

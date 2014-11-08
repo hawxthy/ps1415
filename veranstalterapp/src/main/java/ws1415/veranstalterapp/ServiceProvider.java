@@ -6,7 +6,7 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 /**
- * Created by Bernd Eissing, Martin Wrodarczyk on 24.10.2014.
+ * Created by Bernd Eissing, Martin Wrodarczyk, Richard Schulze on 24.10.2014.
  */
 public abstract class ServiceProvider {
     private static SkatenightAPI service;
@@ -40,7 +40,7 @@ public abstract class ServiceProvider {
     /**
      * Loggt den Veranstalter in die Veranstalterapp ein.
      *
-     * @param credential der Berechtigungsnachweis
+     * @param credential GoogleAccountCredential, das den ausgewählten Google-Account enthält.
      */
     public static void login(GoogleAccountCredential credential) {
         SkatenightAPI.Builder builder = new SkatenightAPI.Builder(

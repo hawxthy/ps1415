@@ -7,23 +7,21 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Toast;
 
-import com.appspot.skatenight_ms.skatenightAPI.SkatenightAPI;
-import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import ws1415.ps1415.task.UpdateLocationTask;
 import ws1415.ps1415.util.LocationUtils;
 
 /**
  * Created by Tristan Rust on 28.10.2014.
  *
  * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient und diese auf den
- * Server senden und falls der Nutzer noch nicht existiert wird er angelegt, ansonsten geupdatet.
+ * Server sendet. Falls der Nutzer noch nicht existiert wird er angelegt, ansonsten geupdatet.
  *
  */
 public class LocationTransmitterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {

@@ -1,4 +1,4 @@
-package ws1415.ps1415;
+package ws1415.ps1415.task;
 
 import android.test.AndroidTestCase;
 
@@ -6,6 +6,9 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+
+import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.task.UpdateLocationTask;
 
 /**
  * ACHTUNG: Test läuft über den normalen Google-Server, da das @-Zeichen bei einer Anfrage an den
@@ -24,6 +27,10 @@ public class UpdateLocationTaskTest extends AndroidTestCase {
         ServiceProvider.setupProductionServerConnection();
     }
 
+    /**
+     * Überträgt die Testposition an den Server und prüft, ob die Daten korrekt abgespeichert
+     * wurden.
+     */
     public void testTask() throws ExecutionException, InterruptedException, IOException {
         UpdateLocationTask task = new UpdateLocationTask();
         task.execute(testMail, testLocation).get();

@@ -3,13 +3,10 @@ package ws1415.ps1415;
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -23,10 +20,10 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 
+import ws1415.ps1415.task.QueryMemberTask;
 import ws1415.ps1415.util.LocationUtils;
 
 
