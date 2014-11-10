@@ -1,4 +1,4 @@
-package ws1415.ps1415.task;
+package ws1415.veranstalterapp.task;
 
 import android.test.AndroidTestCase;
 
@@ -10,13 +10,11 @@ import com.google.api.client.util.DateTime;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
-import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.ShowInformationActivity;
-import ws1415.ps1415.task.QueryEventTask;
+import ws1415.veranstalterapp.ServiceProvider;
+import ws1415.veranstalterapp.ShowInformationFragment;
 
 /**
- * TestCase für QueryEventTask.
- * Created by Richard on 06.11.2014.
+ * Created by Richard Schulze on 10.11.2014.
  */
 public class QueryEventTaskTest extends AndroidTestCase {
     private Event testEvent;
@@ -74,12 +72,12 @@ public class QueryEventTaskTest extends AndroidTestCase {
 
     /**
      * Prüft, ob das durch den QueryEventTask abgerufene Event die korrekten Daten enthält.
-     * @throws ExecutionException
+     * @throws java.util.concurrent.ExecutionException
      * @throws InterruptedException
      */
     public void testTask() throws ExecutionException, InterruptedException {
         QueryEventTask task = new QueryEventTask();
-        Event event = task.execute(new ShowInformationActivity() {
+        Event event = task.execute(new ShowInformationFragment() {
             @Override
             public void setEventInformation(Event e) {
                 // Methode mit leerem Rumpf überschreiben,

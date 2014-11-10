@@ -50,4 +50,27 @@ public abstract class ServiceProvider {
         service = builder.build();
     }
 
+    /**
+     * Erstellt ein Skatenight-API Objekt, das eine Verbindung zum Test-Server aufbaut.
+     * Kann für Testklassen benutzt werden.
+     */
+    public static void setupTestServerConnection() {
+        SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                new AndroidJsonFactory(), null);
+        builder.setRootUrl("http://192.168.178.21:8080/_ah/api");
+        service = builder.build();
+    }
+
+    /**
+     * Erstellt ein Skatenight-API Objekt, das eine Verbindung zum Production-Server aufbaut.
+     */
+    public static void setupProductionServerConnection() {
+        SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                new AndroidJsonFactory(), null);
+        builder.setRootUrl("https://skatenight-ms.appspot.com/_ah/api");
+        service = builder.build();
+    }
+
 }

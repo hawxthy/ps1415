@@ -87,9 +87,9 @@
     <orderEntry type="library" exported="" name="google-api-client-android-1.18.0-rc" level="project" />
     <orderEntry type="library" exported="" name="google-http-client-android-1.18.0-rc" level="project" />
     <orderEntry type="library" exported="" name="google-oauth-client-1.18.0-rc" level="project" />
-    <orderEntry type="library" exported="" name="play-services-6.1.11" level="project" />
     <orderEntry type="library" exported="" name="google-http-client-1.18.0-rc" level="project" />
     <orderEntry type="library" exported="" name="SkatenightBackend-endpoints-android" level="project" />
+    <orderEntry type="library" exported="" name="play-services-6.1.71" level="project" />
     <orderEntry type="library" exported="" name="support-v13-21.0.0" level="project" />
   </component>
 </module>
