@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp;
+package ws1415.veranstalterapp.Fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -7,6 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.Activities.RouteEditorActivity;
 
 
 public class EditorWaypointsFragment extends Fragment {

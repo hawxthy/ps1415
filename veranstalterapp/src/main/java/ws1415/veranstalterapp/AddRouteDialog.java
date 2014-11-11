@@ -8,6 +8,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import ws1415.veranstalterapp.Activities.HoldTabsActivity;
+import ws1415.veranstalterapp.Activities.RouteEditorActivity;
+
 
 public class AddRouteDialog extends Activity {
     private EditText routeNameEditText;

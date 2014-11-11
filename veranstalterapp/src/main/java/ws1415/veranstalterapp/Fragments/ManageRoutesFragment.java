@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp;
+package ws1415.veranstalterapp.Fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
+import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.Activities.ShowRouteActivity;
 import ws1415.veranstalterapp.task.DeleteRouteTask;
 import ws1415.veranstalterapp.task.QueryRouteTask;
 
@@ -46,6 +48,14 @@ public class ManageRoutesFragment extends Fragment {
     }
 
     /**
+     * Aktualisiert die Liste der Strecken.
+     */
+    @Override
+    public void onResume(){
+        super.onResume();
+        new QueryRouteTask().execute(this);
+    }
+    /**
      * Ruft die Routen von Server ab, setzt die Listener für die List Items.
      *
      * @param inflater
@@ -58,7 +68,6 @@ public class ManageRoutesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_manage_routes, container, false);
 
         routeListView = (ListView) view.findViewById(R.id.manage_routes_route_list);
-        new QueryRouteTask().execute(this);
         routeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             /**
              * Ruft die showRouteActivity auf, die die ausgewählte Route anzeigt.

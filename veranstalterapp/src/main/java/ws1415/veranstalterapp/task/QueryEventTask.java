@@ -6,7 +6,7 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 import java.io.IOException;
 
 import ws1415.veranstalterapp.ServiceProvider;
-import ws1415.veranstalterapp.ShowInformationFragment;
+import ws1415.veranstalterapp.Fragments.ShowInformationFragment;
 
 /**
  * Created by Richard on 21.10.2014.

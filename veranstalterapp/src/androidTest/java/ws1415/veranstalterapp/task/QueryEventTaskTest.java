@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 import ws1415.veranstalterapp.ServiceProvider;
-import ws1415.veranstalterapp.ShowInformationFragment;
+import ws1415.veranstalterapp.Fragments.ShowInformationFragment;
 
 /**
  * Created by Richard Schulze on 10.11.2014.

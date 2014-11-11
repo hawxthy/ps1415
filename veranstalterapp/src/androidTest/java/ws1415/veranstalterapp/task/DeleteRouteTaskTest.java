@@ -7,7 +7,7 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Text;
 
 import java.io.IOException;
 
-import ws1415.veranstalterapp.ManageRoutesFragment;
+import ws1415.veranstalterapp.Fragments.ManageRoutesFragment;
 import ws1415.veranstalterapp.ServiceProvider;
 
 
