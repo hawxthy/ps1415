@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
+import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 import java.text.SimpleDateFormat;
@@ -42,6 +43,7 @@ public class ShowInformationActivity extends Activity {
     private String fee;
     private String description;
     private String route;
+    private Route routeObject;
 
     // Erstellen eines SimpleDateFormats, damit das Datum und die Uhrzeit richtig angezeigt werden
     private SimpleDateFormat dateFormat;
@@ -190,6 +192,7 @@ public class ShowInformationActivity extends Activity {
             }
             if (e.getRoute() != null && e.getRoute().getRouteData() != null) {
                 route = e.getRoute().getRouteData().getValue();
+                routeObject = e.getRoute();
             }
         } else {
             title = null;
@@ -222,6 +225,7 @@ public class ShowInformationActivity extends Activity {
             locationView.setText(location);
             feeView.setText(fee);
             descriptionView.setText(description);
+            mapButton.setText(routeObject.getName() + " (" + routeObject.getLength() + ")");
             mapButton.setEnabled(true);
         }
         else {
