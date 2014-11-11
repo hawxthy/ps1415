@@ -6,9 +6,9 @@ import android.support.v4.app.FragmentManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.veranstalterapp.AnnounceInformationFragment;
-import ws1415.veranstalterapp.ManageRoutesFragment;
-import ws1415.veranstalterapp.ShowInformationFragment;
+import ws1415.veranstalterapp.Fragments.AnnounceInformationFragment;
+import ws1415.veranstalterapp.Fragments.ManageRoutesFragment;
+import ws1415.veranstalterapp.Fragments.ShowInformationFragment;
 
 /**
  * Klasse die die Tabs der HoldTabsActivity verwaltet.

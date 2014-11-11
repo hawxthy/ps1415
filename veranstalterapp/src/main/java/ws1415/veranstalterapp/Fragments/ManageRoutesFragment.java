@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp;
+package ws1415.veranstalterapp.Fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
+import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.ShowRouteActivity;
 import ws1415.veranstalterapp.task.DeleteRouteTask;
 import ws1415.veranstalterapp.task.QueryRouteTask;
 

@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
+import ws1415.veranstalterapp.Fragments.AnnounceInformationFragment;
 
 
 public class ChooseRouteActivity extends Activity {

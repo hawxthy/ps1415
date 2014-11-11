@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp;
+package ws1415.veranstalterapp.Fragments;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -27,6 +27,9 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 import com.appspot.skatenight_ms.skatenightAPI.model.Text;
 import com.google.api.client.util.DateTime;
 
+import ws1415.veranstalterapp.ChooseRouteActivity;
+import ws1415.veranstalterapp.HoldTabsActivity;
+import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.CreateEventTask;
 
 /**

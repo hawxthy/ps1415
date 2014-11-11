@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp;
+package ws1415.veranstalterapp.Fragments;
 
 
 
@@ -14,6 +14,9 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import ws1415.veranstalterapp.HoldTabsActivity;
+import ws1415.veranstalterapp.R;
 
 /**
  * Fragment zum begutachten der Metainformationen der erstellten Veranstaltung.

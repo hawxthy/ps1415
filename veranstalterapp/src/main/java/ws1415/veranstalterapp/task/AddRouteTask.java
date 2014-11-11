@@ -2,13 +2,10 @@ package ws1415.veranstalterapp.task;
 
 import android.os.AsyncTask;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 
 import java.io.IOException;
 
-import ws1415.veranstalterapp.HoldTabsActivity;
-import ws1415.veranstalterapp.ManageRoutesFragment;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**
