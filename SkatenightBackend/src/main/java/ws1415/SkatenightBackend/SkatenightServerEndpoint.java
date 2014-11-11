@@ -34,45 +34,45 @@ public class SkatenightServerEndpoint {
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
 
-    /**
-     * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
-     * @param mail Die hinzuzufügende Mail-Adresse
-     */
-    public void addHost(@Named("mail") String mail) {
-        PersistenceManager pm = pmf.getPersistenceManager();
-        try {
-            Query q = pm.newQuery(Host.class);
-            q.setFilter("email == emailParam");
-            q.declareParameters("String emailParam");
-            List<Host> results = (List<Host>) q.execute(mail);
-            if (results.isEmpty()) {
-                Host h = new Host();
-                h.setEmail(mail);
-                pm.makePersistent(h);
-            }
-        } finally {
-            pm.close();
-        }
-    }
-
-    /**
-     * Entfernt die angegebene Mail-Adresse aus den Veranstaltern.
-     * @param mail Die zu entfernende Mail-Adresse
-     */
-    public void removeHost(@Named("mail") String mail) {
-        PersistenceManager pm = pmf.getPersistenceManager();
-        try {
-            Query q = pm.newQuery(Host.class);
-            q.setFilter("email == emailParam");
-            q.declareParameters("String emailParam");
-            List<Host> results = (List<Host>) q.execute(mail);
-            if (!results.isEmpty()) {
-                pm.deletePersistentAll(results);
-            }
-        } finally {
-            pm.close();
-        }
-    }
+//    /**
+//     * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
+//     * @param mail Die hinzuzufügende Mail-Adresse
+//     */
+//    public void addHost(@Named("mail") String mail) {
+//        PersistenceManager pm = pmf.getPersistenceManager();
+//        try {
+//            Query q = pm.newQuery(Host.class);
+//            q.setFilter("email == emailParam");
+//            q.declareParameters("String emailParam");
+//            List<Host> results = (List<Host>) q.execute(mail);
+//            if (results.isEmpty()) {
+//                Host h = new Host();
+//                h.setEmail(mail);
+//                pm.makePersistent(h);
+//            }
+//        } finally {
+//            pm.close();
+//        }
+//    }
+//
+//    /**
+//     * Entfernt die angegebene Mail-Adresse aus den Veranstaltern.
+//     * @param mail Die zu entfernende Mail-Adresse
+//     */
+//    public void removeHost(@Named("mail") String mail) {
+//        PersistenceManager pm = pmf.getPersistenceManager();
+//        try {
+//            Query q = pm.newQuery(Host.class);
+//            q.setFilter("email == emailParam");
+//            q.declareParameters("String emailParam");
+//            List<Host> results = (List<Host>) q.execute(mail);
+//            if (!results.isEmpty()) {
+//                pm.deletePersistentAll(results);
+//            }
+//        } finally {
+//            pm.close();
+//        }
+//    }
 
     /**
      * Prüft, ob die angegebene Mail-Adresse zu einem authorisierten Veranstalter-Account gehört.
@@ -229,9 +229,17 @@ public class SkatenightServerEndpoint {
 
     /**
      * Speichert die angegebene Route auf dem Server
+     * @param user Der User, der die Route hinzufügen möchte
      * @param route zu speichernde Route
      */
-    public void addRoute(Route route){
+    public void addRoute(User user, Route route) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (!isHost(user.getEmail()).value) {
+            throw new OAuthRequestException("user is not a host");
+        }
+
         PersistenceManager pm = pmf.getPersistenceManager();
         if(route != null){
             try{
@@ -263,10 +271,18 @@ public class SkatenightServerEndpoint {
 
     /**
      * Lösche Route vom Server
+     * @param user Der User, der die Route löschen möchte
      * @param id Die ID der zu löschenden Route.
      * @return true, wenn die Route gelöscht wurde, sonst false
      */
-    public BooleanWrapper deleteRoute(@Named("id") long id) {
+    public BooleanWrapper deleteRoute(User user, @Named("id") long id) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (!isHost(user.getEmail()).value) {
+            throw new OAuthRequestException("user is not a host");
+        }
+
         Event event = getEvent();
         if (event.getRoute().getKey().getId() == id) {
             return new BooleanWrapper(false);
