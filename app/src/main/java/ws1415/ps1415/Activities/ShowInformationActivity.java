@@ -1,4 +1,4 @@
-package ws1415.ps1415;
+package ws1415.ps1415.Activities;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -21,6 +21,8 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import ws1415.ps1415.Constants;
+import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryEventTask;
 
 
@@ -100,7 +102,7 @@ public class ShowInformationActivity extends Activity {
 
         // SharePreferences skatenight.app laden
         prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
-        credential = GoogleAccountCredential.usingAudience(this,"server:client_id:"+Constants.WEB_CLIENT_ID);
+        credential = GoogleAccountCredential.usingAudience(this,"server:client_id:"+ Constants.WEB_CLIENT_ID);
 
         // accountName aus SharedPreferences laden
         if (prefs.contains("accountName")) {
