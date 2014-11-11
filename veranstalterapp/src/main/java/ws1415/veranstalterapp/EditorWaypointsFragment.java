@@ -17,11 +17,20 @@ public class EditorWaypointsFragment extends Fragment {
         if (getActivity() instanceof RouteEditorActivity) {
             final RouteEditorActivity activity = (RouteEditorActivity) getActivity();
             ListView listView = (ListView) view.findViewById(R.id.route_editor_waypoints_listview);
-            listView.setAdapter(activity.getWaypointArrayAdapter());
+            listView.setAdapter(activity.getArrayAdapter());
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     ((RouteEditorActivity) getActivity()).showWaypoint((RouteEditorActivity.Waypoint) parent.getAdapter().getItem(position));
+                }
+            });
+
+            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    RouteEditorActivity activity = (RouteEditorActivity) getActivity();
+                    activity.removeWaypoint(position);
+                    return true;
                 }
             });
         }

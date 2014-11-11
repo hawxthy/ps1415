@@ -2,11 +2,15 @@ package ws1415.veranstalterapp;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,10 +27,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -52,6 +53,10 @@ import ws1415.veranstalterapp.util.LocationUtils;
 
 
 public class RouteEditorActivity extends Activity implements ActionBar.TabListener {
+    private static final String LOG_TAG = RouteEditorActivity.class.getSimpleName();
+
+    private static final String EXTRA_NAME = "route_editor_activity_extra_name";
+    private static final String MEMBER_NAME = "route_editor_activity_member_name";
     private static final String MEMBER_WAYPOINTS = "route_editor_activity_member_waypoints";
     private static final String MEMBER_ROUTE = "route_editor_activity_member_route";
 
@@ -60,6 +65,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     private SectionsPagerAdapter sectionsPagerAdapter;
     private ViewPager viewPager;
 
+    private String name;
     private ArrayAdapter<Waypoint> waypointArrayAdapter;
     private Route route;
 
@@ -68,6 +74,8 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_editor);
 
+        name = null;
+
         waypointArrayAdapter = new WaypointAdapter(
                 this,
                 R.layout.list_view_item_waypoint,
@@ -75,12 +83,25 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
         route = null;
 
+        Intent intent;
         if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(MEMBER_NAME)) {
+                name = savedInstanceState.getString(MEMBER_NAME);
+            }
             if (savedInstanceState.containsKey(MEMBER_WAYPOINTS)) {
                 waypointArrayAdapter.addAll((Waypoint[]) savedInstanceState.getParcelableArray(MEMBER_WAYPOINTS));
             }
             if (savedInstanceState.containsKey(MEMBER_ROUTE)) {
                 route = (Route) savedInstanceState.getParcelable(MEMBER_ROUTE);
+            }
+        }
+        else if ((intent = getIntent()) != null) {
+            if (intent.hasExtra(EXTRA_NAME)) {
+                name = intent.getStringExtra(EXTRA_NAME);
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "No name!", Toast.LENGTH_SHORT).show();
+                finish();
             }
         }
 
@@ -94,7 +115,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(true);
 
-        for(int i = 0; i < sectionsPagerAdapter.getCount(); i++) {
+        for (int i = 0; i < sectionsPagerAdapter.getCount(); i++) {
             actionBar.addTab(actionBar.newTab().setText(sectionsPagerAdapter.getPageTitle(i)).setTabListener(this));
         }
 
@@ -105,12 +126,12 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
             }
 
             @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2){
+            public void onPageScrolled(int arg0, float arg1, int arg2) {
 
             }
 
             @Override
-            public void onPageScrollStateChanged(int arg0){
+            public void onPageScrollStateChanged(int arg0) {
 
             }
         });
@@ -118,6 +139,8 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(MEMBER_NAME, name);
+
         Waypoint[] temp = new Waypoint[waypointArrayAdapter.getCount()];
         for (int i = 0; i < waypointArrayAdapter.getCount(); i++) {
             temp[i] = waypointArrayAdapter.getItem(i);
@@ -140,7 +163,9 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.getItem(0).setEnabled(waypointArrayAdapter.getCount() < MAX_WAYPOINTS);
-        menu.getItem(0).getIcon().setAlpha(menu.getItem(0).isEnabled() ? 255 : 64);
+        Drawable d = menu.getItem(0).getIcon().mutate();
+        d.setAlpha(menu.getItem(0).isEnabled() ? 255 : 64);
+        menu.getItem(0).setIcon(d);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -150,20 +175,72 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if (id == android.R.id.home) {
+            showSaveDialog(false);
+            return true;
+        }
         if (id == R.id.action_settings) {
             return true;
         }
         else if (id == R.id.action_add_waypoint) {
-            EditorMapFragment mapFragment = (EditorMapFragment) getFragmentByPosition(0);
-            GoogleMap map = mapFragment.getMap();
-            Waypoint waypoint = Waypoint.create(map.getCameraPosition().target, getString(R.string.route_editor_waypoint_name_format, waypointArrayAdapter.getCount()+1));
-            waypointArrayAdapter.add(waypoint);
-            mapFragment.updateWaypoint(waypoint);
-            invalidateOptionsMenu();
-            loadRoute();
+            addWaypoint();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        showSaveDialog(true);
+    }
+
+    private void showSaveDialog(final boolean backButtonPressed) {
+        if (route != null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(R.string.route_editor_save_dialog);
+
+            builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    String encoded = LocationUtils.encodePolyline(route.getPolylineOptions().getPoints());
+                    Toast.makeText(getApplicationContext(), encoded, Toast.LENGTH_SHORT).show();
+                    if (backButtonPressed) {
+                        RouteEditorActivity.super.onBackPressed();
+                    }
+                    else {
+                        RouteEditorActivity.this.finish();
+                    }
+                }
+            });
+            builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    if (backButtonPressed) {
+                        RouteEditorActivity.super.onBackPressed();
+                    }
+                    else {
+                        RouteEditorActivity.this.finish();
+                    }
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+        else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(R.string.route_editor_leave_dialog);
+            builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    RouteEditorActivity.super.onBackPressed();
+                }
+            });
+            builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
     }
 
     @Override
@@ -181,16 +258,63 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
     }
 
-    public ArrayAdapter<Waypoint> getWaypointArrayAdapter() {
+    public ArrayAdapter<Waypoint> getArrayAdapter() {
         return waypointArrayAdapter;
     }
 
+    /**
+     * Fügt einen neuen Waypoint am Mittelpunkt der Karte hinzu und aktualisiert die Strecke.
+     */
+    public void addWaypoint() {
+        EditorMapFragment mapFragment = (EditorMapFragment) getFragmentByPosition(0);
+        waypointArrayAdapter.add(mapFragment.addWaypoint(waypointArrayAdapter.getCount() + 1));
+        invalidateOptionsMenu();
+        loadRoute();
+    }
+
+    /**
+     * Entfernt den Waypoint mit dem Index position und aktualisiert die Route.
+     * @param position Index des zu löschenden Waypoint.
+     */
+    public void removeWaypoint(int position) {
+        if (position < 0 || position >= waypointArrayAdapter.getCount()) {
+            throw new IndexOutOfBoundsException("Index " + position + " is out of bounds.");
+        }
+        EditorMapFragment mapFragment = (EditorMapFragment) getFragmentByPosition(0);
+        Waypoint waypoint = waypointArrayAdapter.getItem(position);
+        waypointArrayAdapter.remove(waypoint);
+        mapFragment.removeWaypoint(waypoint);
+
+        Toast.makeText(getApplicationContext(),
+                getString(R.string.route_editor_waypoint_deleted, waypoint.getMarkerOptions().getTitle()),
+                Toast.LENGTH_SHORT).show();
+
+        // Titel der Marker der nachfolgenden Waypoints aktualisieren.
+        for (int i = position; i < waypointArrayAdapter.getCount(); i++) {
+            waypoint = waypointArrayAdapter.getItem(i);
+            waypoint.getMarkerOptions().title(getString(R.string.route_editor_waypoint_name_format, i+1));
+            mapFragment.updateWaypoint(waypoint);
+        }
+
+        invalidateOptionsMenu();
+        loadRoute();
+    }
+
+    /**
+     * Entfernt die aktuelle Route und läd eine neue im Hintergrund.
+     */
     public void loadRoute() {
+        setRoute(null);
         if (waypointArrayAdapter.getCount() > 1) {
             new RouteLoaderTask().execute(waypointArrayAdapter);
         }
     }
 
+    /**
+     * Zeigt die neue Route auf der Karte an. Sollte nur vom RouteLoaderTask aufgerufen werden.
+     *
+     * @param route Neue Route.
+     */
     private void setRoute(Route route) {
         if (this.route != null && this.route.getPolyline() != null) {
             this.route.getPolyline().remove();
@@ -198,33 +322,42 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
         this.route = route;
         EditorMapFragment mapFragment = (EditorMapFragment) getFragmentByPosition(0);
         if (mapFragment == null) {
-            Toast.makeText(getApplicationContext(), "mapFragment is null", Toast.LENGTH_LONG).show();
             return;
         }
         mapFragment.updateRoute(route);
     }
 
+    /**
+     * Liefert die aktuelle Route. Falls keine Route vorhanden ist, wird null zurückgegeben.
+     *
+     * @return Aktuelle Route.
+     */
     public Route getRoute() {
-        return this.route;
+        return route;
     }
 
+    /**
+     * Zentriert die Karte beim übergebenen Waypoint und öffnet das Info-Fenster.
+     *
+     * @param waypoint Zu zeigender Waypoint.
+     */
     public void showWaypoint(Waypoint waypoint) {
-        waypoint.getMarker().showInfoWindow();
         viewPager.setCurrentItem(0);
         EditorMapFragment mapFragment = (EditorMapFragment) getFragmentByPosition(0);
-        GoogleMap map = mapFragment.getMap();
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(waypoint.getMarkerOptions().getPosition(), 15.0f)));
+        mapFragment.showWaypoint(waypoint);
     }
 
+    /**
+     * Liefert das Fragment am Index pos.
+     *
+     * @param pos Index des Fragment.
+     * @return Fragment mit Index pos.
+     */
     private Fragment getFragmentByPosition(int pos) {
         String tag = "android:switcher:" + viewPager.getId() + ":" + pos;
         return getFragmentManager().findFragmentByTag(tag);
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -269,17 +402,27 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
         public View getView(int position, View convertView, ViewGroup parent) {
             View view = super.getView(position, convertView, parent);
             TextView textView = (TextView) view.findViewById(R.id.list_view_item_waypoint_name_textview);
-            textView.setText(getString(R.string.route_editor_waypoint_name_format, (position+1)));
+            textView.setText(getItem(position).getMarkerOptions().getTitle());
+            //textView.setText(getString(R.string.route_editor_waypoint_name_format, (position + 1)));
             return view;
         }
     }
 
+    /**
+     * Task zum erstellen einer Route mit den im ArrayAdapter enthaltenen Waypoints als Wegpunkten.
+     * Die Route wird mithilfe der Google Directions API
+     * (https://developers.google.com/maps/documentation/directions/) erstellt. Es müssen mindestens
+     * 2 Wegpunkte übergeben werden. Aufgrund der Einschränkungen der API dürfen neben dem Start-
+     * und Endpunkt maximal 8 Wegpunkte übergeben werden. Die Anweisungen werden als JSON String
+     * runtergeladen und anschließend in ein Route Objekt eingefügt. Das Ergebnis wird der
+     * RouteEditorActivity über die setRoute Methode geliefert.
+     */
     private class RouteLoaderTask extends AsyncTask<ArrayAdapter<Waypoint>, Void, Route> {
         private final String LOG_TAG = RouteLoaderTask.class.getSimpleName();
 
         @Override
         protected Route doInBackground(ArrayAdapter<Waypoint>... params) {
-            if (params.length < 1) return null;
+            if (params.length != 1) return null;
 
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
@@ -291,7 +434,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
             final String BASE_URL = "http://maps.googleapis.com/maps/api/directions/json?";
 
             final String ORIGIN = positionToString(waypoints.getItem(0).getMarkerOptions().getPosition());
-            final String DESTINATION = positionToString(waypoints.getItem(waypoints.getCount()-1).getMarkerOptions().getPosition());
+            final String DESTINATION = positionToString(waypoints.getItem(waypoints.getCount() - 1).getMarkerOptions().getPosition());
             final String WAYPOINTS = waypointsToString(waypoints);
 
             Uri.Builder builder = Uri.parse(BASE_URL).buildUpon();
@@ -365,7 +508,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
         private String waypointsToString(ArrayAdapter<Waypoint> waypoints) {
             StringBuilder builder = new StringBuilder();
-            for (int i = 1; i < waypoints.getCount()-1; i++) {
+            for (int i = 1; i < waypoints.getCount() - 1; i++) {
                 builder.append(positionToString(waypoints.getItem(i).getMarkerOptions().getPosition()));
                 builder.append("|");
             }
@@ -413,6 +556,14 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
         }
     }
 
+    /**
+     * Klasse für eine auf der Karte anzuzeigende Route. Sie beinhaltet die PolylineOptions zum
+     * hinzufügen der Route zur Karte, die Polyline Referenz zur gezeichneten Route auf der Karte
+     * und die Länge der Route in Metern (als integer Wert). Sie implementiert das Parcelable
+     * Interface, damit die Route zwischengespeichert werden kann. Es werden jedoch lediglich das
+     * PolylineOptions Objekt und die Routenlänge gespeichert. Die Polyline wird auf null gesetzt,
+     * kann aber mithilfe der PolylineOptions neu gezeichnet werden.
+     */
     public static class Route implements Parcelable {
         private PolylineOptions polylineOptions;
         private Polyline polyline;
@@ -422,7 +573,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
         public Route(List<LatLng> line, int distance) throws ParseException {
             this.polylineOptions = new PolylineOptions()
                     .color(Color.BLUE)
-                    .width(10.0f);
+                    .width(5.0f);
             this.polylineOptions.addAll(line);
 
             this.polyline = null;
@@ -478,6 +629,14 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
         };
     }
 
+    /**
+     * Klasse für einen auf der Karte anzuzeigenden Wegpunkt. Sie beinhaltet die MarkerOptions zum
+     * hinzufügen des Markers auf der Karte und die Marker Referenz zum dargestellten Marker auf
+     * der Karte. Falls der Waypoint derzeit nicht auf der Karte sichtbar ist, ist dieser null.
+     * Die Klasse implementiert das Parcelable Interface, damit die Wegpunkte zwischengespeichert
+     * werden können. Es wird jedoch lediglich das MarkerOptions Objekt gespeichert. Der Marker
+     * wird auf null gesetzt, kann aber mithilfe der MarkerOptions neu erzeugt werden.
+     */
     public static class Waypoint implements Parcelable {
         private MarkerOptions markerOptions;
         private Marker marker;

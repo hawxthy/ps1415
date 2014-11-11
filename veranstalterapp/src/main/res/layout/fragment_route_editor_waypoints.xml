@@ -8,8 +8,8 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="ws1415.veranstalterapp.RouteEditorActivity$EditorWaypointsFragment">
 
-
-    <ws1415.veranstalterapp.DynamicListView
+    <!-- <ws1415.veranstalterapp.DynamicListView -->
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/route_editor_waypoints_listview"
