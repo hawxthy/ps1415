@@ -183,7 +183,7 @@ public class ShowInformationActivity extends Activity {
             }
             location = e.getLocation();
             if (e.getFee() != null) {
-                fee = e.getFee().toString();
+                fee = e.getFee().toString()+" €";
             } else {
                 fee = "";
             }

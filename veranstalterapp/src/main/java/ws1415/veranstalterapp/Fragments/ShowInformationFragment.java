@@ -65,7 +65,7 @@ public class ShowInformationFragment extends Fragment {
             dateView.setText(dateFormat.format(new Date(e.getDate().getValue())));
             locationView.setText(e.getLocation());
             routeView.setText(e.getRoute().getName() + " (" + e.getRoute().getLength() + ")");
-            feeView.setText(e.getFee());
+            feeView.setText(e.getFee()+" €");
             if (e.getDescription() != null) {
                 descriptionView.setText(e.getDescription().getValue());
             }
