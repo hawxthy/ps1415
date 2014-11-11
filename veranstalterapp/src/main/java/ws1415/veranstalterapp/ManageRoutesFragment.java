@@ -45,6 +45,11 @@ public class ManageRoutesFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        new QueryRouteTask().execute(this);
+    }
     /**
      * Ruft die Routen von Server ab, setzt die Listener für die List Items.
      *
