@@ -25,7 +25,9 @@ import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryEventTask;
 
-
+/**
+ * Zeigt die Informationen des aktuellen Events an.
+ */
 public class ShowInformationActivity extends Activity {
     static final int REQUEST_ACCOUNT_PICKER = 2;
     private GoogleAccountCredential credential;

@@ -7,6 +7,6 @@ import android.test.AndroidTestCase;
  */
 public class CreateEventTaskTest extends AndroidTestCase {
 
-    
+
 
 }
