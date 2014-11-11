@@ -76,5 +76,6 @@
     <string name="title_activity_add_route_dialog_routename">Routename: </string>
     <string name="activity_add_route_dialog_cancel">Cancel</string>
     <string name="activity_add_route_dialog_apply">Apply</string>
+    <string name="activity_add_route_dialog_empty">Routename can not be empty</string>
 
 </resources>
