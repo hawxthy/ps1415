@@ -28,7 +28,9 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryMemberTask;
 import ws1415.ps1415.util.LocationUtils;
 
-
+/**
+ * Zeigt die Strecke des aktuellen Events auf einer Karte an.
+ */
 public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE = "show_route_extra_route";
     private static final String MEMBER_ROUTE = "show_route_member_route";

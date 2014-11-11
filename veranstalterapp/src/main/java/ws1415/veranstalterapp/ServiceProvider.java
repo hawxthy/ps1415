@@ -6,7 +6,9 @@ import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 /**
- * Created by Bernd Eissing, Martin Wrodarczyk, Richard Schulze on 24.10.2014.
+ * Singleton-Klasse, die den Zweck eines zentralen Zugriffspunkts auf das Backend erfüllt.
+ *
+ * Created by Richard on 21.10.2014.
  */
 public abstract class ServiceProvider {
     private static SkatenightAPI service;
