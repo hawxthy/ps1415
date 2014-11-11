@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Adaper;
+package ws1415.veranstalterapp.Adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -11,11 +11,18 @@ import ws1415.veranstalterapp.ManageRoutesFragment;
 import ws1415.veranstalterapp.ShowInformationFragment;
 
 /**
- * Created by Bernd Eissing on 28.10.2014.
+ * Klasse die die Tabs der HoldTabsActivity verwaltet.
+ *
+ * Created by Bernd Eissing, Martin Wrodarczyk on 28.10.2014.
  */
 public class TabsPagerAdapter extends FragmentPagerAdapter{
     private List<Fragment> myTabs = new ArrayList<Fragment>();
 
+    /**
+     * Konstruktor, der die Tabs initialisiert.
+     *
+     * @param fm der FragmentManager
+     */
     public TabsPagerAdapter(FragmentManager fm){
         super(fm);
         myTabs.add(new ShowInformationFragment());
@@ -23,6 +30,12 @@ public class TabsPagerAdapter extends FragmentPagerAdapter{
         myTabs.add(new ManageRoutesFragment());
     }
 
+    /**
+     * Gibt das Fragment, welches im Tab an der Stelle Index gespeichert ist, zurück
+     *
+     * @param index Stelle des Fragments, 0 ShowInformationFragment, 1 AnnounceInformationFragment, 2 ManageRoutesFragment
+     * @return das Fragment
+     */
     @Override
     public Fragment getItem(int index){
 
@@ -40,6 +53,11 @@ public class TabsPagerAdapter extends FragmentPagerAdapter{
         return null;
     }
 
+    /**
+     * Gibt die Anzahl an Tabs zurück
+     *
+     * @return Anz. der Tabs
+     */
     @Override
     public int getCount(){
         // Gibt die Anzahl an Tabs zurück

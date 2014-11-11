@@ -22,7 +22,7 @@ import javax.jdo.Transaction;
 
 
 /**
- * Die ServerAPI, die alle Zugriffe auf den Server für die Skatenight-App entgegen nimmt.
+ * Die ServerAPI, die Api-Methoden zur Verfügung stellt.
  * @author Richard, Daniel
  */
 @Api(name = "skatenightAPI",
@@ -31,24 +31,8 @@ import javax.jdo.Transaction;
             Constants.WEB_CLIENT_ID, com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID},
     audiences = {Constants.ANDROID_AUDIENCE})
 public class SkatenightServerEndpoint {
-    private Key hostRootKey;
-    private DatastoreService datastore;
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
-
-    public SkatenightServerEndpoint() {
-        datastore = DatastoreServiceFactory.getDatastoreService();
-
-        // Standard-Veranstalter definieren
-        Host h = new Host();
-        h.setEmail("example@example.com");
-        PersistenceManager pm = pmf.getPersistenceManager();
-        try {
-            pm.makePersistent(h);
-        } finally {
-            pm.close();
-        }
-    }
 
     /**
      * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
@@ -119,6 +103,8 @@ public class SkatenightServerEndpoint {
             if (results.isEmpty()) {
                 return null;
             } else {
+                // Name abrufen, damit die Daten gefetcht werden
+                results.get(0).getRoute().getName();
                 return results.get(0);
             }
         } finally {
@@ -142,10 +128,40 @@ public class SkatenightServerEndpoint {
         PersistenceManager pm = pmf.getPersistenceManager();
         try {
             // Altes Event-Objekt löschen
-            List<Event> events = (List<Event>) pm.newQuery(
-                    "select from " + Event.class.getName()).execute();
+            List<Event> events = (List<Event>) pm.newQuery(Event.class).execute();
             pm.deletePersistentAll(events);
             if (e != null) {
+                Query q = pm.newQuery(Route.class);
+                q.setFilter("name == nameParam");
+                q.declareParameters("String nameParam");
+                List<Route> results = (List<Route>) q.execute(e.getRoute().getName());
+                if (!results.isEmpty()) {
+                    e.setRoute(results.get(0));
+                }
+                pm.makePersistent(e);
+            }
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Dient Testzwecken, damit das Event ohne credentials gesetzt werden kann.
+     */
+    public void setEventTestMethod(Event e) {
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            // Altes Event-Objekt löschen
+            List<Event> events = (List<Event>) pm.newQuery(Event.class).execute();
+            pm.deletePersistentAll(events);
+            if (e != null) {
+                Query q = pm.newQuery(Route.class);
+                q.setFilter("name == nameParam");
+                q.declareParameters("String nameParam");
+                List<Route> results = (List<Route>) q.execute(e.getRoute().getName());
+                if (!results.isEmpty()) {
+                    e.setRoute(results.get(0));
+                }
                 pm.makePersistent(e);
             }
         } finally {
@@ -169,7 +185,7 @@ public class SkatenightServerEndpoint {
                 m.setEmail(mail);
                 /**
                  * TODO:Als Name wird zurzeit die Mail-Adresse verwendet, da noch keine Eingabe-
-                 * möglichkeit für den Namen besteht.
+                 * möglichkeit für den Namen besteht. (sollte im nächsten Sprint übernommen werden)
                  */
                 m.setName(mail);
             }
@@ -194,7 +210,13 @@ public class SkatenightServerEndpoint {
         Member member = null;
         PersistenceManager pm = pmf.getPersistenceManager();
         try {
-            member = (Member) pm.getObjectById(email);
+            Query q = pm.newQuery(Member.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Member> results = (List<Member>) q.execute(email);
+            if (!results.isEmpty()) {
+                member = results.get(0);
+            }
         } catch(JDOObjectNotFoundException e) {
             // Wird geworfen, wenn kein Objekt mit dem angegebenen Schlüssel existiert
             // In diesem Fall null zurückgeben
@@ -205,10 +227,24 @@ public class SkatenightServerEndpoint {
         return member;
     }
 
+    /**
+     * Speichert die angegebene Route auf dem Server
+     * @param route zu speichernde Route
+     */
+    public void addRoute(Route route){
+        PersistenceManager pm = pmf.getPersistenceManager();
+        if(route != null){
+            try{
+                pm.makePersistent(route);
+            }finally {
+                pm.close();
+            }
+        }
+    }
 
     /**
      *  Gibt eine Liste von allen gespeicherten Routen zurück
-     *  @return Liste der Routen, null falls keine existieren.
+     *  @return Liste der Routen.
      */
     public List<Route> getRoutes(){
         PersistenceManager pm = pmf.getPersistenceManager();
@@ -227,22 +263,26 @@ public class SkatenightServerEndpoint {
 
     /**
      * Lösche Route vom Server
-     * @param route die Route, die gelöscht werden soll
+     * @param id Die ID der zu löschenden Route.
+     * @return true, wenn die Route gelöscht wurde, sonst false
      */
-    public void deleteRoute(Route route){
+    public BooleanWrapper deleteRoute(@Named("id") long id) {
+        Event event = getEvent();
+        if (event.getRoute().getKey().getId() == id) {
+            return new BooleanWrapper(false);
+        }
         PersistenceManager pm = pmf.getPersistenceManager();
-        //Transaction tx = pm.currentTransaction();
-        //tx.begin();
         try{
-            pm.makePersistent(route);
-            //tx.commit();
-            pm.deletePersistent(pm.newQuery(Route.class).equals(route));
+            for (Route r : (List<Route>) pm.newQuery(Route.class).execute()) {
+                if (r.getKey().getId() == id) {
+                    pm.deletePersistent(r);
+                    return new BooleanWrapper(true);
+                }
+            }
         }finally{
-            //if(tx.isActive()){
-              //  tx.rollback();
-            //}
             pm.close();
         }
+        return new BooleanWrapper(false);
     }
 
 }

@@ -7,13 +7,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
@@ -22,12 +20,13 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import ws1415.ps1415.task.QueryEventTask;
+
 
 public class ShowInformationActivity extends Activity {
     static final int REQUEST_ACCOUNT_PICKER = 2;
     private GoogleAccountCredential credential;
     private SharedPreferences prefs;
-    public static final String WEB_CLIENT_ID = "37947570052-dk3rjhgran1s38gscv6va2rmmv2bei8r.apps.googleusercontent.com";
 
 
     private static final String MEMBER_TITLE = "show_infomation_member_title";
@@ -64,6 +63,7 @@ public class ShowInformationActivity extends Activity {
                     builder.setMessage("Deine Position wird gespeichert & auf der Karte angezeigt.");
                     builder.setPositiveButton(Html.fromHtml("<font color='#1FB1FF'>Ok</font>"), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            // Leite wieter auf die Karte
                             Intent intent = new Intent(ShowInformationActivity.this, ShowRouteActivity.class);
                             intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, route);
                             startActivity(intent);
@@ -75,10 +75,8 @@ public class ShowInformationActivity extends Activity {
                         }
                     });
 
+                    // Zeigt den Dialog
                     AlertDialog dialog = builder.create();
-                    // WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
-                    // lp.alpha = 0.9f;
-                    // dialog.getWindow().setAttributes(lp);
                     dialog.show();
                 }
             }
@@ -100,7 +98,7 @@ public class ShowInformationActivity extends Activity {
 
         // SharePreferences skatenight.app laden
         prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
-        credential = GoogleAccountCredential.usingAudience(this,"server:client_id:"+this.WEB_CLIENT_ID);
+        credential = GoogleAccountCredential.usingAudience(this,"server:client_id:"+Constants.WEB_CLIENT_ID);
 
         // accountName aus SharedPreferences laden
         if (prefs.contains("accountName")) {
@@ -113,6 +111,9 @@ public class ShowInformationActivity extends Activity {
         }
     }
 
+    /**
+     * Callback-Methode für den Account-Picker.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

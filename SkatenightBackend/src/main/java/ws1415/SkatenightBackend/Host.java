@@ -8,6 +8,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
+ * Datenmodell für einen Veranstalter.
  * Created by Richard on 31.10.2014.
  */
 @PersistenceCapable

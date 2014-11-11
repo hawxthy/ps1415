@@ -1,11 +1,8 @@
-package ws1415.ps1415;
-
-import com.appspot.skatenight_ms.skatenightAPI.model.Member;
+package ws1415.veranstalterapp;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,33 +11,38 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.text.ParseException;
 import java.util.List;
 
-import ws1415.ps1415.task.QueryMemberTask;
-import ws1415.ps1415.util.LocationUtils;
+import ws1415.veranstalterapp.util.LocationUtils;
 
-
+/**
+ * Activity zum Anzeigen einer Route in einer Map.
+ *
+ * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
+ */
 public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE = "show_route_extra_route";
     private static final String MEMBER_ROUTE = "show_route_member_route";
 
     private GoogleMap googleMap;
     private PolylineOptions route;
-    private Intent service;
 
-    private Location location; // Enthält die aktuelle Position, die vom Server runtergeladen wurde
-
+    /**
+     * Zeigt die Route, die über einen Intent verschickt wurde, an.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_route);
+
+        setTitle(getIntent().getStringExtra("routeName"));
 
         googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.show_route_map_fragment)).getMap();
         googleMap.setMyLocationEnabled(true);
@@ -81,27 +83,6 @@ public class ShowRouteActivity extends Activity {
                 e.printStackTrace();
             }
         }
-
-        // Ruft die aktuellen Memberinformationen ab
-        new QueryMemberTask().execute((ShowRouteActivity) this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        // Starten des Hintergrundservices zur Standortermittlung
-        service = new Intent(getBaseContext(), LocationTransmitterService.class);
-        service.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startService(service);
-
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        stopService(service);
     }
 
     @Override
@@ -131,42 +112,4 @@ public class ShowRouteActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    /**
-     * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte.
-     * @param m Das neue Event-Objekt.
-     */
-    public void drawMembers(Member m) {
-        if (m != null) {
-            try {
-                // googleMap.clear();
-
-                // Dekodiert den Positionsstring vom Server zu LatLng
-                location = LocationUtils.decodeLocation(m.getLocation());
-                LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
-
-                // Markerfarbe
-                float markerColor;
-                markerColor = BitmapDescriptorFactory.HUE_YELLOW;
-
-                // Fügt den aktuellen Membermarker auf die Karte ein
-                googleMap.addMarker(new MarkerOptions()
-                        .position(pos)
-                        .title("Skater " + m.getName())
-                        .snippet("" + m.getUpdatedAt())
-                        .icon(BitmapDescriptorFactory
-                                .defaultMarker(markerColor)));
-
-
-            } catch (ParseException e) {
-                e.printStackTrace();
-                Toast.makeText(getApplicationContext(), "Error: Couldn't decode the location.", Toast.LENGTH_LONG).show();
-                location = null;
-            }
-
-        } else {
-            location = null;
-        }
-    }
-
 }

@@ -7,14 +7,16 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:text="@string/show_info_header_date"
         style="?android:attr/listSeparatorTextViewStyle"
-        android:paddingLeft="0dp" />
+        android:paddingLeft="0dp"
+        android:textColor="#ff000000" />
 
     <TextView
         android:text="@string/downloading"
@@ -23,14 +25,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:paddingLeft="5dp"/>
+        android:paddingLeft="5dp"
+        android:textColor="#ff000000" />
 
     <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:text="@string/show_info_header_location"
         style="?android:attr/listSeparatorTextViewStyle"
-        android:paddingLeft="0dp"/>
+        android:paddingLeft="0dp"
+        android:textColor="#ff000000" />
 
     <TextView
         android:text="@string/downloading"
@@ -39,14 +43,34 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:paddingLeft="5dp"/>
+        android:paddingLeft="5dp"
+        android:textColor="#ff000000" />
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="@string/show_info_header_route"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:paddingLeft="0dp"
+        android:textColor="#ff000000" />
+
+    <TextView
+        android:text="@string/downloading"
+        android:id="@+id/show_info_route_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingLeft="5dp"
+        android:textColor="#ff000000" />
 
     <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:text="@string/show_info_header_fee"
         style="?android:attr/listSeparatorTextViewStyle"
-        android:paddingLeft="0dp"/>
+        android:paddingLeft="0dp"
+        android:textColor="#ff000000" />
 
     <TextView
         android:text="@string/downloading"
@@ -55,14 +79,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:paddingLeft="5dp" />
+        android:paddingLeft="5dp"
+        android:textColor="#ff000000" />
 
     <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:text="@string/show_info_header_description"
         style="?android:attr/listSeparatorTextViewStyle"
-        android:paddingLeft="0dp" />
+        android:paddingLeft="0dp"
+        android:textColor="#ff000000" />
 
     <TextView
         android:text="@string/downloading"
@@ -71,5 +97,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
-        android:paddingLeft="5dp"/>
+        android:paddingLeft="5dp"
+        android:textColor="#ff000000" />
 </LinearLayout>

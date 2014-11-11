@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp;
+package ws1415.veranstalterapp.task;
 
 import android.os.AsyncTask;
 
@@ -8,8 +8,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ws1415.veranstalterapp.ManageRoutesFragment;
+import ws1415.veranstalterapp.ServiceProvider;
+
 /**
- * Created by Bernd Eissing on 04.11.2014.
+ * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.
+ *
+ * Created by Bernd Eissing, Martin Wrodarczyk on 04.11.2014.
  */
 public class QueryRouteTask extends AsyncTask<ManageRoutesFragment, Void, List<Route>> {
     private ManageRoutesFragment view;
@@ -29,8 +34,16 @@ public class QueryRouteTask extends AsyncTask<ManageRoutesFragment, Void, List<R
         return null;
     }
 
+    /**
+     * Erhält die Liste von Routen vom Server und setzt diese mit setRouteToListView(...)
+     * in die ListView in ManageRoutesActivity.
+     *
+     * @param results Liste mit Routen vom Server
+     */
     @Override
     protected void onPostExecute(List<Route> results){
         view.setRoutesToListView((ArrayList<Route>) results);
     }
 }
+
+

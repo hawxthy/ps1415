@@ -2,6 +2,8 @@ package ws1415.SkatenightBackend;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
+import com.google.appengine.datanucleus.annotations.Unowned;
+
 import java.util.Date;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -10,7 +12,8 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
- * Created by Bernd Eissing, Martin Wrodarczyk on 21.10.2014.
+ * Datenmodell für eine Veranstaltung.
+ * Created by Richard Schulze, Bernd Eissing, Martin Wrodarczyk on 21.10.2014.
  */
 @PersistenceCapable
 public class Event {
@@ -28,6 +31,7 @@ public class Event {
     @Persistent
     private Text description;
     @Persistent(defaultFetchGroup = "true")
+    @Unowned
     private Route route;
 
     public Key getKey() {

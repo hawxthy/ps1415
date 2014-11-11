@@ -2,26 +2,37 @@ package ws1415.veranstalterapp;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import ws1415.veranstalterapp.Adaper.TabsPagerAdapter;
+import ws1415.veranstalterapp.Adapter.TabsPagerAdapter;
+import ws1415.veranstalterapp.task.QueryEventTask;
 
-
+/**
+ * Die Activity, welche beim starten der Veranstalter App ausgeführt wird. Diese Activity
+ * dient zum halten von Fragmenten, dem ShowInformationFragment, AnnounceInformationFragment und dem
+ * ManageRoutesFragment.
+ *
+ * Created by Bernd Eissing, Martin Wrodarczyk.
+ */
 public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabListener {
-    private ViewPager viewPager;
+    private static ViewPager viewPager;
     private static TabsPagerAdapter mAdapter;
-    private ActionBar actionBar;
+    private static ActionBar actionBar;
     private MenuItem menuItem;
     private boolean menuCreated;
 
     private String[] tabs;
 
+    /**
+     * Erstellt die Activity, beschriftet die Tabs und initialisiert die Tabverwaltung.
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +67,11 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
         // Setze akuellen Tab beim swipen
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
+            /**
+             * Wechselt den Tab, wenn die Seite beim Swipen verändert wird.
+             *
+             * @param position Die Position des Tabs, zu dem geswiped wird
+             */
             @Override
             public void onPageSelected(int position) {
                 // Wechsel Tab, wenn Seite beim Swipen verändert wird.
@@ -74,7 +90,12 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
         });
     }
 
-
+    /**
+     * Erstellt das ActionBar Menu.
+     *
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -83,31 +104,36 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
         return true;
     }
 
+    /**
+     * Händelt ActionBar Item clicks. Wenn man das action_add_route Item
+     * auswählt, wird die RouteEditorActivity gestartet.
+     *
+     * @param item Das Item in der Action Bar
+     * @return true
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
-        }else if(id == R.id.action_add_route){
-            // TODO Methode addRoute() muss hier aufgerufen werden
+        }else if(id == R.id.action_add_route) {
+            Intent intent = new Intent(this, AddRouteDialog.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Wechselt Tab bei Tabauswahl
+     *
+     * @param tab Ausgewählter Tab
+     * @param fragmentTransaction
+     */
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
         // Zeige aktuell gewählten Tab an
         viewPager.setCurrentItem(tab.getPosition());
-        if(tab.getPosition()== 2){
-            //menuItem.setVisible(true);
-        } else{
-            //menuItem.setVisible(false);
-        }
     }
 
     @Override
@@ -120,7 +146,33 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
 
     }
 
+    /**
+     * Updated die Informationen in dem Tab "ShowInformationFragment", diese Methode wird aufgerufen,
+     * wenn die Informationen im "AnnounceInformationFragment" gesetzt und abgeschickt werden.
+     */
     public static void updateInformation(){
         new QueryEventTask().execute((ShowInformationFragment) mAdapter.getItem(0));
+    }
+
+    /**
+     * Gibt den Adapter zurück, der die Tabs verwaltet.
+     *
+     * @return Der Adapter
+     */
+    public static TabsPagerAdapter getAdapter(){
+        return mAdapter;
+    }
+
+    /**
+     * Gibt den ViewPager zurück.
+     *
+     * @return
+     */
+    public static ViewPager getViewPager(){
+        return viewPager;
+    }
+
+    public static ActionBar getActionBar2(){
+        return actionBar;
     }
 }

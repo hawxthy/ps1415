@@ -20,8 +20,9 @@
     <string name="announce_info_location">Ort:</string>
     <string name="announce_info_location_hint">Gib einen Ort an</string>
     <string name="announce_info_map">Map:</string>
-    <string name="announce_info_choose_map">Wähle Map</string>
+    <string name="announce_info_choose_map">Wähle Route</string>
     <string name="announce_info_description">Beschreibung:</string>
+    <string name="title_activity_login">Login</string>
     <string name="login_button">Login</string>
     <string name="areyousure">Sind Sie sicher?</string>
     <string name="yes">Ja</string>
@@ -34,6 +35,7 @@
     <string-array name="selections_menu">
         <item name="delete">Löschen</item>
     </string-array>
+    <string name="route_delete_failed">Route ist aktueller Veranstaltung zugewiesen</string>
 
     <!-- Route Editor xml -->
     <string name="title_activity_route_editor">Streckeneditor</string>
@@ -49,11 +51,25 @@
     <string name="title_fragment_show_information">Zeige Informationen</string>
     <string name="show_info_header_date">Datum und Uhrzeit</string>
     <string name="show_info_header_location">Ort</string>
+    <string name="show_info_header_route">Route</string>
     <string name="show_info_header_fee">Teilnahmegebühr</string>
     <string name="show_info_header_description">Beschreibung</string>
     <string name="downloading">Wird abgerufen...</string>
     <string name="not_authorized">Nicht authorisiert</string>
+    <string name="show_info_empty_text">N/A</string>
 
     <!--Strings zu list_view_item_layout-->
     <string name="list_view_item_layout_length">Länge:</string>
+
+    <!--Strings zu activity_choose_route-->
+    <string name="title_activity_choose_route">Wähle Route</string>
+
+    <!--Strings zu activity_show_route-->
+    <string name="title_activity_show_route">Route</string>
+
+    <!--Strings zu activtiy_add_route_dialog-->
+    <string name="title_activity_add_route_dialog">Erstelle Route</string>
+    <string name="title_activity_add_route_dialog_routename">Routename: </string>
+    <string name="activity_add_route_dialog_cancel">Abbrechen</string>
+    <string name="activity_add_route_dialog_apply">Ok</string>
 </resources>

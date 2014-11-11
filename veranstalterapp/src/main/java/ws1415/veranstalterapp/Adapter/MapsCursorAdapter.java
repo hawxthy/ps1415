@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Adaper;
+package ws1415.veranstalterapp.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -15,28 +15,54 @@ import java.util.List;
 import ws1415.veranstalterapp.R;
 
 /**
- * Created by Bernd Eissing on 31.10.2014.
+ * Klasse zum füllen er ListView in ManageRoutesFragment.
+ *
+ * Created by Bernd Eissing, Martin Wrodarczyk on 31.10.2014.
  */
 public class MapsCursorAdapter extends BaseAdapter {
     private List<Route> routeList = new ArrayList<Route>();
     private Context mContext;
     private LayoutInflater inflater;
 
+    /**
+     * Konstruktor, der den Inhalt der Liste festlegt.
+     *
+     * @param context Context, von dem aus der Adapter aufgerufen wird
+     * @param routeList Liset von den Routen
+     */
     public MapsCursorAdapter(Context context, ArrayList<Route> routeList){
         mContext = context;
         this.routeList = routeList;
     }
 
+    /**
+     * Gibt die Anzahl der Routen in der Liste zurück
+     * @return Anz. der Routen
+     */
     @Override
     public int getCount() {
-        return routeList.size();
+        if(routeList == null){
+            return 0;
+        }else{
+            return routeList.size();
+        }
     }
 
+    /**
+     * Gibt die Route an der Stelle i in der Liste zurück
+     * @param i Stelle
+     * @return Route
+     */
     @Override
-    public Object getItem(int i) {
+    public Route getItem(int i) {
         return routeList.get(i);
     }
 
+    /**
+     * Gibt die Id der Route in der Liste zurück
+     * @param i Stelle
+     * @return Id
+     */
     @Override
     public long getItemId(int i) {
         return i;
@@ -72,12 +98,17 @@ public class MapsCursorAdapter extends BaseAdapter {
         } else{
             holder = (Holder)convertView.getTag();
         }
-        holder.routeName.setText(routeList.get(position).getName());
-        holder.routeLength.setText(routeList.get(position).getLength());
+        holder.routeName.setText(getItem(position).getName());
+        holder.routeLength.setText(getItem(position).getLength());
 
         return convertView;
     }
 
+    /**
+     * Entfernt Route mit der angegebenen ID
+     *
+     * @param i ID
+     */
     public void removeListItem(int i){
         routeList.remove(i);
         notifyDataSetChanged();

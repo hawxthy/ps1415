@@ -7,22 +7,21 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Toast;
 
-import com.appspot.skatenight_ms.skatenightAPI.SkatenightAPI;
-import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import ws1415.ps1415.task.UpdateLocationTask;
 import ws1415.ps1415.util.LocationUtils;
 
 /**
  * Created by Tristan Rust on 28.10.2014.
  *
- * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient.
+ * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient und diese auf den
+ * Server sendet. Falls der Nutzer noch nicht existiert wird er angelegt, ansonsten geupdatet.
  *
  */
 public class LocationTransmitterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -39,6 +38,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // Starten des GoogleApiClients
         gac = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
@@ -53,18 +53,17 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     @Override
     public void onCreate() {
         super.onCreate();
-        Toast.makeText(getApplicationContext(), "onCreate", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onDestroy() {
-        Toast.makeText(getApplicationContext(), "onDestroy", Toast.LENGTH_LONG).show();
         if (gac != null) gac.disconnect();
         super.onDestroy();
     }
 
     @Override
     public void onConnected(Bundle bundle) {
+        // Sendet die Location Requests sekündlich
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setFastestInterval(1000);
