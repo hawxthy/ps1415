@@ -46,8 +46,11 @@
     <string name="title_activity_route_editor">Route Editor</string>
     <string name="title_fragment_route_editor_map">Map</string>
     <string name="title_fragment_route_editor_waypoints">Waypoints</string>
-    <string name="route_editor_waypoint_name_format">Waypoint <xliff:g id="number">%1$d</xliff:g></string>
     <string name="route_editor_error_load_route">Unable to load route.</string>
+    <string name="route_editor_waypoint_name_format">Waypoint <xliff:g id="number">%1$d</xliff:g></string>
+    <string name="route_editor_waypoint_deleted"><xliff:g id="waypoint_name">%1$s</xliff:g> deleted.</string>
+    <string name="route_editor_save_dialog">Save route?</string>
+    <string name="route_editor_leave_dialog">No route has been created. Do you want to leave anyway?</string>
 
     <!-- Strings zu activity_showinformation -->
     <string name="title_fragment_show_information">Show Information</string>
