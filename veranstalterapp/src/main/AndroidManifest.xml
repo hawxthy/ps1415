@@ -15,7 +15,7 @@
             android:value="AIzaSyApuZLPxk_RgFsWATD-eC6V6YpS6C8vUiE" />
 
         <activity
-            android:name=".HoldTabsActivity"
+            android:name=".Activities.HoldTabsActivity"
             android:label="@string/title_activity_start_page"
             android:screenOrientation="portrait" >
         </activity>
@@ -31,22 +31,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RouteEditorActivity"
+            android:name=".Activities.RouteEditorActivity"
             android:label="@string/title_activity_route_editor"
-            android:parentActivityName=".HoldTabsActivity" >
+            android:parentActivityName=".Activities.HoldTabsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.veranstalterapp.HoldTabsActivity" />
         </activity>
         <activity
-            android:name=".ChooseRouteActivity"
+            android:name=".Activities.ChooseRouteActivity"
             android:label="@string/title_activity_choose_route"
             android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
         <activity
-            android:name=".ShowRouteActivity"
+            android:name=".Activities.ShowRouteActivity"
             android:label="@string/title_activity_show_route"
-            android:parentActivityName=".HoldTabsActivity" >
+            android:parentActivityName=".Activities.HoldTabsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.HoldTabsActivity" />

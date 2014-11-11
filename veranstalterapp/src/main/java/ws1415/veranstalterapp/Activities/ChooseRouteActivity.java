@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp;
+package ws1415.veranstalterapp.Activities;
 import android.os.AsyncTask;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Route;
@@ -15,6 +15,8 @@ import android.widget.ListView;
 
 import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
 import ws1415.veranstalterapp.Fragments.AnnounceInformationFragment;
+import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.ServiceProvider;
 
 
 public class ChooseRouteActivity extends Activity {

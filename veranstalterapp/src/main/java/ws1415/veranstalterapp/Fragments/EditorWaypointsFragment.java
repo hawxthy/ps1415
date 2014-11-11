@@ -9,7 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.RouteEditorActivity;
+import ws1415.veranstalterapp.Activities.RouteEditorActivity;
 
 
 public class EditorWaypointsFragment extends Fragment {

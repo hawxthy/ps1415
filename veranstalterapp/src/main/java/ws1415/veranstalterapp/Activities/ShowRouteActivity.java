@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp;
+package ws1415.veranstalterapp.Activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.text.ParseException;
 import java.util.List;
 
+import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.util.LocationUtils;
 
 /**

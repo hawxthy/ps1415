@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp;
+package ws1415.veranstalterapp.Activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -52,6 +52,7 @@ import java.util.Locale;
 
 import ws1415.veranstalterapp.Fragments.EditorMapFragment;
 import ws1415.veranstalterapp.Fragments.EditorWaypointsFragment;
+import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.AddRouteTask;
 import ws1415.veranstalterapp.util.LocationUtils;
 

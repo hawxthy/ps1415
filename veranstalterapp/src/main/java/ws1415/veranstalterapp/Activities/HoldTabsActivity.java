@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp;
+package ws1415.veranstalterapp.Activities;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
@@ -10,7 +10,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import ws1415.veranstalterapp.Adapter.TabsPagerAdapter;
+import ws1415.veranstalterapp.AddRouteDialog;
 import ws1415.veranstalterapp.Fragments.ShowInformationFragment;
+import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.QueryEventTask;
 
 /**

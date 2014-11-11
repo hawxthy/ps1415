@@ -21,7 +21,7 @@ import java.util.List;
 
 import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.ShowRouteActivity;
+import ws1415.veranstalterapp.Activities.ShowRouteActivity;
 import ws1415.veranstalterapp.task.DeleteRouteTask;
 import ws1415.veranstalterapp.task.QueryRouteTask;
 

@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.RouteEditorActivity;
+import ws1415.veranstalterapp.Activities.RouteEditorActivity;
 
 public class EditorMapFragment extends Fragment implements GoogleMap.OnMarkerDragListener {
     private GoogleMap googleMap;
