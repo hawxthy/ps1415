@@ -63,7 +63,6 @@ public class ManageRoutesFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_manage_routes, container, false);
 
         routeListView = (ListView) view.findViewById(R.id.manage_routes_route_list);
-        new QueryRouteTask().execute(this);
         routeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             /**
              * Ruft die showRouteActivity auf, die die ausgewählte Route anzeigt.
