@@ -219,7 +219,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                     String length;
                     if (route.getDistance() < 1000) {
                         length = route.getDistance() + " m";
-                        //length = String.format("%i m", route.getDistance());
+                        //length = String.format("%i m", route.getDistance()); // Crash?!
                     }
                     else {
                         length = String.format("%.1f km", route.getDistance()/1000.0f);
@@ -598,8 +598,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
         public Route(List<LatLng> line, int distance) throws ParseException {
             this.polylineOptions = new PolylineOptions()
-                    .color(Color.BLUE)
-                    .width(5.0f);
+                    .color(Color.BLUE);
             this.polylineOptions.addAll(line);
 
             this.polyline = null;
