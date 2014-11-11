@@ -31,8 +31,6 @@ public class AddRouteDialog extends Activity {
     public void cancel(View view){
         Intent intent = new Intent(this, HoldTabsActivity.class);
         startActivity(intent);
-        HoldTabsActivity.getViewPager().setCurrentItem(2);
-        HoldTabsActivity.getActionBar2().setSelectedNavigationItem(2);
     }
 
     public void apply(View view){

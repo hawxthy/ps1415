@@ -18,7 +18,7 @@ import ws1415.veranstalterapp.Activities.HoldTabsActivity;
 import ws1415.veranstalterapp.R;
 
 /**
- * Fragment zum begutachten der Metainformationen der erstellten Veranstaltung.
+ * Fragment zum Begutachten der Metainformationen der erstellten Veranstaltung.
  *
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
