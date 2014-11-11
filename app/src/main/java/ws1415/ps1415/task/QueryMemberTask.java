@@ -3,15 +3,13 @@ package ws1415.ps1415.task;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 
 import java.io.IOException;
 
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.ShowRouteActivity;
+import ws1415.ps1415.Activities.ShowRouteActivity;
 
 /**
  * Created by Tristan Rust on 21.10.2014.

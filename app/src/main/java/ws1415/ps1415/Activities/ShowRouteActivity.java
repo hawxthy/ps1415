@@ -1,4 +1,4 @@
-package ws1415.ps1415;
+package ws1415.ps1415.Activities;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Member;
 
@@ -23,6 +23,8 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.text.ParseException;
 import java.util.List;
 
+import ws1415.ps1415.LocationTransmitterService;
+import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryMemberTask;
 import ws1415.ps1415.util.LocationUtils;
 

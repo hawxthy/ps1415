@@ -15,7 +15,7 @@
             android:value="AIzaSyAN9aeb9Ef8oUD5iEZcH0f0MdURjBQsGKc" />
 
         <activity
-            android:name=".ShowInformationActivity"
+            android:name=".Activities.ShowInformationActivity"
             android:label="@string/title_activity_showinformation" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,9 +24,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ShowRouteActivity"
+            android:name=".Activities.ShowRouteActivity"
             android:label="@string/title_activity_show_route"
-            android:parentActivityName=".ShowInformationActivity" >
+            android:parentActivityName=".Activities.ShowInformationActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.ShowInformationActivity" />

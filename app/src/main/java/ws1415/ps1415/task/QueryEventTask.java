@@ -1,14 +1,13 @@
 package ws1415.ps1415.task;
 
 import android.os.AsyncTask;
-import android.widget.TextView;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 
 import java.io.IOException;
 
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.ShowInformationActivity;
+import ws1415.ps1415.Activities.ShowInformationActivity;
 
 /**
  * Created by Richard on 21.10.2014.
