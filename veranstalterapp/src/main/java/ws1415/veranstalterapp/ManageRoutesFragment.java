@@ -45,6 +45,9 @@ public class ManageRoutesFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    /**
+     * Aktualisiert die Liste der Strecken.
+     */
     @Override
     public void onResume(){
         super.onResume();
