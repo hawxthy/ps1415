@@ -27,6 +27,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.appspot.skatenight_ms.skatenightAPI.model.Text;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -49,13 +50,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import ws1415.veranstalterapp.task.AddRouteTask;
 import ws1415.veranstalterapp.util.LocationUtils;
 
 
 public class RouteEditorActivity extends Activity implements ActionBar.TabListener {
     private static final String LOG_TAG = RouteEditorActivity.class.getSimpleName();
 
-    private static final String EXTRA_NAME = "route_editor_activity_extra_name";
+    public static final String EXTRA_NAME = "route_editor_activity_extra_name";
     private static final String MEMBER_NAME = "route_editor_activity_member_name";
     private static final String MEMBER_WAYPOINTS = "route_editor_activity_member_waypoints";
     private static final String MEMBER_ROUTE = "route_editor_activity_member_route";
@@ -99,10 +101,11 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
             if (intent.hasExtra(EXTRA_NAME)) {
                 name = intent.getStringExtra(EXTRA_NAME);
             }
-            else {
-                Toast.makeText(getApplicationContext(), "No name!", Toast.LENGTH_SHORT).show();
-                finish();
-            }
+        }
+
+        if (name == null || name.length() <= 0) {
+            Log.e(LOG_TAG, "Name should not be empty.");
+            finish();
         }
 
         sectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
@@ -194,6 +197,12 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
         showSaveDialog(true);
     }
 
+    /**
+     * Zeigt einen "Möchten Sie speichern?" Dialog an und speichert ggf.
+     *
+     * @param backButtonPressed <code>true</code> falls die Methode von der <code>onBackPressed</code>
+     *                          Methode aufgerufen wurde, <code>false</code> sonst.
+     */
     private void showSaveDialog(final boolean backButtonPressed) {
         if (route != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -202,7 +211,24 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
             builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     String encoded = LocationUtils.encodePolyline(route.getPolylineOptions().getPoints());
-                    Toast.makeText(getApplicationContext(), encoded, Toast.LENGTH_SHORT).show();
+
+                    com.appspot.skatenight_ms.skatenightAPI.model.Route rt = new com.appspot.skatenight_ms.skatenightAPI.model.Route();
+                    rt.setName(name);
+                    rt.setRouteData(new Text().setValue(encoded));
+
+                    String length;
+                    if (route.getDistance() < 1000) {
+                        length = route.getDistance() + " m";
+                        //length = String.format("%i m", route.getDistance());
+                    }
+                    else {
+                        length = String.format("%.1f km", route.getDistance()/1000.0f);
+                    }
+
+                    rt.setLength(length);
+
+                    new AddRouteTask().execute(rt);
+
                     if (backButtonPressed) {
                         RouteEditorActivity.super.onBackPressed();
                     }
