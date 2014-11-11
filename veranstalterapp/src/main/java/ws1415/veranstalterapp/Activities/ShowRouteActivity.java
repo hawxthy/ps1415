@@ -24,7 +24,7 @@ import ws1415.veranstalterapp.util.LocationUtils;
 /**
  * Activity zum Anzeigen einer Route in einer Map.
  *
- * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
+ * Edited by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
 public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE = "show_route_extra_route";
