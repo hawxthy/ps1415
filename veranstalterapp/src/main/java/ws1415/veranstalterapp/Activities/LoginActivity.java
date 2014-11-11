@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp;
+package ws1415.veranstalterapp.Activities;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -10,6 +10,8 @@ import android.view.View;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
+import ws1415.veranstalterapp.Constants;
+import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.LoginTask;
 
 /**
@@ -28,7 +30,7 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        credential = GoogleAccountCredential.usingAudience(this,"server:client_id:"+Constants.WEB_CLIENT_ID);
+        credential = GoogleAccountCredential.usingAudience(this,"server:client_id:"+ Constants.WEB_CLIENT_ID);
 
         // Kein accountName gesetzt, also AccountPicker aufrufen
         if (credential.getSelectedAccountName() == null) {

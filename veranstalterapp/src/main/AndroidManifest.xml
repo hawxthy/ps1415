@@ -20,7 +20,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".LoginActivity"
+            android:name=".Activities.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait" >
