@@ -8,7 +8,7 @@ import java.util.List;
 
 import ws1415.veranstalterapp.Fragments.AnnounceInformationFragment;
 import ws1415.veranstalterapp.Fragments.ManageRoutesFragment;
-import ws1415.veranstalterapp.Fragments.ShowInformationFragment;
+import ws1415.veranstalterapp.Fragments.ShowEventsFragment;
 
 /**
  * Klasse die die Tabs der HoldTabsActivity verwaltet.
@@ -25,7 +25,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter{
      */
     public TabsPagerAdapter(FragmentManager fm){
         super(fm);
-        myTabs.add(new ShowInformationFragment());
+        myTabs.add(new ShowEventsFragment());
         myTabs.add(new AnnounceInformationFragment());
         myTabs.add(new ManageRoutesFragment());
     }
@@ -33,7 +33,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter{
     /**
      * Gibt das Fragment, welches im Tab an der Stelle Index gespeichert ist, zurück
      *
-     * @param index Stelle des Fragments, 0 ShowInformationFragment, 1 AnnounceInformationFragment, 2 ManageRoutesFragment
+     * @param index Stelle des Fragments, 0 ShowEventsFragment, 1 AnnounceInformationFragment, 2 ManageRoutesFragment
      * @return das Fragment
      */
     @Override
@@ -41,7 +41,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter{
 
         switch(index){
             case 0:
-                // ShowInformationFragment
+                // ShowEventsFragment
                 return myTabs.get(0);
             case 1:
                 // AnnounceInformationFragment

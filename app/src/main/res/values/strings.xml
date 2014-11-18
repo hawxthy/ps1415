@@ -15,4 +15,11 @@
     <string name="show_info_button_map">Map</string>
     <string name="downloading">Downloading...</string>
 
+
+    <!--Strings zu activity showEvents-->
+    <string name="title_activity_show_events">Events</string>
+    <string-array name="selections_menu">
+        <item name="delete">Delete</item>
+    </string-array>
+
 </resources>

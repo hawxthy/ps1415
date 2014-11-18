@@ -10,8 +10,8 @@ import com.google.api.client.util.DateTime;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
+import ws1415.veranstalterapp.Fragments.ShowInformationActivity;
 import ws1415.veranstalterapp.ServiceProvider;
-import ws1415.veranstalterapp.Fragments.ShowInformationFragment;
 
 /**
  * Created by Richard Schulze on 10.11.2014.
@@ -77,7 +77,7 @@ public class QueryEventTaskTest extends AndroidTestCase {
      */
     public void testTask() throws ExecutionException, InterruptedException {
         QueryEventTask task = new QueryEventTask();
-        Event event = task.execute(new ShowInformationFragment() {
+        Event event = task.execute(new ShowInformationActivity() {
             @Override
             public void setEventInformation(Event e) {
                 // Methode mit leerem Rumpf überschreiben,

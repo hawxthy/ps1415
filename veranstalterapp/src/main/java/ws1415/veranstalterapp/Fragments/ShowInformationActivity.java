@@ -3,11 +3,9 @@ package ws1415.veranstalterapp.Fragments;
 
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 
@@ -16,37 +14,32 @@ import java.util.Date;
 
 import ws1415.veranstalterapp.Activities.HoldTabsActivity;
 import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.task.GetEventTask;
 
 /**
- * Fragment zum Begutachten der Metainformationen der erstellten Veranstaltung.
+ * Activity zum Begutachten der Metainformationen der erstellten Veranstaltung.
  *
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
-public class ShowInformationFragment extends Fragment {
+public class ShowInformationActivity extends Activity {
     private ActionBar actionBar;
-    private View view;
     private SimpleDateFormat dateFormat;
 
     /**
-     * Erstellt die View und updatet die Informationen in dem ShowInformationFragment.
+     * Erstellt die View und zeigt die Informationen in der ShowInformationActivity.
      *
-     * @param inflater
-     * @param container
      * @param savedInstanceState
      * @return
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_show_information, container, false);
-
+    protected void onCreate( Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_show_information);
         dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
-        actionBar = getActivity().getActionBar();
-
-        HoldTabsActivity.updateInformation();
-
-        return view;
+        actionBar = this.getActionBar();
+        long id = getIntent().getLongExtra("event", 0);
+        new GetEventTask(this).execute(id);
     }
 
     /**
@@ -55,13 +48,13 @@ public class ShowInformationFragment extends Fragment {
      * @param e Das neue Event-Objekt.
      */
     public void setEventInformation(Event e) {
-        TextView dateView = (TextView) view.findViewById(R.id.show_info_date_textview);
-        TextView locationView = (TextView) view.findViewById(R.id.show_info_location_textview);
-        TextView routeView = (TextView) view.findViewById(R.id.show_info_route_textview);
-        TextView feeView = (TextView) view.findViewById(R.id.show_info_fee_textview);
-        TextView descriptionView = (TextView) view.findViewById(R.id.show_info_description_textview);
+        TextView dateView = (TextView) findViewById(R.id.show_info_date_textview);
+        TextView locationView = (TextView) findViewById(R.id.show_info_location_textview);
+        TextView routeView = (TextView) findViewById(R.id.show_info_route_textview);
+        TextView feeView = (TextView) findViewById(R.id.show_info_fee_textview);
+        TextView descriptionView = (TextView) findViewById(R.id.show_info_description_textview);
         if (e != null) {
-            actionBar.getTabAt(0).setText(e.getTitle());
+            this.setTitle(e.getTitle());
             dateView.setText(dateFormat.format(new Date(e.getDate().getValue())));
             locationView.setText(e.getLocation());
             routeView.setText(e.getRoute().getName() + " (" + e.getRoute().getLength() + ")");
