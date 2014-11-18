@@ -2,9 +2,6 @@ package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.Named;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -18,7 +15,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
-import javax.jdo.Transaction;
 
 
 /**
@@ -173,10 +169,12 @@ public class SkatenightServerEndpoint {
      * Aktualisiert die für die angegebene Mail-Adresse gespeicherte Position auf dem Server. Falls
      * kein Member-Objekt für die Mail-Adresse existiert, so wird ein neues Objekt angelegt.
      * @param mail Die Mail-Adresse des zu aktualisierenden Member-Objekts.
-     * @param location Die neue Position.
+     * @param latitude
+     * @param longitude
      */
     public void updateMemberLocation(@Named("mail") String mail,
-                                     @Named("location") String location) {
+                                     @Named("latitude") double latitude,
+                                     @Named("longitude") double longitude) {
         if (mail != null) {
             Member m = getMember(mail);
             if (m == null) {
@@ -189,7 +187,8 @@ public class SkatenightServerEndpoint {
                  */
                 m.setName(mail);
             }
-            m.setLocation(location);
+            m.setLatitude(latitude);
+            m.setLongitude(longitude);
             m.setUpdatedAt(new Date());
 
             PersistenceManager pm = pmf.getPersistenceManager();
