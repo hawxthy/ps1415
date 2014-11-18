@@ -1,17 +1,17 @@
 package ws1415.veranstalterapp.Activities;
+
+import android.app.Activity;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import android.app.Activity;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
 import ws1415.veranstalterapp.Fragments.AnnounceInformationFragment;

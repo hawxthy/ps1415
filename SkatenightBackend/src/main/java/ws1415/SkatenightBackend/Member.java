@@ -27,24 +27,24 @@ public class Member {
     @Persistent
     private String email;     // Einzigartige google Email, zum identifizieren eines Nutzers (Primary Key)
 
-    public String getName() {return name;}
+    public String getName() { return name; }
 
-    public void setName(String name) {this.name = name;}
+    public void setName(String name) { this.name = name; }
 
-    public Date getUpdatedAt() {return updatedAt;}
+    public Date getUpdatedAt() { return updatedAt; }
 
-    public void setUpdatedAt(Date updatedAt) {this.updatedAt = updatedAt;}
+    public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
 
-    public double getLatitude() {return latitude;}
+    public double getLatitude() { return latitude; }
 
-    public void setLatitude(double latitude) {this.latitude = latitude;}
+    public void setLatitude(double latitude) { this.latitude = latitude; }
 
-    public double getLongitude() {return longitude;}
+    public double getLongitude() { return longitude; }
 
-    public void setLongitude(double longitude) {this.longitude = longitude;}
+    public void setLongitude(double longitude) { this.longitude = longitude; }
 
-    public void setEmail(String email) {this.email = email;}
+    public void setEmail(String email) { this.email = email; }
 
-    public String getEmail() {return email;}
+    public String getEmail() { return email; }
 
 }

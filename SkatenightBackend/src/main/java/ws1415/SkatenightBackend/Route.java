@@ -3,7 +3,9 @@ package ws1415.SkatenightBackend;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 
-import javax.annotation.Generated;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -26,6 +28,8 @@ public class Route {
     @Persistent
     private Text routeData;
     @Persistent
+    private List<RoutePoint> routePoints;
+    @Persistent
     private String length;
 
     public String getName() {
@@ -43,6 +47,10 @@ public class Route {
     public void setRouteData(Text routeData) {
         this.routeData = routeData;
     }
+
+    public List<RoutePoint> getRoutePoints() { return routePoints; }
+
+    public void setRoutePoints(List<RoutePoint> routePoints) { this.routePoints = new ArrayList(routePoints); }
 
     public String getLength() {
         return length;
