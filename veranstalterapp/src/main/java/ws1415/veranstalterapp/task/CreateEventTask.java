@@ -21,7 +21,7 @@ public class CreateEventTask extends AsyncTask<Event, Void, Void> {
      */
     protected Void doInBackground(Event... params){
         try{
-            ServiceProvider.getService().skatenightServerEndpoint().setEvent(params[0]).execute();
+            ServiceProvider.getService().skatenightServerEndpoint().createEvent(params[0]).execute();
         }catch(IOException e) {
             e.printStackTrace();
         }

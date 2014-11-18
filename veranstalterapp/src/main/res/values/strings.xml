@@ -53,7 +53,7 @@
     <string name="route_editor_leave_dialog">No route has been created. Do you want to leave anyway?</string>
 
     <!-- Strings zu activity_showinformation -->
-    <string name="title_fragment_show_information">Show Information</string>
+    <string name="title_activity_show_information">Show Information</string>
     <string name="show_info_header_date">Time and date</string>
     <string name="show_info_header_location">Location</string>
     <string name="show_info_header_route">Route</string>
@@ -77,5 +77,8 @@
     <string name="activity_add_route_dialog_cancel">Cancel</string>
     <string name="activity_add_route_dialog_apply">Apply</string>
     <string name="activity_add_route_dialog_empty">Routename can not be empty</string>
+
+    <!--Strings zu ShowEventsFragment-->
+    <string name="title_fragment_show_events">Events</string>
 
 </resources>

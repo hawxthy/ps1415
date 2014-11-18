@@ -35,7 +35,6 @@ public class ManageRoutesFragment extends Fragment {
     private ListView routeListView;
     private List<Route> routeList;
     private MapsCursorAdapter mAdapter;
-    private MenuItem addRouteItem;
 
     /**
      * Ruft Methode auf, um das add_route_item in der ActionBar zu setzen.
