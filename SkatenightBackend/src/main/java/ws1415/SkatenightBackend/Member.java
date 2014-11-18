@@ -8,7 +8,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 /**
  * Stellt einen User innerhalb der Anwendung dar.
- * 
+ *
  * Created by Tristan Rust on 24.10.2014.
  */
 @PersistenceCapable
