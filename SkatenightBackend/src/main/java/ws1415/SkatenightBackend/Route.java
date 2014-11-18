@@ -4,7 +4,6 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -27,7 +26,7 @@ public class Route {
      */
     @Persistent
     private Text routeData;
-    @Persistent
+    @Persistent(serialized = "true")
     private ArrayList<RoutePoint> routePoints;
     @Persistent
     private String length;
@@ -48,9 +47,13 @@ public class Route {
         this.routeData = routeData;
     }
 
-    public ArrayList<RoutePoint> getRoutePoints() { return routePoints; }
+    public ArrayList<RoutePoint> getRoutePoints() {
+        return routePoints;
+    }
 
-    public void setRoutePoints(ArrayList<RoutePoint> routePoints) { this.routePoints = routePoints; }
+    public void setRoutePoints(ArrayList<RoutePoint> routePoints) {
+        this.routePoints = routePoints;
+    }
 
     public String getLength() {
         return length;
