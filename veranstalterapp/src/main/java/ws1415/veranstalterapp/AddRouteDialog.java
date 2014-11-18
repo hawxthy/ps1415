@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import ws1415.veranstalterapp.Activities.HoldTabsActivity;
 import ws1415.veranstalterapp.Activities.RouteEditorActivity;
 
 
@@ -28,9 +27,8 @@ public class AddRouteDialog extends Activity {
      *
      * @param view
      */
-    public void cancel(View view){
-        Intent intent = new Intent(this, HoldTabsActivity.class);
-        startActivity(intent);
+    public void cancel(View view) {
+        finish();
     }
 
     public void apply(View view){

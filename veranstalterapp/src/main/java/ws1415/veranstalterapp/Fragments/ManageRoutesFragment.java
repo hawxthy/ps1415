@@ -81,7 +81,7 @@ public class ManageRoutesFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                Toast.makeText(getActivity().getApplicationContext(), "size: " + routeList.get(i).getRoutePoints().size(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity().getApplicationContext(), "size: " + routeList.get(i).getRoutePoints(), Toast.LENGTH_LONG).show();
 
                 Intent intent = new Intent(getActivity(), ShowRouteActivity.class);
                 intent.putExtra("show_route_extra_route", routeList.get(i).getRouteData().getValue());
