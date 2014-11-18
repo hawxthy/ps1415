@@ -28,7 +28,7 @@ public class Route {
     @Persistent
     private Text routeData;
     @Persistent
-    private List<RoutePoint> routePoints;
+    private ArrayList<RoutePoint> routePoints;
     @Persistent
     private String length;
 
@@ -48,9 +48,9 @@ public class Route {
         this.routeData = routeData;
     }
 
-    public List<RoutePoint> getRoutePoints() { return routePoints; }
+    public ArrayList<RoutePoint> getRoutePoints() { return routePoints; }
 
-    public void setRoutePoints(List<RoutePoint> routePoints) { this.routePoints = new ArrayList(routePoints); }
+    public void setRoutePoints(ArrayList<RoutePoint> routePoints) { this.routePoints = routePoints; }
 
     public String getLength() {
         return length;

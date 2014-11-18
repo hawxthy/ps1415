@@ -1,9 +1,11 @@
 package ws1415.SkatenightBackend;
 
+import java.io.Serializable;
+
 /**
  * Created by Pascal Otto on 18.11.14.
  */
-public class RoutePoint {
+public class RoutePoint implements Serializable {
     private double latitude;
     private double longitude;
 
