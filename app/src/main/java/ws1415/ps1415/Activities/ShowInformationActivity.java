@@ -25,6 +25,7 @@ import java.util.Date;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.task.AddEventToMemberTask;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.task.QueryEventTask;
 
@@ -126,10 +127,10 @@ public class ShowInformationActivity extends Activity {
             startActivityForResult(credential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
         }
 
-        String mail = credential.getSelectedAccountName();
+        String email = credential.getSelectedAccountName();
 
         // EmailAdresse des aktuellen users dem Event hinzufügen
-        this.event.addMember(mail);
+        new AddEventToMemberTask(this.event).execute(email);
     }
 
     /**
