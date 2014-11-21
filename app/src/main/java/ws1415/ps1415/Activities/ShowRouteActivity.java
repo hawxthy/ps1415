@@ -33,9 +33,11 @@ import ws1415.ps1415.util.LocationUtils;
 public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE = "show_route_extra_route";
     private static final String MEMBER_ROUTE = "show_route_member_route";
+    private static final String MEMBER_ROUTE_HIGHLIGHT = "show_route_member_route_highlight";
 
     private GoogleMap googleMap;
     private PolylineOptions route;
+    private PolylineOptions routeHighlight;
     private Intent service;
 
     private Location location; // Enthält die aktuelle Position, die vom Server runtergeladen wurde
@@ -49,9 +51,15 @@ public class ShowRouteActivity extends Activity {
         googleMap.setMyLocationEnabled(true);
 
         Intent intent;
-        if (savedInstanceState != null && savedInstanceState.containsKey(MEMBER_ROUTE)) {
-            route = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_ROUTE);
-            googleMap.addPolyline(route);
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(MEMBER_ROUTE)) {
+                route = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_ROUTE);
+                googleMap.addPolyline(route);
+            }
+            if (savedInstanceState.containsKey(MEMBER_ROUTE_HIGHLIGHT)) {
+                routeHighlight = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_ROUTE_HIGHLIGHT);
+                googleMap.addPolyline(routeHighlight);
+            }
         }
         else if ((intent = getIntent()) != null && intent.hasExtra(EXTRA_ROUTE)) {
             String encodedPath = intent.getStringExtra(EXTRA_ROUTE);
@@ -60,6 +68,7 @@ public class ShowRouteActivity extends Activity {
 
                 route = new PolylineOptions()
                         .addAll(line)
+                        .width(10.0f)
                         .color(Color.BLUE);
 
                 googleMap.clear();
@@ -111,6 +120,9 @@ public class ShowRouteActivity extends Activity {
     protected void onSaveInstanceState(Bundle outState) {
         if (route != null) {
             outState.putParcelable(MEMBER_ROUTE, route);
+        }
+        if (routeHighlight != null) {
+            outState.putParcelable(MEMBER_ROUTE_HIGHLIGHT, routeHighlight);
         }
 
         super.onSaveInstanceState(outState);
