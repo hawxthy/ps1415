@@ -33,7 +33,7 @@ import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.CreateEventTask;
 
 /**
- * Fragment zum veröffentlichen von neuen Veranstaltungen.
+ * Fragment zum Veröffentlichen von neuen Veranstaltungen.
  * <p/>
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
