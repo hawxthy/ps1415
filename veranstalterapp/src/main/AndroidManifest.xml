@@ -37,7 +37,7 @@
         <activity
             android:name=".Activities.ChooseRouteActivity"
             android:label="@string/title_activity_choose_route"
-            android:theme="@android:style/Theme.Holo.Dialog" />
+            android:theme="@android:style/Theme.Holo.Dialog"/>
         <activity
             android:name=".Activities.ShowRouteActivity"
             android:label="@string/title_activity_show_route"

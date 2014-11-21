@@ -130,7 +130,7 @@ public class ManageRoutesFragment extends Fragment {
     private void createSelectionsMenu(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(routeList.get(position).getName())
-                .setItems(R.array.selections_menu, new DialogInterface.OnClickListener() {
+                .setItems(R.array.selections_menu_manage_routes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int index) {
                         if (index == 0) {
                             deleteRoute(routeList.get(position));

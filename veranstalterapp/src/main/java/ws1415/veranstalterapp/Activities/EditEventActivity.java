@@ -19,9 +19,9 @@ import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Event;
-import com.appspot.skatenight_ms.skatenightAPI.model.Route;
-import com.appspot.skatenight_ms.skatenightAPI.model.Text;
+import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Text;
 import com.google.api.client.util.DateTime;
 
 import java.text.SimpleDateFormat;
@@ -157,6 +157,7 @@ public class EditEventActivity extends Activity {
             public void onClick(View view) {
                 Intent intent = new Intent(EditEventActivity.this, ChooseRouteActivity.class);
                 startActivity(intent);
+                ChooseRouteActivity.giveEditEVentActivity(EditEventActivity.this);
             }
         });
     }
@@ -335,6 +336,7 @@ public class EditEventActivity extends Activity {
         editTextFee.setText(event.getFee());
         editTextLocation.setText(event.getLocation());
         editTextDescription.setText(event.getDescription().getValue());
+        routePickerButton.setText(event.getRoute().getName());
 
         // SimpleDateFormat für die Uhrzeit vom Event
         SimpleDateFormat time = new SimpleDateFormat("HH:mm");

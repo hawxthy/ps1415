@@ -36,6 +36,10 @@
     <string name="title_fragment_manage_routes">Manage Routes</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string-array name="selections_menu_manage_routes">
+        <item name="delete">Delete</item>
+    </string-array>
+
     <string-array name="selections_menu">
         <item name="edit">Edit</item>
         <item name="delete">Delete</item>
