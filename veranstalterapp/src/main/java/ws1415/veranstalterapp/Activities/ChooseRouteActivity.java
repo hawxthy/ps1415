@@ -37,8 +37,9 @@ public class ChooseRouteActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 ((AnnounceInformationFragment)HoldTabsActivity.getAdapter().getItem(1)).setRoute(routeList.get(i));
-                Log.d("Parent ist: ", String.valueOf(getParent()));
-                activity.setRoute(routeList.get(i));
+                if(activity != null){
+                    activity.setRoute(routeList.get(i));
+                }
                 finish();
             }
         });

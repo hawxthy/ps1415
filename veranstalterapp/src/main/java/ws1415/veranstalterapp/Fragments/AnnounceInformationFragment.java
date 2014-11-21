@@ -264,7 +264,7 @@ public class AnnounceInformationFragment extends Fragment {
                 description = new Text();
                 description.setValue(editTextDescription.getText().toString());
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (!title.isEmpty() && !fee.isEmpty() && dTime != null && !location.isEmpty() && !description.isEmpty() && route != null) {
+                if (!title.isEmpty() && !fee.isEmpty() && dTime != null && !location.isEmpty() && !description.getValue().isEmpty() && route != null) {
                     // Erstelle ein neue Event
                     event = new Event();
 
