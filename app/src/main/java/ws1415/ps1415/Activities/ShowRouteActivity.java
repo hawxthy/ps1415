@@ -38,6 +38,7 @@ public class ShowRouteActivity extends Activity {
 
     private GoogleMap googleMap;
     private PolylineOptions route;
+    private Polyline routeLine;
     private PolylineOptions routeHighlight;
     private Polyline routeHighlightLine;
     private Intent service;
@@ -56,11 +57,11 @@ public class ShowRouteActivity extends Activity {
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(MEMBER_ROUTE)) {
                 route = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_ROUTE);
-                googleMap.addPolyline(route);
+                routeLine = googleMap.addPolyline(route);
             }
             if (savedInstanceState.containsKey(MEMBER_ROUTE_HIGHLIGHT)) {
                 routeHighlight = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_ROUTE_HIGHLIGHT);
-                googleMap.addPolyline(routeHighlight);
+                routeHighlightLine = googleMap.addPolyline(routeHighlight);
             }
         }
         else if ((intent = getIntent()) != null && intent.hasExtra(EXTRA_ROUTE)) {
@@ -70,11 +71,11 @@ public class ShowRouteActivity extends Activity {
 
                 route = new PolylineOptions()
                         .addAll(line)
-                        .width(10.0f)
+                        .width(12.0f)
                         .color(Color.BLUE);
 
                 googleMap.clear();
-                googleMap.addPolyline(route);
+                routeLine = googleMap.addPolyline(route);
 
                 googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                     @Override
@@ -182,7 +183,7 @@ public class ShowRouteActivity extends Activity {
         if (routeHighlightLine != null) routeHighlightLine.remove();
         routeHighlight = new PolylineOptions()
                 .addAll(highlight)
-                .width(5.0f)
+                .width(8.0f)
                 .color(Color.GREEN);
 
         routeHighlightLine = googleMap.addPolyline(routeHighlight);
