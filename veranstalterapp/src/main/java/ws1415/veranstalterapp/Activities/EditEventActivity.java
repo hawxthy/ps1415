@@ -274,17 +274,11 @@ public class EditEventActivity extends Activity {
                     event.setDescription(description);
                     new EditEventTask().execute(event);
                     Toast.makeText(EditEventActivity.this,
-                            getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
-                    editTextTitle.setText("");
-                    editTextFee.setText("");
-                    timePickerButton.setText(getString(R.string.announce_info_set_time));
-                    editTextLocation.setText("");
-                    routePickerButton.setText(getString(R.string.announce_info_choose_map));
-                    editTextDescription.setText("");
-                    setCurrentDateOnView();
+                            getResources().getString(R.string.eventedited), Toast.LENGTH_LONG).show();
 
                     // Update die Informationen in ShowInformationFragment
                     HoldTabsActivity.updateInformation();
+                    finish();
                 } else {
                     cancelInfo(false);
                 }
