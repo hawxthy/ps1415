@@ -26,7 +26,7 @@ public class Route {
      */
     @Persistent
     private Text routeData;
-    @Persistent(serialized = "true")
+    @Persistent(serialized = "true", defaultFetchGroup = "true")
     private ArrayList<RoutePoint> routePoints;
     @Persistent
     private String length;
