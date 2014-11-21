@@ -38,7 +38,7 @@ public class DeleteRouteTask extends AsyncTask<Route, Void, Boolean> {
         }catch(IOException e){
             e.printStackTrace();
         }
-        return null;
+        return false;
     }
 
     /**
