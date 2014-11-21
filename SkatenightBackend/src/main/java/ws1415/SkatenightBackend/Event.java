@@ -38,8 +38,6 @@ public class Event{
     private int routeFieldFirst;
     @Persistent
     private int routeFieldLast;
-    @Persistent(serialized = "true", defaultFetchGroup = "true")
-    private ArrayList<String> memberMailList;
 
     public Key getKey() {
         return key;
@@ -95,11 +93,5 @@ public class Event{
 
     public void setRoute(Route route) {
         this.route = route;
-    }
-
-    public void addMember(String mail) {getMemberMailList().add(mail);}
-
-    public ArrayList<String> getMemberMailList() {
-        return memberMailList;
     }
 }

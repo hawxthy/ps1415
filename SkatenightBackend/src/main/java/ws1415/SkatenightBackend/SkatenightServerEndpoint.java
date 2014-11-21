@@ -206,6 +206,17 @@ public class SkatenightServerEndpoint {
     }
 
     /**
+     *
+     */
+    public void addEventToMember(Event event,@Named("email")String email) {
+        Member member = getMember(email);
+        ArrayList<Event> eventList = new ArrayList();
+        eventList.add(event);
+        member.setEventList(eventList);
+
+    }
+
+    /**
      * Speichert die angegebene Route auf dem Server
      * @param user Der User, der die Route hinzufügen möchte
      * @param route zu speichernde Route

@@ -14,17 +14,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
+import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.task.AddEventToMemberTask;
 import ws1415.ps1415.task.GetEventTask;
+import ws1415.ps1415.task.QueryEventTask;
 
 /**
  * Zeigt die Informationen des aktuellen Events an.
@@ -124,10 +127,10 @@ public class ShowInformationActivity extends Activity {
             startActivityForResult(credential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
         }
 
-        String mail = credential.getSelectedAccountName();
+        String email = credential.getSelectedAccountName();
 
         // EmailAdresse des aktuellen users dem Event hinzufügen
-        //this.event.addMember(mail);
+        new AddEventToMemberTask(this.event).execute(email);
     }
 
     /**
