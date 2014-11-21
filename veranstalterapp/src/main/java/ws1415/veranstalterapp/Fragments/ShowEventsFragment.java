@@ -18,10 +18,13 @@ import com.appspot.skatenight_ms.skatenightAPI.model.Route;
 import java.util.ArrayList;
 import java.util.List;
 
+import ws1415.veranstalterapp.Activities.EditEventActivity;
 import ws1415.veranstalterapp.Activities.ShowRouteActivity;
 import ws1415.veranstalterapp.Adapter.EventsCursorAdapter;
 import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
 import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.task.DeleteEventTask;
+import ws1415.veranstalterapp.task.EditEventTask;
 import ws1415.veranstalterapp.task.QueryEventTask;
 
 /**
@@ -133,12 +136,37 @@ public class ShowEventsFragment extends Fragment {
                 .setItems(R.array.selections_menu, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int index) {
                         if (index == 0) {
-                            //deleteEvent(eventList.get(position));
+                            editEvent(eventList.get(position));
+                        }else if(index == 1){
+                            deleteEvent(eventList.get(position));
                         }
+
                     }
                 });
         builder.create();
         builder.show();
     }
 
+    /**
+     * Löscht das Event aus der Liste
+     *
+     * @param event das zu löschende Event
+     */
+    public void deleteEventFromList(Event event){
+        mAdapter.removeListItem(eventList.indexOf(event));
+        eventList.remove(event);
+    }
+
+    /**
+     * Löscht das Event vom Server
+     *
+     * @param event das zu löschende Event
+     */
+    private void deleteEvent(Event event){ new DeleteEventTask(this).execute(event);}
+
+
+    private void editEvent(Event event){
+        Intent intent = new Intent(getActivity(), EditEventActivity.class);
+        intent.putExtra("event", event.getKey().getId());
+    }
 }
