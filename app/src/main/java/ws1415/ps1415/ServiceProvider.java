@@ -3,7 +3,6 @@ package ws1415.ps1415;
 import com.appspot.skatenight_ms.skatenightAPI.SkatenightAPI;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 /**
  * Singleton-Klasse, die den Zweck eines zentralen Zugriffspunkts auf das Backend erfüllt.
@@ -20,32 +19,13 @@ public abstract class ServiceProvider {
      */
     public static SkatenightAPI getService() {
         if (service == null) {
-            setupProductionServerConnection();
+            SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
+                    AndroidHttp.newCompatibleTransport(),
+                    new AndroidJsonFactory(), null);
+            builder.setRootUrl(Constants.API_URL);
+            service = builder.build();
         }
         return service;
-    }
-
-    /**
-     * Erstellt ein Skatenight-API Objekt, das eine Verbindung zum Test-Server aufbaut.
-     * Kann für Testklassen benutzt werden.
-     */
-    public static void setupTestServerConnection() {
-        SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
-                AndroidHttp.newCompatibleTransport(),
-                new AndroidJsonFactory(), null);
-        builder.setRootUrl("http://10.66.20.74:8080/_ah/api");
-        service = builder.build();
-    }
-
-    /**
-     * Erstellt ein Skatenight-API Objekt, das eine Verbindung zum Production-Server aufbaut.
-     */
-    public static void setupProductionServerConnection() {
-        SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
-                AndroidHttp.newCompatibleTransport(),
-                new AndroidJsonFactory(), null);
-        builder.setRootUrl("https://skatenight-ms.appspot.com/_ah/api");
-        service = builder.build();
     }
 
 }
