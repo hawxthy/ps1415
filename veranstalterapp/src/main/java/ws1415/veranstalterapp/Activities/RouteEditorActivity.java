@@ -27,8 +27,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.RoutePoint;
-import com.appspot.skatenight_ms.skatenightAPI.model.Text;
+import com.skatenight.skatenightAPI.model.RoutePoint;
+import com.skatenight.skatenightAPI.model.Text;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -230,7 +230,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                     Toast.makeText(getApplicationContext(), "size: " + routePoints.size(), Toast.LENGTH_LONG).show();
 
 
-                    com.appspot.skatenight_ms.skatenightAPI.model.Route rt = new com.appspot.skatenight_ms.skatenightAPI.model.Route();
+                    com.skatenight.skatenightAPI.model.Route rt = new com.skatenight.skatenightAPI.model.Route();
                     rt.setName(name);
                     rt.setRouteData(new Text().setValue(encoded));
                     rt.setRoutePoints(routePoints);

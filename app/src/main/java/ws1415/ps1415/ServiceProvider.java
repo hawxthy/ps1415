@@ -1,8 +1,8 @@
 package ws1415.ps1415;
 
-import com.appspot.skatenight_ms.skatenightAPI.SkatenightAPI;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.skatenight.skatenightAPI.SkatenightAPI;
 
 /**
  * Singleton-Klasse, die den Zweck eines zentralen Zugriffspunkts auf das Backend erfüllt.

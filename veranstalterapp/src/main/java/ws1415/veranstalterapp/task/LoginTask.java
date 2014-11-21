@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.BooleanWrapper;
+import com.skatenight.skatenightAPI.model.BooleanWrapper;
 
 import java.io.IOException;
 

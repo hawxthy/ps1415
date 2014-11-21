@@ -1,6 +1,7 @@
 package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.Api;
+import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -30,7 +31,8 @@ import javax.jdo.Transaction;
     version = "v1",
     clientIds = {Constants.ANDROID_USER_CLIENT_ID, Constants.ANDROID_HOST_CLIENT_ID,
             Constants.WEB_CLIENT_ID, com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID},
-    audiences = {Constants.ANDROID_AUDIENCE})
+    audiences = {Constants.ANDROID_AUDIENCE},
+    namespace = @ApiNamespace(ownerDomain = "skatenight.com", ownerName = "skatenight"))
 public class SkatenightServerEndpoint {
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
