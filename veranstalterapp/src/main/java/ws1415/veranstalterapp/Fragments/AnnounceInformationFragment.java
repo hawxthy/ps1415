@@ -34,7 +34,7 @@ import ws1415.veranstalterapp.task.CreateEventTask;
 
 /**
  * Fragment zum Veröffentlichen von neuen Veranstaltungen.
- * <p/>
+ *
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
 public class AnnounceInformationFragment extends Fragment {

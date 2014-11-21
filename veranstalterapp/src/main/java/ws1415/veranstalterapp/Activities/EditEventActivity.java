@@ -8,11 +8,7 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -29,7 +25,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.task.CreateEventTask;
 import ws1415.veranstalterapp.task.EditEventTask;
 import ws1415.veranstalterapp.task.GetEventTask;
 
@@ -157,7 +152,7 @@ public class EditEventActivity extends Activity {
             public void onClick(View view) {
                 Intent intent = new Intent(EditEventActivity.this, ChooseRouteActivity.class);
                 startActivity(intent);
-                ChooseRouteActivity.giveEditEVentActivity(EditEventActivity.this);
+                ChooseRouteActivity.giveEditEventActivity(EditEventActivity.this);
             }
         });
     }
@@ -295,22 +290,15 @@ public class EditEventActivity extends Activity {
 
     /**
      * Gibt momentan einen Toast aus, wenn der Benutzer auf den Cancel Button drückt
-     * (löscht alle Eingaben) oder wenn der Benutze ein unvollständiges Event hinzufügen will
+     * wird ausgegeben, dass das Event nicht editiert wure
      */
     public void cancelInfo(boolean allSet) {
         if (allSet) {
-            Toast.makeText(this, "Wurde noch nicht erstellt", Toast.LENGTH_LONG).show();
-            editTextTitle.setText("");
-            editTextFee.setText("");
-            editTextLocation.setText("");
-            routePickerButton.setText(getString(R.string.announce_info_choose_map));
-            editTextDescription.setText("");
-            setCurrentDateOnView();
+            Toast.makeText(this, "Wurde nicht editiert", Toast.LENGTH_LONG).show();
+            finish();
         } else {
             Toast.makeText(this, "Nicht alle Felder ausgefüllt", Toast.LENGTH_LONG).show();
         }
-
-        timePickerButton.setText(getResources().getString(R.string.announce_info_set_time));
     }
 
     /**
@@ -323,6 +311,11 @@ public class EditEventActivity extends Activity {
         routePickerButton.setText(selectedRoute.getName());
     }
 
+    /**
+     * Schreibt die Daten aus dem Event in die Textfelder der View
+     *
+     * @param event Das event, dessen Daten übernommen werden sollen
+     */
     public void setEventDataToView(Event event){
         this.event = event;
         // Setze die Attribute vom Event auf die EditText Felder

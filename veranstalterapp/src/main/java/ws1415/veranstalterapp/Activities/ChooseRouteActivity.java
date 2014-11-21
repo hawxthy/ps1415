@@ -3,7 +3,6 @@ package ws1415.veranstalterapp.Activities;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -19,14 +18,23 @@ import ws1415.veranstalterapp.Fragments.AnnounceInformationFragment;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.ServiceProvider;
 
-
+/**
+ * Activity zum Auswählen einer Route für das zu erstellende Event.
+ *
+ * Created by Bernd Eissing, Marting Wrodarczyk on 21.11.2014.
+ */
 public class ChooseRouteActivity extends Activity {
     private ListView lv;
     private List<Route> routeList;
     private MapsCursorAdapter mAdapter;
     private static EditEventActivity activity;
 
-
+    /**
+     * Initialisiert die ListView, setzt den OnClickListener und füllt die Liste in der View
+     * mit den Routen vom Server
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,9 +51,14 @@ public class ChooseRouteActivity extends Activity {
                 finish();
             }
         });
-        new QueryRouteTask2().execute(this);
+        new PrivateQueryRouteTask().execute(this);
     }
 
+    /**
+     * Schreibt die Routen aus der übergebenen Liste in die ListView der Activity
+     *
+     * @param results die Liste der Routen
+     */
     public void setRoutesToListView(ArrayList<Route> results) {
         routeList = results;
         mAdapter = new MapsCursorAdapter(this, results);
@@ -58,7 +71,7 @@ public class ChooseRouteActivity extends Activity {
      *
      * Created by Bernd Eissing, Martin Wrodarczyk on 04.11.2014.
      */
-    private class QueryRouteTask2 extends AsyncTask<ChooseRouteActivity, Void, List<Route>> {
+    private class PrivateQueryRouteTask extends AsyncTask<ChooseRouteActivity, Void, List<Route>> {
         private ChooseRouteActivity view;
 
         /**
@@ -76,13 +89,23 @@ public class ChooseRouteActivity extends Activity {
             return null;
         }
 
+        /**
+         * Ruft setRoutesToListView in ChooseRouteActivity auf.
+         *
+         * @param results
+         */
         @Override
         protected void onPostExecute(List<Route> results){
             view.setRoutesToListView((ArrayList<Route>) results);
         }
     }
 
-    public static void giveEditEVentActivity(EditEventActivity eea){
+    /**
+     * Übergibt die Instanz der EditEventActivity der ChooseRouteActivity
+     *
+     * @param eea die Instanz der EditEventActivity
+     */
+    public static void giveEditEventActivity(EditEventActivity eea){
         activity = eea;
     }
 }
