@@ -349,7 +349,7 @@ public class SkatenightServerEndpoint {
             createEvent(user, event);
         }
 
-        return b;
+        return new BooleanWrapper(b.value);
     }
 
     /**
