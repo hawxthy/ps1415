@@ -19,7 +19,8 @@ import ws1415.ps1415.task.UpdateLocationTask;
  */
 public class UpdateLocationTaskTest extends AndroidTestCase {
     private static final String testMail = "max@mustermann.de";
-    private static final String testLocation = "{rd|Ha`lm@";
+    private static final double testLongitude = 1.05;
+    private static final double testLatitude = 7.23;
 
     public void setUp() throws Exception {
         super.setUp();
@@ -31,11 +32,12 @@ public class UpdateLocationTaskTest extends AndroidTestCase {
      * wurden.
      */
     public void testTask() throws ExecutionException, InterruptedException, IOException {
-        UpdateLocationTask task = new UpdateLocationTask();
-        task.execute(testMail, testLocation).get();
+        UpdateLocationTask task = new UpdateLocationTask(testMail, testLatitude, testLongitude);
+        task.execute().get();
         Member m = ServiceProvider.getService().skatenightServerEndpoint().getMember(testMail)
                 .execute();
         assertNotNull("member is null", m);
-        assertEquals("wrong location", testLocation, m.getLocation());
+        assertEquals("wrong member latitude", testLatitude, m.getLatitude());
+        assertEquals("wrong member longitude", testLongitude, m.getLongitude());
     }
 }

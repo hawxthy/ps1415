@@ -21,7 +21,8 @@ import ws1415.ps1415.Activities.ShowRouteActivity;
  */
 public class QueryMemberTaskTest extends AndroidTestCase {
     private static final String testMail = "max@mustermann.de";
-    private static final String testLocation = "{rd|Ha`lm@";
+    private static final double testLongitude = 1.05;
+    private static final double testLatitude = 7.23;
 
     /**
      * Stellt sicher, dass auf dem Server ein Member-Objekt mit der angegebenen Mail und Position
@@ -33,7 +34,7 @@ public class QueryMemberTaskTest extends AndroidTestCase {
 
         // Member-Objekt auf dem Server erstellen lassen
         ServiceProvider.getService().skatenightServerEndpoint().updateMemberLocation(testMail,
-                testLocation).execute();
+                testLatitude, testLongitude).execute();
     }
 
     /**
@@ -103,6 +104,7 @@ public class QueryMemberTaskTest extends AndroidTestCase {
         assertEquals("wrong member email", testMail, m.getEmail());
         // Nach Implementierung des Backends wird als Name die Mail-Adresse verwendet:
         assertEquals("wrong name", testMail, m.getName());
-        assertEquals("wrong member location", testLocation, m.getLocation());
+        assertEquals("wrong member latitude", testLatitude, m.getLatitude());
+        assertEquals("wrong member longitude", testLongitude, m.getLongitude());
     }
 }
