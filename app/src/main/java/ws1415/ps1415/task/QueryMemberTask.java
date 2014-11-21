@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Member;
+import com.skatenight.skatenightAPI.model.Member;
 
 import java.io.IOException;
 

@@ -2,9 +2,9 @@ package ws1415.ps1415.task;
 
 import android.test.AndroidTestCase;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Event;
-import com.appspot.skatenight_ms.skatenightAPI.model.Route;
-import com.appspot.skatenight_ms.skatenightAPI.model.Text;
+import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Text;
 import com.google.api.client.util.DateTime;
 
 import java.util.Date;

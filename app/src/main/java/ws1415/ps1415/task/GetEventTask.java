@@ -2,7 +2,7 @@ package ws1415.ps1415.task;
 
 import android.os.AsyncTask;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Event;
 
 import java.io.IOException;
 
