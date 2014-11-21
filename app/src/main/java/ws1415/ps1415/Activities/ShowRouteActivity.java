@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.text.ParseException;
@@ -38,6 +39,7 @@ public class ShowRouteActivity extends Activity {
     private GoogleMap googleMap;
     private PolylineOptions route;
     private PolylineOptions routeHighlight;
+    private Polyline routeHighlightLine;
     private Intent service;
 
     private Location location; // Enthält die aktuelle Position, die vom Server runtergeladen wurde
@@ -87,6 +89,8 @@ public class ShowRouteActivity extends Activity {
                         }
                     }
                 });
+
+                highlightRoute(5, 10);
             }
             catch (ParseException e) {
                 Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
@@ -173,4 +177,14 @@ public class ShowRouteActivity extends Activity {
         }
     }
 
+    private void highlightRoute(int first, int last) {
+        List<LatLng> highlight = route.getPoints().subList(first, last);
+        if (routeHighlightLine != null) routeHighlightLine.remove();
+        routeHighlight = new PolylineOptions()
+                .addAll(highlight)
+                .width(7.5f)
+                .color(Color.RED);
+
+        routeHighlightLine = googleMap.addPolyline(routeHighlight);
+    }
 }

@@ -33,6 +33,10 @@ public class Event{
     @Persistent(defaultFetchGroup = "true")
     @Unowned
     private Route route;
+    @Persistent
+    private int routeFieldFirst;
+    @Persistent
+    private int routeFieldLast;
 
     public Key getKey() {
         return key;
