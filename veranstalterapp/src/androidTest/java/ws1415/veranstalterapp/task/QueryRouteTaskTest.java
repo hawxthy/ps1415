@@ -78,8 +78,6 @@ public class QueryRouteTaskTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        ServiceProvider.setupTestServerConnection();
-
         // Bestehende Routen löschen
         for (Route r : ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute()
                 .getItems()) {

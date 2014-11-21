@@ -1,34 +1,30 @@
 package ws1415.veranstalterapp.task;
 
+import android.app.Service;
 import android.test.AndroidTestCase;
 
+import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
-import com.google.api.client.util.DateTime;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import ws1415.veranstalterapp.Fragments.ShowEventsFragment;
-import ws1415.veranstalterapp.Fragments.ShowInformationActivity;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**
- * Created by Richard Schulze, Martin Wrodarczyk on 10.11.2014.
+ * Created by Martin on 21.11.2014.
  */
-public class QueryEventTaskTest extends AndroidTestCase {
-    private Route route1, route2;
+public class DeleteEventTaskTest extends AndroidTestCase {
     private Event event1, event2;
-    private List<Event> testEvents;
+    private Route route1, route2;
+
     /**
-     * Stellt eine Verbindung zum Testserver her und bereitet die Testdaten vor.
+     * Testdaten erstellen
      */
-    public QueryEventTaskTest() {
-        // Testdaten erstellen
+    public DeleteEventTaskTest() {
         route1 = new Route();
         route1.setName("Route 1");
         route1.setLength("5 km");
@@ -76,57 +72,50 @@ public class QueryEventTaskTest extends AndroidTestCase {
         event2.setLocation("Schlossplatz");
         event2.setRoute(route2);
         event2.setDescription(new Text().setValue("Die zweite Skatenight"));
-
-        testEvents = new ArrayList<Event>();
-        testEvents.add(event1);
-        testEvents.add(event2);
     }
 
     /**
-     * Überträgt die Testdaten auf den Server.
+     * Die Daten werden vor jedem Test neu auf den Server geschrieben.
      *
      * @throws Exception
      */
     public void setUp() throws Exception {
         super.setUp();
 
-        // Test-Events auf den Server übertragen
+        // Bestehende Events löschen
+        for (Event e : ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+                .execute().getItems()) {
+            ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                    .execute();
+        }
+
         ServiceProvider.getService().skatenightServerEndpoint().createEvent(event1).execute();
         ServiceProvider.getService().skatenightServerEndpoint().createEvent(event2).execute();
+
+        for( Event e : ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+                .execute().getItems()){
+            if(event1.getTitle().equals(e.getTitle())){
+                event1 = e;
+            } else if(event2.getTitle().equals(e.getTitle())){
+                event2 = e;
+            }
+        }
     }
 
     /**
-     * Prüft, ob das durch den QueryEventTask abgerufene Event die korrekten Daten enthält.
-     *
-     * @throws java.util.concurrent.ExecutionException
-     * @throws InterruptedException
+     * Das Löschen von Events testen.
      */
-    public void testTask() throws ExecutionException, InterruptedException, IOException {
-        QueryEventTask task = new QueryEventTask();
-        List<Event> eventList = task.execute(new ShowEventsFragment() {
+    public void testTask() throws IOException{
+        new DeleteEventTask(new ShowEventsFragment(){
             @Override
-            public void setEventsToListView(List<Event> results) {
+            public void deleteEventFromList(Event e){
                 // Methode mit leerem Rumpf überschreiben,
                 // da der Callback für den Test nicht relevant ist
             }
-        }).get();
-
-        assertNotNull("events are null", eventList);
-        for (int i = 0; i < eventList.size(); i++) {
-            assertEquals(i + ".event: wrong title", eventList.get(i).getTitle(), testEvents.get(i).getTitle());
-            assertEquals(i + ".event: wrong date", eventList.get(i).getDate().getValue(), testEvents.get(i).getDate().getValue());
-            assertEquals(i + ".event: wrong fee", eventList.get(i).getFee(), testEvents.get(i).getFee());
-            assertEquals(i + ".event: wrong location", eventList.get(i).getLocation(), testEvents.get(i).getLocation());
-            assertNotNull(i + ".event: event description is null", testEvents.get(i).getDescription());
-            assertEquals(i + ".event: wrong description", eventList.get(i).getDescription().getValue(),
-                    testEvents.get(i).getDescription().getValue());
-            assertNotNull(i + ".event: route is null", eventList.get(i).getRoute());
-            assertEquals(i + ".event: wrong route name", eventList.get(i).getRoute().getName(), testEvents.get(i).getRoute().getName());
-            assertEquals(i + ".event: wrong route length", eventList.get(i).getRoute().getLength(), testEvents.get(i).getRoute().getLength());
-            assertNotNull(i + ".event: route data is null", eventList.get(i).getRoute().getRouteData());
-            assertEquals(i + ".event: wrong route data", eventList.get(i).getRoute().getRouteData().getValue(),
-                    testEvents.get(i).getRoute().getRouteData().getValue());
+        }).execute(event2);
+        for(Event e : ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+                .execute().getItems()){
+            assertNotSame("event2 not deleted", event2.getKey().getId(), e.getKey().getId());
         }
-
     }
 }
