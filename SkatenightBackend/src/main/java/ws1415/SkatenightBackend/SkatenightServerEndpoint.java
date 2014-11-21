@@ -20,6 +20,7 @@ import javax.jdo.Query;
 
 /**
  * Die ServerAPI, die Api-Methoden zur Verfügung stellt.
+ *
  * @author Richard, Daniel
  */
 @Api(name = "skatenightAPI",
@@ -74,6 +75,7 @@ public class SkatenightServerEndpoint {
 
     /**
      * Prüft, ob die angegebene Mail-Adresse zu einem authorisierten Veranstalter-Account gehört.
+     *
      * @param mail Die zu prüfende Mail
      * @return true, wenn der Account ein authorisierter Veranstalter ist, false sonst
      */
@@ -92,10 +94,11 @@ public class SkatenightServerEndpoint {
 
     /**
      * Aktualisiert das auf dem Server gespeicherte Event-Objekt.
+     *
      * @param user Der User, der das Event-Objekt aktualisieren möchte.
-     * @param e Das neue Event-Objekt.
+     * @param e    Das neue Event-Objekt.
      */
-    public void createEvent(User user, Event e)throws OAuthRequestException, IOException {
+    public void createEvent(User user, Event e) throws OAuthRequestException, IOException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
@@ -195,7 +198,7 @@ public class SkatenightServerEndpoint {
             if (!results.isEmpty()) {
                 member = results.get(0);
             }
-        } catch(JDOObjectNotFoundException e) {
+        } catch (JDOObjectNotFoundException e) {
             // Wird geworfen, wenn kein Objekt mit dem angegebenen Schlüssel existiert
             // In diesem Fall null zurückgeben
             return null;
@@ -207,7 +210,8 @@ public class SkatenightServerEndpoint {
 
     /**
      * Speichert die angegebene Route auf dem Server
-     * @param user Der User, der die Route hinzufügen möchte
+     *
+     * @param user  Der User, der die Route hinzufügen möchte
      * @param route zu speichernde Route
      */
     public void addRoute(User user, Route route) throws OAuthRequestException {
@@ -219,38 +223,40 @@ public class SkatenightServerEndpoint {
         }
 
         PersistenceManager pm = pmf.getPersistenceManager();
-        if(route != null){
-            try{
+        if (route != null) {
+            try {
                 pm.makePersistent(route);
-            }finally {
+            } finally {
                 pm.close();
             }
         }
     }
 
     /**
-     *  Gibt eine Liste von allen gespeicherten Routen zurück
-     *  @return Liste der Routen.
+     * Gibt eine Liste von allen gespeicherten Routen zurück
+     *
+     * @return Liste der Routen.
      */
-    public List<Route> getRoutes(){
+    public List<Route> getRoutes() {
         PersistenceManager pm = pmf.getPersistenceManager();
 
-        try{
+        try {
             List<Route> result = (List<Route>) pm.newQuery(Route.class).execute();
-            if(result.isEmpty()){
+            if (result.isEmpty()) {
                 return new ArrayList<Route>();
-            }else{
+            } else {
                 return result;
             }
-        }finally{
+        } finally {
             pm.close();
         }
     }
 
     /**
      * Lösche Route vom Server
+     *
      * @param user Der User, der die Route löschen möchte
-     * @param id Die ID der zu löschenden Route.
+     * @param id   Die ID der zu löschenden Route.
      * @return true, wenn die Route gelöscht wurde, sonst false
      */
     public BooleanWrapper deleteRoute(User user, @Named("id") long id) throws OAuthRequestException {
@@ -262,21 +268,21 @@ public class SkatenightServerEndpoint {
         }
 
         List<Event> eventList = getAllEvents();
-        for(int i = 0; i < eventList.size(); i++){
+        for (int i = 0; i < eventList.size(); i++) {
             if (eventList.get(i).getRoute().getKey().getId() == id) {
                 return new BooleanWrapper(false);
             }
         }
 
         PersistenceManager pm = pmf.getPersistenceManager();
-        try{
+        try {
             for (Route r : (List<Route>) pm.newQuery(Route.class).execute()) {
                 if (r.getKey().getId() == id) {
                     pm.deletePersistent(r);
                     return new BooleanWrapper(true);
                 }
             }
-        }finally{
+        } finally {
             pm.close();
         }
         return new BooleanWrapper(false);
@@ -289,10 +295,10 @@ public class SkatenightServerEndpoint {
      * @param keyId Id von dem Event
      * @return Das Event, null falls keins gefunden wurde
      */
-    public Event getEvent(@Named("id") long keyId){
+    public Event getEvent(@Named("id") long keyId) {
         List<Event> eventList = getAllEvents();
-        for(int i = 0; i < eventList.size(); i++){
-            if(eventList.get(i).getKey().getId() == keyId){
+        for (int i = 0; i < eventList.size(); i++) {
+            if (eventList.get(i).getKey().getId() == keyId) {
                 return eventList.get(i);
             }
         }
@@ -300,21 +306,67 @@ public class SkatenightServerEndpoint {
     }
 
     /**
+     * Löscht  das übergebene Event vom Server, falls dieses existiert
+     *
+     * @param keyId die Id von dem Event
+     * @param user  der User, der die Operation aufruft
+     * @throws OAuthRequestException
+     */
+    public BooleanWrapper deleteEvent(@Named("id") long keyId, User user) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (!isHost(user.getEmail()).value) {
+            throw new OAuthRequestException("user is not a host");
+        }
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            Event event = getEvent(keyId);
+            if (event != null) {
+                pm.deletePersistent(event);
+                return new BooleanWrapper(true);
+            }
+        } finally {
+            pm.close();
+        }
+        return new BooleanWrapper(false);
+    }
+
+    /**
+     * Bearbeitet das Event mit der Id des übergebenen Events mit den Daten des übergebenen Events.
+     *
+     * @param event das zu bearbeitende Event mit den neuen Daten
+     * @param user User, der die Methode aufruft
+     * @return true, wenn aktion erfolgreicht, false sonst
+     * @throws OAuthRequestException
+     * @throws IOException
+     */
+    public BooleanWrapper editEvent(Event event, User user) throws OAuthRequestException, IOException {
+        long keyId = event.getKey().getId();
+        BooleanWrapper b = deleteEvent(keyId, user);
+        if(b.value) {
+            createEvent(user, event);
+        }
+
+        return b;
+    }
+
+    /**
      * Gibt eine ArrayList von allen auf dem Server gespeicherten Events zurück.
      *
      * @return Liste mit allen Events
      */
-    public List<Event> getAllEvents(){
+    public List<Event> getAllEvents() {
         PersistenceManager pm = pmf.getPersistenceManager();
 
-        try{
+        try {
             List<Event> result = (List<Event>) pm.newQuery(Event.class).execute();
-            if(result.isEmpty()){
+            if (result.isEmpty()) {
                 return new ArrayList<Event>();
-            }else{
+            } else {
                 return result;
             }
-        }finally{
+        } finally {
             pm.close();
         }
     }
