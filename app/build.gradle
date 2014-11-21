@@ -8,6 +8,12 @@ android {
             storeFile file('../skatenight-release.jks')
             storePassword 'trackingserver'
         }
+        jenkins {
+            keyAlias 'Skatenight-User-App-Jenkins-Key'
+            keyPassword 'trackingserver'
+            storeFile file('../skatenight-release.jks')
+            storePassword 'trackingserver'
+        }
         debug {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
@@ -32,6 +38,9 @@ android {
         }
         debug {
             signingConfig signingConfigs.debug
+        }
+        jenkins {
+            signingConfig signingConfigs.jenkins
         }
     }
     lintOptions {
