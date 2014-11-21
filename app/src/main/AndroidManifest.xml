@@ -1,29 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ws1415.ps1415" >
+    package="ws1415.ps1415">
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <activity
             android:name=".Activities.ShowInformationActivity"
-            android:label="@string/title_activity_showinformation" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:label="@string/title_activity_showinformation"></activity>
         <activity
             android:name=".Activities.ShowRouteActivity"
             android:label="@string/title_activity_show_route"
-            android:parentActivityName=".Activities.ShowInformationActivity" >
+            android:parentActivityName=".Activities.ShowInformationActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.ShowInformationActivity" />
@@ -32,8 +26,17 @@
         <service
             android:name=".LocationTransmitterService"
             android:enabled="true"
-            android:exported="true" >
-        </service>
+            android:exported="true"></service>
+
+        <activity
+            android:name=".Activities.ShowEventsActivity"
+            android:label="@string/title_activity_show_events">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -41,7 +44,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <uses-feature

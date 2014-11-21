@@ -93,31 +93,11 @@ public class SkatenightServerEndpoint {
     }
 
     /**
-     * Liefert das aktuell auf dem Server hinterlegte Event-Objekt.
-     * @return Das aktuelle Event-Objekt.
-     */
-    public Event getEvent() {
-        PersistenceManager pm = pmf.getPersistenceManager();
-        try {
-            List<Event> results = (List<Event>) pm.newQuery(Event.class).execute();
-            if (results.isEmpty()) {
-                return null;
-            } else {
-                // Name abrufen, damit die Daten gefetcht werden
-                results.get(0).getRoute().getName();
-                return results.get(0);
-            }
-        } finally {
-            pm.close();
-        }
-    }
-
-    /**
      * Aktualisiert das auf dem Server gespeicherte Event-Objekt.
      * @param user Der User, der das Event-Objekt aktualisieren möchte.
      * @param e Das neue Event-Objekt.
      */
-    public void setEvent(User user, Event e)throws OAuthRequestException, IOException {
+    public void createEvent(User user, Event e)throws OAuthRequestException, IOException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
@@ -127,9 +107,6 @@ public class SkatenightServerEndpoint {
 
         PersistenceManager pm = pmf.getPersistenceManager();
         try {
-            // Altes Event-Objekt löschen
-            List<Event> events = (List<Event>) pm.newQuery(Event.class).execute();
-            pm.deletePersistentAll(events);
             if (e != null) {
                 Query q = pm.newQuery(Route.class);
                 q.setFilter("name == nameParam");
@@ -283,10 +260,13 @@ public class SkatenightServerEndpoint {
             throw new OAuthRequestException("user is not a host");
         }
 
-        Event event = getEvent();
-        if (event.getRoute().getKey().getId() == id) {
-            return new BooleanWrapper(false);
+        List<Event> eventList = getAllEvents();
+        for(int i = 0; i < eventList.size(); i++){
+            if (eventList.get(i).getRoute().getKey().getId() == id) {
+                return new BooleanWrapper(false);
+            }
         }
+
         PersistenceManager pm = pmf.getPersistenceManager();
         try{
             for (Route r : (List<Route>) pm.newQuery(Route.class).execute()) {
@@ -299,6 +279,43 @@ public class SkatenightServerEndpoint {
             pm.close();
         }
         return new BooleanWrapper(false);
+    }
+
+    /**
+     * Durchsucht alle auf dem Server gespeicherten Events nach dem übergebenen Event und gibt dieses,
+     * falls vorhanden zurück.
+     *
+     * @param keyId Id von dem Event
+     * @return Das Event, null falls keins gefunden wurde
+     */
+    public Event getEvent(@Named("id") long keyId){
+        List<Event> eventList = getAllEvents();
+        for(int i = 0; i < eventList.size(); i++){
+            if(eventList.get(i).getKey().getId() == keyId){
+                return eventList.get(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gibt eine ArrayList von allen auf dem Server gespeicherten Events zurück.
+     *
+     * @return Liste mit allen Events
+     */
+    public List<Event> getAllEvents(){
+        PersistenceManager pm = pmf.getPersistenceManager();
+
+        try{
+            List<Event> result = (List<Event>) pm.newQuery(Event.class).execute();
+            if(result.isEmpty()){
+                return new ArrayList<Event>();
+            }else{
+                return result;
+            }
+        }finally{
+            pm.close();
+        }
     }
 
 }

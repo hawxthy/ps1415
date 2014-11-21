@@ -4,26 +4,29 @@ import android.os.AsyncTask;
 import com.appspot.skatenight_ms.skatenightAPI.model.Event;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import ws1415.veranstalterapp.Fragments.ShowEventsFragment;
+import ws1415.veranstalterapp.Fragments.ShowInformationActivity;
 import ws1415.veranstalterapp.ServiceProvider;
-import ws1415.veranstalterapp.Fragments.ShowInformationFragment;
 
 /**
  * Created by Richard on 21.10.2014.
  */
-public class QueryEventTask extends AsyncTask<ShowInformationFragment, Void, Event> {
-    private ShowInformationFragment view;
+public class QueryEventTask extends AsyncTask<ShowEventsFragment, Void, List<Event>> {
+    private ShowEventsFragment view;
 
     /**
-     * Ruft das aktuelle Event-Objekt vom Server ab.
-     * @param params Die zu befüllende Activity
-     * @return Das abgerufene Event-Objekt.
+     * Ruft die aktuellen Event-Objekte vom Server ab.
+     * @param params Das zu befüllende Fragment
+     * @return Die abgerufene Event-Liste.
      */
     @Override
-    protected Event doInBackground(ShowInformationFragment... params) {
+    protected List<Event> doInBackground(ShowEventsFragment... params) {
         view = params[0];
         try {
-            return ServiceProvider.getService().skatenightServerEndpoint().getEvent().execute();
+            return ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -31,11 +34,11 @@ public class QueryEventTask extends AsyncTask<ShowInformationFragment, Void, Eve
     }
 
     /**
-     * Übergibt das abgerufene Event-Objekt an die View.
-     * @param e Das abgerufene Event-Objekt.
+     * Übergibt die abgerufene Event-Liste an die View.
+     * @param results Die abgerufene Event-Liste.
      */
     @Override
-    protected void onPostExecute(Event e) {
-        view.setEventInformation(e);
+    protected void onPostExecute(List<Event> results) {
+        view.setEventsToListView(results);
     }
 }

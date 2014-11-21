@@ -16,7 +16,7 @@ import javax.jdo.annotations.PrimaryKey;
  * Created by Richard Schulze, Bernd Eissing, Martin Wrodarczyk on 21.10.2014.
  */
 @PersistenceCapable
-public class Event {
+public class Event{
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;

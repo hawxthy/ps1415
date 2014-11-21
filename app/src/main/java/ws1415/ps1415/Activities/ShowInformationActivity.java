@@ -23,6 +23,7 @@ import java.util.Date;
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
+import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.task.QueryEventTask;
 
 /**
@@ -52,12 +53,19 @@ public class ShowInformationActivity extends Activity {
     // Erstellen eines SimpleDateFormats, damit das Datum und die Uhrzeit richtig angezeigt werden
     private SimpleDateFormat dateFormat;
 
+    /**
+     *
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_showinformation);
 
         dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+
+        Long keyId = getIntent().getLongExtra("event", 0);
 
         Button mapButton = (Button) findViewById(R.id.show_info_map_button);
         mapButton.setOnClickListener(new View.OnClickListener() {
@@ -98,7 +106,7 @@ public class ShowInformationActivity extends Activity {
             updateGUI();
         }
         else {
-            new QueryEventTask().execute(this);
+            new GetEventTask(this).execute(keyId);
         }
 
 
