@@ -338,7 +338,7 @@ public class SkatenightServerEndpoint {
      *
      * @param event das zu bearbeitende Event mit den neuen Daten
      * @param user User, der die Methode aufruft
-     * @return true, wenn aktion erfolgreicht, false sonst
+     * @return true, wenn Aktion erfolgreich, false sonst
      * @throws OAuthRequestException
      * @throws IOException
      */
