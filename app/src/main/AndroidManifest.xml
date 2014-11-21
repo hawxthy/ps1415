@@ -13,7 +13,8 @@
 
         <activity
             android:name=".Activities.ShowInformationActivity"
-            android:label="@string/title_activity_showinformation"></activity>
+            android:label="@string/title_activity_showinformation"
+            android:exported="true"></activity>
         <activity
             android:name=".Activities.ShowRouteActivity"
             android:label="@string/title_activity_show_route"
