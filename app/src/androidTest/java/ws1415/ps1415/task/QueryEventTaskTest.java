@@ -25,7 +25,6 @@ public class QueryEventTaskTest extends AndroidTestCase {
      * Stellt eine Verbindung zum Testserver her und bereitet die Testdaten vor.
      */
     public QueryEventTaskTest() {
-        ServiceProvider.setupTestServerConnection();
 
         // Testdaten erstellen
         testEvent = new Event();
