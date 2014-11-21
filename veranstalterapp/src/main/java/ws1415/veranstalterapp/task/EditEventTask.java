@@ -26,7 +26,7 @@ public class EditEventTask extends AsyncTask<Event, Void, Boolean> {
     protected Boolean doInBackground(Event... params){
         event = params[0];
         try{
-            return ServiceProvider.getService().skatenightServerEndpoint().editEvent(event).execute();
+            return ServiceProvider.getService().skatenightServerEndpoint().editEvent(event).execute().getValue();
         }catch (IOException e){
             e.printStackTrace();
         }

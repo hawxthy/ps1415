@@ -168,5 +168,6 @@ public class ShowEventsFragment extends Fragment {
     private void editEvent(Event event){
         Intent intent = new Intent(getActivity(), EditEventActivity.class);
         intent.putExtra("event", event.getKey().getId());
+        startActivity(intent);
     }
 }

@@ -338,11 +338,11 @@ public class EditEventActivity extends Activity {
 
         // SimpleDateFormat für die Uhrzeit vom Event
         SimpleDateFormat time = new SimpleDateFormat("HH:mm");
-        timePickerButton.setText(time.format(event.getDate()));
+        timePickerButton.setText(time.format(new Date(event.getDate().getValue())));
 
         //SimpleDateFormat für das Datum vom Event
         SimpleDateFormat date = new SimpleDateFormat("dd-MM-yyyy");
-        datePickerButton.setText(date.format(event.getDate()));
+        datePickerButton.setText(date.format(new Date(event.getDate().getValue())));
 
     }
 }

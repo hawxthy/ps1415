@@ -3,6 +3,7 @@ package ws1415.veranstalterapp.Activities;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -35,6 +36,8 @@ public class ChooseRouteActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 ((AnnounceInformationFragment)HoldTabsActivity.getAdapter().getItem(1)).setRoute(routeList.get(i));
+                Log.d("Parent ist: ", String.valueOf(getParent()));
+                ((EditEventActivity)getParent()).setRoute(routeList.get(i));
                 finish();
             }
         });
