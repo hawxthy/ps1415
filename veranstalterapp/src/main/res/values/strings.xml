@@ -85,6 +85,10 @@
 
     <!-- Strings zu ShowEventsFragment -->
     <string name="title_fragment_show_events">Events</string>
-    <string name="title_activity_edit_event">EditEventActivity</string>
+
+    <!-- String zu EditEventActivity -->
+    <string name="title_activity_edit_event">Edit Event</string>
+    <string name="eventedited">Event was edited</string>
+    <string name="edit_event_info_apply_button">Save</string>
 
 </resources>
