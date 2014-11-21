@@ -351,6 +351,7 @@ public class SkatenightServerEndpoint {
         try {
             Event event = getEvent(keyId);
             if (event != null) {
+                pm.makePersistent(event);
                 pm.deletePersistent(event);
                 return new BooleanWrapper(true);
             }
