@@ -1,7 +1,5 @@
 package ws1415.ps1415.Activities;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Member;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -11,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.skatenight.skatenightAPI.model.Member;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -142,32 +141,21 @@ public class ShowRouteActivity extends Activity {
      */
     public void drawMembers(Member m) {
         if (m != null) {
-            try {
-                // googleMap.clear();
+            // googleMap.clear();
 
-                // Dekodiert den Positionsstring vom Server zu LatLng
-                location = LocationUtils.decodeLocation(m.getLocation());
-                LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
+            LatLng pos = new LatLng(m.getLatitude(), m.getLongitude());
 
-                // Markerfarbe
-                float markerColor;
-                markerColor = BitmapDescriptorFactory.HUE_YELLOW;
+            // Markerfarbe
+            float markerColor;
+            markerColor = BitmapDescriptorFactory.HUE_YELLOW;
 
-                // Fügt den aktuellen Membermarker auf die Karte ein
-                googleMap.addMarker(new MarkerOptions()
-                        .position(pos)
-                        .title("Skater " + m.getName())
-                        .snippet("" + m.getUpdatedAt())
-                        .icon(BitmapDescriptorFactory
-                                .defaultMarker(markerColor)));
-
-
-            } catch (ParseException e) {
-                e.printStackTrace();
-                Toast.makeText(getApplicationContext(), "Error: Couldn't decode the location.", Toast.LENGTH_LONG).show();
-                location = null;
-            }
-
+            // Fügt den aktuellen Membermarker auf die Karte ein
+            googleMap.addMarker(new MarkerOptions()
+                    .position(pos)
+                    .title("Skater " + m.getName())
+                    .snippet("" + m.getUpdatedAt())
+                    .icon(BitmapDescriptorFactory
+                            .defaultMarker(markerColor)));
         } else {
             location = null;
         }

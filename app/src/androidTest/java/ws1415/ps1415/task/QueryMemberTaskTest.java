@@ -3,7 +3,7 @@ package ws1415.ps1415.task;
 import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Member;
+import com.skatenight.skatenightAPI.model.Member;
 
 import java.util.Map;
 import java.util.Set;
@@ -30,8 +30,6 @@ public class QueryMemberTaskTest extends AndroidTestCase {
      */
     public void setUp() throws Exception {
         super.setUp();
-
-        ServiceProvider.setupProductionServerConnection();
 
         // Member-Objekt auf dem Server erstellen lassen
         ServiceProvider.getService().skatenightServerEndpoint().updateMemberLocation(testMail,

@@ -2,7 +2,7 @@ package ws1415.ps1415.task;
 
 import android.test.AndroidTestCase;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Member;
+import com.skatenight.skatenightAPI.model.Member;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -24,7 +24,6 @@ public class UpdateLocationTaskTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        ServiceProvider.setupProductionServerConnection();
     }
 
     /**

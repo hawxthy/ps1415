@@ -11,7 +11,8 @@ import android.view.MenuItem;
 
 import ws1415.veranstalterapp.Adapter.TabsPagerAdapter;
 import ws1415.veranstalterapp.AddRouteDialog;
-import ws1415.veranstalterapp.Fragments.ShowInformationFragment;
+import ws1415.veranstalterapp.Fragments.ShowEventsFragment;
+import ws1415.veranstalterapp.Fragments.ShowInformationActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.QueryEventTask;
 
@@ -44,7 +45,7 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
 
         // Beschrifte die Tabs
         tabs = new String[]{
-                getResources().getString(R.string.title_fragment_show_information),
+                getResources().getString(R.string.title_fragment_show_events),
                 getResources().getString(R.string.title_fragment_announce_information),
                 getResources().getString(R.string.title_fragment_manage_routes)};
 
@@ -150,11 +151,11 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
     }
 
     /**
-     * Updated die Informationen in dem Tab "ShowInformationFragment", diese Methode wird aufgerufen,
+     * Updated die Informationen in dem Tab "ShowEventsFragment", diese Methode wird aufgerufen,
      * wenn die Informationen im "AnnounceInformationFragment" gesetzt und abgeschickt werden.
      */
     public static void updateInformation(){
-        new QueryEventTask().execute((ShowInformationFragment) mAdapter.getItem(0));
+        new QueryEventTask().execute((ShowEventsFragment) mAdapter.getItem(0));
     }
 
     /**

@@ -13,8 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Route;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,6 @@ public class ManageRoutesFragment extends Fragment {
     private ListView routeListView;
     private List<Route> routeList;
     private MapsCursorAdapter mAdapter;
-    private MenuItem addRouteItem;
 
     /**
      * Ruft Methode auf, um das add_route_item in der ActionBar zu setzen.
@@ -79,6 +79,10 @@ public class ManageRoutesFragment extends Fragment {
              */
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                Toast.makeText(getActivity().getApplicationContext(), "size: " + routeList.get(i).getRoutePoints(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity().getApplicationContext(), "Name: " + routeList.get(i).getName(), Toast.LENGTH_LONG).show();
+
                 Intent intent = new Intent(getActivity(), ShowRouteActivity.class);
                 intent.putExtra("show_route_extra_route", routeList.get(i).getRouteData().getValue());
                 intent.putExtra("routeName", routeList.get(i).getName());
@@ -126,7 +130,7 @@ public class ManageRoutesFragment extends Fragment {
     private void createSelectionsMenu(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(routeList.get(position).getName())
-                .setItems(R.array.selections_menu, new DialogInterface.OnClickListener() {
+                .setItems(R.array.selections_menu_manage_routes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int index) {
                         if (index == 0) {
                             deleteRoute(routeList.get(position));

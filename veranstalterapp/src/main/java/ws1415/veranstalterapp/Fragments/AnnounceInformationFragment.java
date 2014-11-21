@@ -22,9 +22,9 @@ import android.widget.Toast;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Event;
-import com.appspot.skatenight_ms.skatenightAPI.model.Route;
-import com.appspot.skatenight_ms.skatenightAPI.model.Text;
+import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Text;
 import com.google.api.client.util.DateTime;
 
 import ws1415.veranstalterapp.Activities.ChooseRouteActivity;
@@ -34,7 +34,7 @@ import ws1415.veranstalterapp.task.CreateEventTask;
 
 /**
  * Fragment zum Veröffentlichen von neuen Veranstaltungen.
- * <p/>
+ *
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
 public class AnnounceInformationFragment extends Fragment {
@@ -264,7 +264,7 @@ public class AnnounceInformationFragment extends Fragment {
                 description = new Text();
                 description.setValue(editTextDescription.getText().toString());
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (!title.isEmpty() && !fee.isEmpty() && dTime != null && !location.isEmpty() && !description.isEmpty() && route != null) {
+                if (!title.isEmpty() && !fee.isEmpty() && dTime != null && !location.isEmpty() && !description.getValue().isEmpty() && route != null) {
                     // Erstelle ein neue Event
                     event = new Event();
 

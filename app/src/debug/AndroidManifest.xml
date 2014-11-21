@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ws1415.ps1415" >
+
+    <application>
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyDQgEKF42jjm57x7kgnY7EI62CcXW_zDS0" />
+    </application>
+
+</manifest>

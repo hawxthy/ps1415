@@ -3,7 +3,7 @@ package ws1415.veranstalterapp.task;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Event;
 import java.io.IOException;
 
 import ws1415.veranstalterapp.ServiceProvider;
@@ -21,7 +21,7 @@ public class CreateEventTask extends AsyncTask<Event, Void, Void> {
      */
     protected Void doInBackground(Event... params){
         try{
-            ServiceProvider.getService().skatenightServerEndpoint().setEvent(params[0]).execute();
+            ServiceProvider.getService().skatenightServerEndpoint().createEvent(params[0]).execute();
         }catch(IOException e) {
             e.printStackTrace();
         }

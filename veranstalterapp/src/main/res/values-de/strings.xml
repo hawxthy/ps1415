@@ -10,7 +10,7 @@
     <!-- Annoucne Information xml-->
     <string name="title_fragment_announce_information">Veranstaltung erstellen</string>
     <string name="announce_info_apply_button">Erstellen</string>
-    <string name="announce_info_cancel_button">Cancel</string>
+    <string name="announce_info_cancel_button">Abbrechen</string>
     <string name="announce_info_title">Titel:</string>
     <string name="announce_info_title_hint">Gib einen Titel an</string>
     <string name="announce_info_fee">Gebühr:</string>
@@ -32,7 +32,13 @@
     <!--Manage Routes xml-->
     <string name="title_fragment_manage_routes">Verwalte Strecken</string>
     <string name="hello_blank_fragment">Hallo blank Fragment</string>
+
+    <string-array name="selections_menu_manage_routes">
+        <item name="delete">Löschen</item>
+    </string-array>
+
     <string-array name="selections_menu">
+        <item name="edit">Editieren</item>
         <item name="delete">Löschen</item>
     </string-array>
     <string name="route_delete_failed">Route ist aktueller Veranstaltung zugewiesen</string>
@@ -48,7 +54,7 @@
     <string name="route_editor_leave_dialog">Es wurde keine Route erstellt. Trotzdem verlassen?</string>
 
     <!--Strings zu activity_showinformation-->
-    <string name="title_fragment_show_information">Zeige Informationen</string>
+    <string name="title_activity_show_information">Zeige Informationen</string>
     <string name="show_info_header_date">Datum und Uhrzeit</string>
     <string name="show_info_header_location">Ort</string>
     <string name="show_info_header_route">Route</string>
@@ -73,4 +79,12 @@
     <string name="activity_add_route_dialog_cancel">Abbrechen</string>
     <string name="activity_add_route_dialog_apply">Ok</string>
     <string name="activity_add_route_dialog_empty">Routenname darf nicht leer sein</string>
+
+    <!--Strings zu ShowEventsFragment-->
+    <string name="title_fragment_show_events">Veranstaltungen</string>
+
+    <!-- String zu EditEventActivity -->
+    <string name="title_activity_edit_event">Veranstaltung bearbeiten</string>
+    <string name="eventedited">Veranstaltung wurde bearbeitet</string>
+    <string name="edit_event_info_apply_button">Speichern</string>
 </resources>

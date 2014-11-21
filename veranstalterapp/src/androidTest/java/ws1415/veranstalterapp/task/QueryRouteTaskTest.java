@@ -2,8 +2,8 @@ package ws1415.veranstalterapp.task;
 
 import android.test.AndroidTestCase;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Route;
-import com.appspot.skatenight_ms.skatenightAPI.model.Text;
+import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,8 +77,6 @@ public class QueryRouteTaskTest extends AndroidTestCase {
      */
     public void setUp() throws Exception {
         super.setUp();
-
-        ServiceProvider.setupTestServerConnection();
 
         // Bestehende Routen löschen
         for (Route r : ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute()

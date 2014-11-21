@@ -1,0 +1,131 @@
+package ws1415.ps1415.adapter;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import com.skatenight.skatenightAPI.model.Event;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import ws1415.ps1415.R;
+
+/**
+ * Klasse zum Füllen der ListView in ShowEventsFragment.
+ *
+ * Created by Bernd Eissing, Martin Wrodarczyk on 18.11.2014.
+ */
+public class EventsCursorAdapter extends BaseAdapter{
+    private List<Event> eventList = new ArrayList<Event>();
+    private Context mContext;
+    private LayoutInflater inflater;
+
+    private SimpleDateFormat eventDateFormat;
+
+    /**
+     * Konstruktor, der den Inhalt der Liste festlegt.
+     *
+     * @param context Context, von dem aus der Adapter aufgerufen wird
+     * @param eventList Liste von den Events
+     */
+    public EventsCursorAdapter(Context context, List<Event> eventList){
+        mContext = context;
+        this.eventList = eventList;
+
+        eventDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+    }
+
+    /**
+     * Gibt die Anzahl der Events in der Liste zurück.
+     *
+     * @return Anz. der Events
+     */
+    @Override
+    public int getCount() {
+        if(eventList == null){
+            return 0;
+        }else{
+            return eventList.size();
+        }
+    }
+
+    /**
+     * Gibt das event and der Stelle i in der Liste zurück.
+     *
+     * @param i Stelle
+     * @return das Event
+     */
+    @Override
+    public Event getItem(int i) {
+        return eventList.get(i);
+    }
+
+    /**
+     * Gibt die Id des Events in der Liste zurück
+     *
+     * @param i Stelle des Events
+     * @return Id des EVents
+     */
+    @Override
+    public long getItemId(int i) {
+        return i;
+    }
+
+    /**
+     * Klasse zum Halten der GUI Elemente, damit keine Kopien erstellt werden.
+     */
+    private class Holder{
+        private TextView eventName;
+        private TextView eventDate;
+        private TextView eventFee;
+        private TextView eventLocation;
+    }
+
+    /**
+     * Setzt das Layout der Items in der ListView
+     *
+     * @param position Position in der ListView un in der ArrayList
+     * @param convertView Position in der ListView mit den Daten aus der ArrayList
+     * @param viewGroup Die Liste welche die Maps hält
+     * @return Das Item in der Liste von den Maps
+     */
+    @Override
+    public View getView(int position, View convertView, ViewGroup viewGroup) {
+        Holder holder;
+        inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        if(convertView == null){
+            holder = new Holder();
+            convertView = inflater.inflate(R.layout.list_view_item_event_layout, viewGroup, false);
+            holder.eventName = (TextView) convertView.findViewById(R.id.list_view_item_event_layout_name);
+            holder.eventLocation = (TextView) convertView.findViewById(R.id.list_view_item_event_layout_location);
+            holder.eventDate = (TextView) convertView.findViewById(R.id.list_view_item_event_layout_date);
+            holder.eventFee = (TextView) convertView.findViewById(R.id.list_view_item_event_layout_fee);
+            convertView.setTag(holder);
+        }else{
+            holder = (Holder)convertView.getTag();
+        }
+        holder.eventName.setText(getItem(position).getTitle());
+        holder.eventLocation.setText(getItem(position).getLocation());
+        holder.eventDate.setText(eventDateFormat.format(new Date(getItem(position).getDate().getValue())));
+        holder.eventFee.setText(getItem(position).getFee() +" €");
+
+        return convertView;
+    }
+
+    /**
+     * Entfernt Event mit der angegebenen ID
+     *
+     * @param i ID
+     */
+    public void removeListItem(int i){
+        eventList.remove(i);
+        notifyDataSetChanged();
+    }
+}

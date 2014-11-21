@@ -15,7 +15,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import ws1415.ps1415.task.UpdateLocationTask;
-import ws1415.ps1415.util.LocationUtils;
 
 /**
  * Created by Tristan Rust on 28.10.2014.
@@ -86,11 +85,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         SharedPreferences prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
         String email = prefs.getString("accountName", null);
 
-        // Kodiert die Locationdaten als String zur Speicherung auf dem Server
-        String locString = LocationUtils.encodeLocation(location);
-
         // Sendet die Nutzerdaten an den Server
-        new UpdateLocationTask().execute(email, locString);
+        new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
 
     }
 

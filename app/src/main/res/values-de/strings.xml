@@ -15,5 +15,11 @@
     <string name="show_info_button_map">Karte</string>
     <string name="downloading">Wird abgerufen...</string>
 
+    <!--Strings zu activity showEvents-->
+    <string name="title_activity_show_events">Veranstaltungen</string>
+    <string-array name="selections_menu">
+        <item name="delete">Löschen</item>
+    </string-array>
+
 
 </resources>

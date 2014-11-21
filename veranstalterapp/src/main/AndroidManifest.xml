@@ -10,15 +10,11 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        <meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyApuZLPxk_RgFsWATD-eC6V6YpS6C8vUiE" />
 
         <activity
             android:name=".Activities.HoldTabsActivity"
             android:label="@string/title_activity_start_page"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Activities.LoginActivity"
             android:exported="true"
@@ -41,8 +37,7 @@
         <activity
             android:name=".Activities.ChooseRouteActivity"
             android:label="@string/title_activity_choose_route"
-            android:theme="@android:style/Theme.Holo.Dialog" >
-        </activity>
+            android:theme="@android:style/Theme.Holo.Dialog"/>
         <activity
             android:name=".Activities.ShowRouteActivity"
             android:label="@string/title_activity_show_route"
@@ -54,7 +49,18 @@
         <activity
             android:name=".AddRouteDialog"
             android:label="@string/title_activity_add_route_dialog"
-            android:theme="@android:style/Theme.Holo.Dialog">
+            android:theme="@android:style/Theme.Holo.Dialog" />
+        <activity
+            android:name=".Fragments.ShowInformationActivity"
+            android:label="@string/title_activity_show_information"
+            android:parentActivityName=".Activities.HoldTabsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.HoldTabsActivity" />
+        </activity>
+        <activity
+            android:name=".Activities.EditEventActivity"
+            android:label="@string/title_activity_edit_event" >
         </activity>
     </application>
 

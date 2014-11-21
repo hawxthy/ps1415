@@ -14,8 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import com.appspot.skatenight_ms.skatenightAPI.model.Event;
-import com.appspot.skatenight_ms.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Route;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 import java.text.SimpleDateFormat;
@@ -23,6 +23,7 @@ import java.util.Date;
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
+import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.task.QueryEventTask;
 
 /**
@@ -52,12 +53,19 @@ public class ShowInformationActivity extends Activity {
     // Erstellen eines SimpleDateFormats, damit das Datum und die Uhrzeit richtig angezeigt werden
     private SimpleDateFormat dateFormat;
 
+    /**
+     *
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_showinformation);
 
         dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+
+        Long keyId = getIntent().getLongExtra("event", 0);
 
         Button mapButton = (Button) findViewById(R.id.show_info_map_button);
         mapButton.setOnClickListener(new View.OnClickListener() {
@@ -98,7 +106,7 @@ public class ShowInformationActivity extends Activity {
             updateGUI();
         }
         else {
-            new QueryEventTask().execute(this);
+            new GetEventTask(this).execute(keyId);
         }
 
 
