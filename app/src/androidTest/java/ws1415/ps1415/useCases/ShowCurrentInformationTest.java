@@ -106,6 +106,9 @@ public class ShowCurrentInformationTest extends ActivityInstrumentationTestCase2
         assertNotNull("descriptionView is inizalized", descriptionView.getText() != null);
     }
 
+    /**
+     * Prüft, ob die Event-Daten in der GUI mit denen auf dem Server übereinstimmen.
+     */
     public void testCurrentInformationUI() {
         String dateText         = (String) dateView.getText();
         String locationText     = (String) locationView.getText();
