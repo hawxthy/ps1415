@@ -50,7 +50,7 @@ appengine {
 war.dependsOn appengineEnhance
 
 /**
- * Die beiden folgenden Tasks kopieren die Dateien aus den Unterordnern debug bzw. release in den
+ * Die folgenden Tasks kopieren die Dateien aus den Unterordnern debug, release bzw. jenkins in den
  * main-Ordner. So können die Konfigurationsdateien für den Test- bzw. Production-Server mit einer
  * Befehlszeile ausgetauscht werden.
  */
@@ -60,5 +60,9 @@ task applyTestserverConfig(type: Copy) {
 }
 task applyProductionserverConfig(type: Copy) {
     from 'src/release'
+    into 'src/main'
+}
+task applyJenkinsserverConfig(type: Copy) {
+    from 'src/jenkins'
     into 'src/main'
 }
