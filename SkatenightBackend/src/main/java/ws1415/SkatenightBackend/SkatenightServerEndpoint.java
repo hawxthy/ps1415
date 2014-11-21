@@ -334,6 +334,25 @@ public class SkatenightServerEndpoint {
     }
 
     /**
+     * Bearbeitet das Event mit der Id des übergebenen Events mit den Daten des übergebenen Events.
+     *
+     * @param event das zu bearbeitende Event mit den neuen Daten
+     * @param user User, der die Methode aufruft
+     * @return true, wenn aktion erfolgreicht, false sonst
+     * @throws OAuthRequestException
+     * @throws IOException
+     */
+    public BooleanWrapper editEvent(Event event, User user) throws OAuthRequestException, IOException {
+        long keyId = event.getKey().getId();
+        BooleanWrapper b = deleteEvent(keyId, user);
+        if(b.value) {
+            createEvent(user, event);
+        }
+
+        return b;
+    }
+
+    /**
      * Gibt eine ArrayList von allen auf dem Server gespeicherten Events zurück.
      *
      * @return Liste mit allen Events
