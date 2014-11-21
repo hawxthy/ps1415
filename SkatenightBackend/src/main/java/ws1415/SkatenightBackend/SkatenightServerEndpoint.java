@@ -188,7 +188,6 @@ public class SkatenightServerEndpoint {
 
     /**
      * Liefert das auf dem Server hinterlegte Member-Objekt mit der angegebenen Mail.
-     *
      * @param email Die Mail-Adresse des Member-Objekts, das abgerufen werden soll.
      * @return Das aktuelle Member-Objekt.
      */
