@@ -10,7 +10,7 @@
     <!-- Annoucne Information xml-->
     <string name="title_fragment_announce_information">Veranstaltung erstellen</string>
     <string name="announce_info_apply_button">Erstellen</string>
-    <string name="announce_info_cancel_button">Cancel</string>
+    <string name="announce_info_cancel_button">Abbrechen</string>
     <string name="announce_info_title">Titel:</string>
     <string name="announce_info_title_hint">Gib einen Titel an</string>
     <string name="announce_info_fee">Gebühr:</string>
