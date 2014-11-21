@@ -208,12 +208,29 @@ public class SkatenightServerEndpoint {
     /**
      *
      */
-    public void addEventToMember(Event event,@Named("email")String email) {
-        Member member = getMember(email);
-        ArrayList<Event> eventList = new ArrayList();
-        eventList.add(event);
-        member.setEventList(eventList);
+    public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
 
+        Event event = getEvent(keyId);
+        ArrayList<String> memberKeys = event.getMemberList();
+        memberKeys.add(email);
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            pm.makePersistent(event);
+        }
+        finally {
+            pm.close();
+        }
+    }
+
+    public List<Member> getMembersFromEvent(@Named("id") long keyId) {
+        Event event = getEvent(keyId);
+
+        List<Member> members = new ArrayList<Member>(event.getMemberList().size());
+        for (String key: event.getMemberList()) {
+            members.add(getMember(key));
+        }
+        return members;
     }
 
     /**

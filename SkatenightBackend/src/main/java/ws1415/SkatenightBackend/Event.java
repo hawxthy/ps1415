@@ -38,6 +38,8 @@ public class Event{
     private int routeFieldFirst;
     @Persistent
     private int routeFieldLast;
+    @Persistent(serialized = "true", defaultFetchGroup = "true")
+    private ArrayList<String> memberList;
 
     public Key getKey() {
         return key;
@@ -93,5 +95,13 @@ public class Event{
 
     public void setRoute(Route route) {
         this.route = route;
+    }
+
+    public void setMemberList(ArrayList<String> memberList) {
+        this.memberList = memberList;
+    }
+
+    public ArrayList<String> getMemberList() {
+        return this.memberList;
     }
 }

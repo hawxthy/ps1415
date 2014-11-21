@@ -25,6 +25,7 @@ import java.util.List;
 
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
+import ws1415.ps1415.task.GetMembersFromEventTask;
 import ws1415.ps1415.task.QueryMemberTask;
 import ws1415.ps1415.util.LocationUtils;
 
@@ -97,6 +98,8 @@ public class ShowRouteActivity extends Activity {
                 Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
+
+            new GetMembersFromEventTask(this, intent.getLongExtra("test", 0));
         }
 
         // Ruft die aktuellen Memberinformationen ab
@@ -187,5 +190,9 @@ public class ShowRouteActivity extends Activity {
                 .color(Color.GREEN);
 
         routeHighlightLine = googleMap.addPolyline(routeHighlight);
+    }
+
+    public void updateMembers(List<Member> members) {
+        Toast.makeText(getApplicationContext(), members.toString(), Toast.LENGTH_LONG).show();
     }
 }

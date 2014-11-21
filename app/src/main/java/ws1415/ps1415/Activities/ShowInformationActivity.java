@@ -14,20 +14,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.task.AddEventToMemberTask;
+import ws1415.ps1415.task.AddMemberToEventTask;
 import ws1415.ps1415.task.GetEventTask;
-import ws1415.ps1415.task.QueryEventTask;
 
 /**
  * Zeigt die Informationen des aktuellen Events an.
@@ -52,7 +51,8 @@ public class ShowInformationActivity extends Activity {
     private String description;
     private String route;
     private Route routeObject;
-    private Event event;
+    private long key;
+    //private Event event;
 
     // Erstellen eines SimpleDateFormats, damit das Datum und die Uhrzeit richtig angezeigt werden
     private SimpleDateFormat dateFormat;
@@ -84,6 +84,7 @@ public class ShowInformationActivity extends Activity {
                             // Leite wieter auf die Karte
                             Intent intent = new Intent(ShowInformationActivity.this, ShowRouteActivity.class);
                             intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, route);
+                            intent.putExtra("test", key);
                             startActivity(intent);
                         }
                     });
@@ -126,11 +127,6 @@ public class ShowInformationActivity extends Activity {
         if (credential.getSelectedAccountName() == null) {
             startActivityForResult(credential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
         }
-
-        String email = credential.getSelectedAccountName();
-
-        // EmailAdresse des aktuellen users dem Event hinzufügen
-        new AddEventToMemberTask(this.event).execute(email);
     }
 
     /**
@@ -193,8 +189,9 @@ public class ShowInformationActivity extends Activity {
      */
     public void setEventInformation(Event e) {
         if (e != null) {
-            this.event = e;
             title =  e.getTitle();
+            key = e.getKey().getId();
+            Toast.makeText(getApplicationContext(), "" + e.getMemberList(), Toast.LENGTH_LONG).show();
             if (e.getDate() != null) {
                 date = dateFormat.format(new Date(e.getDate().getValue()));
             } else {
@@ -215,6 +212,12 @@ public class ShowInformationActivity extends Activity {
                 route = e.getRoute().getRouteData().getValue();
                 routeObject = e.getRoute();
             }
+
+            // TODO: Member nur hinzufügen wenn er auch wirklich teilnehmen möchte
+            String email = credential.getSelectedAccountName();
+
+            // EmailAdresse des aktuellen users dem Event hinzufügen
+            new AddMemberToEventTask(e).execute(email);
         } else {
             title = null;
             date = null;

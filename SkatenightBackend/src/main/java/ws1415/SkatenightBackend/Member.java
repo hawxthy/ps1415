@@ -1,6 +1,5 @@
 package ws1415.SkatenightBackend;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 import javax.jdo.annotations.PersistenceCapable;
@@ -27,8 +26,6 @@ public class Member {
     @PrimaryKey
     @Persistent
     private String email;     // Einzigartige google Email, zum identifizieren eines Nutzers (Primary Key)
-    @Persistent(serialized = "true", defaultFetchGroup = "true")
-    private ArrayList<Event> eventList;
 
     public String getName() {
         return name;
@@ -69,14 +66,4 @@ public class Member {
     public String getEmail() {
         return email;
     }
-
-    public void setEventList(ArrayList<Event> eventList) {
-        this.eventList = eventList;
-    }
-
-    public ArrayList<Event> getEventList() {
-        return this.eventList;
-    }
-
-
 }
