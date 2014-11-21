@@ -215,14 +215,18 @@ public class SkatenightServerEndpoint {
 
         Event event = getEvent(keyId);
         ArrayList<String> memberKeys = event.getMemberList();
-        memberKeys.add(email);
+        if (memberKeys == null) memberKeys = new ArrayList<String>();
+        if (!memberKeys.contains(email)) {
+            memberKeys.add(email);
+            event.setMemberList(memberKeys);
 
-        PersistenceManager pm = pmf.getPersistenceManager();
-        try {
-            pm.makePersistent(event);
-        }
-        finally {
-            pm.close();
+            PersistenceManager pm = pmf.getPersistenceManager();
+            try {
+                pm.makePersistent(event);
+            }
+            finally {
+                pm.close();
+            }
         }
     }
 

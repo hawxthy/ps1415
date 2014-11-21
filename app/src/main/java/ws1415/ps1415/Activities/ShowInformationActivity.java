@@ -191,7 +191,7 @@ public class ShowInformationActivity extends Activity {
         if (e != null) {
             title =  e.getTitle();
             key = e.getKey().getId();
-            Toast.makeText(getApplicationContext(), "" + e.getMemberList(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), key + " " + e.getMemberList(), Toast.LENGTH_LONG).show();
             if (e.getDate() != null) {
                 date = dateFormat.format(new Date(e.getDate().getValue()));
             } else {
@@ -226,7 +226,7 @@ public class ShowInformationActivity extends Activity {
             description = null;
             route = null;
         }
-        updateGUI();
+        //updateGUI();
     }
 
     /**
