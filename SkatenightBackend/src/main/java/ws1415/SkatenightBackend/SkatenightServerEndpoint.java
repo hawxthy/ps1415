@@ -1,6 +1,7 @@
 package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.Api;
+import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -27,10 +28,11 @@ import javax.jdo.Transaction;
  * @author Richard, Daniel
  */
 @Api(name = "skatenightAPI",
-        version = "v1",
-        clientIds = {Constants.ANDROID_USER_CLIENT_ID, Constants.ANDROID_HOST_CLIENT_ID,
-                Constants.WEB_CLIENT_ID, com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID},
-        audiences = {Constants.ANDROID_AUDIENCE})
+    version = "v1",
+    clientIds = {Constants.ANDROID_USER_CLIENT_ID, Constants.ANDROID_HOST_CLIENT_ID,
+            Constants.WEB_CLIENT_ID, com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID},
+    audiences = {Constants.ANDROID_AUDIENCE},
+    namespace = @ApiNamespace(ownerDomain = "skatenight.com", ownerName = "skatenight"))
 public class SkatenightServerEndpoint {
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
@@ -152,12 +154,13 @@ public class SkatenightServerEndpoint {
     /**
      * Aktualisiert die für die angegebene Mail-Adresse gespeicherte Position auf dem Server. Falls
      * kein Member-Objekt für die Mail-Adresse existiert, so wird ein neues Objekt angelegt.
-     *
-     * @param mail     Die Mail-Adresse des zu aktualisierenden Member-Objekts.
-     * @param location Die neue Position.
+     * @param mail Die Mail-Adresse des zu aktualisierenden Member-Objekts.
+     * @param latitude
+     * @param longitude
      */
     public void updateMemberLocation(@Named("mail") String mail,
-                                     @Named("location") String location) {
+                                     @Named("latitude") double latitude,
+                                     @Named("longitude") double longitude) {
         if (mail != null) {
             Member m = getMember(mail);
             if (m == null) {
@@ -170,7 +173,8 @@ public class SkatenightServerEndpoint {
                  */
                 m.setName(mail);
             }
-            m.setLocation(location);
+            m.setLatitude(latitude);
+            m.setLongitude(longitude);
             m.setUpdatedAt(new Date());
 
             PersistenceManager pm = pmf.getPersistenceManager();
@@ -324,6 +328,7 @@ public class SkatenightServerEndpoint {
         try {
             Event event = getEvent(keyId);
             if (event != null) {
+                pm.makePersistent(event);
                 pm.deletePersistent(event);
                 return new BooleanWrapper(true);
             }

@@ -36,7 +36,12 @@
     <string name="title_fragment_manage_routes">Manage Routes</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string-array name="selections_menu_manage_routes">
+        <item name="delete">Delete</item>
+    </string-array>
+
     <string-array name="selections_menu">
+        <item name="edit">Edit</item>
         <item name="delete">Delete</item>
     </string-array>
 
@@ -71,14 +76,15 @@
     <!-- Strings zu activity_show_route -->
     <string name="title_activity_show_route">Route</string>
 
-    <!--Strings zu activtiy_add_route_dialog-->
+    <!-- Strings zu activtiy_add_route_dialog -->
     <string name="title_activity_add_route_dialog">Add Route</string>
     <string name="title_activity_add_route_dialog_routename">Routename: </string>
     <string name="activity_add_route_dialog_cancel">Cancel</string>
     <string name="activity_add_route_dialog_apply">Apply</string>
     <string name="activity_add_route_dialog_empty">Routename can not be empty</string>
 
-    <!--Strings zu ShowEventsFragment-->
+    <!-- Strings zu ShowEventsFragment -->
     <string name="title_fragment_show_events">Events</string>
+    <string name="title_activity_edit_event">EditEventActivity</string>
 
 </resources>

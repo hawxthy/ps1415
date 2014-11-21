@@ -1,11 +1,13 @@
 package ws1415.veranstalterapp.task;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Event;
 
 import java.io.IOException;
 
+import ws1415.veranstalterapp.Activities.EditEventActivity;
 import ws1415.veranstalterapp.Fragments.ShowInformationActivity;
 import ws1415.veranstalterapp.ServiceProvider;
 
@@ -15,11 +17,11 @@ import ws1415.veranstalterapp.ServiceProvider;
  * Created by Bernd Eissing, Martin Wrodarczyk on 04.11.2014.
  */
 public class GetEventTask extends AsyncTask<Long, Void, Event> {
-    private ShowInformationActivity sia;
+    private Activity a;
     private Event event;
 
-    public GetEventTask(ShowInformationActivity sia) {
-        this.sia = sia;
+    public GetEventTask(Activity a) {
+        this.a = a;
     }
 
     /**
@@ -39,7 +41,11 @@ public class GetEventTask extends AsyncTask<Long, Void, Event> {
     }
 
     @Override
-    protected void onPostExecute(Event event){
-        sia.setEventInformation(event);
+    protected void onPostExecute(Event event) {
+        if (a instanceof ShowInformationActivity) {
+            ((ShowInformationActivity) a).setEventInformation(event);
+        }else if(a instanceof EditEventActivity){
+            ((EditEventActivity)a).setEventDataToView(event);
+        }
     }
 }

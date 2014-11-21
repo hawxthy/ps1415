@@ -14,8 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import com.appspot.skatenight_ms.skatenightAPI.model.Event;
-import com.appspot.skatenight_ms.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Route;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 import java.text.SimpleDateFormat;

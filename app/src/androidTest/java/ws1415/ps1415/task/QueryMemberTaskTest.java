@@ -3,7 +3,7 @@ package ws1415.ps1415.task;
 import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Member;
+import com.skatenight.skatenightAPI.model.Member;
 
 import java.util.Map;
 import java.util.Set;

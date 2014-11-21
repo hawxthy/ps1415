@@ -1,17 +1,18 @@
 package ws1415.veranstalterapp.Activities;
-import android.os.AsyncTask;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Route;
+import android.app.Activity;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+
+import com.skatenight.skatenightAPI.model.Route;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import android.app.Activity;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
 import ws1415.veranstalterapp.Fragments.AnnounceInformationFragment;
@@ -23,6 +24,7 @@ public class ChooseRouteActivity extends Activity {
     private ListView lv;
     private List<Route> routeList;
     private MapsCursorAdapter mAdapter;
+    private static EditEventActivity activity;
 
 
     @Override
@@ -35,6 +37,8 @@ public class ChooseRouteActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 ((AnnounceInformationFragment)HoldTabsActivity.getAdapter().getItem(1)).setRoute(routeList.get(i));
+                Log.d("Parent ist: ", String.valueOf(getParent()));
+                activity.setRoute(routeList.get(i));
                 finish();
             }
         });
@@ -75,5 +79,9 @@ public class ChooseRouteActivity extends Activity {
         protected void onPostExecute(List<Route> results){
             view.setRoutesToListView((ArrayList<Route>) results);
         }
+    }
+
+    public static void giveEditEVentActivity(EditEventActivity eea){
+        activity = eea;
     }
 }

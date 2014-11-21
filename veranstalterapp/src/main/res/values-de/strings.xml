@@ -32,7 +32,13 @@
     <!--Manage Routes xml-->
     <string name="title_fragment_manage_routes">Verwalte Strecken</string>
     <string name="hello_blank_fragment">Hallo blank Fragment</string>
+
+    <string-array name="selections_menu_manage_routes">
+        <item name="delete">Löschen</item>
+    </string-array>
+
     <string-array name="selections_menu">
+        <item name="edit">Editieren</item>
         <item name="delete">Löschen</item>
     </string-array>
     <string name="route_delete_failed">Route ist aktueller Veranstaltung zugewiesen</string>

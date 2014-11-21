@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Route;
 
 import java.util.ArrayList;
 import java.util.List;

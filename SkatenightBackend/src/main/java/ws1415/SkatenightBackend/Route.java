@@ -3,7 +3,8 @@ package ws1415.SkatenightBackend;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 
-import javax.annotation.Generated;
+import java.util.ArrayList;
+
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -25,6 +26,8 @@ public class Route {
      */
     @Persistent
     private Text routeData;
+    @Persistent(serialized = "true", defaultFetchGroup = "true")
+    private ArrayList<RoutePoint> routePoints;
     @Persistent
     private String length;
 
@@ -42,6 +45,14 @@ public class Route {
 
     public void setRouteData(Text routeData) {
         this.routeData = routeData;
+    }
+
+    public ArrayList<RoutePoint> getRoutePoints() {
+        return routePoints;
+    }
+
+    public void setRoutePoints(ArrayList<RoutePoint> routePoints) {
+        this.routePoints = routePoints;
     }
 
     public String getLength() {
