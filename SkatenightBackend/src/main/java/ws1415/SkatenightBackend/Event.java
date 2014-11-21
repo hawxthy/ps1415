@@ -34,6 +34,10 @@ public class Event{
     @Persistent(defaultFetchGroup = "true")
     @Unowned
     private Route route;
+    @Persistent
+    private int routeFieldFirst;
+    @Persistent
+    private int routeFieldLast;
     @Persistent(serialized = "true", defaultFetchGroup = "true")
     private ArrayList<String> memberMailList;
 
