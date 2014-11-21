@@ -90,7 +90,7 @@ public class ShowRouteActivity extends Activity {
                     }
                 });
 
-                highlightRoute(5, 10);
+                highlightRoute(5, 20);
             }
             catch (ParseException e) {
                 Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
@@ -182,8 +182,8 @@ public class ShowRouteActivity extends Activity {
         if (routeHighlightLine != null) routeHighlightLine.remove();
         routeHighlight = new PolylineOptions()
                 .addAll(highlight)
-                .width(7.5f)
-                .color(Color.RED);
+                .width(5.0f)
+                .color(Color.GREEN);
 
         routeHighlightLine = googleMap.addPolyline(routeHighlight);
     }

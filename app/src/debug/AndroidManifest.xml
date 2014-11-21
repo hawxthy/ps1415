@@ -9,7 +9,7 @@
         android:theme="@style/AppTheme" >
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDFoXgid49cRLtVZUggZ3pmjpLzch8agsk" />
+            android:value="AIzaSyDQgEKF42jjm57x7kgnY7EI62CcXW_zDS0" />
     </application>
 
 </manifest>
