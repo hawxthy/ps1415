@@ -4,6 +4,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 import com.google.appengine.datanucleus.annotations.Unowned;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -33,6 +34,8 @@ public class Event{
     @Persistent(defaultFetchGroup = "true")
     @Unowned
     private Route route;
+    @Persistent(serialized = "true", defaultFetchGroup = "true")
+    private ArrayList<String> memberMailList;
 
     public Key getKey() {
         return key;
@@ -88,5 +91,11 @@ public class Event{
 
     public void setRoute(Route route) {
         this.route = route;
+    }
+
+    public void addMember(String mail) {getMemberMailList().add(mail);}
+
+    public ArrayList<String> getMemberMailList() {
+        return memberMailList;
     }
 }
