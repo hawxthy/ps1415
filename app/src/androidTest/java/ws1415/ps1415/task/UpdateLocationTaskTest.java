@@ -24,7 +24,6 @@ public class UpdateLocationTaskTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        ServiceProvider.setupProductionServerConnection();
     }
 
     /**

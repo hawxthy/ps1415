@@ -5,7 +5,7 @@
     <application>
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDQgEKF42jjm57x7kgnY7EI62CcXW_zDS0" />
+            android:value="AIzaSyAQ47zRjgPRk1sxJYifd2URQdEnk5HvnRw" />
     </application>
 
 </manifest>

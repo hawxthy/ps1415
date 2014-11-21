@@ -1,30 +1,44 @@
-package ws1415.ps1415.task;
+package ws1415.ps1415.useCases;
 
-import android.test.AndroidTestCase;
+import android.test.ActivityInstrumentationTestCase2;
+import android.widget.Button;
+import android.widget.TextView;
 
+import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
-import com.google.api.client.util.DateTime;
 
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
 
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.Activities.ShowInformationActivity;
+import ws1415.ps1415.R;
+import ws1415.ps1415.ServiceProvider;
 
 /**
- * TestCase für QueryEventTask.
- * Created by Richard on 06.11.2014.
+ * Testet den Use Case "Aktuelle Informationen anzeigen".
+ *
+ * @author Tristan
  */
-public class QueryEventTaskTest extends AndroidTestCase {
+public class ShowCurrentInformationTest extends ActivityInstrumentationTestCase2<ShowInformationActivity> {
+
+    private ShowInformationActivity mActivity;
+
+    private TextView dateView;
+    private TextView locationView;
+    private TextView feeView;
+    private TextView descriptionView;
+    private Button mapButton;
+
     private Event testEvent;
     private Route testRoute;
 
     /**
      * Stellt eine Verbindung zum Testserver her und bereitet die Testdaten vor.
      */
-    public QueryEventTaskTest() {
+    public ShowCurrentInformationTest() {
+        // Bezug auf die ShowInformationActivity
+        super(ShowInformationActivity.class);
 
         // Testdaten erstellen
         testEvent = new Event();
@@ -59,44 +73,62 @@ public class QueryEventTaskTest extends AndroidTestCase {
         testEvent.setRoute(testRoute);
     }
 
+    @Override
     /**
      * Überträgt die Testdaten auf den Server.
      * @throws Exception
      */
-    public void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
+
+        setActivityInitialTouchMode(false);
+
+        mActivity = getActivity();
+
+        dateView = (TextView) mActivity.findViewById(R.id.show_info_date_textview);
+        locationView = (TextView) mActivity.findViewById(R.id.show_info_location_textview);
+        feeView = (TextView) mActivity.findViewById(R.id.show_info_fee_textview);
+        descriptionView = (TextView) mActivity.findViewById(R.id.show_info_description_textview);
+        mapButton = (Button) mActivity.findViewById(R.id.show_info_map_button);
 
         // Test-Event setzen
         ServiceProvider.getService().skatenightServerEndpoint().setEventTestMethod(testEvent).execute();
+
     }
 
     /**
-     * Prüft, ob das durch den QueryEventTask abgerufene Event die korrekten Daten enthält.
-     * @throws ExecutionException
-     * @throws InterruptedException
+     * Stellt eine Verbindung zum Testserver her und bereitet die Testdaten vor.
      */
-    public void testTask() throws ExecutionException, InterruptedException {
-        QueryEventTask task = new QueryEventTask();
-        Event event = task.execute(new ShowInformationActivity() {
-            @Override
-            public void setEventInformation(Event e) {
-                // Methode mit leerem Rumpf überschreiben,
-                // da der Callback für den Test nicht relevant ist
-            }
-        }).get();
-        assertNotNull("event is null", event);
-        assertEquals("wrong title", testEvent.getTitle(), event.getTitle());
-        assertEquals("wrong date", testEvent.getDate().getValue(), event.getDate().getValue());
-        assertEquals("wrong fee", testEvent.getFee(), event.getFee());
-        assertEquals("wrong location", testEvent.getLocation(), event.getLocation());
-        assertNotNull("event description is null", event.getDescription());
-        assertEquals("wrong description", testEvent.getDescription().getValue(),
-                event.getDescription().getValue());
-        assertNotNull("route is null", event.getRoute());
-        assertEquals("wrong route name", testRoute.getName(), event.getRoute().getName());
-        assertEquals("wrong route length", testRoute.getLength(), event.getRoute().getLength());
-        assertNotNull("route data is null", event.getRoute().getRouteData());
-        assertEquals("wrong route data", testRoute.getRouteData().getValue(),
-                event.getRoute().getRouteData().getValue());
+    public void testPreConditions() {
+        assertNotNull("dateView is inizalized", dateView.getText() != null);
+        assertNotNull("locationView is inizalized", locationView.getText() != null);
+        assertNotNull("feeViewView is inizalized", feeView.getText() != null);
+        assertNotNull("descriptionView is inizalized", descriptionView.getText() != null);
     }
+
+    /**
+     * Prüft, ob die Event-Daten in der GUI mit denen auf dem Server übereinstimmen.
+     */
+    public void testCurrentInformationUI() {
+        String dateText         = (String) dateView.getText();
+        String locationText     = (String) locationView.getText();
+        String feeText          = (String) feeView.getText();
+        String descriptionText  = (String) descriptionView.getText();
+
+        // Vergleich der Event Daten mit denen aus den Views
+        assertEquals("wrong date", testEvent.getDate().getValue(), dateText);
+        assertEquals("wrong location", testEvent.getLocation(), locationText);
+        assertEquals("wrong fee", testEvent.getFee(), feeText);
+        assertEquals("wrong description", testEvent.getDescription().getValue(), descriptionText);
+    }
+
 }
+
+
+
+
+
+
+
+
+

@@ -31,8 +31,6 @@ public class QueryMemberTaskTest extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        ServiceProvider.setupProductionServerConnection();
-
         // Member-Objekt auf dem Server erstellen lassen
         ServiceProvider.getService().skatenightServerEndpoint().updateMemberLocation(testMail,
                 testLocation).execute();
