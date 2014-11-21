@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Event;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

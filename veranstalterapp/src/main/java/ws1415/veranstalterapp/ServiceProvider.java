@@ -1,6 +1,6 @@
 package ws1415.veranstalterapp;
 
-import com.appspot.skatenight_ms.skatenightAPI.SkatenightAPI;
+import com.skatenight.skatenightAPI.SkatenightAPI;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
