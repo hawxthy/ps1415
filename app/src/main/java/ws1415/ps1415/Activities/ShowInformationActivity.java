@@ -18,11 +18,13 @@ import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.task.QueryEventTask;
 
@@ -49,6 +51,7 @@ public class ShowInformationActivity extends Activity {
     private String description;
     private String route;
     private Route routeObject;
+    private Event event;
 
     // Erstellen eines SimpleDateFormats, damit das Datum und die Uhrzeit richtig angezeigt werden
     private SimpleDateFormat dateFormat;
@@ -109,7 +112,6 @@ public class ShowInformationActivity extends Activity {
             new GetEventTask(this).execute(keyId);
         }
 
-
         // SharePreferences skatenight.app laden
         prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
         credential = GoogleAccountCredential.usingAudience(this,"server:client_id:"+ Constants.WEB_CLIENT_ID);
@@ -123,6 +125,11 @@ public class ShowInformationActivity extends Activity {
         if (credential.getSelectedAccountName() == null) {
             startActivityForResult(credential.newChooseAccountIntent(),REQUEST_ACCOUNT_PICKER);
         }
+
+        String mail = credential.getSelectedAccountName();
+
+        // EmailAdresse des aktuellen users dem Event hinzufügen
+        this.event.addMember(mail);
     }
 
     /**
@@ -185,6 +192,7 @@ public class ShowInformationActivity extends Activity {
      */
     public void setEventInformation(Event e) {
         if (e != null) {
+            this.event = e;
             title =  e.getTitle();
             if (e.getDate() != null) {
                 date = dateFormat.format(new Date(e.getDate().getValue()));
