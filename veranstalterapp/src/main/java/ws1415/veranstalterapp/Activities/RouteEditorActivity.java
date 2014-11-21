@@ -27,6 +27,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.appspot.skatenight_ms.skatenightAPI.model.RoutePoint;
 import com.appspot.skatenight_ms.skatenightAPI.model.Text;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -213,11 +214,27 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
             builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    String encoded = LocationUtils.encodePolyline(route.getPolylineOptions().getPoints());
+                    List<LatLng> src = route.getPolylineOptions().getPoints();
+
+                    String encoded = LocationUtils.encodePolyline(src);
+
+                    List<RoutePoint> routePoints = new ArrayList<RoutePoint>(src.size());
+                    for (LatLng p: src) {
+                        RoutePoint routePoint = new RoutePoint();
+                        routePoint.setLatitude(p.latitude);
+                        routePoint.setLongitude(p.longitude);
+                        routePoints.add(routePoint);
+                    }
+
+
+                    Toast.makeText(getApplicationContext(), "size: " + routePoints.size(), Toast.LENGTH_LONG).show();
+
 
                     com.appspot.skatenight_ms.skatenightAPI.model.Route rt = new com.appspot.skatenight_ms.skatenightAPI.model.Route();
                     rt.setName(name);
                     rt.setRouteData(new Text().setValue(encoded));
+                    rt.setRoutePoints(routePoints);
+                    Toast.makeText(getApplicationContext(), "size: " + rt.getRoutePoints().size(), Toast.LENGTH_LONG).show();
 
                     String length;
                     if (route.getDistance() < 1000) {
@@ -529,6 +546,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
             }
 
             setRoute(route);
+            Toast.makeText(getApplicationContext(), route.getPolylineOptions().getPoints().size() + " " + route.getDistance(), Toast.LENGTH_LONG).show();
         }
 
         private String positionToString(LatLng position) {
