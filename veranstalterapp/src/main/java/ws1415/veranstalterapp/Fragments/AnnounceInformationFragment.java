@@ -22,9 +22,9 @@ import android.widget.Toast;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Event;
-import com.appspot.skatenight_ms.skatenightAPI.model.Route;
-import com.appspot.skatenight_ms.skatenightAPI.model.Text;
+import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Text;
 import com.google.api.client.util.DateTime;
 
 import ws1415.veranstalterapp.Activities.ChooseRouteActivity;

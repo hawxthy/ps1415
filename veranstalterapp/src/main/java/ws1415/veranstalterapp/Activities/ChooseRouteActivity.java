@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.appspot.skatenight_ms.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Route;
 
 import java.io.IOException;
 import java.util.ArrayList;
