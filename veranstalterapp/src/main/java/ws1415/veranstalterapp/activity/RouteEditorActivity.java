@@ -51,8 +51,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import ws1415.veranstalterapp.Fragments.EditorMapFragment;
-import ws1415.veranstalterapp.Fragments.EditorWaypointsFragment;
+import ws1415.veranstalterapp.fragment.EditorMapFragment;
+import ws1415.veranstalterapp.fragment.EditorWaypointsFragment;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.AddRouteTask;
 import ws1415.veranstalterapp.util.LocationUtils;
