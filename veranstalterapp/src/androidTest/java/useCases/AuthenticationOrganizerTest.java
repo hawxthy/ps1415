@@ -1,5 +1,6 @@
 package useCases;
 
+import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -39,8 +40,9 @@ public class AuthenticationOrganizerTest extends ActivityInstrumentationTestCase
 
     }
 
-    public void testPreConditions() {
-
+    // Loggt den Nutzer ein
+    public void testPreConditions() throws InterruptedException {
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(LoginActivity.class.getName(), null, false);
     }
 
 
