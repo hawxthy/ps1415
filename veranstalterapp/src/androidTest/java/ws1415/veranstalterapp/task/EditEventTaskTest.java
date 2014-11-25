@@ -1,7 +1,5 @@
 package ws1415.veranstalterapp.task;
 
-import android.test.AndroidTestCase;
-
 import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
