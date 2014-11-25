@@ -2,10 +2,10 @@ package ws1415.veranstalterapp.task;
 
 import android.test.AndroidTestCase;
 
+import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
-import com.google.api.client.util.DateTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,9 +13,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import ws1415.veranstalterapp.Fragments.ShowEventsFragment;
-import ws1415.veranstalterapp.Fragments.ShowInformationActivity;
 import ws1415.veranstalterapp.ServiceProvider;
+import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 
 /**
  * Created by Richard Schulze, Martin Wrodarczyk on 10.11.2014.

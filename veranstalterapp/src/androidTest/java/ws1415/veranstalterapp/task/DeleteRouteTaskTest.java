@@ -1,14 +1,12 @@
 package ws1415.veranstalterapp.task;
 
-import android.test.AndroidTestCase;
-
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.IOException;
 
-import ws1415.veranstalterapp.Fragments.ManageRoutesFragment;
 import ws1415.veranstalterapp.ServiceProvider;
+import ws1415.veranstalterapp.fragment.ManageRoutesFragment;
 
 
 /**
