@@ -97,6 +97,22 @@ public class Event{
         this.route = route;
     }
 
+    public int getRouteFieldFirst() {
+        return routeFieldFirst;
+    }
+
+    public void setRouteFieldFirst(int routeFieldFirst) {
+        this.routeFieldFirst = routeFieldFirst;
+    }
+
+    public int getRouteFieldLast() {
+        return routeFieldLast;
+    }
+
+    public void setRouteFieldLast(int routeFieldLast) {
+        this.routeFieldLast = routeFieldLast;
+    }
+
     public void setMemberList(ArrayList<String> memberList) {
         this.memberList = memberList;
     }

@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
@@ -43,6 +42,8 @@ public class ShowInformationActivity extends Activity {
     private static final String MEMBER_FEE = "show_infomation_member_fee";
     private static final String MEMBER_DESCRIPTION = "show_infomation_member_description";
     private static final String MEMBER_ROUTE = "show_infomation_member_route";
+    private static final String MEMBER_ROUTE_FIELD_FIRST = "show_information_member_route_field_first";
+    private static final String MEMBER_ROUTE_FIELD_LAST = "show_information_member_route_field_last";
 
     private String title;
     private String date;
@@ -51,8 +52,8 @@ public class ShowInformationActivity extends Activity {
     private String description;
     private String route;
     private Route routeObject;
-    private long key;
-    //private Event event;
+    private int routeFieldFirst;
+    private int routeFieldLast;
 
     // Erstellen eines SimpleDateFormats, damit das Datum und die Uhrzeit richtig angezeigt werden
     private SimpleDateFormat dateFormat;
@@ -71,6 +72,21 @@ public class ShowInformationActivity extends Activity {
 
         Long keyId = getIntent().getLongExtra("event", 0);
 
+        if (savedInstanceState != null) {
+            title = savedInstanceState.getString(MEMBER_TITLE);
+            date = savedInstanceState.getString(MEMBER_DATE);
+            location = savedInstanceState.getString(MEMBER_LOCATION);
+            fee = savedInstanceState.getString(MEMBER_FEE);
+            description = savedInstanceState.getString(MEMBER_DESCRIPTION);
+            route = savedInstanceState.getString(MEMBER_ROUTE);
+            routeFieldFirst = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_FIRST);
+            routeFieldLast = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_LAST);
+            updateGUI();
+        }
+        else {
+            new GetEventTask(this).execute(keyId);
+        }
+
         Button mapButton = (Button) findViewById(R.id.show_info_map_button);
         mapButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,7 +100,8 @@ public class ShowInformationActivity extends Activity {
                             // Leite wieter auf die Karte
                             Intent intent = new Intent(ShowInformationActivity.this, ShowRouteActivity.class);
                             intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, route);
-                            intent.putExtra("test", key);
+                            intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_FIRST, routeFieldFirst);
+                            intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_LAST, routeFieldLast);
                             startActivity(intent);
                         }
                     });
@@ -100,19 +117,6 @@ public class ShowInformationActivity extends Activity {
                 }
             }
         });
-
-        if (savedInstanceState != null) {
-            title = savedInstanceState.getString(MEMBER_TITLE);
-            date = savedInstanceState.getString(MEMBER_DATE);
-            location = savedInstanceState.getString(MEMBER_LOCATION);
-            fee = savedInstanceState.getString(MEMBER_FEE);
-            description = savedInstanceState.getString(MEMBER_DESCRIPTION);
-            route = savedInstanceState.getString(MEMBER_ROUTE);
-            updateGUI();
-        }
-        else {
-            new GetEventTask(this).execute(keyId);
-        }
 
         // SharePreferences skatenight.app laden
         prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
@@ -160,6 +164,8 @@ public class ShowInformationActivity extends Activity {
         outState.putString(MEMBER_FEE, fee);
         outState.putString(MEMBER_DESCRIPTION, description);
         outState.putString(MEMBER_ROUTE, route);
+        outState.putInt(MEMBER_ROUTE_FIELD_FIRST, routeFieldFirst);
+        outState.putInt(MEMBER_ROUTE_FIELD_LAST, routeFieldLast);
 
         super.onSaveInstanceState(outState);
     }
@@ -190,8 +196,6 @@ public class ShowInformationActivity extends Activity {
     public void setEventInformation(Event e) {
         if (e != null) {
             title =  e.getTitle();
-            key = e.getKey().getId();
-            Toast.makeText(getApplicationContext(), key + " " + e.getMemberList(), Toast.LENGTH_LONG).show();
             if (e.getDate() != null) {
                 date = dateFormat.format(new Date(e.getDate().getValue()));
             } else {
@@ -212,6 +216,13 @@ public class ShowInformationActivity extends Activity {
                 route = e.getRoute().getRouteData().getValue();
                 routeObject = e.getRoute();
             }
+            if (e.getRouteFieldFirst() != null) {
+                routeFieldFirst = e.getRouteFieldFirst();
+            }
+            if (e.getRouteFieldLast() != null) {
+                routeFieldLast = e.getRouteFieldLast();
+            }
+
 
             // TODO: Member nur hinzufügen wenn er auch wirklich teilnehmen möchte
             String email = credential.getSelectedAccountName();
@@ -225,6 +236,9 @@ public class ShowInformationActivity extends Activity {
             fee = null;
             description = null;
             route = null;
+            routeObject = null;
+            routeFieldFirst = 0;
+            routeFieldLast = 0;
         }
         updateGUI();
     }

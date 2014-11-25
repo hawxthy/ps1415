@@ -3,6 +3,7 @@ package ws1415.SkatenightBackend;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -32,6 +33,7 @@ import javax.jdo.Query;
 public class SkatenightServerEndpoint {
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
+    private long lastFieldUpdateTime = 0;
 
 //    /**
 //     * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
@@ -173,6 +175,13 @@ public class SkatenightServerEndpoint {
             m.setLongitude(longitude);
             m.setUpdatedAt(new Date());
 
+            // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
+            if (System.currentTimeMillis()-lastFieldUpdateTime >= 300000) {
+                List<Event> myEvents = getCurrentEventsForMember(mail);
+
+
+            }
+
             PersistenceManager pm = pmf.getPersistenceManager();
             try {
                 pm.makePersistent(m);
@@ -180,6 +189,141 @@ public class SkatenightServerEndpoint {
                 pm.close();
             }
         }
+    }
+
+    private void calculateField(@Named("id") long id) {
+        PersistenceManager pm = pmf.getPersistenceManager();
+        Event event = getEvent(id);
+        List<RoutePoint> points = event.getRoute().getRoutePoints();
+        List<Member> members = getMembersFromEvent(event.getKey().getId());
+
+        int first = points.size()-1;
+        int last = 0;
+
+        for (Member member : members) {
+            int closestIndex = -1;
+            float minDistance = Float.POSITIVE_INFINITY;
+            for (int i = 0; i < points.size(); i++) {
+                float distance = distance(
+                        member.getLatitude(), member.getLongitude(),
+                        points.get(i).getLatitude(), points.get(i).getLongitude());
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestIndex = i;
+                }
+            }
+
+            if (closestIndex < first) first = closestIndex;
+            if (closestIndex > last) last = closestIndex;
+
+        }
+
+        event.setRouteFieldFirst(first);
+        event.setRouteFieldLast(last);
+        updateEvent(event);
+    }
+
+    /**
+     * Kopie der Funktion zur Distanzberechnung zwischen 2 Koordinaten aus dem Android Source code.
+     *
+     * @param startLat
+     * @param startLon
+     * @param endLat
+     * @param endLon
+     * @return
+     */
+    private float distance(double startLat, double startLon,
+                           double endLat, double endLon) {
+        // Based on http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
+        // using the "Inverse Formula" (section 4)
+        int MAXITERS = 20;
+        // Convert lat/long to radians
+        startLat *= Math.PI / 180.0;
+        endLat *= Math.PI / 180.0;
+        startLon *= Math.PI / 180.0;
+        endLon *= Math.PI / 180.0;
+        double a = 6378137.0; // WGS84 major axis
+        double b = 6356752.3142; // WGS84 semi-major axis
+        double f = (a - b) / a;
+        double aSqMinusBSqOverBSq = (a * a - b * b) / (b * b);
+        double L = endLon - startLon;
+        double A = 0.0;
+        double U1 = Math.atan((1.0 - f) * Math.tan(startLat));
+        double U2 = Math.atan((1.0 - f) * Math.tan(endLat));
+        double cosU1 = Math.cos(U1);
+        double cosU2 = Math.cos(U2);
+        double sinU1 = Math.sin(U1);
+        double sinU2 = Math.sin(U2);
+        double cosU1cosU2 = cosU1 * cosU2;
+        double sinU1sinU2 = sinU1 * sinU2;
+        double sigma = 0.0;
+        double deltaSigma = 0.0;
+        double cosSqAlpha = 0.0;
+        double cos2SM = 0.0;
+        double cosSigma = 0.0;
+        double sinSigma = 0.0;
+        double cosLambda = 0.0;
+        double sinLambda = 0.0;
+        double lambda = L; // initial guess
+        for (int iter = 0; iter < MAXITERS; iter++) {
+            double lambdaOrig = lambda;
+            cosLambda = Math.cos(lambda);
+            sinLambda = Math.sin(lambda);
+            double t1 = cosU2 * sinLambda;
+            double t2 = cosU1 * sinU2 - sinU1 * cosU2 * cosLambda;
+            double sinSqSigma = t1 * t1 + t2 * t2; // (14)
+            sinSigma = Math.sqrt(sinSqSigma);
+            cosSigma = sinU1sinU2 + cosU1cosU2 * cosLambda; // (15)
+            sigma = Math.atan2(sinSigma, cosSigma); // (16)
+            double sinAlpha = (sinSigma == 0) ? 0.0 :
+                    cosU1cosU2 * sinLambda / sinSigma; // (17)
+            cosSqAlpha = 1.0 - sinAlpha * sinAlpha;
+            cos2SM = (cosSqAlpha == 0) ? 0.0 :
+                    cosSigma - 2.0 * sinU1sinU2 / cosSqAlpha; // (18)
+            double uSquared = cosSqAlpha * aSqMinusBSqOverBSq; // defn
+            A = 1 + (uSquared / 16384.0) * // (3)
+                    (4096.0 + uSquared *
+                            (-768 + uSquared * (320.0 - 175.0 * uSquared)));
+            double B = (uSquared / 1024.0) * // (4)
+                    (256.0 + uSquared *
+                            (-128.0 + uSquared * (74.0 - 47.0 * uSquared)));
+            double C = (f / 16.0) *
+                    cosSqAlpha *
+                    (4.0 + f * (4.0 - 3.0 * cosSqAlpha)); // (10)
+            double cos2SMSq = cos2SM * cos2SM;
+            deltaSigma = B * sinSigma * // (6)
+                    (cos2SM + (B / 4.0) *
+                            (cosSigma * (-1.0 + 2.0 * cos2SMSq) -
+                                    (B / 6.0) * cos2SM *
+                                            (-3.0 + 4.0 * sinSigma * sinSigma) *
+                                            (-3.0 + 4.0 * cos2SMSq)));
+            lambda = L +
+                    (1.0 - C) * f * sinAlpha *
+                            (sigma + C * sinSigma *
+                                    (cos2SM + C * cosSigma *
+                                            (-1.0 + 2.0 * cos2SM * cos2SM))); // (11)
+            double delta = (lambda - lambdaOrig) / lambda;
+            if (Math.abs(delta) < 1.0e-12) {
+                break;
+            }
+        }
+        float distance = (float) (b * A * (sigma - deltaSigma));
+        return distance;
+    }
+
+    public List<Event> getCurrentEventsForMember(@Named("email") String email) {
+        // TODO: Nur Events ausgeben die auch JETZT stattfinden.
+        List<Event> out = new ArrayList();
+
+        List<Event> eventList = getAllEvents();
+        for (Event e : eventList) {
+            if (e.getMemberList().contains(email)) {
+                out.add(e);
+            }
+        }
+
+        return out;
     }
 
     /**
@@ -214,19 +358,14 @@ public class SkatenightServerEndpoint {
     public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
 
         Event event = getEvent(keyId);
+
         ArrayList<String> memberKeys = event.getMemberList();
         if (memberKeys == null) memberKeys = new ArrayList<String>();
         if (!memberKeys.contains(email)) {
             memberKeys.add(email);
             event.setMemberList(memberKeys);
 
-            PersistenceManager pm = pmf.getPersistenceManager();
-            try {
-                pm.makePersistent(event);
-            }
-            finally {
-                pm.close();
-            }
+            updateEvent(event);
         }
     }
 
@@ -363,6 +502,23 @@ public class SkatenightServerEndpoint {
             pm.close();
         }
         return new BooleanWrapper(false);
+    }
+
+    private void updateEvent(Event event) {
+        PersistenceManager pm = pmf.getPersistenceManager();
+
+        Key key = event.getRoute().getKey();
+        Route route = pm.getObjectById(Route.class, key);
+        if (route != null) {
+            event.setRoute(route);
+        }
+
+        try {
+            pm.makePersistent(event);
+        }
+        finally {
+            pm.close();
+        }
     }
 
     /**

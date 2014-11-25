@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.skatenight.skatenightAPI.model.Member;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -19,13 +18,13 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.skatenight.skatenightAPI.model.Member;
 
 import java.text.ParseException;
 import java.util.List;
 
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.ps1415.task.GetMembersFromEventTask;
 import ws1415.ps1415.task.QueryMemberTask;
 import ws1415.ps1415.util.LocationUtils;
 
@@ -34,8 +33,12 @@ import ws1415.ps1415.util.LocationUtils;
  */
 public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE = "show_route_extra_route";
+    public static final String EXTRA_ROUTE_FIELD_FIRST = "show_route_extra_route_field_first";
+    public static final String EXTRA_ROUTE_FIELD_LAST = "show_route_extra_route_field_last";
     private static final String MEMBER_ROUTE = "show_route_member_route";
     private static final String MEMBER_ROUTE_HIGHLIGHT = "show_route_member_route_highlight";
+    private static final String MEMBER_ROUTE_FIELD_FIRST = "show_route_member_route_field_first";
+    private static final String MEMBER_ROUTE_FIELD_LAST = "show_route_member_route_field_last";
 
     private GoogleMap googleMap;
     private PolylineOptions route;
@@ -43,6 +46,8 @@ public class ShowRouteActivity extends Activity {
     private PolylineOptions routeHighlight;
     private Polyline routeHighlightLine;
     private Intent service;
+    private int fieldFirst;
+    private int fieldLast;
 
     private Location location; // Enthält die aktuelle Position, die vom Server runtergeladen wurde
 
@@ -63,6 +68,12 @@ public class ShowRouteActivity extends Activity {
             if (savedInstanceState.containsKey(MEMBER_ROUTE_HIGHLIGHT)) {
                 routeHighlight = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_ROUTE_HIGHLIGHT);
                 routeHighlightLine = googleMap.addPolyline(routeHighlight);
+            }
+            if (savedInstanceState.containsKey(MEMBER_ROUTE_FIELD_FIRST)) {
+                fieldFirst = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_FIRST);
+            }
+            if (savedInstanceState.containsKey(MEMBER_ROUTE_FIELD_LAST)) {
+                fieldLast = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_LAST);
             }
         }
         else if ((intent = getIntent()) != null && intent.hasExtra(EXTRA_ROUTE)) {
@@ -92,16 +103,20 @@ public class ShowRouteActivity extends Activity {
                     }
                 });
 
-                highlightRoute(5, 20);
+                if (intent.hasExtra(EXTRA_ROUTE_FIELD_FIRST)) {
+                    fieldFirst = intent.getIntExtra(EXTRA_ROUTE_FIELD_FIRST, 0);
+                }
+                if (intent.hasExtra(EXTRA_ROUTE_FIELD_LAST)) {
+                    fieldFirst = intent.getIntExtra(EXTRA_ROUTE_FIELD_LAST, 0);
+                }
             }
             catch (ParseException e) {
                 Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
-
-            Toast.makeText(getApplicationContext(), "" + intent.getLongExtra("test", 0), Toast.LENGTH_SHORT).show();
-            new GetMembersFromEventTask(this, intent.getLongExtra("test", 0));
         }
+
+        highlightRoute(fieldFirst, fieldLast);
 
         // Ruft die aktuellen Memberinformationen ab
         new QueryMemberTask().execute((ShowRouteActivity) this);
@@ -133,6 +148,8 @@ public class ShowRouteActivity extends Activity {
         if (routeHighlight != null) {
             outState.putParcelable(MEMBER_ROUTE_HIGHLIGHT, routeHighlight);
         }
+        outState.putInt(MEMBER_ROUTE_FIELD_FIRST, fieldFirst);
+        outState.putInt(MEMBER_ROUTE_FIELD_LAST, fieldLast);
 
         super.onSaveInstanceState(outState);
     }
@@ -191,9 +208,5 @@ public class ShowRouteActivity extends Activity {
                 .color(Color.GREEN);
 
         routeHighlightLine = googleMap.addPolyline(routeHighlight);
-    }
-
-    public void updateMembers(List<Member> members) {
-        Toast.makeText(getApplicationContext(), members.toString(), Toast.LENGTH_LONG).show();
     }
 }
