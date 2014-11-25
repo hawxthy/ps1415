@@ -1,23 +1,22 @@
 package ws1415.veranstalterapp.task;
 
-import android.test.AndroidTestCase;
-
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**
  * Created by Richard Schulze on 10.11.2014.
  */
-public class AddRouteTaskTest extends AndroidTestCase {
+public class AddRouteTaskTest extends AuthTaskTestCase {
     private Route testRoute1;
 
     /**
-     * Testdaten erstellen.
+     * Testdaten erstellen und einloggen.
      */
     public AddRouteTaskTest() {
         testRoute1 = new Route();
@@ -45,21 +44,25 @@ public class AddRouteTaskTest extends AndroidTestCase {
         super.setUp();
 
         // Bestehende Routen löschen
-        for (Route r : ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute()
-                .getItems()) {
-            ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey().getId())
-                    .execute();
+        List<Route> routes = ServiceProvider.getService().skatenightServerEndpoint().getRoutes()
+                .execute().getItems();
+        if (routes != null) {
+            for (Route r : routes) {
+                ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey()
+                        .getId()).execute();
+            }
         }
     }
 
     /**
      * Testet, ob die Route vollständig und korrekt auf dem Server gespeichert wird.
      */
-    public void testTask() throws IOException {
-        new AddRouteTask().execute(testRoute1);
+    public void testTask() throws IOException, ExecutionException, InterruptedException {
+        new AddRouteTask().execute(testRoute1).get();
         // Route wieder abrufen und mit lokaler Route vergleichen
         List<Route> routes = ServiceProvider.getService().skatenightServerEndpoint().getRoutes()
                 .execute().getItems();
+        assertNotNull("no routes on server", routes);
         assertEquals("wrong route count", 1, routes.size());
         Route r = routes.get(0);
         assertNotNull("route is null", r);

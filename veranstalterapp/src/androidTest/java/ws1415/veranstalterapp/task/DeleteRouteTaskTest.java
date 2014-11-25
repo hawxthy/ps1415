@@ -14,7 +14,7 @@ import ws1415.veranstalterapp.ServiceProvider;
 /**
  * Created by Richard Schulze on 10.11.2014.
  */
-public class DeleteRouteTaskTest extends AndroidTestCase {
+public class DeleteRouteTaskTest extends AuthTaskTestCase {
     private Route testRoute1, testRoute2, testRoute3;
 
     /**

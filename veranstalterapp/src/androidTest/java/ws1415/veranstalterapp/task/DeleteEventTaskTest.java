@@ -17,7 +17,7 @@ import ws1415.veranstalterapp.ServiceProvider;
 /**
  * Created by Martin on 21.11.2014.
  */
-public class DeleteEventTaskTest extends AndroidTestCase {
+public class DeleteEventTaskTest extends AuthTaskTestCase {
     private Event event1, event2;
     private Route route1, route2;
 

@@ -15,7 +15,7 @@ import ws1415.veranstalterapp.ServiceProvider;
 /**
  * Created by Bernd Eissing on 21.11.2014.
  */
-public class EditEventTaskTest extends AndroidTestCase {
+public class EditEventTaskTest extends AuthTaskTestCase {
     private Route route;
     private Route route2;
     private Event event;
