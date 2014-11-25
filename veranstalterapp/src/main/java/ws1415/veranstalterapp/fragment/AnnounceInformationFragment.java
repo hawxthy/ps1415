@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -38,6 +39,9 @@ import ws1415.veranstalterapp.task.CreateEventTask;
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
 public class AnnounceInformationFragment extends Fragment {
+    // Die ListView von der xml datei
+    private ListView listView;
+
     // Die Viewelemente für das Event
     private EditText editTextTitle;
     private EditText editTextFee;
@@ -93,25 +97,9 @@ public class AnnounceInformationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_announce_information, container, false);
 
-        // Initialisiere die View Elemente
-        editTextTitle = (EditText) view.findViewById(R.id.announce_info_title_edittext);
-        editTextFee = (EditText) view.findViewById(R.id.announce_info_fee_edittext);
-        editTextLocation = (EditText) view.findViewById(R.id.announce_info_location_edittext);
-        editTextDescription = (EditText) view.findViewById(R.id.announce_info_description_edittext);
+        event = new Event();
+        event.addField(getResources().getString(R.string.announce_info_title), null);
 
-        // Initialisiere die Buttons
-        timePickerButton = (Button) view.findViewById(R.id.announce_info_time_button);
-        datePickerButton = (Button) view.findViewById(R.id.announce_info_date_button);
-        applyButton = (Button) view.findViewById(R.id.announce_info_apply_button);
-        cancelButton = (Button) view.findViewById(R.id.announce_info_cancel_button);
-        routePickerButton = (Button) view.findViewById(R.id.announce_info_choose_route);
-
-        // Setze die Listener für die Buttons
-        setButtonListener();
-
-
-        // Setze die aktuelle Zeit und das Datum
-        setCurrentDateOnView();
         return view;
     }
 
