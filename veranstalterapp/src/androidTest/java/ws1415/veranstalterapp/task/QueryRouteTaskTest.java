@@ -2,6 +2,7 @@ package ws1415.veranstalterapp.task;
 
 import android.test.AndroidTestCase;
 
+import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
@@ -77,6 +78,16 @@ public class QueryRouteTaskTest extends AndroidTestCase {
      */
     public void setUp() throws Exception {
         super.setUp();
+
+        // Bestehende Events löschen
+        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+                .execute().getItems();
+        if (events != null) {
+            for (Event e : events) {
+                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                        .execute();
+            }
+        }
 
         // Bestehende Routen löschen
         for (Route r : ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute()
