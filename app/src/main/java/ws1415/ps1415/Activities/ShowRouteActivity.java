@@ -99,6 +99,7 @@ public class ShowRouteActivity extends Activity {
                 e.printStackTrace();
             }
 
+            Toast.makeText(getApplicationContext(), "" + intent.getLongExtra("test", 0), Toast.LENGTH_SHORT).show();
             new GetMembersFromEventTask(this, intent.getLongExtra("test", 0));
         }
 

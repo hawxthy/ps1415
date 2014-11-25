@@ -226,7 +226,7 @@ public class ShowInformationActivity extends Activity {
             description = null;
             route = null;
         }
-        //updateGUI();
+        updateGUI();
     }
 
     /**

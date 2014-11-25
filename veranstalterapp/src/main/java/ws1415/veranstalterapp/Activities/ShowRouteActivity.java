@@ -27,6 +27,7 @@ import ws1415.veranstalterapp.util.LocationUtils;
  * Edited by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
 public class ShowRouteActivity extends Activity {
+    public static final String EXTRA_TITLE = "show_route_extra_title";
     public static final String EXTRA_ROUTE = "show_route_extra_route";
     private static final String MEMBER_ROUTE = "show_route_member_route";
 
@@ -53,35 +54,40 @@ public class ShowRouteActivity extends Activity {
             route = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_ROUTE);
             googleMap.addPolyline(route);
         }
-        else if ((intent = getIntent()) != null && intent.hasExtra(EXTRA_ROUTE)) {
-            String encodedPath = intent.getStringExtra(EXTRA_ROUTE);
-            try {
-                List<LatLng> line = LocationUtils.decodePolyline(encodedPath);
-
-                route = new PolylineOptions()
-                        .addAll(line)
-                        .color(Color.BLUE);
-
-                googleMap.clear();
-                googleMap.addPolyline(route);
-
-                googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-                    @Override
-                    public void onMapLoaded() {
-                        if (route != null) {
-                            // Grenzwerte der Strecke berechnen und Karte zentrieren
-                            LatLngBounds.Builder builder = LatLngBounds.builder();
-                            for (LatLng point : route.getPoints()) {
-                                builder.include(point);
-                            }
-                            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 50));
-                        }
-                    }
-                });
+        else if ((intent = getIntent()) != null) {
+            if (intent.hasExtra(EXTRA_TITLE)) {
+                setTitle(intent.getStringExtra(EXTRA_TITLE));
             }
-            catch (ParseException e) {
-                Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
+            if (intent.hasExtra(EXTRA_ROUTE)) {
+                String encodedPath = intent.getStringExtra(EXTRA_ROUTE);
+                try {
+                    List<LatLng> line = LocationUtils.decodePolyline(encodedPath);
+
+                    route = new PolylineOptions()
+                            .addAll(line)
+                            .color(Color.BLUE);
+
+                    googleMap.clear();
+                    googleMap.addPolyline(route);
+
+                    googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                        @Override
+                        public void onMapLoaded() {
+                            if (route != null) {
+                                // Grenzwerte der Strecke berechnen und Karte zentrieren
+                                LatLngBounds.Builder builder = LatLngBounds.builder();
+                                for (LatLng point : route.getPoints()) {
+                                    builder.include(point);
+                                }
+                                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 50));
+                            }
+                        }
+                    });
+                }
+                catch (ParseException e) {
+                    Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
             }
         }
     }

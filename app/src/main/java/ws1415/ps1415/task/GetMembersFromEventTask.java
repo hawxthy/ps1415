@@ -1,6 +1,7 @@
 package ws1415.ps1415.task;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.skatenight.skatenightAPI.model.Member;
 
@@ -27,6 +28,7 @@ public class GetMembersFromEventTask extends AsyncTask<Void, Void, List<Member>>
         try {
             return ServiceProvider.getService().skatenightServerEndpoint().getMembersFromEvent(keyId).execute().getItems();
         } catch (IOException e) {
+            Log.e("BLOB", "error");
             e.printStackTrace();
         }
         return null;
