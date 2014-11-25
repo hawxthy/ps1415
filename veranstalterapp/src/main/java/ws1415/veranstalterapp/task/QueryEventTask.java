@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.veranstalterapp.Fragments.ShowEventsFragment;
-import ws1415.veranstalterapp.Fragments.ShowInformationActivity;
+import ws1415.veranstalterapp.fragment.ShowEventsFragment;
+import ws1415.veranstalterapp.fragment.ShowInformationActivity;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**

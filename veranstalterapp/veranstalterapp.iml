@@ -11,7 +11,9 @@
         <option name="SELECTED_BUILD_VARIANT" value="jenkins" />
         <option name="ASSEMBLE_TASK_NAME" value="assembleJenkins" />
         <option name="COMPILE_JAVA_TASK_NAME" value="compileJenkinsJava" />
+        <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleJenkinsTest" />
         <option name="SOURCE_GEN_TASK_NAME" value="generateJenkinsSources" />
+        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateJenkinsTestSources" />
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="MANIFEST_FILE_RELATIVE_PATH" value="/src/main/AndroidManifest.xml" />
         <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
@@ -29,6 +31,11 @@
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/jenkins" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/jenkins" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/jenkins" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/test/jenkins" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/test/jenkins" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/test/jenkins" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/test/jenkins" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/test/jenkins" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/jenkins/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/jenkins/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/jenkins/assets" type="java-resource" />

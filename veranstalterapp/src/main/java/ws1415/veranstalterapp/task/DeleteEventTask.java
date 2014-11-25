@@ -7,7 +7,7 @@ import com.skatenight.skatenightAPI.model.Event;
 
 import java.io.IOException;
 
-import ws1415.veranstalterapp.Fragments.ShowEventsFragment;
+import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**

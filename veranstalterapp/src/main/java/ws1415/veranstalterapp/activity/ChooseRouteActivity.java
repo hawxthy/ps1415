@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Activities;
+package ws1415.veranstalterapp.activity;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
-import ws1415.veranstalterapp.Fragments.AnnounceInformationFragment;
+import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.ServiceProvider;
 

@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Activities;
+package ws1415.veranstalterapp.activity;
 
 import android.app.Activity;
 import android.content.Intent;

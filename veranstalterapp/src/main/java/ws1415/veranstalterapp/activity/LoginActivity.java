@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Activities;
+package ws1415.veranstalterapp.activity;
 
 import android.accounts.AccountManager;
 import android.app.Activity;

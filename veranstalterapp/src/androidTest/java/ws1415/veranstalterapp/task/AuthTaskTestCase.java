@@ -4,7 +4,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
-import ws1415.veranstalterapp.Activities.LoginActivity;
+import ws1415.veranstalterapp.activity.LoginActivity;
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.ServiceProvider;
 

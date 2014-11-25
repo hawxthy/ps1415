@@ -12,11 +12,11 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".Activities.HoldTabsActivity"
+            android:name=".activity.HoldTabsActivity"
             android:label="@string/title_activity_start_page"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".Activities.LoginActivity"
+            android:name=".activity.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait" >
@@ -27,21 +27,21 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.RouteEditorActivity"
+            android:name=".activity.RouteEditorActivity"
             android:label="@string/title_activity_route_editor"
-            android:parentActivityName=".Activities.HoldTabsActivity" >
+            android:parentActivityName=".activity.HoldTabsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.veranstalterapp.HoldTabsActivity" />
         </activity>
         <activity
-            android:name=".Activities.ChooseRouteActivity"
+            android:name=".activity.ChooseRouteActivity"
             android:label="@string/title_activity_choose_route"
             android:theme="@android:style/Theme.Holo.Dialog"/>
         <activity
-            android:name=".Activities.ShowRouteActivity"
+            android:name=".activity.ShowRouteActivity"
             android:label="@string/title_activity_show_route"
-            android:parentActivityName=".Activities.HoldTabsActivity" >
+            android:parentActivityName=".activity.HoldTabsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.HoldTabsActivity" />
@@ -53,13 +53,13 @@
         <activity
             android:name=".Fragments.ShowInformationActivity"
             android:label="@string/title_activity_show_information"
-            android:parentActivityName=".Activities.HoldTabsActivity" >
+            android:parentActivityName=".activity.HoldTabsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.HoldTabsActivity" />
         </activity>
         <activity
-            android:name=".Activities.EditEventActivity"
+            android:name=".activity.EditEventActivity"
             android:label="@string/title_activity_edit_event" >
         </activity>
     </application>

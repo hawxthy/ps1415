@@ -5,7 +5,7 @@
     android:gravity="center"
     android:scaleType="fitCenter"
     android:background="@drawable/background"
-    tools:context="ws1415.veranstalterapp.Activities.LoginActivity">
+    tools:context="ws1415.veranstalterapp.activity.LoginActivity">
 
 
     <Button
