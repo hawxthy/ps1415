@@ -28,7 +28,7 @@ import ws1415.ps1415.ServiceProvider;
 /**
  * Testet den Use Case "Aktuelle Informationen anzeigen".
  *
- * @author Tristan
+ * @author Tristan Rust
  */
 public class ShowCurrentInformationTest extends ActivityInstrumentationTestCase2<ShowEventsActivity> {
 
