@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Fragments;
+package ws1415.veranstalterapp.fragment;
 
 
 import android.app.AlertDialog;
@@ -13,18 +13,13 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.Event;
-import com.skatenight.skatenightAPI.model.Route;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.veranstalterapp.Activities.EditEventActivity;
-import ws1415.veranstalterapp.Activities.ShowRouteActivity;
-import ws1415.veranstalterapp.Adapter.EventsCursorAdapter;
-import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
+import ws1415.veranstalterapp.activity.EditEventActivity;
+import ws1415.veranstalterapp.adapter.EventsCursorAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.DeleteEventTask;
-import ws1415.veranstalterapp.task.EditEventTask;
 import ws1415.veranstalterapp.task.QueryEventTask;
 
 /**

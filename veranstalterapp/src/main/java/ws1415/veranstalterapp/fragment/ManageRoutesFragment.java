@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Fragments;
+package ws1415.veranstalterapp.fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -20,9 +19,9 @@ import com.skatenight.skatenightAPI.model.Route;
 import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
+import ws1415.veranstalterapp.adapter.MapsCursorAdapter;
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.Activities.ShowRouteActivity;
+import ws1415.veranstalterapp.activity.ShowRouteActivity;
 import ws1415.veranstalterapp.task.DeleteRouteTask;
 import ws1415.veranstalterapp.task.QueryRouteTask;
 

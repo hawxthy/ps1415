@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Fragments;
+package ws1415.veranstalterapp.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.Activities.RouteEditorActivity;
+import ws1415.veranstalterapp.activity.RouteEditorActivity;
 
 public class EditorMapFragment extends Fragment implements GoogleMap.OnMarkerDragListener {
     private GoogleMap googleMap;
