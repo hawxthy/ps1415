@@ -3,8 +3,7 @@ apply plugin: 'com.android.application'
 android {
     // Festlegen, welcher Build Type für die Tests genutzt werden soll. Definiert, welche Signing-
     // Configuration für das Testpaket genutzt wird.
-    testBuildType "debug"
-
+    testBuildType "jenkins"
     signingConfigs {
         release {
             keyAlias 'Skatenight-Veranstalter-App-Key'
@@ -26,13 +25,13 @@ android {
         }
     }
     compileSdkVersion 20
-    buildToolsVersion "20.0.0"
+    buildToolsVersion '20.0.0'
     defaultConfig {
-        applicationId "ws1415.veranstalterapp"
+        applicationId 'ws1415.veranstalterapp'
         minSdkVersion 15
         targetSdkVersion 20
         versionCode 1
-        versionName "1.0"
+        versionName '1.0'
     }
     buildTypes {
         release {
@@ -45,11 +44,14 @@ android {
         }
         jenkins {
             signingConfig signingConfigs.jenkins
+            debuggable true
         }
     }
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
+    }
+    productFlavors {
     }
 }
 

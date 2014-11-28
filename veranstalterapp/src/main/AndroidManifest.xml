@@ -13,6 +13,7 @@
 
         <activity
             android:name=".activity.HoldTabsActivity"
+            android:windowSoftInputMode="adjustPan"
             android:label="@string/title_activity_start_page"
             android:screenOrientation="portrait" />
         <activity

@@ -7,6 +7,7 @@ import com.skatenight.skatenightAPI.model.Field;
 
 import java.util.List;
 
+import ws1415.veranstalterapp.Adapter.AnnounceCursorAdapter;
 import ws1415.veranstalterapp.R;
 
 /**
@@ -24,7 +25,7 @@ public class EventUtils {
      *
      * @return Instanz der EventUtils Klasse
      */
-    public static EventUtils getInstance(){
+    public static EventUtils getInstance(Context context){
         if(instance == null){
             instance = new EventUtils(context);
         }

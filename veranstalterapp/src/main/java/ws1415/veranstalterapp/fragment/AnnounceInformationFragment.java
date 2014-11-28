@@ -11,11 +11,14 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
 
+import ws1415.veranstalterapp.Adapter.AnnounceCursorAdapter;
 import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.CreateEventTask;
@@ -38,23 +41,6 @@ public class AnnounceInformationFragment extends Fragment {
     private Button cancelButton;
     private Button editButton;
 
-    // Attribute für das Datum
-    private int year;
-    private int month;
-    private int day;
-
-    private Calendar cal;
-
-    static final int DATE_DIALOG_ID = 1;
-    static final int TIME_DIALOG_ID = 2;
-
-    // Attribute für die Zeit
-    private int hour;
-    private int minute;
-
-    // Das Attribut Route
-    private Route route;
-
     // das neu erstellte Event
     private Event event;
 
@@ -72,17 +58,19 @@ public class AnnounceInformationFragment extends Fragment {
 
         // Erstelle ein neues Event und füge die Standardattribute in die ArrayList ein.
         event = new Event();
-        EventUtils.getInstance().setStandardFields(event);
-        listAdapter = new AnnounceCursorAdapter(this, event.getDynamicFields());
+        event.setDynamicFields(new ArrayList<Field>());
+        EventUtils.getInstance(getActivity()).setStandardFields(event);
+        listAdapter = new AnnounceCursorAdapter(getActivity(), event.getDynamicFields());
 
-        listView = (ListView) getActivity().findViewById(R.id.fragment_announce_information_list_view);
+        listView = (ListView) view.findViewById(R.id.fragment_announce_information_list_view);
         listView.setAdapter(listAdapter);
 
-        applyButton = (Button) getActivity().findViewById(R.id.announce_info_apply_button);
-        cancelButton = (Button) getActivity().findViewById(R.id.announce_info_cancel_button);
-        editButton = (Button) getActivity().findViewById(R.id.announce_info_edit_button);
+        applyButton = (Button) view.findViewById(R.id.announce_info_apply_button);
+        cancelButton = (Button) view.findViewById(R.id.announce_info_cancel_button);
+        editButton = (Button) view.findViewById(R.id.announce_info_edit_button);
 
         setButtonListener();
+
         return view;
     }
 
@@ -141,13 +129,13 @@ public class AnnounceInformationFragment extends Fragment {
                 //if (!title.isEmpty() && !fee.isEmpty() && dTime != null && !location.isEmpty() && !description.getValue().isEmpty() && route != null) {
 
                     // Setze die Attribute vom Event
-                    EventUtils.getInstance().setEventInfo(event, listAdapter);
+                    EventUtils.getInstance(getActivity()).setEventInfo(event, listAdapter);
                     // Erstelle Event auf dem Server
                     new CreateEventTask().execute(event);
                     // Benachrichtige den Benutzer mit einem Toast
                     Toast.makeText(getActivity(), getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
                     // Setze die Attribute von Event auf den Standard
-                    EventUtils.getInstance().setStandardFields(event);
+                    EventUtils.getInstance(getActivity()).setStandardFields(event);
 
                     // Update die Informationen in ShowInformationFragment
                     HoldTabsActivity.updateInformation();
@@ -172,7 +160,7 @@ public class AnnounceInformationFragment extends Fragment {
     public void cancelInfo(boolean allSet) {
         if (allSet) {
             Toast.makeText(getActivity(), "Wurde noch nicht erstellt", Toast.LENGTH_LONG).show();
-            EventUtils.getInstance().setStandardFields(event);
+            EventUtils.getInstance(getActivity()).setStandardFields(event);
         } else {
             Toast.makeText(getActivity(), "Nicht alle Felder ausgefüllt", Toast.LENGTH_LONG).show();
         }
@@ -184,7 +172,7 @@ public class AnnounceInformationFragment extends Fragment {
      * @param selectedRoute Die Route für das Event
      */
     public void setRoute(Route selectedRoute) {
-        route = selectedRoute;
+        //route = selectedRoute;
         //routePickerButton.setText(selectedRoute.getName());
     }
 }

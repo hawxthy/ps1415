@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.skatenight.skatenightAPI.model.Field;
 
-import ws1415.veranstalterapp.fragment.AnnounceInformationFragment.TYPE;
+import ws1415.veranstalterapp.util.EventUtils.TYPE;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
      * @param context Context, von dem aus der Adapter aufgerufen wird
      * @param fieldList Liste von den Routen
      */
-    public AnnounceCursorAdapter(Context context, ArrayList<Field> fieldList){
+    public AnnounceCursorAdapter(Context context, List<Field> fieldList){
         this.context = context;
         this.fieldList = fieldList;
     }
