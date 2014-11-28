@@ -6,7 +6,7 @@
     android:paddingRight="0dp"
     android:paddingTop="0dp"
     android:paddingBottom="0dp"
-    tools:context="ws1415.ps1415.Activities.ShowRouteActivity">
+    tools:context="ws1415.ps1415.activities.ShowRouteActivity">
 
     <fragment
         android:layout_width="match_parent"

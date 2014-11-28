@@ -4,11 +4,9 @@ import android.os.AsyncTask;
 import com.skatenight.skatenightAPI.model.Event;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.veranstalterapp.Fragments.ShowEventsFragment;
-import ws1415.veranstalterapp.Fragments.ShowInformationActivity;
+import ws1415.veranstalterapp.fragments.ShowEventsFragment;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**

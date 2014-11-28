@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.Activities.ShowInformationActivity;
+import ws1415.ps1415.activities.ShowInformationActivity;
 
 /**
  * TestCase für QueryEventTask.

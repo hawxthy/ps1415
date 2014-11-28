@@ -35,5 +35,4 @@ public class UpdateLocationTask extends AsyncTask<Void, Void, Void> {
         }
         return null;
     }
-
 }

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="ws1415.veranstalterapp.Fragments.ManageRoutesFragment">
+    tools:context="ws1415.veranstalterapp.fragments.ManageRoutesFragment">
 
     <ListView
         android:id="@+id/manage_routes_route_list"

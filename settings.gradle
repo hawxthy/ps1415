@@ -1,1 +1,1 @@
-include ':veranstalterapp', ':SkatenightBackend', ':app'
+include ':veranstalterapp', ':SkatenightBackend', ':app', ':common'

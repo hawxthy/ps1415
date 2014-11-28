@@ -1,12 +1,11 @@
 package ws1415.ps1415.task;
 
-import android.os.AsyncTask;
-
 import com.skatenight.skatenightAPI.model.Event;
 
 import java.io.IOException;
 
-import ws1415.ps1415.Activities.ShowInformationActivity;
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.ps1415.ServiceProvider;
 
 /**
@@ -14,12 +13,11 @@ import ws1415.ps1415.ServiceProvider;
  *
  * Created by Bernd Eissing, Martin Wrodarczyk on 04.11.2014.
  */
-public class GetEventTask extends AsyncTask<Long, Void, Event> {
-    private ShowInformationActivity sia;
+public class GetEventTask extends ExtendedTask<Long, Void, Event> {
     private Event event;
 
-    public GetEventTask(ShowInformationActivity sia) {
-        this.sia = sia;
+    public GetEventTask(ExtendedTaskDelegate delegate) {
+        super(delegate);
     }
 
     /**
@@ -34,12 +32,8 @@ public class GetEventTask extends AsyncTask<Long, Void, Event> {
             return ServiceProvider.getService().skatenightServerEndpoint().getEvent(keyId).execute();
         } catch (IOException e) {
             e.printStackTrace();
+            publishError(e.getMessage());
+            return null;
         }
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Event event){
-        sia.setEventInformation(event);
     }
 }

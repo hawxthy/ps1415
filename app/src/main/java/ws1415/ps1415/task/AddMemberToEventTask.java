@@ -1,32 +1,33 @@
 package ws1415.ps1415.task;
 
-import android.os.AsyncTask;
-import android.util.Log;
-
 import com.skatenight.skatenightAPI.model.Event;
 
 import java.io.IOException;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.ps1415.ServiceProvider;
 
 /**
  * Created by Daniel on 21.11.2014.
  */
-public class AddMemberToEventTask extends AsyncTask<String, Void, Void> {
+public class AddMemberToEventTask extends ExtendedTask<Void, Void, Void> {
     private Event event;
+    private String email;
 
-    public AddMemberToEventTask(Event event) {
+    public AddMemberToEventTask(ExtendedTaskDelegate delegate, Event event, String email) {
+        super(delegate);
         this.event = event;
+        this.email = email;
     }
 
     @Override
-    protected Void doInBackground(String... params) {
-        String email = params[0];
+    protected Void doInBackground(Void... params) {
         try {
             ServiceProvider.getService().skatenightServerEndpoint().addMemberToEvent(this.event.getKey().getId(), email).execute();
         } catch (IOException e) {
-            Log.e("ERRR", "error");
             e.printStackTrace();
+            publishError(e.getMessage());
         }
         return null;
     }

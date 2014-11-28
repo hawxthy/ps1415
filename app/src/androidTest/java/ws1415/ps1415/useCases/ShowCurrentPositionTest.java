@@ -5,13 +5,8 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.test.ActivityInstrumentationTestCase2;
-import android.widget.Button;
-import android.widget.TextView;
 
-import ws1415.ps1415.Activities.ShowInformationActivity;
-import ws1415.ps1415.Activities.ShowRouteActivity;
-import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.activities.ShowRouteActivity;
 
 /**
  * Testet den Use Case "Anzeigen der aktuellen Position".

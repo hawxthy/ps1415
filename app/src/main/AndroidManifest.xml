@@ -12,13 +12,18 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".Activities.ShowInformationActivity"
+            android:name=".activities.ShowInformationActivity"
             android:label="@string/title_activity_showinformation"
-            android:exported="true"></activity>
+            android:exported="true"
+            android:parentActivityName=".activities.ShowEventsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.ShowEventsActivity" />
+        </activity>
         <activity
-            android:name=".Activities.ShowRouteActivity"
+            android:name=".activities.ShowRouteActivity"
             android:label="@string/title_activity_show_route"
-            android:parentActivityName=".Activities.ShowInformationActivity">
+            android:parentActivityName=".activities.ShowInformationActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.ShowInformationActivity" />
@@ -30,7 +35,7 @@
             android:exported="true"></service>
 
         <activity
-            android:name=".Activities.ShowEventsActivity"
+            android:name=".activities.ShowEventsActivity"
             android:label="@string/title_activity_show_events">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

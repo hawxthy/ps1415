@@ -10,7 +10,7 @@ import com.google.api.client.util.DateTime;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
-import ws1415.veranstalterapp.Fragments.ShowInformationActivity;
+import ws1415.veranstalterapp.fragments.ShowInformationActivity;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**

@@ -175,13 +175,16 @@ public class SkatenightServerEndpoint {
             m.setLongitude(longitude);
             m.setUpdatedAt(new Date());
 
+
+            List<Event> myEvents = getCurrentEventsForMember(mail);
+
             // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
             if (System.currentTimeMillis()-lastFieldUpdateTime >= 300000) {
-                List<Event> myEvents = getCurrentEventsForMember(mail);
-
-
+                for (Event event : myEvents) {
+                    calculateField(event.getKey().getId());
+                }
+                lastFieldUpdateTime = System.currentTimeMillis();
             }
-
             PersistenceManager pm = pmf.getPersistenceManager();
             try {
                 pm.makePersistent(m);
@@ -314,15 +317,13 @@ public class SkatenightServerEndpoint {
 
     public List<Event> getCurrentEventsForMember(@Named("email") String email) {
         // TODO: Nur Events ausgeben die auch JETZT stattfinden.
-        List<Event> out = new ArrayList();
-
+        List<Event> out = new ArrayList<Event>();
         List<Event> eventList = getAllEvents();
         for (Event e : eventList) {
-            if (e.getMemberList().contains(email)) {
+            if (e.getMemberList() != null && e.getMemberList().contains(email)) {
                 out.add(e);
             }
         }
-
         return out;
     }
 

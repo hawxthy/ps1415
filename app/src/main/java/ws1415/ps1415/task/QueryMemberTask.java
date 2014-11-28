@@ -9,7 +9,7 @@ import com.skatenight.skatenightAPI.model.Member;
 import java.io.IOException;
 
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.Activities.ShowRouteActivity;
+import ws1415.ps1415.activities.ShowRouteActivity;
 
 /**
  * Created by Tristan Rust on 21.10.2014.

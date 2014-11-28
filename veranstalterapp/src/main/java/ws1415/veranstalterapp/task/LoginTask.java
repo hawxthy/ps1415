@@ -8,8 +8,8 @@ import com.skatenight.skatenightAPI.model.BooleanWrapper;
 
 import java.io.IOException;
 
-import ws1415.veranstalterapp.Activities.HoldTabsActivity;
-import ws1415.veranstalterapp.Activities.LoginActivity;
+import ws1415.veranstalterapp.activities.HoldTabsActivity;
+import ws1415.veranstalterapp.activities.LoginActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.ServiceProvider;
 
