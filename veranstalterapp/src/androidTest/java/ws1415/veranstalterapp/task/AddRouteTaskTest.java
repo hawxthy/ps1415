@@ -1,5 +1,7 @@
 package ws1415.veranstalterapp.task;
 
+import android.app.Service;
+
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
