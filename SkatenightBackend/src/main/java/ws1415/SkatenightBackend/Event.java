@@ -1,14 +1,19 @@
 package ws1415.SkatenightBackend;
 
+import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 import com.google.appengine.datanucleus.annotations.Unowned;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonCreator;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonProperty;
 
 import java.awt.Image;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -29,6 +34,8 @@ public class Event{
     @Persistent
     private Date date;
     @Persistent
+    private Date time;
+    @Persistent
     private String fee;
     @Persistent
     private String location;
@@ -39,7 +46,7 @@ public class Event{
     private Route route;
 
     // Dynamische ArrayListe von dynamischen Komponenten
-    @Persistent
+    @Persistent(serialized = "true", defaultFetchGroup = "true")
     private ArrayList<Field> dynamicFields;
 
     public Key getKey() {
@@ -54,57 +61,42 @@ public class Event{
         return (String)getUniqueField(TYPE.TITLE).getValue();
     }
 
-    //public void setTitle(String title) {
-    //    this.title = title;
-    //}
-
-    public Date getDate() {
-        Date time = (Date)getUniqueField(TYPE.TIME).getValue();
-        Date date = (Date)getUniqueField(TYPE.DATE).getValue();
-        Calendar cal1 = Calendar.getInstance();
-        cal1.setTime(date);
-        Calendar cal2 = Calendar.getInstance();
-        cal2.setTime(time);
-        cal1.set(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
-        cal1.set(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
-        return cal1.getTime();
+    public void setDate(Date date){
+        getUniqueField(TYPE.DATE).setValue(date);
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public Date getDate(){
+        return (Date)getUniqueField(TYPE.DATE).getValue();
+    }
+
+    public void setTime(Date time){
+        getUniqueField(TYPE.TIME).setValue(time);
+    }
+
+    public Date getTime(){
+        return (Date)getUniqueField(TYPE.TIME).getValue();
     }
 
     public String getFee() {
         return (String)getUniqueField(TYPE.FEE).getValue();
     }
 
-    public void setFee(String fee) {
-        this.fee = fee;
-    }
-
     public String getLocation() {
         return  (String)getUniqueField(TYPE.LOCATION).getValue();
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public Text getDescription() {
         return  (Text)getUniqueField(TYPE.DESCRIPTION).getValue();
     }
 
-    public void setDescription(Text description) {
-        this.description = description;
+    public void setRoute(Route route){
+        this.route = route;
     }
 
     public Route getRoute() {
-        return  (Route)getUniqueField(TYPE.ROUTE).getValue();
+        return  route;
     }
 
-    public void setRoute(Route route) {
-        this.route = route;
-    }
 
     /**
      * Methode zum finden von eindeutigen Feldern
@@ -121,16 +113,6 @@ public class Event{
         return null;
     }
 
-    /**
-     * Fügt ein Field der ListView in AnnounceInformationFragment mit leerem Inhalt hinzu.
-     *
-     * @param title Titel des DateFields
-     * @param type Der Type des Feldes
-     */
-    public void addField(String title, TYPE type){
-        Field tmpField = new Field(title, type);
-        dynamicFields.add(tmpField);
-    }
 
     public ArrayList<Field> getDynamicFields(){
         return dynamicFields;
@@ -146,14 +128,19 @@ public class Event{
     /**
      * Klasse für die Informationsfelder einer Veranstaltung
      */
-    private class Field{
+    public class Field implements Serializable {
         private String title;
         private Object value;
+        private Blob byteData;
         private TYPE type;
 
         public Field(String title, TYPE type){
             this.title = title;
             this.type = type;
+        }
+
+        @JsonCreator
+        public Field() {
         }
 
         public Object getValue() {
@@ -172,8 +159,20 @@ public class Event{
             this.title = title;
         }
 
+        public Blob getByteData() {
+            return byteData;
+        }
+
+        public void setByteData(Blob byteData) {
+            this.byteData = byteData;
+        }
+
         public TYPE getType(){
             return type;
+        }
+
+        public void setType(TYPE type){
+            this.type = type;
         }
     }
 }

@@ -133,14 +133,14 @@ public class AnnounceCursorAdapter extends BaseAdapter {
             holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
             holder.title.setText(getItem(position).getTitle());
             // @TODO SET BUTTON LISTENER AND BUTTONTEXT FÜR SET DATE
-        } else if(getItem(position).getType().equals(TYPE.TIME)){
+        } else if(getItem(position).getType().equals(TYPE.TIME.name())){
             HolderButtonField holder = new HolderButtonField();
             view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
             holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
             holder.title.setText(getItem(position).getTitle());
             // @TODO SET BUTTON LISTENER AND BUTTONTEXT FÜR SET TIME
-        } else if(getItem(position).getType().equals(TYPE.ROUTE)){
+        } else if(getItem(position).getType().equals(TYPE.ROUTE.name())){
             HolderButtonField holder = new HolderButtonField();
             view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
