@@ -150,4 +150,12 @@ public class AnnounceCursorAdapter extends BaseAdapter {
         }
         return view;
     }
+
+    public void startEditMode(){
+
+    }
+
+    public void exitEditMode(){
+
+    }
 }
