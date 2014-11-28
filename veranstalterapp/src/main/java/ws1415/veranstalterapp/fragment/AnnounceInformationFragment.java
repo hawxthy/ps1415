@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -124,24 +125,28 @@ public class AnnounceInformationFragment extends Fragment {
         builder.setMessage(R.string.areyousure);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                int titleId = EventUtils.getInstance(getActivity()).getUniqueFieldId(EventUtils.TYPE.TITLE, event);
 
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                //if (!title.isEmpty() && !fee.isEmpty() && dTime != null && !location.isEmpty() && !description.getValue().isEmpty() && route != null) {
+                if (titleId != -1 && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_simpletext_editText)).getText().toString().isEmpty()){
 
                     // Setze die Attribute vom Event
-                    EventUtils.getInstance(getActivity()).setEventInfo(event, listAdapter);
+                    EventUtils.getInstance(getActivity()).setEventInfo(event, listView);
+
                     // Erstelle Event auf dem Server
                     new CreateEventTask().execute(event);
+
                     // Benachrichtige den Benutzer mit einem Toast
                     Toast.makeText(getActivity(), getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
+
                     // Setze die Attribute von Event auf den Standard
                     EventUtils.getInstance(getActivity()).setStandardFields(event);
 
                     // Update die Informationen in ShowInformationFragment
                     HoldTabsActivity.updateInformation();
-                //} else {
-                  //  cancelInfo(false);
-                //}
+                } else {
+                    cancelInfo(false);
+                }
 
             }
         });
@@ -161,8 +166,9 @@ public class AnnounceInformationFragment extends Fragment {
         if (allSet) {
             Toast.makeText(getActivity(), "Wurde noch nicht erstellt", Toast.LENGTH_LONG).show();
             EventUtils.getInstance(getActivity()).setStandardFields(event);
+            listAdapter.notifyDataSetChanged();
         } else {
-            Toast.makeText(getActivity(), "Nicht alle Felder ausgefüllt", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Nicht alle notwendigen Felder ausgefüllt", Toast.LENGTH_LONG).show();
         }
     }
 
