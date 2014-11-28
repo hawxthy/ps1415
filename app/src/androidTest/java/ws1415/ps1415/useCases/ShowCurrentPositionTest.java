@@ -6,7 +6,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.test.ActivityInstrumentationTestCase2;
 
-import ws1415.ps1415.activities.ShowRouteActivity;
+import ws1415.ps1415.Activities.ShowRouteActivity;
 
 /**
  * Testet den Use Case "Anzeigen der aktuellen Position".

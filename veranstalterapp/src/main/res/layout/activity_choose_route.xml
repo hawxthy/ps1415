@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="ws1415.veranstalterapp.activities.ChooseRouteActivity">
+    tools:context="ws1415.veranstalterapp.Activities.ChooseRouteActivity">
 
     <ListView
         android:id="@+id/choose_routes_list"

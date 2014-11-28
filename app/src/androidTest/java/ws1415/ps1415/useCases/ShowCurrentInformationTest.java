@@ -11,7 +11,7 @@ import com.skatenight.skatenightAPI.model.Text;
 
 import java.util.Date;
 
-import ws1415.ps1415.activities.ShowInformationActivity;
+import ws1415.ps1415.Activities.ShowInformationActivity;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 

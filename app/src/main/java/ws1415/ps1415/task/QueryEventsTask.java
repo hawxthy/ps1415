@@ -8,7 +8,7 @@ import java.util.List;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.activities.ShowEventsActivity;
+import ws1415.ps1415.Activities.ShowEventsActivity;
 
 /**
  * Created by Richard on 21.10.2014.

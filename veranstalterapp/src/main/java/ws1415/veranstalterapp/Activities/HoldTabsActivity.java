@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import ws1415.veranstalterapp.Adapter.TabsPagerAdapter;
 import ws1415.veranstalterapp.AddRouteDialog;
 import ws1415.veranstalterapp.Fragments.ShowEventsFragment;
-import ws1415.veranstalterapp.Fragments.ShowInformationActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.QueryEventTask;
 

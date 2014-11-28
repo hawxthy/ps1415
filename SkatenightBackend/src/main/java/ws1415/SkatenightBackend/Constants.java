@@ -22,4 +22,16 @@ public class Constants {
      * end über Webaufrufe realisiert ist.
      */
     public static final String ANDROID_AUDIENCE = WEB_CLIENT_ID;
+
+    /**
+     * Definiert die maximale Entfernung in m die ein Skater von einem nächsten Wegpunkt entfernt
+     * sein darf um zu diesem zu gehören.
+     */
+    public static final float MAX_NEXT_WAYPOINT_DISTANCE = 10.0f;
+
+    /**
+     * Definiert die maximale Entfernung in m die ein Skater von einem beliebigen Wegpunkt entfernt
+     * sein darf um zu diesem zu gehören.
+     */
+    public static final float MAX_ANY_WAYPOINT_DISTANCE = 50.0f;
 }
