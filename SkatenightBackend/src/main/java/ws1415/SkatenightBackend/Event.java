@@ -118,6 +118,7 @@ public class Event{
     }
 
     public ArrayList<String> getMemberList() {
-        return this.memberList;
+        if (this.memberList == null) return new ArrayList();
+        else return this.memberList;
     }
 }

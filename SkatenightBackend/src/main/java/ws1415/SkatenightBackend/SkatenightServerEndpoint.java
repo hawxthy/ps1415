@@ -175,22 +175,65 @@ public class SkatenightServerEndpoint {
             m.setLongitude(longitude);
             m.setUpdatedAt(new Date());
 
-
-            List<Event> myEvents = getCurrentEventsForMember(mail);
+            calculateCurrentWaypoint(m);
 
             // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
+            /*
             if (System.currentTimeMillis()-lastFieldUpdateTime >= 300000) {
                 for (Event event : myEvents) {
                     calculateField(event.getKey().getId());
                 }
-                lastFieldUpdateTime = System.currentTimeMillis();
+                //lastFieldUpdateTime = System.currentTimeMillis();
+            }*/
+            /*
+            for (Event event : myEvents) {
+                calculateField(event.getKey().getId());
             }
+            */
             PersistenceManager pm = pmf.getPersistenceManager();
             try {
                 pm.makePersistent(m);
             } finally {
                 pm.close();
             }
+        }
+    }
+
+    private void calculateCurrentWaypoint(Member member) {
+        Event event = member.getCurrentEvent();
+        if (event != null) {
+            Integer currentWaypoint = member.getCurrentWaypoint();
+            if (currentWaypoint == null) {
+                member.setCurrentWaypoint(0);
+            }
+            else {
+                List<RoutePoint> points = event.getRoute().getRoutePoints();
+                if (currentWaypoint < points.size()-1) {
+                    RoutePoint current = points.get(currentWaypoint);
+                    RoutePoint next = points.get(currentWaypoint+1);
+                    float distanceCurrent = distance(current.getLatitude(), current.getLongitude(), member.getLatitude(), member.getLongitude());
+                    float distanceNext = distance(next.getLatitude(), next.getLongitude(), member.getLatitude(), member.getLongitude());
+                    if (distanceNext < distanceCurrent) {
+                        if (distanceNext < Constants.MAX_NEXT_WAYPOINT_DISTANCE) {
+                            member.setCurrentWaypoint(currentWaypoint+1);
+                        }
+                        else {
+                            // Den nächsten Wegpunkt finden:
+                            for (int i = currentWaypoint; i < points.size(); i++) {
+                                float distance = distance(
+                                        member.getLatitude(), member.getLongitude(),
+                                        points.get(i).getLatitude(), points.get(i).getLongitude());
+
+                                if (distance < Constants.MAX_ANY_WAYPOINT_DISTANCE) {
+                                    member.setCurrentWaypoint(i);
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+
         }
     }
 
@@ -320,7 +363,7 @@ public class SkatenightServerEndpoint {
         List<Event> out = new ArrayList<Event>();
         List<Event> eventList = getAllEvents();
         for (Event e : eventList) {
-            if (e.getMemberList() != null && e.getMemberList().contains(email)) {
+            if (e.getMemberList().contains(email)) {
                 out.add(e);
             }
         }
@@ -361,7 +404,6 @@ public class SkatenightServerEndpoint {
         Event event = getEvent(keyId);
 
         ArrayList<String> memberKeys = event.getMemberList();
-        if (memberKeys == null) memberKeys = new ArrayList<String>();
         if (!memberKeys.contains(email)) {
             memberKeys.add(email);
             event.setMemberList(memberKeys);
