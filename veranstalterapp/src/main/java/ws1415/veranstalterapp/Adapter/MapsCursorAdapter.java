@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.task.QueryRouteTask;
 
 /**
  * Klasse zum füllen er ListView in ManageRoutesFragment.

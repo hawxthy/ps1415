@@ -26,7 +26,7 @@ import java.util.List;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryMemberTask;
-import ws1415.ps1415.util.LocationUtils;
+import ws1415.common.util.LocationUtils;
 
 /**
  * Zeigt die Strecke des aktuellen Events auf einer Karte an.
@@ -107,8 +107,9 @@ public class ShowRouteActivity extends Activity {
                     fieldFirst = intent.getIntExtra(EXTRA_ROUTE_FIELD_FIRST, 0);
                 }
                 if (intent.hasExtra(EXTRA_ROUTE_FIELD_LAST)) {
-                    fieldFirst = intent.getIntExtra(EXTRA_ROUTE_FIELD_LAST, 0);
+                    fieldLast = intent.getIntExtra(EXTRA_ROUTE_FIELD_LAST, 0);
                 }
+                Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();
             }
             catch (ParseException e) {
                 Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
@@ -120,6 +121,8 @@ public class ShowRouteActivity extends Activity {
 
         // Ruft die aktuellen Memberinformationen ab
         new QueryMemberTask().execute((ShowRouteActivity) this);
+
+        //new UpdateLocationTask("pascal.otto@googlemail.com", 0.0, 0.0).execute();
     }
 
     @Override
@@ -167,6 +170,10 @@ public class ShowRouteActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        }
         if (id == R.id.action_settings) {
             return true;
         }

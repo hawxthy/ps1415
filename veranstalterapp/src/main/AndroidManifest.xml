@@ -12,11 +12,11 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".activities.HoldTabsActivity"
+            android:name=".Activities.HoldTabsActivity"
             android:label="@string/title_activity_start_page"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".activities.LoginActivity"
+            android:name=".Activities.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait">
@@ -27,21 +27,21 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.RouteEditorActivity"
+            android:name=".Activities.RouteEditorActivity"
             android:label="@string/title_activity_route_editor"
-            android:parentActivityName=".activities.HoldTabsActivity">
+            android:parentActivityName=".Activities.HoldTabsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.veranstalterapp.HoldTabsActivity" />
         </activity>
         <activity
-            android:name=".activities.ChooseRouteActivity"
+            android:name=".Activities.ChooseRouteActivity"
             android:label="@string/title_activity_choose_route"
             android:theme="@android:style/Theme.Holo.Dialog"></activity>
         <activity
-            android:name=".activities.ShowRouteActivity"
+            android:name=".Activities.ShowRouteActivity"
             android:label="@string/title_activity_show_route"
-            android:parentActivityName=".activities.HoldTabsActivity">
+            android:parentActivityName=".Activities.HoldTabsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.HoldTabsActivity" />
@@ -51,9 +51,9 @@
             android:label="@string/title_activity_add_route_dialog"
             android:theme="@android:style/Theme.Holo.Dialog"></activity>
         <activity
-            android:name=".fragments.ShowInformationActivity"
+            android:name=".Fragments.ShowInformationActivity"
             android:label="@string/title_activity_show_information"
-            android:parentActivityName=".activities.HoldTabsActivity">
+            android:parentActivityName=".Activities.HoldTabsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.HoldTabsActivity" />

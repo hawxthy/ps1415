@@ -5,14 +5,12 @@ package ws1415.veranstalterapp.Fragments;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.TextView;
 import com.skatenight.skatenightAPI.model.Event;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import ws1415.veranstalterapp.Activities.HoldTabsActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.GetEventTask;
 

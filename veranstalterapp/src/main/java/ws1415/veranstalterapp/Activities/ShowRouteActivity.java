@@ -19,7 +19,7 @@ import java.text.ParseException;
 import java.util.List;
 
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.util.LocationUtils;
+import ws1415.common.util.LocationUtils;
 
 /**
  * Activity zum Anzeigen einer Route in einer Map.
