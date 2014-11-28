@@ -33,6 +33,12 @@
                 android:text="@string/announce_info_cancel_button" />
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/announce_info_edit_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/announce_info_start_edit_button"/>
     </LinearLayout>
 </ScrollView>
 
