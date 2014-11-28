@@ -1,14 +1,19 @@
 package ws1415.SkatenightBackend;
 
+import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 import com.google.appengine.datanucleus.annotations.Unowned;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonCreator;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonProperty;
 
 import java.awt.Image;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -39,7 +44,7 @@ public class Event{
     private Route route;
 
     // Dynamische ArrayListe von dynamischen Komponenten
-    @Persistent
+    @Persistent(serialized = "true", defaultFetchGroup = "true")
     private ArrayList<Field> dynamicFields;
 
     public Key getKey() {
@@ -51,7 +56,12 @@ public class Event{
     }
 
     public String getTitle() {
-        return (String)getUniqueField(TYPE.TITLE).getValue();
+        Field f = getUniqueField(TYPE.TITLE);
+        if (f != null) {
+            return (String)getUniqueField(TYPE.TITLE).getValue();
+        } else {
+            return null;
+        }
     }
 
     //public void setTitle(String title) {
@@ -75,7 +85,12 @@ public class Event{
     }
 
     public String getFee() {
-        return (String)getUniqueField(TYPE.FEE).getValue();
+        Field f = getUniqueField(TYPE.FEE);
+        if (f != null) {
+            return (String)getUniqueField(TYPE.FEE).getValue();
+        } else {
+            return null;
+        }
     }
 
     public void setFee(String fee) {
@@ -83,7 +98,12 @@ public class Event{
     }
 
     public String getLocation() {
-        return  (String)getUniqueField(TYPE.LOCATION).getValue();
+        Field f = getUniqueField(TYPE.LOCATION);
+        if (f != null) {
+            return (String)getUniqueField(TYPE.LOCATION).getValue();
+        } else {
+            return null;
+        }
     }
 
     public void setLocation(String location) {
@@ -91,7 +111,12 @@ public class Event{
     }
 
     public Text getDescription() {
-        return  (Text)getUniqueField(TYPE.DESCRIPTION).getValue();
+        Field f = getUniqueField(TYPE.DESCRIPTION);
+        if (f != null) {
+            return (Text)getUniqueField(TYPE.DESCRIPTION).getValue();
+        } else {
+            return null;
+        }
     }
 
     public void setDescription(Text description) {
@@ -99,7 +124,12 @@ public class Event{
     }
 
     public Route getRoute() {
-        return  (Route)getUniqueField(TYPE.ROUTE).getValue();
+        Field f = getUniqueField(TYPE.ROUTE);
+        if (f != null) {
+            return (Route)getUniqueField(TYPE.ROUTE).getValue();
+        } else {
+            return null;
+        }
     }
 
     public void setRoute(Route route) {
@@ -129,6 +159,9 @@ public class Event{
      */
     public void addField(String title, TYPE type){
         Field tmpField = new Field(title, type);
+        if (dynamicFields == null) {
+            dynamicFields = new ArrayList<Field>();
+        }
         dynamicFields.add(tmpField);
     }
 
@@ -146,14 +179,19 @@ public class Event{
     /**
      * Klasse für die Informationsfelder einer Veranstaltung
      */
-    private class Field{
+    private class Field implements Serializable {
         private String title;
         private Object value;
+        private Blob byteData;
         private TYPE type;
 
         public Field(String title, TYPE type){
             this.title = title;
             this.type = type;
+        }
+
+        @JsonCreator
+        public Field() {
         }
 
         public Object getValue() {
@@ -172,8 +210,20 @@ public class Event{
             this.title = title;
         }
 
+        public Blob getByteData() {
+            return byteData;
+        }
+
+        public void setByteData(Blob byteData) {
+            this.byteData = byteData;
+        }
+
         public TYPE getType(){
             return type;
+        }
+
+        public void setType(TYPE type) {
+            this.type = type;
         }
     }
 }
