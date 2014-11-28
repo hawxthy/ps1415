@@ -1,14 +1,19 @@
 package ws1415.SkatenightBackend;
 
+import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 import com.google.appengine.datanucleus.annotations.Unowned;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonCreator;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonProperty;
 
 import java.awt.Image;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -41,7 +46,7 @@ public class Event{
     private Route route;
 
     // Dynamische ArrayListe von dynamischen Komponenten
-    @Persistent
+    @Persistent(serialized = "true", defaultFetchGroup = "true")
     private ArrayList<Field> dynamicFields;
 
     public Key getKey() {
@@ -116,22 +121,26 @@ public class Event{
     /**
      * Enum um die Felder zu spezifizieren.
      */
-    private enum TYPE{
+    public enum TYPE{
         SIMPLETEXT, FEE, DATE, TIME, ROUTE, PICTURE, LINK, TITLE, LOCATION, DESCRIPTION
     }
-
 
     /**
      * Klasse für die Informationsfelder einer Veranstaltung
      */
-    public class Field{
+    public class Field implements Serializable {
         private String title;
         private Object value;
+        private Blob byteData;
         private TYPE type;
 
         public Field(String title, TYPE type){
             this.title = title;
             this.type = type;
+        }
+
+        @JsonCreator
+        public Field() {
         }
 
         public Object getValue() {
@@ -148,6 +157,14 @@ public class Event{
 
         public void setTitle(String title) {
             this.title = title;
+        }
+
+        public Blob getByteData() {
+            return byteData;
+        }
+
+        public void setByteData(Blob byteData) {
+            this.byteData = byteData;
         }
 
         public TYPE getType(){
