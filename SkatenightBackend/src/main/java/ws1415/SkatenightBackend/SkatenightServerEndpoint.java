@@ -237,30 +237,58 @@ public class SkatenightServerEndpoint {
         }
     }
 
+    /**
+     * Berechnet anhand der aktuellen Positionen der Member das Feld.
+     * Wobei das Feld um den Wegpunkte herum gebaut wird, welcher die meisten Member enthält
+     * @param id event Id
+     */
     private void calculateField(@Named("id") long id) {
         PersistenceManager pm = pmf.getPersistenceManager();
         Event event = getEvent(id);
         List<RoutePoint> points = event.getRoute().getRoutePoints();
         List<Member> members = getMembersFromEvent(event.getKey().getId());
 
-        int first = points.size()-1;
-        int last = 0;
-
+        // array erstellen welches an der stelle n die Anzahl der Member enthält welche am RoutePoint n sind.
         int memberCountPerRoutePoint[] = new int[points.size()];
-
         for (Member member : members) {
             memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()]+1;
         }
 
-        int mostMemberPerIndex = -1;
-        
+        // Den index des RoutePoints speichern an welchen die meisten Member sind.
+        int mostMemberPerWaypoint = -1;
+        int mostMemberIndex = 0;
         for (int i=0;i<memberCountPerRoutePoint.length;i++) {
-            if (memberCountPerRoutePoint[i] > mostMemberPerIndex) {
-                mostMemberPerIndex = memberCountPerRoutePoint[i];
-
+            if (memberCountPerRoutePoint[i] > mostMemberPerWaypoint) {
+                mostMemberPerWaypoint = memberCountPerRoutePoint[i];
+                mostMemberIndex = i;
             }
         }
 
+        // Vom mostMemberIndex rückwärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
+        // als 5 Member haben
+        int first = mostMemberIndex;
+        while (first > 0) {
+            if (memberCountPerRoutePoint[first-1] >=5) {
+                first--;
+            } else if(memberCountPerRoutePoint[first-2] >=5 && first > 1) {
+                first-=2;
+            } else {
+                break;
+            }
+        }
+
+        // Vom mostMemberIndex vorwaärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
+        // als 5 Member haben
+        int last = mostMemberIndex;
+        while (last < memberCountPerRoutePoint.length) {
+            if (memberCountPerRoutePoint[last+1] >=5) {
+                last++;
+            } else if(memberCountPerRoutePoint[last+2] >=5 && last < memberCountPerRoutePoint.length-1) {
+                last+=2;
+            } else {
+                break;
+            }
+        }
 
         event.setRouteFieldFirst(first);
         event.setRouteFieldLast(last);
