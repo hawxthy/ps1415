@@ -203,24 +203,21 @@ public class SkatenightServerEndpoint {
         int first = points.size()-1;
         int last = 0;
 
+        int memberCountPerRoutePoint[] = new int[points.size()];
+
         for (Member member : members) {
-            int closestIndex = -1;
-            float minDistance = Float.POSITIVE_INFINITY;
-            for (int i = 0; i < points.size(); i++) {
-                float distance = distance(
-                        member.getLatitude(), member.getLongitude(),
-                        points.get(i).getLatitude(), points.get(i).getLongitude());
-
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestIndex = i;
-                }
-            }
-
-            if (closestIndex < first) first = closestIndex;
-            if (closestIndex > last) last = closestIndex;
-
+            memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()]+1;
         }
+
+        int mostMemberPerIndex = -1;
+        
+        for (int i=0;i<memberCountPerRoutePoint.length;i++) {
+            if (memberCountPerRoutePoint[i] > mostMemberPerIndex) {
+                mostMemberPerIndex = memberCountPerRoutePoint[i];
+
+            }
+        }
+
 
         event.setRouteFieldFirst(first);
         event.setRouteFieldLast(last);
