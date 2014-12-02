@@ -206,6 +206,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_picture_textView);
                 holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_picture_button);
                 holder.deleteButton = (Button) view.findViewById(R.id.list_view_item_announce_information_picture_deleteButton);
+                if(!edit_mode) holder.deleteButton.setVisibility(View.GONE);
                 holder.title.setText(getItem(position).getTitle());
                 final int pos = position;
                 holder.deleteButton.setOnClickListener(new OnClickListener() {
@@ -222,6 +223,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_simpletext_textView);
                 holder.deleteButton = (Button) view.findViewById(R.id.list_view_item_announce_information_simpletext_deleteButton);
                 holder.title.setText(getItem(position).getTitle());
+                if(!edit_mode) holder.deleteButton.setVisibility(View.GONE);
                 final int pos = position;
                 holder.deleteButton.setOnClickListener(new OnClickListener() {
                     @Override
