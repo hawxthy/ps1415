@@ -2,6 +2,7 @@ package ws1415.ps1415;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.SkatenightAPI;
 
 /**
@@ -28,4 +29,11 @@ public abstract class ServiceProvider {
         return service;
     }
 
+    public static void login(GoogleAccountCredential credential) {
+        SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                new AndroidJsonFactory(), credential);
+        builder.setRootUrl(Constants.API_URL);
+        service = builder.build();
+    }
 }

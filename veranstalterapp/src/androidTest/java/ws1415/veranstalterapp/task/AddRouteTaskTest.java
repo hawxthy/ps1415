@@ -1,5 +1,8 @@
 package ws1415.veranstalterapp.task;
 
+import android.app.Service;
+
+import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
@@ -42,6 +45,16 @@ public class AddRouteTaskTest extends AuthTaskTestCase {
      */
     public void setUp() throws Exception {
         super.setUp();
+
+        // Bestehende Events löschen
+        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+                .execute().getItems();
+        if (events != null) {
+            for (Event e : events) {
+                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                        .execute();
+            }
+        }
 
         // Bestehende Routen löschen
         List<Route> routes = ServiceProvider.getService().skatenightServerEndpoint().getRoutes()

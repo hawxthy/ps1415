@@ -16,6 +16,7 @@ import ws1415.veranstalterapp.ServiceProvider;
  * @author Richard
  */
 public class AuthTaskTestCase extends ActivityInstrumentationTestCase2<LoginActivity> {
+    public static boolean loggedIn;
 
     public AuthTaskTestCase() {
         super(LoginActivity.class);
@@ -23,11 +24,14 @@ public class AuthTaskTestCase extends ActivityInstrumentationTestCase2<LoginActi
 
     public void setUp() throws Exception {
         super.setUp();
-        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(
-                getActivity(),
-                "server:client_id:"+ Constants.WEB_CLIENT_ID);
-        credential.setSelectedAccountName(credential.getAllAccounts()[0].name);
-        ServiceProvider.login(credential);
+        if (!loggedIn) {
+            GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(
+                    getActivity(),
+                    "server:client_id:"+ Constants.WEB_CLIENT_ID);
+            credential.setSelectedAccountName(credential.getAllAccounts()[0].name);
+            ServiceProvider.login(credential);
+        }
+        loggedIn = true;
     }
 
 }
