@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.adaptertest;
+package ws1415.veranstalterapp.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
