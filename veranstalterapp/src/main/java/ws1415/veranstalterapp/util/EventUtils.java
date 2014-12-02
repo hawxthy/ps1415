@@ -98,6 +98,10 @@ public class EventUtils {
                 // Mach was Richard
             }else if(tmpList.get(i).getType().equals(TYPE.LINK.name())){
                 // Mach was Martin
+            }else if(tmpList.get(i).getType().equals(TYPE.DATE.name())){
+                tmpList.get(i).setValue(list.getAdapter().getDate());
+            }else if(tmpList.get(i).getType().equals(TYPE.TIME.name())){
+                tmpList.get(i).setValue(list.getAdapter().getDate());
             }
         }
     }

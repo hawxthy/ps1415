@@ -14,6 +14,7 @@
     <string name="announce_info_cancel_button">Cancel</string>
     <string name="announce_info_start_edit_button">Edit Event properties</string>
     <string name="announce_info_exit_edit_button">Exit Edit mode</string>
+    <string name="announce_info_edit_mode_string">You can't do this in Edit mode</string>
     <string name="announce_info_title">Title:</string>
     <string name="announce_info_title_hint">Enter a title</string>
     <string name="announce_info_fee">Fee:</string>
@@ -92,5 +93,6 @@
     <string name="title_activity_edit_event">Edit Event</string>
     <string name="eventedited">Event was edited</string>
     <string name="edit_event_info_apply_button">Save</string>
+    <string name="announce_info_edit_button">Edit Event Properties</string>
 
 </resources>
