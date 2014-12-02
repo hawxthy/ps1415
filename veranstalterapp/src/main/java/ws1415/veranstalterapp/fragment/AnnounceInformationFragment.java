@@ -181,4 +181,13 @@ public class AnnounceInformationFragment extends Fragment {
         //route = selectedRoute;
         //routePickerButton.setText(selectedRoute.getName());
     }
+
+    /**
+     * Gibt den Adapter, der die ListView füllt, zurück.
+     *
+     * @return Adapter
+     */
+    public AnnounceCursorAdapter getAdapter(){
+        return listAdapter;
+    }
 }
