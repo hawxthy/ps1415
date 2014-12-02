@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import ws1415.ps1415.Activities.ShowEventsActivity;
+import ws1415.ps1415.activity.ShowEventsActivity;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.task.QueryEventTask;
 

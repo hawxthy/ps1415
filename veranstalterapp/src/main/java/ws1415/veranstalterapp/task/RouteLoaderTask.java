@@ -23,7 +23,7 @@ import java.util.List;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.util.LocationUtils;
-import ws1415.veranstalterapp.Activities.RouteEditorActivity;
+import ws1415.veranstalterapp.activity.RouteEditorActivity;
 
 /**
  * Task zum erstellen einer Route mit den im ArrayAdapter enthaltenen Waypoints als Wegpunkten.

@@ -23,6 +23,10 @@ public class AddMemberToEventTask extends ExtendedTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
+        if (email == null) {
+            publishError("Email should not be null.");
+            return null;
+        }
         try {
             ServiceProvider.getService().skatenightServerEndpoint().addMemberToEvent(this.event.getKey().getId(), email).execute();
         } catch (IOException e) {

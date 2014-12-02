@@ -1,4 +1,4 @@
-package ws1415.ps1415.Activities;
+package ws1415.ps1415.activity;
 
 import android.app.Activity;
 import android.content.Intent;

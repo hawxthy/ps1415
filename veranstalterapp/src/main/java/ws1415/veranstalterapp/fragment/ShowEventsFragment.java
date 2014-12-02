@@ -16,9 +16,8 @@ import com.skatenight.skatenightAPI.model.Event;
 
 import java.util.List;
 
-import ws1415.veranstalterapp.Adapter.EventsCursorAdapter;
-import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.adapter.EventsCursorAdapter;
+import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.DeleteEventTask;
 import ws1415.veranstalterapp.task.QueryEventTask;
