@@ -34,6 +34,8 @@
     <string name="field_picker_picture">Bild</string>
     <string name="field_picker_link">Link</string>
     <string name="field_picker_title">Wähle Feld</string>
+    <string name="choose_image">Bild wählen</string>
+
     <string-array name="field_picker">
         <item>Text</item>
         <item>Bild</item>

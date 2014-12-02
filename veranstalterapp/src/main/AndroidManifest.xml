@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ws1415.veranstalterapp" >
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -12,12 +20,12 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".activity.HoldTabsActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:name="ws1415.veranstalterapp.activity.HoldTabsActivity"
             android:label="@string/title_activity_start_page"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".activity.LoginActivity"
+            android:name="ws1415.veranstalterapp.activity.LoginActivity"
             android:exported="true"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait" >
@@ -28,49 +36,45 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.RouteEditorActivity"
+            android:name="ws1415.veranstalterapp.activity.RouteEditorActivity"
             android:label="@string/title_activity_route_editor"
-            android:parentActivityName=".activity.HoldTabsActivity" >
+            android:parentActivityName="ws1415.veranstalterapp.activity.HoldTabsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.veranstalterapp.HoldTabsActivity" />
         </activity>
         <activity
-            android:name=".activity.ChooseRouteActivity"
+            android:name="ws1415.veranstalterapp.activity.ChooseRouteActivity"
             android:label="@string/title_activity_choose_route"
-            android:theme="@android:style/Theme.Holo.Dialog"/>
+            android:theme="@android:style/Theme.Holo.Dialog" />
         <activity
-            android:name=".activity.ShowRouteActivity"
+            android:name="ws1415.veranstalterapp.activity.ShowRouteActivity"
             android:label="@string/title_activity_show_route"
-            android:parentActivityName=".activity.HoldTabsActivity" >
+            android:parentActivityName="ws1415.veranstalterapp.activity.HoldTabsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.HoldTabsActivity" />
         </activity>
         <activity
-            android:name=".AddRouteDialog"
+            android:name="ws1415.veranstalterapp.AddRouteDialog"
             android:label="@string/title_activity_add_route_dialog"
             android:theme="@android:style/Theme.Holo.Dialog" />
         <activity
-            android:name=".Fragments.ShowInformationActivity"
+            android:name="ws1415.veranstalterapp.Fragments.ShowInformationActivity"
             android:label="@string/title_activity_show_information"
-            android:parentActivityName=".activity.HoldTabsActivity" >
+            android:parentActivityName="ws1415.veranstalterapp.activity.HoldTabsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.HoldTabsActivity" />
         </activity>
         <activity
-            android:name=".activity.EditEventActivity"
+            android:name="ws1415.veranstalterapp.activity.EditEventActivity"
             android:label="@string/title_activity_edit_event" >
         </activity>
+        <activity
+            android:name="ws1415.veranstalterapp.activity.ChooseImageActivity"
+            android:label="@string/title_activity_choose_image" >
+        </activity>
     </application>
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 </manifest>

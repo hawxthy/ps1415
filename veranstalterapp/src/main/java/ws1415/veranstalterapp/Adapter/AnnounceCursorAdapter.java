@@ -1,16 +1,26 @@
 package ws1415.veranstalterapp.Adapter;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.skatenight.skatenightAPI.model.Event;
@@ -19,11 +29,15 @@ import com.skatenight.skatenightAPI.model.Field;
 import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.EventUtils.TYPE;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
+import ws1415.veranstalterapp.util.ImageUtil;
 
 /**
  * Klasse zum Füllen der ListView in AnnounceInformationFragment.
@@ -32,19 +46,25 @@ import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
  */
 public class AnnounceCursorAdapter extends BaseAdapter {
     private List<Field> fieldList = new ArrayList<Field>();
+    private AnnounceInformationFragment parent;
     private Context context;
     private LayoutInflater inflater;
     private Event event;
     private boolean edit_mode;
+    /**
+     * Cache für die Bilder des Eevnts, damit diese nicht bei jedem Scrollen neu skaliert werden müssen.
+     */
+    private HashMap<Field, Bitmap> bitmapCache = new HashMap<Field, Bitmap>();
 
     /**
      * Konstruktor, der den Inhalt der Liste festlegt.
      *
-     * @param context   Context, von dem aus der Adapter aufgerufen wird
+     * @param parent    Activity, von der aus der Adapter aufgerufen wird
      * @param fieldList Liste von den Routen
      */
-    public AnnounceCursorAdapter(Context context, List<Field> fieldList, Event event) {
-        this.context = context;
+    public AnnounceCursorAdapter(AnnounceInformationFragment parent, List<Field> fieldList, Event event) {
+        this.parent = parent;
+        this.context = parent.getActivity();
         this.fieldList = fieldList;
         this.event = event;
     }
@@ -113,6 +133,15 @@ public class AnnounceCursorAdapter extends BaseAdapter {
     }
 
     /**
+     * Klasse zum Halten der GUI-Elemente eines Picture-Felds.
+     */
+    private class HolderPictureField {
+        TextView title;
+        Button button;
+        ImageView image;
+    }
+
+    /**
      * Setzt das Layout der Items in der ListView.
      *
      * @param position    Position in der ListView
@@ -127,49 +156,81 @@ public class AnnounceCursorAdapter extends BaseAdapter {
 
         if (position % 2 == 0 || edit_mode == false) {
             if (edit_mode) position = position / 2;
-            if (getItem(position).getType().equals(TYPE.TITLE.name()) ||
-                    getItem(position).getType().equals(TYPE.LOCATION.name()) ||
-                    getItem(position).getType().equals(TYPE.DESCRIPTION.name()) ||
-                    getItem(position).getType().equals(TYPE.SIMPLETEXT.name()) ||
-                    getItem(position).getType().equals(TYPE.LINK.name())) {
+
+            final Field field = getItem(position);
+            if (field.getType().equals(TYPE.TITLE.name()) ||
+                    field.getType().equals(TYPE.LOCATION.name()) ||
+                    field.getType().equals(TYPE.DESCRIPTION.name()) ||
+                    field.getType().equals(TYPE.SIMPLETEXT.name()) ||
+                    field.getType().equals(TYPE.LINK.name())) {
                 HolderTextField holder = new HolderTextField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_simpletext, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_simpletext_textView);
                 holder.content = (EditText) view.findViewById(R.id.list_view_item_announce_information_simpletext_editText);
-                holder.title.setText(getItem(position).getTitle());
-            } else if (getItem(position).getType().equals(TYPE.FEE.name())) {
+                holder.title.setText(field.getTitle());
+            } else if (field.getType().equals(TYPE.FEE.name())) {
                 HolderTextField holder = new HolderTextField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_fee, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_fee_textView);
                 holder.content = (EditText) view.findViewById(R.id.list_view_item_announce_information_fee_editText);
-                holder.title.setText(getItem(position).getTitle());
-            } else if (getItem(position).getType().equals(TYPE.DATE.name())) {
+                holder.title.setText(field.getTitle());
+            } else if (field.getType().equals(TYPE.DATE.name())) {
                 HolderButtonField holder = new HolderButtonField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
                 holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
-                holder.title.setText(getItem(position).getTitle());
+                holder.title.setText(field.getTitle());
                 // @TODO SET BUTTON LISTENER AND BUTTONTEXT FÜR SET DATE
-            } else if (getItem(position).getType().equals(TYPE.TIME.name())) {
+            } else if (field.getType().equals(TYPE.TIME.name())) {
                 HolderButtonField holder = new HolderButtonField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
                 holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
-                holder.title.setText(getItem(position).getTitle());
+                holder.title.setText(field.getTitle());
                 // @TODO SET BUTTON LISTENER AND BUTTONTEXT FÜR SET TIME
-            } else if (getItem(position).getType().equals(TYPE.ROUTE.name())) {
+            } else if (field.getType().equals(TYPE.ROUTE.name())) {
                 HolderButtonField holder = new HolderButtonField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
                 holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
-                holder.title.setText(getItem(position).getTitle());
+                holder.title.setText(field.getTitle());
                 // @TODO SET BUTTON LISTENER AND BUTTONTEXT FÜR SET ROUTE
-            } else if(getItem(position).getType().equals(TYPE.PICTURE.name())) {
-                HolderButtonField holder = new HolderButtonField();
-                view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
-                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
-                holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
-                holder.title.setText(getItem(position).getTitle());
+            } else if(field.getType().equals(TYPE.PICTURE.name())) {
+                final HolderPictureField holder = new HolderPictureField();
+                view = inflater.inflate(R.layout.list_view_item_announce_information_picture, viewGroup, false);
+                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_picture_textView);
+                holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_picture_button);
+                holder.image = (ImageView) view.findViewById(R.id.list_view_item_announce_information_picture_picture);
+                holder.title.setText(field.getTitle());
+
+                if (field.getValue() != null) {
+                    Bitmap bm = bitmapCache.get(field);
+                    if (bm == null) {
+                        byte[] bytes = (byte[]) field.getValue();
+
+                        // Zunächst nur Auflösung des Bilds abrufen und passende SampleSize berechnen
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inJustDecodeBounds = true;
+                        BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                        options.inSampleSize = ImageUtil.calculateInSampleSize(options, 720);
+                        // Skalierte Version des Bilds abrufen
+                        options.inJustDecodeBounds = false;
+                        bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                        bitmapCache.put(field, bm);
+                    }
+
+                    // Bild anzeigen
+                    holder.image.setImageBitmap(bm);
+                }
+
+                final int finalPosition = position;
+                holder.button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        parent.showPictureChooser(getItem(finalPosition));
+                        bitmapCache.remove(field);
+                    }
+                });
             }
 
         } else {
@@ -241,4 +302,5 @@ public class AnnounceCursorAdapter extends BaseAdapter {
     public boolean getEditMode(){
         return edit_mode;
     }
+
 }

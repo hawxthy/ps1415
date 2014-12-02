@@ -1,18 +1,28 @@
 package ws1415.veranstalterapp.fragment;
 
 import android.app.AlertDialog;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import com.skatenight.skatenightAPI.model.Event;
@@ -24,6 +34,7 @@ import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.CreateEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
+import ws1415.veranstalterapp.util.ImageUtil;
 
 /**
  * Fragment zum Veröffentlichen von neuen Veranstaltungen.
@@ -61,7 +72,7 @@ public class AnnounceInformationFragment extends Fragment {
         event = new Event();
         event.setDynamicFields(new ArrayList<Field>());
         EventUtils.getInstance(getActivity()).setStandardFields(event);
-        listAdapter = new AnnounceCursorAdapter(getActivity(), event.getDynamicFields(), event);
+        listAdapter = new AnnounceCursorAdapter(this, event.getDynamicFields(), event);
 
         listView = (ListView) view.findViewById(R.id.fragment_announce_information_list_view);
         listView.setAdapter(listAdapter);
@@ -180,5 +191,52 @@ public class AnnounceInformationFragment extends Fragment {
     public void setRoute(Route selectedRoute) {
         //route = selectedRoute;
         //routePickerButton.setText(selectedRoute.getName());
+    }
+
+    /**
+     * Zeigt einen Picker-Dialog an, mit dem ein Bild vom Handy gewählt werden kann.
+     * @param f Das Field-Objekt, das das Bild als byte-Array halten soll.
+     */
+    public void showPictureChooser(Field f) {
+        pictureField = f;
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.choose_image)), 0);
+    }
+
+    /**
+     * Zwischenspeicher für die ImageView und das Field, die das im Picture-Picker gewählte Bild anzeigen sollen.
+     */
+    private Field pictureField;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data != null && pictureField != null) {
+            // Pfad ermitteln
+            Uri selectedImageUri = data.getData();
+            String[] projection = { MediaStore.MediaColumns.DATA };
+            CursorLoader cl = new CursorLoader(this.getActivity());
+            cl.setUri(selectedImageUri);
+            cl.setProjection(projection);
+            Cursor cursor = cl.loadInBackground();
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            cursor.moveToFirst();
+            String tempPath = cursor.getString(column_index);
+            Bitmap bm;
+            BitmapFactory.Options btmapOptions = new BitmapFactory.Options();
+            bm = BitmapFactory.decodeFile(tempPath, btmapOptions);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            pictureField.setValue(byteArray);
+
+            // Speicher des Bildes zum Freigeben vorbereiten
+            bm.recycle();
+
+            // Bild in die ListView übernehmen
+            listAdapter.notifyDataSetChanged();
+        }
     }
 }

@@ -39,6 +39,8 @@
     <string name="field_picker_picture">Picture</string>
     <string name="field_picker_link">Link</string>
     <string name="field_picker_title">Choose Field</string>
+    <string name="choose_image">Choose Image</string>
+
     <string-array name="field_picker">
         <item>Text</item>
         <item>Picture</item>
@@ -52,7 +54,6 @@
     <string-array name="selections_menu_manage_routes">
         <item name="delete">Delete</item>
     </string-array>
-
     <string-array name="selections_menu">
         <item name="edit">Edit</item>
         <item name="delete">Delete</item>
@@ -103,5 +104,6 @@
     <string name="title_activity_edit_event">Edit Event</string>
     <string name="eventedited">Event was edited</string>
     <string name="edit_event_info_apply_button">Save</string>
+    <string name="title_activity_choose_image">ChooseImageActivity</string>
 
 </resources>

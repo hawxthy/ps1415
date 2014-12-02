@@ -25,7 +25,7 @@ import javax.jdo.annotations.PrimaryKey;
  * Created by Richard Schulze, Bernd Eissing, Martin Wrodarczyk on 21.10.2014.
  */
 @PersistenceCapable
-public class Event{
+public class Event {
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
@@ -131,7 +131,6 @@ public class Event{
     public class Field implements Serializable {
         private String title;
         private Object value;
-        private Blob byteData;
         private TYPE type;
 
         public Field(String title, TYPE type){
@@ -157,14 +156,6 @@ public class Event{
 
         public void setTitle(String title) {
             this.title = title;
-        }
-
-        public Blob getByteData() {
-            return byteData;
-        }
-
-        public void setByteData(Blob byteData) {
-            this.byteData = byteData;
         }
 
         public TYPE getType(){
