@@ -59,7 +59,7 @@ public class AnnounceInformationFragment extends Fragment {
         event = new Event();
         event.setDynamicFields(new ArrayList<Field>());
         EventUtils.getInstance(getActivity()).setStandardFields(event);
-        listAdapter = new AnnounceCursorAdapter(getActivity(), event.getDynamicFields());
+        listAdapter = new AnnounceCursorAdapter(getActivity(), event.getDynamicFields(), event);
 
         listView = (ListView) view.findViewById(R.id.fragment_announce_information_list_view);
         listView.setAdapter(listAdapter);

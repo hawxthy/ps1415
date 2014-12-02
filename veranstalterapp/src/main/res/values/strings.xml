@@ -32,8 +32,19 @@
     <string name="areyousure">Are you sure?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="apply">Apply</string>
+    <string name="cancel">Cancel</string>
     <string name="eventcreated">Event was created</string>
     <string name="not_authorized">Not authorized</string>
+    <string name="field_picker_text">Text</string>
+    <string name="field_picker_picture">Picture</string>
+    <string name="field_picker_link">Link</string>
+    <string name="field_picker_title">Choose Field</string>
+    <string-array name="field_picker">
+        <item>Text</item>
+        <item>Picture</item>
+        <item>Link</item>
+    </string-array>
 
     <!-- Manage Routes xml -->
     <string name="title_fragment_manage_routes">Manage Routes</string>
