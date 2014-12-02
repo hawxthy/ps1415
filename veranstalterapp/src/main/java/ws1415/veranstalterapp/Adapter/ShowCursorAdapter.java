@@ -2,6 +2,7 @@ package ws1415.veranstalterapp.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -168,6 +169,22 @@ public class ShowCursorAdapter extends BaseAdapter{
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
             holder.content.setText(dateFormat.format((Date)fieldList.get(position).getValue()));
 
+        }else if(getItem(position).getType().equals(TYPE.LINK.name())){
+            HolderTextField holder = new HolderTextField();
+            view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
+            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
+            holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
+            holder.content.setText((String)fieldList.get(position).getValue());
+            final String link = holder.content.getText().toString();
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String url = link;
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    context.startActivity(i);
+                }
+            });
         }
         return view;
     }

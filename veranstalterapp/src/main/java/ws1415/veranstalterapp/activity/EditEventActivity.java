@@ -32,6 +32,12 @@ import ws1415.veranstalterapp.task.EditEventTask;
 import ws1415.veranstalterapp.task.GetEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
 
+/**
+ * Die Activity zum ändern der Attribute eines Events und zum eventuellen hinzufügen weiterer
+ * dynamischer Felder.
+ *
+ * Created by Bernd Eissing, Martin Wrodarczyk.
+ */
 public class EditEventActivity extends Activity {
     // Adapter für die ListView von activity_edit_event_list_view
     private AnnounceCursorAdapter listAdapter;
@@ -176,7 +182,7 @@ public class EditEventActivity extends Activity {
      * @param e Das Event
      */
     public void setEventDataToView(Event e){
-        listAdapter = new AnnounceCursorAdapter(this, event.getDynamicFields());
+        listAdapter = new AnnounceCursorAdapter(this, e.getDynamicFields(), e);
 
         listView = (ListView) findViewById(R.id.fragment_announce_information_list_view);
         listView.setAdapter(listAdapter);
