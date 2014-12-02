@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.Route;
 
@@ -78,13 +77,9 @@ public class ManageRoutesFragment extends Fragment {
              */
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                Toast.makeText(getActivity().getApplicationContext(), "size: " + routeList.get(i).getRoutePoints(), Toast.LENGTH_LONG).show();
-                Toast.makeText(getActivity().getApplicationContext(), "Name: " + routeList.get(i).getName(), Toast.LENGTH_LONG).show();
-
                 Intent intent = new Intent(getActivity(), ShowRouteActivity.class);
-                intent.putExtra("show_route_extra_route", routeList.get(i).getRouteData().getValue());
-                intent.putExtra("routeName", routeList.get(i).getName());
+                intent.putExtra(ShowRouteActivity.EXTRA_TITLE, routeList.get(i).getName());
+                intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, routeList.get(i).getRouteData().getValue());
                 startActivity(intent);
             }
         });

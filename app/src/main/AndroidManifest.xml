@@ -14,7 +14,12 @@
         <activity
             android:name=".Activities.ShowInformationActivity"
             android:label="@string/title_activity_showinformation"
-            android:exported="true"></activity>
+            android:exported="true"
+            android:parentActivityName=".Activities.ShowEventsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.ShowEventsActivity" />
+        </activity>
         <activity
             android:name=".Activities.ShowRouteActivity"
             android:label="@string/title_activity_show_route"

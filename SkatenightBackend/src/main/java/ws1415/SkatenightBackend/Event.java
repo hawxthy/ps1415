@@ -4,6 +4,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 import com.google.appengine.datanucleus.annotations.Unowned;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -33,6 +34,12 @@ public class Event{
     @Persistent(defaultFetchGroup = "true")
     @Unowned
     private Route route;
+    @Persistent
+    private int routeFieldFirst;
+    @Persistent
+    private int routeFieldLast;
+    @Persistent(serialized = "true", defaultFetchGroup = "true")
+    private ArrayList<String> memberList;
 
     public Key getKey() {
         return key;
@@ -88,5 +95,30 @@ public class Event{
 
     public void setRoute(Route route) {
         this.route = route;
+    }
+
+    public int getRouteFieldFirst() {
+        return routeFieldFirst;
+    }
+
+    public void setRouteFieldFirst(int routeFieldFirst) {
+        this.routeFieldFirst = routeFieldFirst;
+    }
+
+    public int getRouteFieldLast() {
+        return routeFieldLast;
+    }
+
+    public void setRouteFieldLast(int routeFieldLast) {
+        this.routeFieldLast = routeFieldLast;
+    }
+
+    public void setMemberList(ArrayList<String> memberList) {
+        this.memberList = memberList;
+    }
+
+    public ArrayList<String> getMemberList() {
+        if (this.memberList == null) return new ArrayList();
+        else return this.memberList;
     }
 }

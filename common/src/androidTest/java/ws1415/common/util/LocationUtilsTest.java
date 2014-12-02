@@ -1,4 +1,4 @@
-package ws1415.ps1415.util;
+package ws1415.common.util;
 
 import android.location.Location;
 
