@@ -13,9 +13,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
+import com.skatenight.skatenightAPI.model.Route;
 
 import ws1415.veranstalterapp.Adapter.AnnounceCursorAdapter;
 import ws1415.veranstalterapp.activity.HoldTabsActivity;
@@ -174,5 +176,14 @@ public class AnnounceInformationFragment extends Fragment {
         } else {
             Toast.makeText(getActivity(), "Nicht alle notwendigen Felder ausgefüllt", Toast.LENGTH_LONG).show();
         }
+    }
+
+    /**
+     * Gibt den Adapter, der die ListView füllt, zurück.
+     *
+     * @return Adapter
+     */
+    public AnnounceCursorAdapter getAdapter(){
+        return listAdapter;
     }
 }

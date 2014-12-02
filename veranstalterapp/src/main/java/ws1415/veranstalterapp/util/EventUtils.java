@@ -55,6 +55,16 @@ public class EventUtils {
     }
 
     /**
+     * Löscht das Feld aus dem Event mit der angegebenen Position.
+     *
+     * @param event Event
+     * @param pos Position in der Liste der Felder
+     */
+    public void deleteDynamicField(Event event, int pos){
+        event.getDynamicFields().remove(pos);
+    }
+
+    /**
      * Enum um die Felder zu spezifizieren.
      */
     public enum TYPE{
