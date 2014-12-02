@@ -177,63 +177,65 @@ public class SkatenightServerEndpoint {
 
             calculateCurrentWaypoint(m);
 
-            // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
-            /*
-            if (System.currentTimeMillis()-lastFieldUpdateTime >= 300000) {
-                for (Event event : myEvents) {
-                    calculateField(event.getKey().getId());
-                }
-                //lastFieldUpdateTime = System.currentTimeMillis();
-            }*/
-            /*
-            for (Event event : myEvents) {
-                calculateField(event.getKey().getId());
-            }
-            */
             PersistenceManager pm = pmf.getPersistenceManager();
             try {
                 pm.makePersistent(m);
             } finally {
                 pm.close();
             }
+
+            // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
+            if (System.currentTimeMillis()-lastFieldUpdateTime >= 300000) {
+                calculateField(m.getCurrentEventId());
+                lastFieldUpdateTime = System.currentTimeMillis();
+            }
         }
     }
 
     private void calculateCurrentWaypoint(Member member) {
-        Event event = member.getCurrentEvent();
-        if (event != null) {
-            Integer currentWaypoint = member.getCurrentWaypoint();
-            if (currentWaypoint == null) {
-                member.setCurrentWaypoint(0);
-            }
-            else {
+        Long eventId = member.getCurrentEventId();
+        if (eventId != null) {
+            Event event = getEvent(member.getCurrentEventId());
+            if (event != null) {
+                Integer currentWaypoint = member.getCurrentWaypoint();
+                if (currentWaypoint == null) {
+                    member.setCurrentWaypoint(0);
+                }
                 List<RoutePoint> points = event.getRoute().getRoutePoints();
                 if (currentWaypoint < points.size()-1) {
                     RoutePoint current = points.get(currentWaypoint);
                     RoutePoint next = points.get(currentWaypoint+1);
                     float distanceCurrent = distance(current.getLatitude(), current.getLongitude(), member.getLatitude(), member.getLongitude());
                     float distanceNext = distance(next.getLatitude(), next.getLongitude(), member.getLatitude(), member.getLongitude());
+                    boolean findNextWaypoint = false;
+                    if (distanceCurrent < Constants.MAX_NEXT_WAYPOINT_DISTANCE) {
+                        findNextWaypoint = true;
+                    }
                     if (distanceNext < distanceCurrent) {
                         if (distanceNext < Constants.MAX_NEXT_WAYPOINT_DISTANCE) {
                             member.setCurrentWaypoint(currentWaypoint+1);
+                            findNextWaypoint = false;
                         }
                         else {
-                            // Den nächsten Wegpunkt finden:
-                            for (int i = currentWaypoint; i < points.size(); i++) {
-                                float distance = distance(
-                                        member.getLatitude(), member.getLongitude(),
-                                        points.get(i).getLatitude(), points.get(i).getLongitude());
+                            findNextWaypoint = true;
+                        }
+                    }
+                    if (findNextWaypoint) {
+                        // Den nächsten Wegpunkt finden:
+                        float minDistance = Float.POSITIVE_INFINITY;
+                        for (int i = currentWaypoint; i < points.size(); i++) {
+                            float distance = distance(
+                                    member.getLatitude(), member.getLongitude(),
+                                    points.get(i).getLatitude(), points.get(i).getLongitude());
 
-                                if (distance < Constants.MAX_ANY_WAYPOINT_DISTANCE) {
-                                    member.setCurrentWaypoint(i);
-                                }
+                            if (distance < 50.0f && distance < minDistance) {
+                                member.setCurrentWaypoint(i);
+                                minDistance = distance;
                             }
                         }
                     }
                 }
-
             }
-
         }
     }
 
@@ -251,15 +253,16 @@ public class SkatenightServerEndpoint {
         // array erstellen welches an der stelle n die Anzahl der Member enthält welche am RoutePoint n sind.
         int memberCountPerRoutePoint[] = new int[points.size()];
         for (Member member : members) {
-            memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()]+1;
+            if (member.getCurrentEventId() != null && member.getCurrentEventId() == id && member.getCurrentWaypoint() != null) {
+                memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()]+1;
+            }
         }
 
         // Den index des RoutePoints speichern an welchen die meisten Member sind.
-        int mostMemberPerWaypoint = -1;
+        //int mostMemberPerWaypoint = -1;
         int mostMemberIndex = 0;
-        for (int i=0;i<memberCountPerRoutePoint.length;i++) {
-            if (memberCountPerRoutePoint[i] > mostMemberPerWaypoint) {
-                mostMemberPerWaypoint = memberCountPerRoutePoint[i];
+        for (int i = 0; i < memberCountPerRoutePoint.length; i++) {
+            if (memberCountPerRoutePoint[i] > memberCountPerRoutePoint[mostMemberIndex]) {
                 mostMemberIndex = i;
             }
         }
@@ -268,9 +271,9 @@ public class SkatenightServerEndpoint {
         // als 5 Member haben
         int first = mostMemberIndex;
         while (first > 0) {
-            if (memberCountPerRoutePoint[first-1] >=5) {
+            if (memberCountPerRoutePoint[first-1] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
                 first--;
-            } else if(memberCountPerRoutePoint[first-2] >=5 && first > 1) {
+            } else if(first > 1 && memberCountPerRoutePoint[first-2] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
                 first-=2;
             } else {
                 break;
@@ -280,10 +283,10 @@ public class SkatenightServerEndpoint {
         // Vom mostMemberIndex vorwaärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
         // als 5 Member haben
         int last = mostMemberIndex;
-        while (last < memberCountPerRoutePoint.length) {
-            if (memberCountPerRoutePoint[last+1] >=5) {
+        while (last < memberCountPerRoutePoint.length-1) {
+            if (memberCountPerRoutePoint[last+1] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
                 last++;
-            } else if(memberCountPerRoutePoint[last+2] >=5 && last < memberCountPerRoutePoint.length-1) {
+            } else if(last < memberCountPerRoutePoint.length-2 && memberCountPerRoutePoint[last+2] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
                 last+=2;
             } else {
                 break;
@@ -427,6 +430,20 @@ public class SkatenightServerEndpoint {
     public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
 
         Event event = getEvent(keyId);
+
+        // TODO: Andern des currentEvent entfernen!
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        Member m = getMember(email);
+        m.setCurrentEventId(event.getKey().getId());
+
+        try {
+            pm.makePersistent(m);
+        }
+        finally {
+            pm.close();
+        }
+
 
         ArrayList<String> memberKeys = event.getMemberList();
         if (!memberKeys.contains(email)) {

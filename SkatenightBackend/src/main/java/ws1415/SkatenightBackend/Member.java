@@ -26,7 +26,7 @@ public class Member {
     @Persistent
     private double longitude;
     @Unowned
-    private Event currentEvent;
+    private Long currentEventId;
     @Persistent
     private Integer currentWaypoint;
     @PrimaryKey
@@ -65,12 +65,12 @@ public class Member {
         this.longitude = longitude;
     }
 
-    public Event getCurrentEvent() {
-        return currentEvent;
+    public Long getCurrentEventId() {
+        return currentEventId;
     }
 
-    public void setCurrentEvent(Event currentEvent) {
-        this.currentEvent = currentEvent;
+    public void setCurrentEventId(Long currentEventId) {
+        this.currentEventId = currentEventId;
     }
 
     public Integer getCurrentWaypoint() {

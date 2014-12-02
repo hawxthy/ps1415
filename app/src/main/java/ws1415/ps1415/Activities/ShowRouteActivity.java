@@ -23,10 +23,10 @@ import com.skatenight.skatenightAPI.model.Member;
 import java.text.ParseException;
 import java.util.List;
 
+import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryMemberTask;
-import ws1415.common.util.LocationUtils;
 
 /**
  * Zeigt die Strecke des aktuellen Events auf einer Karte an.
@@ -121,8 +121,6 @@ public class ShowRouteActivity extends Activity {
 
         // Ruft die aktuellen Memberinformationen ab
         new QueryMemberTask().execute((ShowRouteActivity) this);
-
-        //new UpdateLocationTask("pascal.otto@googlemail.com", 0.0, 0.0).execute();
     }
 
     @Override
@@ -201,6 +199,8 @@ public class ShowRouteActivity extends Activity {
                     .snippet("" + m.getUpdatedAt())
                     .icon(BitmapDescriptorFactory
                             .defaultMarker(markerColor)));
+
+            Toast.makeText(getApplicationContext(), "" + m.getCurrentWaypoint(), Toast.LENGTH_SHORT).show();
         } else {
             location = null;
         }
