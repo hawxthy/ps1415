@@ -89,14 +89,20 @@ public class AnnounceInformationFragment extends Fragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                cancelInfo(true);
+                if(!listAdapter.getEditMode()) {
+                    cancelInfo(true);
+                }
+                Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
             }
         });
 
         applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                applyInfo();
+                if(!listAdapter.getEditMode()) {
+                    applyInfo();
+                }
+                Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
             }
         });
 
@@ -116,7 +122,7 @@ public class AnnounceInformationFragment extends Fragment {
 
     /**
      * Liest die eingegebenen Informationen aus, erstellt ause diesen ein Event und fügt dieses
-     * Event dem Server hinzu. Momentan wir noch das alte Event überschrieben.
+     * Event dem Server hinzu.
      */
     public void applyInfo() {
 
@@ -170,16 +176,6 @@ public class AnnounceInformationFragment extends Fragment {
         } else {
             Toast.makeText(getActivity(), "Nicht alle notwendigen Felder ausgefüllt", Toast.LENGTH_LONG).show();
         }
-    }
-
-    /**
-     * Dies Methode setzt die Route für das Event
-     *
-     * @param selectedRoute Die Route für das Event
-     */
-    public void setRoute(Route selectedRoute) {
-        //route = selectedRoute;
-        //routePickerButton.setText(selectedRoute.getName());
     }
 
     /**
