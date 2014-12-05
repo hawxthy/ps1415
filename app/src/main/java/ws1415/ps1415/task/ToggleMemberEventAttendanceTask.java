@@ -34,7 +34,7 @@ public class ToggleMemberEventAttendanceTask extends ExtendedTask<Void, Void, Bo
             }
             else {
                 ServiceProvider.getService().skatenightServerEndpoint().removeMemberFromEvent(keyId, email).execute();
-                return attending;
+                return !attending;
             }
 
         } catch (IOException e) {

@@ -15,13 +15,17 @@
     <string name="show_info_button_map">Map</string>
     <string name="show_info_button_attend">Attend</string>
     <string name="show_info_button_leave">Leave</string>
+    <string name="show_info_toast_attending">Great Success Of Glorious Registration Task.</string>
+    <string name="show_info_toast_leaving">Great Betrayal Of Skatenight Event Attendance.</string>
     <string name="downloading">Downloading...</string>
 
-
-    <!--Strings zu activity showEvents-->
+    <!-- Strings zu activity showEvents -->
     <string name="title_activity_show_events">Events</string>
+
     <string-array name="selections_menu">
         <item name="delete">Delete</item>
     </string-array>
+
+    <string name="title_activity_active_event">ActiveEventActivity</string>
 
 </resources>

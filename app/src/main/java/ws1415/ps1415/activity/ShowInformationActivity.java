@@ -147,7 +147,6 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         attendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Button attendButton = (Button) findViewById(R.id.show_info_attend_button);
                 new ToggleMemberEventAttendanceTask(ShowInformationActivity.this, keyId, credential.getSelectedAccountName(), attending).execute();
             }
         });
@@ -178,6 +177,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putLong(MEMBER_KEY_ID, keyId);
         outState.putString(MEMBER_TITLE, title);
         outState.putString(MEMBER_DATE, date);
         outState.putString(MEMBER_LOCATION, location);
@@ -325,8 +325,8 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         }
         else if (task instanceof ToggleMemberEventAttendanceTask) {
             attending = (Boolean) result;
-            if (attending) Toast.makeText(getApplicationContext(), "angemeldet", Toast.LENGTH_SHORT).show();
-            else Toast.makeText(getApplicationContext(), "abgemeldet", Toast.LENGTH_SHORT).show();
+            if (attending) Toast.makeText(getApplicationContext(), getString(R.string.show_info_toast_attending), Toast.LENGTH_SHORT).show();
+            else Toast.makeText(getApplicationContext(), R.string.show_info_toast_leaving, Toast.LENGTH_SHORT).show();
             updateAttendButtonTitle();
         }
     }
