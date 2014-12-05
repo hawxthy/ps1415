@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -25,7 +26,7 @@ import javax.jdo.annotations.PrimaryKey;
  * Created by Richard Schulze, Bernd Eissing, Martin Wrodarczyk on 21.10.2014.
  */
 @PersistenceCapable
-public class Event{
+public class Event {
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
@@ -46,8 +47,8 @@ public class Event{
     private Route route;
 
     // Dynamische ArrayListe von dynamischen Komponenten
-    @Persistent(serialized = "true", defaultFetchGroup = "true")
-    private ArrayList<Field> dynamicFields;
+    @Persistent
+    private List<Field> dynamicFields = new ArrayList<Field>();
 
     public Key getKey() {
         return key;
@@ -58,35 +59,35 @@ public class Event{
     }
 
     public String getTitle() {
-        return (String)getUniqueField(TYPE.TITLE).getValue();
+        return (String)getUniqueField(Field.TYPE.TITLE).getValue();
     }
 
     public void setDate(Date date){
-        getUniqueField(TYPE.DATE).setValue(date);
+        getUniqueField(Field.TYPE.DATE).setValue(Long.toString(date.getTime()));
     }
 
     public Date getDate(){
-        return (Date)getUniqueField(TYPE.DATE).getValue();
+        return new Date(Long.parseLong(getUniqueField(Field.TYPE.DATE).getValue()));
     }
 
     public void setTime(Date time){
-        getUniqueField(TYPE.TIME).setValue(time);
+        getUniqueField(Field.TYPE.TIME).setValue(Long.toString(time.getTime()));
     }
 
     public Date getTime(){
-        return (Date)getUniqueField(TYPE.TIME).getValue();
+        return new Date(Long.parseLong(getUniqueField(Field.TYPE.TIME).getValue()));
     }
 
     public String getFee() {
-        return (String)getUniqueField(TYPE.FEE).getValue();
+        return (String)getUniqueField(Field.TYPE.FEE).getValue();
     }
 
     public String getLocation() {
-        return  (String)getUniqueField(TYPE.LOCATION).getValue();
+        return  (String)getUniqueField(Field.TYPE.LOCATION).getValue();
     }
 
     public Text getDescription() {
-        return  (Text)getUniqueField(TYPE.DESCRIPTION).getValue();
+        return  new Text(getUniqueField(Field.TYPE.DESCRIPTION).getValue());
     }
 
     public void setRoute(Route route){
@@ -104,7 +105,7 @@ public class Event{
      * @param type der Typ des eindeutigen Feldes
      * @return Das Feld, null falls keins gefunden wurde
      */
-    public Field getUniqueField(TYPE type){
+    public Field getUniqueField(Field.TYPE type){
         for(int i = 0; i < dynamicFields.size(); i++){
             if(dynamicFields.get(i).getType() == type){
                 return dynamicFields.get(i);
@@ -114,65 +115,11 @@ public class Event{
     }
 
 
-    public ArrayList<Field> getDynamicFields(){
+    public List<Field> getDynamicFields(){
         return dynamicFields;
     }
 
-    /**
-     * Enum um die Felder zu spezifizieren.
-     */
-    public enum TYPE{
-        SIMPLETEXT, FEE, DATE, TIME, ROUTE, PICTURE, LINK, TITLE, LOCATION, DESCRIPTION
-    }
-
-    /**
-     * Klasse für die Informationsfelder einer Veranstaltung
-     */
-    public class Field implements Serializable {
-        private String title;
-        private Object value;
-        private Blob byteData;
-        private TYPE type;
-
-        public Field(String title, TYPE type){
-            this.title = title;
-            this.type = type;
-        }
-
-        @JsonCreator
-        public Field() {
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public void setValue(Object value) {
-            this.value = value;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public Blob getByteData() {
-            return byteData;
-        }
-
-        public void setByteData(Blob byteData) {
-            this.byteData = byteData;
-        }
-
-        public TYPE getType(){
-            return type;
-        }
-
-        public void setType(TYPE type){
-            this.type = type;
-        }
+    public void setDynamicFields(ArrayList<Field> list){
+        this.dynamicFields = list;
     }
 }

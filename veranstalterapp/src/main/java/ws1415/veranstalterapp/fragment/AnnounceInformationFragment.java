@@ -134,7 +134,7 @@ public class AnnounceInformationFragment extends Fragment {
                 int titleId = EventUtils.getInstance(getActivity()).getUniqueFieldId(EventUtils.TYPE.TITLE, event);
 
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (titleId != -1 && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_simpletext_editText)).getText().toString().isEmpty()){
+                if (titleId != -1 && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
 
                     // Setze die Attribute vom Event
                     EventUtils.getInstance(getActivity()).setEventInfo(event, listView);
@@ -147,6 +147,7 @@ public class AnnounceInformationFragment extends Fragment {
 
                     // Setze die Attribute von Event auf den Standard
                     EventUtils.getInstance(getActivity()).setStandardFields(event);
+                    listAdapter.notifyDataSetChanged();
 
                     // Update die Informationen in ShowInformationFragment
                     HoldTabsActivity.updateInformation();
