@@ -4,9 +4,6 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -20,7 +17,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
-import javax.jdo.Transaction;
 
 
 /**
@@ -432,7 +428,6 @@ public class SkatenightServerEndpoint {
      *
      */
     public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
-
         Event event = getEvent(keyId);
 
         // TODO: Andern des currentEvent entfernen!
@@ -452,6 +447,18 @@ public class SkatenightServerEndpoint {
         ArrayList<String> memberKeys = event.getMemberList();
         if (!memberKeys.contains(email)) {
             memberKeys.add(email);
+            event.setMemberList(memberKeys);
+
+            updateEvent(event);
+        }
+    }
+
+    public void removeMemberFromEvent(@Named("id") long keyId, @Named("email") String email) {
+        Event event = getEvent(keyId);
+
+        ArrayList<String> memberKeys = event.getMemberList();
+        if (memberKeys.contains(email)) {
+            memberKeys.remove(email);
             event.setMemberList(memberKeys);
 
             updateEvent(event);

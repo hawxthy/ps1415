@@ -13,6 +13,8 @@
     <string name="show_info_header_fee">Participation fee</string>
     <string name="show_info_header_description">Description</string>
     <string name="show_info_button_map">Map</string>
+    <string name="show_info_button_attend">Attend</string>
+    <string name="show_info_button_leave">Leave</string>
     <string name="downloading">Downloading...</string>
 
 

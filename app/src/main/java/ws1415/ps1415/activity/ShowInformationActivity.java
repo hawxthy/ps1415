@@ -22,17 +22,17 @@ import com.skatenight.skatenightAPI.model.Event;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import ws1415.ps1415.Constants;
-import ws1415.ps1415.R;
-import ws1415.ps1415.task.AddMemberToEventTask;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.ps1415.Constants;
+import ws1415.ps1415.R;
 import ws1415.ps1415.task.GetEventTask;
+import ws1415.ps1415.task.ToggleMemberEventAttendanceTask;
 
 /**
  * Zeigt die Informationen des aktuellen Events an.
  */
-public class ShowInformationActivity extends Activity implements ExtendedTaskDelegate<Void, Event> {
+public class ShowInformationActivity extends Activity implements ExtendedTaskDelegate<Void, Object> {
     public static final String EXTRA_KEY_ID = "show_information_extra_key_id";
 
     private static final String MEMBER_KEY_ID = "show_information_member_key_id";
@@ -45,6 +45,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     private static final String MEMBER_ROUTE_BUTTON_TITLE = "show_information_member_route_button_title";
     private static final String MEMBER_ROUTE_FIELD_FIRST = "show_information_member_route_field_first";
     private static final String MEMBER_ROUTE_FIELD_LAST = "show_information_member_route_field_last";
+    private static final String MEMBER_ATTENDING = "show_information_member_attending";
 
     static final int REQUEST_ACCOUNT_PICKER = 2;
     private GoogleAccountCredential credential;
@@ -60,6 +61,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     private String routeButtonTitle;
     private int routeFieldFirst;
     private int routeFieldLast;
+    private boolean attending;
 
     // Erstellen eines SimpleDateFormats, damit das Datum und die Uhrzeit richtig angezeigt werden
     private SimpleDateFormat dateFormat;
@@ -102,6 +104,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
             routeButtonTitle = savedInstanceState.getString(MEMBER_ROUTE_BUTTON_TITLE);
             routeFieldFirst = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_FIRST);
             routeFieldLast = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_LAST);
+            attending = savedInstanceState.getBoolean(MEMBER_ATTENDING);
             updateGUI();
         }
         else if ((intent = getIntent()) != null) {
@@ -137,6 +140,15 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                     AlertDialog dialog = builder.create();
                     dialog.show();
                 }
+            }
+        });
+
+        Button attendButton = (Button) findViewById(R.id.show_info_attend_button);
+        attendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Button attendButton = (Button) findViewById(R.id.show_info_attend_button);
+                new ToggleMemberEventAttendanceTask(ShowInformationActivity.this, keyId, credential.getSelectedAccountName(), attending).execute();
             }
         });
     }
@@ -175,6 +187,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         outState.putString(MEMBER_ROUTE_BUTTON_TITLE, routeButtonTitle);
         outState.putInt(MEMBER_ROUTE_FIELD_FIRST, routeFieldFirst);
         outState.putInt(MEMBER_ROUTE_FIELD_LAST, routeFieldLast);
+        outState.putBoolean(MEMBER_ATTENDING, attending);
 
         super.onSaveInstanceState(outState);
     }
@@ -232,12 +245,16 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                 routeFieldLast = e.getRouteFieldLast();
             }
 
+            String email = credential.getSelectedAccountName();
+            if (e.getMemberList() != null) {
+                attending = e.getMemberList().contains(email);
+            }
 
             // TODO: Member nur hinzufügen wenn er auch wirklich teilnehmen möchte
-            String email = credential.getSelectedAccountName();
+
 
             // EmailAdresse des aktuellen users dem Event hinzufügen
-            new AddMemberToEventTask(null, e, email).execute();
+            //new AddMemberToEventTask(null, e, email).execute();
         } else {
             title = null;
             date = null;
@@ -261,6 +278,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         TextView feeView = (TextView) findViewById(R.id.show_info_fee_textview);
         TextView descriptionView = (TextView) findViewById(R.id.show_info_description_textview);
         Button mapButton = (Button) findViewById(R.id.show_info_map_button);
+        Button attendButton = (Button) findViewById(R.id.show_info_attend_button);
 
         if (title != null &&
                 date != null &&
@@ -275,6 +293,8 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
             descriptionView.setText(description);
             mapButton.setText(routeButtonTitle);
             mapButton.setEnabled(true);
+            attendButton.setEnabled(true);
+            updateAttendButtonTitle();
         }
         else {
             setTitle("leer");
@@ -283,12 +303,32 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
             feeView.setText("leer");
             descriptionView.setText("leer");
             mapButton.setEnabled(false);
+            attendButton.setEnabled(false);
+            attendButton.setText(getString(R.string.show_info_button_attend));
+        }
+    }
+
+    public void updateAttendButtonTitle() {
+        Button attendButton = (Button) findViewById(R.id.show_info_attend_button);
+        if (attending) {
+            attendButton.setText(getString(R.string.show_info_button_leave));
+        }
+        else {
+            attendButton.setText(getString(R.string.show_info_button_attend));
         }
     }
 
     @Override
-    public void taskDidFinish(ExtendedTask task, Event event) {
-        setEventInformation(event);
+    public void taskDidFinish(ExtendedTask task, Object result) {
+        if (task instanceof GetEventTask) {
+            setEventInformation((Event) result);
+        }
+        else if (task instanceof ToggleMemberEventAttendanceTask) {
+            attending = (Boolean) result;
+            if (attending) Toast.makeText(getApplicationContext(), "angemeldet", Toast.LENGTH_SHORT).show();
+            else Toast.makeText(getApplicationContext(), "abgemeldet", Toast.LENGTH_SHORT).show();
+            updateAttendButtonTitle();
+        }
     }
 
     @Override
