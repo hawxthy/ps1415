@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
@@ -67,6 +68,7 @@ public class AnnounceInformationFragment extends Fragment {
         listAdapter = new AnnounceCursorAdapter(getActivity(), event.getDynamicFields(), event);
 
         listView = (ListView) view.findViewById(R.id.fragment_announce_information_list_view);
+        listView.setItemsCanFocus(true);
         listView.setAdapter(listAdapter);
 
         applyButton = (Button) view.findViewById(R.id.announce_info_apply_button);

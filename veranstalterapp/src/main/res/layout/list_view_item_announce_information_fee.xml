@@ -8,8 +8,7 @@
     <TextView
         android:id="@+id/list_view_item_announce_information_fee_textView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#ff000000"/>
+        android:layout_height="wrap_content"/>
 
     <EditText
         android:id="@+id/list_view_item_announce_information_fee_editText"
@@ -17,7 +16,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:singleLine="true"
-        android:maxLength="30"/>
+        android:maxLength="30"
+        android:inputType="numberSigned"/>
 
     <TextView
         android:layout_width="0dp"

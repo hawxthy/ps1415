@@ -52,7 +52,6 @@ public class EventUtils {
         Field tmpField = new Field();
         tmpField.setType(type.getId());
         tmpField.setTitle(title);
-        tmpField.setValue("");
         event.getDynamicFields().add(pos, tmpField);
     }
 
@@ -95,33 +94,8 @@ public class EventUtils {
      * @param list Liste von Fields von Event
      */
     public void setEventInfo(Event event, ListView list){
-        List<Field> tmpList = event.getDynamicFields();
-        for(int i = 0; i < tmpList.size(); i++){
-            if(tmpList.get(i).getType() == FieldType.TITLE.getId() ||
-               tmpList.get(i).getType() == FieldType.LOCATION.getId() ||
-               tmpList.get(i).getType() == FieldType.DESCRIPTION.getId()){
-                EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
-                    tmpList.get(i).setValue(editText.getText().toString());
-            }else if(tmpList.get(i).getType() == FieldType.FEE.getId()){
-                EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_fee_editText);
-                tmpList.get(i).setValue(editText.getText().toString());
-            }else if(tmpList.get(i).getType() == FieldType.PICTURE.getId()){
-                // Mach was Richard
-            }else if(tmpList.get(i).getType() == FieldType.LINK.getId()){
-                EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_simpletext_editText);
-                tmpList.get(i).setValue(editText.getText().toString());
-            }else if(tmpList.get(i).getType() == FieldType.DATE.getId()){
-                tmpList.get(i).setValue(Long.toString(((AnnounceCursorAdapter) list.getAdapter()).getDate().getTime()));
-            }else if(tmpList.get(i).getType() == FieldType.TIME.getId()){
-                tmpList.get(i).setValue(Long.toString(((AnnounceCursorAdapter) list.getAdapter()).getDate().getTime()));
-            }else if(tmpList.get(i).getType() == FieldType.SIMPLETEXT.getId()){
-                EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_simpletext_editText);
-                tmpList.get(i).setValue(editText.getText().toString());
-            }else if(tmpList.get(i).getType() == FieldType.ROUTE.getId()){
-                //tmpList.get(i).setValue(((AnnounceCursorAdapter)list.getAdapter()).getRoute());
-                event.setRoute(((AnnounceCursorAdapter)list.getAdapter()).getRoute());
-            }
-        }
+        event.setDynamicFields(((AnnounceCursorAdapter)list.getAdapter()).getFieldlist());
+        // TODO Prüfen ob route richtig gesetzt wird
     }
 
     /**
