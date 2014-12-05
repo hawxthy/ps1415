@@ -141,12 +141,12 @@ public class ShowCursorAdapter extends BaseAdapter{
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_button_field_textView_title);
             holder.button = (Button) view.findViewById(R.id.list_view_item_show_information_button_field_button);
             holder.title.setText(fieldList.get(position).getTitle());
-            holder.button.setText(((Route)fieldList.get(position).getValue()).getName());
+            holder.button.setText(event.getRoute().getName());
             holder.button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(context, ShowRouteActivity.class);
-                    intent.putExtra("show_route_extra_route", (((Route) fieldList.get(position).getValue()).getRouteData()).getValue());
+                    intent.putExtra("show_route_extra_route", (event.getRoute().getRouteData()).getValue());
                             context.startActivity(intent);
                 }
             });
@@ -167,7 +167,7 @@ public class ShowCursorAdapter extends BaseAdapter{
             holder.title.setText(fieldList.get(position).getTitle());
             // TODO muss noch richtig gemacht werden
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-            holder.content.setText(dateFormat.format((Date)fieldList.get(position).getValue()));
+            holder.content.setText(dateFormat.format(new Date(Long.parseLong(fieldList.get(position).getValue()))));
 
         }else if(getItem(position).getType().equals(TYPE.LINK.name())){
             HolderTextField holder = new HolderTextField();

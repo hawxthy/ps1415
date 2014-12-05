@@ -71,6 +71,7 @@ public class EditEventActivity extends Activity {
 
 
         new GetEventTask(this).execute(getIntent().getLongExtra("event", 0));
+        ChooseRouteActivity.giveEditEventActivity(this);
 
         // Initialisiere die Buttons
         applyButton = (Button) findViewById(R.id.edit_event_info_apply_button);
@@ -131,7 +132,7 @@ public class EditEventActivity extends Activity {
                 int titleId = EventUtils.getInstance(EditEventActivity.this).getUniqueFieldId(EventUtils.TYPE.TITLE, event);
 
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (titleId != -1 && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_simpletext_editText)).getText().toString().isEmpty()){
+                if (titleId != -1 && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
 
                     // Setze die Attribute vom Event
                     EventUtils.getInstance(EditEventActivity.this).setEventInfo(event, listView);
@@ -186,5 +187,9 @@ public class EditEventActivity extends Activity {
 
         listView = (ListView) findViewById(R.id.fragment_announce_information_list_view);
         listView.setAdapter(listAdapter);
+    }
+
+    public AnnounceCursorAdapter getAdapter(){
+        return listAdapter;
     }
 }

@@ -98,23 +98,29 @@ public class EventUtils {
     public void setEventInfo(Event event, ListView list){
         List<Field> tmpList = event.getDynamicFields();
         for(int i = 0; i < tmpList.size(); i++){
-            if(tmpList.get(i).getType().equals(TYPE.SIMPLETEXT.name()) ||
-               tmpList.get(i).getType().equals(TYPE.TITLE.name()) ||
+            if(tmpList.get(i).getType().equals(TYPE.TITLE.name()) ||
                tmpList.get(i).getType().equals(TYPE.LOCATION.name()) ||
                tmpList.get(i).getType().equals(TYPE.DESCRIPTION.name())){
-                EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_simpletext_editText);
-                tmpList.get(i).setValue(editText.getText());
+                EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
+                    tmpList.get(i).setValue(editText.getText().toString());
             }else if(tmpList.get(i).getType().equals(TYPE.FEE.name())){
                 EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_fee_editText);
-                tmpList.get(i).setValue(editText.getText());
+                tmpList.get(i).setValue(editText.getText().toString());
             }else if(tmpList.get(i).getType().equals(TYPE.PICTURE.name())){
                 // Mach was Richard
             }else if(tmpList.get(i).getType().equals(TYPE.LINK.name())){
-                // Mach was Martin
+                EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_simpletext_editText);
+                tmpList.get(i).setValue(editText.getText().toString());
             }else if(tmpList.get(i).getType().equals(TYPE.DATE.name())){
-                tmpList.get(i).setValue(list.getAdapter().getDate());
+                tmpList.get(i).setValue(Long.toString(((AnnounceCursorAdapter)list.getAdapter()).getDate().getTime()));
             }else if(tmpList.get(i).getType().equals(TYPE.TIME.name())){
-                tmpList.get(i).setValue(list.getAdapter().getDate());
+                tmpList.get(i).setValue(Long.toString(((AnnounceCursorAdapter)list.getAdapter()).getDate().getTime()));
+            }else if(tmpList.get(i).getType().equals(TYPE.SIMPLETEXT.name())){
+                EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_simpletext_editText);
+                tmpList.get(i).setValue(editText.getText().toString());
+            }else if(tmpList.get(i).getType().equals(TYPE.ROUTE.name())){
+                //tmpList.get(i).setValue(((AnnounceCursorAdapter)list.getAdapter()).getRoute());
+                event.setRoute(((AnnounceCursorAdapter)list.getAdapter()).getRoute());
             }
         }
     }

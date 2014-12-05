@@ -46,7 +46,7 @@ public class ChooseRouteActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 ((AnnounceInformationFragment)HoldTabsActivity.getAdapter().getItem(1)).getAdapter().setRoute(routeList.get(i));
                 if(activity != null){
-                    activity.setRoute(routeList.get(i));
+                    activity.getAdapter().setRoute(routeList.get(i));
                 }
                 finish();
             }
