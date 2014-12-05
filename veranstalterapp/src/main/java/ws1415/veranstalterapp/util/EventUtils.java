@@ -10,6 +10,7 @@ import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -47,10 +48,11 @@ public class EventUtils {
      * @param title Titel des DateFields
      * @param type Der Type des Feldes
      */
-    public void addDynamicField(String title, TYPE type, Event event, int pos){
+    public void addDynamicField(String title, FieldType type, Event event, int pos){
         Field tmpField = new Field();
-        tmpField.setType(type.name());
+        tmpField.setType(type.getId());
         tmpField.setTitle(title);
+        tmpField.setValue("");
         event.getDynamicFields().add(pos, tmpField);
     }
 
@@ -65,27 +67,24 @@ public class EventUtils {
     }
 
     /**
-     * Enum um die Felder zu spezifizieren.
-     */
-    public enum TYPE{
-        SIMPLETEXT, FEE, DATE, TIME, ROUTE, PICTURE, LINK, TITLE, LOCATION, DESCRIPTION
-    }
-
-    /**
      * Setzt die Standard Event Informationen, diese umfassen Titel, Fee, Datum, Uhrzeit, Location,
      * Route und Description.
      *
      * @param event Event
      */
     public void setStandardFields(Event event){
-        event.getDynamicFields().clear();
-        addDynamicField(context.getResources().getString(R.string.announce_info_title), EventUtils.TYPE.TITLE, event, 0);
-        addDynamicField(context.getResources().getString(R.string.announce_info_fee), EventUtils.TYPE.FEE, event, 1);
-        addDynamicField(context.getResources().getString(R.string.announce_info_date), EventUtils.TYPE.DATE, event, 2);
-        addDynamicField(context.getResources().getString(R.string.announce_info_time), EventUtils.TYPE.TIME, event, 3);
-        addDynamicField(context.getResources().getString(R.string.announce_info_location), EventUtils.TYPE.LOCATION, event, 4);
-        addDynamicField(context.getResources().getString(R.string.announce_info_map), EventUtils.TYPE.ROUTE, event, 5);
-        addDynamicField(context.getResources().getString(R.string.announce_info_description), EventUtils.TYPE.DESCRIPTION, event, 6);
+        if (event.getDynamicFields() == null) {
+            event.setDynamicFields(new ArrayList<Field>());
+        } else {
+            event.getDynamicFields().clear();
+        }
+        addDynamicField(context.getResources().getString(R.string.announce_info_title), FieldType.TITLE, event, 0);
+        addDynamicField(context.getResources().getString(R.string.announce_info_fee), FieldType.FEE, event, 1);
+        addDynamicField(context.getResources().getString(R.string.announce_info_date), FieldType.DATE, event, 2);
+        addDynamicField(context.getResources().getString(R.string.announce_info_time), FieldType.TIME, event, 3);
+        addDynamicField(context.getResources().getString(R.string.announce_info_location), FieldType.LOCATION, event, 4);
+        addDynamicField(context.getResources().getString(R.string.announce_info_map), FieldType.ROUTE, event, 5);
+        addDynamicField(context.getResources().getString(R.string.announce_info_description), FieldType.DESCRIPTION, event, 6);
     }
 
     /**
@@ -98,27 +97,27 @@ public class EventUtils {
     public void setEventInfo(Event event, ListView list){
         List<Field> tmpList = event.getDynamicFields();
         for(int i = 0; i < tmpList.size(); i++){
-            if(tmpList.get(i).getType().equals(TYPE.TITLE.name()) ||
-               tmpList.get(i).getType().equals(TYPE.LOCATION.name()) ||
-               tmpList.get(i).getType().equals(TYPE.DESCRIPTION.name())){
+            if(tmpList.get(i).getType() == FieldType.TITLE.getId() ||
+               tmpList.get(i).getType() == FieldType.LOCATION.getId() ||
+               tmpList.get(i).getType() == FieldType.DESCRIPTION.getId()){
                 EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
                     tmpList.get(i).setValue(editText.getText().toString());
-            }else if(tmpList.get(i).getType().equals(TYPE.FEE.name())){
+            }else if(tmpList.get(i).getType() == FieldType.FEE.getId()){
                 EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_fee_editText);
                 tmpList.get(i).setValue(editText.getText().toString());
-            }else if(tmpList.get(i).getType().equals(TYPE.PICTURE.name())){
+            }else if(tmpList.get(i).getType() == FieldType.PICTURE.getId()){
                 // Mach was Richard
-            }else if(tmpList.get(i).getType().equals(TYPE.LINK.name())){
+            }else if(tmpList.get(i).getType() == FieldType.LINK.getId()){
                 EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_simpletext_editText);
                 tmpList.get(i).setValue(editText.getText().toString());
-            }else if(tmpList.get(i).getType().equals(TYPE.DATE.name())){
-                tmpList.get(i).setValue(Long.toString(((AnnounceCursorAdapter)list.getAdapter()).getDate().getTime()));
-            }else if(tmpList.get(i).getType().equals(TYPE.TIME.name())){
-                tmpList.get(i).setValue(Long.toString(((AnnounceCursorAdapter)list.getAdapter()).getDate().getTime()));
-            }else if(tmpList.get(i).getType().equals(TYPE.SIMPLETEXT.name())){
+            }else if(tmpList.get(i).getType() == FieldType.DATE.getId()){
+                tmpList.get(i).setValue(Long.toString(((AnnounceCursorAdapter) list.getAdapter()).getDate().getTime()));
+            }else if(tmpList.get(i).getType() == FieldType.TIME.getId()){
+                tmpList.get(i).setValue(Long.toString(((AnnounceCursorAdapter) list.getAdapter()).getDate().getTime()));
+            }else if(tmpList.get(i).getType() == FieldType.SIMPLETEXT.getId()){
                 EditText editText = (EditText) list.getChildAt(i).findViewById(R.id.list_view_item_announce_information_simpletext_editText);
                 tmpList.get(i).setValue(editText.getText().toString());
-            }else if(tmpList.get(i).getType().equals(TYPE.ROUTE.name())){
+            }else if(tmpList.get(i).getType() == FieldType.ROUTE.getId()){
                 //tmpList.get(i).setValue(((AnnounceCursorAdapter)list.getAdapter()).getRoute());
                 event.setRoute(((AnnounceCursorAdapter)list.getAdapter()).getRoute());
             }
@@ -179,9 +178,9 @@ public class EventUtils {
      * @param type der Typ des eindeutigen Feldes
      * @return Die Id, -1 falls keins gefunden wurde
      */
-    public int getUniqueFieldId(TYPE type, Event event){
+    public int getUniqueFieldId(FieldType type, Event event){
         for(int i = 0; i < event.getDynamicFields().size(); i++){
-            if(event.getDynamicFields().get(i).getType().equals(type.name())){
+            if(event.getDynamicFields().get(i).getType() == type.getId()){
                 return i;
             }
         }

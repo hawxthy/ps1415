@@ -27,7 +27,6 @@ import com.skatenight.skatenightAPI.model.Route;
 
 import ws1415.veranstalterapp.activity.ChooseRouteActivity;
 import ws1415.veranstalterapp.util.EventUtils;
-import ws1415.veranstalterapp.util.EventUtils.TYPE;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,6 +34,7 @@ import java.util.Date;
 import java.util.List;
 
 import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.util.FieldType;
 
 /**
  * Klasse zum Füllen der ListView in AnnounceInformationFragment.
@@ -158,19 +158,19 @@ public class AnnounceCursorAdapter extends BaseAdapter {
 
         if (position % 2 == 1 || edit_mode == false) {
             if (edit_mode) position = position / 2;
-            if (getItem(position).getType().equals(TYPE.TITLE.name()) ||
-                    getItem(position).getType().equals(TYPE.LOCATION.name()) ||
-                    getItem(position).getType().equals(TYPE.DESCRIPTION.name())) {
+            if (getItem(position).getType() == FieldType.TITLE.getId() ||
+                    getItem(position).getType() == FieldType.LOCATION.getId() ||
+                    getItem(position).getType() == FieldType.DESCRIPTION.getId()) {
                 HolderUniqueTextField holder = new HolderUniqueTextField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_unique_text, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_uniquetext_textView);
                 holder.title.setText(getItem(position).getTitle());
-            } else if (getItem(position).getType().equals(TYPE.FEE.name())) {
+            } else if (getItem(position).getType() == FieldType.FEE.getId()) {
                 HolderUniqueTextField holder = new HolderUniqueTextField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_fee, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_fee_textView);
                 holder.title.setText(getItem(position).getTitle());
-            } else if (getItem(position).getType().equals(TYPE.DATE.name())) {
+            } else if (getItem(position).getType() == FieldType.DATE.getId()) {
                 HolderButtonField holder = new HolderButtonField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
@@ -178,7 +178,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 holder.title.setText(getItem(position).getTitle());
                 setDateListener(holder.button);
                 holder.button.setText(day + "." + (month + 1) + "." + year);
-            } else if (getItem(position).getType().equals(TYPE.TIME.name())) {
+            } else if (getItem(position).getType() == FieldType.TIME.getId()) {
                 HolderButtonField holder = new HolderButtonField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
@@ -190,7 +190,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 } else {
                     holder.button.setText(hour + ":" + minute + " Uhr");
                 }
-            } else if (getItem(position).getType().equals(TYPE.ROUTE.name())) {
+            } else if (getItem(position).getType() == FieldType.ROUTE.getId()) {
                 HolderButtonField holder = new HolderButtonField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
@@ -200,7 +200,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 setRouteListener(holder.button);
                 if(route != null) holder.button.setText(route.getName());
                 else holder.button.setText(context.getResources().getString(R.string.announce_info_choose_map));
-            } else if (getItem(position).getType().equals(TYPE.PICTURE.name())) {
+            } else if (getItem(position).getType() == FieldType.PICTURE.getId()) {
                 HolderPictureField holder = new HolderPictureField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_picture, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_picture_textView);
@@ -216,8 +216,8 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                         notifyDataSetChanged();
                     }
                 });
-            } else if(getItem(position).getType().equals(TYPE.SIMPLETEXT.name()) ||
-                    getItem(position).getType().equals(TYPE.LINK.name())) {
+            } else if(getItem(position).getType() == FieldType.SIMPLETEXT.getId() ||
+                    getItem(position).getType() == FieldType.LINK.getId()) {
                 HolderSimpleTextField holder = new HolderSimpleTextField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_simpletext, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_simpletext_textView);
@@ -290,11 +290,11 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 String value = input.getText().toString() + ":";
 
                 if (which == 0)
-                    EventUtils.getInstance(context).addDynamicField(value, TYPE.SIMPLETEXT, event, position / 2);
+                    EventUtils.getInstance(context).addDynamicField(value, FieldType.SIMPLETEXT, event, position / 2);
                 else if (which == 1)
-                    EventUtils.getInstance(context).addDynamicField(value, TYPE.PICTURE, event, position / 2);
+                    EventUtils.getInstance(context).addDynamicField(value, FieldType.PICTURE, event, position / 2);
                 else if (which == 2)
-                    EventUtils.getInstance(context).addDynamicField(value, TYPE.LINK, event, position / 2);
+                    EventUtils.getInstance(context).addDynamicField(value, FieldType.LINK, event, position / 2);
                 notifyDataSetChanged();
             }
         });

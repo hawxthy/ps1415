@@ -13,31 +13,10 @@ import javax.jdo.annotations.Persistent;
  * <p/>
  * Created by Bernd Eissing on 02.12.2014.
  */
-@PersistenceCapable
-public class Field {
-
-    /**
-     * Enum um die Felder zu spezifizieren.
-     */
-    public enum TYPE {
-        SIMPLETEXT, FEE, DATE, TIME, ROUTE, PICTURE, LINK, TITLE, LOCATION, DESCRIPTION
-    }
-
-    @Persistent
+public class Field implements Serializable {
     private String title;
-    @Persistent
     private String value;
-    @Persistent
-    private TYPE type;
-
-    public Field(String title, TYPE type) {
-        this.title = title;
-        this.type = type;
-    }
-
-    @JsonCreator
-    public Field() {
-    }
+    private int type;
 
     public String getValue() {
         return value;
@@ -55,11 +34,11 @@ public class Field {
         this.title = title;
     }
 
-    public TYPE getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(TYPE type) {
+    public void setType(int type) {
         this.type = type;
     }
 }

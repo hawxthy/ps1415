@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -36,6 +37,7 @@ import javax.jdo.Transaction;
 public class SkatenightServerEndpoint {
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
+    public static final Logger log = Logger.getLogger(SkatenightServerEndpoint.class.getName());
 
 //    /**
 //     * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.

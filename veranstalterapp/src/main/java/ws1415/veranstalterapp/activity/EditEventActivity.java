@@ -31,6 +31,7 @@ import ws1415.veranstalterapp.task.CreateEventTask;
 import ws1415.veranstalterapp.task.EditEventTask;
 import ws1415.veranstalterapp.task.GetEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
+import ws1415.veranstalterapp.util.FieldType;
 
 /**
  * Die Activity zum ändern der Attribute eines Events und zum eventuellen hinzufügen weiterer
@@ -129,7 +130,7 @@ public class EditEventActivity extends Activity {
         builder.setMessage(R.string.areyousure);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                int titleId = EventUtils.getInstance(EditEventActivity.this).getUniqueFieldId(EventUtils.TYPE.TITLE, event);
+                int titleId = EventUtils.getInstance(EditEventActivity.this).getUniqueFieldId(FieldType.TITLE, event);
 
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
                 if (titleId != -1 && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
@@ -144,7 +145,11 @@ public class EditEventActivity extends Activity {
                     Toast.makeText(EditEventActivity.this, getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
 
                     // Setze die Attribute von Event auf den Standard
+                    event = new Event();
                     EventUtils.getInstance(EditEventActivity.this).setStandardFields(event);
+                    listAdapter = new AnnounceCursorAdapter(EditEventActivity.this, event.getDynamicFields(), event);
+                    listView.setAdapter(listAdapter);
+                    listAdapter.notifyDataSetChanged();
 
                     // Update die Informationen in ShowInformationFragment
                     HoldTabsActivity.updateInformation();

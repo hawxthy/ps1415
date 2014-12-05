@@ -20,7 +20,6 @@ import org.w3c.dom.Text;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.activity.ChooseRouteActivity;
 import ws1415.veranstalterapp.activity.ShowRouteActivity;
-import ws1415.veranstalterapp.util.EventUtils.TYPE;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 import ws1415.veranstalterapp.util.EventUtils;
+import ws1415.veranstalterapp.util.FieldType;
 
 /**
  * Created by Bernd Eissing on 28.11.2014.
@@ -115,10 +115,10 @@ public class ShowCursorAdapter extends BaseAdapter{
         View view = null;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        if(getItem(position).getType().equals(TYPE.TITLE.name()) ||
-           getItem(position).getType().equals(TYPE.LOCATION.name()) ||
-           getItem(position).getType().equals(TYPE.DESCRIPTION.name()) ||
-           getItem(position).getType().equals(TYPE.SIMPLETEXT.name())){
+        if(getItem(position).getType() == FieldType.TITLE.getId() ||
+           getItem(position).getType() == FieldType.LOCATION.getId() ||
+           getItem(position).getType() == FieldType.DESCRIPTION.getId() ||
+           getItem(position).getType() == FieldType.SIMPLETEXT.getId()){
             HolderTextField holder = new HolderTextField();
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
@@ -126,7 +126,7 @@ public class ShowCursorAdapter extends BaseAdapter{
             holder.title.setText(fieldList.get(position).getTitle());
             holder.content.setText(fieldList.get(position).getValue().toString());
 
-        }else if(getItem(position).getType().equals(TYPE.PICTURE)){
+        }else if(getItem(position).getType() == FieldType.PICTURE.getId()){
             HolderImageField holder = new HolderImageField();
             view = inflater.inflate(R.layout.list_view_item_show_information_image_field, viewGroup, false);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_image_field_textView_title);
@@ -135,7 +135,7 @@ public class ShowCursorAdapter extends BaseAdapter{
             // TODO muss noch richtig gemacht werden
             //holder.image.setImageBitmap(fieldList.get(position).getValue());
 
-        }else if(getItem(position).getType().equals(TYPE.ROUTE.name())){
+        }else if(getItem(position).getType() == FieldType.ROUTE.getId()){
             HolderButtonField holder = new HolderButtonField();
             view = inflater.inflate(R.layout.list_view_item_show_information_button_field, viewGroup, false);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_button_field_textView_title);
@@ -151,7 +151,7 @@ public class ShowCursorAdapter extends BaseAdapter{
                 }
             });
 
-        }else if(getItem(position).getType().equals(TYPE.FEE.name())){
+        }else if(getItem(position).getType() == FieldType.FEE.getId()){
             HolderTextField holder = new HolderTextField();
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
@@ -159,7 +159,7 @@ public class ShowCursorAdapter extends BaseAdapter{
             holder.title.setText(fieldList.get(position).getTitle());
             holder.content.setText(fieldList.get(position).getValue().toString()+"€");
 
-        }else if(getItem(position).getType().equals(TYPE.TIME.name())){
+        }else if(getItem(position).getType() == FieldType.TIME.getId()){
             HolderTextField holder = new HolderTextField();
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
@@ -169,7 +169,7 @@ public class ShowCursorAdapter extends BaseAdapter{
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
             holder.content.setText(dateFormat.format(new Date(Long.parseLong(fieldList.get(position).getValue()))));
 
-        }else if(getItem(position).getType().equals(TYPE.LINK.name())){
+        }else if(getItem(position).getType() == FieldType.LINK.getId()){
             HolderTextField holder = new HolderTextField();
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);

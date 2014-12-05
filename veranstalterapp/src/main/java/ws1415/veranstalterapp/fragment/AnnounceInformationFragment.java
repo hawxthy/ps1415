@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -20,10 +21,12 @@ import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
 
 import ws1415.veranstalterapp.Adapter.AnnounceCursorAdapter;
+import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.CreateEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
+import ws1415.veranstalterapp.util.FieldType;
 
 /**
  * Fragment zum Veröffentlichen von neuen Veranstaltungen.
@@ -131,7 +134,7 @@ public class AnnounceInformationFragment extends Fragment {
         builder.setMessage(R.string.areyousure);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                int titleId = EventUtils.getInstance(getActivity()).getUniqueFieldId(EventUtils.TYPE.TITLE, event);
+                int titleId = EventUtils.getInstance(getActivity()).getUniqueFieldId(FieldType.TITLE, event);
 
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
                 if (titleId != -1 && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
@@ -146,7 +149,10 @@ public class AnnounceInformationFragment extends Fragment {
                     Toast.makeText(getActivity(), getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
 
                     // Setze die Attribute von Event auf den Standard
+                    event = new Event();
                     EventUtils.getInstance(getActivity()).setStandardFields(event);
+                    listAdapter = new AnnounceCursorAdapter(getActivity(), event.getDynamicFields(), event);
+                    listView.setAdapter(listAdapter);
                     listAdapter.notifyDataSetChanged();
 
                     // Update die Informationen in ShowInformationFragment
