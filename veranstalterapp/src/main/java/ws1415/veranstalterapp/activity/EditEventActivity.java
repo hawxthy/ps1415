@@ -183,9 +183,9 @@ public class EditEventActivity extends Activity {
      * @param e Das Event
      */
     public void setEventDataToView(Event e){
-        listView = (ListView) findViewById(R.id.fragment_announce_information_list_view);
+        listAdapter = new AnnounceCursorAdapter(this, e.getDynamicFields(), e);
 
-        listAdapter = new AnnounceCursorAdapter(this, e.getDynamicFields(), e, listView);
+        listView = (ListView) findViewById(R.id.fragment_announce_information_list_view);
         listView.setAdapter(listAdapter);
     }
 

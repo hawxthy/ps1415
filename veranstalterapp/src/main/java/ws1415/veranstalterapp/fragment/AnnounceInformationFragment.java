@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
@@ -56,14 +57,14 @@ public class AnnounceInformationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_announce_information, container, false);
-        listView = (ListView) view.findViewById(R.id.fragment_announce_information_list_view);
 
         // Erstelle ein neues Event und füge die Standardattribute in die ArrayList ein.
         event = new Event();
         event.setDynamicFields(new ArrayList<Field>());
         EventUtils.getInstance(getActivity()).setStandardFields(event);
-        listAdapter = new AnnounceCursorAdapter(getActivity(), event.getDynamicFields(), event, listView);
+        listAdapter = new AnnounceCursorAdapter(getActivity(), event.getDynamicFields(), event);
 
+        listView = (ListView) view.findViewById(R.id.fragment_announce_information_list_view);
         listView.setItemsCanFocus(true);
         listView.setAdapter(listAdapter);
 
@@ -148,6 +149,10 @@ public class AnnounceInformationFragment extends Fragment {
 
                     // Setze die Attribute von Event auf den Standard
                     EventUtils.getInstance(getActivity()).setStandardFields(event);
+                    listAdapter.setFieldlist(event.getDynamicFields());
+                    listAdapter.setRoute(null);
+                    listAdapter.setCurrentDate();
+                    listAdapter.setStandardTime();
                     listAdapter.notifyDataSetChanged();
 
                     // Update die Informationen in ShowInformationFragment
