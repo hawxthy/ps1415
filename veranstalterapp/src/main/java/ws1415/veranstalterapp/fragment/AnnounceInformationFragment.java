@@ -20,16 +20,19 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
 
 import ws1415.veranstalterapp.Adapter.AnnounceCursorAdapter;
+import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.CreateEventTask;
@@ -75,6 +78,7 @@ public class AnnounceInformationFragment extends Fragment {
         listAdapter = new AnnounceCursorAdapter(this, event.getDynamicFields(), event);
 
         listView = (ListView) view.findViewById(R.id.fragment_announce_information_list_view);
+        listView.setItemsCanFocus(true);
         listView.setAdapter(listAdapter);
 
         applyButton = (Button) view.findViewById(R.id.announce_info_apply_button);
@@ -100,14 +104,20 @@ public class AnnounceInformationFragment extends Fragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                cancelInfo(true);
+                if(!listAdapter.getEditMode()) {
+                    cancelInfo(true);
+                }
+                Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
             }
         });
 
         applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                applyInfo();
+                if(!listAdapter.getEditMode()) {
+                    applyInfo();
+                }
+                Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
             }
         });
 
@@ -127,7 +137,7 @@ public class AnnounceInformationFragment extends Fragment {
 
     /**
      * Liest die eingegebenen Informationen aus, erstellt ause diesen ein Event und fügt dieses
-     * Event dem Server hinzu. Momentan wir noch das alte Event überschrieben.
+     * Event dem Server hinzu.
      */
     public void applyInfo() {
 
@@ -136,10 +146,10 @@ public class AnnounceInformationFragment extends Fragment {
         builder.setMessage(R.string.areyousure);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                int titleId = EventUtils.getInstance(getActivity()).getUniqueFieldId(EventUtils.TYPE.TITLE, event);
+                int titleId = EventUtils.getInstance(getActivity()).getUniqueFieldId(FieldType.TITLE, event);
 
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (titleId != -1 && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_simpletext_editText)).getText().toString().isEmpty()){
+                if (titleId != -1 && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
 
                     // Setze die Attribute vom Event
                     EventUtils.getInstance(getActivity()).setEventInfo(event, listView);
@@ -151,7 +161,11 @@ public class AnnounceInformationFragment extends Fragment {
                     Toast.makeText(getActivity(), getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
 
                     // Setze die Attribute von Event auf den Standard
+                    event = new Event();
                     EventUtils.getInstance(getActivity()).setStandardFields(event);
+                    listAdapter = new AnnounceCursorAdapter(getActivity(), event.getDynamicFields(), event);
+                    listView.setAdapter(listAdapter);
+                    listAdapter.notifyDataSetChanged();
 
                     // Update die Informationen in ShowInformationFragment
                     HoldTabsActivity.updateInformation();
@@ -184,10 +198,14 @@ public class AnnounceInformationFragment extends Fragment {
     }
 
     /**
-     * Dies Methode setzt die Route für das Event
+     * Gibt den Adapter, der die ListView füllt, zurück.
      *
-     * @param selectedRoute Die Route für das Event
+     * @return Adapter
      */
+    public AnnounceCursorAdapter getAdapter(){
+        return listAdapter;
+    }
+    
     public void setRoute(Route selectedRoute) {
         //route = selectedRoute;
         //routePickerButton.setText(selectedRoute.getName());
@@ -216,7 +234,7 @@ public class AnnounceInformationFragment extends Fragment {
         if (data != null && pictureField != null) {
             // Pfad ermitteln
             Uri selectedImageUri = data.getData();
-            String[] projection = { MediaStore.MediaColumns.DATA };
+            String[] projection = {MediaStore.MediaColumns.DATA};
             CursorLoader cl = new CursorLoader(this.getActivity());
             cl.setUri(selectedImageUri);
             cl.setProjection(projection);
@@ -239,4 +257,5 @@ public class AnnounceInformationFragment extends Fragment {
             listAdapter.notifyDataSetChanged();
         }
     }
+    
 }

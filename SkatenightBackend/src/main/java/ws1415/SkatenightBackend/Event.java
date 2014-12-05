@@ -3,6 +3,7 @@ package ws1415.SkatenightBackend;
 import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
+import com.google.appengine.api.log.LogServiceFactory;
 import com.google.appengine.datanucleus.annotations.Unowned;
 import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonCreator;
 import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonProperty;
@@ -13,7 +14,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -44,10 +47,9 @@ public class Event {
     @Persistent(defaultFetchGroup = "true")
     @Unowned
     private Route route;
-
     // Dynamische ArrayListe von dynamischen Komponenten
     @Persistent(serialized = "true", defaultFetchGroup = "true")
-    private ArrayList<Field> dynamicFields;
+    private List<Field> dynamicFields = new ArrayList<Field>();
 
     public Key getKey() {
         return key;
@@ -58,35 +60,41 @@ public class Event {
     }
 
     public String getTitle() {
-        return (String)getUniqueField(TYPE.TITLE).getValue();
+        return (String)getUniqueField(FieldType.TITLE.getId()).getValue();
     }
 
     public void setDate(Date date){
-        getUniqueField(TYPE.DATE).setValue(date);
+        getUniqueField(FieldType.DATE.getId()).setValue(Long.toString(date.getTime()));
     }
 
     public Date getDate(){
-        return (Date)getUniqueField(TYPE.DATE).getValue();
+        return new Date(Long.parseLong(getUniqueField(FieldType.DATE.getId()).getValue()));
     }
 
     public void setTime(Date time){
-        getUniqueField(TYPE.TIME).setValue(time);
+        getUniqueField(FieldType.TIME.getId()).setValue(Long.toString(time.getTime()));
     }
 
     public Date getTime(){
-        return (Date)getUniqueField(TYPE.TIME).getValue();
+        return new Date(Long.parseLong(getUniqueField(FieldType.TIME.getId()).getValue()));
     }
 
     public String getFee() {
-        return (String)getUniqueField(TYPE.FEE).getValue();
+        return (String)getUniqueField(FieldType.FEE.getId()).getValue();
     }
 
     public String getLocation() {
-        return  (String)getUniqueField(TYPE.LOCATION).getValue();
+        if((String)getUniqueField(FieldType.LOCATION.getId()).getValue() != null){
+            return  (String)getUniqueField(FieldType.LOCATION.getId()).getValue();
+        }
+        return "";
     }
 
     public Text getDescription() {
-        return  (Text)getUniqueField(TYPE.DESCRIPTION).getValue();
+        if(new Text(getUniqueField(FieldType.DESCRIPTION.getId()).getValue()) != null){
+            return  new Text(getUniqueField(FieldType.DESCRIPTION.getId()).getValue());
+        }
+        return new Text("");
     }
 
     public void setRoute(Route route){
@@ -97,6 +105,13 @@ public class Event {
         return  route;
     }
 
+    public List<Field> getDynamicFields(){
+        return dynamicFields;
+    }
+
+    public void setDynamicFields(ArrayList<Field> list){
+        this.dynamicFields = list;
+    }
 
     /**
      * Methode zum finden von eindeutigen Feldern
@@ -104,66 +119,12 @@ public class Event {
      * @param type der Typ des eindeutigen Feldes
      * @return Das Feld, null falls keins gefunden wurde
      */
-    public Field getUniqueField(TYPE type){
+    public Field getUniqueField(int type){
         for(int i = 0; i < dynamicFields.size(); i++){
             if(dynamicFields.get(i).getType() == type){
                 return dynamicFields.get(i);
             }
         }
         return null;
-    }
-
-
-    public ArrayList<Field> getDynamicFields(){
-        return dynamicFields;
-    }
-
-    /**
-     * Enum um die Felder zu spezifizieren.
-     */
-    public enum TYPE{
-        SIMPLETEXT, FEE, DATE, TIME, ROUTE, PICTURE, LINK, TITLE, LOCATION, DESCRIPTION
-    }
-
-    /**
-     * Klasse für die Informationsfelder einer Veranstaltung
-     */
-    public class Field implements Serializable {
-        private String title;
-        private Object value;
-        private TYPE type;
-
-        public Field(String title, TYPE type){
-            this.title = title;
-            this.type = type;
-        }
-
-        @JsonCreator
-        public Field() {
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public void setValue(Object value) {
-            this.value = value;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public TYPE getType(){
-            return type;
-        }
-
-        public void setType(TYPE type){
-            this.type = type;
-        }
     }
 }

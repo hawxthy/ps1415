@@ -13,6 +13,7 @@
     <string name="announce_info_cancel_button">Abbrechen</string>
     <string name="announce_info_start_edit_button">Editiere Event Eigenschaften</string>
     <string name="announce_info_exit_edit_button">Beende Editieren</string>
+    <string name="announce_info_edit_mode_string">Nicht möglich in Edit Modus</string>
     <string name="announce_info_title">Titel:</string>
     <string name="announce_info_title_hint">Gib einen Titel an</string>
     <string name="announce_info_fee">Gebühr:</string>
@@ -99,4 +100,5 @@
     <string name="title_activity_edit_event">Veranstaltung bearbeiten</string>
     <string name="eventedited">Veranstaltung wurde bearbeitet</string>
     <string name="edit_event_info_apply_button">Speichern</string>
+    <string name="announce_info_edit_button">Editiere Event Eigenschaften</string>
 </resources>

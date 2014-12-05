@@ -461,7 +461,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
      * 2 Wegpunkte übergeben werden. Aufgrund der Einschränkungen der API dürfen neben dem Start-
      * und Endpunkt maximal 8 Wegpunkte übergeben werden. Die Anweisungen werden als JSON String
      * runtergeladen und anschließend in ein Route Objekt eingefügt. Das Ergebnis wird der
-     * RouteEditorActivity über die setRoute Methode geliefert.
+     * RouteEditorActivity über die setRouteAndText Methode geliefert.
      */
     private class RouteLoaderTask extends AsyncTask<ArrayAdapter<Waypoint>, Void, Route> {
         private final String LOG_TAG = RouteLoaderTask.class.getSimpleName();

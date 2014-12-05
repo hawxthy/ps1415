@@ -21,6 +21,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/choose_image"/>
+        
+        <Button
+        android:id="@+id/list_view_item_announce_information_picture_deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-"/>
 
     </LinearLayout>
 
