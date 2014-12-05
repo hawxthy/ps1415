@@ -51,11 +51,12 @@ import java.util.List;
 
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
+import ws1415.veranstalterapp.util.FieldType;
 import ws1415.veranstalterapp.util.ImageUtil;
 
 /**
  * Klasse zum Füllen der ListView in AnnounceInformationFragment.
- *
+ * <p/>
  * Created by Martin Wrodarczyk on 28.11.2014.
  */
 public class AnnounceCursorAdapter extends BaseAdapter {
@@ -86,8 +87,18 @@ public class AnnounceCursorAdapter extends BaseAdapter {
      * @param fieldList Liste von den Routen
      */
     public AnnounceCursorAdapter(AnnounceInformationFragment parent, List<Field> fieldList, Event event) {
+        this(parent.getActivity(), fieldList, event);
         this.parent = parent;
-        this.context = parent.getActivity();
+    }
+
+    /**
+     * Konstruktor, der den Inhalt der Liste festlegt.
+     *
+     * @param context   Context, von der aus der Adapter aufgerufen wird
+     * @param fieldList Liste von den Routen
+     */
+    public AnnounceCursorAdapter(Context context, List<Field> fieldList, Event event) {
+        this.context = context;
         this.fieldList = fieldList;
         this.event = event;
         setStandardTime();
@@ -185,9 +196,9 @@ public class AnnounceCursorAdapter extends BaseAdapter {
 
         if (position % 2 == 1 || edit_mode == false) {
             if (edit_mode) position = position / 2;
-            if (getItem(position).getType() == FieldType.TITLE.getId() ||
-                    getItem(position).getType() == FieldType.LOCATION.getId() ||
-                    getItem(position).getType() == FieldType.DESCRIPTION.getId()) {
+
+            final Field field = getItem(position);
+
             final int focusPos = position;
 
             // Textwatcher um die temporären Änderungen von den EditTexts zu speichern
@@ -196,52 +207,63 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
                     fieldList.get(focusPos).setValue(charSequence.toString());
                 }
+
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
                 }
+
                 @Override
                 public void afterTextChanged(Editable editable) {
                 }
             };
 
-            if (getItem(position).getType().equals(TYPE.TITLE.name()) ||
-                    getItem(position).getType().equals(TYPE.LOCATION.name()) ||
-                    getItem(position).getType().equals(TYPE.DESCRIPTION.name())) {
+            if (field.getType() == FieldType.TITLE.getId() ||
+                    field.getType() == FieldType.LOCATION.getId() ||
+                    field.getType() == FieldType.DESCRIPTION.getId()) {
                 HolderUniqueTextField holder = new HolderUniqueTextField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_unique_text, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_uniquetext_textView);
                 holder.content = (EditText) view.findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
 
                 setTitleAndContentInView(holder.title, holder.content, position, watcher);
-            } else if (getItem(position).getType().equals(TYPE.FEE.name())) {
+            } else if (field.getType() == FieldType.FEE.getId()) {
                 HolderUniqueTextField holder = new HolderUniqueTextField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_fee, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_fee_textView);
                 holder.content = (EditText) view.findViewById(R.id.list_view_item_announce_information_fee_editText);
 
                 setTitleAndContentInView(holder.title, holder.content, position, watcher);
-            } else if (getItem(position).getType().equals(TYPE.DATE.name())) {
+            } else if (field.getType() == FieldType.DATE.getId()) {
                 HolderButtonField holder = new HolderButtonField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
                 holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
 
                 setDateInView(holder.title, holder.button, position);
-            } else if (getItem(position).getType().equals(TYPE.TIME.name())) {
+            } else if (field.getType() == FieldType.TIME.getId()) {
                 HolderButtonField holder = new HolderButtonField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
                 holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
 
                 setTimeInView(holder.title, holder.button, position);
-            } else if (getItem(position).getType().equals(TYPE.ROUTE.name())) {
+            } else if (field.getType() == FieldType.ROUTE.getId()) {
                 HolderButtonField holder = new HolderButtonField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
                 holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
-                holder.title.setText(getItem(position).getTitle());
+                holder.title.setText(field.getTitle());
                 setRouteInView(holder.title, holder.button, position);
-            } else if(getItem(position).getType().equals(TYPE.PICTURE.name())) {
+            } else if (field.getType() == FieldType.SIMPLETEXT.getId() ||
+                    field.getType() == FieldType.LINK.getId()) {
+                HolderSimpleTextField holder = new HolderSimpleTextField();
+                view = inflater.inflate(R.layout.list_view_item_announce_information_simpletext, viewGroup, false);
+                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_simpletext_textView);
+                holder.content = (EditText) view.findViewById(R.id.list_view_item_announce_information_simpletext_editText);
+                holder.deleteButton = (Button) view.findViewById(R.id.list_view_item_announce_information_simpletext_deleteButton);
+
+                setSimpleTextInView(holder.title, holder.content, holder.deleteButton, position, watcher);
+            } else if (field.getType() == FieldType.PICTURE.getId()) {
                 final HolderPictureField holder = new HolderPictureField();
                 view = inflater.inflate(R.layout.list_view_item_announce_information_picture, viewGroup, false);
                 holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_picture_textView);
@@ -249,26 +271,26 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 holder.deleteButton = (Button) view.findViewById(R.id.list_view_item_announce_information_picture_deleteButton);
                 holder.image = (ImageView) view.findViewById(R.id.list_view_item_announce_information_picture_picture);
                 setPictureInView(holder.title, holder.deleteButton, position);
-                
-                if (field.getValue() != null) {
-                    Bitmap bm = bitmapCache.get(field);
-                    if (bm == null) {
-                        byte[] bytes = (byte[]) field.getValue();
 
-                        // Zunächst nur Auflösung des Bilds abrufen und passende SampleSize berechnen
-                        BitmapFactory.Options options = new BitmapFactory.Options();
-                        options.inJustDecodeBounds = true;
-                        BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                        options.inSampleSize = ImageUtil.calculateInSampleSize(options, 720);
-                        // Skalierte Version des Bilds abrufen
-                        options.inJustDecodeBounds = false;
-                        bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                        bitmapCache.put(field, bm);
-                    }
-
-                    // Bild anzeigen
-                    holder.image.setImageBitmap(bm);
-                }
+//                    if (field.getValue() != null) {
+//                        Bitmap bm = bitmapCache.get(field);
+//                        if (bm == null) {
+//                            byte[] bytes = (byte[]) field.getValue();
+//
+//                            // Zunächst nur Auflösung des Bilds abrufen und passende SampleSize berechnen
+//                            BitmapFactory.Options options = new BitmapFactory.Options();
+//                            options.inJustDecodeBounds = true;
+//                            BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+//                            options.inSampleSize = ImageUtil.calculateInSampleSize(options, 720);
+//                            // Skalierte Version des Bilds abrufen
+//                            options.inJustDecodeBounds = false;
+//                            bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+//                            bitmapCache.put(field, bm);
+//                        }
+//
+//                        // Bild anzeigen
+//                        holder.image.setImageBitmap(bm);
+//                    }
 
                 final int finalPosition = position;
                 holder.button.setOnClickListener(new View.OnClickListener() {
@@ -279,16 +301,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                     }
                 });
             }
-        } else if(getItem(position).getType().equals(TYPE.SIMPLETEXT.name()) ||
-                    getItem(position).getType().equals(TYPE.LINK.name())) {
-                HolderSimpleTextField holder = new HolderSimpleTextField();
-                view = inflater.inflate(R.layout.list_view_item_announce_information_simpletext, viewGroup, false);
-                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_simpletext_textView);
-                holder.content = (EditText) view.findViewById(R.id.list_view_item_announce_information_simpletext_editText);
-                holder.deleteButton = (Button) view.findViewById(R.id.list_view_item_announce_information_simpletext_deleteButton);
-
-                setSimpleTextInView(holder.title, holder.content, holder.deleteButton, position, watcher);
-            } else {
+        } else {
             HolderAddField holder = new HolderAddField();
             final int pos = position;
             view = inflater.inflate(R.layout.list_view_item_announce_information_plus_item, viewGroup, false);
@@ -303,37 +316,38 @@ public class AnnounceCursorAdapter extends BaseAdapter {
         return view;
     }
 
-    private void setTitleAndContentInView(TextView title, EditText content, int position, TextWatcher watcher){
+    private void setTitleAndContentInView(TextView title, EditText content, int position, TextWatcher watcher) {
         content.addTextChangedListener(watcher);
-        if(getItem(position).getValue() != null) content.setText(getItem(position).getValue().toString());
+        if (getItem(position).getValue() != null)
+            content.setText(getItem(position).getValue().toString());
         else content.setText("");
         title.setText(getItem(position).getTitle());
     }
 
-    private void setDateInView(TextView title, Button button, int position){
+    private void setDateInView(TextView title, Button button, int position) {
         title.setText(getItem(position).getTitle());
-        setDateListener(button);
+        setDateListener(button, getItem(position));
         button.setText(day + "." + (month + 1) + "." + year);
     }
 
     private void setTimeInView(TextView title, Button button, int position) {
         title.setText(getItem(position).getTitle());
-        setTimeListener(button);
+        setTimeListener(button, getItem(position));
         if (minute < 10) button.setText(hour + ":0" + minute + " Uhr");
         else button.setText(hour + ":" + minute + " Uhr");
     }
 
-    private void setRouteInView(TextView title, Button button, int position){
+    private void setRouteInView(TextView title, Button button, int position) {
         routePickerButton = button;
 
         title.setText(getItem(position).getTitle());
         setRouteListener(button);
-        if(route != null) button.setText(route.getName());
+        if (route != null) button.setText(route.getName());
         else button.setText(context.getResources().getString(R.string.announce_info_choose_map));
     }
 
-    private void setPictureInView(TextView title, Button deleteButton, int position){
-        if(!edit_mode) deleteButton.setVisibility(View.GONE);
+    private void setPictureInView(TextView title, Button deleteButton, int position) {
+        if (!edit_mode) deleteButton.setVisibility(View.GONE);
         title.setText(getItem(position).getTitle());
         final int pos = position;
         deleteButton.setOnClickListener(new OnClickListener() {
@@ -345,21 +359,22 @@ public class AnnounceCursorAdapter extends BaseAdapter {
         });
     }
 
-    private void setSimpleTextInView(TextView title, EditText content, Button deleteButton, int position, TextWatcher watcher){
+    private void setSimpleTextInView(TextView title, EditText content, Button deleteButton, int position, TextWatcher watcher) {
         setTitleAndContentInView(title, content, position, watcher);
-        if(!edit_mode) deleteButton.setVisibility(View.GONE);
+        if (!edit_mode) deleteButton.setVisibility(View.GONE);
         final int pos = position;
-       deleteButton.setOnClickListener(new OnClickListener() {
-           @Override
-           public void onClick(View view) {
-               EventUtils.getInstance(context).deleteDynamicField(event, pos);
-               notifyDataSetChanged();
-           }
-       });
+        deleteButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EventUtils.getInstance(context).deleteDynamicField(event, pos);
+                notifyDataSetChanged();
+            }
+        });
     }
 
     /**
      * Erstellt einen Dialog um ein Editierfeld auszuwählen.
+     *
      * @param position
      */
     public void createFieldChooser(final int position) {
@@ -375,7 +390,8 @@ public class AnnounceCursorAdapter extends BaseAdapter {
 
     /**
      * Erstellt je nach Auswahl, ein Editierfeld mit dem angegebenen Titel.
-     * @param which Auswahl des Editierfelds
+     *
+     * @param which    Auswahl des Editierfelds
      * @param position Position in der ListView
      */
     public void createTitleInput(final int which, final int position) {
@@ -400,11 +416,11 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 String value = input.getText().toString() + ":";
 
                 if (which == 0)
-                    EventUtils.getInstance(context).addDynamicField(value, TYPE.SIMPLETEXT, event, position / 2);
+                    EventUtils.getInstance(context).addDynamicField(value, FieldType.SIMPLETEXT, event, position / 2);
                 else if (which == 1)
-                    EventUtils.getInstance(context).addDynamicField(value, TYPE.PICTURE, event, position / 2);
+                    EventUtils.getInstance(context).addDynamicField(value, FieldType.PICTURE, event, position / 2);
                 else if (which == 2)
-                    EventUtils.getInstance(context).addDynamicField(value, TYPE.LINK, event, position / 2);
+                    EventUtils.getInstance(context).addDynamicField(value, FieldType.LINK, event, position / 2);
                 notifyDataSetChanged();
             }
         });
@@ -421,8 +437,9 @@ public class AnnounceCursorAdapter extends BaseAdapter {
      * Setzt den DateListener auf den DateButton.
      *
      * @param button Button des Editierfeldes Datum
+     * @param field  Das Field-Objekt in das das Datum geschrieben werden soll
      */
-    private void setDateListener(final Button button) {
+    private void setDateListener(final Button button, final Field field) {
         final OnDateSetListener datePickerListener = new OnDateSetListener() {
 
             // when dialog box is closed, below method will be called.
@@ -432,6 +449,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 day = selectedDay;
 
                 button.setText(day + "." + (month + 1) + "." + year);
+                field.setValue(Long.toString(getDate().getTime()));
             }
         };
 
@@ -447,8 +465,9 @@ public class AnnounceCursorAdapter extends BaseAdapter {
      * Setzt den TimeListener auf den Uhrzeit Button.
      *
      * @param button Button für die Uhrzeit
+     * @param field  Das Field-Objekt in das das Datum geschrieben werden soll
      */
-    private void setTimeListener(final Button button){
+    private void setTimeListener(final Button button, final Field field) {
         final OnTimeSetListener timePickerListener = new OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
@@ -459,6 +478,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 } else {
                     button.setText(hour + ":" + minute + " Uhr");
                 }
+                field.setValue(Long.toString(getDate().getTime()));
             }
         };
 
@@ -473,7 +493,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
     /**
      * Setzt die Standardzeit(20 Uhr).
      */
-    public void setStandardTime(){
+    public void setStandardTime() {
         hour = 20;
         minute = 0;
     }
@@ -493,7 +513,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
      *
      * @param button Button um die Route zu setzen
      */
-    private void setRouteListener(final Button button){
+    private void setRouteListener(final Button button) {
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -533,25 +553,25 @@ public class AnnounceCursorAdapter extends BaseAdapter {
         return edit_mode;
     }
 
-    public List<Field> getFieldlist(){
+    public List<Field> getFieldlist() {
         return fieldList;
     }
 
-    public void setFieldlist(List<Field> fieldList){
+    public void setFieldlist(List<Field> fieldList) {
         this.fieldList = fieldList;
     }
 
-    public Date getDate(){
+    public Date getDate() {
         Calendar cal = Calendar.getInstance();
         cal.set(year, month, day, hour, minute);
         return cal.getTime();
     }
 
-    public Route getRoute(){
+    public Route getRoute() {
         return route;
     }
 
-    public void setRoute(Route route){
+    public void setRoute(Route route) {
         this.route = route;
     }
 

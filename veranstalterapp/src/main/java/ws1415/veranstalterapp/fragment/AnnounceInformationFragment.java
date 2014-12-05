@@ -37,6 +37,7 @@ import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.CreateEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
+import ws1415.veranstalterapp.util.FieldType;
 import ws1415.veranstalterapp.util.ImageUtil;
 
 /**
@@ -248,7 +249,7 @@ public class AnnounceInformationFragment extends Fragment {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
-            pictureField.setValue(byteArray);
+            //pictureField.setValue(byteArray);
 
             // Speicher des Bildes zum Freigeben vorbereiten
             bm.recycle();

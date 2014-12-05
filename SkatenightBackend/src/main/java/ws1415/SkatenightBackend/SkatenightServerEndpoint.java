@@ -39,27 +39,27 @@ public class SkatenightServerEndpoint {
             "transactions-optional");
     public static final Logger log = Logger.getLogger(SkatenightServerEndpoint.class.getName());
 
-//    /**
-//     * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
-//     * @param mail Die hinzuzufügende Mail-Adresse
-//     */
-//    public void addHost(@Named("mail") String mail) {
-//        PersistenceManager pm = pmf.getPersistenceManager();
-//        try {
-//            Query q = pm.newQuery(Host.class);
-//            q.setFilter("email == emailParam");
-//            q.declareParameters("String emailParam");
-//            List<Host> results = (List<Host>) q.execute(mail);
-//            if (results.isEmpty()) {
-//                Host h = new Host();
-//                h.setEmail(mail);
-//                pm.makePersistent(h);
-//            }
-//        } finally {
-//            pm.close();
-//        }
-//    }
-//
+    /**
+     * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
+     * @param mail Die hinzuzufügende Mail-Adresse
+     */
+    public void addHost(@Named("mail") String mail) {
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            Query q = pm.newQuery(Host.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Host> results = (List<Host>) q.execute(mail);
+            if (results.isEmpty()) {
+                Host h = new Host();
+                h.setEmail(mail);
+                pm.makePersistent(h);
+            }
+        } finally {
+            pm.close();
+        }
+    }
+
 //    /**
 //     * Entfernt die angegebene Mail-Adresse aus den Veranstaltern.
 //     * @param mail Die zu entfernende Mail-Adresse

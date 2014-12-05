@@ -124,7 +124,7 @@ public class ShowCursorAdapter extends BaseAdapter{
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
             holder.title.setText(fieldList.get(position).getTitle());
-            holder.content.setText(fieldList.get(position).getValue().toString());
+            holder.content.setText(fieldList.get(position).getValue());
 
         }else if(getItem(position).getType() == FieldType.PICTURE.getId()){
             HolderImageField holder = new HolderImageField();

@@ -93,57 +93,9 @@ public class EventUtils {
      * @param event Event
      * @param list Liste von Fields von Event
      */
-    public void setEventInfo(Event event, ListView list){
-        event.setDynamicFields(((AnnounceCursorAdapter)list.getAdapter()).getFieldlist());
-        // TODO Prüfen ob route richtig gesetzt wird
-    }
-
-    /**
-     * Wird vom AnnounceCursorAdapter aufgerufen, um die angegebene Route dem Event zuzuordnen.
-     *
-     * @param event Event
-     * @param route Route
-     */
-    public void setRouteToEvent(Event event, Route route){
-        event.setRoute(route);
-    }
-
-    /**
-     * Wird vom AnnounceCursorAdapter aufgerufen, um das angegebene Datum dem Event zuzuordnen.
-     *
-     * @param event Event
-     * @param date Datum
-     */
-    public void setDateToEvent(Event event, Date date){
-        event.setDate(new DateTime(date));
-    }
-
-    /**
-     * Wird vom AnnounceCursorAdapter aufgerufen, um die angegebene Uhrzeit dem EVent zuzuordnen.
-     *
-     * @param event Event
-     * @param date Uhrzeit
-     */
-    public void setTimeToEvent(Event event, Date date){
-        event.setTime(new DateTime(date));
-    }
-
-    /**
-     * Holt sich die Uhrzeit und das Datum vom Event und vereinigt diese zu einem Date
-     *
-     * @param event Event
-     * @return Das vereinigte Date, umfasst Datum und Uhrzeit
-     */
-    public Date getFusedDate(Event event) {
-        Date time = new Date(event.getDate().getValue());
-        Date date = new Date(event.getTime().getValue());
-        Calendar cal1 = Calendar.getInstance();
-        cal1.setTime(date);
-        Calendar cal2 = Calendar.getInstance();
-        cal2.setTime(time);
-        cal1.set(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
-        cal1.set(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
-        return cal1.getTime();
+    public void setEventInfo(Event event, ListView list) {
+        event.setDynamicFields(((AnnounceCursorAdapter) list.getAdapter()).getFieldlist());
+        event.setRoute(((AnnounceCursorAdapter) list.getAdapter()).getRoute());
     }
 
     /**
@@ -159,5 +111,21 @@ public class EventUtils {
             }
         }
         return -1;
+    }
+
+    /**
+     * Verbindet die beiden Datumsangaben des Events zu einem.
+     * @return Das zusammengefügte Date.
+     */
+    public Date getFusedDate(Event event) {
+        Date time = new Date(event.getTime().getValue());
+        Date date = new Date(event.getDate().getValue());
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(date);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(time);
+        cal1.set(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
+        cal1.set(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
+        return cal1.getTime();
     }
 }
