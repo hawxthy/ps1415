@@ -61,6 +61,7 @@
         </activity>
         <activity
             android:name=".activity.EditEventActivity"
+            android:windowSoftInputMode="adjustPan"
             android:label="@string/title_activity_edit_event" >
         </activity>
     </application>
