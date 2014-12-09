@@ -449,7 +449,6 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 day = selectedDay;
 
                 button.setText(day + "." + (month + 1) + "." + year);
-                field.setValue(Long.toString(getDate().getTime()));
             }
         };
 
@@ -478,7 +477,6 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 } else {
                     button.setText(hour + ":" + minute + " Uhr");
                 }
-                field.setValue(Long.toString(getDate().getTime()));
             }
         };
 
