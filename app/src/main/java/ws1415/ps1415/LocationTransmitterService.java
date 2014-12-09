@@ -92,7 +92,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
         // Sendet die Nutzerdaten an den Server
         // TODO: Location sollte nur geschickt werden wenn das vom Nutzer gewünscht wird (dann email prompt anzeigen)
-        new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
+        if (email != null) {
+            new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
+        }
 
         sendLocationUpdate(location);
     }
