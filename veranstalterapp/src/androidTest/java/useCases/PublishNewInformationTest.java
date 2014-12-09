@@ -119,7 +119,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
      */
     @SmallTest
     public void testViews() {
-        assertNotNull(getActivity());
+        assertNotNull(mActivity);
 
         // Initialisiere die View Elemente aus dem AnnounceInformationFramgent
         final EditText editTextTitle          = (EditText) mActivity.findViewById(R.id.announce_info_title_edittext);
@@ -130,8 +130,8 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         // Initialisiere die Buttons aus dem AnncounceInformationFragment
         final Button timePickerButton     = (Button) mActivity.findViewById(R.id.announce_info_time_button);
         final Button datePickerButton     = (Button) mActivity.findViewById(R.id.announce_info_date_button);
-        Button applyButton          = (Button) mActivity.findViewById(R.id.announce_info_apply_button);
-        Button cancelButton         = (Button) mActivity.findViewById(R.id.announce_info_cancel_button);
+        Button applyButton                = (Button) mActivity.findViewById(R.id.announce_info_apply_button);
+        Button cancelButton               = (Button) mActivity.findViewById(R.id.announce_info_cancel_button);
         final Button routePickerButton    = (Button) mActivity.findViewById(R.id.announce_info_choose_route);
 
         assertNotNull(editTextTitle);
@@ -350,8 +350,6 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         Button cancelButton               = (Button) mActivity.findViewById(R.id.announce_info_cancel_button);
         final Button routePickerButton    = (Button) mActivity.findViewById(R.id.announce_info_choose_route);
 
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(HoldTabsActivity.class.getName(), null, false);
-
         // Testdaten
         final String textTitle      = "TestEventDestroy";
         final String textFee        = "500";
@@ -440,8 +438,6 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         Button applyButton          = (Button) mActivity.findViewById(R.id.announce_info_apply_button);
         Button cancelButton         = (Button) mActivity.findViewById(R.id.announce_info_cancel_button);
         final Button routePickerButton    = (Button) mActivity.findViewById(R.id.announce_info_choose_route);
-
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(HoldTabsActivity.class.getName(), null, false);
 
         // Testdaten
         final String textTitle      = "TestEvent";
