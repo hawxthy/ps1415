@@ -4,6 +4,9 @@ import android.app.Instrumentation;
 import android.os.Handler;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.InstrumentationTestCase;
+import android.test.UiThreadTest;
+import android.test.ViewAsserts;
+import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ListAdapter;
@@ -88,21 +91,21 @@ public class ShowCurrentInformationTest extends ActivityInstrumentationTestCase2
         testEvent.setRoute(testRoute);
     }
 
-    @Override
     /**
      * Überträgt die Testdaten auf den Server.
+     *
      * @throws Exception
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
         // Nutzer einloggen
-        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(
-                getActivity(),
-                "server:client_id:"+ Constants.WEB_CLIENT_ID);
+        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getActivity(), "server:client_id:"+ Constants.WEB_CLIENT_ID);
         credential.setSelectedAccountName(credential.getAllAccounts()[0].name);
         ServiceProvider.login(credential);
 
+        // Touchmode ausschalten, damit auch die UI Elemente getestet werden können
         setActivityInitialTouchMode(false);
 
         // Löschen aller Events
@@ -118,14 +121,14 @@ public class ShowCurrentInformationTest extends ActivityInstrumentationTestCase2
 
         // Die ShowEventsActivity starten
         mActivity = getActivity();
-        // Holt sich die Event Liste
+        // Holt sich die Event Listen-Elemente
         mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
         mListData = mList.getAdapter();
 
     }
 
     /**
-     * Stellt eine Verbindung zum Testserver her und bereitet die Testdaten vor.
+     * Prüfen, ob Events in der Liste vorhanden sind.
      */
     public void testPreConditions() {
         assertNotNull("selection listener on events list initialized", mList.getOnItemClickListener());
@@ -133,21 +136,45 @@ public class ShowCurrentInformationTest extends ActivityInstrumentationTestCase2
 
         // Mindestens ein Event muss existieren
         assertTrue("at least one event exists", mListData.getCount() > 0);
+    }
 
-        // assertNotNull("dateView is inizalized", dateView.getText() != null);
-        // assertNotNull("locationView is inizalized", locationView.getText() != null);
-        // assertNotNull("feeViewView is inizalized", feeView.getText() != null);
-        // assertNotNull("descriptionView is inizalized", descriptionView.getText() != null);
+    protected void tearDown() throws Exception {
+        super.tearDown();
+    }
+
+    /**
+     * Prüft, ob diese Views wirklich in der Activity existieren.
+     */
+    @SmallTest
+    public void testViews() {
+        assertNotNull(getActivity());
+        assertNotNull(mList);
+        assertNotNull(mListData);
+    }
+
+    /**
+     * Prüft, ob die Elemente sich in der Activity überschneiden bzw. wirklich gerendert werden.
+     *
+     * @throws java.lang.Exception
+     */
+    @SmallTest
+    public void testViewsVisible() throws Exception {
+        // Falls es mehr als zwei Elemente in der Liste gibt, prüfe, ob die ersten beiden sich überschneiden oder nicht
+        if (mListData.getCount()>0) {
+            ViewAsserts.assertOnScreen(mListData.getView(0, null, mList).getRootView(), mListData.getView(1, null, mList).getRootView());
+            ViewAsserts.assertOnScreen(mListData.getView(1, null, mList).getRootView(), mListData.getView(0, null, mList).getRootView());
+        }
     }
 
     /**
      * Prüft, ob die Event-Daten in der GUI mit denen auf dem Server übereinstimmen.
+     *
+     * @throws java.lang.InterruptedException
      */
     public void testCurrentInformationUI() throws InterruptedException {
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(
-                ShowInformationActivity.class.getName(), null, false);
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(ShowInformationActivity.class.getName(), null, false);
 
-        // Es wird das erste Event ausgewählt
+        // Es wird ein neuer UI Thread gestartet & das erste Event ausgewählt und anschließend die showInformationActivity gestartet
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -162,7 +189,8 @@ public class ShowCurrentInformationTest extends ActivityInstrumentationTestCase2
         // Die Views aus der ShowInformationActivity holen
         dateView = (TextView) showInformationActivity.findViewById(R.id.show_info_date_textview);
         assertNotNull("dateView is inizalized", dateView.getText() != null);
-        // Warten für den Falls, dass die Daten noch von dem Server angerufen werden
+
+        // Warten für den Falls, dass die Daten noch von dem Server abgerufen werden
         while ((String) dateView.getText() == "Wird abgerufen...")
             Thread.sleep(100);
 
@@ -192,22 +220,41 @@ public class ShowCurrentInformationTest extends ActivityInstrumentationTestCase2
         // assertEquals("wrong fee", testEvent.getFee(), feeText);
         // assertEquals("wrong description", testEvent.getDescription().getValue(), descriptionText);
 
+        // Beendet die ShowCurrentInformation Activity wieder
         showInformationActivity.finish();
 
+    }
+
+    /**
+     * Testet, ob die Activity weiter läuft, wenn diese pausiert hat. Test läuft auf dem UI Thread.
+     */
+    @UiThreadTest
+    public void testStatePause() {
+        // Instrumentation Objekt, das die Anwendung während des Tests kontrolliert
+        Instrumentation instrumentation = this.getInstrumentation();
+
+        // Mindestens ein Event  existiert in der Liste
+        assertTrue("at least one event exists before pause", mListData.getCount() > 0);
+
+        // Pausieren
+        instrumentation.callActivityOnPause(mActivity);
+
+        // Fortsetzen
+        instrumentation.callActivityOnResume(mActivity);
+
+        // Holt sich die Event Listen-Elemente
+        mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
+        mListData = mList.getAdapter();
+
+        // Die Listen Elemente sind immer noch vorhanden
+        assertTrue("at least one event exists before pause", mListData.getCount() > 0);
 
 
-        /*
-        String dateText         = (String) dateView.getText();
-        String locationText     = (String) locationView.getText();
-        String feeText          = (String) feeView.getText();
-        String descriptionText  = (String) descriptionView.getText();
+       // Small: this test doesn't interact with any file system or network.
+       // Medium: Accesses file systems on box which is running tests.
+       // Large: Accesses external file systems, networks, etc.
 
-        // Vergleich der Event Daten mit denen aus den Views
-        assertEquals("wrong date", testEvent.getDate().getValue(), dateText);
-        assertEquals("wrong location", testEvent.getLocation(), locationText);
-        assertEquals("wrong fee", testEvent.getFee(), feeText);
-        assertEquals("wrong description", testEvent.getDescription().getValue(), descriptionText);
-        */
+
     }
 
 }
