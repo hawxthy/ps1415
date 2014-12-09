@@ -48,7 +48,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     private HoldTabsActivity mActivity;
     private ActionBar mActionBar;
 
-    // Wird zum Swipen nach links oder rects verwendet
+    // Wird zum Swipen nach links oder rechts verwendet
     public enum Direction {
         Left, Right;
     }
@@ -82,8 +82,8 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     }
 
     /**
-     * Swipet auf dem Bildschirm.
-     * @param direction Die Richtugn (links oder recths)
+     * Swipt auf dem Bildschirm.
+     * @param direction Die Richtung (links oder recths)
      */
     protected void swipe(Direction direction) {
         Instrumentation inst = getInstrumentation();
@@ -146,7 +146,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     }
 
     /**
-     * Prüft, ob die Elemente sich in der Activity wirklich gerendert werden.
+     * Prüft, ob die Elemente in der Activity wirklich gerendert werden.
      *
      * @throws java.lang.Exception
      */
@@ -161,8 +161,8 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         // Initialisiere die Buttons aus dem AnncounceInformationFragment
         final Button timePickerButton     = (Button) mActivity.findViewById(R.id.announce_info_time_button);
         final Button datePickerButton     = (Button) mActivity.findViewById(R.id.announce_info_date_button);
-        Button applyButton          = (Button) mActivity.findViewById(R.id.announce_info_apply_button);
-        Button cancelButton         = (Button) mActivity.findViewById(R.id.announce_info_cancel_button);
+        Button applyButton                = (Button) mActivity.findViewById(R.id.announce_info_apply_button);
+        Button cancelButton               = (Button) mActivity.findViewById(R.id.announce_info_cancel_button);
         final Button routePickerButton    = (Button) mActivity.findViewById(R.id.announce_info_choose_route);
 
         ViewAsserts.assertOnScreen(mActivity.getWindow().getDecorView(), editTextTitle);
@@ -214,7 +214,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         mActionBar.selectTab(tab1);
         assertEquals(1, mActionBar.getSelectedNavigationIndex());
 
-        // Initialisiere die View Elemente aus dem AnnounceInformationFramgent
+        // Initialisiere die View Elemente aus dem AnnounceInformationFragment
         final EditText editTextTitle          = (EditText) mActivity.findViewById(R.id.announce_info_title_edittext);
         final EditText editTextFee            = (EditText) mActivity.findViewById(R.id.announce_info_fee_edittext);
         final EditText editTextLocation       = (EditText) mActivity.findViewById(R.id.announce_info_location_edittext);
@@ -223,23 +223,21 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         // Initialisiere die Buttons aus dem AnncounceInformationFragment
         final Button timePickerButton     = (Button) mActivity.findViewById(R.id.announce_info_time_button);
         final Button datePickerButton     = (Button) mActivity.findViewById(R.id.announce_info_date_button);
-        Button applyButton          = (Button) mActivity.findViewById(R.id.announce_info_apply_button);
-        Button cancelButton         = (Button) mActivity.findViewById(R.id.announce_info_cancel_button);
+        final Button applyButton                = (Button) mActivity.findViewById(R.id.announce_info_apply_button);
+        Button cancelButton               = (Button) mActivity.findViewById(R.id.announce_info_cancel_button);
         final Button routePickerButton    = (Button) mActivity.findViewById(R.id.announce_info_choose_route);
 
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(HoldTabsActivity.class.getName(), null, false);
-
         // Testdaten
-        final String textTitle      = "TestEvent";
-        final String textFee        = "10";
-        final String textLocation   = "TestStadt";
+        final String textTitle       = "TestEvent";
+        final String textFee         = "10";
+        final String textLocation    = "TestStadt";
         final String textDescription = "TestBeschreibung";
-        final String textDate       = "29.12.2014";
-        final String textTime       = "14:00 Uhr";
-        final String textRoute      = "test";
+        final String textDate        = "29.12.2014";
+        final String textTime        = "14:00 Uhr";
+        final String textRoute       = "test";
 
         // TEST ABBRECHEN
-        // Es wird ein neuer UI Thread gestartet & fülle die Textfelder aus
+        // Es wird ein neuer UI Thread gestartet & die Textfelder werden ausgefüllt
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -308,6 +306,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         // Erstellen des Events
         applyButton.performClick();
 
+
         // Neuer Thread, da es im UiThread ansonsten zu einem DeadLock kommen könnte
         new Thread(new Runnable() {
             @Override
@@ -334,7 +333,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     }
 
     /**
-     * Testet, ob die Activity beim Beenden und wieder Neustarten.
+     * Testet die Activity beim Beenden und wieder Neustarten.
      */
     @SmallTest
     public void testUseCaseStateDestroy() {
