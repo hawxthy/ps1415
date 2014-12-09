@@ -384,13 +384,13 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         String currentRoute         = routePickerButton.getText().toString();
 
         // Testen der aktuellen Werte mit den Testwerten
-        assertEquals(TEST_STATE_DESTROY_TITLE, currentTitle);
-        assertEquals(TEST_STATE_DESTROY_FEE, currentFee);
-        assertEquals(TEST_STATE_DESTROY_LOCATION, currentLocation);
-        assertEquals(TEST_STATE_DESTROY_DESCRIPTION, currentDescription);
-        assertEquals(TEST_STATE_DESTROY_DATE, currentDate);
-        assertEquals(TEST_STATE_DESTROY_TIME, currentTime);
-        assertEquals(TEST_STATE_DESTROY_ROUTE, currentRoute);
+        assertEquals("Current title incorrect!", TEST_STATE_DESTROY_TITLE, currentTitle);
+        assertEquals("Current fee incorrect!", TEST_STATE_DESTROY_FEE, currentFee);
+        assertEquals("Current location incorrect!", TEST_STATE_DESTROY_LOCATION, currentLocation);
+        assertEquals("Current description incorrect!", TEST_STATE_DESTROY_DESCRIPTION, currentDescription);
+        assertEquals("Current date incorrect!", TEST_STATE_DESTROY_DATE, currentDate);
+        assertEquals("Current time incorrect!", TEST_STATE_DESTROY_TIME, currentTime);
+        assertEquals("Current route incorrect!", TEST_STATE_DESTROY_ROUTE, currentRoute);
 
     }
 
@@ -467,13 +467,13 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         });
 
         // Prüfen, ob die Daten jetzt eingefügt wurden
-        assertEquals(textTitle, editTextTitle.getText().toString());
-        assertEquals(textFee, editTextFee.getText().toString());
-        assertEquals(textLocation, editTextLocation.getText().toString());
-        assertEquals(textDescription, editTextDescription.getText().toString());
-        assertEquals(textDate, datePickerButton.getText().toString());
-        assertEquals(textTime, timePickerButton.getText().toString());
-        assertEquals(textRoute, routePickerButton.getText().toString());
+        assertEquals("Title not added!", textTitle, editTextTitle.getText().toString());
+        assertEquals("Fee not added!", textFee, editTextFee.getText().toString());
+        assertEquals("Location not added!", textLocation, editTextLocation.getText().toString());
+        assertEquals("Description not added!", textDescription, editTextDescription.getText().toString());
+        assertEquals("Date not added!", textDate, datePickerButton.getText().toString());
+        assertEquals("Time not added!", textTime, timePickerButton.getText().toString());
+        assertEquals("Route not added!", textRoute, routePickerButton.getText().toString());
 
         // Pausieren
         instrumentation.callActivityOnPause(mActivity);
@@ -482,13 +482,13 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         instrumentation.callActivityOnResume(mActivity);
 
         // Prüfen, ob die gleichen Daten noch in den Feldern/Buttons stehen wie vor dem pausieren
-        assertEquals(textTitle, editTextTitle.getText().toString());
-        assertEquals(textFee, editTextFee.getText().toString());
-        assertEquals(textLocation, editTextLocation.getText().toString());
-        assertEquals(textDescription, editTextDescription.getText().toString());
-        assertEquals(textDate, datePickerButton.getText().toString());
-        assertEquals(textTime, timePickerButton.getText().toString());
-        assertEquals(textRoute, routePickerButton.getText().toString());
+        assertEquals("Title not equal!", textTitle, editTextTitle.getText().toString());
+        assertEquals("Fee not equal!", textFee, editTextFee.getText().toString());
+        assertEquals("Location not equal!", textLocation, editTextLocation.getText().toString());
+        assertEquals("Description not equal!", textDescription, editTextDescription.getText().toString());
+        assertEquals("Date not equal!", textDate, datePickerButton.getText().toString());
+        assertEquals("Time not equal!", textTime, timePickerButton.getText().toString());
+        assertEquals("Route not equal!", textRoute, routePickerButton.getText().toString());
 
     }
 
