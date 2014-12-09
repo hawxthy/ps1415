@@ -94,7 +94,13 @@ public class EventUtils {
      * @param list Liste von Fields von Event
      */
     public void setEventInfo(Event event, ListView list) {
-        event.setDynamicFields(((AnnounceCursorAdapter) list.getAdapter()).getFieldlist());
+        AnnounceCursorAdapter adapter = (AnnounceCursorAdapter) list.getAdapter();
+        event.setDynamicFields(adapter.getFieldlist());
+        // Datum und Uhrezeit auslesen und übernehmen
+        int i = this.getUniqueFieldId(FieldType.DATE, event);
+        event.getDynamicFields().get(i).setValue(Long.toString(adapter.getDate().getTime()));
+        i = this.getUniqueFieldId(FieldType.TIME, event);
+        event.getDynamicFields().get(i).setValue(Long.toString(adapter.getDate().getTime()));
         event.setRoute(((AnnounceCursorAdapter) list.getAdapter()).getRoute());
     }
 
