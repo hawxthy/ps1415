@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Adapter;
+package ws1415.veranstalterapp.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.task.QueryRouteTask;
 
 /**
  * Klasse zum füllen er ListView in ManageRoutesFragment.

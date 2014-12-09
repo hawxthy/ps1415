@@ -13,6 +13,10 @@
     <string name="show_info_header_fee">Teilnahmegebühr</string>
     <string name="show_info_header_description">Beschreibung</string>
     <string name="show_info_button_map">Karte</string>
+    <string name="show_info_button_attend">Teilnehmen</string>
+    <string name="show_info_button_leave">Verlassen</string>
+    <string name="show_info_toast_attending">Angemeldet</string>
+    <string name="show_info_toast_leaving">Abgemeldet</string>
     <string name="downloading">Wird abgerufen...</string>
 
     <!--Strings zu activity showEvents-->

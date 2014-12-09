@@ -62,16 +62,19 @@ public class GetEventTaskTest extends AndroidTestCase {
 
         // Das oben erstellte Event auf dem Server speichern und wieder abrufen, damit
         // der Key für das Even generiert wird.
-        List<Event> eventList = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems();
-        // Löschen alles Events
-        for(int i = 0; i < eventList.size(); i++){
-            ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(eventList.get(i).getKey().getId());
+        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+                .execute().getItems();
+        if (events != null) {
+            for (Event e : events) {
+                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                        .execute();
+            }
         }
 
         // Speichern des einen Events um den Key zu generieren
-        ServiceProvider.getService().skatenightServerEndpoint().createEvent(event);
+        ServiceProvider.getService().skatenightServerEndpoint().createEvent(event).execute();
         // Event vom Server abrufen
-        event = (Event)ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems().get(0);
+        event = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems().get(0);
     }
 
     /**

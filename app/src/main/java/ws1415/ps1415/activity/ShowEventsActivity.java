@@ -1,15 +1,15 @@
-package ws1415.ps1415.Activities;
+package ws1415.ps1415.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.Event;
 
@@ -17,9 +17,11 @@ import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.EventsCursorAdapter;
-import ws1415.ps1415.task.QueryEventTask;
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.ps1415.task.QueryEventsTask;
 
-public class ShowEventsActivity extends Activity {
+public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate<Void, List<Event>> {
     private ListView eventListView;
     private List<Event> eventList;
     private EventsCursorAdapter mAdapter;
@@ -32,7 +34,10 @@ public class ShowEventsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
         setContentView(R.layout.activity_show_events);
+        setProgressBarIndeterminateVisibility(true);
 
         // ListView initialisieren
         eventListView = (ListView) findViewById(R.id.activity_show_events_list_view);
@@ -49,12 +54,12 @@ public class ShowEventsActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(ShowEventsActivity.this, ShowInformationActivity.class);
-                intent.putExtra("event", eventList.get(i).getKey().getId());
+                intent.putExtra(ShowInformationActivity.EXTRA_KEY_ID, eventList.get(i).getKey().getId());
                 startActivity(intent);
             }
         });
 
-        new QueryEventTask().execute(this);
+        new QueryEventsTask(this).execute();
     }
 
     /**
@@ -87,14 +92,22 @@ public class ShowEventsActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Füllt die ListView mit den Events vom Server.
-     *
-     * @param results ArrayList von Events
-     */
-    public void setEventsToListView(List<Event> results) {
-        eventList = results;
-        mAdapter = new EventsCursorAdapter(this, results);
+    @Override
+    public void taskDidFinish(ExtendedTask task, List<Event> events) {
+        eventList = events;
+        mAdapter = new EventsCursorAdapter(this, events);
         eventListView.setAdapter(mAdapter);
+        setProgressBarIndeterminateVisibility(false);
+    }
+
+    @Override
+    public void taskDidProgress(ExtendedTask task, Void... progress) {
+
+    }
+
+    @Override
+    public void taskFailed(ExtendedTask task, String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+        setProgressBarIndeterminateVisibility(false);
     }
 }

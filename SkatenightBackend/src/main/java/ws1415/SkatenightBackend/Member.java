@@ -1,5 +1,7 @@
 package ws1415.SkatenightBackend;
 
+import com.google.appengine.datanucleus.annotations.Unowned;
+
 import java.util.Date;
 
 import javax.jdo.annotations.PersistenceCapable;
@@ -23,6 +25,10 @@ public class Member {
     private double latitude;
     @Persistent
     private double longitude;
+    @Unowned
+    private Long currentEventId;
+    @Persistent
+    private Integer currentWaypoint;
     @PrimaryKey
     @Persistent
     private String email;     // Einzigartige google Email, zum identifizieren eines Nutzers (Primary Key)
@@ -59,6 +65,22 @@ public class Member {
         this.longitude = longitude;
     }
 
+    public Long getCurrentEventId() {
+        return currentEventId;
+    }
+
+    public void setCurrentEventId(Long currentEventId) {
+        this.currentEventId = currentEventId;
+    }
+
+    public Integer getCurrentWaypoint() {
+        return currentWaypoint;
+    }
+
+    public void setCurrentWaypoint(Integer currentWaypoint) {
+        this.currentWaypoint = currentWaypoint;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -66,5 +88,4 @@ public class Member {
     public String getEmail() {
         return email;
     }
-
 }

@@ -3,8 +3,6 @@ package ws1415.SkatenightBackend;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
@@ -19,7 +17,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
-import javax.jdo.Transaction;
 
 
 /**
@@ -36,6 +33,7 @@ import javax.jdo.Transaction;
 public class SkatenightServerEndpoint {
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
+    private long lastFieldUpdateTime = 0;
 
 //    /**
 //     * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
@@ -177,13 +175,227 @@ public class SkatenightServerEndpoint {
             m.setLongitude(longitude);
             m.setUpdatedAt(new Date());
 
+            calculateCurrentWaypoint(m);
+
             PersistenceManager pm = pmf.getPersistenceManager();
             try {
                 pm.makePersistent(m);
             } finally {
                 pm.close();
             }
+
+            // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
+            if (System.currentTimeMillis()-lastFieldUpdateTime >= 300000) {
+                calculateField(m.getCurrentEventId());
+                lastFieldUpdateTime = System.currentTimeMillis();
+            }
         }
+    }
+
+    private void calculateCurrentWaypoint(Member member) {
+        Long eventId = member.getCurrentEventId();
+        if (eventId != null) {
+            Event event = getEvent(member.getCurrentEventId());
+            if (event != null) {
+                Integer currentWaypoint = member.getCurrentWaypoint();
+                if (currentWaypoint == null) {
+                    member.setCurrentWaypoint(0);
+                }
+                List<RoutePoint> points = event.getRoute().getRoutePoints();
+                if (currentWaypoint < points.size()-1) {
+                    RoutePoint current = points.get(currentWaypoint);
+                    RoutePoint next = points.get(currentWaypoint+1);
+                    float distanceCurrent = distance(current.getLatitude(), current.getLongitude(), member.getLatitude(), member.getLongitude());
+                    float distanceNext = distance(next.getLatitude(), next.getLongitude(), member.getLatitude(), member.getLongitude());
+                    boolean findNextWaypoint = false;
+                    if (distanceCurrent < Constants.MAX_NEXT_WAYPOINT_DISTANCE) {
+                        findNextWaypoint = true;
+                    }
+                    if (distanceNext < distanceCurrent) {
+                        if (distanceNext < Constants.MAX_NEXT_WAYPOINT_DISTANCE) {
+                            member.setCurrentWaypoint(currentWaypoint+1);
+                            findNextWaypoint = false;
+                        }
+                        else {
+                            findNextWaypoint = true;
+                        }
+                    }
+                    if (findNextWaypoint) {
+                        // Den nächsten Wegpunkt finden:
+                        float minDistance = Float.POSITIVE_INFINITY;
+                        for (int i = currentWaypoint; i < points.size(); i++) {
+                            float distance = distance(
+                                    member.getLatitude(), member.getLongitude(),
+                                    points.get(i).getLatitude(), points.get(i).getLongitude());
+
+                            if (distance < 50.0f && distance < minDistance) {
+                                member.setCurrentWaypoint(i);
+                                minDistance = distance;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Berechnet anhand der aktuellen Positionen der Member das Feld.
+     * Wobei das Feld um den Wegpunkte herum gebaut wird, welcher die meisten Member enthält
+     * @param id event Id
+     */
+    private void calculateField(@Named("id") long id) {
+        PersistenceManager pm = pmf.getPersistenceManager();
+        Event event = getEvent(id);
+        List<RoutePoint> points = event.getRoute().getRoutePoints();
+        List<Member> members = getMembersFromEvent(event.getKey().getId());
+
+        // array erstellen welches an der stelle n die Anzahl der Member enthält welche am RoutePoint n sind.
+        int memberCountPerRoutePoint[] = new int[points.size()];
+        for (Member member : members) {
+            if (member.getCurrentEventId() != null && member.getCurrentEventId() == id && member.getCurrentWaypoint() != null) {
+                memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()]+1;
+            }
+        }
+
+        // Den index des RoutePoints speichern an welchen die meisten Member sind.
+        //int mostMemberPerWaypoint = -1;
+        int mostMemberIndex = 0;
+        for (int i = 0; i < memberCountPerRoutePoint.length; i++) {
+            if (memberCountPerRoutePoint[i] > memberCountPerRoutePoint[mostMemberIndex]) {
+                mostMemberIndex = i;
+            }
+        }
+
+        // Vom mostMemberIndex rückwärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
+        // als 5 Member haben
+        int first = mostMemberIndex;
+        while (first > 0) {
+            if (memberCountPerRoutePoint[first-1] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
+                first--;
+            } else if(first > 1 && memberCountPerRoutePoint[first-2] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
+                first-=2;
+            } else {
+                break;
+            }
+        }
+
+        // Vom mostMemberIndex vorwaärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
+        // als 5 Member haben
+        int last = mostMemberIndex;
+        while (last < memberCountPerRoutePoint.length-1) {
+            if (memberCountPerRoutePoint[last+1] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
+                last++;
+            } else if(last < memberCountPerRoutePoint.length-2 && memberCountPerRoutePoint[last+2] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
+                last+=2;
+            } else {
+                break;
+            }
+        }
+
+        event.setRouteFieldFirst(first);
+        event.setRouteFieldLast(last);
+        updateEvent(event);
+    }
+
+    /**
+     * Kopie der Funktion zur Distanzberechnung zwischen 2 Koordinaten aus dem Android Source code.
+     *
+     * @param startLat
+     * @param startLon
+     * @param endLat
+     * @param endLon
+     * @return
+     */
+    private float distance(double startLat, double startLon,
+                           double endLat, double endLon) {
+        // Based on http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
+        // using the "Inverse Formula" (section 4)
+        int MAXITERS = 20;
+        // Convert lat/long to radians
+        startLat *= Math.PI / 180.0;
+        endLat *= Math.PI / 180.0;
+        startLon *= Math.PI / 180.0;
+        endLon *= Math.PI / 180.0;
+        double a = 6378137.0; // WGS84 major axis
+        double b = 6356752.3142; // WGS84 semi-major axis
+        double f = (a - b) / a;
+        double aSqMinusBSqOverBSq = (a * a - b * b) / (b * b);
+        double L = endLon - startLon;
+        double A = 0.0;
+        double U1 = Math.atan((1.0 - f) * Math.tan(startLat));
+        double U2 = Math.atan((1.0 - f) * Math.tan(endLat));
+        double cosU1 = Math.cos(U1);
+        double cosU2 = Math.cos(U2);
+        double sinU1 = Math.sin(U1);
+        double sinU2 = Math.sin(U2);
+        double cosU1cosU2 = cosU1 * cosU2;
+        double sinU1sinU2 = sinU1 * sinU2;
+        double sigma = 0.0;
+        double deltaSigma = 0.0;
+        double cosSqAlpha = 0.0;
+        double cos2SM = 0.0;
+        double cosSigma = 0.0;
+        double sinSigma = 0.0;
+        double cosLambda = 0.0;
+        double sinLambda = 0.0;
+        double lambda = L; // initial guess
+        for (int iter = 0; iter < MAXITERS; iter++) {
+            double lambdaOrig = lambda;
+            cosLambda = Math.cos(lambda);
+            sinLambda = Math.sin(lambda);
+            double t1 = cosU2 * sinLambda;
+            double t2 = cosU1 * sinU2 - sinU1 * cosU2 * cosLambda;
+            double sinSqSigma = t1 * t1 + t2 * t2; // (14)
+            sinSigma = Math.sqrt(sinSqSigma);
+            cosSigma = sinU1sinU2 + cosU1cosU2 * cosLambda; // (15)
+            sigma = Math.atan2(sinSigma, cosSigma); // (16)
+            double sinAlpha = (sinSigma == 0) ? 0.0 :
+                    cosU1cosU2 * sinLambda / sinSigma; // (17)
+            cosSqAlpha = 1.0 - sinAlpha * sinAlpha;
+            cos2SM = (cosSqAlpha == 0) ? 0.0 :
+                    cosSigma - 2.0 * sinU1sinU2 / cosSqAlpha; // (18)
+            double uSquared = cosSqAlpha * aSqMinusBSqOverBSq; // defn
+            A = 1 + (uSquared / 16384.0) * // (3)
+                    (4096.0 + uSquared *
+                            (-768 + uSquared * (320.0 - 175.0 * uSquared)));
+            double B = (uSquared / 1024.0) * // (4)
+                    (256.0 + uSquared *
+                            (-128.0 + uSquared * (74.0 - 47.0 * uSquared)));
+            double C = (f / 16.0) *
+                    cosSqAlpha *
+                    (4.0 + f * (4.0 - 3.0 * cosSqAlpha)); // (10)
+            double cos2SMSq = cos2SM * cos2SM;
+            deltaSigma = B * sinSigma * // (6)
+                    (cos2SM + (B / 4.0) *
+                            (cosSigma * (-1.0 + 2.0 * cos2SMSq) -
+                                    (B / 6.0) * cos2SM *
+                                            (-3.0 + 4.0 * sinSigma * sinSigma) *
+                                            (-3.0 + 4.0 * cos2SMSq)));
+            lambda = L +
+                    (1.0 - C) * f * sinAlpha *
+                            (sigma + C * sinSigma *
+                                    (cos2SM + C * cosSigma *
+                                            (-1.0 + 2.0 * cos2SM * cos2SM))); // (11)
+            double delta = (lambda - lambdaOrig) / lambda;
+            if (Math.abs(delta) < 1.0e-12) {
+                break;
+            }
+        }
+        float distance = (float) (b * A * (sigma - deltaSigma));
+        return distance;
+    }
+
+    public List<Event> getCurrentEventsForMember(@Named("email") String email) {
+        // TODO: Nur Events ausgeben die auch JETZT stattfinden.
+        List<Event> out = new ArrayList<Event>();
+        List<Event> eventList = getAllEvents();
+        for (Event e : eventList) {
+            if (e.getMemberList().contains(email)) {
+                out.add(e);
+            }
+        }
+        return out;
     }
 
     /**
@@ -210,6 +422,57 @@ public class SkatenightServerEndpoint {
             pm.close();
         }
         return member;
+    }
+
+    /**
+     *
+     */
+    public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
+        Event event = getEvent(keyId);
+
+        // TODO: Andern des currentEvent entfernen!
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        Member m = getMember(email);
+        m.setCurrentEventId(event.getKey().getId());
+
+        try {
+            pm.makePersistent(m);
+        }
+        finally {
+            pm.close();
+        }
+
+
+        ArrayList<String> memberKeys = event.getMemberList();
+        if (!memberKeys.contains(email)) {
+            memberKeys.add(email);
+            event.setMemberList(memberKeys);
+
+            updateEvent(event);
+        }
+    }
+
+    public void removeMemberFromEvent(@Named("id") long keyId, @Named("email") String email) {
+        Event event = getEvent(keyId);
+
+        ArrayList<String> memberKeys = event.getMemberList();
+        if (memberKeys.contains(email)) {
+            memberKeys.remove(email);
+            event.setMemberList(memberKeys);
+
+            updateEvent(event);
+        }
+    }
+
+    public List<Member> getMembersFromEvent(@Named("id") long keyId) {
+        Event event = getEvent(keyId);
+
+        List<Member> members = new ArrayList<Member>(event.getMemberList().size());
+        for (String key: event.getMemberList()) {
+            members.add(getMember(key));
+        }
+        return members;
     }
 
     /**
@@ -335,6 +598,23 @@ public class SkatenightServerEndpoint {
             pm.close();
         }
         return new BooleanWrapper(false);
+    }
+
+    private void updateEvent(Event event) {
+        PersistenceManager pm = pmf.getPersistenceManager();
+
+        Key key = event.getRoute().getKey();
+        Route route = pm.getObjectById(Route.class, key);
+        if (route != null) {
+            event.setRoute(route);
+        }
+
+        try {
+            pm.makePersistent(event);
+        }
+        finally {
+            pm.close();
+        }
     }
 
     /**

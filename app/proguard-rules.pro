@@ -16,7 +16,7 @@
 #   public *;
 #}
 
--keep class * extends java.util.ListResourceBundle {
+-keep class * extends java.ws1415.common.util.ListResourceBundle {
     protected Object[][] getContents();
 }
 
