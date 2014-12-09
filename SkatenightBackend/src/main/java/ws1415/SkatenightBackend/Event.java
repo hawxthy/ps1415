@@ -1,11 +1,23 @@
 package ws1415.SkatenightBackend;
 
+import com.google.appengine.api.datastore.Blob;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
+import com.google.appengine.api.log.LogServiceFactory;
 import com.google.appengine.datanucleus.annotations.Unowned;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonCreator;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.ArrayList;
+import java.awt.Image;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -17,23 +29,16 @@ import javax.jdo.annotations.PrimaryKey;
  * Created by Richard Schulze, Bernd Eissing, Martin Wrodarczyk on 21.10.2014.
  */
 @PersistenceCapable
-public class Event{
+public class Event {
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
-    @Persistent
-    private String title;
-    @Persistent
-    private Date date;
-    @Persistent
-    private String fee;
-    @Persistent
-    private String location;
-    @Persistent
-    private Text description;
     @Persistent(defaultFetchGroup = "true")
     @Unowned
     private Route route;
+    // Dynamische ArrayListe von dynamischen Komponenten
+    @Persistent(serialized = "true", defaultFetchGroup = "true")
+    private List<Field> dynamicFields = new ArrayList<Field>();
     @Persistent
     private int routeFieldFirst;
     @Persistent
@@ -50,51 +55,72 @@ public class Event{
     }
 
     public String getTitle() {
-        return title;
+        return (String)getUniqueField(FieldType.TITLE.getId()).getValue();
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setDate(Date date){
+        getUniqueField(FieldType.DATE.getId()).setValue(Long.toString(date.getTime()));
     }
 
-    public Date getDate() {
-        return date;
+    public Date getDate(){
+        return new Date(Long.parseLong(getUniqueField(FieldType.DATE.getId()).getValue()));
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setTime(Date time){
+        getUniqueField(FieldType.TIME.getId()).setValue(Long.toString(time.getTime()));
+    }
+
+    public Date getTime(){
+        return new Date(Long.parseLong(getUniqueField(FieldType.TIME.getId()).getValue()));
     }
 
     public String getFee() {
-        return fee;
-    }
-
-    public void setFee(String fee) {
-        this.fee = fee;
+        return (String)getUniqueField(FieldType.FEE.getId()).getValue();
     }
 
     public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
+        if((String)getUniqueField(FieldType.LOCATION.getId()).getValue() != null){
+            return  (String)getUniqueField(FieldType.LOCATION.getId()).getValue();
+        }
+        return "";
     }
 
     public Text getDescription() {
-        return description;
+        if(new Text(getUniqueField(FieldType.DESCRIPTION.getId()).getValue()) != null){
+            return  new Text(getUniqueField(FieldType.DESCRIPTION.getId()).getValue());
+        }
+        return new Text("");
     }
 
-    public void setDescription(Text description) {
-        this.description = description;
+    public void setRoute(Route route){
+        this.route = route;
     }
 
     public Route getRoute() {
-        return route;
+        return  route;
     }
 
-    public void setRoute(Route route) {
-        this.route = route;
+    public List<Field> getDynamicFields(){
+        return dynamicFields;
+    }
+
+    public void setDynamicFields(ArrayList<Field> list){
+        this.dynamicFields = list;
+    }
+
+    /**
+     * Methode zum finden von eindeutigen Feldern
+     *
+     * @param type der Typ des eindeutigen Feldes
+     * @return Das Feld, null falls keins gefunden wurde
+     */
+    public Field getUniqueField(int type) {
+        for (int i = 0; i < dynamicFields.size(); i++) {
+            if (dynamicFields.get(i).getType() == type) {
+                return dynamicFields.get(i);
+            }
+        }
+        return null;
     }
 
     public int getRouteFieldFirst() {

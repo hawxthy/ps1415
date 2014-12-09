@@ -1,36 +1,46 @@
 package ws1415.veranstalterapp.fragment;
 
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.DatePickerDialog.OnDateSetListener;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
-import android.app.TimePickerDialog.OnTimeSetListener;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TimePicker;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
-import com.google.api.client.util.DateTime;
 
-import ws1415.veranstalterapp.activity.ChooseRouteActivity;
+import ws1415.veranstalterapp.Adapter.AnnounceCursorAdapter;
+import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.CreateEventTask;
+import ws1415.veranstalterapp.util.EventUtils;
+import ws1415.veranstalterapp.util.FieldType;
+import ws1415.veranstalterapp.util.ImageUtil;
 
 /**
  * Fragment zum Veröffentlichen von neuen Veranstaltungen.
@@ -38,45 +48,16 @@ import ws1415.veranstalterapp.task.CreateEventTask;
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
 public class AnnounceInformationFragment extends Fragment {
-    // Die Viewelemente für das Event
-    private EditText editTextTitle;
-    private EditText editTextFee;
-    private EditText editTextLocation;
-    private EditText editTextDescription;
+    //Adapter für die ListView listView
+    private AnnounceCursorAdapter listAdapter;
 
-    // Der Button für die Route
-    private Button routePickerButton;
+    // Die ListView von der xml datei fragment_announce_information
+    private ListView listView;
 
-    // Die Buttons für Zeit und Datum
-    private Button datePickerButton;
-    private Button timePickerButton;
-
-    // Die Buttons für Cancel und Apply
+    // Die Buttons für Cancel, Apply und Edit
     private Button applyButton;
     private Button cancelButton;
-
-    // Attribute für das Datum
-    private int year;
-    private int month;
-    private int day;
-
-    // Attribute für die Eingabe felder
-    private String title;
-    private String fee;
-    private String location;
-    private Text description;
-
-    private Calendar cal;
-
-    static final int DATE_DIALOG_ID = 1;
-    static final int TIME_DIALOG_ID = 2;
-
-    // Attribute für die Zeit
-    private int hour;
-    private int minute;
-
-    // Das Attribut Route
-    private Route route;
+    private Button editButton;
 
     // das neu erstellte Event
     private Event event;
@@ -93,26 +74,28 @@ public class AnnounceInformationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_announce_information, container, false);
 
-        // Initialisiere die View Elemente
-        editTextTitle = (EditText) view.findViewById(R.id.announce_info_title_edittext);
-        editTextFee = (EditText) view.findViewById(R.id.announce_info_fee_edittext);
-        editTextLocation = (EditText) view.findViewById(R.id.announce_info_location_edittext);
-        editTextDescription = (EditText) view.findViewById(R.id.announce_info_description_edittext);
+        // Erstelle ein neues Event und füge die Standardattribute in die ArrayList ein.
+        event = new Event();
+        event.setDynamicFields(new ArrayList<Field>());
+        EventUtils.getInstance(getActivity()).setStandardFields(event);
+        listAdapter = new AnnounceCursorAdapter(this, event.getDynamicFields(), event);
 
-        // Initialisiere die Buttons
-        timePickerButton = (Button) view.findViewById(R.id.announce_info_time_button);
-        datePickerButton = (Button) view.findViewById(R.id.announce_info_date_button);
+        listView = (ListView) view.findViewById(R.id.fragment_announce_information_list_view);
+        listView.setItemsCanFocus(true);
+        listView.setAdapter(listAdapter);
+
         applyButton = (Button) view.findViewById(R.id.announce_info_apply_button);
         cancelButton = (Button) view.findViewById(R.id.announce_info_cancel_button);
-        routePickerButton = (Button) view.findViewById(R.id.announce_info_choose_route);
+        editButton = (Button) view.findViewById(R.id.announce_info_edit_button);
 
-        // Setze die Listener für die Buttons
         setButtonListener();
 
-
-        // Setze die aktuelle Zeit und das Datum
-        setCurrentDateOnView();
         return view;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
     }
 
     /**
@@ -124,116 +107,40 @@ public class AnnounceInformationFragment extends Fragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                cancelInfo(true);
+                if(!listAdapter.getEditMode()) {
+                    cancelInfo(true);
+                }
+                Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
             }
         });
 
         applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                applyInfo();
+                if(!listAdapter.getEditMode()) {
+                    applyInfo();
+                }
+                Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
             }
         });
 
-        timePickerButton.setOnClickListener(new View.OnClickListener() {
+        editButton.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View view) {
-                /**
-                 * Die onClick Methode welche aufgerufen wird, wenn der datePickerButton gedrückt wird.
-                 */
-                showDialog(TIME_DIALOG_ID).show();
-            }
-        });
-
-        datePickerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /**
-                 * Die onClick Methode welche aufgerufen wird, wenn der datePickerButton gedrückt wird.
-                 */
-                showDialog(DATE_DIALOG_ID).show();
-            }
-        });
-
-        routePickerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), ChooseRouteActivity.class);
-                startActivity(intent);
+            public void onClick(View view){
+                if(editButton.getText().equals(getResources().getString(R.string.announce_info_start_edit_button))){
+                    listAdapter.startEditMode();
+                    editButton.setText(getResources().getString(R.string.announce_info_exit_edit_button));
+                }else if(editButton.getText().equals(getResources().getString(R.string.announce_info_exit_edit_button))){
+                    listAdapter.exitEditMode();
+                    editButton.setText(getResources().getString(R.string.announce_info_start_edit_button));
+                }
             }
         });
     }
-
-    /**
-     * Erstellt je nach id ein DatePicker- oder TimePicker Dialog.
-     *
-     * @param id DatePickerDialog falls id = 1, TimePickerDialog falls id = 2
-     * @return Dialog Fenster
-     */
-    protected Dialog showDialog(int id) {
-        switch (id) {
-            case DATE_DIALOG_ID:
-                // setze das Datum des Pickers als das angegebene Datum für das Event
-                return new DatePickerDialog(getActivity(), datePickerListener, year, month, day);
-            case TIME_DIALOG_ID:
-                // setze die Zeit des Picker als angegebene Zeit für das Event
-                return new TimePickerDialog(getActivity(), timePickerListener, hour, minute, true);
-        }
-        return null;
-    }
-
-    /**
-     * Setzt das angegebene Datum bei einer Änderung als Text auf den datePickerButton.
-     */
-    private OnDateSetListener datePickerListener = new OnDateSetListener() {
-
-        // when dialog box is closed, below method will be called.
-        public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
-            year = selectedYear;
-            month = selectedMonth;
-            day = selectedDay;
-
-            // set selected date into Button
-            datePickerButton.setText(day + "." + (month + 1) + "." + year);
-        }
-    };
-
-    /**
-     * Setzt das aktuelle Datum als Text auf den datePickerButton.
-     */
-    public void setCurrentDateOnView() {
-        final Calendar c = Calendar.getInstance();
-        year = c.get(Calendar.YEAR);
-        month = c.get(Calendar.MONTH);
-        day = c.get(Calendar.DAY_OF_MONTH);
-
-        // set selected date into Button
-        datePickerButton.setText(day + "." + (month + 1) + "." + year);
-    }
-
-    /**
-     * Setzt einen Listener, welcher die ausgewählte Uhrzeit bei einer Änderung setzt und auf
-     * den timePickerButton setzt.
-     */
-    private OnTimeSetListener timePickerListener = new OnTimeSetListener() {
-
-        @Override
-        public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-            hour = selectedHour;
-            minute = selectedMinute;
-            if (minute < 10) {
-                //minute = 0+ selectedMinute;
-                timePickerButton.setText(hour + ":0" + minute + " Uhr");
-            } else {
-                timePickerButton.setText(hour + ":" + minute + " Uhr");
-            }
-        }
-    };
-
 
     /**
      * Liest die eingegebenen Informationen aus, erstellt ause diesen ein Event und fügt dieses
-     * Event dem Server hinzu. Momentan wir noch das alte Event überschrieben.
+     * Event dem Server hinzu.
      */
     public void applyInfo() {
 
@@ -242,49 +149,26 @@ public class AnnounceInformationFragment extends Fragment {
         builder.setMessage(R.string.areyousure);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                int titleId = EventUtils.getInstance(getActivity()).getUniqueFieldId(FieldType.TITLE, event);
 
-                // Weise die Werte aus den Feldern Variablen zu, um damit dann das Event zu setzen.
-                title = editTextTitle.getText().toString();
-                fee = editTextFee.getText().toString();
-                // Erstelle einen Calendar zum Speichern des Datums und der Uhrzeit
-                cal = Calendar.getInstance();
-                cal.set(Calendar.YEAR, year);
-                cal.set(Calendar.MONTH, month);
-                cal.set(Calendar.DAY_OF_MONTH, day);
-                cal.set(Calendar.HOUR, hour);
-                cal.set(Calendar.MINUTE, minute);
-
-                // Weise die Daten aus Calendar dem Datentyp Date zu
-                Date date = cal.getTime();
-                // Mache aus dem Date ein DateTime, da dies von ServerBackend benötigt wird.
-                DateTime dTime = new DateTime(date);
-
-
-                location = editTextLocation.getText().toString();
-                description = new Text();
-                description.setValue(editTextDescription.getText().toString());
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (!title.isEmpty() && !fee.isEmpty() && dTime != null && !location.isEmpty() && !description.getValue().isEmpty() && route != null) {
-                    // Erstelle ein neue Event
-                    event = new Event();
+                if (titleId != -1 && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
 
                     // Setze die Attribute vom Event
-                    event.setTitle(title);
-                    event.setFee(fee);
-                    event.setDate(dTime);
-                    event.setLocation(location);
-                    event.setRoute(route);
-                    event.setDescription(description);
+                    EventUtils.getInstance(getActivity()).setEventInfo(event, listView);
+
+                    // Erstelle Event auf dem Server
                     new CreateEventTask().execute(event);
-                    Toast.makeText(getActivity(),
-                            getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
-                    editTextTitle.setText("");
-                    editTextFee.setText("");
-                    timePickerButton.setText(getString(R.string.announce_info_set_time));
-                    editTextLocation.setText("");
-                    routePickerButton.setText(getString(R.string.announce_info_choose_map));
-                    editTextDescription.setText("");
-                    setCurrentDateOnView();
+
+                    // Benachrichtige den Benutzer mit einem Toast
+                    Toast.makeText(getActivity(), getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
+
+                    // Setze die Attribute von Event auf den Standard
+                    event = new Event();
+                    EventUtils.getInstance(getActivity()).setStandardFields(event);
+                    listAdapter = new AnnounceCursorAdapter(getActivity(), event.getDynamicFields(), event);
+                    listView.setAdapter(listAdapter);
+                    listAdapter.notifyDataSetChanged();
 
                     // Update die Informationen in ShowInformationFragment
                     HoldTabsActivity.updateInformation();
@@ -309,26 +193,72 @@ public class AnnounceInformationFragment extends Fragment {
     public void cancelInfo(boolean allSet) {
         if (allSet) {
             Toast.makeText(getActivity(), "Wurde noch nicht erstellt", Toast.LENGTH_LONG).show();
-            editTextTitle.setText("");
-            editTextFee.setText("");
-            editTextLocation.setText("");
-            routePickerButton.setText(getString(R.string.announce_info_choose_map));
-            editTextDescription.setText("");
-            setCurrentDateOnView();
+            EventUtils.getInstance(getActivity()).setStandardFields(event);
+            listAdapter.notifyDataSetChanged();
         } else {
-            Toast.makeText(getActivity(), "Nicht alle Felder ausgefüllt", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Nicht alle notwendigen Felder ausgefüllt", Toast.LENGTH_LONG).show();
         }
-
-        timePickerButton.setText(getResources().getString(R.string.announce_info_set_time));
     }
 
     /**
-     * Dies Methode setzt die Route für das Event
+     * Gibt den Adapter, der die ListView füllt, zurück.
      *
-     * @param selectedRoute Die Route für das Event
+     * @return Adapter
      */
-    public void setRoute(Route selectedRoute) {
-        route = selectedRoute;
-        routePickerButton.setText(selectedRoute.getName());
+    public AnnounceCursorAdapter getAdapter(){
+        return listAdapter;
     }
+    
+    public void setRoute(Route selectedRoute) {
+        //route = selectedRoute;
+        //routePickerButton.setText(selectedRoute.getName());
+    }
+
+    /**
+     * Zeigt einen Picker-Dialog an, mit dem ein Bild vom Handy gewählt werden kann.
+     * @param f Das Field-Objekt, das das Bild als byte-Array halten soll.
+     */
+    public void showPictureChooser(Field f) {
+        pictureField = f;
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.choose_image)), 0);
+    }
+
+    /**
+     * Zwischenspeicher für die ImageView und das Field, die das im Picture-Picker gewählte Bild anzeigen sollen.
+     */
+    private Field pictureField;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data != null && pictureField != null) {
+            // Pfad ermitteln
+            Uri selectedImageUri = data.getData();
+            String[] projection = {MediaStore.MediaColumns.DATA};
+            CursorLoader cl = new CursorLoader(this.getActivity());
+            cl.setUri(selectedImageUri);
+            cl.setProjection(projection);
+            Cursor cursor = cl.loadInBackground();
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            cursor.moveToFirst();
+            String tempPath = cursor.getString(column_index);
+            Bitmap bm;
+            BitmapFactory.Options btmapOptions = new BitmapFactory.Options();
+            bm = BitmapFactory.decodeFile(tempPath, btmapOptions);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            pictureField.setData(new Text().setValue(Base64.encodeToString(byteArray, Base64.DEFAULT)));
+
+            // Speicher des Bildes zum Freigeben vorbereiten
+            bm.recycle();
+
+            // Bild in die ListView übernehmen
+            listAdapter.notifyDataSetChanged();
+        }
+    }
+    
 }

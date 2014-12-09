@@ -11,6 +11,9 @@
     <string name="title_fragment_announce_information">Veranstaltung erstellen</string>
     <string name="announce_info_apply_button">Erstellen</string>
     <string name="announce_info_cancel_button">Abbrechen</string>
+    <string name="announce_info_start_edit_button">Editiere Event Eigenschaften</string>
+    <string name="announce_info_exit_edit_button">Beende Editieren</string>
+    <string name="announce_info_edit_mode_string">Nicht möglich in Edit Modus</string>
     <string name="announce_info_title">Titel:</string>
     <string name="announce_info_title_hint">Gib einen Titel an</string>
     <string name="announce_info_fee">Gebühr:</string>
@@ -28,7 +31,17 @@
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="eventcreated">Veranstaltung wurde erstellt</string>
+    <string name="field_picker_text">Text</string>
+    <string name="field_picker_picture">Bild</string>
+    <string name="field_picker_link">Link</string>
+    <string name="field_picker_title">Wähle Feld</string>
+    <string name="choose_image">Bild wählen</string>
 
+    <string-array name="field_picker">
+        <item>Text</item>
+        <item>Bild</item>
+        <item>Link</item>
+    </string-array>
     <!--Manage Routes xml-->
     <string name="title_fragment_manage_routes">Verwalte Strecken</string>
     <string name="hello_blank_fragment">Hallo blank Fragment</string>
@@ -87,4 +100,5 @@
     <string name="title_activity_edit_event">Veranstaltung bearbeiten</string>
     <string name="eventedited">Veranstaltung wurde bearbeitet</string>
     <string name="edit_event_info_apply_button">Speichern</string>
+    <string name="announce_info_edit_button">Editiere Event Eigenschaften</string>
 </resources>
