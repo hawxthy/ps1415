@@ -225,7 +225,7 @@ public class ShowCursorAdapter extends BaseAdapter {
                 public void onClick(View view) {
                     String url = link;
                     Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse(url));
+                    i.setData(Uri.parse("http://"+url));
                     context.startActivity(i);
                 }
             });

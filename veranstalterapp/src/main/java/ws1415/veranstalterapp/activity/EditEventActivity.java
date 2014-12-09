@@ -46,12 +46,10 @@ public class EditEventActivity extends Activity {
     // Die ListView von der xml datei activity_edit_event
     private ListView listView;
 
-
     // Die Buttons für Cancel, Apply, Edit
     private Button applyButton;
     private Button cancelButton;
     private Button editButton;
-
 
     // Das Attribut Route
     private Route route;
@@ -92,14 +90,20 @@ public class EditEventActivity extends Activity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                cancelInfo(true);
+                if(!listAdapter.getEditMode()) {
+                    cancelInfo(true);
+                }
+                Toast.makeText(EditEventActivity.this, getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
             }
         });
 
         applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                applyInfo();
+                if(!listAdapter.getEditMode()) {
+                    applyInfo();
+                }
+                Toast.makeText(EditEventActivity.this, getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
             }
         });
 
@@ -144,12 +148,7 @@ public class EditEventActivity extends Activity {
                     // Benachrichtige den Benutzer mit einem Toast
                     Toast.makeText(EditEventActivity.this, getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
 
-                    // Setze die Attribute von Event auf den Standard
-                    event = new Event();
-                    EventUtils.getInstance(EditEventActivity.this).setStandardFields(event);
-                    listAdapter = new AnnounceCursorAdapter(EditEventActivity.this, event.getDynamicFields(), event);
-                    listView.setAdapter(listAdapter);
-                    listAdapter.notifyDataSetChanged();
+                    finish();
 
                     // Update die Informationen in ShowInformationFragment
                     HoldTabsActivity.updateInformation();
@@ -188,9 +187,10 @@ public class EditEventActivity extends Activity {
      * @param e Das Event
      */
     public void setEventDataToView(Event e){
+        event = e;
         listAdapter = new AnnounceCursorAdapter(this, e.getDynamicFields(), e);
 
-        listView = (ListView) findViewById(R.id.fragment_announce_information_list_view);
+        listView = (ListView) findViewById(R.id.activity_edit_event_list_view);
         listView.setAdapter(listAdapter);
     }
 

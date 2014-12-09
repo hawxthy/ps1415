@@ -49,6 +49,7 @@ public class ShowInformationActivity extends Activity {
      */
     public void setEventInformation(Event e) {
         if (e != null) {
+            setTitle(e.getTitle());
             listAdapter = new ShowCursorAdapter(this, e.getDynamicFields(), e);
 
             listView = (ListView) findViewById(R.id.activity_show_information_list_view);
