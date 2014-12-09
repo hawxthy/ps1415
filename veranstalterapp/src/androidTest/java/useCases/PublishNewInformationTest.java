@@ -318,8 +318,8 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                boolean found = false;
                 if (list != null) {
-                    boolean found = false;
                     for (Event e : list) {
                         if (e.getKey().getName() == textTime) {
                             found = true;
@@ -327,6 +327,8 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
                         }
                     }
                     assertTrue(found);
+                } else {
+                    assertTrue("Couldn't find any events!", found);
                 }
             }
         }).start();
