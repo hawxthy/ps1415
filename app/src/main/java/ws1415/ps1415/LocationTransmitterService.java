@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -24,6 +25,8 @@ import ws1415.ps1415.task.UpdateLocationTask;
  *
  */
 public class LocationTransmitterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+    public static final String NOTIFICATION_LOCATION = "location_transmitter_service_notification_location";
+    private LocalBroadcastManager broadcastManager;
 
     private GoogleApiClient gac;
 
@@ -52,6 +55,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     @Override
     public void onCreate() {
         super.onCreate();
+
+        broadcastManager = LocalBroadcastManager.getInstance(this);
     }
 
     @Override
@@ -89,6 +94,14 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // TODO: Location sollte nur geschickt werden wenn das vom Nutzer gewünscht wird (dann email prompt anzeigen)
         new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
 
+        sendLocationUpdate(location);
+    }
+
+    private void sendLocationUpdate(Location location) {
+        Intent intent = new Intent(NOTIFICATION_LOCATION);
+        if(location != null)
+            intent.putExtra(NOTIFICATION_LOCATION, location);
+        broadcastManager.sendBroadcast(intent);
     }
 
     @Override

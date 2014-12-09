@@ -24,7 +24,6 @@ import java.text.ParseException;
 import java.util.List;
 
 import ws1415.common.util.LocationUtils;
-import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryMemberTask;
 
@@ -45,7 +44,6 @@ public class ShowRouteActivity extends Activity {
     private Polyline routeLine;
     private PolylineOptions routeHighlight;
     private Polyline routeHighlightLine;
-    private Intent service;
     private int fieldFirst;
     private int fieldLast;
 
@@ -126,19 +124,11 @@ public class ShowRouteActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        // Starten des Hintergrundservices zur Standortermittlung
-        service = new Intent(getBaseContext(), LocationTransmitterService.class);
-        service.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startService(service);
-
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-
-        stopService(service);
     }
 
     @Override

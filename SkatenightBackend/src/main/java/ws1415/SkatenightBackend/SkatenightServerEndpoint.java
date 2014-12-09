@@ -434,7 +434,7 @@ public class SkatenightServerEndpoint {
 
         PersistenceManager pm = pmf.getPersistenceManager();
         Member m = getMember(email);
-        m.setCurrentEventId(event.getKey().getId());
+        m.setCurrentEventId(keyId);
 
         try {
             pm.makePersistent(m);
