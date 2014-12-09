@@ -27,9 +27,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import ws1415.ps1415.Activities.ShowInformationActivity;
 import ws1415.ps1415.R;
-import ws1415.ps1415.Activities.ShowRouteActivity;
+import ws1415.ps1415.activity.ShowRouteActivity;
 import ws1415.ps1415.util.FieldType;
 import ws1415.ps1415.util.ImageUtil;
 
@@ -179,6 +178,8 @@ public class ShowCursorAdapter extends BaseAdapter {
                                 // Leite wieter auf die Karte
                                 Intent intent = new Intent(context, ShowRouteActivity.class);
                                 intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, event.getRoute().getRouteData().getValue());
+                                intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_FIRST, event.getRouteFieldFirst());
+                                intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_LAST, event.getRouteFieldLast());
                                 context.startActivity(intent);
                             }
                         });
@@ -209,7 +210,7 @@ public class ShowCursorAdapter extends BaseAdapter {
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
             holder.title.setText(fieldList.get(position).getTitle());
-            // TODO muss noch richtig gemacht werden
+            // muss noch richtig gemacht werden
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
             holder.content.setText(dateFormat.format(new Date(Long.parseLong(fieldList.get(position).getValue()))));
 

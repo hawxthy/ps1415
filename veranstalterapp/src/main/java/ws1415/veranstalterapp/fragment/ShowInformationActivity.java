@@ -12,7 +12,7 @@ import com.skatenight.skatenightAPI.model.Event;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import ws1415.veranstalterapp.Adapter.ShowCursorAdapter;
+import ws1415.veranstalterapp.adapter.ShowCursorAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.GetEventTask;
 

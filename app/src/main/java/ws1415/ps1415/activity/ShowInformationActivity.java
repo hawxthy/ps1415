@@ -37,6 +37,8 @@ import ws1415.ps1415.task.ToggleMemberEventAttendanceTask;
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
 public class ShowInformationActivity extends Activity implements ExtendedTaskDelegate<Void, Object> {
+    public static final int REQUEST_ACCOUNT_PICKER = 2;
+
     public static final String EXTRA_KEY_ID = "show_information_extra_key_id";
 
     private static final String MEMBER_KEY_ID = "show_information_member_key_id";
@@ -53,6 +55,9 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     private int routeFieldFirst;
     private int routeFieldLast;
     private boolean attending;
+
+    private SharedPreferences prefs;
+    private GoogleAccountCredential credential;
 
     /**
      * Erstellt die View und zeigt die Informationen in der ShowInformationActivity.
@@ -85,7 +90,6 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
             routeFieldFirst = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_FIRST);
             routeFieldLast = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_LAST);
             attending = savedInstanceState.getBoolean(MEMBER_ATTENDING);
-            updateGUI();
         }
         else if ((intent = getIntent()) != null) {
             keyId = intent.getLongExtra(EXTRA_KEY_ID, 0);
