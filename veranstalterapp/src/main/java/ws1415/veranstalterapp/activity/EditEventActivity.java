@@ -148,12 +148,7 @@ public class EditEventActivity extends Activity {
                     // Benachrichtige den Benutzer mit einem Toast
                     Toast.makeText(EditEventActivity.this, getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
 
-                    // Setze die Attribute von Event auf den Standard
-                    event = new Event();
-                    EventUtils.getInstance(EditEventActivity.this).setStandardFields(event);
-                    listAdapter = new AnnounceCursorAdapter(EditEventActivity.this, event.getDynamicFields(), event);
-                    listView.setAdapter(listAdapter);
-                    listAdapter.notifyDataSetChanged();
+                    finish();
 
                     // Update die Informationen in ShowInformationFragment
                     HoldTabsActivity.updateInformation();

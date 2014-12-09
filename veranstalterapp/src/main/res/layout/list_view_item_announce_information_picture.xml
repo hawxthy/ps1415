@@ -28,18 +28,13 @@
         android:layout_height="wrap_content"
         android:text="-"/>
 
-        <Button
-            android:id="@+id/list_view_item_announce_information_picture_deleteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="-"/>
-
     </LinearLayout>
 
     <ImageView
         android:id="@+id/list_view_item_announce_information_picture_picture"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:adjustViewBounds="true"
         />
 
