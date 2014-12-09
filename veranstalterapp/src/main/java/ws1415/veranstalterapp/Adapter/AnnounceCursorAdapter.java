@@ -34,9 +34,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Text;
 
 import ws1415.veranstalterapp.activity.ChooseRouteActivity;
 import ws1415.veranstalterapp.util.EventUtils;
@@ -272,25 +274,24 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 holder.image = (ImageView) view.findViewById(R.id.list_view_item_announce_information_picture_picture);
                 setPictureInView(holder.title, holder.deleteButton, position);
 
-//                    if (field.getValue() != null) {
-//                        Bitmap bm = bitmapCache.get(field);
-//                        if (bm == null) {
-//                            byte[] bytes = (byte[]) field.getValue();
-//
-//                            // Zunächst nur Auflösung des Bilds abrufen und passende SampleSize berechnen
-//                            BitmapFactory.Options options = new BitmapFactory.Options();
-//                            options.inJustDecodeBounds = true;
-//                            BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-//                            options.inSampleSize = ImageUtil.calculateInSampleSize(options, 720);
-//                            // Skalierte Version des Bilds abrufen
-//                            options.inJustDecodeBounds = false;
-//                            bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-//                            bitmapCache.put(field, bm);
-//                        }
-//
-//                        // Bild anzeigen
-//                        holder.image.setImageBitmap(bm);
-//                    }
+                Bitmap bm = bitmapCache.get(field);
+                if (bm == null) {
+                    Text encodedBytes = field.getData();
+                    if (encodedBytes != null) {
+                        byte[] bytes = Base64.decodeBase64(encodedBytes.getValue());
+                        // Zunächst nur Auflösung des Bilds abrufen und passende SampleSize berechnen
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inJustDecodeBounds = true;
+                        BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                        options.inSampleSize = ImageUtil.calculateInSampleSize(options, 720);
+                        // Skalierte Version des Bilds abrufen
+                        options.inJustDecodeBounds = false;
+                        bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                        bitmapCache.put(field, bm);
+                    }
+                }
+                // Bild anzeigen
+                holder.image.setImageBitmap(bm);
 
                 final int finalPosition = position;
                 holder.button.setOnClickListener(new View.OnClickListener() {

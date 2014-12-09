@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -14,18 +16,22 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
+import com.skatenight.skatenightAPI.model.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import ws1415.ps1415.Activities.ShowInformationActivity;
 import ws1415.ps1415.R;
 import ws1415.ps1415.Activities.ShowRouteActivity;
 import ws1415.ps1415.util.FieldType;
+import ws1415.ps1415.util.ImageUtil;
 
 /**
  * Created by Bernd Eissing on 28.11.2014.
@@ -35,6 +41,12 @@ public class ShowCursorAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater inflater;
     private Event event;
+
+
+    /**
+     * Cache für die Bilder des Eevnts, damit diese nicht bei jedem Scrollen neu skaliert werden müssen.
+     */
+    private HashMap<Field, Bitmap> bitmapCache = new HashMap<Field, Bitmap>();
 
     /**
      * Konstruktor, der den Inhalt der Liste festlegt.
@@ -130,9 +142,24 @@ public class ShowCursorAdapter extends BaseAdapter {
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_image_field_textView_title);
             holder.image = (ImageView) view.findViewById(R.id.list_view_item_show_information_image_field_imageView);
             holder.title.setText(fieldList.get(position).getTitle());
-            // TODO muss noch richtig gemacht werden
-            //holder.image.setImageBitmap(fieldList.get(position).getValue());
-
+            Bitmap bm = bitmapCache.get(getItem(position));
+            if (bm == null) {
+                Text encodedBytes = getItem(position).getData();
+                if (encodedBytes != null) {
+                    byte[] bytes = Base64.decodeBase64(encodedBytes.getValue());
+                    // Zunächst nur Auflösung des Bilds abrufen und passende SampleSize berechnen
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                    options.inSampleSize = ImageUtil.calculateInSampleSize(options, 720);
+                    // Skalierte Version des Bilds abrufen
+                    options.inJustDecodeBounds = false;
+                    bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                    bitmapCache.put(getItem(position), bm);
+                }
+            }
+            // Bild anzeigen
+            holder.image.setImageBitmap(bm);
         } else if (getItem(position).getType() == FieldType.ROUTE.getId()) {
             HolderButtonField holder = new HolderButtonField();
             view = inflater.inflate(R.layout.list_view_item_show_information_button_field, viewGroup, false);

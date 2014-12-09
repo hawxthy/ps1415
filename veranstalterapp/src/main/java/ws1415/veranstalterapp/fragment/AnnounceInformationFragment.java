@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import java.util.Date;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Text;
 
 import ws1415.veranstalterapp.Adapter.AnnounceCursorAdapter;
 import ws1415.veranstalterapp.ServiceProvider;
@@ -249,7 +251,7 @@ public class AnnounceInformationFragment extends Fragment {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
-            //pictureField.setValue(byteArray);
+            pictureField.setData(new Text().setValue(Base64.encodeToString(byteArray, Base64.DEFAULT)));
 
             // Speicher des Bildes zum Freigeben vorbereiten
             bm.recycle();

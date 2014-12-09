@@ -32,18 +32,6 @@ public class Event {
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Key key;
-    @Persistent
-    private String title;
-    @Persistent
-    private Date date;
-    @Persistent
-    private Date time;
-    @Persistent
-    private String fee;
-    @Persistent
-    private String location;
-    @Persistent
-    private Text description;
     @Persistent(defaultFetchGroup = "true")
     @Unowned
     private Route route;
