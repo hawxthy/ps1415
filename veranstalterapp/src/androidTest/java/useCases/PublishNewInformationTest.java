@@ -492,6 +492,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
 
     }
 
+
 }
 
 
