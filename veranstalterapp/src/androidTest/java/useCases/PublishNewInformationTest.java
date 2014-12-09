@@ -4,11 +4,14 @@ import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.Instrumentation;
+import android.graphics.Point;
+import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.test.UiThreadTest;
 import android.test.ViewAsserts;
 import android.test.suitebuilder.annotation.SmallTest;
+import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -45,6 +48,11 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     private HoldTabsActivity mActivity;
     private ActionBar mActionBar;
 
+    // Wird zum Swipen nach links oder rects verwendet
+    public enum Direction {
+        Left, Right;
+    }
+
     public PublishNewInformationTest() {
         super(HoldTabsActivity.class);
     }
@@ -67,9 +75,34 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
 
         // Die HoldTabsActivity wird gestartet
         mActivity = getActivity();
-
+        // ActionBar der TabActivity holen
         mActionBar = mActivity.getActionBar();
+        // Swipe zum "Veranstaltung erstellen" Tab
+        swipe(Direction.Right);
+    }
 
+    /**
+     * Swipet auf dem Bildschirm.
+     * @param direction Die Richtugn (links oder recths)
+     */
+    protected void swipe(Direction direction) {
+        Instrumentation inst = getInstrumentation();
+        Point size = new Point();
+        mActivity.getWindowManager().getDefaultDisplay().getSize(size);
+        int width = size.x;
+
+        // Festellen in welche Richtung
+        long downTime = SystemClock.uptimeMillis();
+        float xStart = ((direction == Direction.Left) ? (width - 10) : 10);
+        float xEnd = ((direction == Direction.Left) ? 10 : (width - 10));
+
+        // Der Wert für die y verändert sich nicht
+        inst.sendPointerSync(MotionEvent.obtain(downTime, SystemClock.uptimeMillis(),
+                MotionEvent.ACTION_DOWN, xStart, size.y / 2, 0));
+        inst.sendPointerSync(MotionEvent.obtain(downTime, SystemClock.uptimeMillis(),
+                MotionEvent.ACTION_MOVE, xEnd, size.y / 2, 0));
+        inst.sendPointerSync(MotionEvent.obtain(downTime, SystemClock.uptimeMillis() + 1000,
+                MotionEvent.ACTION_UP, xEnd, size.y / 2, 0));
     }
 
     /**
@@ -275,7 +308,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         // Erstellen des Events
         applyButton.performClick();
 
-
+        // Neuer Thread, da es im UiThread ansonsten zu einem DeadLock kommen könnte
         new Thread(new Runnable() {
             @Override
             public void run() {
