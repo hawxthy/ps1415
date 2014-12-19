@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.veranstalterapp.Adapter.MapsCursorAdapter;
+import ws1415.veranstalterapp.adapter.MapsCursorAdapter;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.ServiceProvider;
@@ -44,9 +44,9 @@ public class ChooseRouteActivity extends Activity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ((AnnounceInformationFragment)HoldTabsActivity.getAdapter().getItem(1)).setRoute(routeList.get(i));
+                ((AnnounceInformationFragment)HoldTabsActivity.getAdapter().getItem(1)).getAdapter().setRouteAndText(routeList.get(i));
                 if(activity != null){
-                    activity.setRoute(routeList.get(i));
+                    activity.getAdapter().setRouteAndText(routeList.get(i));
                 }
                 finish();
             }

@@ -1,8 +1,5 @@
 package ws1415.veranstalterapp.task;
 
-import android.app.Service;
-import android.test.AndroidTestCase;
-
 import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
@@ -10,8 +7,9 @@ import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
-import ws1415.veranstalterapp.Fragments.ShowEventsFragment;
+import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**
@@ -83,10 +81,13 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
         super.setUp();
 
         // Bestehende Events löschen
-        for (Event e : ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
-                .execute().getItems()) {
-            ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
-                    .execute();
+        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+                .execute().getItems();
+        if (events != null) {
+            for (Event e : events) {
+                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                        .execute();
+            }
         }
 
         ServiceProvider.getService().skatenightServerEndpoint().createEvent(event1).execute();

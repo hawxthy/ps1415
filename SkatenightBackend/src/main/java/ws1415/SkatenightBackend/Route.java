@@ -48,7 +48,8 @@ public class Route {
     }
 
     public ArrayList<RoutePoint> getRoutePoints() {
-        return routePoints;
+        if (routePoints == null) return new ArrayList();
+        else return routePoints;
     }
 
     public void setRoutePoints(ArrayList<RoutePoint> routePoints) {

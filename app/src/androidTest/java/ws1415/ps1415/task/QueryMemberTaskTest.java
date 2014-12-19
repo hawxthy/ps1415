@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.Activities.ShowRouteActivity;
+import ws1415.ps1415.activity.ShowRouteActivity;
 
 /**
  * ACHTUNG: Test läuft über den normalen Google-Server, da das @-Zeichen bei einer Anfrage an den

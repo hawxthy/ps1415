@@ -1,4 +1,4 @@
-package ws1415.ps1415.Activities;
+package ws1415.ps1415.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.skatenight.skatenightAPI.model.Member;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -17,26 +16,38 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.skatenight.skatenightAPI.model.Member;
 
 import java.text.ParseException;
 import java.util.List;
 
+import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryMemberTask;
-import ws1415.ps1415.util.LocationUtils;
 
 /**
  * Zeigt die Strecke des aktuellen Events auf einer Karte an.
  */
 public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE = "show_route_extra_route";
+    public static final String EXTRA_ROUTE_FIELD_FIRST = "show_route_extra_route_field_first";
+    public static final String EXTRA_ROUTE_FIELD_LAST = "show_route_extra_route_field_last";
     private static final String MEMBER_ROUTE = "show_route_member_route";
+    private static final String MEMBER_ROUTE_HIGHLIGHT = "show_route_member_route_highlight";
+    private static final String MEMBER_ROUTE_FIELD_FIRST = "show_route_member_route_field_first";
+    private static final String MEMBER_ROUTE_FIELD_LAST = "show_route_member_route_field_last";
 
     private GoogleMap googleMap;
     private PolylineOptions route;
+    private Polyline routeLine;
+    private PolylineOptions routeHighlight;
+    private Polyline routeHighlightLine;
     private Intent service;
+    private int fieldFirst;
+    private int fieldLast;
 
     private Location location; // Enthält die aktuelle Position, die vom Server runtergeladen wurde
 
@@ -49,9 +60,21 @@ public class ShowRouteActivity extends Activity {
         googleMap.setMyLocationEnabled(true);
 
         Intent intent;
-        if (savedInstanceState != null && savedInstanceState.containsKey(MEMBER_ROUTE)) {
-            route = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_ROUTE);
-            googleMap.addPolyline(route);
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(MEMBER_ROUTE)) {
+                route = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_ROUTE);
+                routeLine = googleMap.addPolyline(route);
+            }
+            if (savedInstanceState.containsKey(MEMBER_ROUTE_HIGHLIGHT)) {
+                routeHighlight = (PolylineOptions) savedInstanceState.getParcelable(MEMBER_ROUTE_HIGHLIGHT);
+                routeHighlightLine = googleMap.addPolyline(routeHighlight);
+            }
+            if (savedInstanceState.containsKey(MEMBER_ROUTE_FIELD_FIRST)) {
+                fieldFirst = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_FIRST);
+            }
+            if (savedInstanceState.containsKey(MEMBER_ROUTE_FIELD_LAST)) {
+                fieldLast = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_LAST);
+            }
         }
         else if ((intent = getIntent()) != null && intent.hasExtra(EXTRA_ROUTE)) {
             String encodedPath = intent.getStringExtra(EXTRA_ROUTE);
@@ -60,10 +83,11 @@ public class ShowRouteActivity extends Activity {
 
                 route = new PolylineOptions()
                         .addAll(line)
+                        .width(12.0f)
                         .color(Color.BLUE);
 
                 googleMap.clear();
-                googleMap.addPolyline(route);
+                routeLine = googleMap.addPolyline(route);
 
                 googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                     @Override
@@ -78,12 +102,22 @@ public class ShowRouteActivity extends Activity {
                         }
                     }
                 });
+
+                if (intent.hasExtra(EXTRA_ROUTE_FIELD_FIRST)) {
+                    fieldFirst = intent.getIntExtra(EXTRA_ROUTE_FIELD_FIRST, 0);
+                }
+                if (intent.hasExtra(EXTRA_ROUTE_FIELD_LAST)) {
+                    fieldLast = intent.getIntExtra(EXTRA_ROUTE_FIELD_LAST, 0);
+                }
+                Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();
             }
             catch (ParseException e) {
                 Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         }
+
+        highlightRoute(fieldFirst, fieldLast);
 
         // Ruft die aktuellen Memberinformationen ab
         new QueryMemberTask().execute((ShowRouteActivity) this);
@@ -112,6 +146,11 @@ public class ShowRouteActivity extends Activity {
         if (route != null) {
             outState.putParcelable(MEMBER_ROUTE, route);
         }
+        if (routeHighlight != null) {
+            outState.putParcelable(MEMBER_ROUTE_HIGHLIGHT, routeHighlight);
+        }
+        outState.putInt(MEMBER_ROUTE_FIELD_FIRST, fieldFirst);
+        outState.putInt(MEMBER_ROUTE_FIELD_LAST, fieldLast);
 
         super.onSaveInstanceState(outState);
     }
@@ -129,6 +168,10 @@ public class ShowRouteActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        }
         if (id == R.id.action_settings) {
             return true;
         }
@@ -156,9 +199,21 @@ public class ShowRouteActivity extends Activity {
                     .snippet("" + m.getUpdatedAt())
                     .icon(BitmapDescriptorFactory
                             .defaultMarker(markerColor)));
+
+            Toast.makeText(getApplicationContext(), "" + m.getCurrentWaypoint(), Toast.LENGTH_SHORT).show();
         } else {
             location = null;
         }
     }
 
+    private void highlightRoute(int first, int last) {
+        List<LatLng> highlight = route.getPoints().subList(first, last);
+        if (routeHighlightLine != null) routeHighlightLine.remove();
+        routeHighlight = new PolylineOptions()
+                .addAll(highlight)
+                .width(8.0f)
+                .color(Color.GREEN);
+
+        routeHighlightLine = googleMap.addPolyline(routeHighlight);
+    }
 }

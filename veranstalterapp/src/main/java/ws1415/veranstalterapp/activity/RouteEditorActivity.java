@@ -23,18 +23,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.skatenight.skatenightAPI.model.RoutePoint;
-import com.skatenight.skatenightAPI.model.Text;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.skatenight.skatenightAPI.model.RoutePoint;
+import com.skatenight.skatenightAPI.model.Text;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,11 +55,17 @@ import java.util.Locale;
 import ws1415.veranstalterapp.fragment.EditorMapFragment;
 import ws1415.veranstalterapp.fragment.EditorWaypointsFragment;
 import ws1415.veranstalterapp.R;
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.common.util.LocationUtils;
+import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.fragment.EditorMapFragment;
+import ws1415.veranstalterapp.fragment.EditorWaypointsFragment;
 import ws1415.veranstalterapp.task.AddRouteTask;
-import ws1415.veranstalterapp.util.LocationUtils;
+import ws1415.veranstalterapp.task.RouteLoaderTask;
 
 
-public class RouteEditorActivity extends Activity implements ActionBar.TabListener {
+public class RouteEditorActivity extends Activity implements ActionBar.TabListener, ExtendedTaskDelegate<Void, RouteEditorActivity.Route> {
     private static final String LOG_TAG = RouteEditorActivity.class.getSimpleName();
 
     public static final String EXTRA_NAME = "route_editor_activity_extra_name";
@@ -74,11 +81,16 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     private String name;
     private ArrayAdapter<Waypoint> waypointArrayAdapter;
     private Route route;
+    private RouteLoaderTask currentTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
         setContentView(R.layout.activity_route_editor);
+        setProgressBarIndeterminateVisibility(false);
 
         name = null;
 
@@ -142,6 +154,11 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
             }
         });
+
+        if (route == null && waypointArrayAdapter.getCount() > 1) {
+            // Wir sollten eigentlich eine Route haben...
+            loadRoute();
+        }
     }
 
     @Override
@@ -352,7 +369,9 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     public void loadRoute() {
         setRoute(null);
         if (waypointArrayAdapter.getCount() > 1) {
-            new RouteLoaderTask().execute(waypointArrayAdapter);
+            currentTask = new RouteLoaderTask(this);
+            currentTask.execute(waypointArrayAdapter);
+            setProgressBarIndeterminateVisibility(true);
         }
     }
 
@@ -404,6 +423,30 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
         return getFragmentManager().findFragmentByTag(tag);
     }
 
+    @Override
+    public void taskDidFinish(ExtendedTask task, Route route) {
+        if (task == currentTask) {
+            setRoute(route);
+            setProgressBarIndeterminateVisibility(false);
+            currentTask = null;
+        }
+    }
+
+    @Override
+    public void taskDidProgress(ExtendedTask task, Void... progress) {
+
+    }
+
+    @Override
+    public void taskFailed(ExtendedTask task, String message) {
+        if (task == currentTask) {
+            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            setProgressBarIndeterminateVisibility(false);
+            currentTask = null;
+        }
+
+    }
+
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -451,155 +494,6 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
             textView.setText(getItem(position).getMarkerOptions().getTitle());
             //textView.setText(getString(R.string.route_editor_waypoint_name_format, (position + 1)));
             return view;
-        }
-    }
-
-    /**
-     * Task zum erstellen einer Route mit den im ArrayAdapter enthaltenen Waypoints als Wegpunkten.
-     * Die Route wird mithilfe der Google Directions API
-     * (https://developers.google.com/maps/documentation/directions/) erstellt. Es müssen mindestens
-     * 2 Wegpunkte übergeben werden. Aufgrund der Einschränkungen der API dürfen neben dem Start-
-     * und Endpunkt maximal 8 Wegpunkte übergeben werden. Die Anweisungen werden als JSON String
-     * runtergeladen und anschließend in ein Route Objekt eingefügt. Das Ergebnis wird der
-     * RouteEditorActivity über die setRoute Methode geliefert.
-     */
-    private class RouteLoaderTask extends AsyncTask<ArrayAdapter<Waypoint>, Void, Route> {
-        private final String LOG_TAG = RouteLoaderTask.class.getSimpleName();
-
-        @Override
-        protected Route doInBackground(ArrayAdapter<Waypoint>... params) {
-            if (params.length != 1) return null;
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            final ArrayAdapter<Waypoint> waypoints = params[0];
-
-            if (waypoints.getCount() < 2) return null;
-
-            final String BASE_URL = "http://maps.googleapis.com/maps/api/directions/json?";
-
-            final String ORIGIN = positionToString(waypoints.getItem(0).getMarkerOptions().getPosition());
-            final String DESTINATION = positionToString(waypoints.getItem(waypoints.getCount() - 1).getMarkerOptions().getPosition());
-            final String WAYPOINTS = waypointsToString(waypoints);
-
-            Uri.Builder builder = Uri.parse(BASE_URL).buildUpon();
-            builder.appendQueryParameter("origin", ORIGIN);
-            builder.appendQueryParameter("destination", DESTINATION);
-            builder.appendQueryParameter("waypoints", WAYPOINTS);
-            builder.appendQueryParameter("sensor", "true");
-
-            String jsonString = null;
-
-            try {
-                URL url = new URL(builder.build().toString());
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) return null;
-
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() <= 0) return null;
-                jsonString = buffer.toString();
-            }
-            catch (IOException e) {
-                Log.e(LOG_TAG, "Error downloading directions.", e);
-            }
-            finally {
-                if (urlConnection != null) urlConnection.disconnect();
-
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    }
-                    catch (IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream.", e);
-                    }
-                }
-            }
-
-            if (jsonString != null) {
-                try {
-                    return parseJSONString(jsonString);
-                }
-                catch (JSONException e) {
-                    Log.e(LOG_TAG, "Unable to parse JSON string.", e);
-                    return null;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Route route) {
-            super.onPostExecute(route);
-            if (route == null) {
-                Toast.makeText(getApplicationContext(), getString(R.string.route_editor_error_load_route), Toast.LENGTH_SHORT).show();
-            }
-
-            setRoute(route);
-            Toast.makeText(getApplicationContext(), route.getPolylineOptions().getPoints().size() + " " + route.getDistance(), Toast.LENGTH_LONG).show();
-        }
-
-        private String positionToString(LatLng position) {
-            return position.latitude + "," + position.longitude;
-        }
-
-        private String waypointsToString(ArrayAdapter<Waypoint> waypoints) {
-            StringBuilder builder = new StringBuilder();
-            for (int i = 1; i < waypoints.getCount() - 1; i++) {
-                builder.append(positionToString(waypoints.getItem(i).getMarkerOptions().getPosition()));
-                builder.append("|");
-            }
-            return builder.toString();
-        }
-
-        private Route parseJSONString(String jsonString) throws JSONException {
-            JSONObject directionsJSON = new JSONObject(jsonString);
-            JSONArray routesArray = directionsJSON.getJSONArray("routes");
-            if (routesArray.length() <= 0) {
-                return null;
-            }
-
-            JSONObject route = routesArray.getJSONObject(0);
-            JSONArray legs = route.getJSONArray("legs");
-
-            List<LatLng> line = new ArrayList<LatLng>();
-            int distance = 0;
-
-            for (int i = 0; i < legs.length(); i++) {
-                JSONObject leg = legs.getJSONObject(i);
-                JSONArray steps = leg.getJSONArray("steps");
-                for (int j = 0; j < steps.length(); j++) {
-                    JSONObject step = steps.getJSONObject(j);
-                    distance += step.getJSONObject("distance").getInt("value");
-                    try {
-                        line.addAll(LocationUtils.decodePolyline(step.getJSONObject("polyline").getString("points")));
-                    }
-                    catch (ParseException e) {
-                        Log.e(LOG_TAG, "Unable to parse polyline", e);
-                        return null;
-                    }
-                }
-            }
-
-            Route out = null;
-            try {
-                out = new Route(line, distance);
-            }
-            catch (ParseException e) {
-                Log.e(LOG_TAG, "Unable to parse polyline.", e);
-                return null;
-            }
-            return out;
         }
     }
 

@@ -4,7 +4,6 @@ android {
     // Festlegen, welcher Build Type für die Tests genutzt werden soll. Definiert, welche Signing-
     // Configuration für das Testpaket genutzt wird.
     testBuildType "jenkins"
-
     signingConfigs {
         release {
             keyAlias 'Skatenight-Veranstalter-App-Key'
@@ -26,30 +25,34 @@ android {
         }
     }
     compileSdkVersion 20
-    buildToolsVersion "20.0.0"
+    buildToolsVersion '20.0.0'
     defaultConfig {
-        applicationId "ws1415.veranstalterapp"
+        applicationId 'ws1415.veranstalterapp'
         minSdkVersion 15
         targetSdkVersion 20
         versionCode 1
-        versionName "1.0"
+        versionName '1.0'
     }
     buildTypes {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            debuggable true
         }
         debug {
             signingConfig signingConfigs.debug
         }
         jenkins {
             signingConfig signingConfigs.jenkins
+            debuggable true
         }
     }
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
+    }
+    productFlavors {
     }
 }
 
@@ -59,4 +62,5 @@ dependencies {
     compile 'com.android.support:support-v4:21.0.0'
     compile 'com.google.android.gms:play-services:6.1.+'
     compile 'com.android.support:support-v13:21.0.0'
+    compile project(':common')
 }

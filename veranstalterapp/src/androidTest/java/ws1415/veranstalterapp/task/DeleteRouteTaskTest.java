@@ -1,14 +1,14 @@
 package ws1415.veranstalterapp.task;
 
-import android.test.AndroidTestCase;
-
+import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.IOException;
+import java.util.List;
 
-import ws1415.veranstalterapp.Fragments.ManageRoutesFragment;
 import ws1415.veranstalterapp.ServiceProvider;
+import ws1415.veranstalterapp.fragment.ManageRoutesFragment;
 
 
 /**
@@ -76,6 +76,16 @@ public class DeleteRouteTaskTest extends AuthTaskTestCase {
      */
     public void setUp() throws Exception {
         super.setUp();
+
+        // Bestehende Events löschen
+        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+                .execute().getItems();
+        if (events != null) {
+            for (Event e : events) {
+                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                        .execute();
+            }
+        }
 
         // Bestehende Routen löschen
         for (Route r : ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute()
