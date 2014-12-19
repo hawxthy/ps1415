@@ -7,11 +7,11 @@ public class Constants {
     /**
      * Client-ID für die normale App.
      */
-    public static final String ANDROID_USER_CLIENT_ID = "37947570052-0730rlarj87fm7pvl930qma6gmhbciuu.apps.googleusercontent.com";
+    public static final String ANDROID_USER_CLIENT_ID = "37947570052-g006o3ovfotnjqreltom6c7cbktm7dap.apps.googleusercontent.com";
     /**
      * Client-ID für die Veranstalter-App.
      */
-    public static final String ANDROID_HOST_CLIENT_ID = "37947570052-1frhohnd9vbt3130433qabd1pjgv9jvq.apps.googleusercontent.com";
+    public static final String ANDROID_HOST_CLIENT_ID = "37947570052-4ru7asfhnrjmmqvj3qdpo2rrp31fudf3.apps.googleusercontent.com";
     /**
      * Client-ID für Webaufrufe.
      */
