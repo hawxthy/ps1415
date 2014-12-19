@@ -24,30 +24,30 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name="ws1415.ps1415.activity.ShowInformationActivity"
+            android:name=".activity.ShowInformationActivity"
             android:exported="true"
             android:label="@string/title_activity_showinformation"
-            android:parentActivityName="ws1415.ps1415.activity.ShowEventsActivity" >
+            android:parentActivityName=".activity.ShowEventsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.ShowEventsActivity" />
         </activity>
         <activity
-            android:name="ws1415.ps1415.activity.ShowRouteActivity"
+            android:name=".activity.ShowRouteActivity"
             android:label="@string/title_activity_show_route"
-            android:parentActivityName="ws1415.ps1415.activity.ShowInformationActivity" >
+            android:parentActivityName=".activity.ShowInformationActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.ShowInformationActivity" />
         </activity>
 
         <service
-            android:name="ws1415.ps1415.LocationTransmitterService"
+            android:name=".LocationTransmitterService"
             android:enabled="true"
             android:exported="true" />
 
         <activity
-            android:name="ws1415.ps1415.activity.ShowEventsActivity"
+            android:name=".activity.ShowEventsActivity"
             android:label="@string/title_activity_show_events" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -56,13 +56,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ws1415.ps1415.activity.ActiveEventActivity"
+            android:name=".activity.ActiveEventActivity"
             android:label="@string/title_activity_active_event" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".Settings"
+            android:label="@string/title_activity_settings" >
         </activity>
     </application>
 
