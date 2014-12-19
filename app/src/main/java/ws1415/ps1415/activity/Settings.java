@@ -1,9 +1,11 @@
-package ws1415.ps1415;
+package ws1415.ps1415.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import ws1415.ps1415.R;
 
 
 public class Settings extends Activity {
