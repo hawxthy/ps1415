@@ -16,6 +16,7 @@ import java.util.List;
 
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.util.EventUtils;
+import ws1415.veranstalterapp.util.FieldType;
 
 /**
  * Klasse zum Füllen der ListView in ShowEventsFragment.
@@ -112,10 +113,10 @@ public class EventsCursorAdapter extends BaseAdapter{
         }else{
             holder = (Holder)convertView.getTag();
         }
-        holder.eventName.setText(EventUtils.getInstance(mContext).getUniqueField(8, getItem(position)).getValue());
-        holder.eventLocation.setText(EventUtils.getInstance(mContext).getUniqueField(9, getItem(position)).getValue());
+        holder.eventName.setText(EventUtils.getInstance(mContext).getUniqueField(FieldType.TITLE.getId(), getItem(position)).getValue());
+        holder.eventLocation.setText(EventUtils.getInstance(mContext).getUniqueField(FieldType.LOCATION.getId(), getItem(position)).getValue());
         holder.eventDate.setText(eventDateFormat.format(EventUtils.getInstance(mContext).getFusedDate(getItem(position))));
-        holder.eventFee.setText(EventUtils.getInstance(mContext).getUniqueField(2, getItem(position)).getValue() +" €");
+        holder.eventFee.setText(EventUtils.getInstance(mContext).getUniqueField(FieldType.FEE.getId(), getItem(position)).getValue() +" €");
 
         return convertView;
     }
