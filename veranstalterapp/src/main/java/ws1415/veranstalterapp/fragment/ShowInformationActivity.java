@@ -15,6 +15,7 @@ import java.util.Date;
 import ws1415.veranstalterapp.adapter.ShowCursorAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.GetEventTask;
+import ws1415.veranstalterapp.util.EventUtils;
 
 /**
  * Activity zum Begutachten der Metainformationen der erstellten Veranstaltung.
@@ -49,7 +50,7 @@ public class ShowInformationActivity extends Activity {
      */
     public void setEventInformation(Event e) {
         if (e != null) {
-            setTitle(e.getTitle());
+            setTitle(EventUtils.getInstance(this).getUniqueField(8, e).getValue());
             listAdapter = new ShowCursorAdapter(this, e.getDynamicFields(), e);
 
             listView = (ListView) findViewById(R.id.activity_show_information_list_view);
