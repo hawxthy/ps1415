@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Adapter;
+package ws1415.veranstalterapp.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -189,7 +189,7 @@ public class ShowCursorAdapter extends BaseAdapter{
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
             holder.title.setText(fieldList.get(position).getTitle());
-            // TODO muss noch richtig gemacht werden
+            // muss noch richtig gemacht werden
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
             holder.content.setText(dateFormat.format(new Date(Long.parseLong(fieldList.get(position).getValue()))));
 

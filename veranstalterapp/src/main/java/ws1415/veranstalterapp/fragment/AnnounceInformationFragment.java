@@ -17,30 +17,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import java.io.IOException;
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
-import ws1415.veranstalterapp.Adapter.AnnounceCursorAdapter;
-import ws1415.veranstalterapp.ServiceProvider;
-import ws1415.veranstalterapp.activity.HoldTabsActivity;
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+
 import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.activity.HoldTabsActivity;
+import ws1415.veranstalterapp.adapter.AnnounceCursorAdapter;
 import ws1415.veranstalterapp.task.CreateEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.FieldType;
-import ws1415.veranstalterapp.util.ImageUtil;
 
 /**
  * Fragment zum Veröffentlichen von neuen Veranstaltungen.
@@ -152,7 +145,7 @@ public class AnnounceInformationFragment extends Fragment {
                 int titleId = EventUtils.getInstance(getActivity()).getUniqueFieldId(FieldType.TITLE, event);
 
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (titleId != -1 && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
+                if (titleId != -1/* && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()*/){
 
                     // Setze die Attribute vom Event
                     EventUtils.getInstance(getActivity()).setEventInfo(event, listView);

@@ -5,7 +5,6 @@ package ws1415.veranstalterapp;
  */
 public class Constants {
     public static final String WEB_CLIENT_ID = "37947570052-dk3rjhgran1s38gscv6va2rmmv2bei8r.apps.googleusercontent.com";
-
     /**
      * Die URL der aufzurufenden API.
      */

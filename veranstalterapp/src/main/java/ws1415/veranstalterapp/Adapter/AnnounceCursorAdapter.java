@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Adapter;
+package ws1415.veranstalterapp.adapter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
