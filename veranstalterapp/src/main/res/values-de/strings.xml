@@ -2,6 +2,7 @@
 
     <string name="app_name">Veranstalte Skatenight</string>
     <string name="action_settings">Settings</string>
+    <string name="action_permission">Rechte</string>
     <string name="action_add_route">Erstelle Strecke</string>
 
     <!--Activity Hold Tabs xml-->
