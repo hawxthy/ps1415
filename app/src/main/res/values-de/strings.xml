@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ps1415</string>
+    <string name="app_name">Skatenight</string>
     <string name="title_activity_showinformation">Wird abgerufen...</string>
     <string name="title_activity_show_route">Strecke</string>
     <string name="hello_world">Hello world!</string>
