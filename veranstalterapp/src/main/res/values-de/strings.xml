@@ -106,4 +106,13 @@
     <string name="announce_info_edit_button">Editiere Event Eigenschaften</string>
 
     <string name="title_activity_permission_management">PermissionManagementActivity</string>
+
+    <!--Strings zu AddHostDialog -->
+    <string name="title_activity_add_host_dialog_hostname">E-Mail</string>
+    <string name="activity_add_host_dialog_cancel">Abbrechen</string>
+    <string name="activity_add_host_dialog_apply">Hinzufügen</string>
+
+    <string-array name="selections_menu_manage_hosts">
+        <item>Löschen</item>
+    </string-array>
 </resources>

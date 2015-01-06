@@ -109,8 +109,16 @@
     <string name="edit_event_info_apply_button">Save</string>
     <string name="title_activity_choose_image">ChooseImageActivity</string>
     <string name="announce_info_edit_button">Edit Event Properties</string>
-
-
     <string name="title_activity_permission_management">PermissionManagementActivity</string>
+    <string name="title_activity_add_host_dialog">AddHostDialog</string>
+
+    <!--Strings zu AddHostDialog -->
+    <string name="title_activity_add_host_dialog_hostname">Mail</string>
+    <string name="activity_add_host_dialog_cancel">Cancel</string>
+    <string name="activity_add_host_dialog_apply">Add</string>
+
+    <string-array name="selections_menu_manage_hosts">
+        <item>Löschen</item>
+    </string-array>
 
 </resources>

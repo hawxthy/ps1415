@@ -68,6 +68,11 @@
             android:name=".activity.PermissionManagementActivity"
             android:label="@string/title_activity_permission_management" >
         </activity>
+        <activity
+            android:name=".activity.AddHostDialog"
+            android:label="@string/title_activity_add_host_dialog"
+            android:theme="@android:style/Theme.Holo.Dialog" >
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

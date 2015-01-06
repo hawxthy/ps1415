@@ -1,9 +1,14 @@
 package ws1415.veranstalterapp.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.Host;
@@ -11,6 +16,7 @@ import com.skatenight.skatenightAPI.model.Host;
 import java.util.List;
 
 import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.adapter.HostCursorAdapter;
 import ws1415.veranstalterapp.task.QueryHostsTask;
 
 public class PermissionManagementActivity extends Activity {
@@ -25,7 +31,24 @@ public class PermissionManagementActivity extends Activity {
 
         listView = (ListView) findViewById(R.id.activtiy_permission_management_list_view);
 
-        new QueryHostsTask();
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            /**
+             * Löscht den Host vom Server und von der listView
+             *
+             * @param adapterView
+             * @param view
+             * @param i Position des Hosts in der listView
+             * @param l
+             * @return
+             */
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                createSelectionsMenu(i);
+                return true;
+            }
+        });
+
+        new QueryHostsTask().execute(this);
     }
 
 
@@ -44,6 +67,8 @@ public class PermissionManagementActivity extends Activity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
+        }else if(id == R.id.action_add_host){
+            addHost();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -57,5 +82,42 @@ public class PermissionManagementActivity extends Activity {
         hostList = results;
         adapter = new HostCursorAdapter(this, hostList);
         listView.setAdapter(adapter);
+    }
+
+    /**
+     * Startet den AddHostDialog mit allen nötigen Informationen.
+     */
+    public void addHost(){
+        AddHostDialog.givePMActivity(this);
+        Intent intent = new Intent(this, AddHostDialog.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Dient zum refreshen der Liste der aktuellen Hosts.
+     */
+    public void refresh(){
+        new QueryHostsTask().execute(this);
+    }
+
+    /**
+     * Erstellt einen Dialog, welcher aufgerufen wird, wenn ein Item in der ListView lange
+     * ausgewählt wird. In diesem Dialog kann man dann auswählen, ob man den ausgewählten
+     * Host löschen möchte.
+     *
+     * @param position
+     */
+    private void createSelectionsMenu(final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(hostList.get(position).getEmail())
+                .setItems(R.array.selections_menu_manage_hosts, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int index) {
+                        if (index == 0) {
+                            new DeleteHostTask(this).execute(hostList.get(position).getEmail());
+                        }
+                    }
+                });
+        builder.create();
+        builder.show();
     }
 }

@@ -3,6 +3,7 @@ package ws1415.veranstalterapp.task;
 import android.os.AsyncTask;
 
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Host;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,7 +15,7 @@ import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 /**
  * Created by Bernd Eissing on 19.12.2014.
  */
-public class QueryHostsTask extends AsyncTask<PermissionManagementActivity, Void, List<Event>> {
+public class QueryHostsTask extends AsyncTask<PermissionManagementActivity, Void, List<Host>> {
     private PermissionManagementActivity view;
 
     /**
@@ -23,7 +24,7 @@ public class QueryHostsTask extends AsyncTask<PermissionManagementActivity, Void
      * @return Die abgerufene Event-Liste.
      */
     @Override
-    protected List<Event> doInBackground(PermissionManagementActivity... params) {
+    protected List<Host> doInBackground(PermissionManagementActivity... params) {
         view = params[0];
         try {
             return ServiceProvider.getService().skatenightServerEndpoint().getHosts().execute().getItems();
