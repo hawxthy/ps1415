@@ -14,7 +14,7 @@ import ws1415.veranstalterapp.activity.PermissionManagementActivity;
  *
  * Created by Martin on 06.01.2015.
  */
-public class AddHostTask extends AsyncTask<Host, Void, Boolean>{
+public class AddHostTask extends AsyncTask<String, Void, Void>{
     PermissionManagementActivity pma;
 
     public AddHostTask(PermissionManagementActivity pma){
@@ -23,13 +23,13 @@ public class AddHostTask extends AsyncTask<Host, Void, Boolean>{
     /**
      * Erstellt einen neuen Veranstalter auf dem Server.
      *
-     * @param params Host, der erstellt wird
+     * @param params E-Mail vom Veranstalter, der erstellt wird
      * @return
      */
     @Override
-    protected Boolean doInBackground(Host... params) {
+    protected Void doInBackground(String... params) {
         try{
-            return ServiceProvider.getService().skatenightServerEndpoint().addHost(params[0]).execute();
+            ServiceProvider.getService().skatenightServerEndpoint().addHost(params[0]).execute();
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -38,13 +38,9 @@ public class AddHostTask extends AsyncTask<Host, Void, Boolean>{
 
     /**
      * Aktualisiert die Liste mit dem neuen Host.
-     *
-     * @param result true, bei erfolgreicher Löschung, false andernfalls
      */
     @Override
-    protected void onPostExecute(Boolean result) {
-        if (result == true) {
-            pma.refresh();
-        }
+    protected void onPostExecute() {
+        pma.refresh();
     }
 }
