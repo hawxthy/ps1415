@@ -44,13 +44,18 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     public static final String NOTIFICATION_EXTRA_LOCATION = "location_transmitter_service_notification_location";
     public static final String NOTIFICATION_EXTRA_CURRENT_WAYPOINT = "location_transmitter_service_notification_current_waypoint";
     public static final String NOTIFICATION_EXTRA_WAYPOINT_COUNT = "location_transmitter_service_notification_waypoint_count";
+    public static final String NOTIFICATION_EXTRA_CURRENT_DISTANCE = "location_transmitter_service_notification_current_distance";
     private LocalBroadcastManager broadcastManager;
 
     private GoogleApiClient gac;
     private List<LatLng> waypoints;
     private int currentWaypoint; // TODO: currentWaypoint speichern!
+    private float currentDistance;
+    private boolean foundFirstWaypoint;
 
     public LocationTransmitterService() {
+        foundFirstWaypoint = false;
+        currentDistance = 0;
     }
 
     @Override
@@ -119,12 +124,26 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         }
 
         if (waypoints != null && waypoints.size() > 0) {
+            // Nur aktuelle Distanz berechnen wenn, bereits ein current Waypoint existiert
+            int oldWaypoint = -1;
+            if (foundFirstWaypoint) {
+                oldWaypoint = currentWaypoint;
+            }
             calculateCurrentWaypoint(new LatLng(location.getLatitude(), location.getLongitude()));
+            foundFirstWaypoint = true;
+
             Log.d(LOG_TAG, "current: " + currentWaypoint);
+
+            // Aktuelle Distance aktualisieren
+            if (oldWaypoint != -1) {
+                currentDistance += distance(oldWaypoint, currentWaypoint);
+            }
         }
+
 
         sendLocationUpdate(location);
     }
+
 
     private void sendLocationUpdate(Location location) {
         if (waypoints != null) {
@@ -133,6 +152,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                 intent.putExtra(NOTIFICATION_EXTRA_LOCATION, location);
             intent.putExtra(NOTIFICATION_EXTRA_CURRENT_WAYPOINT, currentWaypoint);
             intent.putExtra(NOTIFICATION_EXTRA_WAYPOINT_COUNT, waypoints.size());
+            intent.putExtra(NOTIFICATION_EXTRA_CURRENT_DISTANCE,currentDistance);
             broadcastManager.sendBroadcast(intent);
         }
     }
@@ -193,6 +213,20 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         float[] distance = new float[1];
         Location.distanceBetween(lat1, lon1, lat2, lon2, distance);
         return distance[0];
+    }
+
+    /**
+     * Berechnet die Distanz zwischen 2 Wegpunkten
+     * @param waypoint1 index des ersten Wegpunktes
+     * @param waypoint2 index des zweiten Wegpunktes
+     * @return die Distanz
+     */
+    private float distance(int waypoint1, int waypoint2) {
+        LatLng w1 = waypoints.get(waypoint1);
+        LatLng w2 = waypoints.get(waypoint2);
+        float distanceW1W2 = distance(w1.latitude, w1.longitude, w2.latitude, w2.longitude);
+
+        return distanceW1W2;
     }
 
     @Override
