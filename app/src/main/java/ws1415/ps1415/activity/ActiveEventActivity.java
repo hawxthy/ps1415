@@ -133,20 +133,31 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         long current = new Date().getTime()-startDate.getTime();
         current /= 1000;
 
-        ((ProgressBar) findViewById(R.id.active_event_progressbar)).setProgress((int)(current%101));
+        String sign = (current < 0) ? "-":"";
 
         long s = Math.abs(current%60);
         current /= 60;
         long m = Math.abs(current%60);
         current /= 60;
-        long h = current;
-        timerTextView.setText(getString(R.string.active_event_timer_format, h, m, s));
+        long h = Math.abs(current);
+        timerTextView.setText(getString(R.string.active_event_timer_format, sign, h, m, s));
+    }
+
+    private boolean isEventNull(Event e) {
+        if (e == null) {
+            return true;
+        }
+        else {
+            if (e.getDate() == null) return true;
+            else if (e.getRoute() == null) return true;
+        }
+        return false;
     }
 
     @Override
     public void taskDidFinish(ExtendedTask task, Event event) {
         setProgressBarIndeterminateVisibility(false);
-        if (event != null) {
+        if (!isEventNull(event)) {
             ((ScrollView) findViewById(R.id.active_event_scroll_view)).setVisibility(View.VISIBLE);
             startDate = new Date(event.getDate().getValue());
             try {
@@ -155,10 +166,9 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             catch (ParseException e) {
                 Toast.makeText(getApplicationContext(), "Parse failed", Toast.LENGTH_SHORT).show();
             }
-
         }
         else {
-            Toast.makeText(getApplicationContext(), "No CurrentEventId!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Invalid event!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -189,15 +199,25 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         public void onReceive(Context context, Intent intent) {
             TextView altitudeTextView = (TextView) findViewById(R.id.active_event_current_altitude_textview);
 
-            Location location = (Location) intent.getParcelableExtra(LocationTransmitterService.NOTIFICATION_LOCATION);
+            Location location = (Location) intent.getParcelableExtra(LocationTransmitterService.NOTIFICATION_EXTRA_LOCATION);
             if (location.hasAltitude()) {
                 altitudeTextView.setText(getString(R.string.active_event_altitude_format_meters, location.getAltitude()));
             }
+            int currentWaypoint = intent.getIntExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_WAYPOINT, 0);
+            int waypointCount = intent.getIntExtra(LocationTransmitterService.NOTIFICATION_EXTRA_WAYPOINT_COUNT, 0);
+
+            ProgressBar progressBar = (ProgressBar) findViewById(R.id.active_event_progressbar);
+            progressBar.setProgress(currentWaypoint);
+            progressBar.setMax(waypointCount);
+
+            Toast.makeText(getApplicationContext(), currentWaypoint + "/" + waypointCount, Toast.LENGTH_SHORT).show();
+
+            /*
             if (location.hasSpeed()) {
                 float speed = location.getSpeed()*3.6f; // Geschwindigkeit in km/h
                 Toast.makeText(getApplicationContext(), speed + " km/h", Toast.LENGTH_SHORT).show();
                 // TODO: Höchste/Durchschnittliche Geschwindigkeit berechnen & speichern
-            }
+            }*/
         }
     }
 }

@@ -4,6 +4,7 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -434,6 +435,11 @@ public class SkatenightServerEndpoint {
 
         PersistenceManager pm = pmf.getPersistenceManager();
         Member m = getMember(email);
+        if (m == null) {
+            // TODO: Member anderso hinzufügen?
+            m = new Member();
+            m.setEmail(email);
+        }
         m.setCurrentEventId(keyId);
 
         try {
@@ -553,6 +559,18 @@ public class SkatenightServerEndpoint {
             pm.close();
         }
         return new BooleanWrapper(false);
+    }
+
+    public Text getEventRoute(@Named("id") long keyId) {
+        Event e = getEvent(keyId);
+        if (e != null) {
+            Route r = e.getRoute();
+            if (r != null) {
+                return r.getRouteData();
+            }
+        }
+        return null;
+
     }
 
     /**

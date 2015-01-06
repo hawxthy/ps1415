@@ -36,6 +36,6 @@
     <string name="active_event_button_end">End participation</string>
     <string name="active_event_no_email_message">Please register for an event first.</string>
 
-    <string name="active_event_timer_format"><xliff:g id="hours">%1$02d</xliff:g>:<xliff:g id="minutes">%2$02d</xliff:g>:<xliff:g id="seconds">%3$02d</xliff:g></string>
+    <string name="active_event_timer_format"><xliff:g id="sign">%1$s</xliff:g><xliff:g id="hours">%2$02d</xliff:g>:<xliff:g id="minutes">%3$02d</xliff:g>:<xliff:g id="seconds">%4$02d</xliff:g></string>
     <string name="active_event_altitude_format_meters"><xliff:g id="altitude">%1$.1f</xliff:g> m</string>
 </resources>
