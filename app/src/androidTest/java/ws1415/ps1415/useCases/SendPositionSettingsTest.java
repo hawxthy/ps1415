@@ -1,6 +1,8 @@
 package ws1415.ps1415.useCases;
 
+import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -69,6 +71,14 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         // Mindestens ein Event muss exisitieren
         assertTrue("at least on event exists", mListData.getCount() > 0);
     }
+
+    @UiThreadTest
+    public void testStatePause() {
+        Instrumentation instrumentation = this.getInstrumentation();
+
+        assertTrue("asdf", mListData.getCount() > 0);
+    }
+
 
 }
 
