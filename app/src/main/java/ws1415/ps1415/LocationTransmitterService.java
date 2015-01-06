@@ -45,17 +45,20 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     public static final String NOTIFICATION_EXTRA_CURRENT_WAYPOINT = "location_transmitter_service_notification_current_waypoint";
     public static final String NOTIFICATION_EXTRA_WAYPOINT_COUNT = "location_transmitter_service_notification_waypoint_count";
     public static final String NOTIFICATION_EXTRA_CURRENT_DISTANCE = "location_transmitter_service_notification_current_distance";
+    public static final String NOTIFICATION_EXTRA_MAX_SPEED = "location_transmitter_service_notification_max_speed";
     private LocalBroadcastManager broadcastManager;
 
     private GoogleApiClient gac;
     private List<LatLng> waypoints;
     private int currentWaypoint; // TODO: currentWaypoint speichern!
+    private float maxSpeed;
     private float currentDistance;
     private boolean foundFirstWaypoint;
 
     public LocationTransmitterService() {
         foundFirstWaypoint = false;
-        currentDistance = 0;
+        currentDistance = 0.0f;
+        maxSpeed = 0.0f;
     }
 
     @Override
@@ -73,8 +76,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                 .build();
 
         gac.connect();
-
-        new RouteLoaderTask(this, 5759409141579776L).execute();
+        //5759409141579776L
+        //5741031244955648L
+        new RouteLoaderTask(this, 5741031244955648L).execute();
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -139,11 +143,12 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                 currentDistance += distance(oldWaypoint, currentWaypoint);
             }
         }
-
+        if (location.hasSpeed()) {
+            maxSpeed = Math.max(location.getSpeed(), maxSpeed);
+        }
 
         sendLocationUpdate(location);
     }
-
 
     private void sendLocationUpdate(Location location) {
         if (waypoints != null) {
@@ -153,6 +158,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             intent.putExtra(NOTIFICATION_EXTRA_CURRENT_WAYPOINT, currentWaypoint);
             intent.putExtra(NOTIFICATION_EXTRA_WAYPOINT_COUNT, waypoints.size());
             intent.putExtra(NOTIFICATION_EXTRA_CURRENT_DISTANCE,currentDistance);
+            intent.putExtra(NOTIFICATION_EXTRA_MAX_SPEED, maxSpeed);
             broadcastManager.sendBroadcast(intent);
         }
     }
@@ -163,12 +169,6 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     }
 
     private void calculateCurrentWaypoint(LatLng location) {
-        //Integer currentWaypoint = member.getCurrentWaypoint();
-        /*
-        if (currentWaypoint == null) {
-            member.setCurrentWaypoint(0);
-        }
-        */
         if (currentWaypoint < waypoints.size()-1) {
             LatLng current = waypoints.get(currentWaypoint);
             LatLng next = waypoints.get(currentWaypoint+1);
