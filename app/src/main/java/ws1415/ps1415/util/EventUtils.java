@@ -1,22 +1,13 @@
-package ws1415.veranstalterapp.util;
+package ws1415.ps1415.util;
 
 import android.content.Context;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
 
-import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
-import com.skatenight.skatenightAPI.model.Route;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
-import ws1415.veranstalterapp.adapter.AnnounceCursorAdapter;
-import ws1415.veranstalterapp.R;
 
 /**
  * Utility Singleton Klasse für die Klasse Event. Unterstützende Klasse um dynamische Felder für
@@ -53,55 +44,6 @@ public class EventUtils {
         tmpField.setType(type.getId());
         tmpField.setTitle(title);
         event.getDynamicFields().add(pos, tmpField);
-    }
-
-    /**
-     * Löscht das Feld aus dem Event mit der angegebenen Position.
-     *
-     * @param event Event
-     * @param pos Position in der Liste der Felder
-     */
-    public void deleteDynamicField(Event event, int pos){
-        event.getDynamicFields().remove(pos);
-    }
-
-    /**
-     * Setzt die Standard Event Informationen, diese umfassen Titel, Fee, Datum, Uhrzeit, Location,
-     * Route und Description.
-     *
-     * @param event Event
-     */
-    public void setStandardFields(Event event){
-        if (event.getDynamicFields() == null) {
-            event.setDynamicFields(new ArrayList<Field>());
-        } else {
-            event.getDynamicFields().clear();
-        }
-        addDynamicField(context.getResources().getString(R.string.announce_info_title), FieldType.TITLE, event, 0);
-        addDynamicField(context.getResources().getString(R.string.announce_info_fee), FieldType.FEE, event, 1);
-        addDynamicField(context.getResources().getString(R.string.announce_info_date), FieldType.DATE, event, 2);
-        addDynamicField(context.getResources().getString(R.string.announce_info_time), FieldType.TIME, event, 3);
-        addDynamicField(context.getResources().getString(R.string.announce_info_location), FieldType.LOCATION, event, 4);
-        addDynamicField(context.getResources().getString(R.string.announce_info_map), FieldType.ROUTE, event, 5);
-        addDynamicField(context.getResources().getString(R.string.announce_info_description), FieldType.DESCRIPTION, event, 6);
-    }
-
-    /**
-     * Geht die Liste von Fields von Event durch und setzt die Informationen, die in den EditText Elementen
-     * stehen auf die value von den Field objekten.
-     *
-     * @param event Event
-     * @param list Liste von Fields von Event
-     */
-    public void setEventInfo(Event event, ListView list) {
-        AnnounceCursorAdapter adapter = (AnnounceCursorAdapter) list.getAdapter();
-        event.setDynamicFields(adapter.getFieldlist());
-        // Datum und Uhrezeit auslesen und übernehmen
-        int i = this.getUniqueFieldId(FieldType.DATE, event);
-        event.getDynamicFields().get(i).setValue(Long.toString(adapter.getDate().getTime()));
-        i = this.getUniqueFieldId(FieldType.TIME, event);
-        event.getDynamicFields().get(i).setValue(Long.toString(adapter.getDate().getTime()));
-        event.setRoute(((AnnounceCursorAdapter) list.getAdapter()).getRoute());
     }
 
     /**

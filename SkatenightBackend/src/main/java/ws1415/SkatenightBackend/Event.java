@@ -54,44 +54,6 @@ public class Event {
         this.key = key;
     }
 
-    public String getTitle() {
-        return (String)getUniqueField(FieldType.TITLE.getId()).getValue();
-    }
-
-    public void setDate(Date date){
-        getUniqueField(FieldType.DATE.getId()).setValue(Long.toString(date.getTime()));
-    }
-
-    public Date getDate(){
-        return new Date(Long.parseLong(getUniqueField(FieldType.DATE.getId()).getValue()));
-    }
-
-    public void setTime(Date time){
-        getUniqueField(FieldType.TIME.getId()).setValue(Long.toString(time.getTime()));
-    }
-
-    public Date getTime(){
-        return new Date(Long.parseLong(getUniqueField(FieldType.TIME.getId()).getValue()));
-    }
-
-    public String getFee() {
-        return (String)getUniqueField(FieldType.FEE.getId()).getValue();
-    }
-
-    public String getLocation() {
-        if((String)getUniqueField(FieldType.LOCATION.getId()).getValue() != null){
-            return  (String)getUniqueField(FieldType.LOCATION.getId()).getValue();
-        }
-        return "";
-    }
-
-    public Text getDescription() {
-        if(new Text(getUniqueField(FieldType.DESCRIPTION.getId()).getValue()) != null){
-            return  new Text(getUniqueField(FieldType.DESCRIPTION.getId()).getValue());
-        }
-        return new Text("");
-    }
-
     public void setRoute(Route route){
         this.route = route;
     }
@@ -106,21 +68,6 @@ public class Event {
 
     public void setDynamicFields(ArrayList<Field> list){
         this.dynamicFields = list;
-    }
-
-    /**
-     * Methode zum finden von eindeutigen Feldern
-     *
-     * @param type der Typ des eindeutigen Feldes
-     * @return Das Feld, null falls keins gefunden wurde
-     */
-    public Field getUniqueField(int type) {
-        for (int i = 0; i < dynamicFields.size(); i++) {
-            if (dynamicFields.get(i).getType() == type) {
-                return dynamicFields.get(i);
-            }
-        }
-        return null;
     }
 
     public int getRouteFieldFirst() {

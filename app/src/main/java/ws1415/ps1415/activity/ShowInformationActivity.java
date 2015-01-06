@@ -31,6 +31,8 @@ import ws1415.ps1415.adapter.ShowCursorAdapter;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.task.ToggleMemberEventAttendanceTask;
+import ws1415.ps1415.util.EventUtils;
+import ws1415.ps1415.util.FieldType;
 
 /**
  * Activity zum Begutachten der Metainformationen der erstellten Veranstaltung.
@@ -192,7 +194,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     public void setEventInformation(Event e) {
         Button attendButton = (Button) findViewById(R.id.show_info_attend_button);
         if (e != null) {
-            setTitle(e.getTitle());
+            setTitle(EventUtils.getInstance(this).getUniqueField(FieldType.TITLE.getId(), e).getValue());
             listAdapter = new ShowCursorAdapter(this, e.getDynamicFields(), e);
 
             listView = (ListView) findViewById(R.id.activity_show_information_list_view);

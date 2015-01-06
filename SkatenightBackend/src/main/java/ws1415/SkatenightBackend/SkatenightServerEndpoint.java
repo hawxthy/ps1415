@@ -119,6 +119,8 @@ public class SkatenightServerEndpoint {
                 if (!results.isEmpty()) {
                     e.setRoute(results.get(0));
                 }
+                // Weil sonst Nullpointer beim Editieren kommmt
+                e.setKey(null);
                 pm.makePersistent(e);
             }
         } finally {

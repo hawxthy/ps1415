@@ -21,6 +21,7 @@ import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.DeleteEventTask;
 import ws1415.veranstalterapp.task.QueryEventTask;
+import ws1415.veranstalterapp.util.EventUtils;
 
 /**
  * Klasse, welche eine Liste von Events bereitstellt.
@@ -127,12 +128,12 @@ public class ShowEventsFragment extends Fragment {
      */
     private void createSelectionsMenu(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(eventList.get(position).getTitle())
+        builder.setTitle(EventUtils.getInstance(getActivity()).getUniqueField(8, eventList.get(position)).getValue())
                 .setItems(R.array.selections_menu, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int index) {
                         if (index == 0) {
                             editEvent(eventList.get(position));
-                        }else if(index == 1){
+                        } else if (index == 1) {
                             deleteEvent(eventList.get(position));
                         }
 
