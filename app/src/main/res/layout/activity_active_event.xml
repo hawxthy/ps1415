@@ -80,6 +80,28 @@
 
         <Space
             android:layout_width="match_parent"
+            android:layout_height="20dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/active_event_header_cur_speed"
+            android:id="@+id/textView2"/>
+
+        <TextView
+            style="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="0,0 km/h"
+            android:id="@+id/active_event_cur_speed_textview"
+            android:layout_weight="1"
+            android:singleLine="false"
+            android:textStyle="bold"/>
+
+        <Space
+            android:layout_width="match_parent"
             android:layout_height="20dp"
             />
 
@@ -94,7 +116,9 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/active_event_header_max_speed"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:maxLines="2"
+                android:ellipsize="end"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -102,7 +126,9 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/active_event_header_avg_speed"
                 android:layout_weight="1"
-                />
+                android:maxLines="2"
+                android:ellipsize="end"/>
+
         </LinearLayout>
 
         <LinearLayout
@@ -114,7 +140,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="0 km/h"
+                android:text="0,0 km/h"
                 android:id="@+id/active_event_max_speed_textview"
                 android:layout_weight="1"
                 android:singleLine="false"
@@ -125,7 +151,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="0 km/h"
+                android:text="0,0 km/h"
                 android:id="@+id/active_event_avg_speed_textview"
                 android:layout_weight="1"
                 style="bold"

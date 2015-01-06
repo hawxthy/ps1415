@@ -212,12 +212,14 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 
             Toast.makeText(getApplicationContext(), currentWaypoint + "/" + waypointCount, Toast.LENGTH_SHORT).show();
 
-            /*
             if (location.hasSpeed()) {
-                float speed = location.getSpeed()*3.6f; // Geschwindigkeit in km/h
-                Toast.makeText(getApplicationContext(), speed + " km/h", Toast.LENGTH_SHORT).show();
-                // TODO: Höchste/Durchschnittliche Geschwindigkeit berechnen & speichern
-            }*/
+                TextView curSpeedTextView = (TextView) findViewById(R.id.active_event_cur_speed_textview);
+                curSpeedTextView.setText(getString(R.string.active_event_speed_format, location.getSpeed()));
+            }
+
+            float maxSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_MAX_SPEED, 0.0f);
+            TextView maxSpeedTextView = (TextView) findViewById(R.id.active_event_max_speed_textview);
+            maxSpeedTextView.setText(getString(R.string.active_event_speed_format, maxSpeed));
         }
     }
 }
