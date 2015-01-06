@@ -17,6 +17,7 @@ import java.util.List;
 
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.adapter.HostCursorAdapter;
+import ws1415.veranstalterapp.task.DeleteHostTask;
 import ws1415.veranstalterapp.task.QueryHostsTask;
 
 public class PermissionManagementActivity extends Activity {
@@ -113,7 +114,7 @@ public class PermissionManagementActivity extends Activity {
                 .setItems(R.array.selections_menu_manage_hosts, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int index) {
                         if (index == 0) {
-                            new DeleteHostTask(this).execute(hostList.get(position).getEmail());
+                            new DeleteHostTask(PermissionManagementActivity.this).execute(hostList.get(position).getEmail());
                         }
                     }
                 });
