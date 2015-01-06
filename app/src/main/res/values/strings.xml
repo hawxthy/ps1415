@@ -39,5 +39,6 @@
 
     <string name="active_event_timer_format"><xliff:g id="sign">%1$s</xliff:g><xliff:g id="hours">%2$02d</xliff:g>:<xliff:g id="minutes">%3$02d</xliff:g>:<xliff:g id="seconds">%4$02d</xliff:g></string>
     <string name="active_event_altitude_format_meters"><xliff:g id="altitude">%1$.1f</xliff:g> m</string>
+    <string name="active_event_distance_format_meters"><xliff:g id="distance">%1$.1f</xliff:g> m</string>
     <string name="active_event_speed_format"><xliff:g id="speed">%1$.1f</xliff:g> kph</string>
 </resources>
