@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.widget.ListView;
 
 import android.text.Html;
@@ -37,6 +38,7 @@ import ws1415.ps1415.task.ToggleMemberEventAttendanceTask;
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
 public class ShowInformationActivity extends Activity implements ExtendedTaskDelegate<Void, Object> {
+    public static final int SETTINGS_RESULT = 1;
     public static final int REQUEST_ACCOUNT_PICKER = 2;
 
     public static final String EXTRA_KEY_ID = "show_information_extra_key_id";
@@ -69,6 +71,16 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_information);
+
+        // Button zum öffnen der Usersettings
+        Button btnSettings = (Button) findViewById(R.id.buttonSettings);
+        // start the SettingActivity when users clicks on Settings
+        btnSettings.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), Settings.class);
+                startActivityForResult(i, SETTINGS_RESULT);
+            }
+        });
 
         // SharePreferences skatenight.app laden
         prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
@@ -112,6 +124,10 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
+            case SETTINGS_RESULT:
+                // Öffnet die Usersettings
+                displayUserSettings();
+                break;
             case REQUEST_ACCOUNT_PICKER:
                 if (data != null && data.getExtras() != null) {
                     String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
@@ -126,6 +142,17 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                 }
                 break;
         }
+    }
+
+    /**
+     * Speichert die Usersettings in einem String.
+     */
+    private void displayUserSettings() {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String  settings = "";
+
+        settings=settings+"Position Senden:"+ sharedPrefs.getBoolean("prefSendLocation", false);
     }
     
     @Override

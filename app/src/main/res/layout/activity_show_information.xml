@@ -19,6 +19,12 @@
 
 
     <Button
+        android:layout_width="346dp"
+        android:layout_height="wrap_content"
+        android:text="Einstellungen"
+        android:id="@+id/buttonSettings" />
+
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/show_info_attend_button"

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory android:title="Einstellungen" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="prefSendLocation"
+            android:summary="Erlaubt das Senden der aktuellen Position an den Server."
+            android:title="Position Senden" >
+        </CheckBoxPreference>
+    </PreferenceCategory>
+</PreferenceScreen>
