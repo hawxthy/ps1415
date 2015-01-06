@@ -217,6 +217,10 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
                 curSpeedTextView.setText(getString(R.string.active_event_speed_format, location.getSpeed()));
             }
 
+            float currentDistance = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_DISTANCE, 0.0f);
+            TextView currentDistanceTextView = (TextView) findViewById(R.id.active_event_current_distance_textview);
+            currentDistanceTextView.setText(getString(R.string.active_event_distance_format_meters, currentDistance));
+
             float maxSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_MAX_SPEED, 0.0f);
             TextView maxSpeedTextView = (TextView) findViewById(R.id.active_event_max_speed_textview);
             maxSpeedTextView.setText(getString(R.string.active_event_speed_format, maxSpeed));
