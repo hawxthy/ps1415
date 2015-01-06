@@ -40,7 +40,7 @@ public class AddHostTask extends AsyncTask<String, Void, Void>{
      * Aktualisiert die Liste mit dem neuen Host.
      */
     @Override
-    protected void onPostExecute() {
+    protected void onPostExecute(Void result) {
         pma.refresh();
     }
 }
