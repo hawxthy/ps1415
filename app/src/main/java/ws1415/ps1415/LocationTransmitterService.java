@@ -17,13 +17,10 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.util.LocationUtils;
-import ws1415.ps1415.task.RouteLoaderTask;
 import ws1415.ps1415.task.UpdateLocationTask;
 
 /**
@@ -33,32 +30,42 @@ import ws1415.ps1415.task.UpdateLocationTask;
  * Server sendet. Falls der Nutzer noch nicht existiert wird er angelegt, ansonsten geupdatet.
  *
  */
-public class LocationTransmitterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ExtendedTaskDelegate<Void, String> {
+public class LocationTransmitterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String LOG_TAG = LocationTransmitterService.class.getSimpleName();
 
     public static final float MAX_NEXT_WAYPOINT_DISTANCE = 10.0f;
     public static final float MAX_ANY_WAYPOINT_DISTANCE = 60.0f;
     public static final int MIN_WAYPOINT_MEMBER_COUNT = 1;
 
+    public static final String EXTRA_WAYPOINTS = "location_transmitter_service_extra_waypoints";
+    public static final String EXTRA_START_DATE = "location_transmitter_service_extra_start_date";
+
     public static final String NOTIFICATION_LOCATION = "location_transmitter_service_notification_location";
     public static final String NOTIFICATION_EXTRA_LOCATION = "location_transmitter_service_notification_location";
     public static final String NOTIFICATION_EXTRA_CURRENT_WAYPOINT = "location_transmitter_service_notification_current_waypoint";
     public static final String NOTIFICATION_EXTRA_WAYPOINT_COUNT = "location_transmitter_service_notification_waypoint_count";
     public static final String NOTIFICATION_EXTRA_CURRENT_DISTANCE = "location_transmitter_service_notification_current_distance";
+    public static final String NOTIFICATION_EXTRA_CUR_SPEED = "location_transmitter_service_notification_cur_speed";
     public static final String NOTIFICATION_EXTRA_MAX_SPEED = "location_transmitter_service_notification_max_speed";
+    public static final String NOTIFICATION_EXTRA_AVG_SPEED = "location_transmitter_service_notification_avg_speed";
     private LocalBroadcastManager broadcastManager;
 
     private GoogleApiClient gac;
     private List<LatLng> waypoints;
+    private Date startDate;
     private int currentWaypoint; // TODO: currentWaypoint speichern!
+    private float curSpeed;
     private float maxSpeed;
+    private float avgSpeed;
     private float currentDistance;
     private boolean foundFirstWaypoint;
 
     public LocationTransmitterService() {
         foundFirstWaypoint = false;
         currentDistance = 0.0f;
+        curSpeed = 0.0f;
         maxSpeed = 0.0f;
+        avgSpeed = 0.0f;
     }
 
     @Override
@@ -78,8 +85,10 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         gac.connect();
         //5759409141579776L
         //5741031244955648L
-        new RouteLoaderTask(this, 5741031244955648L).execute();
 
+        Log.e(LOG_TAG, Arrays.toString(intent.getExtras().keySet().toArray()));
+        waypoints = intent.getParcelableArrayListExtra(EXTRA_WAYPOINTS);
+        startDate = new Date(intent.getLongExtra(EXTRA_START_DATE, 0));
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -101,7 +110,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // Sendet die Location Requests sekündlich
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setFastestInterval(1000);
+        locationRequest.setInterval(1000);
 
         LocationServices.FusedLocationApi.requestLocationUpdates(gac, locationRequest, this);
     }
@@ -144,7 +153,14 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             }
         }
         if (location.hasSpeed()) {
-            maxSpeed = Math.max(location.getSpeed(), maxSpeed);
+            curSpeed = mpsTokph(location.getSpeed());
+            maxSpeed = Math.max(curSpeed, maxSpeed);
+
+            float elapsedTimeH = (new Date().getTime()-startDate.getTime())/3.6e6f;
+            // currentDistance/1000.0f -> km
+            // elapsedTimeH -> verstrichene Zeit in h
+
+            avgSpeed = (currentDistance/1000.0f)/elapsedTimeH;
         }
 
         sendLocationUpdate(location);
@@ -158,7 +174,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             intent.putExtra(NOTIFICATION_EXTRA_CURRENT_WAYPOINT, currentWaypoint);
             intent.putExtra(NOTIFICATION_EXTRA_WAYPOINT_COUNT, waypoints.size());
             intent.putExtra(NOTIFICATION_EXTRA_CURRENT_DISTANCE,currentDistance);
+            intent.putExtra(NOTIFICATION_EXTRA_CUR_SPEED, curSpeed);
             intent.putExtra(NOTIFICATION_EXTRA_MAX_SPEED, maxSpeed);
+            intent.putExtra(NOTIFICATION_EXTRA_AVG_SPEED, avgSpeed);
             broadcastManager.sendBroadcast(intent);
         }
     }
@@ -215,6 +233,10 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         return distance[0];
     }
 
+    private float mpsTokph(float val) {
+        return val*3.6f;
+    }
+
     /**
      * Berechnet die Distanz zwischen 2 Wegpunkten
      * @param waypoint1 index des ersten Wegpunktes
@@ -227,27 +249,5 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         float distanceW1W2 = distance(w1.latitude, w1.longitude, w2.latitude, w2.longitude);
 
         return distanceW1W2;
-    }
-
-    @Override
-    public void taskDidFinish(ExtendedTask task, String s) {
-        Log.d(LOG_TAG, s);
-        try {
-            waypoints = LocationUtils.decodePolyline(s);
-        }
-        catch (ParseException e) {
-            Log.e(LOG_TAG, "Unable to parse waypoints.", e);
-        }
-        onLocationChanged(LocationServices.FusedLocationApi.getLastLocation(gac));
-    }
-
-    @Override
-    public void taskDidProgress(ExtendedTask task, Void... progress) {
-
-    }
-
-    @Override
-    public void taskFailed(ExtendedTask task, String message) {
-        Log.e(LOG_TAG, message);
     }
 }

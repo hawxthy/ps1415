@@ -28,7 +28,7 @@
     <!-- Strings zu activity activeEvent -->
     <string name="title_activity_active_event">Local analysis</string>
     <string name="active_event_header_current_distance">Current distance</string>
-    <string name="active_event_header_total_distance">Total distance</string>
+    <string name="active_event_header_total_distance">Route length</string>
     <string name="active_event_header_cur_speed">Current speed</string>
     <string name="active_event_header_max_speed">Maximum speed</string>
     <string name="active_event_header_avg_speed">Average speed</string>

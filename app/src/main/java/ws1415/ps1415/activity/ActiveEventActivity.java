@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.skatenight.skatenightAPI.model.Event;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -78,6 +79,12 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     }
 
     @Override
+    protected void onDestroy() {
+        stopService(new Intent(getBaseContext(), LocationTransmitterService.class));
+        super.onDestroy();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putLong("date", startDate.getTime());
         super.onSaveInstanceState(outState);
@@ -91,7 +98,6 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             clockTimer.scheduleAtFixedRate(clockTimerTask, 0, 1000);
         }
 
-        startService(new Intent(getBaseContext(), LocationTransmitterService.class));
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(LocationTransmitterService.NOTIFICATION_LOCATION));
     }
 
@@ -101,8 +107,6 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             clockTimerTask.cancel();
             clockTimerTask = null;
         }
-
-        stopService(new Intent(getBaseContext(), LocationTransmitterService.class));
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         super.onPause();
     }
@@ -158,7 +162,6 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     public void taskDidFinish(ExtendedTask task, Event event) {
         setProgressBarIndeterminateVisibility(false);
         if (!isEventNull(event)) {
-            ((ScrollView) findViewById(R.id.active_event_scroll_view)).setVisibility(View.VISIBLE);
             startDate = new Date(event.getDate().getValue());
             try {
                 waypoints = LocationUtils.decodePolyline(event.getRoute().getRouteData().getValue());
@@ -166,6 +169,17 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             catch (ParseException e) {
                 Toast.makeText(getApplicationContext(), "Parse failed", Toast.LENGTH_SHORT).show();
             }
+
+            Intent serviceIntent = new Intent(getBaseContext(), LocationTransmitterService.class);
+            serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
+            serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
+            startService(serviceIntent);
+            updateTimerTextView();
+
+            TextView distanceTextView = (TextView) findViewById(R.id.active_event_total_distance_textview);
+            distanceTextView.setText(event.getRoute().getLength());
+
+            ((ScrollView) findViewById(R.id.active_event_scroll_view)).setVisibility(View.VISIBLE);
         }
         else {
             Toast.makeText(getApplicationContext(), "Invalid event!", Toast.LENGTH_SHORT).show();
@@ -212,18 +226,21 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 
             Toast.makeText(getApplicationContext(), currentWaypoint + "/" + waypointCount, Toast.LENGTH_SHORT).show();
 
-            if (location.hasSpeed()) {
-                TextView curSpeedTextView = (TextView) findViewById(R.id.active_event_cur_speed_textview);
-                curSpeedTextView.setText(getString(R.string.active_event_speed_format, location.getSpeed()));
-            }
-
             float currentDistance = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_DISTANCE, 0.0f);
             TextView currentDistanceTextView = (TextView) findViewById(R.id.active_event_current_distance_textview);
             currentDistanceTextView.setText(getString(R.string.active_event_distance_format_meters, currentDistance));
 
+            float curSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CUR_SPEED, 0.0f);
+            TextView curSpeedTextView = (TextView) findViewById(R.id.active_event_cur_speed_textview);
+            curSpeedTextView.setText(getString(R.string.active_event_speed_format, curSpeed));
+
             float maxSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_MAX_SPEED, 0.0f);
             TextView maxSpeedTextView = (TextView) findViewById(R.id.active_event_max_speed_textview);
             maxSpeedTextView.setText(getString(R.string.active_event_speed_format, maxSpeed));
+
+            float avgSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_AVG_SPEED, 0.0f);
+            TextView avgSpeedTextView = (TextView) findViewById(R.id.active_event_avg_speed_textview);
+            curSpeedTextView.setText(getString(R.string.active_event_speed_format, curSpeed));
         }
     }
 }

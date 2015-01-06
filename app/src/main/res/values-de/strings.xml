@@ -28,7 +28,7 @@
     <!-- Strings zu activity activeEvent -->
     <string name="title_activity_active_event">Lokale Auswertung</string>
     <string name="active_event_header_current_distance">Aktuelle Distanz</string>
-    <string name="active_event_header_total_distance">Gesamte Distanz</string>
+    <string name="active_event_header_total_distance">Streckenlänge</string>
     <string name="active_event_header_cur_speed">Aktuelle Geschwindigkeit</string>
     <string name="active_event_header_max_speed">Maximale Geschwindigkeit</string>
     <string name="active_event_header_avg_speed">∅-Geschwindigkeit</string>
