@@ -3,6 +3,7 @@ package ws1415.ps1415.useCases;
 import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
+import android.test.suitebuilder.annotation.SmallTest;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -55,29 +56,31 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
 
         // Die ShowEventsActivity starten
         mActivity = getActivity();
+        Thread.sleep(5000);
         // Holt sich die Event Listen-Elemente
         mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
         mListData = mList.getAdapter();
-
     }
 
     /**
      * Prüfen, ob Events in der Liste vorhanden sind.
      */
     public void testPreConditions() {
-        assertNotNull("Selection listener on events list initialized", mList.getOnItemClickListener());
+        assertNotNull("selection listener on events list initialized", mList.getOnItemClickListener());
         assertNotNull("adapter for events initialized", mListData);
 
-        // Mindestens ein Event muss exisitieren
-        assertTrue("at least on event exists", mListData.getCount() > 0);
+        // Mindestens ein Event muss existieren
+        assertTrue("at least one event exists", mListData.getCount() > 0);
     }
 
-    @UiThreadTest
-    public void testStatePause() {
-        Instrumentation instrumentation = this.getInstrumentation();
-
-        assertTrue("asdf", mListData.getCount() > 0);
+    @SmallTest
+    public void test() {
+        assertEquals(1,1);
     }
+
+
+
+
 
 
 }

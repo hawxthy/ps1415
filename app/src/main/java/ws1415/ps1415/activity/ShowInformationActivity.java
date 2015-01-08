@@ -74,16 +74,6 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_information);
 
-        // Button zum öffnen der Usersettings
-        Button btnSettings = (Button) findViewById(R.id.buttonSettings);
-        // start the SettingActivity when users clicks on Settings
-        btnSettings.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), Settings.class);
-                startActivityForResult(i, SETTINGS_RESULT);
-            }
-        });
-
         // SharePreferences skatenight.app laden
         prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
         credential = GoogleAccountCredential.usingAudience(this, "server:client_id:" + Constants.WEB_CLIENT_ID);
@@ -171,6 +161,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
      public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.example, menu);
+
         return true;
     }
 
@@ -181,6 +172,8 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Intent i = new Intent(getApplicationContext(), Settings.class);
+            startActivityForResult(i, SETTINGS_RESULT);
             return true;
         }
         return super.onOptionsItemSelected(item);
