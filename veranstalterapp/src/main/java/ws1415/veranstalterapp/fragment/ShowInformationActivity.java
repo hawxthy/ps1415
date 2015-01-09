@@ -8,7 +8,7 @@ import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.Event;
 
-import ws1415.veranstalterapp.adapter_renaming.ShowCursorAdapter;
+import ws1415.veranstalterapp.adapter.ShowCursorAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.GetEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
