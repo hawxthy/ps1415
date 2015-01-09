@@ -20,6 +20,11 @@ import ws1415.veranstalterapp.adapter.HostCursorAdapter;
 import ws1415.veranstalterapp.task.DeleteHostTask;
 import ws1415.veranstalterapp.task.QueryHostsTask;
 
+/**
+ * Klasse zum Verwalten von Veranstaltern und deren Rechten.
+ *
+ * Created by Bernd Eissing, Martin Wrodarczyk.
+ */
 public class PermissionManagementActivity extends Activity {
     HostCursorAdapter adapter;
     ListView listView;
@@ -66,9 +71,9 @@ public class PermissionManagementActivity extends Activity {
     }
 
     /**
-     * Füllt die ListView mit den Events vom Server.
+     * Füllt die ListView mit den Veranstaltern vom Server.
      *
-     * @param results ArrayList von Events
+     * @param results ArrayList von Veranstaltern
      */
     public void setHostsToListView(List<Host> results) {
         hostList = results;
