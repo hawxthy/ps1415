@@ -201,6 +201,7 @@ public class SkatenightServerEndpoint {
                 Integer currentWaypoint = member.getCurrentWaypoint();
                 if (currentWaypoint == null) {
                     member.setCurrentWaypoint(0);
+                    currentWaypoint = 0;
                 }
                 List<RoutePoint> points = event.getRoute().getRoutePoints();
                 if (currentWaypoint < points.size()-1) {
