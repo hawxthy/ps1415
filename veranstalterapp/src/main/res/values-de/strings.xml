@@ -98,21 +98,22 @@
     <!--Strings zu ShowEventsFragment-->
     <string name="title_fragment_show_events">Veranstaltungen</string>
 
-    <!-- String zu EditEventActivity -->
+    <!-- Strings zu EditEventActivity -->
     <string name="title_activity_edit_event">Veranstaltung bearbeiten</string>
     <string name="eventedited">Veranstaltung wurde bearbeitet</string>
     <string name="edit_event_info_apply_button">Speichern</string>
     <string name="title_activity_choose_image">ChooseImageActivity</string>
     <string name="announce_info_edit_button">Editiere Event Eigenschaften</string>
 
-    <string name="title_activity_permission_management">PermissionManagementActivity</string>
-
-    <!--Strings zu AddHostDialog -->
-    <string name="title_activity_add_host_dialog_hostname">E-Mail</string>
-    <string name="activity_add_host_dialog_cancel">Abbrechen</string>
-    <string name="activity_add_host_dialog_apply">Hinzufügen</string>
-
+    <!--Strings zu PermissionManagementActivity-->
+    <string name="title_activity_permission_management">Rechteverwaltung</string>
     <string-array name="selections_menu_manage_hosts">
         <item>Löschen</item>
     </string-array>
+
+    <!--Strings zu AddHostDialog -->
+    <string name="title_activity_add_host_dialog">Veranstalter hinufügen</string>
+    <string name="title_activity_add_host_dialog_hostname">E-Mail</string>
+    <string name="activity_add_host_dialog_cancel">Abbrechen</string>
+    <string name="activity_add_host_dialog_apply">Hinzufügen</string>
 </resources>

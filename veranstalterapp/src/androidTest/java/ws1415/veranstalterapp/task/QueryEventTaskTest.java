@@ -1,3 +1,4 @@
+/*
 package ws1415.veranstalterapp.task;
 
 import android.test.AndroidTestCase;
@@ -16,16 +17,20 @@ import java.util.concurrent.ExecutionException;
 import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 
+*/
 /**
  * Created by Richard Schulze, Martin Wrodarczyk on 10.11.2014.
- */
+ *//*
+
 public class QueryEventTaskTest extends AuthTaskTestCase {
     private Route route1, route2;
     private Event event1, event2;
     private List<Event> testEvents;
-    /**
+    */
+/**
      * Stellt eine Verbindung zum Testserver her und bereitet die Testdaten vor.
-     */
+     *//*
+
     public QueryEventTaskTest() {
         // Testdaten erstellen
         route1 = new Route();
@@ -81,11 +86,13 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
         testEvents.add(event2);
     }
 
-    /**
+    */
+/**
      * Überträgt die Testdaten auf den Server.
      *
      * @throws Exception
-     */
+     *//*
+
     public void setUp() throws Exception {
         super.setUp();
 
@@ -116,12 +123,14 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
         ServiceProvider.getService().skatenightServerEndpoint().createEvent(event2).execute();
     }
 
-    /**
+    */
+/**
      * Prüft, ob das durch den QueryEventTask abgerufene Event die korrekten Daten enthält.
      *
      * @throws java.util.concurrent.ExecutionException
      * @throws InterruptedException
-     */
+     *//*
+
     public void testTask() throws ExecutionException, InterruptedException, IOException {
         QueryEventTask task = new QueryEventTask();
         List<Event> eventList = task.execute(new ShowEventsFragment() {
@@ -162,3 +171,4 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
 
     }
 }
+*/

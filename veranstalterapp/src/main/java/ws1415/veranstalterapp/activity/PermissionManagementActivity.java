@@ -24,6 +24,7 @@ public class PermissionManagementActivity extends Activity {
     HostCursorAdapter adapter;
     ListView listView;
     List<Host> hostList;
+    AlertDialog c_dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,20 +33,10 @@ public class PermissionManagementActivity extends Activity {
 
         listView = (ListView) findViewById(R.id.activtiy_permission_management_list_view);
 
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            /**
-             * Löscht den Host vom Server und von der listView
-             *
-             * @param adapterView
-             * @param view
-             * @param i Position des Hosts in der listView
-             * @param l
-             * @return
-             */
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 createSelectionsMenu(i);
-                return true;
             }
         });
 
@@ -118,7 +109,16 @@ public class PermissionManagementActivity extends Activity {
                         }
                     }
                 });
-        builder.create();
+
+        c_dialog = builder.create();
         builder.show();
+    }
+
+    public List<Host> getHostList() {
+        return hostList;
+    }
+
+    public AlertDialog getLastDialog(){
+        return c_dialog;
     }
 }
