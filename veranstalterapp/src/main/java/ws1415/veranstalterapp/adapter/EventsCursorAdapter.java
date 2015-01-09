@@ -11,7 +11,6 @@ import com.skatenight.skatenightAPI.model.Event;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import ws1415.veranstalterapp.R;

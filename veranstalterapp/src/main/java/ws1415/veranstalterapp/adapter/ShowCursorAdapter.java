@@ -16,11 +16,9 @@ import android.widget.TextView;
 import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
-import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.activity.ChooseRouteActivity;
 import ws1415.veranstalterapp.activity.ShowRouteActivity;
 
 import java.text.SimpleDateFormat;
@@ -29,7 +27,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.FieldType;
 import ws1415.veranstalterapp.util.ImageUtil;
 

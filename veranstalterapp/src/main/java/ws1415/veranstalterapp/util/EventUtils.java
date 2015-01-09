@@ -1,19 +1,14 @@
 package ws1415.veranstalterapp.util;
 
 import android.content.Context;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 
-import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
-import com.skatenight.skatenightAPI.model.Route;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import ws1415.veranstalterapp.adapter.AnnounceCursorAdapter;
 import ws1415.veranstalterapp.R;
