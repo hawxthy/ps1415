@@ -155,13 +155,12 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         if (location.hasSpeed()) {
             curSpeed = mpsTokph(location.getSpeed());
             maxSpeed = Math.max(curSpeed, maxSpeed);
-
-            float elapsedTimeH = (new Date().getTime()-startDate.getTime())/3.6e6f;
-            // currentDistance/1000.0f -> km
-            // elapsedTimeH -> verstrichene Zeit in h
-
-            avgSpeed = (currentDistance/1000.0f)/elapsedTimeH;
         }
+
+        float elapsedTimeH = (new Date().getTime()-startDate.getTime())/3.6e6f;
+        // currentDistance/1000.0f -> km
+        // elapsedTimeH -> verstrichene Zeit in h
+        avgSpeed = (currentDistance/1000.0f)/elapsedTimeH;
 
         sendLocationUpdate(location);
     }

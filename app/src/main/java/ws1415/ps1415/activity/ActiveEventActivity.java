@@ -240,7 +240,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 
             float avgSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_AVG_SPEED, 0.0f);
             TextView avgSpeedTextView = (TextView) findViewById(R.id.active_event_avg_speed_textview);
-            curSpeedTextView.setText(getString(R.string.active_event_speed_format, curSpeed));
+            avgSpeedTextView.setText(getString(R.string.active_event_speed_format, avgSpeed));
         }
     }
 }
