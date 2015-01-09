@@ -216,4 +216,8 @@ public class ShowRouteActivity extends Activity {
 
         routeHighlightLine = googleMap.addPolyline(routeHighlight);
     }
+
+    public Intent getService() {
+        return service;
+    }
 }

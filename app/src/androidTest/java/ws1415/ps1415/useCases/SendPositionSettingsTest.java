@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
@@ -13,6 +14,8 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
 import android.test.UiThreadTest;
 import android.test.ViewAsserts;
+import android.test.suitebuilder.annotation.LargeTest;
+import android.test.suitebuilder.annotation.MediumTest;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.text.method.Touch;
 import android.view.KeyEvent;
@@ -22,31 +25,43 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Field;
+import com.skatenight.skatenightAPI.model.Member;
 import com.skatenight.skatenightAPI.model.Route;
 
 import ws1415.ps1415.Constants;
+import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.Settings;
 import ws1415.ps1415.activity.ShowEventsActivity;
 import com.skatenight.skatenightAPI.model.Event;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import ws1415.ps1415.activity.ShowInformationActivity;
+import ws1415.ps1415.activity.ShowRouteActivity;
+import ws1415.ps1415.task.QueryMemberTask;
+import ws1415.ps1415.task.UpdateLocationTask;
 import ws1415.ps1415.util.EventUtils;
 
 /**
- *
+ * Testet den Use Case "Übertragung der aktuellen Position an den Server".
  *
  * @author Tristan Rust
  */
 public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<ShowEventsActivity> {
 
     private ShowEventsActivity mActivity;
+
+    private final String TEST_EMAIL        = "tristan.rust@googlemail.com";
+    private final LatLng TEST_POSITION     = new LatLng(51.9659371, 7.6032621);
+    private final LatLng TEST_NEW_POSITION = new LatLng(51.9659847, 7.6033358);
 
     // ShowEventsActivty UI Elemente
     private ListView mList;
@@ -160,15 +175,14 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
         getInstrumentation().invokeMenuActionSync(mActivity, R.id.action_settings, 0);
 
-        // Pausieren
-        getInstrumentation().callActivityOnPause(mActivity);
-
-        // Fortsetzen
-        getInstrumentation().callActivityOnResume(mActivity);
-
-        // UI Elemente lassen sich hier nicht ansprechen, da diese durch die xml generiert werden über die geerbte PreferenceActivity
+        // UI Elemente lassen sich hier nicht ansprechen
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
         sharedPreferences.edit().putBoolean("prefSendLocation", true).apply();
+
+        Activity am = getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 2000);
+        Thread.sleep(2500);
+
+        am.finish();
 
         // Beenden & Neustarten der Activity
         mActivity.finish();
@@ -180,7 +194,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
 
     /**
      * Testet, ob die Activity weiter läuft, wenn diese pausiert hat. Test läuft auf dem UI Thread.
-     * @throws Exception
+     * @throws java.lang.InterruptedException
      */
     @SmallTest
     public void testSettingsUIStatePause() throws InterruptedException {
@@ -190,28 +204,59 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
         getInstrumentation().invokeMenuActionSync(mActivity, R.id.action_settings, 0);
 
-        // Pausieren
-        getInstrumentation().callActivityOnPause(mActivity);
-
-        // Fortsetzen
-        getInstrumentation().callActivityOnResume(mActivity);
-
-        // UI Elemente lassen sich hier nicht ansprechen, da diese durch die xml generiert werden über die geerbte PreferenceActivity
+        // UI Elemente lassen sich hier nicht ansprechen
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
         sharedPreferences.edit().putBoolean("prefSendLocation", true).apply();
 
         Activity am = getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 2000);
         Thread.sleep(2500);
 
+        // Pausieren
+        getInstrumentation().callActivityOnPause(am);
+
+        // Fortsetzen
+        getInstrumentation().callActivityOnResume(am);
+
         am.finish();
 
         assertEquals(true, sharedPreferences.getBoolean("prefSendLocation", false));
-
     }
 
+    /**
+     * Testet, ob die Position an den Server übertragen wird, wenn der User dies aktiviert hat.
+     * <strong>GPS muss hierfür aktiviert sein</strong>
+     *
+     * @throws java.lang.Exception
+     */
+    @LargeTest
+    public void testSendPosition() throws Exception {
+        // Aktiviert die Funktion zum Senden
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+        sharedPreferences.edit().putBoolean("prefSendLocation", true).apply();
+
+        assertEquals(true, sharedPreferences.getBoolean("prefSendLocation", false));
+
+        // Testen, ob die Position an den Server gesendet wird bei aktiver Einstellung
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(ShowRouteActivity.class.getName(), null, false);
+
+        Thread.sleep(2000);
+        ShowRouteActivity am = (ShowRouteActivity) getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 10000);
+        assertNotNull("ShowRouteActivity didn't start!", am);
+
+        // Setzen der Position auf den Server
+        new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude).execute();
+
+        Member m = ServiceProvider.getService().skatenightServerEndpoint().getMember(TEST_EMAIL).execute();
+        assertEquals(TEST_POSITION.latitude, m.getLatitude());
+        assertEquals(TEST_POSITION.longitude, m.getLongitude());
+
+        // Starten des Hintergrundservices zur Standortermittlung
+
+        am.finish();
 
 
 
+    }
 
 }
 
