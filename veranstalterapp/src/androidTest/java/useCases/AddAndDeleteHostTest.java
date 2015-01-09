@@ -22,7 +22,9 @@ import ws1415.veranstalterapp.activity.PermissionManagementActivity;
 import ws1415.veranstalterapp.task.DeleteHostTask;
 
 /**
- * Created by Bernd Eissing on 06.01.2015.
+ * Testet das Hinzufügen und Löschen eines neuen Veranstalters.
+ *
+ * Created by Bernd Eissing & Martin Wrodarczyk on 06.01.2015.
  */
 public class AddAndDeleteHostTest extends ActivityInstrumentationTestCase2<PermissionManagementActivity> {
     private PermissionManagementActivity mActivity;
@@ -55,6 +57,9 @@ public class AddAndDeleteHostTest extends ActivityInstrumentationTestCase2<Permi
         mActionBar = mActivity.getActionBar();
     }
 
+    /**
+     * Testet ob alle View-Elemente nicht null sind.
+     */
     @SmallTest
     public void testView(){
         assertNotNull(mActivity);
@@ -65,6 +70,11 @@ public class AddAndDeleteHostTest extends ActivityInstrumentationTestCase2<Permi
         assertNotNull(listView);
     }
 
+    /**
+     * Testet ob alle View-Elemente auf dem Bildschirm sichtbar sind.
+     *
+     * @throws Exception
+     */
     @SmallTest
     public void testViewVisible()throws Exception{
         // Initialisiere das View Element
@@ -77,6 +87,11 @@ public class AddAndDeleteHostTest extends ActivityInstrumentationTestCase2<Permi
         super.tearDown();
     }
 
+    /**
+     * Testet das Hinzufügen und Löschen eines neuen Veranstalters.
+     *
+     * @throws Exception
+     */
     public void testUseCase() throws Exception{
         Instrumentation.ActivityMonitor am = getInstrumentation().addMonitor(AddHostDialog.class.getName(), null, false);
         final View addHost = mActivity.findViewById(R.id.action_add_host);
