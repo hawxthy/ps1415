@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.widget.ListView;
 
 import android.text.Html;
@@ -39,6 +40,7 @@ import ws1415.ps1415.util.FieldType;
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
 public class ShowInformationActivity extends Activity implements ExtendedTaskDelegate<Void, Object> {
+    public static final int SETTINGS_RESULT = 1;
     public static final int REQUEST_ACCOUNT_PICKER = 2;
 
     public static final String EXTRA_KEY_ID = "show_information_extra_key_id";
@@ -114,6 +116,10 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
+            case SETTINGS_RESULT:
+                // Öffnet die Usersettings
+                displayUserSettings();
+                break;
             case REQUEST_ACCOUNT_PICKER:
                 if (data != null && data.getExtras() != null) {
                     String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
@@ -128,6 +134,17 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                 }
                 break;
         }
+    }
+
+    /**
+     * Speichert die Usersettings in einem String.
+     */
+    private void displayUserSettings() {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String  settings = "";
+
+        settings=settings+"Position Senden:"+ sharedPrefs.getBoolean("prefSendLocation", false);
     }
     
     @Override
@@ -144,6 +161,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
      public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.example, menu);
+
         return true;
     }
 
@@ -154,6 +172,8 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Intent i = new Intent(getApplicationContext(), Settings.class);
+            startActivityForResult(i, SETTINGS_RESULT);
             return true;
         }
         return super.onOptionsItemSelected(item);

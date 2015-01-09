@@ -60,7 +60,7 @@ public class ShowCurrentInformationTest extends ActivityInstrumentationTestCase2
         super(ShowEventsActivity.class);
 
         // Testdaten erstellen
-        testEvent = new Event();
+        /*testEvent = new Event();
         testEvent.setTitle("Testtitel");
         testEvent.setDate(new DateTime(new Date()));
         testEvent.setFee("3");
@@ -90,6 +90,7 @@ public class ShowCurrentInformationTest extends ActivityInstrumentationTestCase2
                 "VB~ATRBPDPDXDz@F??PRNHJLHRHPRh@DTHT??LZTd@Xf@JNNVb@l@`BdBbBjB??BNhBvB??LJ\\VJ@LP" +
                 "j@t@FLXh@Vp@BF??b@vANh@d@fBh@pB@HDXBRBTB^Dj@?BBVCZ"));
         testEvent.setRoute(testRoute);
+        */
     }
 
     /**

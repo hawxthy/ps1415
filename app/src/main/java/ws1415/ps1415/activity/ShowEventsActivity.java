@@ -22,6 +22,8 @@ import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.ps1415.task.QueryEventsTask;
 
 public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate<Void, List<Event>> {
+    public static final int SETTINGS_RESULT = 1;
+
     private ListView eventListView;
     private List<Event> eventList;
     private EventsCursorAdapter mAdapter;
@@ -87,6 +89,8 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Intent i = new Intent(getApplicationContext(), Settings.class);
+            startActivityForResult(i, SETTINGS_RESULT);
             return true;
         }
         return super.onOptionsItemSelected(item);
