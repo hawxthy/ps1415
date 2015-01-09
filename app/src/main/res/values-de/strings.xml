@@ -33,6 +33,7 @@
     <string name="active_event_header_max_speed">Maximale Geschwindigkeit</string>
     <string name="active_event_header_avg_speed">∅-Geschwindigkeit</string>
     <string name="active_event_header_current_altitude">Aktuelle Höhe</string>
+    <string name="active_event_header_elevation_gain">Höhenmeter</string>
     <string name="active_event_button_speed_profile">Geschwindigkeitsprofil</string>
     <string name="active_event_button_end">Teilnahme beenden</string>
     <string name="active_event_no_email_message">Bitte erst an einem Event teilnehmen.</string>

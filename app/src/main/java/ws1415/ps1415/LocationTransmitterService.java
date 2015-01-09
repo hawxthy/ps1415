@@ -35,7 +35,6 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
     public static final float MAX_NEXT_WAYPOINT_DISTANCE = 10.0f;
     public static final float MAX_ANY_WAYPOINT_DISTANCE = 60.0f;
-    public static final int MIN_WAYPOINT_MEMBER_COUNT = 1;
 
     public static final String EXTRA_WAYPOINTS = "location_transmitter_service_extra_waypoints";
     public static final String EXTRA_START_DATE = "location_transmitter_service_extra_start_date";
@@ -48,6 +47,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     public static final String NOTIFICATION_EXTRA_CUR_SPEED = "location_transmitter_service_notification_cur_speed";
     public static final String NOTIFICATION_EXTRA_MAX_SPEED = "location_transmitter_service_notification_max_speed";
     public static final String NOTIFICATION_EXTRA_AVG_SPEED = "location_transmitter_service_notification_avg_speed";
+    public static final String NOTIFICATION_EXTRA_ELEVATION_GAIN = "location_transmitter_service_notification_elevation_gain";
     private LocalBroadcastManager broadcastManager;
 
     private GoogleApiClient gac;
@@ -59,6 +59,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     private float avgSpeed;
     private float currentDistance;
     private boolean foundFirstWaypoint;
+    private float previousAlt;
+    private float elevationGain;
 
     public LocationTransmitterService() {
         foundFirstWaypoint = false;
@@ -66,6 +68,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         curSpeed = 0.0f;
         maxSpeed = 0.0f;
         avgSpeed = 0.0f;
+        previousAlt = Float.NaN;
+        elevationGain = 0.0f;
     }
 
     @Override
@@ -157,6 +161,16 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             maxSpeed = Math.max(curSpeed, maxSpeed);
         }
 
+        if (location.hasAltitude()) {
+            if (!Float.isNaN(previousAlt)) {
+                if (location.getAltitude() > previousAlt) {
+                    elevationGain += location.getAltitude()-previousAlt;
+                }
+            }
+
+            previousAlt = (float)location.getAltitude();
+        }
+
         float elapsedTimeH = (new Date().getTime()-startDate.getTime())/3.6e6f;
         // currentDistance/1000.0f -> km
         // elapsedTimeH -> verstrichene Zeit in h
@@ -176,6 +190,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             intent.putExtra(NOTIFICATION_EXTRA_CUR_SPEED, curSpeed);
             intent.putExtra(NOTIFICATION_EXTRA_MAX_SPEED, maxSpeed);
             intent.putExtra(NOTIFICATION_EXTRA_AVG_SPEED, avgSpeed);
+            intent.putExtra(NOTIFICATION_EXTRA_ELEVATION_GAIN, elevationGain);
             broadcastManager.sendBroadcast(intent);
         }
     }

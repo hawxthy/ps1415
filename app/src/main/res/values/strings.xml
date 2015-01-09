@@ -33,6 +33,7 @@
     <string name="active_event_header_max_speed">Maximum speed</string>
     <string name="active_event_header_avg_speed">Average speed</string>
     <string name="active_event_header_current_altitude">Current altitude</string>
+    <string name="active_event_header_elevation_gain">Elevation gain</string>
     <string name="active_event_button_speed_profile">Speed profile</string>
     <string name="active_event_button_end">End participation</string>
     <string name="active_event_no_email_message">Please register for an event first.</string>

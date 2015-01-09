@@ -241,6 +241,10 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             float avgSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_AVG_SPEED, 0.0f);
             TextView avgSpeedTextView = (TextView) findViewById(R.id.active_event_avg_speed_textview);
             avgSpeedTextView.setText(getString(R.string.active_event_speed_format, avgSpeed));
+
+            float elevationGain = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_ELEVATION_GAIN, 0.0f);
+            TextView elevationGainTextView = (TextView) findViewById(R.id.active_event_elevation_gain_textview);
+            elevationGainTextView.setText(getString(R.string.active_event_altitude_format_meters, elevationGain));
         }
     }
 }
