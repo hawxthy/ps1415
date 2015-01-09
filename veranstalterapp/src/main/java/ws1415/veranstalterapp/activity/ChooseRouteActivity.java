@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.veranstalterapp.adapter.MapsCursorAdapter;
+import ws1415.veranstalterapp.Adapter1.MapsCursorAdapter;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.ServiceProvider;
