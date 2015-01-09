@@ -9,8 +9,6 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.security.Permission;
-
 import ws1415.veranstalterapp.AddRouteDialog;
 import ws1415.veranstalterapp.adapter.TabsPagerAdapter;
 import ws1415.veranstalterapp.fragment.ShowEventsFragment;

@@ -2,15 +2,11 @@ package ws1415.veranstalterapp.fragment;
 
 
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.ListView;
-import android.widget.TextView;
-import com.skatenight.skatenightAPI.model.Event;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.skatenight.skatenightAPI.model.Event;
 
 import ws1415.veranstalterapp.adapter.ShowCursorAdapter;
 import ws1415.veranstalterapp.R;
