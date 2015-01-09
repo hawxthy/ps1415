@@ -1,3 +1,4 @@
+/*
 package ws1415.veranstalterapp.task;
 
 import com.google.api.client.util.DateTime;
@@ -12,16 +13,20 @@ import java.util.List;
 import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 import ws1415.veranstalterapp.ServiceProvider;
 
+*/
 /**
  * Created by Martin on 21.11.2014.
- */
+ *//*
+
 public class DeleteEventTaskTest extends AuthTaskTestCase {
     private Event event1, event2;
     private Route route1, route2;
 
-    /**
+    */
+/**
      * Testdaten erstellen
-     */
+     *//*
+
     public DeleteEventTaskTest() {
         route1 = new Route();
         route1.setName("Route 1");
@@ -72,11 +77,13 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
         event2.setDescription(new Text().setValue("Die zweite Skatenight"));
     }
 
-    /**
+    */
+/**
      * Die Daten werden vor jedem Test neu auf den Server geschrieben.
      *
      * @throws Exception
-     */
+     *//*
+
     public void setUp() throws Exception {
         super.setUp();
 
@@ -103,9 +110,11 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
         }
     }
 
-    /**
+    */
+/**
      * Das Löschen von Events testen.
-     */
+     *//*
+
     public void testTask() throws IOException{
         new DeleteEventTask(new ShowEventsFragment(){
             @Override
@@ -120,3 +129,4 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
         }
     }
 }
+*/

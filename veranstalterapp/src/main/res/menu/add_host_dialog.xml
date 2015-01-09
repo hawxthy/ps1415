@@ -1,11 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ws1415.veranstalterapp.activity.HoldTabsActivity" >
-
-    <item android:id="@+id/action_permission"
-        android:title="@string/action_permission"
-        android:orderInCategory="100"
-        android:showAsAction="never" />
+    tools:context="ws1415.veranstalterapp.activity.AddHostDialog" >
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"

@@ -1,3 +1,4 @@
+/*
 package useCases;
 
 import android.app.ActionBar;
@@ -30,11 +31,13 @@ import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.activity.LoginActivity;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
 
+*/
 /**
  * Testet den Use Case "Veröffentichen neuer Informationen".
  *
  * @author Tristan Rust
- */
+ *//*
+
 public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<HoldTabsActivity> {
 
     private static final String TEST_STATE_DESTROY_TITLE = "TestEventDestroy";
@@ -57,10 +60,12 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         super(HoldTabsActivity.class);
     }
 
-    /**
+    */
+/**
      * Loggt den Veranstalter ein und wechselt auf das VeranstaltungErstellenTab.
      * @throws Exception
-     */
+     *//*
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -81,10 +86,12 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         swipe(Direction.Right);
     }
 
-    /**
+    */
+/**
      * Swipt auf dem Bildschirm.
      * @param direction Die Richtung (links oder recths)
-     */
+     *//*
+
     protected void swipe(Direction direction) {
         Instrumentation inst = getInstrumentation();
         Point size = new Point();
@@ -105,18 +112,22 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
                 MotionEvent.ACTION_UP, xEnd, size.y / 2, 0));
     }
 
-    /**
+    */
+/**
      * Prüfen, ob alle Tabs vorhanden sind
-     */
+     *//*
+
     @SmallTest
     public void testPreConditions() {
         assertEquals(ActionBar.NAVIGATION_MODE_TABS, mActionBar.getNavigationMode());
         assertEquals(3, mActionBar.getNavigationItemCount());
     }
 
-    /**
+    */
+/**
      * Prüft, ob diese Views wirklich in der Activity existieren.
-     */
+     *//*
+
     @SmallTest
     public void testViews() {
         assertNotNull(mActivity);
@@ -145,11 +156,13 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         assertNotNull(routePickerButton);
     }
 
-    /**
+    */
+/**
      * Prüft, ob die Elemente in der Activity wirklich gerendert werden.
      *
      * @throws java.lang.Exception
-     */
+     *//*
+
     @SmallTest
     public void testViewsVisible() throws Exception {
         // Initialisiere die View Elemente aus dem AnnounceInformationFramgent
@@ -182,10 +195,12 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         super.tearDown();
     }
 
-    /**
+    */
+/**
      * Testet den UseCase.
      * @throws Exception
-     */
+     *//*
+
     @UiThreadTest
     public void testUseCase() throws Exception {
         // Prüfen, ob alle Tabs vorhanden sind
@@ -334,9 +349,11 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         }).start();
     }
 
-    /**
+    */
+/**
      * Testet die Activity beim Beenden und wieder Neustarten.
-     */
+     *//*
+
     @SmallTest
     public void testUseCaseStateDestroy() {
         // Initialisiere die View Elemente aus dem AnnounceInformationFramgent
@@ -394,9 +411,11 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
 
     }
 
-    /**
+    */
+/**
      * Testet, ob die Activity weiter läuft, wenn diese pausiert hat. Test läuft auf dem UI Thread.
-     */
+     *//*
+
     @UiThreadTest
     public void testUseCaseStatePauseResume() {
         // Instrumentation Objekt, das die Anwendung während des Tests kontrolliert
@@ -511,3 +530,4 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
 
 
 
+*/

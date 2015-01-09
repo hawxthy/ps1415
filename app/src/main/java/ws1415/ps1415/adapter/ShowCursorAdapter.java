@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -219,8 +220,10 @@ public class ShowCursorAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
-            holder.content.setText((String) fieldList.get(position).getValue());
+            holder.content.setText(fieldList.get(position).getValue());
+            holder.title.setText(fieldList.get(position).getTitle());
             final String link = holder.content.getText().toString();
+            holder.content.setTextColor(Color.BLUE);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
