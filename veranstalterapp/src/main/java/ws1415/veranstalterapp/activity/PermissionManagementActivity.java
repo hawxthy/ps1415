@@ -16,7 +16,7 @@ import com.skatenight.skatenightAPI.model.Host;
 import java.util.List;
 
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.Adapter1.HostCursorAdapter;
+import ws1415.veranstalterapp.adapter.HostCursorAdapter;
 import ws1415.veranstalterapp.task.DeleteHostTask;
 import ws1415.veranstalterapp.task.QueryHostsTask;
 

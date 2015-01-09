@@ -13,7 +13,7 @@ import android.widget.Toast;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
 
-import ws1415.veranstalterapp.Adapter1.AnnounceCursorAdapter;
+import ws1415.veranstalterapp.adapter.AnnounceCursorAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.EditEventTask;
 import ws1415.veranstalterapp.task.GetEventTask;

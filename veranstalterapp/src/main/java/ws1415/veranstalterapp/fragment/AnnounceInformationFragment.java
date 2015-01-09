@@ -29,7 +29,7 @@ import java.util.ArrayList;
 
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.activity.HoldTabsActivity;
-import ws1415.veranstalterapp.Adapter1.AnnounceCursorAdapter;
+import ws1415.veranstalterapp.adapter.AnnounceCursorAdapter;
 import ws1415.veranstalterapp.task.CreateEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.FieldType;

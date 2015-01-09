@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.Adapter1;
+package ws1415.veranstalterapp.adapter;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;

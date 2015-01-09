@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import ws1415.veranstalterapp.Adapter1.AnnounceCursorAdapter;
+import ws1415.veranstalterapp.adapter.AnnounceCursorAdapter;
 import ws1415.veranstalterapp.R;
 
 /**

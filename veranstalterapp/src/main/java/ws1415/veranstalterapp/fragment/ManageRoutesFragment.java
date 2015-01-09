@@ -18,7 +18,7 @@ import com.skatenight.skatenightAPI.model.Route;
 import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.veranstalterapp.Adapter1.MapsCursorAdapter;
+import ws1415.veranstalterapp.adapter.MapsCursorAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.activity.ShowRouteActivity;
 import ws1415.veranstalterapp.task.DeleteRouteTask;
