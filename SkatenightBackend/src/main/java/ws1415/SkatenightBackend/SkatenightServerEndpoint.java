@@ -4,6 +4,7 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -203,6 +204,7 @@ public class SkatenightServerEndpoint {
                 Integer currentWaypoint = member.getCurrentWaypoint();
                 if (currentWaypoint == null) {
                     member.setCurrentWaypoint(0);
+                    currentWaypoint = 0;
                 }
                 List<RoutePoint> points = event.getRoute().getRoutePoints();
                 if (currentWaypoint < points.size()-1) {
@@ -437,7 +439,7 @@ public class SkatenightServerEndpoint {
 
         PersistenceManager pm = pmf.getPersistenceManager();
         Member m = getMember(email);
-        m.setCurrentEventId(event.getKey().getId());
+        m.setCurrentEventId(keyId);
 
         try {
             pm.makePersistent(m);

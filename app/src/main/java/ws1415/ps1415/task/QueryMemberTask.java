@@ -31,7 +31,9 @@ public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> 
         try {
             SharedPreferences prefs = view.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
             String email = prefs.getString("accountName", null);
-            return ServiceProvider.getService().skatenightServerEndpoint().getMember(email).execute();
+            if (email != null) {
+                return ServiceProvider.getService().skatenightServerEndpoint().getMember(email).execute();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
