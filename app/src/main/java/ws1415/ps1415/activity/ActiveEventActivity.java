@@ -34,6 +34,7 @@ import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryCurrentMemberEventTask;
+import ws1415.ps1415.util.EventUtils;
 
 public class ActiveEventActivity extends Activity implements ExtendedTaskDelegate<Void, Event> {
     private LocationReceiver receiver;
@@ -152,8 +153,8 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             return true;
         }
         else {
-            if (e.getDate() == null) return true;
-            else if (e.getRoute() == null) return true;
+            if (EventUtils.getInstance(this).getFusedDate(e) == null) return true;
+            else if (EventUtils.getInstance(this).getFusedDate(e) == null) return true;
         }
         return false;
     }
@@ -162,7 +163,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     public void taskDidFinish(ExtendedTask task, Event event) {
         setProgressBarIndeterminateVisibility(false);
         if (!isEventNull(event)) {
-            startDate = new Date(event.getDate().getValue());
+            startDate = EventUtils.getInstance(this).getFusedDate(event);
             try {
                 waypoints = LocationUtils.decodePolyline(event.getRoute().getRouteData().getValue());
             }

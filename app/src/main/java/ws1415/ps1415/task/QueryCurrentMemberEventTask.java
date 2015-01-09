@@ -24,10 +24,11 @@ public class QueryCurrentMemberEventTask extends ExtendedTask<Void, Void, Event>
     protected Event doInBackground(Void... params) {
         try {
             Member m = ServiceProvider.getService().skatenightServerEndpoint().getMember(email).execute();
+            // TODO: Fehler, wenn Teilnehmer zu keinem Event angemeldet ist
             Event e = ServiceProvider.getService().skatenightServerEndpoint().getEvent(m.getCurrentEventId()).execute();
             return e;
         }
-        catch (IOException e) {
+        catch (Exception e) {
             publishError(e.getMessage());
         }
         return null;
