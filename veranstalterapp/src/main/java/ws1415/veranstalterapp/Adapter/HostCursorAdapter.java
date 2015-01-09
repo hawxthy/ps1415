@@ -92,7 +92,7 @@ public class HostCursorAdapter extends BaseAdapter {
 
         if(convertView == null){
             holder = new Holder();
-            convertView = inflater.inflate(R.layout.list_view_item_permission_management, false);
+            convertView = inflater.inflate(R.layout.list_view_item_permission_management, viewGroup, false);
             holder.hostMail = (TextView) convertView.findViewById(R.id.list_view_item_permission_management_textView);
             convertView.setTag(holder);
         }else{
