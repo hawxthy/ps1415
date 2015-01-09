@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.adapter;
+package ws1415.veranstalterapp.adapter_renaming;
 
 import android.content.Context;
 import android.view.LayoutInflater;

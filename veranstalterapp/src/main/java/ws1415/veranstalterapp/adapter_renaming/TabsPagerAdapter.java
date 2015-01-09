@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.adapter;
+package ws1415.veranstalterapp.adapter_renaming;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
