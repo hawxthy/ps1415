@@ -53,7 +53,7 @@ import ws1415.ps1415.task.UpdateLocationTask;
 import ws1415.ps1415.util.EventUtils;
 
 /**
- * Testet den Use Case "Übertragung der aktuellen Position an den Server".
+ * Testet den Use Case "Handhabung der aktuellen Position".
  *
  * @author Tristan Rust
  */
