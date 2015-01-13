@@ -7,6 +7,8 @@ import android.widget.Button;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
+import java.io.IOException;
+
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.ServiceProvider;
@@ -43,19 +45,18 @@ public class AuthenticationOrganizerTest extends ActivityInstrumentationTestCase
         // Nutzer einloggen
         credential = GoogleAccountCredential.usingAudience(getActivity(), "server:client_id:"+ Constants.WEB_CLIENT_ID);
         credential.setSelectedAccountName(credential.getAllAccounts()[0].name);
-        ServiceProvider.login(credential);
+        //ServiceProvider.login(credential);
 
     }
 
     /**
      * Prüfen, ob auch keine Account Daten vorhanden sind, damit der Account Picker angezeigt wird.
      */
+    @SmallTest
     public void testPreConditions() {
-        // Nutzer einloggen
-        credential.setSelectedAccountName(credential.getAllAccounts()[0].name);
-        ServiceProvider.login(credential);
-        assertTrue(credential.getSelectedAccountName() == null);
-        assertNotNull(mButton);
+        assertEquals(true, credential != null);
+        // Prüft die Existenz eines Benutzeraccounts
+        assertEquals(true, credential.getSelectedAccountName() != null);
     }
 
     /**
@@ -63,31 +64,18 @@ public class AuthenticationOrganizerTest extends ActivityInstrumentationTestCase
      */
     @SmallTest
     public void testViews() {
-        assertNotNull(getActivity());
+        assertNotNull(mActivity);
         assertNotNull(mButton);
     }
 
     /**
-     * Testet, ob der Veranstalter über die UI eingeloggt werden kann.
+     * Testet, ob der ausgewählte Benutzeraccount ein Veranstalter ist.
      *
-     * @throws InterruptedException
+     * @throws IOException
      */
-    public void testLoginUI() throws InterruptedException {
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(LoginActivity.class.getName(), null, false);
-
-        // Es wird ein neuer UI Thread gestartet, um das Veranstalterkonto auswählen zu können
-        mActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mButton.performClick();
-            }
-        });
-
-        credential.setSelectedAccountName(credential.getAllAccounts()[0].name);
-        ServiceProvider.login(credential);
-
-
-    }
+  //  public void testLoginUI() throws IOException {
+  //      assertEquals(new Boolean(true), ServiceProvider.getService().skatenightServerEndpoint().isHost(credential.getSelectedAccountName()).execute().getValue());
+  //  }
 
 
 }
