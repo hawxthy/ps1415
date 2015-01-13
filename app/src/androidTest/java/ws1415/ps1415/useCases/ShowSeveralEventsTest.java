@@ -56,43 +56,43 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
 
         fieldData.setTitle("Titel");
         fieldData.setValue(TEST_TITLE);
-        fieldData.setType(8);
-        fieldData.setData(new Text());
-        eventData.add(fieldData);
-
-        fieldData.setTitle("Datum");
-        fieldData.setValue(TEST_DATE);
-        fieldData.setType(3);
-        fieldData.setData(new Text());
-        eventData.add(fieldData);
-
-        fieldData.setTitle("Zeit");
-        fieldData.setValue(TEST_TIME);
-        fieldData.setType(4);
+        fieldData.setType(FieldType.TITLE.getId());
         fieldData.setData(new Text());
         eventData.add(fieldData);
 
         fieldData.setTitle("Ort");
         fieldData.setValue(TEST_LOCATION);
-        fieldData.setType(9);
+        fieldData.setType(FieldType.LOCATION.getId());
         fieldData.setData(new Text());
         eventData.add(fieldData);
 
-        fieldData.setTitle("Beschreibung");
-        fieldData.setValue(TEST_DESCRIPTION);
-        fieldData.setType(10);
+        fieldData.setTitle("Datum");
+        fieldData.setValue(TEST_DATE);
+        fieldData.setType(FieldType.DATE.getId());
+        fieldData.setData(new Text());
+        eventData.add(fieldData);
+
+        fieldData.setTitle("Zeit");
+        fieldData.setValue(TEST_TIME);
+        fieldData.setType(FieldType.TIME.getId());
         fieldData.setData(new Text());
         eventData.add(fieldData);
 
         fieldData.setTitle("Gebühr");
         fieldData.setValue(TEST_FEE);
-        fieldData.setType(2);
+        fieldData.setType(FieldType.FEE.getId());
+        fieldData.setData(new Text());
+        eventData.add(fieldData);
+
+        fieldData.setTitle("Beschreibung");
+        fieldData.setValue(TEST_DESCRIPTION);
+        fieldData.setType(FieldType.DESCRIPTION.getId());
         fieldData.setData(new Text());
         eventData.add(fieldData);
 
         fieldData.setTitle("Route");
         fieldData.setValue("Testroute");
-        fieldData.setType(5);
+        fieldData.setType(FieldType.ROUTE.getId());
         fieldData.setData(new Text());
         eventData.add(fieldData);
 
