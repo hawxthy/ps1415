@@ -4,7 +4,6 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -12,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -195,6 +193,22 @@ public class SkatenightServerEndpoint {
         }
     }
 
+    public void createMember(@Named("mail") String mail) {
+        Member m = getMember(mail);
+        if (m == null) {
+            m = new Member();
+            m.setEmail(mail);
+            m.setName(mail);
+
+            PersistenceManager pm = pmf.getPersistenceManager();
+            try {
+                pm.makePersistent(m);
+            } finally {
+                pm.close();
+            }
+        }
+    }
+
     /**
      * Aktualisiert die für die angegebene Mail-Adresse gespeicherte Position auf dem Server. Falls
      * kein Member-Objekt für die Mail-Adresse existiert, so wird ein neues Objekt angelegt.
@@ -207,16 +221,6 @@ public class SkatenightServerEndpoint {
                                      @Named("longitude") double longitude) {
         if (mail != null) {
             Member m = getMember(mail);
-            if (m == null) {
-                // Neuen Member anlegen
-                m = new Member();
-                m.setEmail(mail);
-                /**
-                 * Als Name wird zurzeit die Mail-Adresse verwendet, da noch keine Eingabe-
-                 * möglichkeit für den Namen besteht. (sollte im nächsten Sprint übernommen werden)
-                 */
-                m.setName(mail);
-            }
             m.setLatitude(latitude);
             m.setLongitude(longitude);
             m.setUpdatedAt(new Date());
