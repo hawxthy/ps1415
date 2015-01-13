@@ -1,14 +1,13 @@
 package ws1415.ps1415.task;
 
 import android.os.AsyncTask;
-import com.skatenight.skatenightAPI.model.Member;
+
 import java.io.IOException;
+
 import ws1415.ps1415.ServiceProvider;
 
 
 public class AddMemberTask extends AsyncTask<String, Void, Void> {
-
-
 
     @Override
     protected Void doInBackground(String... params) {
