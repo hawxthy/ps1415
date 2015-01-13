@@ -158,7 +158,7 @@ public class AnnounceInformationFragment extends Fragment {
                     // Setze die Attribute von Event auf den Standard
                     event = new Event();
                     EventUtils.getInstance(getActivity()).setStandardFields(event);
-                    listAdapter = new AnnounceCursorAdapter(getActivity(), event.getDynamicFields(), event);
+                    listAdapter = new AnnounceCursorAdapter(AnnounceInformationFragment.this, event.getDynamicFields(), event);
                     listView.setAdapter(listAdapter);
                     listAdapter.notifyDataSetChanged();
 

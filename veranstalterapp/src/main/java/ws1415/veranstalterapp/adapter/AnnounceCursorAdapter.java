@@ -32,6 +32,7 @@ import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
 import ws1415.veranstalterapp.activity.ChooseRouteActivity;
+import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.util.EventUtils;
 
 import java.util.ArrayList;
@@ -78,22 +79,23 @@ public class AnnounceCursorAdapter extends BaseAdapter {
      * @param fieldList Liste von den Routen
      */
     public AnnounceCursorAdapter(AnnounceInformationFragment parent, List<Field> fieldList, Event event) {
-        this(parent.getActivity(), fieldList, event);
+        this.context = parent.getActivity();
+        this.fieldList = fieldList;
+        this.event = event;
         this.parent = parent;
+        setStandardTime();
+        setCurrentDate();
     }
 
     /**
      * Konstruktor, der den Inhalt der Liste festlegt.
-     *
-     * @param context   Context, von der aus der Adapter aufgerufen wird
-     * @param fieldList Liste von den Routen
      */
-    public AnnounceCursorAdapter(Context context, List<Field> fieldList, Event event) {
-        this.context = context;
+    public AnnounceCursorAdapter(EditEventActivity parent, List<Field> fieldList, Event event){
+        this.context = parent;
         this.fieldList = fieldList;
         this.event = event;
-        setStandardTime();
-        setCurrentDate();
+        setDate(EventUtils.getInstance(context).getFusedDate(event));
+        setRoute(event.getRoute());
     }
 
     /**
@@ -553,6 +555,16 @@ public class AnnounceCursorAdapter extends BaseAdapter {
         Calendar cal = Calendar.getInstance();
         cal.set(year, month, day, hour, minute);
         return cal.getTime();
+    }
+
+    public void setDate(Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        year = cal.get(Calendar.YEAR);
+        month = cal.get(Calendar.MONTH);
+        day = cal.get(Calendar.DAY_OF_MONTH);
+        hour = cal.get(Calendar.HOUR_OF_DAY);
+        minute = cal.get(Calendar.MINUTE);
     }
 
     public Route getRoute() {
