@@ -1,6 +1,8 @@
 package ws1415.ps1415.useCases;
 
 import android.test.ActivityInstrumentationTestCase2;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.DateTime;
@@ -15,8 +17,10 @@ import java.util.Date;
 import java.util.List;
 
 import ws1415.ps1415.Constants;
+import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.ShowEventsActivity;
+import ws1415.ps1415.task.CreateEventTask;
 import ws1415.ps1415.util.FieldType;
 
 /**
@@ -32,45 +36,64 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
     private Route testRoute;
 
     private final String TEST_TITLE = "testTitle";
-    private final String TEST_FEE = "testFee";
+    private final String TEST_FEE = "5";
     private final String TEST_DATE = "27.2.2015";
     private final String TEST_TIME = "20:00 Uhr";
     private final String TEST_LOCATION = "testOrt";
     private final String TEST_DESCRIPTION = "testBeschreibung";
 
-
+    // ShowEventsActivity UI Elemente
+    private ListView mList;
+    private ListAdapter mListData;
 
     public ShowSeveralEventsTest() {
         super(ShowEventsActivity.class);
 
         testEvent = new Event();
-        testEvent.setDynamicFields(new ArrayList<Field>());
 
         ArrayList<Field> eventData = new ArrayList<Field>();
         Field fieldData = new Field();
 
+        fieldData.setTitle("Titel");
         fieldData.setValue(TEST_TITLE);
         fieldData.setType(8);
+        fieldData.setData(new Text());
         eventData.add(fieldData);
 
+        fieldData.setTitle("Datum");
         fieldData.setValue(TEST_DATE);
         fieldData.setType(3);
+        fieldData.setData(new Text());
         eventData.add(fieldData);
 
+        fieldData.setTitle("Zeit");
         fieldData.setValue(TEST_TIME);
         fieldData.setType(4);
+        fieldData.setData(new Text());
         eventData.add(fieldData);
 
+        fieldData.setTitle("Ort");
         fieldData.setValue(TEST_LOCATION);
         fieldData.setType(9);
+        fieldData.setData(new Text());
         eventData.add(fieldData);
 
+        fieldData.setTitle("Beschreibung");
         fieldData.setValue(TEST_DESCRIPTION);
         fieldData.setType(10);
+        fieldData.setData(new Text());
         eventData.add(fieldData);
 
+        fieldData.setTitle("Gebühr");
         fieldData.setValue(TEST_FEE);
         fieldData.setType(2);
+        fieldData.setData(new Text());
+        eventData.add(fieldData);
+
+        fieldData.setTitle("Route");
+        fieldData.setValue("Testroute");
+        fieldData.setType(5);
+        fieldData.setData(new Text());
         eventData.add(fieldData);
 
         testRoute = new Route();
@@ -90,7 +113,7 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
                 "j@t@FLXh@Vp@BF??b@vANh@d@fBh@pB@HDXBRBTB^Dj@?BBVCZ"));
 
         testEvent.setDynamicFields(eventData);
-
+        testEvent.setRoute(testRoute);
 
     }
 
@@ -107,20 +130,41 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
         setActivityInitialTouchMode(false);
 
         // Löschen aller Events
-        List<Event> list = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems();
+        /*List<Event> list = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems();
         if (list != null) {
             for (Event e : list) {
                 ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId()).execute();
             }
-        }
+        }*/
 
+        Thread.sleep(1000);
         // Neues Test Event anlegen
-        ServiceProvider.getService().skatenightServerEndpoint().createEvent(testEvent).execute();
+        //ServiceProvider.getService().skatenightServerEndpoint().createEvent(testEvent).execute();
+        new CreateEventTask().execute(testEvent);
+        Thread.sleep(1000);
 
         // Die ShowEventsActivity starten
         mActivity = getActivity();
 
+        // Holt sich die Event Listen-Elemente
+        mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
+        mListData = mList.getAdapter();
     }
+
+    /**
+     * Prüfen, ob Events in der Liste vorhanden sind.
+     */
+    public void testPreConditions() {
+        assertNotNull("Activity could not start!", mActivity);
+        assertNotNull("selection listener on events list initialized", mList.getOnItemClickListener());
+        assertNotNull("adapter for events initialized", mListData);
+
+        // Mindestens ein Event muss existieren
+        assertTrue("at least one event exists", mListData.getCount() > 0);
+    }
+
+
+
 
 }
 
