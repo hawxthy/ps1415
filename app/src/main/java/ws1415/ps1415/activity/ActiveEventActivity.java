@@ -35,6 +35,7 @@ import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryCurrentMemberEventTask;
 import ws1415.ps1415.util.EventUtils;
+import ws1415.ps1415.util.FieldType;
 
 public class ActiveEventActivity extends Activity implements ExtendedTaskDelegate<Void, Event> {
     private LocationReceiver receiver;
@@ -152,10 +153,13 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         if (e == null) {
             return true;
         }
-        else {
-            if (EventUtils.getInstance(this).getFusedDate(e) == null) return true;
-            else if (EventUtils.getInstance(this).getFusedDate(e) == null) return true;
+        else if (EventUtils.getInstance(this).getUniqueField(3, e) == null) {
+            return true;
         }
+        else if (e.getRoute().getRouteData() == null) {
+            return true;
+        }
+
         return false;
     }
 
