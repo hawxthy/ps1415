@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     // Festlegen, welcher Build Type für die Tests genutzt werden soll. Definiert, welche Signing-
     // Configuration für das Testpaket genutzt wird.
-    testBuildType "jenkins"
+    testBuildType "debug"
     signingConfigs {
         release {
             keyAlias 'Skatenight-Veranstalter-App-Key'
@@ -35,7 +35,7 @@ android {
     }
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             debuggable true

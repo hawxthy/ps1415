@@ -4,6 +4,7 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -36,45 +37,59 @@ public class SkatenightServerEndpoint {
             "transactions-optional");
     private long lastFieldUpdateTime = 0;
 
-//    /**
-//     * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
-//     * @param mail Die hinzuzufügende Mail-Adresse
-//     */
-//    public void addHost(@Named("mail") String mail) {
-//        PersistenceManager pm = pmf.getPersistenceManager();
-//        try {
-//            Query q = pm.newQuery(Host.class);
-//            q.setFilter("email == emailParam");
-//            q.declareParameters("String emailParam");
-//            List<Host> results = (List<Host>) q.execute(mail);
-//            if (results.isEmpty()) {
-//                Host h = new Host();
-//                h.setEmail(mail);
-//                pm.makePersistent(h);
-//            }
-//        } finally {
-//            pm.close();
-//        }
-//    }
-//
-//    /**
-//     * Entfernt die angegebene Mail-Adresse aus den Veranstaltern.
-//     * @param mail Die zu entfernende Mail-Adresse
-//     */
-//    public void removeHost(@Named("mail") String mail) {
-//        PersistenceManager pm = pmf.getPersistenceManager();
-//        try {
-//            Query q = pm.newQuery(Host.class);
-//            q.setFilter("email == emailParam");
-//            q.declareParameters("String emailParam");
-//            List<Host> results = (List<Host>) q.execute(mail);
-//            if (!results.isEmpty()) {
-//                pm.deletePersistentAll(results);
-//            }
-//        } finally {
-//            pm.close();
-//        }
-//    }
+    /**
+     * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
+     * @param mail Die hinzuzufügende Mail-Adresse
+     */
+    public void addHost(User user, @Named("mail") String mail) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (!isHost(user.getEmail()).value) {
+            throw new OAuthRequestException("user is not a host");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            Query q = pm.newQuery(Host.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Host> results = (List<Host>) q.execute(mail);
+            if (results.isEmpty()) {
+                Host h = new Host();
+                h.setEmail(mail);
+                pm.makePersistent(h);
+            }
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Entfernt die angegebene Mail-Adresse aus den Veranstaltern.
+     * @param mail Die zu entfernende Mail-Adresse
+     */
+    public void removeHost(User user, @Named("mail") String mail) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (!isHost(user.getEmail()).value) {
+            throw new OAuthRequestException("user is not a host");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            Query q = pm.newQuery(Host.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Host> results = (List<Host>) q.execute(mail);
+            if (!results.isEmpty()) {
+                pm.deletePersistentAll(results);
+            }
+        } finally {
+            pm.close();
+        }
+    }
 
     /**
      * Prüft, ob die angegebene Mail-Adresse zu einem authorisierten Veranstalter-Account gehört.
@@ -93,6 +108,34 @@ public class SkatenightServerEndpoint {
         } finally {
             pm.close();
         }
+    }
+
+    /**
+     * Gibt die Liste aller registrierten Veranstalter zurück.
+     * @param user Der Benutzer, der die Liste anfordert. Er muss bereits als Veranstalter eingetra-
+     *             gen sein.
+     * @return Eine Liste aller Veranstalter.
+     * @throws OAuthRequestException
+     */
+    public List<Host> getHosts(User user) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (!isHost(user.getEmail()).value) {
+            throw new OAuthRequestException("user is not a host");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        List<Host> result;
+        try {
+            result = (List<Host>) pm.newQuery(Host.class).execute();
+        } finally {
+            pm.close();
+        }
+        if (result == null) {
+            result = new ArrayList<Host>();
+        }
+        return result;
     }
 
     /**
@@ -203,6 +246,7 @@ public class SkatenightServerEndpoint {
                 Integer currentWaypoint = member.getCurrentWaypoint();
                 if (currentWaypoint == null) {
                     member.setCurrentWaypoint(0);
+                    currentWaypoint = 0;
                 }
                 List<RoutePoint> points = event.getRoute().getRoutePoints();
                 if (currentWaypoint < points.size()-1) {
@@ -437,7 +481,7 @@ public class SkatenightServerEndpoint {
 
         PersistenceManager pm = pmf.getPersistenceManager();
         Member m = getMember(email);
-        m.setCurrentEventId(event.getKey().getId());
+        m.setCurrentEventId(keyId);
 
         try {
             pm.makePersistent(m);

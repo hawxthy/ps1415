@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <string name="app_name">Skatenight</string>
     <string name="title_activity_showinformation">Wird abgerufen...</string>
@@ -7,7 +7,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Einstellungen</string>
 
-    <!--Strings zu activity_showinformation-->
+    <!-- Strings zu activity_showinformation -->
     <string name="show_info_header_date">Datum und Uhrzeit</string>
     <string name="show_info_header_location">Ort</string>
     <string name="show_info_header_fee">Teilnahmegebühr</string>
@@ -19,11 +19,27 @@
     <string name="show_info_toast_leaving">Abgemeldet</string>
     <string name="downloading">Wird abgerufen...</string>
 
-    <!--Strings zu activity showEvents-->
+    <!-- Strings zu activity showEvents -->
     <string name="title_activity_show_events">Veranstaltungen</string>
     <string-array name="selections_menu">
         <item name="delete">Löschen</item>
     </string-array>
 
+    <!-- Strings zu activity activeEvent -->
+    <string name="title_activity_active_event">Lokale Auswertung</string>
+    <string name="active_event_header_current_distance">Aktuelle Distanz</string>
+    <string name="active_event_header_total_distance">Streckenlänge</string>
+    <string name="active_event_header_cur_speed">Aktuelle Geschwindigkeit</string>
+    <string name="active_event_header_max_speed">Maximale Geschwindigkeit</string>
+    <string name="active_event_header_avg_speed">∅-Geschwindigkeit</string>
+    <string name="active_event_header_current_altitude">Aktuelle Höhe</string>
+    <string name="active_event_header_elevation_gain">Höhenmeter</string>
+    <string name="active_event_button_speed_profile">Geschwindigkeitsprofil</string>
+    <string name="active_event_button_end">Teilnahme beenden</string>
+    <string name="active_event_no_email_message">Bitte erst an einem Event teilnehmen.</string>
 
+    <string name="active_event_timer_format"><xliff:g id="sign">%1$s</xliff:g><xliff:g id="hours">%2$02d</xliff:g>:<xliff:g id="minutes">%3$02d</xliff:g>:<xliff:g id="seconds">%4$02d</xliff:g></string>
+    <string name="active_event_altitude_format_meters"><xliff:g id="altitude">%1$.1f</xliff:g> m</string>
+    <string name="active_event_distance_format_meters"><xliff:g id="distance">%1$.1f</xliff:g> m</string>
+    <string name="active_event_speed_format"><xliff:g id="speed">%1$.1f</xliff:g> km/h</string>
 </resources>

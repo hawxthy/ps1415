@@ -1,3 +1,4 @@
+/*
 package ws1415.veranstalterapp.task;
 
 import android.test.AndroidTestCase;
@@ -13,17 +14,21 @@ import java.util.List;
 
 import ws1415.veranstalterapp.ServiceProvider;
 
+*/
 /**
  * Created by Bernd Eissing on 21.11.2014.
- */
+ *//*
+
 public class GetEventTaskTest extends AndroidTestCase {
     private Route route;
     private Event event;
 
-    /**
+    */
+/**
      * Erstellt 2 Routen und ein Event. Wobei dem Event eine der beiden Routen
      * zugeordnet wird. Dient zum Initialisieren der Objekte
-     */
+     *//*
+
     public GetEventTaskTest(){
         // Erstellle die Route für das Event
         route = new Route();
@@ -52,11 +57,13 @@ public class GetEventTaskTest extends AndroidTestCase {
         event.setDescription(new Text().setValue("Das ist ein Testevent"));
     }
 
-    /**
+    */
+/**
      * Löscht alle Events vom Server und speichert dann das TestEvent
      *
      * @throws Exception
-     */
+     *//*
+
     public void setUp() throws Exception{
         super.setUp();
 
@@ -77,11 +84,13 @@ public class GetEventTaskTest extends AndroidTestCase {
         event = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems().get(0);
     }
 
-    /**
+    */
+/**
      * Tested, ob die Attribute von event mit testEvent übereinstimmen
      *
      * @throws IOException
-     */
+     *//*
+
     public void testTask() throws IOException{
         // Event mit getEvent vom Server abrufen und mit event vergleichen
         Event testEvent = ServiceProvider.getService().skatenightServerEndpoint().getEvent(event.getKey().getId()).execute();
@@ -94,3 +103,4 @@ public class GetEventTaskTest extends AndroidTestCase {
         assertEquals("Die Description stimmt nicht überein", event.getDescription(), testEvent.getDescription());
     }
 }
+*/
