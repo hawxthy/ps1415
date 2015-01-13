@@ -252,5 +252,9 @@ public class AnnounceInformationFragment extends Fragment {
             listAdapter.notifyDataSetChanged();
         }
     }
+
+    public ListView getListView(){
+        return listView;
+    }
     
 }
