@@ -12,4 +12,9 @@ public abstract class Constants {
      * Die URL der aufzurufenden API.
      */
     public static final String API_URL = "https://skatenight-ms-jenkins.appspot.com/_ah/api";
+
+    /**
+     * Die Project-ID zur Kommunikation per GCM.
+     */
+    public static final String GCM_PROJECT_ID = "1032268444653";
 }

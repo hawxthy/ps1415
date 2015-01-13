@@ -4,7 +4,6 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -19,6 +18,9 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
+
+import ws1415.SkatenightBackend.gcm.Message;
+import ws1415.SkatenightBackend.gcm.Sender;
 
 
 /**
@@ -36,6 +38,7 @@ public class SkatenightServerEndpoint {
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
     private long lastFieldUpdateTime = 0;
+    protected static final Logger logger = Logger.getLogger(SkatenightServerEndpoint.class.getName());
 
     /**
      * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
@@ -703,16 +706,18 @@ public class SkatenightServerEndpoint {
         }
     }
 
+
+    public void registerForGCM(@Named("regid") String regid) {
+
+        Sender sender = new Sender(Constants.GCM_API_KEY);
+        Message m = new Message.Builder()
+                .delayWhileIdle(false)
+                .addData("type", "test")
+                .build();
+        try {
+            sender.send(m, regid, 2);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
