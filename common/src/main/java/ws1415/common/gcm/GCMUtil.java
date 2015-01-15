@@ -1,4 +1,4 @@
-package ws1415.common.util;
+package ws1415.common.gcm;
 
 import android.app.Activity;
 import android.util.Log;

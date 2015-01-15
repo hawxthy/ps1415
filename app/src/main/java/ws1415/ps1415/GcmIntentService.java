@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import ws1415.common.gcm.MessageType;
 import ws1415.ps1415.activity.ShowEventsActivity;
 
 public class GcmIntentService extends IntentService {
@@ -36,25 +37,33 @@ public class GcmIntentService extends IntentService {
              * recognize.
              */
             if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                sendNotification("Send error: " + extras.toString());
+                // TODO
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-                sendNotification("Deleted messages on server: " + extras.toString());
+                // TODO
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                sendNotification("Received: " + extras.toString());
+                MessageType type;
+                try {
+                    type = MessageType.valueOf(extras.getString("type"));
+                } catch(IllegalArgumentException e) {
+                    type = null;
+                }
+                switch (type) {
+                    case NOTIFICATION_MESSAGE:
+                        sendNotification(extras);
+                        break;
+                }
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         GcmBroadcastReceiver.completeWakefulIntent(intent);
     }
 
-    public void makeToast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_LONG);
-    }
-
     // Put the message into a notification and post it.
     // This is just one simple example of what you might choose to do with
     // a GCM message.
-    private void sendNotification(String msg) {
+    private void sendNotification(Bundle extras) {
+        String title = extras.getString("title");
+        String msg = extras.getString("content");
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -63,7 +72,8 @@ public class GcmIntentService extends IntentService {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setContentTitle("GCM Notification")
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle(title)
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(msg))
                         .setContentText(msg);

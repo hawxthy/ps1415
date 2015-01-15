@@ -1,5 +1,6 @@
 package ws1415.ps1415.activity;
 
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -18,12 +19,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
 
 import java.io.IOException;
 import java.util.List;
 
-import ws1415.common.util.GCMUtil;
+import ws1415.common.gcm.GCMUtil;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
@@ -35,6 +37,7 @@ import ws1415.ps1415.task.QueryEventsTask;
 public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate<Void, List<Event>> {
     private static final String TAG = "Skatenight";
     public static final int SETTINGS_RESULT = 1;
+    public static final int REQUEST_ACCOUNT_PICKER = 2;
 
     private ListView eventListView;
     private List<Event> eventList;
@@ -48,6 +51,9 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
     private GoogleCloudMessaging gcm;
     private String regid;
     private Context context;
+
+    private SharedPreferences prefs;
+    private GoogleAccountCredential credential;
 
 
     /**
@@ -83,8 +89,27 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
             }
         });
 
-        new QueryEventsTask(this).execute();
+        // SharePreferences skatenight.app laden
+        prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+        credential = GoogleAccountCredential.usingAudience(this, "server:client_id:" + Constants.WEB_CLIENT_ID);
 
+        // accountName aus SharedPreferences laden
+        if (prefs.contains("accountName")) {
+            credential.setSelectedAccountName(prefs.getString("accountName", null));
+        }
+
+        // Kein accountName gesetzt, also AccountPicker aufrufen
+        if (credential.getSelectedAccountName() == null) {
+            startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+        } else {
+            ServiceProvider.login(credential);
+            initGCM();
+        }
+
+        new QueryEventsTask(this).execute();
+    }
+
+    private void initGCM() {
         // GCM initialisieren
         context = this;
         if (GCMUtil.checkPlayServices(this)) {
@@ -93,6 +118,8 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
 
             if (regid.isEmpty()) {
                 registerInBackground();
+            } else {
+                sendRegistrationIdToBackend();
             }
         } else {
             Log.i(TAG, "No valid Google Play Services APK found.");
@@ -149,6 +176,32 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
     public void taskFailed(ExtendedTask task, String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
         setProgressBarIndeterminateVisibility(false);
+    }
+
+    /**
+     * Callback-Methode für den Account-Picker.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_ACCOUNT_PICKER:
+                if (data != null && data.getExtras() != null) {
+                    String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
+                    if (accountName != null) {
+                        credential.setSelectedAccountName(accountName);
+
+                        // accountName in den SharedPreferences speichern
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("accountName", accountName);
+                        editor.commit();
+
+                        ServiceProvider.login(credential);
+                        initGCM();
+                    }
+                }
+                break;
+        }
     }
 
     // ---------- Methoden für GCM ----------
@@ -253,11 +306,17 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
      * Sendet die Registration-ID für GCM an das Backend.
      */
     private void sendRegistrationIdToBackend() {
-        try {
-            ServiceProvider.getService().skatenightServerEndpoint().registerForGCM(regid).execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().skatenightServerEndpoint().registerForGCM(regid).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        }.execute(null, null, null);
     }
 
     /**
