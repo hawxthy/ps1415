@@ -17,7 +17,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -36,11 +35,13 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     public static final float MAX_NEXT_WAYPOINT_DISTANCE = 10.0f;
     public static final float MAX_ANY_WAYPOINT_DISTANCE = 60.0f;
 
+    public static final String EXTRA_EVENT_ID = "location_transmitter_service_extra_event_id";
     public static final String EXTRA_WAYPOINTS = "location_transmitter_service_extra_waypoints";
     public static final String EXTRA_START_DATE = "location_transmitter_service_extra_start_date";
 
     public static final String NOTIFICATION_LOCATION = "location_transmitter_service_notification_location";
     public static final String NOTIFICATION_EXTRA_LOCATION = "location_transmitter_service_notification_location";
+    public static final String NOTIFICATION_EXTRA_EVENT_ID = "location_transmitter_service_notification_event_id";
     public static final String NOTIFICATION_EXTRA_CURRENT_WAYPOINT = "location_transmitter_service_notification_current_waypoint";
     public static final String NOTIFICATION_EXTRA_WAYPOINT_COUNT = "location_transmitter_service_notification_waypoint_count";
     public static final String NOTIFICATION_EXTRA_CURRENT_DISTANCE = "location_transmitter_service_notification_current_distance";
@@ -51,6 +52,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     private LocalBroadcastManager broadcastManager;
 
     private GoogleApiClient gac;
+    private long eventId;
     private List<LatLng> waypoints;
     private Date startDate;
     private int currentWaypoint; // TODO: currentWaypoint speichern!
@@ -88,6 +90,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
         gac.connect();
 
+        eventId = intent.getLongExtra(EXTRA_EVENT_ID, -1);
         waypoints = intent.getParcelableArrayListExtra(EXTRA_WAYPOINTS);
         startDate = new Date(intent.getLongExtra(EXTRA_START_DATE, 0));
         return super.onStartCommand(intent, flags, startId);
@@ -181,6 +184,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             Intent intent = new Intent(NOTIFICATION_LOCATION);
             if(location != null)
                 intent.putExtra(NOTIFICATION_EXTRA_LOCATION, location);
+            intent.putExtra(NOTIFICATION_EXTRA_EVENT_ID, eventId);
             intent.putExtra(NOTIFICATION_EXTRA_CURRENT_WAYPOINT, currentWaypoint);
             intent.putExtra(NOTIFICATION_EXTRA_WAYPOINT_COUNT, waypoints.size());
             intent.putExtra(NOTIFICATION_EXTRA_CURRENT_DISTANCE,currentDistance);

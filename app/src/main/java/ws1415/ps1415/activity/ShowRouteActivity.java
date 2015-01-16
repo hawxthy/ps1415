@@ -1,12 +1,16 @@
 package ws1415.ps1415.activity;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,6 +28,7 @@ import java.text.ParseException;
 import java.util.List;
 
 import ws1415.common.util.LocationUtils;
+import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryMemberTask;
 
@@ -34,10 +39,12 @@ public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE = "show_route_extra_route";
     public static final String EXTRA_ROUTE_FIELD_FIRST = "show_route_extra_route_field_first";
     public static final String EXTRA_ROUTE_FIELD_LAST = "show_route_extra_route_field_last";
+    public static final String EXTRA_EVENT_ID = "show_route_extra_event_id";
     private static final String MEMBER_ROUTE = "show_route_member_route";
     private static final String MEMBER_ROUTE_HIGHLIGHT = "show_route_member_route_highlight";
     private static final String MEMBER_ROUTE_FIELD_FIRST = "show_route_member_route_field_first";
     private static final String MEMBER_ROUTE_FIELD_LAST = "show_route_member_route_field_last";
+    private static final String MEMBER_EVENT_ID = "show_route_member_event_id";
 
     private GoogleMap googleMap;
     private PolylineOptions route;
@@ -207,4 +214,10 @@ public class ShowRouteActivity extends Activity {
         routeHighlightLine = googleMap.addPolyline(routeHighlight);
     }
 
+    private class LocationReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(getApplicationContext(), "Receive", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

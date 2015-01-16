@@ -44,6 +44,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     private Date startDate;
     private Timer clockTimer;
 
+    private long eventId;
     private String email;
     private List<LatLng> waypoints;
 
@@ -167,6 +168,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     public void taskDidFinish(ExtendedTask task, Event event) {
         setProgressBarIndeterminateVisibility(false);
         if (!isEventNull(event)) {
+            eventId = event.getKey().getId();
             startDate = EventUtils.getInstance(this).getFusedDate(event);
             try {
                 waypoints = LocationUtils.decodePolyline(event.getRoute().getRouteData().getValue());
@@ -176,6 +178,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             }
 
             Intent serviceIntent = new Intent(getBaseContext(), LocationTransmitterService.class);
+            serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, eventId);
             serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
             serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
             startService(serviceIntent);
