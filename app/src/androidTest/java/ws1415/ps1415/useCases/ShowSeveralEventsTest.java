@@ -1,6 +1,11 @@
 package ws1415.ps1415.useCases;
 
+import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.UiThreadTest;
+import android.test.ViewAsserts;
+import android.test.suitebuilder.annotation.LargeTest;
+import android.test.suitebuilder.annotation.SmallTest;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -19,7 +24,9 @@ import java.util.List;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.activity.Settings;
 import ws1415.ps1415.activity.ShowEventsActivity;
+import ws1415.ps1415.activity.ShowInformationActivity;
 import ws1415.ps1415.task.CreateEventTask;
 import ws1415.ps1415.util.FieldType;
 
@@ -32,15 +39,12 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
 
     private ShowEventsActivity mActivity;
 
-    private Event testEvent;
-    private Route testRoute;
-
-    private final String TEST_TITLE = "testTitle";
-    private final String TEST_FEE = "5";
-    private final String TEST_DATE = "27.2.2015";
+    private final String TEST_TITLE = "TestTitle";
+    private final String TEST_FEE = "100";
+    private final String TEST_DATE = "1.12.2015";
     private final String TEST_TIME = "20:00 Uhr";
-    private final String TEST_LOCATION = "testOrt";
-    private final String TEST_DESCRIPTION = "testBeschreibung";
+    private final String TEST_LOCATION = "Münster";
+    private final String TEST_DESCRIPTION = "TestDescription";
 
     // ShowEventsActivity UI Elemente
     private ListView mList;
@@ -49,6 +53,7 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
     public ShowSeveralEventsTest() {
         super(ShowEventsActivity.class);
 
+        /*
         testEvent = new Event();
 
         ArrayList<Field> eventData = new ArrayList<Field>();
@@ -56,43 +61,43 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
 
         fieldData.setTitle("Titel");
         fieldData.setValue(TEST_TITLE);
-        fieldData.setType(8);
-        fieldData.setData(new Text());
-        eventData.add(fieldData);
-
-        fieldData.setTitle("Datum");
-        fieldData.setValue(TEST_DATE);
-        fieldData.setType(3);
-        fieldData.setData(new Text());
-        eventData.add(fieldData);
-
-        fieldData.setTitle("Zeit");
-        fieldData.setValue(TEST_TIME);
-        fieldData.setType(4);
+        fieldData.setType(FieldType.TITLE.getId());
         fieldData.setData(new Text());
         eventData.add(fieldData);
 
         fieldData.setTitle("Ort");
         fieldData.setValue(TEST_LOCATION);
-        fieldData.setType(9);
+        fieldData.setType(FieldType.LOCATION.getId());
         fieldData.setData(new Text());
         eventData.add(fieldData);
 
-        fieldData.setTitle("Beschreibung");
-        fieldData.setValue(TEST_DESCRIPTION);
-        fieldData.setType(10);
+        fieldData.setTitle("Datum");
+        fieldData.setValue(TEST_DATE);
+        fieldData.setType(FieldType.DATE.getId());
+        fieldData.setData(new Text());
+        eventData.add(fieldData);
+
+        fieldData.setTitle("Zeit");
+        fieldData.setValue(TEST_TIME);
+        fieldData.setType(FieldType.TIME.getId());
         fieldData.setData(new Text());
         eventData.add(fieldData);
 
         fieldData.setTitle("Gebühr");
         fieldData.setValue(TEST_FEE);
-        fieldData.setType(2);
+        fieldData.setType(FieldType.FEE.getId());
+        fieldData.setData(new Text());
+        eventData.add(fieldData);
+
+        fieldData.setTitle("Beschreibung");
+        fieldData.setValue(TEST_DESCRIPTION);
+        fieldData.setType(FieldType.DESCRIPTION.getId());
         fieldData.setData(new Text());
         eventData.add(fieldData);
 
         fieldData.setTitle("Route");
         fieldData.setValue("Testroute");
-        fieldData.setType(5);
+        fieldData.setType(FieldType.ROUTE.getId());
         fieldData.setData(new Text());
         eventData.add(fieldData);
 
@@ -114,6 +119,7 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
 
         testEvent.setDynamicFields(eventData);
         testEvent.setRoute(testRoute);
+        */
 
     }
 
@@ -137,15 +143,18 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
             }
         }*/
 
+        /*
         Thread.sleep(1000);
         // Neues Test Event anlegen
         //ServiceProvider.getService().skatenightServerEndpoint().createEvent(testEvent).execute();
         new CreateEventTask().execute(testEvent);
         Thread.sleep(1000);
+        */
 
         // Die ShowEventsActivity starten
         mActivity = getActivity();
 
+        Thread.sleep(5000);
         // Holt sich die Event Listen-Elemente
         mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
         mListData = mList.getAdapter();
@@ -163,8 +172,52 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
         assertTrue("at least one event exists", mListData.getCount() > 0);
     }
 
+    protected void tearDown() throws Exception {super.tearDown();}
+
+    /**
+     * Prüft, ob die Elemente sich in der Activity überschneiden bzw. wirklich gerendert werden.
+     *
+     * @throws java.lang.Exception
+     */
+    @SmallTest
+    public void testViewsVisible() throws Exception {
+        // Falls es mehr als zwei Elemente in der Liste gibt, prüfe, ob die ersten beiden sich überschneiden oder nicht
+        if (mListData != null && mListData.getCount()>1) {
+            ViewAsserts.assertOnScreen(mListData.getView(0, null, mList).getRootView(), mListData.getView(1, null, mList).getRootView());
+            ViewAsserts.assertOnScreen(mListData.getView(1, null, mList).getRootView(), mListData.getView(0, null, mList).getRootView());
+        }
+    }
+
+    /**
+     * Prüft, ob ein Event ausgewählt werden kann und zudem die entsprechenden Informationen
+     * detailiert angezeigt wird.
+     *
+     * @throws Exception
+     *
+     */
+    @UiThreadTest
+    public void testUseCaseUI() throws Exception {
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(ShowInformationActivity.class.getName(), null, false);
+
+        // Es wird ein neuer UI Thread gestartet & das erste Event ausgewählt und anschließend die ShowInformationActivity gestartet.
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int firstEvent = 0;
+                mList.performItemClick(mList.getAdapter().getView(firstEvent, null, mList), firstEvent, mList.getAdapter().getItemId(firstEvent));
+            }
+        });
+
+        // ShowInformationActivity starten
+        ShowInformationActivity showInformationActivity = (ShowInformationActivity) getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 5000);
+        assertNotNull("ShowInformationActivity didn't start!", showInformationActivity);
+
+        // Die Views aus der ShowInformationActivity holen
+        Thread.sleep(5000);
 
 
+
+    }
 
 }
 
