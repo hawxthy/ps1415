@@ -39,7 +39,6 @@ public class SkatenightServerEndpoint {
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
     private long lastFieldUpdateTime = 0;
-    protected static final Logger logger = Logger.getLogger(SkatenightServerEndpoint.class.getName());
 
     /**
      * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
