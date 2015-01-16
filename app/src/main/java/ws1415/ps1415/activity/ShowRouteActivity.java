@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,11 +23,9 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.skatenight.skatenightAPI.model.Member;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.common.util.LocationUtils;
-import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryMemberTask;
 
