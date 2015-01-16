@@ -8,27 +8,21 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.widget.ListView;
-
-import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.ps1415.Constants;
-import ws1415.ps1415.adapter.ShowCursorAdapter;
 import ws1415.ps1415.R;
+import ws1415.ps1415.adapter.ShowCursorAdapter;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.task.ToggleMemberEventAttendanceTask;
 import ws1415.ps1415.util.EventUtils;
@@ -76,17 +70,6 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
 
         // SharePreferences skatenight.app laden
         prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
-        credential = GoogleAccountCredential.usingAudience(this, "server:client_id:" + Constants.WEB_CLIENT_ID);
-
-        // accountName aus SharedPreferences laden
-        if (prefs.contains("accountName")) {
-            credential.setSelectedAccountName(prefs.getString("accountName", null));
-        }
-
-        // Kein accountName gesetzt, also AccountPicker aufrufen
-        if (credential.getSelectedAccountName() == null) {
-            startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-        }
 
         Intent intent;
         if (savedInstanceState != null) {
@@ -104,7 +87,21 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         attendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new ToggleMemberEventAttendanceTask(ShowInformationActivity.this, keyId, credential.getSelectedAccountName(), attending).execute();
+                // SharePreferences skatenight.app laden
+                credential = GoogleAccountCredential.usingAudience(ShowInformationActivity.this, "server:client_id:" + Constants.WEB_CLIENT_ID);
+
+                // accountName aus SharedPreferences laden
+                if (prefs.contains("accountName")) {
+                    credential.setSelectedAccountName(prefs.getString("accountName", null));
+                }
+
+                // Kein accountName gesetzt, also AccountPicker aufrufen
+                if (credential.getSelectedAccountName() == null) {
+                    startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+                }
+                else {
+                    new ToggleMemberEventAttendanceTask(ShowInformationActivity.this, keyId, credential.getSelectedAccountName(), attending).execute();
+                }
             }
         });
     }
@@ -130,6 +127,8 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putString("accountName", accountName);
                         editor.commit();
+
+                        new ToggleMemberEventAttendanceTask(this, keyId, credential.getSelectedAccountName(), attending).execute();
                     }
                 }
                 break;

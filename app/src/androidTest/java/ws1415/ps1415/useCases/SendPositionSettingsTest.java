@@ -1,6 +1,7 @@
 package ws1415.ps1415.useCases;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.FragmentManager;
 import android.app.Instrumentation;
 import android.content.Context;
@@ -24,6 +25,7 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.model.people.Person;
@@ -51,7 +53,7 @@ import ws1415.ps1415.task.UpdateLocationTask;
 import ws1415.ps1415.util.EventUtils;
 
 /**
- * Testet den Use Case "Übertragung der aktuellen Position an den Server".
+ * Testet den Use Case "Handhabung der aktuellen Position".
  *
  * @author Tristan Rust
  */
@@ -60,8 +62,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
     private ShowEventsActivity mActivity;
 
     private final String TEST_EMAIL        = "tristan.rust@googlemail.com";
-    private final LatLng TEST_POSITION     = new LatLng(51.9659371, 7.6032621);
-    private final LatLng TEST_NEW_POSITION = new LatLng(51.9659847, 7.6033358);
+    private final LatLng TEST_POSITION     = new LatLng(35.660866, 108.808594); // Somewhere in China
 
     // ShowEventsActivty UI Elemente
     private ListView mList;
@@ -230,33 +231,64 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
      */
     @LargeTest
     public void testSendPosition() throws Exception {
-        // Aktiviert die Funktion zum Senden
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(Settings.class.getName(), null, false);
+
+        // Klick auf die Menüoption
+        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
+        getInstrumentation().invokeMenuActionSync(mActivity, R.id.action_settings, 0);
+
+        // UI Elemente lassen sich hier nicht ansprechen
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
         sharedPreferences.edit().putBoolean("prefSendLocation", true).apply();
 
-        assertEquals(true, sharedPreferences.getBoolean("prefSendLocation", false));
-
-        // Testen, ob die Position an den Server gesendet wird bei aktiver Einstellung
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(ShowRouteActivity.class.getName(), null, false);
-
-        Thread.sleep(2000);
-        ShowRouteActivity am = (ShowRouteActivity) getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 10000);
-        assertNotNull("ShowRouteActivity didn't start!", am);
+        Activity am = getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 2000);
+        Thread.sleep(2500);
 
         // Setzen der Position auf den Server
         new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude).execute();
+        Thread.sleep(2000);
 
         Member m = ServiceProvider.getService().skatenightServerEndpoint().getMember(TEST_EMAIL).execute();
         assertEquals(TEST_POSITION.latitude, m.getLatitude());
         assertEquals(TEST_POSITION.longitude, m.getLongitude());
 
+        boolean active = sharedPreferences.getBoolean("prefSendLocation", true);
+        assertTrue(active);
+
         // Starten des Hintergrundservices zur Standortermittlung
+        Intent service;
+        service = new Intent(mActivity.getBaseContext(), LocationTransmitterService.class);
+        service.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mActivity.startService(service);
+        Thread.sleep(5000);
+
+        // Prüfen, ob die neuen Positionen auf dem Server übernommen worden sind
+        assertNotSame("Position not updated!", TEST_POSITION.latitude, m.getLatitude());
+        assertNotSame("Position not updated!", TEST_POSITION.longitude, m.getLongitude());
+
+        // Service wieder deaktivieren
+        sharedPreferences.edit().putBoolean("prefSendLocation", false).apply();
+        active = sharedPreferences.getBoolean("prefSendLocation", true);
+        assertFalse(active);
+
+        mActivity.stopService(service);
+
+        boolean running = false;
+
+        // Prüfen, ob der Service noch läuft
+        ActivityManager manager = (ActivityManager) mActivity.getSystemService(mActivity.getApplication().ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo services : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if ("LocationTransmitterService".equals(services.service.getClassName())) {
+                running = true;
+            }
+        }
+
+        assertFalse("Service should be stopped!", running);
 
         am.finish();
 
-
-
     }
+
 
 }
 

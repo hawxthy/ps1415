@@ -233,6 +233,8 @@ public class ShowCursorAdapter extends BaseAdapter {
                     context.startActivity(i);
                 }
             });
+        } else if(getItem(position).getType() == FieldType.DATE.getId()){
+            view = new View(context);
         }
         return view;
     }
