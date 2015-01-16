@@ -1,17 +1,10 @@
 package ws1415.veranstalterapp.fragment;
 
 import android.app.AlertDialog;
-import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +15,7 @@ import android.widget.Toast;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
-import com.skatenight.skatenightAPI.model.Text;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 import ws1415.veranstalterapp.R;
@@ -39,7 +30,7 @@ import ws1415.veranstalterapp.util.FieldType;
  *
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
-public class AnnounceInformationFragment extends Fragment {
+public class AnnounceInformationFragment extends Fragment implements AnnounceCursorAdapter.PictureChooserActivity {
     //Adapter für die ListView listView
     private AnnounceCursorAdapter listAdapter;
 
@@ -158,7 +149,7 @@ public class AnnounceInformationFragment extends Fragment {
                     // Setze die Attribute von Event auf den Standard
                     event = new Event();
                     EventUtils.getInstance(getActivity()).setStandardFields(event);
-                    listAdapter = new AnnounceCursorAdapter(getActivity(), event.getDynamicFields(), event);
+                    listAdapter = new AnnounceCursorAdapter(AnnounceInformationFragment.this, event.getDynamicFields(), event);
                     listView.setAdapter(listAdapter);
                     listAdapter.notifyDataSetChanged();
 
@@ -206,51 +197,13 @@ public class AnnounceInformationFragment extends Fragment {
         //routePickerButton.setText(selectedRoute.getName());
     }
 
-    /**
-     * Zeigt einen Picker-Dialog an, mit dem ein Bild vom Handy gewählt werden kann.
-     * @param f Das Field-Objekt, das das Bild als byte-Array halten soll.
-     */
-    public void showPictureChooser(Field f) {
-        pictureField = f;
-        Intent intent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        startActivityForResult(Intent.createChooser(intent, getString(R.string.choose_image)), 0);
-    }
-
-    /**
-     * Zwischenspeicher für die ImageView und das Field, die das im Picture-Picker gewählte Bild anzeigen sollen.
-     */
-    private Field pictureField;
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data != null && pictureField != null) {
-            // Pfad ermitteln
-            Uri selectedImageUri = data.getData();
-            String[] projection = {MediaStore.MediaColumns.DATA};
-            CursorLoader cl = new CursorLoader(this.getActivity());
-            cl.setUri(selectedImageUri);
-            cl.setProjection(projection);
-            Cursor cursor = cl.loadInBackground();
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            cursor.moveToFirst();
-            String tempPath = cursor.getString(column_index);
-            Bitmap bm;
-            BitmapFactory.Options btmapOptions = new BitmapFactory.Options();
-            bm = BitmapFactory.decodeFile(tempPath, btmapOptions);
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
-            pictureField.setData(new Text().setValue(Base64.encodeToString(byteArray, Base64.DEFAULT)));
-
-            // Speicher des Bildes zum Freigeben vorbereiten
-            bm.recycle();
-
-            // Bild in die ListView übernehmen
-            listAdapter.notifyDataSetChanged();
-        }
+        // Verarbietet das ausgewählte Bild
+        // Hier wird der RequestCOde dazu verwendet die Positions des zu ändernden dynamischen Feldes
+        // zu übergeben.
+        listAdapter.processImage(requestCode, data);
     }
     
 }
