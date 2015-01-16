@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -127,6 +128,8 @@ public class ShowCursorAdapter extends BaseAdapter{
            getItem(position).getType() == FieldType.SIMPLETEXT.getId()){
             HolderTextField holder = new HolderTextField();
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
+            view.setEnabled(false);
+            view.setOnClickListener(null);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
             holder.title.setText(fieldList.get(position).getTitle());
@@ -135,6 +138,8 @@ public class ShowCursorAdapter extends BaseAdapter{
         }else if(getItem(position).getType() == FieldType.PICTURE.getId()){
             HolderImageField holder = new HolderImageField();
             view = inflater.inflate(R.layout.list_view_item_show_information_image_field, viewGroup, false);
+            view.setEnabled(false);
+            view.setOnClickListener(null);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_image_field_textView_title);
             holder.image = (ImageView) view.findViewById(R.id.list_view_item_show_information_image_field_imageView);
             holder.title.setText(fieldList.get(position).getTitle());
@@ -175,6 +180,8 @@ public class ShowCursorAdapter extends BaseAdapter{
         }else if(getItem(position).getType() == FieldType.FEE.getId()){
             HolderTextField holder = new HolderTextField();
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
+            view.setEnabled(false);
+            view.setOnClickListener(null);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
             holder.title.setText(fieldList.get(position).getTitle());
@@ -183,6 +190,8 @@ public class ShowCursorAdapter extends BaseAdapter{
         }else if(getItem(position).getType() == FieldType.TIME.getId()){
             HolderTextField holder = new HolderTextField();
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
+            view.setEnabled(false);
+            view.setOnClickListener(null);;
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
             holder.title.setText(fieldList.get(position).getTitle());
@@ -196,6 +205,8 @@ public class ShowCursorAdapter extends BaseAdapter{
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
             holder.content.setText((String)fieldList.get(position).getValue());
+            holder.content.setTextColor(Color.BLUE);
+            holder.title.setText((String)fieldList.get(position).getTitle());
             final String link = holder.content.getText().toString();
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -206,6 +217,8 @@ public class ShowCursorAdapter extends BaseAdapter{
                     context.startActivity(i);
                 }
             });
+        }else if(getItem(position).getType() == FieldType.DATE.getId()){
+            view = new View(context);
         }
         return view;
     }

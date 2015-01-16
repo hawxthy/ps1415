@@ -123,6 +123,10 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
             Intent intent = new Intent(this, AddRouteDialog.class);
             startActivity(intent);
             return true;
+        }else if(id == R.id.action_permission){
+            Intent intent = new Intent(this, PermissionManagementActivity.class);
+            startActivity(intent);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

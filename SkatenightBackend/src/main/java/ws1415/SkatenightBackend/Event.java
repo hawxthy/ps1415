@@ -94,4 +94,53 @@ public class Event {
         if (this.memberList == null) return new ArrayList();
         else return this.memberList;
     }
+
+    // ---------- Hilfsmethoden für den Umgang mit den dynamischen Eigenschaften ---------
+
+    /**
+     * Methode zum finden von Id's von eindeutigen Feldern.
+     *
+     * @param type der Typ des eindeutigen Feldes
+     * @return Die Id, -1 falls keins gefunden wurde
+     */
+    public int getUniqueFieldId(FieldType type){
+        for(int i = 0; i < this.getDynamicFields().size(); i++){
+            if(this.getDynamicFields().get(i).getType() == type.getId()){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Verbindet die beiden Datumsangaben des Events zu einem.
+     * @return Das zusammengefügte Date.
+     */
+    public Date getFusedDate() {
+        Date time = new Date(Long.parseLong(getUniqueField(FieldType.TIME.getId()).getValue()));
+        Date date = new Date(Long.parseLong(getUniqueField(FieldType.DATE.getId()).getValue()));
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(date);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(time);
+        cal1.set(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
+        cal1.set(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
+        return cal1.getTime();
+    }
+
+    /**
+     * Methode zum finden von eindeutigen Feldern
+     *
+     * @param type der Typ des eindeutigen Feldes
+     * @return Das Feld, null falls keins gefunden wurde
+     */
+    public Field getUniqueField(int type) {
+        for (int i = 0; i < this.getDynamicFields().size(); i++) {
+            if (this.getDynamicFields().get(i).getType() == type) {
+                return this.getDynamicFields().get(i);
+            }
+        }
+        return null;
+    }
+
 }

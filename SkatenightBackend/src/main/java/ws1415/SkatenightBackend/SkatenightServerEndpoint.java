@@ -4,7 +4,6 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -12,13 +11,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
+
+import ws1415.SkatenightBackend.gcm.RegistrationManager;
+import ws1415.SkatenightBackend.gcm.Message;
+import ws1415.SkatenightBackend.gcm.MessageType;
+import ws1415.SkatenightBackend.gcm.Sender;
 
 
 /**
@@ -37,45 +40,59 @@ public class SkatenightServerEndpoint {
             "transactions-optional");
     private long lastFieldUpdateTime = 0;
 
-//    /**
-//     * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
-//     * @param mail Die hinzuzufügende Mail-Adresse
-//     */
-//    public void addHost(@Named("mail") String mail) {
-//        PersistenceManager pm = pmf.getPersistenceManager();
-//        try {
-//            Query q = pm.newQuery(Host.class);
-//            q.setFilter("email == emailParam");
-//            q.declareParameters("String emailParam");
-//            List<Host> results = (List<Host>) q.execute(mail);
-//            if (results.isEmpty()) {
-//                Host h = new Host();
-//                h.setEmail(mail);
-//                pm.makePersistent(h);
-//            }
-//        } finally {
-//            pm.close();
-//        }
-//    }
-//
-//    /**
-//     * Entfernt die angegebene Mail-Adresse aus den Veranstaltern.
-//     * @param mail Die zu entfernende Mail-Adresse
-//     */
-//    public void removeHost(@Named("mail") String mail) {
-//        PersistenceManager pm = pmf.getPersistenceManager();
-//        try {
-//            Query q = pm.newQuery(Host.class);
-//            q.setFilter("email == emailParam");
-//            q.declareParameters("String emailParam");
-//            List<Host> results = (List<Host>) q.execute(mail);
-//            if (!results.isEmpty()) {
-//                pm.deletePersistentAll(results);
-//            }
-//        } finally {
-//            pm.close();
-//        }
-//    }
+    /**
+     * Fügt die angegebene Mail-Adresse als Veranstalter hinzu.
+     * @param mail Die hinzuzufügende Mail-Adresse
+     */
+    public void addHost(User user, @Named("mail") String mail) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (!isHost(user.getEmail()).value) {
+            throw new OAuthRequestException("user is not a host");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            Query q = pm.newQuery(Host.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Host> results = (List<Host>) q.execute(mail);
+            if (results.isEmpty()) {
+                Host h = new Host();
+                h.setEmail(mail);
+                pm.makePersistent(h);
+            }
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Entfernt die angegebene Mail-Adresse aus den Veranstaltern.
+     * @param mail Die zu entfernende Mail-Adresse
+     */
+    public void removeHost(User user, @Named("mail") String mail) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (!isHost(user.getEmail()).value) {
+            throw new OAuthRequestException("user is not a host");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            Query q = pm.newQuery(Host.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Host> results = (List<Host>) q.execute(mail);
+            if (!results.isEmpty()) {
+                pm.deletePersistentAll(results);
+            }
+        } finally {
+            pm.close();
+        }
+    }
 
     /**
      * Prüft, ob die angegebene Mail-Adresse zu einem authorisierten Veranstalter-Account gehört.
@@ -94,6 +111,34 @@ public class SkatenightServerEndpoint {
         } finally {
             pm.close();
         }
+    }
+
+    /**
+     * Gibt die Liste aller registrierten Veranstalter zurück.
+     * @param user Der Benutzer, der die Liste anfordert. Er muss bereits als Veranstalter eingetra-
+     *             gen sein.
+     * @return Eine Liste aller Veranstalter.
+     * @throws OAuthRequestException
+     */
+    public List<Host> getHosts(User user) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (!isHost(user.getEmail()).value) {
+            throw new OAuthRequestException("user is not a host");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        List<Host> result;
+        try {
+            result = (List<Host>) pm.newQuery(Host.class).execute();
+        } finally {
+            pm.close();
+        }
+        if (result == null) {
+            result = new ArrayList<Host>();
+        }
+        return result;
     }
 
     /**
@@ -123,6 +168,29 @@ public class SkatenightServerEndpoint {
                 // Weil sonst Nullpointer beim Editieren kommmt
                 e.setKey(null);
                 pm.makePersistent(e);
+
+                // Benachrichtigung an User schicken
+                long secondsTillStart = (e.getFusedDate().getTime() - System.currentTimeMillis()) / 1000;
+
+                // Benachrichtigung nur schicken, wenn Event in der Zukunft liegt
+                if (secondsTillStart > 0) {
+                    Sender sender = new Sender(Constants.GCM_API_KEY);
+                    Message m = new Message.Builder()
+                            // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
+                            .delayWhileIdle(true)
+                            .collapseKey("event_created")
+                            // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
+                            .timeToLive((int) secondsTillStart)
+                            .addData("type", MessageType.NOTIFICATION_MESSAGE.name())
+                            .addData("title", "Ein neues Event wurde erstellt")
+                            .addData("content", e.getUniqueField(FieldType.TITLE.getId()).getValue())
+                            .build();
+                    try {
+                        sender.send(m, getRegistrationManager(pm).getRegisteredUser(), 5);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
             }
         } finally {
             pm.close();
@@ -153,6 +221,22 @@ public class SkatenightServerEndpoint {
         }
     }
 
+    public void createMember(@Named("mail") String mail) {
+        Member m = getMember(mail);
+        if (m == null) {
+            m = new Member();
+            m.setEmail(mail);
+            m.setName(mail);
+
+            PersistenceManager pm = pmf.getPersistenceManager();
+            try {
+                pm.makePersistent(m);
+            } finally {
+                pm.close();
+            }
+        }
+    }
+
     /**
      * Aktualisiert die für die angegebene Mail-Adresse gespeicherte Position auf dem Server. Falls
      * kein Member-Objekt für die Mail-Adresse existiert, so wird ein neues Objekt angelegt.
@@ -165,16 +249,6 @@ public class SkatenightServerEndpoint {
                                      @Named("longitude") double longitude) {
         if (mail != null) {
             Member m = getMember(mail);
-            if (m == null) {
-                // Neuen Member anlegen
-                m = new Member();
-                m.setEmail(mail);
-                /**
-                 * Als Name wird zurzeit die Mail-Adresse verwendet, da noch keine Eingabe-
-                 * möglichkeit für den Namen besteht. (sollte im nächsten Sprint übernommen werden)
-                 */
-                m.setName(mail);
-            }
             m.setLatitude(latitude);
             m.setLongitude(longitude);
             m.setUpdatedAt(new Date());
@@ -661,16 +735,41 @@ public class SkatenightServerEndpoint {
         }
     }
 
+    /**
+     * Wird von den Benutzer-Apps aufgerufen,
+     * @param user
+     * @param regid
+     */
+    public void registerForGCM(User user, @Named("regid") String regid) throws OAuthRequestException {
+        if (user != null) {
+            RegistrationManager registrationManager;
+
+            // Den GCM-Manager abrufen, falls er existiert, sonst einen neuen Manager anlegen.
+            PersistenceManager pm = pmf.getPersistenceManager();
+            try {
+                registrationManager = getRegistrationManager(pm);
+                registrationManager.addRegistrationId(user.getEmail(), regid);
+                pm.makePersistent(registrationManager);
+            } finally {
+                pm.close();
+            }
+        }
+    }
+
+    /**
+     * Ruft über den angegebenen PersistenceManager den RegistrationManager aus der Datenbank ab.
+     * @param pm Der zu verwendende PersistenceManager.
+     * @return Gibt den RegistrationManager zurück, der in der Datenbank gespeichert ist.
+     */
+    private RegistrationManager getRegistrationManager(PersistenceManager pm) {
+        RegistrationManager registrationManager;
+        Query q = pm.newQuery(RegistrationManager.class);
+        List<RegistrationManager> result = (List<RegistrationManager>) q.execute();
+        if (!result.isEmpty()) {
+            registrationManager = result.get(0);
+        } else {
+            registrationManager = new RegistrationManager();
+        }
+        return registrationManager;
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-

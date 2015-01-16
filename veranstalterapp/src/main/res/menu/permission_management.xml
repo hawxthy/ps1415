@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ws1415.veranstalterapp.activity.PermissionManagementActivity" >
+    <item
+        android:id="@+id/action_add_host"
+        android:title="@string/action_add_host"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_new" />
+</menu>
