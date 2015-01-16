@@ -40,4 +40,9 @@ public class Constants {
      * des Feldes zu werten.
      */
     public static final int MIN_WAYPOINT_MEMBER_COUNT = 1;
+
+    /**
+     * Der Public API-Key, der in der Developer Console für GCM angelegt wurde.
+     */
+    public static final String GCM_API_KEY = "AIzaSyCpwhxda1Lb5E61_fybZq2iSJgViZu3QNM";
 }

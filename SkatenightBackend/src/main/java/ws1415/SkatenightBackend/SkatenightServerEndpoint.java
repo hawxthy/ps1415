@@ -18,6 +18,11 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
+import ws1415.SkatenightBackend.gcm.RegistrationManager;
+import ws1415.SkatenightBackend.gcm.Message;
+import ws1415.SkatenightBackend.gcm.MessageType;
+import ws1415.SkatenightBackend.gcm.Sender;
+
 
 /**
  * Die ServerAPI, die Api-Methoden zur Verfügung stellt.
@@ -163,6 +168,29 @@ public class SkatenightServerEndpoint {
                 // Weil sonst Nullpointer beim Editieren kommmt
                 e.setKey(null);
                 pm.makePersistent(e);
+
+                // Benachrichtigung an User schicken
+                long secondsTillStart = (e.getFusedDate().getTime() - System.currentTimeMillis()) / 1000;
+
+                // Benachrichtigung nur schicken, wenn Event in der Zukunft liegt
+                if (secondsTillStart > 0) {
+                    Sender sender = new Sender(Constants.GCM_API_KEY);
+                    Message m = new Message.Builder()
+                            // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
+                            .delayWhileIdle(true)
+                            .collapseKey("event_created")
+                            // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
+                            .timeToLive((int) secondsTillStart)
+                            .addData("type", MessageType.NOTIFICATION_MESSAGE.name())
+                            .addData("title", "Ein neues Event wurde erstellt")
+                            .addData("content", e.getUniqueField(FieldType.TITLE.getId()).getValue())
+                            .build();
+                    try {
+                        sender.send(m, getRegistrationManager(pm).getRegisteredUser(), 5);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
             }
         } finally {
             pm.close();
@@ -707,16 +735,41 @@ public class SkatenightServerEndpoint {
         }
     }
 
+    /**
+     * Wird von den Benutzer-Apps aufgerufen,
+     * @param user
+     * @param regid
+     */
+    public void registerForGCM(User user, @Named("regid") String regid) throws OAuthRequestException {
+        if (user != null) {
+            RegistrationManager registrationManager;
+
+            // Den GCM-Manager abrufen, falls er existiert, sonst einen neuen Manager anlegen.
+            PersistenceManager pm = pmf.getPersistenceManager();
+            try {
+                registrationManager = getRegistrationManager(pm);
+                registrationManager.addRegistrationId(user.getEmail(), regid);
+                pm.makePersistent(registrationManager);
+            } finally {
+                pm.close();
+            }
+        }
+    }
+
+    /**
+     * Ruft über den angegebenen PersistenceManager den RegistrationManager aus der Datenbank ab.
+     * @param pm Der zu verwendende PersistenceManager.
+     * @return Gibt den RegistrationManager zurück, der in der Datenbank gespeichert ist.
+     */
+    private RegistrationManager getRegistrationManager(PersistenceManager pm) {
+        RegistrationManager registrationManager;
+        Query q = pm.newQuery(RegistrationManager.class);
+        List<RegistrationManager> result = (List<RegistrationManager>) q.execute();
+        if (!result.isEmpty()) {
+            registrationManager = result.get(0);
+        } else {
+            registrationManager = new RegistrationManager();
+        }
+        return registrationManager;
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-

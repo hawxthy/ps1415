@@ -28,6 +28,7 @@ public class ToggleMemberEventAttendanceTask extends ExtendedTask<Void, Void, Bo
             return null;
         }
         try {
+            ServiceProvider.getService().skatenightServerEndpoint().createMember(email).execute();
             if (!attending) {
                 ServiceProvider.getService().skatenightServerEndpoint().addMemberToEvent(keyId, email).execute();
                 return !attending;
