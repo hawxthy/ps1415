@@ -1,6 +1,8 @@
 package ws1415.veranstalterapp.fragment;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -44,6 +46,8 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
 
     // das neu erstellte Event
     private Event event;
+
+    private AlertDialog lastDialog;
 
     /**
      * Erstellt die View, initialisiert die Attribute, setzt die Listener für die Buttons.
@@ -163,10 +167,11 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                cancelInfo(true);
             }
         });
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        lastDialog = builder.create();
+        lastDialog.show();
     }
 
     /**
@@ -204,6 +209,18 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
         // Hier wird der RequestCOde dazu verwendet die Positions des zu ändernden dynamischen Feldes
         // zu übergeben.
         listAdapter.processImage(requestCode, data);
+    }
+
+    public AlertDialog getLastDialog(){
+        return lastDialog;
+    }
+
+    public ListView getListView(){
+        return listView;
+    }
+
+    public Event getCurrentEvent(){
+        return event;
     }
     
 }
