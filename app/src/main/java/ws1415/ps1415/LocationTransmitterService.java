@@ -158,7 +158,10 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             foundFirstWaypoint = true;
 
             // CurrentWaypoint in die passedWaypoint Liste eintragen
-            this.passedWaypoints.add(currentWaypoint);
+            if (!this.passedWaypoints.contains(currentWaypoint)) {
+                this.passedWaypoints.add(currentWaypoint);
+            }
+
 
             Log.d(LOG_TAG, "current: " + currentWaypoint);
 
