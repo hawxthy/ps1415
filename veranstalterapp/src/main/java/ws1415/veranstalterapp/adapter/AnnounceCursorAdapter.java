@@ -6,10 +6,14 @@ import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -35,6 +39,7 @@ import ws1415.veranstalterapp.activity.ChooseRouteActivity;
 import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.util.EventUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Calendar;
@@ -53,7 +58,7 @@ import ws1415.veranstalterapp.util.ImageUtil;
  */
 public class AnnounceCursorAdapter extends BaseAdapter {
     private List<Field> fieldList = new ArrayList<Field>();
-    private AnnounceInformationFragment parent;
+    private PictureChooserActivity parent;
     private Context context;
     private LayoutInflater inflater;
     private Event event;
@@ -94,6 +99,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
         this.context = parent;
         this.fieldList = fieldList;
         this.event = event;
+        this.parent = parent;
         setDate(EventUtils.getInstance(context).getFusedDate(event));
         setRoute(event.getRoute());
     }
@@ -288,7 +294,10 @@ public class AnnounceCursorAdapter extends BaseAdapter {
                 holder.button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        parent.showPictureChooser(getItem(finalPosition));
+                        Intent intent = new Intent(Intent.ACTION_PICK,
+                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        intent.setType("image/*");
+                        parent.startActivityForResult(Intent.createChooser(intent, context.getString(R.string.choose_image)), finalPosition);
                         bitmapCache.remove(field);
                     }
                 });
@@ -575,5 +584,44 @@ public class AnnounceCursorAdapter extends BaseAdapter {
         this.route = route;
     }
 
+    /**
+     * Verarbeitet ein Bild, das über den PictureChooser ausgewählt wurde.
+     * @param fieldPosition Die Position des dynamischen Feldes, dessen Bild geändert werden soll.
+     * @param data Die Daten, die vom Chooser zurückgegeben wurden
+     */
+    public void processImage(int fieldPosition, Intent data) {
+        Field pictureField = getItem(fieldPosition);
+        if (data != null && pictureField != null) {
+            // Pfad ermitteln
+            Uri selectedImageUri = data.getData();
+            String[] projection = {MediaStore.MediaColumns.DATA};
+            CursorLoader cl = new CursorLoader(context);
+            cl.setUri(selectedImageUri);
+            cl.setProjection(projection);
+            Cursor cursor = cl.loadInBackground();
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            cursor.moveToFirst();
+            String tempPath = cursor.getString(column_index);
+            Bitmap bm;
+            BitmapFactory.Options btmapOptions = new BitmapFactory.Options();
+            bm = BitmapFactory.decodeFile(tempPath, btmapOptions);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            pictureField.setData(new Text().setValue(android.util.Base64.encodeToString(byteArray, android.util.Base64.DEFAULT)));
 
+            // Speicher des Bildes zum Freigeben vorbereiten
+            bm.recycle();
+
+            // Bild in die ListView übernehmen
+            this.notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * Interface für Activities und Fragments, die einen PictureChooser anzeigen können.
+     */
+    public interface PictureChooserActivity {
+        public void startActivityForResult(Intent intent, int requestCode);
+    }
 }
