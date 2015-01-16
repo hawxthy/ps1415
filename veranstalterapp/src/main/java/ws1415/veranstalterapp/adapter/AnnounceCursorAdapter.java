@@ -602,6 +602,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
             cursor.moveToFirst();
             String tempPath = cursor.getString(column_index);
+            cursor.close();
             Bitmap bm;
             BitmapFactory.Options btmapOptions = new BitmapFactory.Options();
             bm = BitmapFactory.decodeFile(tempPath, btmapOptions);
