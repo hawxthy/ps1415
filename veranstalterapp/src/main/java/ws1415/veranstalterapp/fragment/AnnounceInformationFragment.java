@@ -132,14 +132,14 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
         builder.setMessage(R.string.areyousure);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                int titleId = EventUtils.getInstance(getActivity()).getUniqueFieldId(FieldType.TITLE, event);
+                // Setze die Attribute vom Event
+                EventUtils.getInstance(getActivity()).setEventInfo(event, listView);
 
-                // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (titleId != -1/* && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()*/){
+                // Initialisiere Pflichtfelder
+                String eventTitle = EventUtils.getInstance(AnnounceInformationFragment.this.getActivity()).getUniqueField(FieldType.TITLE.getId(), event).getValue();
+                Route eventRoute = event.getRoute();
 
-                    // Setze die Attribute vom Event
-                    EventUtils.getInstance(getActivity()).setEventInfo(event, listView);
-
+                if (!eventTitle.equals("") && eventRoute != null){
                     // Erstelle Event auf dem Server
                     new CreateEventTask().execute(event);
 
