@@ -13,9 +13,13 @@ import android.test.suitebuilder.annotation.SmallTest;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 import ws1415.ps1415.Constants;
+import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.Settings;
@@ -26,12 +30,14 @@ import ws1415.ps1415.activity.ShowRouteActivity;
 /**
  * Testet den Use Case "Anzeigen der aktuellen Position".
  * <strong>Für diesen Test muss GPS muss aktiviert sein.</strong>
+ * Es wird lediglich die Map aufgerufen, die dann wenn GPS verfügbar ist, automatisch (von Android)
+ * einen blauen Punkt auf die Karte setzt, der die Position anzeigt.
  *
  * @author Tristan Rust
  */
-public class ShowCurrentPositionTest extends ActivityInstrumentationTestCase2<ShowRouteActivity> {
+public class ShowCurrentPositionTest extends ActivityInstrumentationTestCase2<ShowEventsActivity> {
 
-    private ShowRouteActivity mActivity;
+    private ShowEventsActivity mActivity;
     private LocationManager mLocationManager;
 
     // ShowEventsActivity UI Elemente
@@ -39,7 +45,7 @@ public class ShowCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
     private ListAdapter mListData;
 
     public ShowCurrentPositionTest() {
-        super(ShowRouteActivity.class);
+        super(ShowEventsActivity.class);
     }
 
     @Override
@@ -56,13 +62,11 @@ public class ShowCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
 
         // Die ShowRouteActivity starten
         mActivity = getActivity();
-        assertNotNull("Activity didn't start!", mActivity);
-        // mLocationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
 
         Thread.sleep(5000); // Zeit zum initialisieren
         // Holt sich die Event Listen-Elemente
-        // mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
-        // mListData = mList.getAdapter();
+        mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
+        mListData = mList.getAdapter();
     }
 
     /**
@@ -77,73 +81,40 @@ public class ShowCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
         assertTrue("at least one event exists", mListData.getCount() > 0);
     }
 
-    /**
-     * Prüft, ob die Elemente sich in der Activity überschneiden bzw. wirklich gerendert werden.
-     *
-     * @throws java.lang.Exception
-     */
-    @SmallTest
-    public void testViewsVisible() {
-        // Falls es mehr als zwei Elemente in der Liste gibt, prüfe, ob die ersten beiden sich überschneiden oder nicht
-        /*if (mListData != null && mListData.getCount()>1) {
-           ViewAsserts.assertOnScreen(mListData.getView(0, null, mList).getRootView(), mListData.getView(1, null, mList).getRootView());
-           ViewAsserts.assertOnScreen(mListData.getView(1, null, mList).getRootView(), mListData.getView(0, null, mList).getRootView());
-        }*/
-        assertTrue(true);
-    }
-
     protected void tearDown() throws Exception {super.tearDown();}
 
     @UiThreadTest
     public void testUseCase() throws Exception {
-        Instrumentation.ActivityMonitor am = getInstrumentation().addMonitor(ShowRouteActivity.class.getName(), null, false);
+        Instrumentation.ActivityMonitor am = getInstrumentation().addMonitor(ShowInformationActivity.class.getName(), null, false);
 
         // Es wird ein neuer UI Thread gestartet & das erste Event ausgewählt und anschließend die showInformationActivity gestartet
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 int firstEvent = 0;
-                // mList.performItemClick(mList.getAdapter().getView(firstEvent, null, mList), firstEvent, mList.getAdapter().getItemId(firstEvent));
+                mList.performItemClick(mList.getAdapter().getView(firstEvent, null, mList), firstEvent, mList.getAdapter().getItemId(firstEvent));
             }
         });
 
-        Thread.sleep(5000);
+        Thread.sleep(1000); // Zeit zum initialisieren
+        getInstrumentation().getTargetContext().getApplicationContext();
+        Context context = mActivity.getBaseContext();
+        Intent intent = new Intent(context, ShowRouteActivity.class);
+        mActivity.startActivity(intent);
+        Thread.sleep(5000); // Zeit zum initialisieren
 
+
+        // BUG: Android Bug, die App stürzt ab beim Versuch von der ShowInformationActivity zu wechseln.
+        //      Es ist auch nicht möglich die ShowRouteActivity dirket über die Insturmentations anzusprechen,
+        //      deshalb wird die ShowRouteActivity direkt angesprochen, um die Karte + Position anzuzeigen.
+        //
         // ShowInformationActivity showInformationActivity = (ShowInformationActivity) getInstrumentation().waitForMonitorWithTimeout(am, 1000);
         // assertNotNull("ShowInformationActivity started", showInformationActivity);
-
-
-        /*Intent intent = new Intent(context, ShowRouteActivity.class);
-        intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, event.getRoute().getRouteData().getValue());
-        intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_FIRST, event.getRouteFieldFirst());
-        intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_LAST, event.getRouteFieldLast());
-        context.startActivity(intent);
-        */
-
-
-
+        // Intent intent = new Intent(mActivity, ShowInformationActivity.class);
+        // intent.putExtra(ShowInformationActivity.EXTRA_KEY_ID, "5675267779461120");
+        // mActivity.startActivity(intent);
 
     }
-
-    /**
-     * Prüft, ob die Position, die mit Hilfe von GPS ermittelt wurde angezeigt wird.
-     * <strong>GPS muss hierfür aktiviert sein.</strong>
-     *
-     * @exception java.lang.InterruptedException
-     */
-    /*
-    public void testUseCase() throws InterruptedException {
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(ShowRouteActivity.class.getName(), null, false);
-
-        Criteria criteria = new Criteria();
-        Location location = mLocationManager.getLastKnownLocation(mLocationManager.getBestProvider(criteria, false));
-
-
-
-
-        Thread.sleep(5000);
-        assertNotNull("location could not be requested", location);
-    }*/
 
 }
 
