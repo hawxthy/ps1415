@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 
 import ws1415.ps1415.task.UpdateLocationTask;
 
@@ -49,11 +50,15 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     public static final String NOTIFICATION_EXTRA_MAX_SPEED = "location_transmitter_service_notification_max_speed";
     public static final String NOTIFICATION_EXTRA_AVG_SPEED = "location_transmitter_service_notification_avg_speed";
     public static final String NOTIFICATION_EXTRA_ELEVATION_GAIN = "location_transmitter_service_notification_elevation_gain";
+    public static final String NOTIFICATION_EXTRA_PASSED_WAYPOINTS = "location_transmitter_service_notification_passed_waypoints";
+    public static final String NOTIFICATION_EXTRA_PASSED_WAYPOINT_TIME = "location_transmitter_service_notification_passed_waypoint_time";
     private LocalBroadcastManager broadcastManager;
 
     private GoogleApiClient gac;
     private long eventId;
     private List<LatLng> waypoints;
+    private List<Integer> passedWaypoints;
+    private List<Long> passedWaypointTimes;
     private Date startDate;
     private int currentWaypoint; // TODO: currentWaypoint speichern!
     private float curSpeed;
@@ -72,6 +77,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         avgSpeed = 0.0f;
         previousAlt = Float.NaN;
         elevationGain = 0.0f;
+        List<Integer> passedWaypoints = new ArrayList<>();
+        List<Long> passedWaypointTime = new ArrayList<>();
+
     }
 
     @Override
@@ -149,6 +157,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             calculateCurrentWaypoint(new LatLng(location.getLatitude(), location.getLongitude()));
             foundFirstWaypoint = true;
 
+            // CurrentWaypoint in die passedWaypoint Liste eintragen
+            this.passedWaypoints.add(currentWaypoint);
+
             Log.d(LOG_TAG, "current: " + currentWaypoint);
 
             // Aktuelle Distance aktualisieren
@@ -176,6 +187,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // elapsedTimeH -> verstrichene Zeit in h
         avgSpeed = (currentDistance/1000.0f)/elapsedTimeH;
 
+        // vergangene Zeit in der passedWaypointTime liste speichern
+        this.passedWaypointTimes.add(new Date().getTime());
+
         sendLocationUpdate(location);
     }
 
@@ -192,6 +206,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             intent.putExtra(NOTIFICATION_EXTRA_MAX_SPEED, maxSpeed);
             intent.putExtra(NOTIFICATION_EXTRA_AVG_SPEED, avgSpeed);
             intent.putExtra(NOTIFICATION_EXTRA_ELEVATION_GAIN, elevationGain);
+            intent.putExtra(NOTIFICATION_EXTRA_PASSED_WAYPOINTS, passedWaypoints.toArray());
+            intent.putExtra(NOTIFICATION_EXTRA_PASSED_WAYPOINT_TIME, passedWaypointTimes.toArray());
             broadcastManager.sendBroadcast(intent);
         }
     }
