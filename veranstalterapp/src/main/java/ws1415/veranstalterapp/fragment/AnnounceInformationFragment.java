@@ -1,6 +1,7 @@
 package ws1415.veranstalterapp.fragment;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -53,6 +54,8 @@ public class AnnounceInformationFragment extends Fragment {
 
     // das neu erstellte Event
     private Event event;
+
+    private AlertDialog lastDialog;
 
     /**
      * Erstellt die View, initialisiert die Attribute, setzt die Listener für die Buttons.
@@ -172,10 +175,11 @@ public class AnnounceInformationFragment extends Fragment {
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                cancelInfo(true);
             }
         });
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        lastDialog = builder.create();
+        lastDialog.show();
     }
 
     /**
@@ -253,8 +257,16 @@ public class AnnounceInformationFragment extends Fragment {
         }
     }
 
+    public AlertDialog getLastDialog(){
+        return lastDialog;
+    }
+
     public ListView getListView(){
         return listView;
+    }
+
+    public Event getCurrentEvent(){
+        return event;
     }
     
 }
