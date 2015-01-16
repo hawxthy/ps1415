@@ -77,8 +77,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         avgSpeed = 0.0f;
         previousAlt = Float.NaN;
         elevationGain = 0.0f;
-        List<Integer> passedWaypoints = new ArrayList<>();
-        List<Long> passedWaypointTime = new ArrayList<>();
+        passedWaypoints = new ArrayList<>();
+        passedWaypointTimes = new ArrayList<>();
 
     }
 
@@ -158,8 +158,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             foundFirstWaypoint = true;
 
             // CurrentWaypoint in die passedWaypoint Liste eintragen
-            if (!this.passedWaypoints.contains(currentWaypoint)) {
-                this.passedWaypoints.add(currentWaypoint);
+            if (passedWaypoints.get(passedWaypoints.size()-1) != currentWaypoint) {
+                passedWaypoints.add(currentWaypoint);
             }
 
 
