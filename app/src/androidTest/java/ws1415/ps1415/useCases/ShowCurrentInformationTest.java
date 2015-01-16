@@ -56,7 +56,7 @@ public class ShowCurrentInformationTest extends ActivityInstrumentationTestCase2
      * Stellt eine Verbindung zum Testserver her und bereitet die Testdaten vor.
      */
     public ShowCurrentInformationTest() {
-        // Bezug auf die ShowInformationActivity
+        // Bezug auf die ShowEventsActivity
         super(ShowEventsActivity.class);
 
         // Testdaten erstellen

@@ -53,7 +53,8 @@ import ws1415.ps1415.task.UpdateLocationTask;
 import ws1415.ps1415.util.EventUtils;
 
 /**
- * Testet den Use Case "Übertragung der aktuellen Position an den Server".
+ * Testet den Use Case "Handhabung der aktuellen Position".
+ * <strong>GPS muss aktiviert sein.</strong>
  *
  * @author Tristan Rust
  */
@@ -61,15 +62,13 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
 
     private ShowEventsActivity mActivity;
 
+    // Test Daten zur Positionsübertragung
     private final String TEST_EMAIL        = "tristan.rust@googlemail.com";
     private final LatLng TEST_POSITION     = new LatLng(35.660866, 108.808594); // Somewhere in China
 
     // ShowEventsActivty UI Elemente
     private ListView mList;
     private ListAdapter mListData;
-
-    private Event testEvent;
-    private Route testRoute;
 
     public SendPositionSettingsTest() {
         super(ShowEventsActivity.class);
@@ -86,7 +85,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         getInstrumentation().getTargetContext().getApplicationContext();
         mActivity = getActivity();
         // Löschen der Voreinstellungen
-        // Clear everything in the SharedPreferences
+        // Alles in den SharedPreferences löschen
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear().commit();
@@ -96,7 +95,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         credential.setSelectedAccountName(credential.getAllAccounts()[0].name);
         ServiceProvider.login(credential);
 
-        Thread.sleep(5000);
+        Thread.sleep(5000); // Zeit zum initialisieren
         // Holt sich die Event Listen-Elemente
         mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
         mListData = mList.getAdapter();
@@ -194,7 +193,8 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
 
 
     /**
-     * Testet, ob die Activity weiter läuft, wenn diese pausiert hat. Test läuft auf dem UI Thread.
+     * Testet, ob die Activity weiter läuft, wenn diese pausiert hat. Large Test, da auf Ressourcen eines Servers, bzw.
+     * anderen Netzwerkes abgerufen werden. <strong>GPS muss hierfür aktiviert sein.</strong>
      * @throws java.lang.InterruptedException
      */
     @SmallTest
@@ -225,7 +225,9 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
 
     /**
      * Testet, ob die Position an den Server übertragen wird, wenn der User dies aktiviert hat.
-     * <strong>GPS muss hierfür aktiviert sein</strong>
+     * Large Test, da auf Ressourcen eines Servers, bzw.
+     * anderen Netzwerkes abgerufen werden.
+     * <strong>GPS muss hierfür aktiviert sein.</strong>
      *
      * @throws java.lang.Exception
      */
@@ -241,26 +243,29 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
         sharedPreferences.edit().putBoolean("prefSendLocation", true).apply();
 
+        // Acitivty Monitor starten
         Activity am = getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 2000);
-        Thread.sleep(2500);
+        Thread.sleep(2500); // Zeit zum initialisieren
 
         // Setzen der Position auf den Server
         new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude).execute();
-        Thread.sleep(2000);
+        Thread.sleep(2000); // Zeit zum initialisieren
 
+        // Teilnehmer, der seine Position an den Server senden wird
         Member m = ServiceProvider.getService().skatenightServerEndpoint().getMember(TEST_EMAIL).execute();
         assertEquals(TEST_POSITION.latitude, m.getLatitude());
         assertEquals(TEST_POSITION.longitude, m.getLongitude());
 
+        // Prüfen, ob das Senden aktiviert ist
         boolean active = sharedPreferences.getBoolean("prefSendLocation", true);
         assertTrue(active);
 
-        // Starten des Hintergrundservices zur Standortermittlung
+        // Starten des Hintergrundservices zur Standortermittlung, GPS muss aktiv sein
         Intent service;
         service = new Intent(mActivity.getBaseContext(), LocationTransmitterService.class);
         service.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mActivity.startService(service);
-        Thread.sleep(5000);
+        Thread.sleep(10000); // Zeit zum Senden
 
         // Prüfen, ob die neuen Positionen auf dem Server übernommen worden sind
         assertNotSame("Position not updated!", TEST_POSITION.latitude, m.getLatitude());
@@ -271,8 +276,10 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         active = sharedPreferences.getBoolean("prefSendLocation", true);
         assertFalse(active);
 
+        // Übertragenden Service stoppen
         mActivity.stopService(service);
 
+        // Gibt an, ob der Service noch läuft
         boolean running = false;
 
         // Prüfen, ob der Service noch läuft

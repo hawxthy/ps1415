@@ -3,6 +3,7 @@ package ws1415.veranstalterapp.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -26,7 +27,7 @@ import ws1415.veranstalterapp.util.FieldType;
  *
  * Created by Bernd Eissing, Martin Wrodarczyk.
  */
-public class EditEventActivity extends Activity {
+public class EditEventActivity extends Activity implements AnnounceCursorAdapter.PictureChooserActivity {
     // Adapter für die ListView von activity_edit_event_list_view
     private AnnounceCursorAdapter listAdapter;
 
@@ -124,7 +125,7 @@ public class EditEventActivity extends Activity {
                 int titleId = EventUtils.getInstance(EditEventActivity.this).getUniqueFieldId(FieldType.TITLE, event);
 
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (titleId != -1 && !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
+                if (titleId != -1) { //&& !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
 
                     // Setze die Attribute vom Event
                     EventUtils.getInstance(EditEventActivity.this).setEventInfo(event, listView);
@@ -183,5 +184,14 @@ public class EditEventActivity extends Activity {
 
     public AnnounceCursorAdapter getAdapter(){
         return listAdapter;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Verarbietet das ausgewählte Bild
+        // Hier wird der RequestCOde dazu verwendet die Positions des zu ändernden dynamischen Feldes
+        // zu übergeben.
+        listAdapter.processImage(requestCode, data);
     }
 }
