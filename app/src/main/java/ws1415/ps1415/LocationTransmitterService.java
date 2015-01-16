@@ -17,9 +17,9 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 
 import ws1415.ps1415.task.UpdateLocationTask;
 
@@ -158,8 +158,11 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             foundFirstWaypoint = true;
 
             // CurrentWaypoint in die passedWaypoint Liste eintragen
-            if (passedWaypoints.get(passedWaypoints.size()-1) != currentWaypoint) {
+            if (passedWaypoints.isEmpty() || (passedWaypoints.get(passedWaypoints.size()-1) != currentWaypoint)) {
                 passedWaypoints.add(currentWaypoint);
+
+                // vergangene Zeit in der passedWaypointTime liste speichern
+                this.passedWaypointTimes.add(new Date().getTime());
             }
 
 
@@ -190,9 +193,6 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // elapsedTimeH -> verstrichene Zeit in h
         avgSpeed = (currentDistance/1000.0f)/elapsedTimeH;
 
-        // vergangene Zeit in der passedWaypointTime liste speichern
-        this.passedWaypointTimes.add(new Date().getTime());
-
         sendLocationUpdate(location);
     }
 
@@ -209,10 +209,26 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             intent.putExtra(NOTIFICATION_EXTRA_MAX_SPEED, maxSpeed);
             intent.putExtra(NOTIFICATION_EXTRA_AVG_SPEED, avgSpeed);
             intent.putExtra(NOTIFICATION_EXTRA_ELEVATION_GAIN, elevationGain);
-            intent.putExtra(NOTIFICATION_EXTRA_PASSED_WAYPOINTS, passedWaypoints.toArray());
-            intent.putExtra(NOTIFICATION_EXTRA_PASSED_WAYPOINT_TIME, passedWaypointTimes.toArray());
+            intent.putExtra(NOTIFICATION_EXTRA_PASSED_WAYPOINTS, toPrimitiveInt(passedWaypoints));
+            intent.putExtra(NOTIFICATION_EXTRA_PASSED_WAYPOINT_TIME, toPrimitiveLong(passedWaypointTimes));
             broadcastManager.sendBroadcast(intent);
         }
+    }
+
+    private int[] toPrimitiveInt(List<Integer> list) {
+        int[] out = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            out[i] = list.get(i);
+        }
+        return out;
+    }
+
+    private long[] toPrimitiveLong(List<Long> list) {
+        long[] out = new long[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            out[i] = list.get(i);
+        }
+        return out;
     }
 
     @Override
