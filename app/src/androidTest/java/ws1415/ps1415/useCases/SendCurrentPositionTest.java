@@ -95,7 +95,7 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
     /**
     * Prüft, ob die Elemente sich in der Activity überschneiden bzw. wirklich gerendert werden.
     *
-            * @throws java.lang.Exception
+    * @throws java.lang.Exception
     */
     @SmallTest
     public void testViewsVisible() throws Exception {
