@@ -14,7 +14,7 @@
     <string name="title_fragment_announce_information">Create Event</string>
     <string name="announce_info_apply_button">Apply</string>
     <string name="announce_info_cancel_button">Cancel</string>
-    <string name="announce_info_start_edit_button">Edit Event properties</string>
+    <string name="announce_info_start_edit_button">Enter Edit Mode</string>
     <string name="announce_info_exit_edit_button">Exit Edit mode</string>
     <string name="announce_info_edit_mode_string">You can\'t do this in Edit mode</string>
     <string name="announce_info_title">Title:</string>

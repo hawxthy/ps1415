@@ -97,7 +97,7 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
                 if(!listAdapter.getEditMode()) {
                     cancelInfo(true);
                 }
-                Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
+                Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -107,7 +107,7 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
                 if(!listAdapter.getEditMode()) {
                     applyInfo();
                 }
-                Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
+                Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_SHORT).show();
             }
         });
 
