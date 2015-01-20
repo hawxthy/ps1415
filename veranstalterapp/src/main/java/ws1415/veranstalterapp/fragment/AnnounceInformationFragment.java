@@ -96,18 +96,20 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
             public void onClick(View view) {
                 if(!listAdapter.getEditMode()) {
                     cancelInfo(true);
+                } else {
+                    Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_SHORT).show();
                 }
-                Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
             }
         });
 
         applyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!listAdapter.getEditMode()) {
+                if (!listAdapter.getEditMode()) {
                     applyInfo();
+                } else {
+                    Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_SHORT).show();
                 }
-                Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
             }
         });
 
