@@ -22,10 +22,10 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by Tristan Rust on 28.10.2014.
- *
  * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient und diese auf den
  * Server sendet. Falls der Nutzer noch nicht existiert wird er angelegt, ansonsten geupdatet.
+ *
+ * @author Tristan Rust
  *
  */
 public class LocationTransmitterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -140,7 +140,6 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         String email = prefs.getString("accountName", null);
 
         // Sendet die Nutzerdaten an den Server
-        // TODO: Location sollte nur geschickt werden wenn das vom Nutzer gewünscht wird (dann email prompt anzeigen)
         if (email != null) {
             //new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
         }

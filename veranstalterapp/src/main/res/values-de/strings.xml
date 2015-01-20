@@ -13,9 +13,9 @@
     <string name="title_fragment_announce_information">Veranstaltung erstellen</string>
     <string name="announce_info_apply_button">Erstellen</string>
     <string name="announce_info_cancel_button">Abbrechen</string>
-    <string name="announce_info_start_edit_button">Editiere Event Eigenschaften</string>
+    <string name="announce_info_start_edit_button">Starte Editieren</string>
     <string name="announce_info_exit_edit_button">Beende Editieren</string>
-    <string name="announce_info_edit_mode_string">Nicht möglich in Edit Modus</string>
+    <string name="announce_info_edit_mode_string">Nicht möglich im Edit Modus</string>
     <string name="announce_info_title">Titel:</string>
     <string name="announce_info_title_hint">Gib einen Titel an</string>
     <string name="announce_info_fee">Gebühr:</string>

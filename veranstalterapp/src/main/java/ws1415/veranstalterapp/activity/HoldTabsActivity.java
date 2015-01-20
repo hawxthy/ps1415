@@ -117,9 +117,7 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }else if(id == R.id.action_add_route) {
+        if(id == R.id.action_add_route) {
             Intent intent = new Intent(this, AddRouteDialog.class);
             startActivity(intent);
             return true;

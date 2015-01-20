@@ -170,7 +170,7 @@ public class SkatenightServerEndpoint {
                 pm.makePersistent(e);
 
                 // Benachrichtigung an User schicken
-                long secondsTillStart = (e.getFusedDate().getTime() - System.currentTimeMillis()) / 1000;
+                long secondsTillStart = (FieldType.getFusedDate(e).getTime() - System.currentTimeMillis()) / 1000;
 
                 // Benachrichtigung nur schicken, wenn Event in der Zukunft liegt
                 if (secondsTillStart > 0) {
@@ -183,7 +183,7 @@ public class SkatenightServerEndpoint {
                             .timeToLive((int) secondsTillStart)
                             .addData("type", MessageType.NOTIFICATION_MESSAGE.name())
                             .addData("title", "Ein neues Event wurde erstellt")
-                            .addData("content", e.getUniqueField(FieldType.TITLE.getId()).getValue())
+                            .addData("content", FieldType.getUniqueField(FieldType.TITLE.getId(), e).getValue())
                             .build();
                     try {
                         sender.send(m, getRegistrationManager(pm).getRegisteredUser(), 5);
