@@ -137,6 +137,13 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
         // assertNotNull("ShowInformationActivity didn't start!", showInformationActivity);
         Thread.sleep(5000);
 
+        List<Event> list = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems();
+        assertNotNull("No events on the server!", list);
+        Event event = list.get(0);
+
+        List<Field> extractedEvent = event.getDynamicFields();
+
+
 
 
         // TextView dateView = (TextView) showInformationActivity.findViewById(R.id.show_info_date_textview);
