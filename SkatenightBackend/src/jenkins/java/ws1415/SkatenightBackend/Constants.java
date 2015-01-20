@@ -5,6 +5,10 @@ package ws1415.SkatenightBackend;
  */
 public class Constants {
     /**
+     * Die Basisadresse des Backends.
+     */
+    public static final String BASE_URL = "https://skatenight-ms-jenkins.appspot.com";
+    /**
      * Client-ID für die normale App.
      */
     public static final String ANDROID_USER_CLIENT_ID = "1032268444653-kj1mpisvlrpl67e7db2fu2005aube7mu.apps.googleusercontent.com";
