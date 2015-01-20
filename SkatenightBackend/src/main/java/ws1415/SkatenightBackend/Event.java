@@ -45,6 +45,8 @@ public class Event {
     private int routeFieldLast;
     @Persistent(serialized = "true", defaultFetchGroup = "true")
     private ArrayList<String> memberList;
+    @Persistent
+    private boolean notificationSend = false;
 
     public Key getKey() {
         return key;
@@ -95,6 +97,14 @@ public class Event {
         else return this.memberList;
     }
 
+    public boolean isNotificationSend() {
+        return notificationSend;
+    }
+
+    public void setNotificationSend(boolean notificationSend) {
+        this.notificationSend = notificationSend;
+    }
+
     // ---------- Hilfsmethoden für den Umgang mit den dynamischen Eigenschaften ---------
 
     /**
@@ -142,5 +152,4 @@ public class Event {
         }
         return null;
     }
-
 }

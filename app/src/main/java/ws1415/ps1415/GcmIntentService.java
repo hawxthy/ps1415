@@ -51,6 +51,10 @@ public class GcmIntentService extends IntentService {
                     case NOTIFICATION_MESSAGE:
                         sendNotification(extras);
                         break;
+                    case EVENT_START_MESSAGE:
+                        extras.putString("title", "Event start");
+                        extras.putString("content", "Event start");
+                        break;
                 }
             }
         }
