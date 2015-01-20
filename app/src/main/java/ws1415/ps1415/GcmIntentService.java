@@ -66,7 +66,7 @@ public class GcmIntentService extends IntentService {
                         break;
                     case EVENT_START_MESSAGE:
                         // LocationTransmitterService starten, wenn Einstellung entsprechend
-                        long eventId = extras.getLong("eventId");
+                        long eventId = Long.parseLong(extras.getString("eventId"));
                         try {
                             Event e = new GetEventTask(null).execute(eventId).get();
                             Date startDate = EventUtils.getInstance(this).getFusedDate(e);
