@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import com.skatenight.skatenightAPI.model.Member;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ws1415.common.util.LocationUtils;
@@ -271,7 +273,7 @@ public class ShowRouteActivity extends Activity {
         else if (speed <= 5.0f) {
             return Color.RED;
         }
-        else if (speed <= 10.0f) {
+        else if (speed <= 15.0f) {
             return Color.GREEN;
         }
         else {
@@ -286,9 +288,8 @@ public class ShowRouteActivity extends Activity {
             routeTrack.clear();
             int[] visited = intent.getIntArrayExtra(LocationTransmitterService.NOTIFICATION_EXTRA_PASSED_WAYPOINTS);
             long[] timestamps = intent.getLongArrayExtra(LocationTransmitterService.NOTIFICATION_EXTRA_PASSED_WAYPOINT_TIME);
-            Toast.makeText(getApplicationContext(), visited.length + " - " + timestamps.length, Toast.LENGTH_SHORT).show();
 
-            if (visited.length > 0 && visited.length == timestamps.length) {
+            if (visited.length > 1 && visited.length == timestamps.length) {
                 List<LatLng> waypoints = route.getPoints();
 
                 PolylineOptions opt = new PolylineOptions();
@@ -305,21 +306,24 @@ public class ShowRouteActivity extends Activity {
                     Location.distanceBetween(curWaypoint.latitude, curWaypoint.longitude, prevWaypoint.latitude, prevWaypoint.longitude, output);
                     float distanceM = output[0];
 
-                    float elapsedH = elapsedMs*3e6f;
+
+
+                    float elapsedH = elapsedMs/3.6e6f;
                     float distanceKm = distanceM/1000.0f;
 
                     float speed = distanceKm/elapsedH;
 
-                    opt.add(waypoints.get(visited[i]));
-
                     int color = colorForSpeed(speed);
                     if ((prevSpeed != null && color != colorForSpeed(prevSpeed)) || i == visited.length-1) {
-                        opt.color(color);
+                        opt.color(colorForSpeed((prevSpeed == null)?0.0f:prevSpeed));
+                        opt.add(waypoints.get(visited[i]));
                         routeTrack.add(opt);
 
                         opt = new PolylineOptions();
-                        opt.add(waypoints.get(visited[i]));
                     }
+
+                    opt.add(waypoints.get(visited[i]));
+
                     prevSpeed = speed;
                 }
             }

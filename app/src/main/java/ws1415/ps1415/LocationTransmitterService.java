@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import ws1415.ps1415.task.UpdateLocationTask;
-
 /**
  * Created by Tristan Rust on 28.10.2014.
  *
@@ -79,7 +77,6 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         elevationGain = 0.0f;
         passedWaypoints = new ArrayList<>();
         passedWaypointTimes = new ArrayList<>();
-
     }
 
     @Override
@@ -145,7 +142,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // Sendet die Nutzerdaten an den Server
         // TODO: Location sollte nur geschickt werden wenn das vom Nutzer gewünscht wird (dann email prompt anzeigen)
         if (email != null) {
-            new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
+            //new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
         }
 
         if (waypoints != null && waypoints.size() > 0) {
@@ -162,7 +159,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                 passedWaypoints.add(currentWaypoint);
 
                 // vergangene Zeit in der passedWaypointTime liste speichern
-                this.passedWaypointTimes.add(new Date().getTime());
+                passedWaypointTimes.add(new Date().getTime());
             }
 
 
@@ -237,6 +234,19 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     }
 
     private void calculateCurrentWaypoint(LatLng location) {
+        float minDistance = Float.POSITIVE_INFINITY;
+        for (int i = currentWaypoint; i < waypoints.size(); i++) {
+            float distance = distance(
+                    location.latitude, location.longitude,
+                    waypoints.get(i).latitude, waypoints.get(i).longitude);
+            //Log.d(LOG_TAG, i + ": " + distance);
+            if (distance < MAX_ANY_WAYPOINT_DISTANCE && distance < minDistance) {
+                //member.setCurrentWaypoint(i);
+                currentWaypoint = i;
+                minDistance = distance;
+            }
+        }
+        /*
         if (currentWaypoint < waypoints.size()-1) {
             LatLng current = waypoints.get(currentWaypoint);
             LatLng next = waypoints.get(currentWaypoint+1);
@@ -259,7 +269,6 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                 }
             }
             if (findNextWaypoint) {
-                Log.d(LOG_TAG, "findNextWaypoint");
                 // Den nächsten Wegpunkt finden:
                 float minDistance = Float.POSITIVE_INFINITY;
                 for (int i = currentWaypoint; i < waypoints.size(); i++) {
@@ -275,6 +284,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                 }
             }
         }
+        */
     }
 
     private float distance(double lat1, double lon1, double lat2, double lon2) {

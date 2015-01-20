@@ -250,7 +250,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             progressBar.setProgress(currentWaypoint);
             progressBar.setMax(waypointCount);
 
-            Toast.makeText(getApplicationContext(), currentWaypoint + "/" + waypointCount, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), currentWaypoint + "/" + waypointCount, Toast.LENGTH_SHORT).show();
 
             float currentDistance = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_DISTANCE, 0.0f);
             TextView currentDistanceTextView = (TextView) findViewById(R.id.active_event_current_distance_textview);
