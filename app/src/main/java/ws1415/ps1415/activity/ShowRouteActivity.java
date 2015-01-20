@@ -266,14 +266,11 @@ public class ShowRouteActivity extends Activity {
         }
     }
 
-    private int colorForSpeed(float speed) {
-        if (speed <= 0.0f) {
-            return Color.DKGRAY;
-        }
-        else if (speed <= 5.0f) {
+    private int colorForSpeed(double speed) {
+        if (speed <= 5.0) {
             return Color.RED;
         }
-        else if (speed <= 15.0f) {
+        else if (speed <= 15.0) {
             return Color.GREEN;
         }
         else {
@@ -294,7 +291,7 @@ public class ShowRouteActivity extends Activity {
 
                 PolylineOptions opt = new PolylineOptions();
                 opt.add(waypoints.get(visited[0]));
-                Float prevSpeed = null;
+                Double prevSpeed = null;
 
                 for (int i = 1; i < visited.length; i++) {
                     long elapsedMs = timestamps[i]-timestamps[i-1];
@@ -304,14 +301,14 @@ public class ShowRouteActivity extends Activity {
 
                     float[] output = new float[1];
                     Location.distanceBetween(curWaypoint.latitude, curWaypoint.longitude, prevWaypoint.latitude, prevWaypoint.longitude, output);
-                    float distanceM = output[0];
+                    double distanceM = output[0];
 
 
 
-                    float elapsedH = elapsedMs/3.6e6f;
-                    float distanceKm = distanceM/1000.0f;
+                    double elapsedH = elapsedMs/3.6e6;
+                    double distanceKm = distanceM/1000.0;
 
-                    float speed = distanceKm/elapsedH;
+                    double speed = distanceKm/elapsedH;
 
                     int color = colorForSpeed(speed);
                     if ((prevSpeed != null && color != colorForSpeed(prevSpeed)) || i == visited.length-1) {
