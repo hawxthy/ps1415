@@ -1,10 +1,12 @@
 /*
+
 package ws1415.veranstalterapp.task;
 
 import android.test.AndroidTestCase;
 
 import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
@@ -16,22 +18,30 @@ import java.util.concurrent.ExecutionException;
 
 import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.fragment.ShowEventsFragment;
+import ws1415.veranstalterapp.util.FieldType;
+
 
 */
 /**
  * Created by Richard Schulze, Martin Wrodarczyk on 10.11.2014.
  *//*
 
+
 public class QueryEventTaskTest extends AuthTaskTestCase {
     private Route route1, route2;
     private Event event1, event2;
     private List<Event> testEvents;
+    private long time;
+
     */
 /**
      * Stellt eine Verbindung zum Testserver her und bereitet die Testdaten vor.
      *//*
 
+
     public QueryEventTaskTest() {
+        Date date = new Date();
+        time = date.getTime();
         // Testdaten erstellen
         route1 = new Route();
         route1.setName("Route 1");
@@ -66,25 +76,106 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
                 "j@t@FLXh@Vp@BF??b@vANh@d@fBh@pB@HDXBRBTB^Dj@?BBVCZ"));
 
         event1 = new Event();
-        event1.setTitle("Skatenight 1");
-        event1.setFee("2");
-        event1.setDate(new DateTime(new Date()));
-        event1.setLocation("MS");
+        event1.setDynamicFields(new ArrayList<Field>());
+
+        Field tmpField = new Field();
+        tmpField.setType(FieldType.TITLE.getId());
+        tmpField.setTitle("Title");
+        tmpField.setValue("Skatenight 1");
+        event1.getDynamicFields().add(0, tmpField);
+
+        Field tmpField2 = new Field();
+        tmpField2.setType(FieldType.FEE.getId());
+        tmpField2.setTitle("Fee");
+        tmpField2.setValue("2");
+        event1.getDynamicFields().add(1, tmpField2);
+
+        Field tmpField3 = new Field();
+        tmpField3.setType(FieldType.DATE.getId());
+        tmpField3.setTitle("Date");
+        tmpField3.setValue(Long.toString(time));
+        event1.getDynamicFields().add(2, tmpField3);
+
+        Field tmpField4 = new Field();
+        tmpField4.setType(FieldType.TIME.getId());
+        tmpField4.setTitle("Time");
+
+        tmpField4.setValue(Long.toString(time));
+        event1.getDynamicFields().add(3, tmpField4);
+
+        Field tmpField5 = new Field();
+        tmpField5.setType(FieldType.LOCATION.getId());
+        tmpField5.setTitle("Location");
+        tmpField5.setValue("MS");
+        event1.getDynamicFields().add(4, tmpField5);
+
+        Field tmpField6 = new Field();
+        tmpField6.setType(FieldType.ROUTE.getId());
+        tmpField6.setTitle("Map");
+        tmpField6.setValue(route1.getName());
+        event1.getDynamicFields().add(5, tmpField6);
         event1.setRoute(route1);
-        event1.setDescription(new Text().setValue("Die erste Skatenight"));
+
+        Field tmpField7 = new Field();
+        tmpField7.setType(FieldType.DESCRIPTION.getId());
+        tmpField7.setTitle("Description");
+        tmpField7.setValue("Die erste Skatenightt");
+        event1.getDynamicFields().add(6, tmpField7);
+
 
         event2 = new Event();
-        event2.setTitle("Skatenight 2");
-        event2.setFee("5");
-        event2.setDate(new DateTime(new Date()));
-        event2.setLocation("Schlossplatz");
-        event2.setRoute(route2);
-        event2.setDescription(new Text().setValue("Die zweite Skatenight"));
+        event2.setDynamicFields(new ArrayList<Field>());
+
+        tmpField = new Field();
+        tmpField.setType(FieldType.TITLE.getId());
+        tmpField.setTitle("Title");
+        tmpField.setValue("Skatenight 2");
+        event2.getDynamicFields().add(0, tmpField);
+
+        tmpField2 = new Field();
+        tmpField2.setType(FieldType.FEE.getId());
+        tmpField2.setTitle("Fee");
+        tmpField2.setValue("5");
+        event2.getDynamicFields().add(1, tmpField2);
+
+        tmpField3 = new Field();
+        tmpField3.setType(FieldType.DATE.getId());
+        tmpField3.setTitle("Date");
+        tmpField3.setValue(Long.toString(time));
+        event2.getDynamicFields().add(2, tmpField3);
+
+        tmpField4 = new Field();
+        tmpField4.setType(FieldType.TIME.getId());
+        tmpField4.setTitle("Time");
+
+        tmpField4.setValue(Long.toString(time));
+        event2.getDynamicFields().add(3, tmpField4);
+
+        tmpField5 = new Field();
+        tmpField5.setType(FieldType.LOCATION.getId());
+        tmpField5.setTitle("Location");
+        tmpField5.setValue("Schlossplatz");
+        event2.getDynamicFields().add(4, tmpField5);
+
+        tmpField6 = new Field();
+        tmpField6.setType(FieldType.ROUTE.getId());
+        tmpField6.setTitle("Map");
+        tmpField6.setValue(route2.getName());
+        event2.getDynamicFields().add(5, tmpField6);
+        event2.setRoute(route1);
+
+        tmpField7 = new Field();
+        tmpField7.setType(FieldType.DESCRIPTION.getId());
+        tmpField7.setTitle("Description");
+        tmpField7.setValue("Daie zweite Skatenight");
+        event2.getDynamicFields().add(6, tmpField7);
+
 
         testEvents = new ArrayList<Event>();
         testEvents.add(event1);
         testEvents.add(event2);
     }
+
 
     */
 /**
@@ -92,6 +183,7 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
      *
      * @throws Exception
      *//*
+
 
     public void setUp() throws Exception {
         super.setUp();
@@ -123,6 +215,7 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
         ServiceProvider.getService().skatenightServerEndpoint().createEvent(event2).execute();
     }
 
+
     */
 /**
      * Prüft, ob das durch den QueryEventTask abgerufene Event die korrekten Daten enthält.
@@ -130,6 +223,7 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
      * @throws java.util.concurrent.ExecutionException
      * @throws InterruptedException
      *//*
+
 
     public void testTask() throws ExecutionException, InterruptedException, IOException {
         QueryEventTask task = new QueryEventTask();
@@ -152,6 +246,39 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
                 // Event 2
                 testIndex = 1;
             }
+            for (int i = 0; i < event1.getDynamicFields().size(); i++) {
+                if (event1.getDynamicFields().get(i).getType() == FieldType.TITLE.getId()) {
+                    for (int j = 0; j < eventList.get(testIndex).getDynamicFields().size(); j++) {
+                        if (testEvent.getDynamicFields().get(j).getType() == FieldType.TITLE.getId()) {
+                            assertEquals("Der Title stimmt nicht überein", event1.getDynamicFields().get(i).getValue(), testEvent.getDynamicFields().get(j).getValue());
+                        }
+                    }
+                } else if (event1.getDynamicFields().get(i).getType() == FieldType.FEE.getId()) {
+                    for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
+                        if (testEvent.getDynamicFields().get(j).getType() == FieldType.FEE.getId()) {
+                            assertEquals("Die Fee stimmt nicht überein", event1.getDynamicFields().get(i).getValue(), testEvent.getDynamicFields().get(j).getValue());
+                        }
+                    }
+                } else if (event1.getDynamicFields().get(i).getType() == FieldType.LOCATION.getId()) {
+                    for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
+                        if (testEvent.getDynamicFields().get(j).getType() == FieldType.LOCATION.getId()) {
+                            assertEquals("Die Location stimmt nicht überein", event1.getDynamicFields().get(i).getValue(), testEvent.getDynamicFields().get(j).getValue());
+                        }
+                    }
+                } else if (event1.getDynamicFields().get(i).getType() == FieldType.DESCRIPTION.getId()) {
+                    for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
+                        if (testEvent.getDynamicFields().get(j).getType() == FieldType.DESCRIPTION.getId()) {
+                            assertEquals("Die Beschreibung stimmt nicht überein", event1.getDynamicFields().get(i).getValue(), testEvent.getDynamicFields().get(j).getValue());
+                        }
+                    }
+                } else if (event1.getDynamicFields().get(i).getType() == FieldType.ROUTE.getId()) {
+                    for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
+                        if (testEvent.getDynamicFields().get(j).getType() == FieldType.ROUTE.getId()) {
+                            assertEquals("Der Routenname stimmt nicht überein", event1.getDynamicFields().get(i), testEvent.getDynamicFields().get(j));
+                        }
+                    }
+                }
+            }
             assertEquals(i + ".event: wrong title", eventList.get(i).getTitle(), testEvents.get(testIndex).getTitle());
             // Datum verändert sich manchmal um 1ms, daher kleine Bweichung zulassen
             assertTrue(i + ".event: wrong date", testEvents.get(testIndex).getDate().getValue() - 20 < eventList.get(i).getDate().getValue()
@@ -171,4 +298,5 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
 
     }
 }
+
 */

@@ -16,7 +16,7 @@ import ws1415.veranstalterapp.ServiceProvider;
 /**
  * Created by Richard Schulze on 10.11.2014.
  */
-public class QueryRouteTaskTest extends AndroidTestCase {
+public class QueryRouteTaskTest extends AuthTaskTestCase {
     private Route testRoute1, testRoute2, testRoute3;
 
     /**
