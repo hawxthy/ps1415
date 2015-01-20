@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -254,6 +253,15 @@ public class ShowRouteActivity extends Activity {
     }
 
     private void drawTrack() {
+        if (routeLine != null) {
+            routeLine.remove();
+            routeLine = googleMap.addPolyline(route);
+        }
+        if (routeHighlightLine != null) {
+            routeHighlightLine.remove();
+            routeHighlightLine = googleMap.addPolyline(routeHighlight);
+        }
+
         // Linien entfernen
         for (Polyline subline : routeTrackLines) {
             subline.remove();

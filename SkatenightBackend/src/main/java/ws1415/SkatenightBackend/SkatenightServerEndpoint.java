@@ -11,18 +11,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
-import javax.servlet.http.HttpServlet;
 
-import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
+import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
 
 
@@ -512,18 +510,6 @@ public class SkatenightServerEndpoint {
         Event event = getEvent(keyId);
 
         //  Andern des currentEvent entfernen!
-
-        PersistenceManager pm = pmf.getPersistenceManager();
-        Member m = getMember(email);
-        m.setCurrentEventId(keyId);
-
-        try {
-            pm.makePersistent(m);
-        }
-        finally {
-            pm.close();
-        }
-
 
         ArrayList<String> memberKeys = event.getMemberList();
         if (!memberKeys.contains(email)) {

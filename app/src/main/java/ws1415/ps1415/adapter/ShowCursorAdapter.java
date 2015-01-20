@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -180,27 +181,37 @@ public class ShowCursorAdapter extends BaseAdapter {
                 public void onClick(final View view) {
                     if (event.getRoute() != null && event.getRoute().getRouteData() != null) {
                         // Erstellt den Dialog, ob die Position gespeichert werden soll und auf der Karte angezeigt wird
-                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        builder.setMessage("Deine Position wird gespeichert & auf der Karte angezeigt.");
-                        builder.setPositiveButton(Html.fromHtml("<font color='#1FB1FF'>Ok</font>"), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // Leite wieter auf die Karte
-                                Intent intent = new Intent(context, ShowRouteActivity.class);
-                                intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, event.getRoute().getRouteData().getValue());
-                                intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_FIRST, event.getRouteFieldFirst());
-                                intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_LAST, event.getRouteFieldLast());
-                                context.startActivity(intent);
-                            }
-                        });
-                        builder.setNegativeButton(Html.fromHtml("<font color='#1FB1FF'>Abbrechen</font>"), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // Tue nichts
-                            }
-                        });
+                        final SharedPreferences pref = context.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+                        if (!pref.contains("prefSendLocation")) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setMessage("Darf deine Position an den Server geschickt werden?");
+                            builder.setPositiveButton(Html.fromHtml("<font color='#1FB1FF'>Ja</font>"), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // Leite wieter auf die Karte
+                                    SharedPreferences.Editor editor = pref.edit();
+                                    editor.putBoolean("prefSendLocation", true);
+                                    editor.commit();
+                                    showMap();
+                                }
+                            });
+                            builder.setNegativeButton(Html.fromHtml("<font color='#1FB1FF'>Nein</font>"), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // Tue nichts
+                                    SharedPreferences.Editor editor = pref.edit();
+                                    editor.putBoolean("prefSendLocation", false);
+                                    editor.commit();
+                                    showMap();
+                                }
+                            });
 
-                        // Zeigt den Dialog
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
+                            // Zeigt den Dialog
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+                        else {
+                            showMap();
+                        }
+
                     }
                 }
             });
@@ -257,5 +268,14 @@ public class ShowCursorAdapter extends BaseAdapter {
             view = new View(context);
         }
         return view;
+    }
+
+    private void showMap() {
+        // Leite wieter auf die Karte
+        Intent intent = new Intent(context, ShowRouteActivity.class);
+        intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, event.getRoute().getRouteData().getValue());
+        intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_FIRST, event.getRouteFieldFirst());
+        intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_LAST, event.getRouteFieldLast());
+        context.startActivity(intent);
     }
 }
