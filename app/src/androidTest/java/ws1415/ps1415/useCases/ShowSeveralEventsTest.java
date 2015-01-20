@@ -42,7 +42,7 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
 
     private final String TEST_TITLE = "TestEvent";
     private final String TEST_FEE = "10";
-    private final String TEST_DATE = "29.12.2014";
+    private final String TEST_DATE = "29.12.2015";
     private final String TEST_TIME = "14:00 Uhr";
     private final String TEST_LOCATION = "TestStadt";
     private final String TEST_DESCRIPTION = "TestBeschreibung";
@@ -102,7 +102,7 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
      * @throws java.lang.Exception
      */
     @SmallTest
-    public void testViewsVisible() throws Exception {
+    public void testViewsVisible() {
         // Falls es mehr als zwei Elemente in der Liste gibt, prüfe, ob die ersten beiden sich überschneiden oder nicht
         /*if (mListData != null && mListData.getCount()>1) {
             ViewAsserts.assertOnScreen(mListData.getView(0, null, mList).getRootView(), mListData.getView(1, null, mList).getRootView());
