@@ -79,8 +79,6 @@ public class EventStartServlet extends HttpServlet {
                         // Wird geworfen, wenn kein Objekt mit dem angegebenen Schlüssel existiert
                         // In diesem Fall null zurückgeben
                         member = null;
-                    } finally {
-                        pm.close();
                     }
                 }
 
