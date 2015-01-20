@@ -100,8 +100,8 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
 
         Field tmpField7 = new Field();
         tmpField7.setType(FieldType.DESCRIPTION.getId());
-        tmpField7.setTitle("Describition");
-        tmpField7.setValue("Martin stinkt");
+        tmpField7.setTitle("Description");
+        tmpField7.setValue("Martin");
         event1.getDynamicFields().add(6, tmpField7);
         event2 = event1;
     }
