@@ -1,6 +1,7 @@
 package ws1415.SkatenightBackend.gcm;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +12,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
 /**
- * Verwaltet die Registration-IDs für GCM der Benutzer.
+ * Verwaltet die Registration-IDs der Benutzer für GCM.
  * @author Richard
  */
 @PersistenceCapable
@@ -43,15 +44,10 @@ public class RegistrationManager {
             ids = new HashSet<>();
             userIDs.put(email, ids);
         }
-        if (!ids.contains(regid)) {
-            // Falls die ID schon von einem anderen Benutzer registriert wurde, dann ID beim
-            // vorherigen Benutzer entfernen
-            for (Set<String> tmp : userIDs.values()) {
-                if (tmp.remove(regid)) {
-                    break;
-                }
-            }
-            ids.add(regid);
-        }
+        ids.add(regid);
+    }
+
+    public Set<String> getUserIds(String mail) {
+        return userIDs.get(mail);
     }
 }

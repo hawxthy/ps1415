@@ -27,8 +27,10 @@ import ws1415.veranstalterapp.util.FieldType;
  */
 
 public class DeleteEventTaskTest extends AuthTaskTestCase {
-    private Event event1;
+    private Event event1, event2;
     private Route route1;
+    private long time;
+    private ArrayList<Event> eventList;
 
 
     /**
@@ -36,6 +38,8 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
      */
 
     public DeleteEventTaskTest() {
+        Date date = new Date();
+        time = date.getTime();
         route1 = new Route();
         route1.setName("Route 1");
         route1.setLength("5 km");
@@ -71,13 +75,14 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
         Field tmpField3 = new Field();
         tmpField3.setType(FieldType.DATE.getId());
         tmpField3.setTitle("Date");
-        tmpField3.setValue("29.01.2014");
+        tmpField3.setValue(Long.toString(time));
         event1.getDynamicFields().add(2, tmpField3);
 
         Field tmpField4 = new Field();
         tmpField4.setType(FieldType.TIME.getId());
         tmpField4.setTitle("Time");
-        tmpField4.setValue("14:00 Uhr");
+
+        tmpField4.setValue(Long.toString(time));
         event1.getDynamicFields().add(3, tmpField4);
 
         Field tmpField5 = new Field();
@@ -98,6 +103,7 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
         tmpField7.setTitle("Describition");
         tmpField7.setValue("Martin stinkt");
         event1.getDynamicFields().add(6, tmpField7);
+        event2 = event1;
     }
 
 
@@ -111,16 +117,17 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
         super.setUp();
 
         // Bestehende Events löschen
-        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+        eventList = (ArrayList<Event>)ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
                 .execute().getItems();
-        if (events != null) {
-            for (Event e : events) {
+        if (eventList != null) {
+            for (Event e : eventList) {
                 ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
                         .execute();
             }
         }
 
         ServiceProvider.getService().skatenightServerEndpoint().createEvent(event1).execute();
+        ServiceProvider.getService().skatenightServerEndpoint().createEvent(event2).execute();
 
         for( Event e : ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
                 .execute().getItems()){
@@ -145,7 +152,7 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
         }).execute(event1).get();
         for(Event e : ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
                 .execute().getItems()){
-            assertNotSame("event1 not deleted", event1.getKey().getId(), e.getKey().getId());
+            assertNotSame("event1 not existent", event1.getKey().getId(), e.getKey().getId());
         }
     }
 }

@@ -343,9 +343,9 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for(int i = 0; i < list.size(); i++){
-            if(list.get(i).getName().equals(routename)){
-                testRoute1= list.get(i);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getName().equals(routename)) {
+                testRoute1 = list.get(i);
                 break;
             }
         }
@@ -359,7 +359,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
             }
         });
         Thread.sleep(3000);
-        final Button  okButton = ((AnnounceInformationFragment) mActivity.getAdapter().getItem(1)).getLastDialog().getButton(AlertDialog.BUTTON_POSITIVE);
+        final Button okButton = ((AnnounceInformationFragment) mActivity.getAdapter().getItem(1)).getLastDialog().getButton(AlertDialog.BUTTON_POSITIVE);
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -369,26 +369,26 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         Thread.sleep(3000);
 
 
-                // Suche das neu angelegte Event
-                List<Event> list2 = null;
-                try {
-                    list2 = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                boolean found = false;
-                if (list2 != null) {
-                    for (Event e : list2) {
-                        if (EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue().equals(textTitle)) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    assertTrue(found);
-                } else {
-                    assertTrue("Couldn't find any events!", found);
+        // Suche das neu angelegte Event
+        List<Event> list2 = null;
+        try {
+            list2 = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        boolean found = false;
+        if (list2 != null) {
+            for (Event e : list2) {
+                if (EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue().equals(textTitle)) {
+                    found = true;
+                    break;
                 }
             }
+            assertTrue(found);
+        } else {
+            assertTrue("Couldn't find any events!", found);
+        }
+    }
 
 
     /**
@@ -396,7 +396,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
      */
 
     @SmallTest
-    public void testUseCaseStateDestroy() {
+    public void testUseCaseStateDestroy() throws Exception{
 
         // Testdaten
         final String textTitle = "TestEventDestroy";
@@ -407,20 +407,37 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         final String textTime = "12:00 Uhr";
         final String textRoute = "test";
 
-        // Setzen der Testwerte
-        editTextTitle.setText(textTitle);
-        editTextFee.setText(textFee);
-        editTextLocation.setText(textLocation);
-        editTextDescription.setText(textDescription);
-        datePickerButton.setText(textDate);
-        timePickerButton.setText(textTime);
-        routePickerButton.setText(textRoute);
+        final EditText editTextTitle = (EditText) listView.getChildAt(0).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
+        final EditText editTextFee = (EditText) listView.getChildAt(1).findViewById(R.id.list_view_item_announce_information_fee_editText);
+        final EditText editTextLocation = (EditText) listView.getChildAt(4).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
+        final EditText editTextDescription = (EditText) listView.getChildAt(6).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
 
+        // Initialisiere die Buttons aus dem AnncounceInformationFragment
+        final Button timePickerButton = (Button) listView.getChildAt(3).findViewById(R.id.list_view_item_announce_information_button_button);
+        final Button datePickerButton = (Button) listView.getChildAt(2).findViewById(R.id.list_view_item_announce_information_button_button);
+        final Button routePickerButton = (Button) listView.getChildAt(5).findViewById(R.id.list_view_item_announce_information_button_button);
+
+        // Setzen der Testwerte
+        mActivity = this.getActivity();
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                editTextTitle.setText(textTitle);
+                editTextFee.setText(textFee);
+                editTextLocation.setText(textLocation);
+                editTextDescription.setText(textDescription);
+                datePickerButton.setText(textDate);
+                timePickerButton.setText(textTime);
+                routePickerButton.setText(textRoute);
+            }
+        });
+        Thread.sleep(3000);
         // Beenden & Neustarten der Activity
         mActivity.finish();
         mActivity = this.getActivity();
 
         // Abrufen der aktuellen Werte
+
         String currentTitle = editTextTitle.getText().toString();
         String currentFee = editTextFee.getText().toString();
         String currentLocation = editTextLocation.getText().toString();
@@ -428,6 +445,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         String currentDate = datePickerButton.getText().toString();
         String currentTime = timePickerButton.getText().toString();
         String currentRoute = routePickerButton.getText().toString();
+
 
         // Testen der aktuellen Werte mit den Testwerten
         assertEquals("Current title incorrect!", TEST_STATE_DESTROY_TITLE, currentTitle);
@@ -441,10 +459,10 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     }
 
 
-   /**
-    * Testet, ob die Activity weiter läuft, wenn diese pausiert hat.
-    * Test läuft auf dem UI Thread.
-    */
+    /**
+     * Testet, ob die Activity weiter läuft, wenn diese pausiert hat.
+     * Test läuft auf dem UI Thread.
+     */
     @UiThreadTest
     public void testUseCaseStatePauseResume() {
         // Instrumentation Objekt, das die Anwendung während des Tests kontrolliert

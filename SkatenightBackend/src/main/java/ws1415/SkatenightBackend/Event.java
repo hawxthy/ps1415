@@ -32,6 +32,8 @@ public class Event {
     private int routeFieldLast;
     @Persistent(serialized = "true", defaultFetchGroup = "true")
     private ArrayList<String> memberList;
+    @Persistent
+    private boolean notificationSend = false;
 
     public Key getKey() {
         return key;
@@ -80,5 +82,13 @@ public class Event {
     public ArrayList<String> getMemberList() {
         if (this.memberList == null) return new ArrayList();
         else return this.memberList;
+    }
+
+    public boolean isNotificationSend() {
+        return notificationSend;
+    }
+
+    public void setNotificationSend(boolean notificationSend) {
+        this.notificationSend = notificationSend;
     }
 }
