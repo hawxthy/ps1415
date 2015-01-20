@@ -140,7 +140,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // Holt sich die Google Mail Adresse aus den SharedPreferences, die beim Einloggen angegeben werden mussten
         SharedPreferences prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
         String email = prefs.getString("accountName", null);
-        boolean sendLocation = prefs.getBoolean("sendLocation", false);
+        boolean sendLocation = prefs.getBoolean("prefSendLocation", false);
 
         // Sendet die Nutzerdaten an den Server
         if (email != null && sendLocation) {
