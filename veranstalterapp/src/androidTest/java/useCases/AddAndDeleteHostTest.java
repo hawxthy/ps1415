@@ -121,7 +121,7 @@ public class AddAndDeleteHostTest extends ActivityInstrumentationTestCase2<Permi
             }
         });
 
-        Thread.sleep(10000);
+        Thread.sleep(3000);
         final ListView hostList = (ListView) mActivity.findViewById(R.id.activtiy_permission_management_list_view);
         boolean found = false;
         int position = -1;
@@ -140,13 +140,12 @@ public class AddAndDeleteHostTest extends ActivityInstrumentationTestCase2<Permi
                 hostList.performItemClick(hostList.getAdapter().getView(pos, null, hostList), pos, hostList.getAdapter().getItemId(pos));
             }
         });
-
-        Thread.sleep(5000);
+        Thread.sleep(3000);
 
         final AlertDialog dialog = mActivity.getLastDialog();
         new DeleteHostTask(mActivity).execute(mActivity.getHostList().get(pos).getEmail());
         dialog.cancel();
-        Thread.sleep(5000);
+        Thread.sleep(3000);
         found = false;
 
         for(int i = 0; i < hostList.getAdapter().getCount(); i++){

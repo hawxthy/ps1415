@@ -42,7 +42,7 @@ import ws1415.veranstalterapp.util.FieldType;
  */
 
 public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<HoldTabsActivity> {
-
+    private volatile boolean click;
     private EditText editTextTitle;
     private EditText editTextFee;
     private EditText editTextLocation;
@@ -270,14 +270,25 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         assertEquals(textTime, timePickerButton.getText().toString());
         assertEquals(textRoute, routePickerButton.getText().toString());
 
+        click = false;
         // Abbrechen wodurch alle Felder zurück gesetzt werden sollten
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 cancelButton.performClick();
+                click = true;
+
             }
         });
-        Thread.sleep(3000);
+        int time = 0;
+        // Warten auf den Click
+        while(!click && time < 50){
+            Thread.sleep(100);
+            time++;
+            // exception machen
+        }
+        assertTrue("Timeout", time < 50);
+
 
         final EditText editTextTitle2 = (EditText) listView.getChildAt(0).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
         final EditText editTextFee2 = (EditText) listView.getChildAt(1).findViewById(R.id.list_view_item_announce_information_fee_editText);
