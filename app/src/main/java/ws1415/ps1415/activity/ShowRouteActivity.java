@@ -9,9 +9,9 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -27,7 +27,6 @@ import com.skatenight.skatenightAPI.model.Member;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import ws1415.common.util.LocationUtils;
@@ -266,11 +265,11 @@ public class ShowRouteActivity extends Activity {
         }
     }
 
-    private int colorForSpeed(double speed) {
-        if (speed <= 5.0) {
+    private int colorForSpeed(float speed) {
+        if (speed <= 5.0f) {
             return Color.RED;
         }
-        else if (speed <= 15.0) {
+        else if (speed <= 15.0f) {
             return Color.GREEN;
         }
         else {
@@ -286,29 +285,34 @@ public class ShowRouteActivity extends Activity {
             int[] visited = intent.getIntArrayExtra(LocationTransmitterService.NOTIFICATION_EXTRA_PASSED_WAYPOINTS);
             long[] timestamps = intent.getLongArrayExtra(LocationTransmitterService.NOTIFICATION_EXTRA_PASSED_WAYPOINT_TIME);
 
-            if (visited.length > 1 && visited.length == timestamps.length) {
+            if (visited.length > 0 && visited.length == timestamps.length) {
                 List<LatLng> waypoints = route.getPoints();
 
                 PolylineOptions opt = new PolylineOptions();
                 opt.add(waypoints.get(visited[0]));
-                Double prevSpeed = null;
+                Float prevSpeed = null;
 
                 for (int i = 1; i < visited.length; i++) {
                     long elapsedMs = timestamps[i]-timestamps[i-1];
 
-                    LatLng curWaypoint = waypoints.get(i);
-                    LatLng prevWaypoint = waypoints.get(i-1);
+                    LatLng curWaypoint = waypoints.get(visited[i]);
+                    LatLng prevWaypoint = waypoints.get(visited[i-1]);
 
                     float[] output = new float[1];
                     Location.distanceBetween(curWaypoint.latitude, curWaypoint.longitude, prevWaypoint.latitude, prevWaypoint.longitude, output);
-                    double distanceM = output[0];
+                    float distanceM = output[0];
 
+                    float elapsedH = elapsedMs/3.6e6f;
+                    float distanceKm = distanceM/1000.0f;
 
-
-                    double elapsedH = elapsedMs/3.6e6;
-                    double distanceKm = distanceM/1000.0;
-
-                    double speed = distanceKm/elapsedH;
+                    float speed = distanceKm/elapsedH;
+                    /*
+                    if (i == visited.length-2) {
+                        ((TextView) findViewById(R.id.textView)).setText("" + speed);
+                        ((TextView) findViewById(R.id.textView2)).setText("" + distanceM);
+                        ((TextView) findViewById(R.id.textView3)).setText("" + elapsedMs);
+                    }
+                    */
 
                     int color = colorForSpeed(speed);
                     if ((prevSpeed != null && color != colorForSpeed(prevSpeed)) || i == visited.length-1) {

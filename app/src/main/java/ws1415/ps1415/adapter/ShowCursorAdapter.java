@@ -131,6 +131,8 @@ public class ShowCursorAdapter extends BaseAdapter {
                 getItem(position).getType() == FieldType.SIMPLETEXT.getId()) {
             HolderTextField holder = new HolderTextField();
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
+            view.setEnabled(false);
+            view.setOnClickListener(null);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
             String contentValue = fieldList.get(position).getValue();
@@ -141,6 +143,8 @@ public class ShowCursorAdapter extends BaseAdapter {
         } else if (getItem(position).getType() == FieldType.PICTURE.getId()) {
             HolderImageField holder = new HolderImageField();
             view = inflater.inflate(R.layout.list_view_item_show_information_image_field, viewGroup, false);
+            view.setEnabled(false);
+            view.setOnClickListener(null);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_image_field_textView_title);
             holder.image = (ImageView) view.findViewById(R.id.list_view_item_show_information_image_field_imageView);
             holder.title.setText(fieldList.get(position).getTitle());
@@ -165,6 +169,8 @@ public class ShowCursorAdapter extends BaseAdapter {
         } else if (getItem(position).getType() == FieldType.ROUTE.getId()) {
             HolderButtonField holder = new HolderButtonField();
             view = inflater.inflate(R.layout.list_view_item_show_information_button_field, viewGroup, false);
+            view.setEnabled(false);
+            view.setOnClickListener(null);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_button_field_textView_title);
             holder.button = (Button) view.findViewById(R.id.list_view_item_show_information_button_field_button);
             holder.title.setText(fieldList.get(position).getTitle());
@@ -202,6 +208,8 @@ public class ShowCursorAdapter extends BaseAdapter {
         } else if (getItem(position).getType() == FieldType.FEE.getId()) {
             HolderTextField holder = new HolderTextField();
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
+            view.setEnabled(false);
+            view.setOnClickListener(null);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
             String contentValue = fieldList.get(position).getValue();
@@ -212,6 +220,8 @@ public class ShowCursorAdapter extends BaseAdapter {
         } else if (getItem(position).getType() == FieldType.TIME.getId()) {
             HolderTextField holder = new HolderTextField();
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
+            view.setEnabled(false);
+            view.setOnClickListener(null);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
             holder.title.setText(fieldList.get(position).getTitle());
