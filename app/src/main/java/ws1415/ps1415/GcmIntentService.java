@@ -71,9 +71,8 @@ public class GcmIntentService extends IntentService {
                             Event e = new GetEventTask(null).execute(eventId).get();
                             Date startDate = EventUtils.getInstance(this).getFusedDate(e);
                             List<LatLng> waypoints = LocationUtils.decodePolyline(e.getRoute().getRouteData().getValue());
-
                             Intent serviceIntent = new Intent(getBaseContext(), LocationTransmitterService.class);
-                            // TODO Event ID übergeben
+                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, eventId);
                             serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
                             serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
                             startService(serviceIntent);
