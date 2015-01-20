@@ -112,10 +112,18 @@ public class EventsCursorAdapter extends BaseAdapter{
         }else{
             holder = (Holder)convertView.getTag();
         }
+        String eventLocationText = EventUtils.getInstance(mContext).getUniqueField(FieldType.LOCATION.getId(), getItem(position)).getValue();
+        String eventFeeText = EventUtils.getInstance(mContext).getUniqueField(FieldType.FEE.getId(), getItem(position)).getValue();
         holder.eventName.setText(EventUtils.getInstance(mContext).getUniqueField(FieldType.TITLE.getId(), getItem(position)).getValue());
-        holder.eventLocation.setText(EventUtils.getInstance(mContext).getUniqueField(FieldType.LOCATION.getId(), getItem(position)).getValue());
         holder.eventDate.setText(eventDateFormat.format(EventUtils.getInstance(mContext).getFusedDate(getItem(position))));
-        holder.eventFee.setText(EventUtils.getInstance(mContext).getUniqueField(FieldType.FEE.getId(), getItem(position)).getValue() +" €");
+
+
+        if(eventLocationText != null) holder.eventLocation.setText(eventLocationText);
+        else holder.eventLocation.setText("n/a");
+
+        if(eventFeeText != null) holder.eventFee.setText(eventFeeText + " €");
+        else holder.eventFee.setText("n/a");
+
 
         return convertView;
     }
