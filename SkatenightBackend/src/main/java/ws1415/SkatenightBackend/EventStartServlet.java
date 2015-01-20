@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
@@ -60,9 +61,27 @@ public class EventStartServlet extends HttpServlet {
 
             for (Event e : startingEvents) {
                 // Registration-IDs abrufen
+                Member member;
                 Set<String> ids = new HashSet<>();
                 for (String s : e.getMemberList()) {
                     ids.addAll(registrationManager.getUserIds(s));
+                    try {
+                        q = pm.newQuery(Member.class);
+                        q.setFilter("email == emailParam");
+                        q.declareParameters("String emailParam");
+                        List<Member> results = (List<Member>) q.execute(s);
+                        if (!results.isEmpty()) {
+                            member = results.get(0);
+                            member.setCurrentEventId(e.getKey().getId());
+                            pm.makePersistent(member);
+                        }
+                    } catch (JDOObjectNotFoundException ex) {
+                        // Wird geworfen, wenn kein Objekt mit dem angegebenen Schlüssel existiert
+                        // In diesem Fall null zurückgeben
+                        member = null;
+                    } finally {
+                        pm.close();
+                    }
                 }
 
                 if (!ids.isEmpty()) {
