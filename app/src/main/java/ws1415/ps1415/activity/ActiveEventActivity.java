@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -35,7 +36,6 @@ import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryCurrentMemberEventTask;
 import ws1415.ps1415.util.EventUtils;
-import ws1415.ps1415.util.FieldType;
 
 public class ActiveEventActivity extends Activity implements ExtendedTaskDelegate<Void, Event> {
     private LocationReceiver receiver;
@@ -44,7 +44,9 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     private Date startDate;
     private Timer clockTimer;
 
+    private long eventId;
     private String email;
+    private String encodedWaypoints;
     private List<LatLng> waypoints;
 
     private TimerTask clockTimerTask;
@@ -76,6 +78,17 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 
         timerTextView = (TextView) findViewById(R.id.active_event_timer_textview);
         clockTimer = new Timer(true);
+
+        Button speedProfileButton = (Button) findViewById(R.id.active_event_speed_profile_button);
+        speedProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ActiveEventActivity.this, ShowRouteActivity.class);
+                intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, encodedWaypoints);
+                intent.putExtra(ShowRouteActivity.EXTRA_EVENT_ID, eventId);
+                startActivity(intent);
+            }
+        });
 
         receiver = new LocationReceiver();
     }
@@ -167,7 +180,10 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     public void taskDidFinish(ExtendedTask task, Event event) {
         setProgressBarIndeterminateVisibility(false);
         if (!isEventNull(event)) {
+            eventId = event.getKey().getId();
             startDate = EventUtils.getInstance(this).getFusedDate(event);
+
+            encodedWaypoints = event.getRoute().getRouteData().getValue();
             try {
                 waypoints = LocationUtils.decodePolyline(event.getRoute().getRouteData().getValue());
             }
@@ -176,6 +192,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             }
 
             Intent serviceIntent = new Intent(getBaseContext(), LocationTransmitterService.class);
+            serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, eventId);
             serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
             serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
             startService(serviceIntent);
@@ -213,6 +230,10 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         }
     }
 
+    /**
+     * Private Klasse zum empfangen von location updates vom LocationTransmitterTask
+     * (benötigt weil BroadcastReceiver Klasse und nicht Interface).
+     */
     private class LocationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -229,7 +250,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             progressBar.setProgress(currentWaypoint);
             progressBar.setMax(waypointCount);
 
-            Toast.makeText(getApplicationContext(), currentWaypoint + "/" + waypointCount, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), currentWaypoint + "/" + waypointCount, Toast.LENGTH_SHORT).show();
 
             float currentDistance = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_DISTANCE, 0.0f);
             TextView currentDistanceTextView = (TextView) findViewById(R.id.active_event_current_distance_textview);

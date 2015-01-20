@@ -1,7 +1,6 @@
 package ws1415.ps1415.task;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.io.IOException;
 
@@ -30,10 +29,10 @@ public class UpdateLocationTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         try {
-            Log.e("Err", "Err start");
+            //Log.e("Err", "Err start");
             ServiceProvider.getService().skatenightServerEndpoint().updateMemberLocation(email, latitude, longitude).execute();
         } catch (IOException e) {
-            Log.e("Err", "Err error");
+            //Log.e("Err", "Err error");
             e.printStackTrace();
         }
         return null;
