@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.ps1415.task.UpdateLocationTask;
+
 /**
  * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient und diese auf den
  * Server sendet. Falls der Nutzer noch nicht existiert wird er angelegt, ansonsten geupdatet.
@@ -138,10 +140,11 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // Holt sich die Google Mail Adresse aus den SharedPreferences, die beim Einloggen angegeben werden mussten
         SharedPreferences prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
         String email = prefs.getString("accountName", null);
+        boolean sendLocation = prefs.getBoolean("sendLocation", false);
 
         // Sendet die Nutzerdaten an den Server
-        if (email != null) {
-            //new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
+        if (email != null && sendLocation) {
+            new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
         }
 
         if (waypoints != null && waypoints.size() > 0) {
