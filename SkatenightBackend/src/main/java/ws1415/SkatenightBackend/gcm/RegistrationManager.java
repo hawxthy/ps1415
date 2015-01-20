@@ -44,16 +44,7 @@ public class RegistrationManager {
             ids = new HashSet<>();
             userIDs.put(email, ids);
         }
-        if (!ids.contains(regid)) {
-            // Falls die ID schon von einem anderen Benutzer registriert wurde, dann ID beim
-            // vorherigen Benutzer entfernen
-            for (Set<String> tmp : userIDs.values()) {
-                if (tmp.remove(regid)) {
-                    break;
-                }
-            }
-            ids.add(regid);
-        }
+        ids.add(regid);
     }
 
     public Set<String> getUserIds(String mail) {

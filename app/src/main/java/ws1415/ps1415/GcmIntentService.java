@@ -5,14 +5,27 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.maps.model.LatLng;
+import com.skatenight.skatenightAPI.model.Event;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import ws1415.common.gcm.MessageType;
+import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.activity.ShowEventsActivity;
+import ws1415.ps1415.task.GetEventTask;
+import ws1415.ps1415.util.EventUtils;
 
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
@@ -52,8 +65,25 @@ public class GcmIntentService extends IntentService {
                         sendNotification(extras);
                         break;
                     case EVENT_START_MESSAGE:
-                        extras.putString("title", "Event start");
-                        extras.putString("content", "Event start");
+                        // LocationTransmitterService starten, wenn Einstellung entsprechend
+                        long eventId = extras.getLong("eventId");
+                        try {
+                            Event e = new GetEventTask(null).execute(eventId).get();
+                            Date startDate = EventUtils.getInstance(this).getFusedDate(e);
+                            List<LatLng> waypoints = LocationUtils.decodePolyline(e.getRoute().getRouteData().getValue());
+
+                            Intent serviceIntent = new Intent(getBaseContext(), LocationTransmitterService.class);
+                            // TODO Event ID übergeben
+                            serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
+                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
+                            startService(serviceIntent);
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        } catch (ExecutionException e1) {
+                            e1.printStackTrace();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                         break;
                 }
             }

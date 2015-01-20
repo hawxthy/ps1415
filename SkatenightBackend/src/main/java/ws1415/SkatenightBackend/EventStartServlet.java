@@ -1,6 +1,7 @@
 package ws1415.SkatenightBackend;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -64,13 +65,18 @@ public class EventStartServlet extends HttpServlet {
                     ids.addAll(registrationManager.getUserIds(s));
                 }
 
-                Sender sender = new Sender(Constants.GCM_API_KEY);
-                Message m = new Message.Builder()
-                        .delayWhileIdle(false)
-                        .timeToLive(3600)
-                        .addData("type", MessageType.EVENT_START_MESSAGE.name())
-                        .build();
-                sender.send(m, new LinkedList<>(ids), 5);
+                if (!ids.isEmpty()) {
+                    Sender sender = new Sender(Constants.GCM_API_KEY);
+                    Message m = new Message.Builder()
+                            .delayWhileIdle(false)
+                            .timeToLive(3600)
+                            .addData("type", MessageType.EVENT_START_MESSAGE.name())
+                            .addData("eventId", Long.toString(e.getKey().getId()))
+                            .build();
+                    sender.send(m, new LinkedList<>(ids), 5);
+                }
+                e.setNotificationSend(true);
+                pm.makePersistent(e);
             }
         } catch (Exception ex) {
             _logger.info("error processing cron job: " + ex);
