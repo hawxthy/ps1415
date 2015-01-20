@@ -133,8 +133,10 @@ public class ShowCursorAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
+            String contentValue = fieldList.get(position).getValue();
             holder.title.setText(fieldList.get(position).getTitle());
-            holder.content.setText(fieldList.get(position).getValue());
+            if(contentValue != null) holder.content.setText(contentValue);
+            else holder.content.setText("n/a");
 
         } else if (getItem(position).getType() == FieldType.PICTURE.getId()) {
             HolderImageField holder = new HolderImageField();
@@ -202,8 +204,10 @@ public class ShowCursorAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
+            String contentValue = fieldList.get(position).getValue();
             holder.title.setText(fieldList.get(position).getTitle());
-            holder.content.setText(fieldList.get(position).getValue().toString() + "€");
+            if(contentValue != null) holder.content.setText(contentValue.toString() + " €");
+            else holder.content.setText("n/a");
 
         } else if (getItem(position).getType() == FieldType.TIME.getId()) {
             HolderTextField holder = new HolderTextField();
@@ -220,17 +224,23 @@ public class ShowCursorAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
             holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
             holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
-            holder.content.setText(fieldList.get(position).getValue());
+            String contentValue = fieldList.get(position).getValue();
             holder.title.setText(fieldList.get(position).getTitle());
-            final String link = holder.content.getText().toString();
-            holder.content.setTextColor(Color.BLUE);
+            if(contentValue != null){
+                holder.content.setText(contentValue);
+                holder.content.setTextColor(Color.BLUE);
+            } else {
+                holder.content.setText("n/a");
+            }
+            final String link = contentValue;
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String url = link;
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse("http://"+url));
-                    context.startActivity(i);
+                    if(link != null) {
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse("http://" + link));
+                        context.startActivity(i);
+                    }
                 }
             });
         } else if(getItem(position).getType() == FieldType.DATE.getId()){
