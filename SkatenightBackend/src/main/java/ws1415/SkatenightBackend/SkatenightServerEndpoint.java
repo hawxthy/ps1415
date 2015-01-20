@@ -289,7 +289,7 @@ public class SkatenightServerEndpoint {
                     float distanceCurrent = distance(current.getLatitude(), current.getLongitude(), member.getLatitude(), member.getLongitude());
                     float distanceNext = distance(next.getLatitude(), next.getLongitude(), member.getLatitude(), member.getLongitude());
                     boolean findNextWaypoint = false;
-                    if (distanceCurrent < Constants.MAX_NEXT_WAYPOINT_DISTANCE) {
+                    if (distanceCurrent > Constants.MAX_NEXT_WAYPOINT_DISTANCE) {
                         findNextWaypoint = true;
                     }
                     if (distanceNext < distanceCurrent) {

@@ -54,7 +54,7 @@ import ws1415.ps1415.util.EventUtils;
 
 /**
  * Testet den Use Case "Handhabung der aktuellen Position".
- * <strong>GPS muss aktiviert sein.</strong>
+ * <strong>GPS muss aktiviert sein sowie eine Internetverbindung bestehen.</strong>
  *
  * @author Tristan Rust
  */

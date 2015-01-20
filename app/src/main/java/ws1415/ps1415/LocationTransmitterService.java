@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.ps1415.task.UpdateLocationTask;
+
 /**
  * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient und diese auf den
  * Server sendet. Falls der Nutzer noch nicht existiert wird er angelegt, ansonsten geupdatet.
@@ -138,10 +140,11 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // Holt sich die Google Mail Adresse aus den SharedPreferences, die beim Einloggen angegeben werden mussten
         SharedPreferences prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
         String email = prefs.getString("accountName", null);
+        boolean sendLocation = prefs.getBoolean("sendLocation", false);
 
         // Sendet die Nutzerdaten an den Server
-        if (email != null) {
-            //new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
+        if (email != null && sendLocation) {
+            new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
         }
 
         if (waypoints != null && waypoints.size() > 0) {
@@ -233,28 +236,15 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     }
 
     private void calculateCurrentWaypoint(LatLng location) {
-        float minDistance = Float.POSITIVE_INFINITY;
-        for (int i = currentWaypoint; i < waypoints.size(); i++) {
-            float distance = distance(
-                    location.latitude, location.longitude,
-                    waypoints.get(i).latitude, waypoints.get(i).longitude);
-            //Log.d(LOG_TAG, i + ": " + distance);
-            if (distance < MAX_ANY_WAYPOINT_DISTANCE && distance < minDistance) {
-                //member.setCurrentWaypoint(i);
-                currentWaypoint = i;
-                minDistance = distance;
-            }
-        }
-        /*
         if (currentWaypoint < waypoints.size()-1) {
             LatLng current = waypoints.get(currentWaypoint);
             LatLng next = waypoints.get(currentWaypoint+1);
             float distanceCurrent = distance(current.latitude, current.longitude, location.latitude, location.longitude);
             float distanceNext = distance(next.latitude, next.longitude, location.latitude, location.longitude);
-            Log.d(LOG_TAG, "dcurrent: " + distanceCurrent);
-            Log.d(LOG_TAG, "dnext: " + distanceNext);
+            Log.d(LOG_TAG, "current: " + currentWaypoint + " " + distanceCurrent);
+            Log.d(LOG_TAG, "next: " + (currentWaypoint+1) + " " + distanceNext);
             boolean findNextWaypoint = false;
-            if (distanceCurrent < MAX_NEXT_WAYPOINT_DISTANCE) {
+            if (distanceCurrent > MAX_NEXT_WAYPOINT_DISTANCE) {
                 findNextWaypoint = true;
             }
             if (distanceNext < distanceCurrent) {
@@ -268,13 +258,14 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                 }
             }
             if (findNextWaypoint) {
+                Log.e(LOG_TAG, "findNextWaypoint " + currentWaypoint);
                 // Den nächsten Wegpunkt finden:
                 float minDistance = Float.POSITIVE_INFINITY;
                 for (int i = currentWaypoint; i < waypoints.size(); i++) {
                     float distance = distance(
                             location.latitude, location.longitude,
                             waypoints.get(i).latitude, waypoints.get(i).longitude);
-                    Log.d(LOG_TAG, i + ": " + distance);
+                    //Log.d(LOG_TAG, i + ": " + distance);
                     if (distance < MAX_ANY_WAYPOINT_DISTANCE && distance < minDistance) {
                         //member.setCurrentWaypoint(i);
                         currentWaypoint = i;
@@ -282,8 +273,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                     }
                 }
             }
+            Log.e(LOG_TAG, "calculated " + currentWaypoint);
         }
-        */
     }
 
     private float distance(double lat1, double lon1, double lat2, double lon2) {

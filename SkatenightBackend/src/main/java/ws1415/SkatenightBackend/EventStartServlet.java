@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
@@ -60,9 +61,25 @@ public class EventStartServlet extends HttpServlet {
 
             for (Event e : startingEvents) {
                 // Registration-IDs abrufen
+                Member member;
                 Set<String> ids = new HashSet<>();
                 for (String s : e.getMemberList()) {
                     ids.addAll(registrationManager.getUserIds(s));
+                    try {
+                        q = pm.newQuery(Member.class);
+                        q.setFilter("email == emailParam");
+                        q.declareParameters("String emailParam");
+                        List<Member> results = (List<Member>) q.execute(s);
+                        if (!results.isEmpty()) {
+                            member = results.get(0);
+                            member.setCurrentEventId(e.getKey().getId());
+                            pm.makePersistent(member);
+                        }
+                    } catch (JDOObjectNotFoundException ex) {
+                        // Wird geworfen, wenn kein Objekt mit dem angegebenen Schlüssel existiert
+                        // In diesem Fall null zurückgeben
+                        member = null;
+                    }
                 }
 
                 if (!ids.isEmpty()) {
@@ -72,6 +89,16 @@ public class EventStartServlet extends HttpServlet {
                             .timeToLive(3600)
                             .addData("type", MessageType.EVENT_START_MESSAGE.name())
                             .addData("eventId", Long.toString(e.getKey().getId()))
+                            .build();
+                    sender.send(m, new LinkedList<>(ids), 5);
+
+                    String event_title = FieldType.getUniqueField(FieldType.TITLE.getId(), e).getValue();
+                    m = new Message.Builder()
+                            .delayWhileIdle(false)
+                            .timeToLive(3600)
+                            .addData("type", MessageType.NOTIFICATION_MESSAGE.name())
+                            .addData("title", "Event beginnt")
+                            .addData("content", "Das Event " + event_title + " startet!")
                             .build();
                     sender.send(m, new LinkedList<>(ids), 5);
                 }
