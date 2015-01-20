@@ -30,7 +30,7 @@ import ws1415.ps1415.task.UpdateLocationTask;
 
 /**
  * Testet den User Case "Übertragung der aktuellen Position an den Server".
- * <strong>Für diesen Test muss GPS aktiviert sein.</strong>
+ * <strong>Für diesen Test muss GPS aktiviert sein sowie eine Internetverbindung bestehen.</strong>
  *
  * @author Tristan Rust
  */
