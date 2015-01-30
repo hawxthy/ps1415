@@ -1,11 +1,9 @@
 package ws1415.ps1415.task;
 
-import android.os.AsyncTask;
+import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.io.IOException;
-import java.util.List;
 
-import ws1415.SkatenightBackend.UserGroup;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 
@@ -23,11 +21,11 @@ public class QueryUserGroupsTask extends AsyncTask<AllUsergroupsFragment, Void, 
     @Override
     protected List<UserGroup> doInBackground(AllUsergroupsFragment... params) {
         view = params[0];
-        //try {
-        //    return ServiceProvider.getService().skatenightServerEndpoint().getAllUserGroups().execute().getItems();
-        //} catch (IOException e) {
-        //    e.printStackTrace();
-        //}
+        try {
+            return ServiceProvider.getService().skatenightServerEndpoint().getAllUserGroups().execute().getItems();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -37,8 +35,7 @@ public class QueryUserGroupsTask extends AsyncTask<AllUsergroupsFragment, Void, 
      */
     @Override
     protected void onPostExecute(List<UserGroup> results) {
-
-        //view.setUserGroupsToListView(results);
+        view.setUserGroupsToListView(results);
     }
 }
-
+}

@@ -774,4 +774,19 @@ public class SkatenightServerEndpoint {
         }
         return registrationManager;
     }
+
+    /**
+     * Gibt eine Liste aller auf dem Server gespeicherter Benutzergruppen zurück.
+     * @return Eine Liste aller Benutzergruppen.
+     */
+    public List<UserGroup> getAllUserGroups() {
+        PersistenceManager pm = pmf.getPersistenceManager();
+
+        try {
+            List<UserGroup> result = (List<UserGroup>) pm.newQuery(UserGroup.class).execute();
+            return result;
+        } finally {
+            pm.close();
+        }
+    }
 }
