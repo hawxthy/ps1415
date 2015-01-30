@@ -1,8 +1,8 @@
 package ws1415.SkatenightBackend;
 
-import com.google.appengine.api.datastore.Key;
-
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.jdo.annotations.PersistenceCapable;
@@ -15,13 +15,13 @@ import javax.jdo.annotations.PrimaryKey;
  */
 @PersistenceCapable
 public class UserGroup {
-
+    @PrimaryKey
     @Persistent
-    private String name;
+    private String name;            // Eindeutiger Name der Gruppe
     @Persistent
     private Member creator;
     @Persistent
-    private Set<String> members = new HashSet<>();
+    private List<String> members = new ArrayList<>();
 
     public UserGroup() {
         // Konstruktor für GAE
@@ -47,7 +47,7 @@ public class UserGroup {
         return creator;
     }
 
-    public Set<String> getMembers() {
+    public List<String> getMembers() {
         return members;
     }
 }

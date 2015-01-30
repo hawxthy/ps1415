@@ -10,7 +10,6 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.TabsUsergroupsAdapter;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 
