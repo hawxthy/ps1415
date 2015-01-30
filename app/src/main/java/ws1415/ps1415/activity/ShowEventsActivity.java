@@ -9,6 +9,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -90,7 +91,7 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
         });
 
         // SharePreferences skatenight.app laden
-        prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         credential = GoogleAccountCredential.usingAudience(this, "server:client_id:" + Constants.WEB_CLIENT_ID);
 
         // accountName aus SharedPreferences laden

@@ -1,12 +1,12 @@
 package ws1415.ps1415;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -138,10 +138,11 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
      */
     public void onLocationChanged(Location location) {
         // Holt sich die Google Mail Adresse aus den SharedPreferences, die beim Einloggen angegeben werden mussten
-        SharedPreferences prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String email = prefs.getString("accountName", null);
         boolean sendLocation = prefs.getBoolean("prefSendLocation", false);
-
+        Log.e(LOG_TAG, email + " - " + (sendLocation?"true":"false"));
+        Log.e(LOG_TAG, ""+prefs.getAll().keySet());
         // Sendet die Nutzerdaten an den Server
         if (email != null && sendLocation) {
             new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();

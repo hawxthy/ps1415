@@ -18,7 +18,6 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.skatenight.skatenightAPI.model.Event;
@@ -178,10 +177,6 @@ public class ShowCursorAdapter extends BaseAdapter {
             holder.button = (Button) view.findViewById(R.id.list_view_item_show_information_button_field_button);
             holder.title.setText(fieldList.get(position).getTitle());
             holder.button.setText(event.getRoute().getName());
-
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-            Toast.makeText(context.getApplicationContext(), pref.contains("prefSendLocation")?"true":"false", Toast.LENGTH_SHORT).show();
-
             holder.button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View view) {

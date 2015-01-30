@@ -3,7 +3,6 @@ package ws1415.ps1415.activity;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -69,7 +68,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         setContentView(R.layout.activity_show_information);
 
         // SharePreferences skatenight.app laden
-        prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         Intent intent;
         if (savedInstanceState != null) {

@@ -1,8 +1,8 @@
 package ws1415.ps1415.task;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 
 import com.skatenight.skatenightAPI.model.Member;
 
@@ -29,7 +29,7 @@ public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> 
         view = params[0];
 
         try {
-            SharedPreferences prefs = view.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(view.getApplicationContext());
             String email = prefs.getString("accountName", null);
             if (email != null) {
                 return ServiceProvider.getService().skatenightServerEndpoint().getMember(email).execute();
