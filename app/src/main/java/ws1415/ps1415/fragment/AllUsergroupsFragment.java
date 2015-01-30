@@ -146,15 +146,15 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
      *
      * @param usergroup die zu löschende UserGroup
      */
-    public void deleteEventFromList(UserGroup usergroup){
+    public void deleteUserGroupFromList(UserGroup usergroup){
         mAdapter.removeListItem(userGroupList.indexOf(usergroup));
-        userGroupList.remove(event);
+        userGroupList.remove(usergroup);
     }
 
     /**
      * Löscht die UserGroup vom Server
      *
-     * @param event die zu löschende UserGroup
+     * @param usergroup die zu löschende UserGroup
      */
     private void deleteUserGroup(UserGroup usergroup){ new DeleteUserGroupTask(this).execute(usergroup);}
 }

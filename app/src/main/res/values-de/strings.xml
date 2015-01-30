@@ -52,6 +52,6 @@
     <string name="action_add_user_group">Usergruppe hinzufügen</string>
 
     <string name="list_view_item_usergroup_creator">Ersteller: </string>
-    <string name="list_view_item_usergroup_member">Mitglieder: </string>
+    <string name="list_view_item_usergroup_membercount">Mitglieder: </string>
     <string name="list_view_item_usergroup_comma">, </string>
 </resources>

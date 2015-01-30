@@ -52,7 +52,7 @@
     <string name="action_add_user_group">Add Usergroup</string>
 
     <string name="list_view_item_usergroup_creator">Creator: </string>
-    <string name="list_view_item_usergroup_member">Member: </string>
+    <string name="list_view_item_usergroup_membercount">Member: </string>
     <string name="list_view_item_usergroup_comma">, </string>
 
 </resources>

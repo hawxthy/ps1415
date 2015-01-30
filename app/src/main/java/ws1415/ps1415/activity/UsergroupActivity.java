@@ -12,6 +12,8 @@ import android.view.MenuItem;
 
 import ws1415.ps1415.adapter.TabsUsergroupsAdapter;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
+import ws1415.ps1415.R;
+import ws1415.ps1415.task.QueryUserGroupsTask;
 
 /**
  * Created by Bernd.

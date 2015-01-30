@@ -12,6 +12,8 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import ws1415.ps1415.R;
+
 
 /**
  * Dieser Adapter wird für das Anzeigen der Usergruppen in der Liste genutzt.
@@ -96,5 +98,15 @@ public class UsergroupAdapter extends BaseAdapter {
         holder.groupCount.setText(getItem(position).getMembers().size());
 
         return convertView;
+    }
+
+    /**
+     * Entfernt UserGroup mit der angegebenen ID.
+     *
+     * @param i ID
+     */
+    public void removeListItem(int i) {
+        groupList.remove(i);
+        notifyDataSetChanged();
     }
 }
