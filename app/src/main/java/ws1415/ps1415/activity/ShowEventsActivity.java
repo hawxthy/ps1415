@@ -7,8 +7,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +28,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.skatenight.skatenightAPI.model.Event;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.common.gcm.GCMUtil;
@@ -33,9 +38,11 @@ import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.EventsCursorAdapter;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.ps1415.adapter.NavDrawerListAdapter;
+import ws1415.ps1415.model.NavDrawerItem;
 import ws1415.ps1415.task.QueryEventsTask;
 
-public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate<Void, List<Event>> {
+public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDelegate<Void, List<Event>> {
     private static final String TAG = "Skatenight";
     public static final int SETTINGS_RESULT = 1;
     public static final int REQUEST_ACCOUNT_PICKER = 2;

@@ -7,6 +7,23 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <!-- Navigation Drawer -->
+    <string name="drawer_open">Slider Menu Opened</string>
+    <string name="drawer_close">Slider Menu Closed</string>
+
+    <string-array name="nav_drawer_items">
+        <item>Events</item>
+        <item>User Groups</item>
+    </string-array>
+
+    <array name="nav_drawer_icons">
+        <item>@drawable/ic_event</item>
+        <item>@drawable/ic_group</item>
+    </array>
+
+    <!-- Content Description -->
+    <string name="desc_list_item_icon">Item Icon</string>
+
     <!-- Strings zu activity_showinformation -->
     <string name="show_info_header_date">Time and date</string>
     <string name="show_info_header_location">Location</string>
@@ -47,6 +64,7 @@
     <string name="title_activity_settings">Settings</string>
 
     <!--Strings zu activity UsergroupActivity-->
+    <string name="title_activity_base">BaseActivity</string>
     <string name="title_activity_user_group_activity">Manage Groups</string>
     <string name="title_fragment_all_user_groups">Groups</string>
     <string name="title_fragment_my_user_groups">My Groups</string>

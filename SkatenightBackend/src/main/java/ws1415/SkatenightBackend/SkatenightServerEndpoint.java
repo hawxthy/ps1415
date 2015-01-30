@@ -836,6 +836,7 @@ public class SkatenightServerEndpoint {
         PersistenceManager pm = pmf.getPersistenceManager();
         try {
             UserGroup ug = new UserGroup(member);
+            ug.setName(name);
             pm.makePersistent(ug);
         } finally {
             pm.close();
