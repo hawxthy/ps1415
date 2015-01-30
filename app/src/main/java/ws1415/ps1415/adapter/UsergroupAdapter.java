@@ -7,6 +7,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import ws1415.SkatenightBackend.UserGroup;
 import ws1415.ps1415.R;
 
 /**
@@ -88,8 +92,8 @@ public class UsergroupAdapter extends BaseAdapter {
         }
 
         holder.groupName.setText(getItem(position).getName());
-        holder.groupCreator.setText(getItem(position).getCreator());
-        holder.groupCount.setText(getItem(position).getMember().size());
+        holder.groupCreator.setText(getItem(position).getCreator().getName());
+        holder.groupCount.setText(getItem(position).getMembers().size());
 
         return convertView;
     }
