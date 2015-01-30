@@ -12,8 +12,8 @@
     <string name="drawer_close">Slider Menu Closed</string>
 
     <string-array name="nav_drawer_items">
-        <item >Home</item>
-        <item >User Groups</item>
+        <item>Events</item>
+        <item>User Groups</item>
     </string-array>
 
     <array name="nav_drawer_icons">
@@ -38,6 +38,7 @@
 
     <!-- Strings zu activity showEvents -->
     <string name="title_activity_show_events">Events</string>
+
     <string-array name="selections_menu">
         <item name="delete">Delete</item>
     </string-array>
@@ -68,14 +69,10 @@
     <string name="list_view_item_usergroup_membercount">Member: </string>
     <string name="list_view_item_usergroup_comma">, </string>
 
-    <!--Strings zu activity UsergroupActivity-->
-    <string name="title_activity_user_group_activity">Manage Groups</string>
+    <!-- Strings zu activity UsergroupActivity -->
     <string name="title_fragment_all_user_groups">Groups</string>
     <string name="title_fragment_my_user_groups">My Groups</string>
     <string name="action_add_user_group">Add Usergroup</string>
-
-    <string name="list_view_item_usergroup_creator">Creator: </string>
-    <string name="list_view_item_usergroup_membercount">Member: </string>
-    <string name="list_view_item_usergroup_comma">, </string>
+    <string name="title_activity_base">BaseActivity</string>
 
 </resources>
