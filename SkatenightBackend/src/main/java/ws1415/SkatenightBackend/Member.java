@@ -37,10 +37,8 @@ public class Member {
     @PrimaryKey
     @Persistent
     private String email;     // Einzigartige google Email, zum identifizieren eines Nutzers (Primary Key)
-    @Persistent
-    private List<String> groups = new ArrayList<>();
-
-    private List<UserGroup> createdGroups = new ArrayList<>();
+    @Persistent(defaultFetchGroup = "true")
+    private Set<String> groups = new HashSet<>();
 
     public String getName() {
         return name;
@@ -100,7 +98,15 @@ public class Member {
 
     public void addGroup(UserGroup g) {
         if (g != null) {
+            groups.add(g.getName());
+            g.getMembers().add(email);
+        }
+    }
 
+    public void removeGroup(UserGroup g) {
+        if (g != null) {
+            groups.remove(g.getName());
+            g.getMembers().remove(email);
         }
     }
 }

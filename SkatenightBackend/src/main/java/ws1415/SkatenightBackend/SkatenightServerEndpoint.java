@@ -11,18 +11,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
-import javax.servlet.http.HttpServlet;
+import javax.naming.NoPermissionException;
 
-import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
+import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
 
 
@@ -776,6 +775,29 @@ public class SkatenightServerEndpoint {
     }
 
     /**
+     * Ruft die Gruppe mit dem angegebenen Namen ab.
+     * @param name Der Name der abzurufenden Gruppe.
+     * @return Die UserGroup-Entity.
+     */
+    private UserGroup getUserGroup(String name) {
+        PersistenceManager pm = pmf.getPersistenceManager();
+
+        try {
+            Query q = pm.newQuery(UserGroup.class);
+            q.setFilter("name == nameParam");
+            q.declareParameters("String nameParam");
+            List<UserGroup> existingGroups = (List<UserGroup>) q.execute(name);
+            if (existingGroups.isEmpty()) {
+                return null;
+            } else {
+                return existingGroups.get(0);
+            }
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
      * Gibt eine Liste aller auf dem Server gespeicherter Benutzergruppen zurück.
      * @return Eine Liste aller Benutzergruppen.
      */
@@ -788,5 +810,76 @@ public class SkatenightServerEndpoint {
         } finally {
             pm.close();
         }
+    }
+
+    /**
+     * Erstellt eine Gruppe mit dem angegebenen Namen
+     * @param user Der Benutzer, der die Gruppe anlegen möchte.
+     * @param name Der Name der neuen Gruppe.
+     */
+    public void createUserGroup(User user, @Named("name") String name) throws OAuthRequestException {
+        if (user == null) {
+            throw new NullPointerException("no user submitted");
+        }
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("no group name submitted");
+        }
+        Member member = getMember(user.getEmail());
+        if (member == null) {
+            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
+            throw new IllegalArgumentException("user is not registered");
+        }
+        if (getUserGroup(name) != null) {
+            throw new IllegalArgumentException("group with submitted name already exists");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            UserGroup ug = new UserGroup(member);
+            pm.makePersistent(ug);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Löscht die Gruppe, falls der aufrufende Benutzer der Ersteller der Gruppe ist.
+     * @param user Der Benutzer, der den Löschvorgang durchführen möchte.
+     * @param name Der Name, der zu löschenden Gruppe.
+     */
+    public void deleteUserGroup(User user, @Named("name") String name) throws OAuthRequestException {
+        if (user == null) {
+            throw new NullPointerException("no user submitted");
+        }
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("no group name submitted");
+        }
+        Member member = getMember(user.getEmail());
+        if (member == null) {
+            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
+            throw new IllegalArgumentException("user is not registered");
+        }
+        UserGroup ug = getUserGroup(name);
+        if (ug != null) {
+            if (!ug.getCreator().getEmail().equals(user.getEmail())) {
+                throw new IllegalArgumentException("user is not creator of group");
+            }
+
+            PersistenceManager pm = pmf.getPersistenceManager();
+            try {
+                pm.deletePersistent(ug);
+            } finally {
+                pm.close();
+            }
+        }
+    }
+
+    /**
+     * Fügt den aufrufenden Benutzer zu der angegebenen Gruppe hinzu.
+     * @param user Der aufrufende Benutzer.
+     * @param groupName Der Name der beizutretenden Gruppe
+     */
+    public void addUserToGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException {
+        // TODO
     }
 }

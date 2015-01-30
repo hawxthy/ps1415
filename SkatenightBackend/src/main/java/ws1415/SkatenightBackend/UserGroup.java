@@ -21,7 +21,7 @@ public class UserGroup {
     @Persistent
     private Member creator;
     @Persistent
-    private List<String> members = new ArrayList<>();
+    private Set<String> members = new HashSet<>();
 
     public UserGroup() {
         // Konstruktor für GAE
@@ -32,7 +32,7 @@ public class UserGroup {
             throw new IllegalArgumentException("creator can not be null");
         }
         this.creator = creator;
-
+        creator.addGroup(this);
     }
 
     public String getName() {
@@ -47,7 +47,7 @@ public class UserGroup {
         return creator;
     }
 
-    public List<String> getMembers() {
+    public Set<String> getMembers() {
         return members;
     }
 }
