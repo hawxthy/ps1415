@@ -96,11 +96,9 @@ public class Member {
         return email;
     }
 
-    public Set<Key> getGroups() {
-        return groups;
-    }
-
-    public Set<UserGroup> getCreatedGroups() {
-        return createdGroups;
+    public void addGroup(UserGroup g) {
+        if (g != null) {
+            
+        }
     }
 }
