@@ -7,11 +7,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.skatenight.skatenightAPI.model.UserGroup;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.SkatenightBackend.UserGroup;
-import ws1415.ps1415.R;
 
 /**
  * Dieser Adapter wird für das Anzeigen der Usergruppen in der Liste genutzt.

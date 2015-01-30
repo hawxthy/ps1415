@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.util.List;
 

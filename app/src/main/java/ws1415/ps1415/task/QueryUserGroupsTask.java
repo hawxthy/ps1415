@@ -1,5 +1,7 @@
 package ws1415.ps1415.task;
 
+import com.skatenight.skatenightAPI.model.UserGroup;
+
 import java.io.IOException;
 
 import ws1415.ps1415.ServiceProvider;
