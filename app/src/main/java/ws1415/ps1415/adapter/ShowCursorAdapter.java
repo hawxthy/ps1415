@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.skatenight.skatenightAPI.model.Event;
@@ -178,29 +178,30 @@ public class ShowCursorAdapter extends BaseAdapter {
             holder.button = (Button) view.findViewById(R.id.list_view_item_show_information_button_field_button);
             holder.title.setText(fieldList.get(position).getTitle());
             holder.button.setText(event.getRoute().getName());
+
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+            Toast.makeText(context.getApplicationContext(), pref.contains("prefSendLocation")?"true":"false", Toast.LENGTH_SHORT).show();
+
             holder.button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View view) {
                     if (event.getRoute() != null && event.getRoute().getRouteData() != null) {
                         // Erstellt den Dialog, ob die Position gespeichert werden soll und auf der Karte angezeigt wird
-                        Log.e("ShowCursorAdapter", "1: " + PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext()).getAll().keySet());
-                        Log.e("ShowCursorAdapter", "2: " + PreferenceManager.getDefaultSharedPreferences(context).getAll().keySet());
-                        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());//context.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+                        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
                         if (!pref.contains("prefSendLocation")) {
-                            // TODO: Hard-coded strings ersetzen
-                            AlertDialog.Builder builder = new AlertDialog.Builder(context.getApplicationContext());
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
                             builder.setMessage("Darf deine Position an den Server geschickt werden?");
                             builder.setPositiveButton(Html.fromHtml("<font color='#1FB1FF'>Ja</font>"), new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     // Leite wieter auf die Karte
-                                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());//context.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+                                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
                                     pref.edit().putBoolean("prefSendLocation", true).apply();
                                     showMap();
                                 }
                             });
                             builder.setNegativeButton(Html.fromHtml("<font color='#1FB1FF'>Nein</font>"), new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());//context.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+                                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
                                     pref.edit().putBoolean("prefSendLocation", false).apply();
                                     showMap();
                                 }
