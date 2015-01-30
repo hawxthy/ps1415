@@ -46,4 +46,9 @@
     <!-- Strings zu activity settings -->
     <string name="title_activity_settings">Settings</string>
 
+    <!--Strings zu activity UsergroupActivity-->
+    <string name="title_fragment_all_user_groups">Groups</string>
+    <string name="title_fragment_my_user_groups">My Groups</string>
+    <string name="action_add_user_group">Add Usergroup</string>
+
 </resources>
