@@ -174,4 +174,11 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
         super.onCreateOptionsMenu(menu, menuInflater);
     }
 
+    /**
+     * Dient zum refreshen der Liste der aktuellen UserGroups.
+     */
+    public void refresh(){
+        new QueryUserGroupsTask().execute(this);
+    }
+
 }

@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -56,6 +57,9 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
     private GoogleAccountCredential credential;
 
 
+    private Button testButton;
+
+
     /**
      * Fragt alle Events vom Server ab und fügt diese in die Liste ein
      *
@@ -89,6 +93,16 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
             }
         });
 
+        testButton = (Button)findViewById(R.id.buttonbutton);
+        testButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ShowEventsActivity.this, UsergroupActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
         // SharePreferences skatenight.app laden
         prefs = this.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
         credential = GoogleAccountCredential.usingAudience(this, "server:client_id:" + Constants.WEB_CLIENT_ID);
@@ -105,6 +119,8 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
             ServiceProvider.login(credential);
             initGCM();
         }
+
+
 
         new QueryEventsTask(this).execute();
     }

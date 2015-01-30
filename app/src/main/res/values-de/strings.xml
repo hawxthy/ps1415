@@ -55,4 +55,10 @@
     <string name="list_view_item_usergroup_creator">Ersteller: </string>
     <string name="list_view_item_usergroup_membercount">Mitglieder: </string>
     <string name="list_view_item_usergroup_comma">, </string>
+
+    <!--Strings zu AddUserGroupActivity-->
+    <string name="title_activity_add_user_group">Gruppe hinzufügen</string>
+    <string name="title_activity_add_user_group_title">Groupname</string>
+    <string name="activity_add_user_group_cancel_text">Abbrechen</string>
+    <string name="activity_add_user_group_apply_text">Ok</string>
 </resources>

@@ -114,6 +114,7 @@ public class UsergroupActivity extends FragmentActivity implements ActionBar.Tab
         int id = item.getItemId();
         if(id == R.id.action_add_user_group) {
             Intent intent = new Intent(this, AddUserGroupActivity.class);
+            AddUserGroupActivity.giveAllUsergroupsFragment((AllUsergroupsFragment)getAdapter().getItem(0));
             startActivity(intent);
             return true;
         }
