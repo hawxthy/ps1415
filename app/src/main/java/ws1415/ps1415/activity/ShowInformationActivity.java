@@ -200,6 +200,13 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                 routeFieldLast = e.getRouteFieldLast();
             }
             attendButton.setEnabled(true);
+
+            if (prefs.contains("accountName") && e.getMemberList() != null) {
+                attending = e.getMemberList().contains(prefs.getString("accountName", ""));
+            }
+            else {
+                attending = false;
+            }
             updateAttendButtonTitle();
         } else {
             attendButton.setEnabled(false);

@@ -9,7 +9,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -181,25 +183,25 @@ public class ShowCursorAdapter extends BaseAdapter {
                 public void onClick(final View view) {
                     if (event.getRoute() != null && event.getRoute().getRouteData() != null) {
                         // Erstellt den Dialog, ob die Position gespeichert werden soll und auf der Karte angezeigt wird
-                        final SharedPreferences pref = context.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+                        Log.e("ShowCursorAdapter", "1: " + PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext()).getAll().keySet());
+                        Log.e("ShowCursorAdapter", "2: " + PreferenceManager.getDefaultSharedPreferences(context).getAll().keySet());
+                        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());//context.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
                         if (!pref.contains("prefSendLocation")) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            // TODO: Hard-coded strings ersetzen
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context.getApplicationContext());
                             builder.setMessage("Darf deine Position an den Server geschickt werden?");
                             builder.setPositiveButton(Html.fromHtml("<font color='#1FB1FF'>Ja</font>"), new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     // Leite wieter auf die Karte
-                                    SharedPreferences.Editor editor = pref.edit();
-                                    editor.putBoolean("prefSendLocation", true);
-                                    editor.commit();
+                                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());//context.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+                                    pref.edit().putBoolean("prefSendLocation", true).apply();
                                     showMap();
                                 }
                             });
                             builder.setNegativeButton(Html.fromHtml("<font color='#1FB1FF'>Nein</font>"), new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    // Tue nichts
-                                    SharedPreferences.Editor editor = pref.edit();
-                                    editor.putBoolean("prefSendLocation", false);
-                                    editor.commit();
+                                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());//context.getSharedPreferences("skatenight.app", Context.MODE_PRIVATE);
+                                    pref.edit().putBoolean("prefSendLocation", false).apply();
                                     showMap();
                                 }
                             });
