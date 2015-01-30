@@ -29,12 +29,13 @@ public class DeleteUserGroupTask extends AsyncTask<UserGroup, Void, Boolean> {
     protected Boolean doInBackground(UserGroup... params) {
         usergroup = params[0];
         try {
-            return ServiceProvider.getService().skatenightServerEndpoint().deleteUserGroup(
-                    params[0].getName()).execute().getValue();
+            ServiceProvider.getService().skatenightServerEndpoint().deleteUserGroup(
+                    params[0].getName()).execute();
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
+        return true;
     }
 
     /**
