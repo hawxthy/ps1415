@@ -1,5 +1,7 @@
 package ws1415.SkatenightBackend;
 
+import com.google.appengine.datanucleus.annotations.Unowned;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,9 +20,11 @@ public class UserGroup {
     @PrimaryKey
     @Persistent
     private String name;            // Eindeutiger Name der Gruppe
-    @Persistent
+    @Persistent(defaultFetchGroup = "true")
+    @Unowned
     private Member creator;
-    @Persistent
+    @Persistent(defaultFetchGroup = "true")
+    @Unowned
     private Set<String> members = new HashSet<>();
 
     public UserGroup() {
