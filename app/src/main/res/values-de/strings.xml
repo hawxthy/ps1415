@@ -12,7 +12,7 @@
     <string name="drawer_close">Slider Menu geschlossen</string>
 
     <string-array name="nav_drawer_items">
-        <item >Home</item>
+        <item >Veranstaltungen</item>
         <item >Nutzergruppen</item>
     </string-array>
 
@@ -72,8 +72,4 @@
     <string name="title_fragment_all_user_groups">Groups</string>
     <string name="title_fragment_my_user_groups">My Groups</string>
     <string name="action_add_user_group">Usergruppe hinzufügen</string>
-
-    <string name="list_view_item_usergroup_creator">Ersteller: </string>
-    <string name="list_view_item_usergroup_member">Mitglieder: </string>
-    <string name="list_view_item_usergroup_comma">, </string>
 </resources>
