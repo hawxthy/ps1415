@@ -47,6 +47,7 @@
     <string name="title_activity_settings">Einstellungen</string>
 
     <!--Strings zu activity UsergroupActivity-->
+    <string name="title_activity_user_group_activity">Gruppen verwalten</string>
     <string name="title_fragment_all_user_groups">Groups</string>
     <string name="title_fragment_my_user_groups">My Groups</string>
     <string name="action_add_user_group">Usergruppe hinzufügen</string>

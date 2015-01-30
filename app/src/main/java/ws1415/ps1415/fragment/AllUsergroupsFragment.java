@@ -1,11 +1,10 @@
 package ws1415.ps1415.fragment;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -17,6 +16,7 @@ import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.UsergroupAdapter;
+import ws1415.ps1415.task.DeleteUserGroupTask;
 import ws1415.ps1415.task.QueryUserGroupsTask;
 
 /**
@@ -76,6 +76,7 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
              */
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //TODO Gruppe beitreten implementieren.
                 //Intent intent = new Intent(getActivity(), ShowInformationActivity.class);
                 //intent.putExtra("event", eventList.get(i).getKey().getId());
                 //startActivity(intent);
@@ -94,7 +95,7 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
              */
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //TODO Was finden was man machen kann, wenn Zeit ist.
+                //TODO Löschen der Gruppe implementieren.
                 //createSelectionsMenu(i);
                 return true;
             }
@@ -156,5 +157,21 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
      *
      * @param usergroup die zu löschende UserGroup
      */
-    private void deleteUserGroup(UserGroup usergroup){ new DeleteUserGroupTask(this).execute(usergroup);}
+    private void deleteUserGroup(UserGroup usergroup){
+        new DeleteUserGroupTask(this).execute(usergroup);
+    }
+
+    /**
+     * Erstellt das ActionBar Menu
+     *
+     * @param menu
+     * @param menuInflater
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.add_user_group_plus_button, menu);
+        super.onCreateOptionsMenu(menu, menuInflater);
+    }
+
 }
