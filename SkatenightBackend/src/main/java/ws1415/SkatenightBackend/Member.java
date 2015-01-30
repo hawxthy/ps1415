@@ -1,8 +1,11 @@
 package ws1415.SkatenightBackend;
 
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.datanucleus.annotations.Unowned;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -32,6 +35,10 @@ public class Member {
     @PrimaryKey
     @Persistent
     private String email;     // Einzigartige google Email, zum identifizieren eines Nutzers (Primary Key)
+    @Persistent
+    private Set<Key> groups = new HashSet<>();
+
+    private Set<UserGroup> createdGroups = new HashSet<>();
 
     public String getName() {
         return name;
@@ -87,5 +94,11 @@ public class Member {
 
     public String getEmail() {
         return email;
+    }
+
+    public void addGroup(UserGroup g) {
+        if (g != null) {
+            
+        }
     }
 }
