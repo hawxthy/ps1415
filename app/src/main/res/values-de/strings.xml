@@ -7,6 +7,23 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Einstellungen</string>
 
+    <!-- Navigation Drawer -->
+    <string name="drawer_open">Slider Menu geöffnet</string>
+    <string name="drawer_close">Slider Menu geschlossen</string>
+
+    <string-array name="nav_drawer_items">
+        <item >Home</item>
+        <item >Nutzergruppen</item>
+    </string-array>
+
+    <array name="nav_drawer_icons">
+        <item>@drawable/ic_event</item>
+        <item>@drawable/ic_group</item>
+    </array>
+
+    <!-- Content Description -->
+    <string name="desc_list_item_icon">Item Icon</string>
+
     <!-- Strings zu activity_showinformation -->
     <string name="show_info_header_date">Datum und Uhrzeit</string>
     <string name="show_info_header_location">Ort</string>
@@ -42,6 +59,11 @@
     <string name="active_event_altitude_format_meters"><xliff:g id="altitude">%1$.1f</xliff:g> m</string>
     <string name="active_event_distance_format_meters"><xliff:g id="distance">%1$.1f</xliff:g> m</string>
     <string name="active_event_speed_format"><xliff:g id="speed">%1$.1f</xliff:g> km/h</string>
+
+    <!-- Strings für den UsergroupAdapter -->
+    <string name="list_view_item_usergroup_creator">Ersteller: </string>
+    <string name="list_view_item_usergroup_membercount">Mitglieder: </string>
+    <string name="list_view_item_usergroup_comma">, </string>
 
     <!-- Strings zu activity settings -->
     <string name="title_activity_settings">Einstellungen</string>
