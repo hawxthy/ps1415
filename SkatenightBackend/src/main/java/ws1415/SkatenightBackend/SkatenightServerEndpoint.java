@@ -11,18 +11,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
-import javax.servlet.http.HttpServlet;
 
-import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
+import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
 
 
@@ -143,6 +141,7 @@ public class SkatenightServerEndpoint {
         return result;
     }
 
+
     /**
      * Aktualisiert das auf dem Server gespeicherte Event-Objekt.
      *
@@ -150,6 +149,20 @@ public class SkatenightServerEndpoint {
      * @param e    Das neue Event-Objekt.
      */
     public void createEvent(User user, Event e) throws OAuthRequestException, IOException {
+        createEvent(user, e, false);
+    }
+
+    /**
+     * Aktualisiert das auf dem Server gespeicherte Event-Objekt. Diese Methode ist private, damit
+     * aus den Apps der Parameter editing nicht manuell angegeben werden kann.
+     *
+     * @param user      Der User, der das Event-Objekt aktualisieren möchte.
+     * @param e         Das neue Event-Objekt.
+     * @param editing   true, wenn das Event editiert wurde, false, wenn es sich um ein neues Event
+     *                  handelt. Hat Auswirkungen auf die Notification, die an die Benutzer gesendet
+     *                  wird.
+     */
+    private void createEvent(User user, Event e, boolean editing) throws OAuthRequestException, IOException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
@@ -176,17 +189,22 @@ public class SkatenightServerEndpoint {
 
                 // Benachrichtigung nur schicken, wenn Event in der Zukunft liegt
                 if (secondsTillStart > 0) {
+                    String eventTitle = FieldType.getUniqueField(FieldType.TITLE.getId(), e).getValue();
                     Sender sender = new Sender(Constants.GCM_API_KEY);
-                    Message m = new Message.Builder()
+                    Message.Builder mb = new Message.Builder()
                             // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
                             .delayWhileIdle(true)
                             .collapseKey("event_created")
                             // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
                             .timeToLive((int) secondsTillStart)
                             .addData("type", MessageType.NOTIFICATION_MESSAGE.name())
-                            .addData("title", "Ein neues Event wurde erstellt")
-                            .addData("content", FieldType.getUniqueField(FieldType.TITLE.getId(), e).getValue())
-                            .build();
+                            .addData("content", eventTitle);
+                    if (editing) {
+                        mb.addData("title", "Ein Event wurde angepasst.");
+                    } else {
+                        mb.addData("title", "Ein neues Event wurde erstellt.");
+                    }
+                    Message m = mb.build();
                     try {
                         sender.send(m, getRegistrationManager(pm).getRegisteredUser(), 5);
                     } catch (IOException ex) {
@@ -711,7 +729,7 @@ public class SkatenightServerEndpoint {
         long keyId = event.getKey().getId();
         BooleanWrapper b = deleteEvent(keyId, user);
         if(b.value) {
-            createEvent(user, event);
+            createEvent(user, event, true);
         }
 
         return new BooleanWrapper(b.value);
