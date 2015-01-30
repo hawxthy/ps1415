@@ -7,8 +7,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +27,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.skatenight.skatenightAPI.model.Event;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.common.gcm.GCMUtil;
@@ -32,9 +37,25 @@ import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.EventsCursorAdapter;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.ps1415.adapter.NavDrawerListAdapter;
+import ws1415.ps1415.model.NavDrawerItem;
 import ws1415.ps1415.task.QueryEventsTask;
 
 public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate<Void, List<Event>> {
+    // NavigationDrawer
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
+
+    private String[] navMenuTitles;
+    private TypedArray navMenuIcons;
+
+    private ArrayList<NavDrawerItem> navDrawerItems;
+    private NavDrawerListAdapter adapter;
+
     private static final String TAG = "Skatenight";
     public static final int SETTINGS_RESULT = 1;
     public static final int REQUEST_ACCOUNT_PICKER = 2;
@@ -68,6 +89,53 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
 
         setContentView(R.layout.activity_show_events);
         setProgressBarIndeterminateVisibility(true);
+
+        // NavigationDrawer initialisieren
+        mTitle = mDrawerTitle = getTitle();
+
+        //Slide Menu Items laden
+        navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
+
+        //Nav Drawer Icons initialisieren
+        navMenuIcons = getResources().obtainTypedArray(R.array.nav_drawer_icons);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
+
+        navDrawerItems = new ArrayList<NavDrawerItem>();
+
+        // Die Nav Drawer Items hinzufügen
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
+
+        navMenuIcons.recycle();
+
+        // Den Nav Drawer Adapter setzen
+        adapter = new NavDrawerListAdapter(getApplicationContext(), navDrawerItems);
+        mDrawerList.setAdapter(adapter);
+
+        // Action Bar Item aktivieren
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+                R.drawable.ic_drawer,
+                R.string.app_name,
+                R.string.app_name
+        ){
+            public void onDrawerClosed(View view) {
+                getActionBar().setTitle(mTitle);
+                // calling onPrepareOptionsMenu() to show action bar icons
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                getActionBar().setTitle(mDrawerTitle);
+                // calling onPrepareOptionsMenu() to hide action bar icons
+                invalidateOptionsMenu();
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         // ListView initialisieren
         eventListView = (ListView) findViewById(R.id.activity_show_events_list_view);
@@ -150,6 +218,9 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        if(mDrawerToggle.onOptionsItemSelected(item)){
+            return true;
+        }
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             Intent i = new Intent(getApplicationContext(), Settings.class);
@@ -157,6 +228,41 @@ public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /***
+     * Wird ausgeführt wenn invalidateOptionsMenu() gestartet wird
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // if nav drawer is opened, hide the action items
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+        menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        getActionBar().setTitle(mTitle);
+    }
+
+    /**
+     * When using the ActionBarDrawerToggle, you must call it during
+     * onPostCreate() and onConfigurationChanged()...
+     */
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Pass any configuration change to the drawer toggls
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override

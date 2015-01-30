@@ -82,10 +82,10 @@ public class UsergroupAdapter extends BaseAdapter {
 
         if (convertView == null) {
             holder = new Holder();
-            convertView = inflater.inflate(R.layout.list_view_item_usergroup, viewGroup, false);
-            holder.groupName = (TextView) convertView.findViewById(R.id.list_view_item_usergroup_name);
-            holder.groupCreator = (TextView) convertView.findViewById(R.id.list_view_item_usergroup_creator);
-            holder.groupCount = (TextView) convertView.findViewById(R.id.list_view_item_usergroup_member);
+            //convertView = inflater.inflate(R.layout.list_view_item_usergroup, viewGroup, false);
+            //holder.groupName = (TextView) convertView.findViewById(R.id.list_view_item_usergroup_name);
+            //holder.groupCreator = (TextView) convertView.findViewById(R.id.list_view_item_usergroup_creator);
+            //holder.groupCount = (TextView) convertView.findViewById(R.id.list_view_item_usergroup_member);
             convertView.setTag(holder);
         } else {
             holder = (Holder) convertView.getTag();
