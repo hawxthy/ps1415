@@ -63,7 +63,6 @@
     <!-- Strings für den UsergroupAdapter -->
     <string name="list_view_item_usergroup_creator">Ersteller: </string>
     <string name="list_view_item_usergroup_membercount">Mitglieder: </string>
-    <string name="list_view_item_usergroup_comma">", "</string>
 
     <!-- Strings zu activity settings -->
     <string name="title_activity_settings">Einstellungen</string>
@@ -81,7 +80,9 @@
     <string name="activity_add_user_group_apply_text">Ok</string>
     <string name="dialog_join_group">Möchten Sie der Gruppe beitreten?</string>
     <string name="dialog_leave_group">Möchten Sie die Gruppe verlassen?</string>
+    <string name="dialog_group_owner">Sie können die Gruppe nicht verlassen, weil Sie der Ersteller der Gruppe sind.</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+    <string name="ok">OK</string>
 
 </resources>

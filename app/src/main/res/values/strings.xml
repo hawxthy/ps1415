@@ -72,7 +72,6 @@
 
     <string name="list_view_item_usergroup_creator">Creator: </string>
     <string name="list_view_item_usergroup_membercount">Member: </string>
-    <string name="list_view_item_usergroup_comma">", "</string>
 
     <!--Strings zu AddUserGroupActivity-->
     <string name="title_activity_add_user_group">Gruppe hinzufügen</string>
@@ -81,7 +80,9 @@
     <string name="activity_add_user_group_apply_text">Apply</string>
     <string name="dialog_join_group">Do you want to join the group?</string>
     <string name="dialog_leave_group">Do you want to leave the group?</string>
+    <string name="dialog_group_owner">You are the creator of the group, therefore you can\'t leave the group.</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="ok">OK</string>
 
 </resources>

@@ -14,13 +14,14 @@ import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.UsergroupAdapter;
 import ws1415.ps1415.task.DeleteUserGroupTask;
+import ws1415.ps1415.task.JoinUserGroupTask;
+import ws1415.ps1415.task.LeaveUserGroupTask;
 import ws1415.ps1415.task.QueryUserGroupsTask;
 
 /**
@@ -71,40 +72,19 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
         userGroupListView = (ListView) view.findViewById(R.id.fragment_show_user_groups_list_view);
 
         userGroupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            /**
-             * Tut im moment noch nichts
-             *
-             * @param adapterView
-             * @param view
-             * @param i
-             * @param l
-             */
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //TODO Gruppe beitreten implementieren.
-                if(!isUserInGroup(ServiceProvider.getEmail(), mAdapter.getItem(i))) {
-                    createSelectionsMenuJoin(i);
+                UserGroup selectedGroup = mAdapter.getItem(i);
+                String userEmail = ServiceProvider.getEmail();
+                if(!isCreator(userEmail, selectedGroup)) {
+                    if (!isUserInGroup(ServiceProvider.getEmail(), selectedGroup)) {
+                        createDialogJoin(i);
+                    } else {
+                        createDialogLeave(i);
+                    }
                 } else {
-                    createSelectionsMenuLeave(i);
+                    createDialogOwner(i);
                 }
-            }
-        });
-
-        userGroupListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            /**
-             * Läscht die Route vom Server und von der ListView
-             *
-             * @param adapterView
-             * @param view
-             * @param i Position der Route in der ListView
-             * @param l
-             * @return
-             */
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //TODO Löschen der Gruppe implementieren.
-                //createSelectionsMenu(i);
-                return true;
             }
         });
 
@@ -129,14 +109,14 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
      *
      * @param position
      */
-    private void createSelectionsMenuJoin(final int position) {
+    private void createDialogJoin(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(mAdapter.getItem(position).getName());
         builder.setMessage(R.string.dialog_join_group);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                // TODO Task zum beitreten aufrufen
+                new JoinUserGroupTask(AllUsergroupsFragment.this).execute(mAdapter.getItem(position).getName());
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -156,14 +136,14 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
      *
      * @param position
      */
-    private void createSelectionsMenuLeave(final int position) {
+    private void createDialogLeave(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(mAdapter.getItem(position).getName());
         builder.setMessage(R.string.dialog_leave_group);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                // TODO Task zum verlassen aufrufen
+                new LeaveUserGroupTask(AllUsergroupsFragment.this).execute(mAdapter.getItem(position).getName());
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -176,11 +156,48 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
         builder.show();
     }
 
+    /**
+     * Erstellt einen Dialog, der den Benutzer darauf hinweist, dass er seiner selbst erstellten
+     * Gruppen nicht verlassen kann.
+     */
+    private void createDialogOwner(final int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(mAdapter.getItem(position).getName());
+        builder.setMessage(R.string.dialog_group_owner);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        builder.create();
+        builder.show();
+    }
+
+    /**
+     * Prüft ob der Benutzer mit der angegebenen Email-Adresse Mitglied in der Gruppe ist.
+     *
+     * @param email Email-Adresse des Benutzers
+     * @param group Gruppe
+     * @return
+     */
     private boolean isUserInGroup(String email, UserGroup group){
         List<String> members = group.getMembers();
         for(int i=0; i<members.size(); i++){
             if(members.get(i).equals(email)) return true;
         }
+        return false;
+    }
+
+    /**
+     * Prüft ob der Benutzer mit der angegebenen Email-Adresse der Ersteller der Gruppe ist.
+     *
+     * @param email Email-Adresse des Benutzers
+     * @param group Gruppe
+     * @return
+     */
+    private boolean isCreator(String email, UserGroup group){
+        String creator = group.getCreator().getEmail();
+        if(creator.equals(email)) return true;
         return false;
     }
 
@@ -218,7 +235,7 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
     }
 
     /**
-     * Dient zum refreshen der Liste der aktuellen UserGroups.
+     * Dient zum Refreshen der Liste der aktuellen UserGroups.
      */
     public void refresh(){
         new QueryUserGroupsTask().execute(this);
