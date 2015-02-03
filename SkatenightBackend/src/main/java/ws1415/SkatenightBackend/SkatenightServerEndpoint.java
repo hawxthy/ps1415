@@ -17,7 +17,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
-import javax.naming.NoPermissionException;
 
 import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
@@ -783,17 +782,20 @@ public class SkatenightServerEndpoint {
         PersistenceManager pm = pmf.getPersistenceManager();
 
         try {
-            Query q = pm.newQuery(UserGroup.class);
-            q.setFilter("name == nameParam");
-            q.declareParameters("String nameParam");
-            List<UserGroup> existingGroups = (List<UserGroup>) q.execute(name);
-            if (existingGroups.isEmpty()) {
-                return null;
-            } else {
-                return existingGroups.get(0);
-            }
+            return getUserGroup(pm, name);
         } finally {
             pm.close();
+        }
+    }
+    private UserGroup getUserGroup(PersistenceManager pm, String name) {
+        Query q = pm.newQuery(UserGroup.class);
+        q.setFilter("name == nameParam");
+        q.declareParameters("String nameParam");
+        List<UserGroup> existingGroups = (List<UserGroup>) q.execute(name);
+        if (existingGroups.isEmpty()) {
+            return null;
+        } else {
+            return existingGroups.get(0);
         }
     }
 
@@ -866,8 +868,19 @@ public class SkatenightServerEndpoint {
                 throw new IllegalArgumentException("user is not creator of group");
             }
 
+            // Benutzer abrufen, die in der Gruppe sind
+            Member[] members = new Member[ug.getMembers().size()];
+            int index = 0;
+            for (String mail : ug.getMembers()) {
+                members[index++] = getMember(mail);
+            }
+
             PersistenceManager pm = pmf.getPersistenceManager();
             try {
+                for (Member m : members) {
+                    m.removeGroup(ug);
+                    pm.makePersistent(m);
+                }
                 pm.deletePersistent(ug);
             } finally {
                 pm.close();
@@ -880,7 +893,62 @@ public class SkatenightServerEndpoint {
      * @param user Der aufrufende Benutzer.
      * @param groupName Der Name der beizutretenden Gruppe
      */
-    public void addUserToGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException {
-        // TODO
+    public void joinUserGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException {
+        if (user == null) {
+            throw new NullPointerException("no user submitted");
+        }
+        if (groupName == null || groupName.isEmpty()) {
+            throw new IllegalArgumentException("no group name submitted");
+        }
+        Member member = getMember(user.getEmail());
+        if (member == null) {
+            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
+            throw new IllegalArgumentException("user is not registered");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            UserGroup ug = getUserGroup(pm, groupName);
+            if (ug == null) {
+                throw new IllegalArgumentException("a group with the submitted group name does not exist");
+            }
+            member.addGroup(ug);
+            pm.makePersistent(member);
+            pm.makePersistent(ug);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Entfernt den aufrufenden Benutzer aus der angegebenen Gruppe.
+     * @param user Der aufrufende Benutzer.
+     * @param groupName Der Name der zu verlassenden Gruppe.
+     */
+    public void leaveUserGroup(User user, @Named("groupName") String groupName) {
+        if (user == null) {
+            throw new NullPointerException("no user submitted");
+        }
+        if (groupName == null || groupName.isEmpty()) {
+            throw new IllegalArgumentException("no group name submitted");
+        }
+        Member member = getMember(user.getEmail());
+        if (member == null) {
+            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
+            throw new IllegalArgumentException("user is not registered");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            UserGroup ug = getUserGroup(pm, groupName);
+            if (ug == null) {
+                throw new IllegalArgumentException("a group with the submitted group name does not exist");
+            }
+            member.removeGroup(ug);
+            pm.makePersistent(member);
+            pm.makePersistent(ug);
+        } finally {
+            pm.close();
+        }
     }
 }
