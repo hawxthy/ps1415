@@ -2,6 +2,8 @@ package ws1415.ps1415.task;
 
 import android.os.AsyncTask;
 
+import java.io.IOException;
+
 import ws1415.ps1415.ServiceProvider;
 
 /**
@@ -10,7 +12,11 @@ import ws1415.ps1415.ServiceProvider;
 public class JoinUserGroupTask extends AsyncTask<String, Void, Void>{
 
     protected Void doInBackground(String... params){
-        ServiceProvider.getService().skatenightServerEndpoint().joinUserGroup(params[0]).execute();
+        try{
+            ServiceProvider.getService().skatenightServerEndpoint().joinUserGroup(params[0]).execute();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
         return null;
     }
 }
