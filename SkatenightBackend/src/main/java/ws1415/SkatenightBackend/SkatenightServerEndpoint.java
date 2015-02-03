@@ -863,6 +863,8 @@ public class SkatenightServerEndpoint {
         try {
             UserGroup ug = new UserGroup(member);
             ug.setName(name);
+            member.addGroup(ug);
+            pm.makePersistent(member);
             pm.makePersistent(ug);
         } finally {
             pm.close();
@@ -960,6 +962,9 @@ public class SkatenightServerEndpoint {
         if (member == null) {
             // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
             throw new IllegalArgumentException("user is not registered");
+        }
+        if (member.getGroups().contains(groupName)) {
+            throw new IllegalArgumentException("you can not leave your own group");
         }
 
         PersistenceManager pm = pmf.getPersistenceManager();
