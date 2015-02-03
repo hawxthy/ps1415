@@ -827,10 +827,23 @@ public class SkatenightServerEndpoint {
         }
 
         PersistenceManager pm = pmf.getPersistenceManager();
+        UserGroup ug;
         try {
             List<UserGroup> result = new LinkedList<>();
+            List<String> missingGroups = new LinkedList<>();
             for (String g : member.getGroups()) {
-                result.add(getUserGroup(pm, g));
+                ug = getUserGroup(pm, g);
+                if (ug != null) {
+                    result.add(ug);
+                } else {
+                    missingGroups.add(g);
+                }
+            }
+            if (missingGroups.size() > 0) {
+                for (String g : missingGroups) {
+                    member.getGroups().remove(g);
+                }
+                pm.makePersistent(member);
             }
             return result;
         } finally {
@@ -907,6 +920,7 @@ public class SkatenightServerEndpoint {
                     m.removeGroup(ug);
                     pm.makePersistent(m);
                 }
+                pm.makePersistent(ug);
                 pm.deletePersistent(ug);
             } finally {
                 pm.close();

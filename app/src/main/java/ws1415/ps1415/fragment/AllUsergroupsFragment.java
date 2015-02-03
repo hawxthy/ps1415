@@ -32,6 +32,7 @@ import ws1415.ps1415.util.groupUtils;
     private ListView userGroupListView;
     private List<UserGroup> userGroupList;
     private UsergroupAdapter mAdapter;
+    AlertDialog c_dialog;
 
     /**
      * Fragt alle UserGroups vom Server ab und fügt diese in die Liste ein
@@ -93,7 +94,7 @@ import ws1415.ps1415.util.groupUtils;
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String email = ServiceProvider.getEmail();
                 UserGroup group = mAdapter.getItem(i);
-                if(groupUtils.isCreator(email, group)){
+                if (groupUtils.isCreator(email, group)) {
                     groupUtils.createDialogDelete(i, mAdapter, AllUsergroupsFragment.this);
                 } else {
                     groupUtils.createDialogDeleteFailed(i, mAdapter, AllUsergroupsFragment.this);
@@ -113,10 +114,11 @@ import ws1415.ps1415.util.groupUtils;
     public void setUserGroupsToListView(List<UserGroup> results) {
         userGroupList = results;
         mAdapter = new UsergroupAdapter(getActivity(), results);
-        if(userGroupListView != null) {
+        if (userGroupListView != null) {
             userGroupListView.setAdapter(mAdapter);
         }
     }
+
 
     /**
      * Löscht die UserGroup aus der Liste

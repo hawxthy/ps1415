@@ -6,9 +6,16 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.skatenight.skatenightAPI.SkatenightAPI;
+import com.skatenight.skatenightAPI.model.UserGroup;
+
+import java.util.List;
+
 import ws1415.ps1415.R;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 import ws1415.ps1415.task.AddUserGroupTask;
+import ws1415.ps1415.task.QueryMyUserGroupsTask;
+import ws1415.ps1415.task.QueryUserGroupsTask;
 
 
 public class AddUserGroupActivity extends Activity {
@@ -39,18 +46,26 @@ public class AddUserGroupActivity extends Activity {
      *
      * @param view
      */
-    public void apply(View view){
+    public void apply(View view) throws Exception {
         String hostName = addHostEditText.getText().toString();
-        if(!hostName.equals("")) {
-            finish();
-            new AddUserGroupTask(allUsergroupsFragment).execute(hostName);
-        } else {
+        if (!hostName.equals("")) {
+            List<UserGroup> groupList = new QueryUserGroupsTask().execute(allUsergroupsFragment).get();
+            for (int i = 0; i < groupList.size(); i++) {
+                if (groupList.get(i).getName().equals(hostName)) {
+                    Toast.makeText(this, "Name darf nicht schon vergeben sein", Toast.LENGTH_LONG).show();
+                } else {
+                    finish();
+                    new AddUserGroupTask(allUsergroupsFragment).execute(hostName);
+                }
+            }
+
+        }else {
             Toast.makeText(this, "Name darf nicht leer sein", Toast.LENGTH_LONG).show();
         }
     }
 
 
-    public static void giveAllUsergroupsFragment(AllUsergroupsFragment fragment){
+    public static void giveAllUsergroupsFragment(AllUsergroupsFragment fragment) {
         allUsergroupsFragment = fragment;
     }
 

@@ -110,7 +110,7 @@ public class Member {
         }
     }
 
-    public HashSet<String> getGroups() {
-        return new HashSet<>(groups);
+    public Set<String> getGroups() {
+        return groups;
     }
 }
