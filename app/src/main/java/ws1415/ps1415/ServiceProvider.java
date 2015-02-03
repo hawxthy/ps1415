@@ -12,6 +12,7 @@ import com.skatenight.skatenightAPI.SkatenightAPI;
  */
 public abstract class ServiceProvider {
     private static SkatenightAPI service;
+    private static String email;
 
     /**
      * Gibt die aktuelle API-Instanz zurück. Falls noch keine Instanz erstellt wurde, wird eine
@@ -35,5 +36,10 @@ public abstract class ServiceProvider {
                 new AndroidJsonFactory(), credential);
         builder.setRootUrl(Constants.API_URL);
         service = builder.build();
+        email = credential.getSelectedAccountName();
+    }
+
+    public static String getEmail(){
+        return email;
     }
 }
