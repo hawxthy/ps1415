@@ -66,12 +66,11 @@ public class CreateJoinLeaveDeleteUserGroupTest extends ActivityInstrumentationT
         // ActionBar der UsergroupActivity holen
         mActionBar = mActivity.getActionBar();
 
-        // Initialisiere das MenuItem
-        addUserGroupButton = (MenuItem) mActionBar.getCustomView().findViewById(R.id.action_add_user_group);
+        // Den Action Button holen
+        addUserGroupButton = mActivity.getMenuItem();
 
         // Initialisiere die ListView
         listView = ((AllUsergroupsFragment) mActivity.getAdapter().getItem(0)).getListView();
-        mActivity.onOptionsItemSelected(addUserGroupButton);
     }
 
     /**
@@ -93,8 +92,6 @@ public class CreateJoinLeaveDeleteUserGroupTest extends ActivityInstrumentationT
     public void testUserCase() throws Exception {
         Instrumentation.ActivityMonitor am = getInstrumentation().addMonitor(AddUserGroupActivity.class.getName(), null, false);
         // Initialisiere das MenuItem
-        final MenuItem addUserGroupButton = (MenuItem) mActionBar.getCustomView().findViewById(R.id.action_add_user_group);
-
 
         mActivity.runOnUiThread(new Runnable() {
             @Override
@@ -125,16 +122,27 @@ public class CreateJoinLeaveDeleteUserGroupTest extends ActivityInstrumentationT
 
         final ListView groupList = (ListView) mActivity.findViewById(R.id.fragment_show_user_groups_list_view);
         boolean found = false;
-        int position = -1;
+        int positionMyGroup = -1;
         for (int i = 0; i < groupList.getAdapter().getCount(); i++) {
             if (((UserGroup) groupList.getAdapter().getItem(i)).getName().equals(userGroup)) {
                 found = true;
-                position = i;
+                positionMyGroup = i;
             }
         }
         assertEquals("Gruppe wurde nicht angelegt", true, found);
 
+
         // Gruppe beitreten
+        found = false;
+        int position = -1;
+        for (int i = 0; i < groupList.getAdapter().getCount(); i++) {
+            if (!((UserGroup) groupList.getAdapter().getItem(i)).getMembers().contains(ServiceProvider.getEmail())) {
+                position = i;
+                found = true;
+            }
+        }
+        assertTrue("Es existiert keine Gruppe, bei der man nicht der Ersteller/Member ist", found);
+
         final int pos = position;
         mActivity.runOnUiThread(new Runnable() {
             @Override
@@ -144,35 +152,49 @@ public class CreateJoinLeaveDeleteUserGroupTest extends ActivityInstrumentationT
         });
         Thread.sleep(3000);
 
-        final AlertDialog dialog = mFragment.getLastDialog();
-        final Button posButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        final Button okButton = ((AllUsergroupsFragment) mActivity.getAdapter().getItem(0)).getLastDialog().getButton(AlertDialog.BUTTON_POSITIVE);
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                posButton.performClick();
+                okButton.performClick();
             }
         });
         Thread.sleep(3000);
 
-        int posGruppe = 0;
-        // Nach der Gruppe suchen und prüfen ob der Name bei den Membern der
-        // Gruppe enthalten ist.
-        for (int i = 0; i < groupList.getAdapter().getCount(); i++) {
-            if (groupList.getAdapter().getItem(i).equals(userGroup)) {
-                posGruppe = i;
-            }
-        }
         found = false;
-        for (int j = 0; j < ((UserGroup) groupList.getAdapter().getItem(posGruppe)).getMembers().size(); j++) {
-            if (((UserGroup) groupList.getAdapter().getItem(posGruppe)).getMembers().get(j).equals(ServiceProvider.getEmail())) {
+        for (int j = 0; j < ((UserGroup) groupList.getAdapter().getItem(position)).getMembers().size(); j++) {
+            if (((UserGroup) groupList.getAdapter().getItem(position)).getMembers().get(j).equals(ServiceProvider.getEmail())) {
                 found = true;
             }
         }
         assertTrue("Member wurde nicht gefunden", found);
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                groupList.performItemClick(groupList.getAdapter().getView(pos, null, groupList), pos, groupList.getAdapter().getItemId(pos));
+            }
+        });
+        Thread.sleep(3000);
+
+        final Button okButtonLeave = ((AllUsergroupsFragment) mActivity.getAdapter().getItem(0)).getLastDialog().getButton(AlertDialog.BUTTON_POSITIVE);
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                okButtonLeave.performClick();
+            }
+        });
+        Thread.sleep(3000);
+
+        found = true;
+        if (!((UserGroup) groupList.getAdapter().getItem(position)).getMembers().contains(ServiceProvider.getEmail())) {
+            found = false;
+        }
+        assertFalse("Benutzer hat die Gruppe nicht verlassen", found);
+
 
         // Da longClick nicht zu simmulieren ist, müssen wir hier den
         // Task direkt aufrufen
-        new DeleteUserGroupTask(mFragment).execute(((UserGroup) groupList.getAdapter().getItem(posGruppe))).get();
+        new DeleteUserGroupTask(mFragment).execute(((UserGroup) groupList.getAdapter().getItem(positionMyGroup))).get();
 
         // Nach der Gruppe suchen und prüfen ob diese noch existiert
         found = false;
