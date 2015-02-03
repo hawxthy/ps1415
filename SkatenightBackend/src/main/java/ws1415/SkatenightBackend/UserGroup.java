@@ -36,7 +36,6 @@ public class UserGroup {
             throw new IllegalArgumentException("creator can not be null");
         }
         this.creator = creator;
-        creator.addGroup(this);
     }
 
     public String getName() {
