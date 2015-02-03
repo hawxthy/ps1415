@@ -10,6 +10,7 @@ import com.google.appengine.api.users.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.JDOHelper;
@@ -808,6 +809,29 @@ public class SkatenightServerEndpoint {
 
         try {
             List<UserGroup> result = (List<UserGroup>) pm.newQuery(UserGroup.class).execute();
+            return result;
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Gibt eine Liste aller Benutzergruppen des angegebenen Benutzers zurück.
+     * @return Eine Liste aller Benutzergruppen.
+     */
+    public List<UserGroup> fetchMyUserGroups(User user) throws OAuthRequestException {
+        Member member;
+        if (user == null || (member = getMember(user.getEmail())) == null) {
+            // Falls kein Benutzer angegeben, dann leere Liste zurückgeben.
+            return new ArrayList<>();
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            List<UserGroup> result = new LinkedList<>();
+            for (String g : member.getGroups()) {
+                result.add(getUserGroup(pm, g));
+            }
             return result;
         } finally {
             pm.close();
