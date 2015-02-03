@@ -963,15 +963,15 @@ public class SkatenightServerEndpoint {
             // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
             throw new IllegalArgumentException("user is not registered");
         }
-        if (member.getGroups().contains(groupName)) {
-            throw new IllegalArgumentException("you can not leave your own group");
-        }
 
         PersistenceManager pm = pmf.getPersistenceManager();
         try {
             UserGroup ug = getUserGroup(pm, groupName);
             if (ug == null) {
                 throw new IllegalArgumentException("a group with the submitted group name does not exist");
+            }
+            if (user.getEmail().equals(ug.getCreator().getEmail())) {
+                throw new IllegalArgumentException("you can not leave your own group");
             }
             member.removeGroup(ug);
             pm.makePersistent(member);
@@ -980,4 +980,5 @@ public class SkatenightServerEndpoint {
             pm.close();
         }
     }
+
 }
