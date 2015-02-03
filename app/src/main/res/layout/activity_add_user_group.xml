@@ -52,7 +52,7 @@
             android:text="@string/activity_add_user_group_cancel_text" />
 
         <Button
-            android:id="@+id/activity_add_host_dialog_apply"
+            android:id="@+id/activity_add_user_group_apply"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dip"
             android:layout_height="wrap_content"

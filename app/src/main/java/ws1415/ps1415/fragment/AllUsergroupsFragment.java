@@ -30,6 +30,7 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
     private ListView userGroupListView;
     private List<UserGroup> userGroupList;
     private UsergroupAdapter mAdapter;
+    AlertDialog c_dialog;
 
     /**
      * Fragt alle UserGroups vom Server ab und fügt diese in die Liste ein
@@ -144,7 +145,7 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
 
             }
         });
-        builder.create();
+        c_dialog = builder.create();
         builder.show();
     }
 
@@ -223,4 +224,11 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
         new QueryUserGroupsTask().execute(this);
     }
 
+    public AlertDialog getLastDialog(){
+        return c_dialog;
+    }
+
+    public ListView getListView(){
+        return userGroupListView;
+    }
 }
