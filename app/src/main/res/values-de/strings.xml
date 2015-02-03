@@ -63,7 +63,7 @@
     <!-- Strings für den UsergroupAdapter -->
     <string name="list_view_item_usergroup_creator">Ersteller: </string>
     <string name="list_view_item_usergroup_membercount">Mitglieder: </string>
-    <string name="list_view_item_usergroup_comma">, </string>
+    <string name="list_view_item_usergroup_comma">", "</string>
 
     <!-- Strings zu activity settings -->
     <string name="title_activity_settings">Einstellungen</string>
