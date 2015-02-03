@@ -2,19 +2,23 @@ package ws1415.ps1415.task;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.v4.app.Fragment;
+
+import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.io.IOException;
 
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
+import ws1415.ps1415.fragment.UsergroupsInterface;
 
 /**
  * Created by Bernd Eissing on 03.02.2015.
  */
 public class JoinUserGroupTask extends AsyncTask<String, Void, Void>{
-    private AllUsergroupsFragment fragment;
+    private UsergroupsInterface fragment;
 
-    public JoinUserGroupTask(AllUsergroupsFragment fragment){
+    public JoinUserGroupTask(UsergroupsInterface fragment){
         this.fragment = fragment;
     }
 

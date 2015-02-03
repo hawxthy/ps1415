@@ -80,6 +80,8 @@
     <string name="activity_add_user_group_apply_text">Apply</string>
     <string name="dialog_join_group">Do you want to join the group?</string>
     <string name="dialog_leave_group">Do you want to leave the group?</string>
+    <string name="dialog_delete_group">Are you sure, that you want to delete the group?</string>
+    <string name="dialog_delete_failed_group">You can\'t delete the group, because you are not the creator of the group.</string>
     <string name="dialog_group_owner">You are the creator of the group, therefore you can\'t leave the group.</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>

@@ -80,6 +80,8 @@
     <string name="activity_add_user_group_apply_text">Ok</string>
     <string name="dialog_join_group">Möchten Sie der Gruppe beitreten?</string>
     <string name="dialog_leave_group">Möchten Sie die Gruppe verlassen?</string>
+    <string name="dialog_delete_group">Sind Sie sicher, dass Sie die Gruppe löschen möchten?</string>
+    <string name="dialog_delete_failed_group">Sie können die Gruppe nicht löschen, da Sie nicht der Ersteller der Gruppe sind.</string>
     <string name="dialog_group_owner">Sie können die Gruppe nicht verlassen, weil Sie der Ersteller der Gruppe sind.</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>

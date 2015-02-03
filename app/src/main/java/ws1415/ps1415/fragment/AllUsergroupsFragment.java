@@ -23,11 +23,12 @@ import ws1415.ps1415.task.DeleteUserGroupTask;
 import ws1415.ps1415.task.JoinUserGroupTask;
 import ws1415.ps1415.task.LeaveUserGroupTask;
 import ws1415.ps1415.task.QueryUserGroupsTask;
+import ws1415.ps1415.util.groupUtils;
 
 /**
  * Created by Martin, Bernd on 30.01.2015.
  */
-    public class AllUsergroupsFragment extends Fragment {
+    public class AllUsergroupsFragment extends Fragment implements UsergroupsInterface{
     private ListView userGroupListView;
     private List<UserGroup> userGroupList;
     private UsergroupAdapter mAdapter;
@@ -75,15 +76,29 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 UserGroup selectedGroup = mAdapter.getItem(i);
                 String userEmail = ServiceProvider.getEmail();
-                if(!isCreator(userEmail, selectedGroup)) {
-                    if (!isUserInGroup(ServiceProvider.getEmail(), selectedGroup)) {
-                        createDialogJoin(i);
+                if(!groupUtils.isCreator(userEmail, selectedGroup)) {
+                    if (!groupUtils.isUserInGroup(ServiceProvider.getEmail(), selectedGroup)) {
+                        groupUtils.createDialogJoin(i, mAdapter, AllUsergroupsFragment.this);
                     } else {
-                        createDialogLeave(i);
+                        groupUtils.createDialogLeave(i, mAdapter, AllUsergroupsFragment.this);
                     }
                 } else {
-                    createDialogOwner(i);
+                    groupUtils.createDialogOwner(i, mAdapter, AllUsergroupsFragment.this);
                 }
+            }
+        });
+
+        userGroupListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String email = ServiceProvider.getEmail();
+                UserGroup group = mAdapter.getItem(i);
+                if(groupUtils.isCreator(email, group)){
+                    groupUtils.createDialogDelete(i, mAdapter, AllUsergroupsFragment.this);
+                } else {
+                    groupUtils.createDialogDeleteFailed(i, mAdapter, AllUsergroupsFragment.this);
+                }
+                return true;
             }
         });
 
@@ -98,108 +113,10 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
     public void setUserGroupsToListView(List<UserGroup> results) {
         userGroupList = results;
         mAdapter = new UsergroupAdapter(getActivity(), results);
-        userGroupListView.setAdapter(mAdapter);
-    }
-
-    /**
-     * Erstellt einen Dialog, welcher aufgerufen wird, wenn ein Item in der ListView lange
-     * ausgewählt wird. In diesem Dialog kann man dann auswählen, ob man der ausgewählten
-     * Gruppe beitreten möchte.
-     *
-     * @param position
-     */
-    private void createDialogJoin(final int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(mAdapter.getItem(position).getName());
-        builder.setMessage(R.string.dialog_join_group);
-        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                new JoinUserGroupTask(AllUsergroupsFragment.this).execute(mAdapter.getItem(position).getName());
-            }
-        });
-        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
-        });
-        builder.create();
-        builder.show();
-    }
-
-    /**
-     * Erstellt einen Dialog, welcher aufgerufen wird, wenn ein Item in der ListView lange
-     * ausgewählt wird. In diesem Dialog kann man dann auswählen, ob man die ausgewählten
-     * Gruppe verlassen möchte.
-     *
-     * @param position
-     */
-    private void createDialogLeave(final int position) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(mAdapter.getItem(position).getName());
-        builder.setMessage(R.string.dialog_leave_group);
-        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                new LeaveUserGroupTask(AllUsergroupsFragment.this).execute(mAdapter.getItem(position).getName());
-            }
-        });
-        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
-        });
-        builder.create();
-        builder.show();
-    }
-
-    /**
-     * Erstellt einen Dialog, der den Benutzer darauf hinweist, dass er seiner selbst erstellten
-     * Gruppen nicht verlassen kann.
-     */
-    private void createDialogOwner(final int position){
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(mAdapter.getItem(position).getName());
-        builder.setMessage(R.string.dialog_group_owner);
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-            }
-        });
-        builder.create();
-        builder.show();
-    }
-
-    /**
-     * Prüft ob der Benutzer mit der angegebenen Email-Adresse Mitglied in der Gruppe ist.
-     *
-     * @param email Email-Adresse des Benutzers
-     * @param group Gruppe
-     * @return
-     */
-    private boolean isUserInGroup(String email, UserGroup group){
-        List<String> members = group.getMembers();
-        for(int i=0; i<members.size(); i++){
-            if(members.get(i).equals(email)) return true;
+        if(userGroupListView != null) {
+            userGroupListView.setAdapter(mAdapter);
         }
-        return false;
     }
-
-    /**
-     * Prüft ob der Benutzer mit der angegebenen Email-Adresse der Ersteller der Gruppe ist.
-     *
-     * @param email Email-Adresse des Benutzers
-     * @param group Gruppe
-     * @return
-     */
-    private boolean isCreator(String email, UserGroup group){
-        String creator = group.getCreator().getEmail();
-        if(creator.equals(email)) return true;
-        return false;
-    }
-
 
     /**
      * Löscht die UserGroup aus der Liste
