@@ -21,6 +21,8 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.UsergroupAdapter;
 import ws1415.ps1415.task.DeleteUserGroupTask;
+import ws1415.ps1415.task.JoinUserGroupTask;
+import ws1415.ps1415.task.LeaveUserGroupTask;
 import ws1415.ps1415.task.QueryUserGroupsTask;
 
 /**
@@ -70,40 +72,13 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
         userGroupListView = (ListView) view.findViewById(R.id.fragment_show_user_groups_list_view);
 
         userGroupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            /**
-             * Tut im moment noch nichts
-             *
-             * @param adapterView
-             * @param view
-             * @param i
-             * @param l
-             */
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //TODO Gruppe beitreten implementieren.
                 if(!isUserInGroup(ServiceProvider.getEmail(), mAdapter.getItem(i))) {
                     createSelectionsMenuJoin(i);
                 } else {
                     createSelectionsMenuLeave(i);
                 }
-            }
-        });
-
-        userGroupListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            /**
-             * Läscht die Route vom Server und von der ListView
-             *
-             * @param adapterView
-             * @param view
-             * @param i Position der Route in der ListView
-             * @param l
-             * @return
-             */
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //TODO Löschen der Gruppe implementieren.
-                //createSelectionsMenu(i);
-                return true;
             }
         });
 
@@ -135,7 +110,7 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                // TODO Task zum beitreten aufrufen
+                new JoinUserGroupTask(AllUsergroupsFragment.this).execute(mAdapter.getItem(position).getName());
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -162,7 +137,7 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                // TODO Task zum verlassen aufrufen
+                new LeaveUserGroupTask(AllUsergroupsFragment.this).execute(mAdapter.getItem(position).getName());
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -217,7 +192,7 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
     }
 
     /**
-     * Dient zum refreshen der Liste der aktuellen UserGroups.
+     * Dient zum Refreshen der Liste der aktuellen UserGroups.
      */
     public void refresh(){
         new QueryUserGroupsTask().execute(this);
