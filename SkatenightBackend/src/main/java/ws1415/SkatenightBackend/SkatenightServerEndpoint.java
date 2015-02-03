@@ -907,6 +907,7 @@ public class SkatenightServerEndpoint {
                     m.removeGroup(ug);
                     pm.makePersistent(m);
                 }
+                pm.makePersistent(ug);
                 pm.deletePersistent(ug);
             } finally {
                 pm.close();
