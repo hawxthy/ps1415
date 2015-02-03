@@ -109,4 +109,8 @@ public class Member {
             g.getMembers().remove(email);
         }
     }
+
+    public HashSet<String> getGroups() {
+        return new HashSet<>(groups);
+    }
 }
