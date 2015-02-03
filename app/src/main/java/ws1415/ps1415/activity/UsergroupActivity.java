@@ -170,4 +170,8 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
     public static ViewPager getViewPager(){
         return viewPager;
     }
+
+    public MenuItem getMenuItem(){
+        return menuItem;
+    }
 }

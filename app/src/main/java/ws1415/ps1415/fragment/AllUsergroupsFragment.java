@@ -126,7 +126,7 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
             }
         });
         c_dialog = builder.create();
-        builder.show();
+        c_dialog.show();
     }
 
     /**
@@ -152,8 +152,8 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
 
             }
         });
-        builder.create();
-        builder.show();
+        c_dialog = builder.create();
+        c_dialog.show();
     }
 
     /**
