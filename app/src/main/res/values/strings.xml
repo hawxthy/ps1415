@@ -79,5 +79,9 @@
     <string name="title_activity_add_user_group_title">Groupname</string>
     <string name="activity_add_user_group_cancel_text">Cancel</string>
     <string name="activity_add_user_group_apply_text">Apply</string>
+    <string name="dialog_join_group">Do you want to join the group?</string>
+    <string name="dialog_leave_group">Do you want to leave the group?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 </resources>

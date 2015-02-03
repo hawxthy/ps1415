@@ -1,5 +1,7 @@
 package ws1415.ps1415.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,9 +14,11 @@ import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.R;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.UsergroupAdapter;
 import ws1415.ps1415.task.DeleteUserGroupTask;
 import ws1415.ps1415.task.QueryUserGroupsTask;
@@ -77,9 +81,11 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //TODO Gruppe beitreten implementieren.
-                //Intent intent = new Intent(getActivity(), ShowInformationActivity.class);
-                //intent.putExtra("event", eventList.get(i).getKey().getId());
-                //startActivity(intent);
+                if(!isUserInGroup(ServiceProvider.getEmail(), mAdapter.getItem(i))) {
+                    createSelectionsMenuJoin(i);
+                } else {
+                    createSelectionsMenuLeave(i);
+                }
             }
         });
 
@@ -117,30 +123,66 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
 
     /**
      * Erstellt einen Dialog, welcher aufgerufen wird, wenn ein Item in der ListView lange
-     * ausgewählt wird. In diesem Dialog kann man dann auswählen, ob man die ausgewählte
-     * Veranstaltung löschen möchte.
+     * ausgewählt wird. In diesem Dialog kann man dann auswählen, ob man der ausgewählten
+     * Gruppe beitreten möchte.
      *
      * @param position
      */
-    /*
-    private void createSelectionsMenu(final int position) {
+    private void createSelectionsMenuJoin(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(EventUtils.getInstance(getActivity()).getUniqueField(8, eventList.get(position)).getValue())
-                .setItems(R.array.selections_menu, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int index) {
-                        if (index == 0) {
-                            editEvent(eventList.get(position));
-                        }
-                        else if (index == 1) {
-                            deleteEvent(eventList.get(position));
-                        }
+        builder.setTitle(mAdapter.getItem(position).getName());
+        builder.setMessage(R.string.dialog_join_group);
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // TODO Task zum beitreten aufrufen
+            }
+        });
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
 
-                    }
-                });
+            }
+        });
         builder.create();
         builder.show();
     }
-    */
+
+    /**
+     * Erstellt einen Dialog, welcher aufgerufen wird, wenn ein Item in der ListView lange
+     * ausgewählt wird. In diesem Dialog kann man dann auswählen, ob man die ausgewählten
+     * Gruppe verlassen möchte.
+     *
+     * @param position
+     */
+    private void createSelectionsMenuLeave(final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(mAdapter.getItem(position).getName());
+        builder.setMessage(R.string.dialog_leave_group);
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // TODO Task zum verlassen aufrufen
+            }
+        });
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        builder.create();
+        builder.show();
+    }
+
+    private boolean isUserInGroup(String email, UserGroup group){
+        List<String> members = group.getMembers();
+        for(int i=0; i<members.size(); i++){
+            if(members.get(i).equals(email)) return true;
+        }
+        return false;
+    }
+
 
     /**
      * Löscht die UserGroup aus der Liste
