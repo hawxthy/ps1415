@@ -72,7 +72,7 @@
 
     <string name="list_view_item_usergroup_creator">Creator: </string>
     <string name="list_view_item_usergroup_membercount">Member: </string>
-    <string name="list_view_item_usergroup_comma">, </string>
+    <string name="list_view_item_usergroup_comma">", "</string>
 
     <!--Strings zu AddUserGroupActivity-->
     <string name="title_activity_add_user_group">Gruppe hinzufügen</string>
