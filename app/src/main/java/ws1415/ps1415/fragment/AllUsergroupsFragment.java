@@ -164,4 +164,11 @@ import ws1415.ps1415.util.groupUtils;
         new QueryUserGroupsTask().execute(this);
     }
 
+    public AlertDialog getLastDialog(){
+        return c_dialog;
+    }
+
+    public ListView getListView(){
+        return userGroupListView;
+    }
 }
