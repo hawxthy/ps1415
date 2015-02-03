@@ -79,12 +79,15 @@ import ws1415.ps1415.util.groupUtils;
                 String userEmail = ServiceProvider.getEmail();
                 if(!groupUtils.isCreator(userEmail, selectedGroup)) {
                     if (!groupUtils.isUserInGroup(ServiceProvider.getEmail(), selectedGroup)) {
-                        groupUtils.createDialogJoin(i, mAdapter, AllUsergroupsFragment.this);
+                        c_dialog = groupUtils.createDialogJoin(i, mAdapter, AllUsergroupsFragment.this);
+                        c_dialog.show();
                     } else {
-                        groupUtils.createDialogLeave(i, mAdapter, AllUsergroupsFragment.this);
+                        c_dialog = groupUtils.createDialogLeave(i, mAdapter, AllUsergroupsFragment.this);
+                        c_dialog.show();
                     }
                 } else {
-                    groupUtils.createDialogOwner(i, mAdapter, AllUsergroupsFragment.this);
+                    c_dialog = groupUtils.createDialogOwner(i, mAdapter, AllUsergroupsFragment.this);
+                    c_dialog.show();
                 }
             }
         });
@@ -95,9 +98,11 @@ import ws1415.ps1415.util.groupUtils;
                 String email = ServiceProvider.getEmail();
                 UserGroup group = mAdapter.getItem(i);
                 if (groupUtils.isCreator(email, group)) {
-                    groupUtils.createDialogDelete(i, mAdapter, AllUsergroupsFragment.this);
+                    c_dialog = groupUtils.createDialogDelete(i, mAdapter, AllUsergroupsFragment.this);
+                    c_dialog.show();
                 } else {
-                    groupUtils.createDialogDeleteFailed(i, mAdapter, AllUsergroupsFragment.this);
+                    c_dialog = groupUtils.createDialogDeleteFailed(i, mAdapter, AllUsergroupsFragment.this);
+                    c_dialog.show();
                 }
                 return true;
             }

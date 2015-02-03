@@ -54,7 +54,7 @@ public class groupUtils {
      *
      * @param position
      */
-    public static void createDialogJoin(final int position, final UsergroupAdapter mAdapter, final Fragment fragment) {
+    public static AlertDialog createDialogJoin(final int position, final UsergroupAdapter mAdapter, final Fragment fragment) {
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
         builder.setTitle(mAdapter.getItem(position).getName());
         builder.setMessage(R.string.dialog_join_group);
@@ -69,8 +69,7 @@ public class groupUtils {
             public void onClick(DialogInterface dialogInterface, int i) {
             }
         });
-        builder.create();
-        builder.show();
+        return builder.create();
     }
 
     /**
@@ -80,7 +79,7 @@ public class groupUtils {
      *
      * @param position
      */
-    public static void createDialogLeave(final int position, final UsergroupAdapter mAdapter, final Fragment fragment) {
+    public static AlertDialog createDialogLeave(final int position, final UsergroupAdapter mAdapter, final Fragment fragment) {
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
         builder.setTitle(mAdapter.getItem(position).getName());
         builder.setMessage(R.string.dialog_leave_group);
@@ -96,8 +95,7 @@ public class groupUtils {
 
             }
         });
-        builder.create();
-        builder.show();
+        return builder.create();
     }
 
 
@@ -105,7 +103,7 @@ public class groupUtils {
      * Erstellt einen Dialog, der den Benutzer darauf hinweist, dass er seiner selbst erstellten
      * Gruppen nicht verlassen kann.
      */
-    public static void createDialogOwner(final int position, final UsergroupAdapter mAdapter, final Fragment fragment){
+    public static AlertDialog createDialogOwner(final int position, final UsergroupAdapter mAdapter, final Fragment fragment){
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
         builder.setTitle(mAdapter.getItem(position).getName());
         builder.setMessage(R.string.dialog_group_owner);
@@ -114,15 +112,14 @@ public class groupUtils {
             public void onClick(DialogInterface dialogInterface, int i) {
             }
         });
-        builder.create();
-        builder.show();
+        return builder.create();
     }
 
     /**
      * Erstellt einen Dialog, der den Benutzer fragt, ob die ausgewählte Gruppe gelöscht werden
      * soll.
      */
-    public static void createDialogDelete(final int position, final UsergroupAdapter mAdapter, final Fragment fragment){
+    public static AlertDialog createDialogDelete(final int position, final UsergroupAdapter mAdapter, final Fragment fragment){
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
         builder.setTitle(mAdapter.getItem(position).getName());
         builder.setMessage(R.string.dialog_delete_group);
@@ -137,15 +134,14 @@ public class groupUtils {
             public void onClick(DialogInterface dialogInterface, int i) {
             }
         });
-        builder.create();
-        builder.show();
+        return builder.create();
     }
 
     /**
      * Erstellt einen Dialog, der den Benutzer darauf hinweist, dass er die Gruppe nicht löschen
      * kann, da er nicht der Ersteller ist.
      */
-    public static void createDialogDeleteFailed(final int position, final UsergroupAdapter mAdapter, final Fragment fragment){
+    public static AlertDialog createDialogDeleteFailed(final int position, final UsergroupAdapter mAdapter, final Fragment fragment){
         AlertDialog.Builder builder = new AlertDialog.Builder(fragment.getActivity());
         builder.setTitle(mAdapter.getItem(position).getName());
         builder.setMessage(R.string.dialog_delete_failed_group);
@@ -154,8 +150,7 @@ public class groupUtils {
             public void onClick(DialogInterface dialogInterface, int i) {
             }
         });
-        builder.create();
-        builder.show();
+        return builder.create();
     }
 
 }
