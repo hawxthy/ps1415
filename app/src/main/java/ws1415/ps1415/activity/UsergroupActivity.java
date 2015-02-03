@@ -18,7 +18,7 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
 /**
  * Created by Bernd.
  */
-public class UsergroupActivity extends FragmentActivity implements ActionBar.TabListener {
+public class UsergroupActivity extends BaseFragmentActivity implements ActionBar.TabListener {
     private static ViewPager viewPager;
     private static TabsUsergroupsAdapter mAdapter;
     private static ActionBar actionBar;
@@ -96,6 +96,7 @@ public class UsergroupActivity extends FragmentActivity implements ActionBar.Tab
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.add_user_group_plus_button, menu);
         menuItem = menu.findItem(R.id.action_add_user_group);
@@ -111,6 +112,7 @@ public class UsergroupActivity extends FragmentActivity implements ActionBar.Tab
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
         int id = item.getItemId();
         if(id == R.id.action_add_user_group) {
             Intent intent = new Intent(this, AddUserGroupActivity.class);
