@@ -64,6 +64,12 @@ public class GcmIntentService extends IntentService {
                     case NOTIFICATION_MESSAGE:
                         sendNotification(extras);
                         break;
+                    case EVENT_NOTIFICATION_MESSAGE:
+                        sendNotification(extras);
+                        // Event-Liste in der ShowEventsActivity aktualisieren
+                        Intent refreshIntent = new Intent(ShowEventsActivity.REFRESH_EVENTS_ACTION);
+                        LocalBroadcastManager.getInstance(this).sendBroadcast(refreshIntent);
+                        break;
                     case EVENT_START_MESSAGE:
                         // LocationTransmitterService starten, wenn Einstellung entsprechend
                         long eventId = Long.parseLong(extras.getString("eventId"));

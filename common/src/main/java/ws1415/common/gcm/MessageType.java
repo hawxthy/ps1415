@@ -11,6 +11,11 @@ public enum MessageType {
      */
     NOTIFICATION_MESSAGE,
     /**
+     * Eine normale Notification, die beim ERstellen oder Ändern eines Events gesendet wird. In der
+     * User-App wird die Liste der Events aktualisiert, wenn die Nachricht empfangen wird.
+     */
+    EVENT_NOTIFICATION_MESSAGE,
+    /**
      * Wird an alle Teilnehmer eines Events gesendet, wenn das Event beginnt.
      */
     EVENT_START_MESSAGE;

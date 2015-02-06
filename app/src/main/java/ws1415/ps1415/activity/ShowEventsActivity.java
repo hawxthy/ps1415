@@ -2,8 +2,10 @@ package ws1415.ps1415.activity;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -11,6 +13,7 @@ import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -44,6 +47,11 @@ import ws1415.ps1415.model.NavDrawerItem;
 import ws1415.ps1415.task.QueryEventsTask;
 
 public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDelegate<Void, List<Event>> {
+    /**
+     * Falls diese Activity einen Intent mit der REFRESH_EVENTS_ACTION erhält, wird die Liste der
+     * Events aktualisiert.
+     */
+    public static final String REFRESH_EVENTS_ACTION = "REFRESH_EVENTS";
     private static final String TAG = "Skatenight";
     public static final int SETTINGS_RESULT = 1;
     public static final int REQUEST_ACCOUNT_PICKER = 2;
@@ -114,6 +122,13 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
             ServiceProvider.login(credential);
             initGCM();
         }
+
+        // Listener für REFRESH_EVENTS_ACTION-Intents erstellen
+        LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                new QueryEventsTask(ShowEventsActivity.this).execute();
+            }
+        }, new IntentFilter(REFRESH_EVENTS_ACTION));
 
         new QueryEventsTask(this).execute();
     }
