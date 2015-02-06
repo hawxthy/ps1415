@@ -47,18 +47,21 @@ public class AddUserGroupActivity extends Activity {
      * @param view
      */
     public void apply(View view) throws Exception {
-        String hostName = addHostEditText.getText().toString();
+        final String hostName = addHostEditText.getText().toString();
         if (!hostName.equals("")) {
-            List<UserGroup> groupList = new QueryUserGroupsTask().execute(allUsergroupsFragment).get();
-            for (int i = 0; i < groupList.size(); i++) {
-                if (groupList.get(i).getName().equals(hostName)) {
-                    Toast.makeText(this, "Name darf nicht schon vergeben sein", Toast.LENGTH_LONG).show();
-                } else {
+            new QueryUserGroupsTask().execute(new AllUsergroupsFragment() {
+                @Override
+                public void setUserGroupsToListView(List<UserGroup> groupList) {
+                    for (int i = 0; i < groupList.size(); i++) {
+                        if (groupList.get(i).getName().equals(hostName)) {
+                            Toast.makeText(AddUserGroupActivity.this, "Name darf nicht schon vergeben sein", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                    }
                     finish();
                     new AddUserGroupTask(allUsergroupsFragment).execute(hostName);
                 }
-            }
-
+            });
         }else {
             Toast.makeText(this, "Name darf nicht leer sein", Toast.LENGTH_LONG).show();
         }
