@@ -197,7 +197,7 @@ public class SkatenightServerEndpoint {
                             .collapseKey("event_created")
                             // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
                             .timeToLive((int) secondsTillStart)
-                            .addData("type", MessageType.NOTIFICATION_MESSAGE.name())
+                            .addData("type", MessageType.EVENT_NOTIFICATION_MESSAGE.name())
                             .addData("content", eventTitle);
                     if (editing) {
                         mb.addData("title", "Ein Event wurde angepasst.");
