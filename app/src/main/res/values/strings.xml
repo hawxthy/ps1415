@@ -7,6 +7,23 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <!-- Navigation Drawer -->
+    <string name="drawer_open">Slider Menu Opened</string>
+    <string name="drawer_close">Slider Menu Closed</string>
+
+    <string-array name="nav_drawer_items">
+        <item>Events</item>
+        <item>User Groups</item>
+    </string-array>
+
+    <array name="nav_drawer_icons">
+        <item>@drawable/ic_event</item>
+        <item>@drawable/ic_group</item>
+    </array>
+
+    <!-- Content Description -->
+    <string name="desc_list_item_icon">Item Icon</string>
+
     <!-- Strings zu activity_showinformation -->
     <string name="show_info_header_date">Time and date</string>
     <string name="show_info_header_location">Location</string>
@@ -45,5 +62,29 @@
 
     <!-- Strings zu activity settings -->
     <string name="title_activity_settings">Settings</string>
+
+    <!--Strings zu activity UsergroupActivity-->
+    <string name="title_activity_base">BaseActivity</string>
+    <string name="title_activity_user_group_activity">Manage Groups</string>
+    <string name="title_fragment_all_user_groups">Groups</string>
+    <string name="title_fragment_my_user_groups">My Groups</string>
+    <string name="action_add_user_group">Add Usergroup</string>
+
+    <string name="list_view_item_usergroup_creator">Creator: </string>
+    <string name="list_view_item_usergroup_membercount">Member: </string>
+
+    <!--Strings zu AddUserGroupActivity-->
+    <string name="title_activity_add_user_group">Gruppe hinzufügen</string>
+    <string name="title_activity_add_user_group_title">Groupname</string>
+    <string name="activity_add_user_group_cancel_text">Cancel</string>
+    <string name="activity_add_user_group_apply_text">Apply</string>
+    <string name="dialog_join_group">Do you want to join the group?</string>
+    <string name="dialog_leave_group">Do you want to leave the group?</string>
+    <string name="dialog_delete_group">Are you sure, that you want to delete the group?</string>
+    <string name="dialog_delete_failed_group">You can\'t delete the group, because you are not the creator of the group.</string>
+    <string name="dialog_group_owner">You are the creator of the group, therefore you can\'t leave the group.</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="ok">OK</string>
 
 </resources>

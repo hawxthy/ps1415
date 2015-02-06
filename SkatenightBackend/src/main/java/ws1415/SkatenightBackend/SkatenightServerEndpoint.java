@@ -10,6 +10,7 @@ import com.google.appengine.api.users.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.JDOHelper;
@@ -760,4 +761,226 @@ public class SkatenightServerEndpoint {
         }
         return registrationManager;
     }
+
+    /**
+     * Ruft die Gruppe mit dem angegebenen Namen ab.
+     * @param name Der Name der abzurufenden Gruppe.
+     * @return Die UserGroup-Entity.
+     */
+    private UserGroup getUserGroup(String name) {
+        PersistenceManager pm = pmf.getPersistenceManager();
+
+        try {
+            return getUserGroup(pm, name);
+        } finally {
+            pm.close();
+        }
+    }
+    private UserGroup getUserGroup(PersistenceManager pm, String name) {
+        Query q = pm.newQuery(UserGroup.class);
+        q.setFilter("name == nameParam");
+        q.declareParameters("String nameParam");
+        List<UserGroup> existingGroups = (List<UserGroup>) q.execute(name);
+        if (existingGroups.isEmpty()) {
+            return null;
+        } else {
+            return existingGroups.get(0);
+        }
+    }
+
+    /**
+     * Gibt eine Liste aller auf dem Server gespeicherter Benutzergruppen zurück.
+     * @return Eine Liste aller Benutzergruppen.
+     */
+    public List<UserGroup> getAllUserGroups() {
+        PersistenceManager pm = pmf.getPersistenceManager();
+
+        try {
+            List<UserGroup> result = (List<UserGroup>) pm.newQuery(UserGroup.class).execute();
+            return result;
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Gibt eine Liste aller Benutzergruppen des angegebenen Benutzers zurück.
+     * @return Eine Liste aller Benutzergruppen.
+     */
+    public List<UserGroup> fetchMyUserGroups(User user) throws OAuthRequestException {
+        Member member;
+        if (user == null || (member = getMember(user.getEmail())) == null) {
+            // Falls kein Benutzer angegeben, dann leere Liste zurückgeben.
+            return new ArrayList<>();
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        UserGroup ug;
+        try {
+            List<UserGroup> result = new LinkedList<>();
+            List<String> missingGroups = new LinkedList<>();
+            for (String g : member.getGroups()) {
+                ug = getUserGroup(pm, g);
+                if (ug != null) {
+                    result.add(ug);
+                } else {
+                    missingGroups.add(g);
+                }
+            }
+            if (missingGroups.size() > 0) {
+                for (String g : missingGroups) {
+                    member.getGroups().remove(g);
+                }
+                pm.makePersistent(member);
+            }
+            return result;
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Erstellt eine Gruppe mit dem angegebenen Namen
+     * @param user Der Benutzer, der die Gruppe anlegen möchte.
+     * @param name Der Name der neuen Gruppe.
+     */
+    public void createUserGroup(User user, @Named("name") String name) throws OAuthRequestException {
+        if (user == null) {
+            throw new NullPointerException("no user submitted");
+        }
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("no group name submitted");
+        }
+        Member member = getMember(user.getEmail());
+        if (member == null) {
+            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
+            throw new IllegalArgumentException("user is not registered");
+        }
+        if (getUserGroup(name) != null) {
+            throw new IllegalArgumentException("group with submitted name already exists");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            UserGroup ug = new UserGroup(member);
+            ug.setName(name);
+            member.addGroup(ug);
+            pm.makePersistent(member);
+            pm.makePersistent(ug);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Löscht die Gruppe, falls der aufrufende Benutzer der Ersteller der Gruppe ist.
+     * @param user Der Benutzer, der den Löschvorgang durchführen möchte.
+     * @param name Der Name, der zu löschenden Gruppe.
+     */
+    public void deleteUserGroup(User user, @Named("name") String name) throws OAuthRequestException {
+        if (user == null) {
+            throw new NullPointerException("no user submitted");
+        }
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("no group name submitted");
+        }
+        Member member = getMember(user.getEmail());
+        if (member == null) {
+            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
+            throw new IllegalArgumentException("user is not registered");
+        }
+        UserGroup ug = getUserGroup(name);
+        if (ug != null) {
+            if (!ug.getCreator().getEmail().equals(user.getEmail())) {
+                throw new IllegalArgumentException("user is not creator of group");
+            }
+
+            // Benutzer abrufen, die in der Gruppe sind
+            Member[] members = new Member[ug.getMembers().size()];
+            int index = 0;
+            for (String mail : ug.getMembers()) {
+                members[index++] = getMember(mail);
+            }
+
+            PersistenceManager pm = pmf.getPersistenceManager();
+            try {
+                for (Member m : members) {
+                    m.removeGroup(ug);
+                    pm.makePersistent(m);
+                }
+                pm.makePersistent(ug);
+                pm.deletePersistent(ug);
+            } finally {
+                pm.close();
+            }
+        }
+    }
+
+    /**
+     * Fügt den aufrufenden Benutzer zu der angegebenen Gruppe hinzu.
+     * @param user Der aufrufende Benutzer.
+     * @param groupName Der Name der beizutretenden Gruppe
+     */
+    public void joinUserGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException {
+        if (user == null) {
+            throw new NullPointerException("no user submitted");
+        }
+        if (groupName == null || groupName.isEmpty()) {
+            throw new IllegalArgumentException("no group name submitted");
+        }
+        Member member = getMember(user.getEmail());
+        if (member == null) {
+            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
+            throw new IllegalArgumentException("user is not registered");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            UserGroup ug = getUserGroup(pm, groupName);
+            if (ug == null) {
+                throw new IllegalArgumentException("a group with the submitted group name does not exist");
+            }
+            member.addGroup(ug);
+            pm.makePersistent(member);
+            pm.makePersistent(ug);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Entfernt den aufrufenden Benutzer aus der angegebenen Gruppe.
+     * @param user Der aufrufende Benutzer.
+     * @param groupName Der Name der zu verlassenden Gruppe.
+     */
+    public void leaveUserGroup(User user, @Named("groupName") String groupName) {
+        if (user == null) {
+            throw new NullPointerException("no user submitted");
+        }
+        if (groupName == null || groupName.isEmpty()) {
+            throw new IllegalArgumentException("no group name submitted");
+        }
+        Member member = getMember(user.getEmail());
+        if (member == null) {
+            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
+            throw new IllegalArgumentException("user is not registered");
+        }
+
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            UserGroup ug = getUserGroup(pm, groupName);
+            if (ug == null) {
+                throw new IllegalArgumentException("a group with the submitted group name does not exist");
+            }
+            if (user.getEmail().equals(ug.getCreator().getEmail())) {
+                throw new IllegalArgumentException("you can not leave your own group");
+            }
+            member.removeGroup(ug);
+            pm.makePersistent(member);
+            pm.makePersistent(ug);
+        } finally {
+            pm.close();
+        }
+    }
+
 }

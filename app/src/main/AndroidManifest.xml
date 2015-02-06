@@ -72,6 +72,16 @@
             android:name=".activity.Settings"
             android:label="@string/title_activity_settings" >
         </activity>
+        <activity
+            android:name=".activity.UsergroupActivity"
+            android:label="@string/title_activity_user_group_activity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activity.AddUserGroupActivity"
+            android:label="@string/title_activity_add_user_group"
+            android:screenOrientation="portrait">
+        </activity>
         <receiver
             android:name=".GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >

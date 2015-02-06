@@ -7,6 +7,23 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Einstellungen</string>
 
+    <!-- Navigation Drawer -->
+    <string name="drawer_open">Slider Menu geöffnet</string>
+    <string name="drawer_close">Slider Menu geschlossen</string>
+
+    <string-array name="nav_drawer_items">
+        <item >Veranstaltungen</item>
+        <item >Nutzergruppen</item>
+    </string-array>
+
+    <array name="nav_drawer_icons">
+        <item>@drawable/ic_event</item>
+        <item>@drawable/ic_group</item>
+    </array>
+
+    <!-- Content Description -->
+    <string name="desc_list_item_icon">Item Icon</string>
+
     <!-- Strings zu activity_showinformation -->
     <string name="show_info_header_date">Datum und Uhrzeit</string>
     <string name="show_info_header_location">Ort</string>
@@ -42,4 +59,32 @@
     <string name="active_event_altitude_format_meters"><xliff:g id="altitude">%1$.1f</xliff:g> m</string>
     <string name="active_event_distance_format_meters"><xliff:g id="distance">%1$.1f</xliff:g> m</string>
     <string name="active_event_speed_format"><xliff:g id="speed">%1$.1f</xliff:g> km/h</string>
+
+    <!-- Strings für den UsergroupAdapter -->
+    <string name="list_view_item_usergroup_creator">Ersteller: </string>
+    <string name="list_view_item_usergroup_membercount">Mitglieder: </string>
+
+    <!-- Strings zu activity settings -->
+    <string name="title_activity_settings">Einstellungen</string>
+
+    <!--Strings zu activity UsergroupActivity-->
+    <string name="title_activity_user_group_activity">Gruppen verwalten</string>
+    <string name="title_fragment_all_user_groups">Groups</string>
+    <string name="title_fragment_my_user_groups">My Groups</string>
+    <string name="action_add_user_group">Usergruppe hinzufügen</string>
+
+    <!--Strings zu AddUserGroupActivity-->
+    <string name="title_activity_add_user_group">Gruppe hinzufügen</string>
+    <string name="title_activity_add_user_group_title">Groupname</string>
+    <string name="activity_add_user_group_cancel_text">Abbrechen</string>
+    <string name="activity_add_user_group_apply_text">Ok</string>
+    <string name="dialog_join_group">Möchten Sie der Gruppe beitreten?</string>
+    <string name="dialog_leave_group">Möchten Sie die Gruppe verlassen?</string>
+    <string name="dialog_delete_group">Sind Sie sicher, dass Sie die Gruppe löschen möchten?</string>
+    <string name="dialog_delete_failed_group">Sie können die Gruppe nicht löschen, da Sie nicht der Ersteller der Gruppe sind.</string>
+    <string name="dialog_group_owner">Sie können die Gruppe nicht verlassen, weil Sie der Ersteller der Gruppe sind.</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="ok">OK</string>
+
 </resources>
