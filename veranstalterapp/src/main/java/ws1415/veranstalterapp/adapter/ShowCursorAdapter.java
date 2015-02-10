@@ -17,11 +17,13 @@ import android.widget.TextView;
 import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
+import com.skatenight.skatenightAPI.model.ServerWaypoint;
 import com.skatenight.skatenightAPI.model.Text;
 
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.activity.ShowRouteActivity;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -174,8 +176,10 @@ public class ShowCursorAdapter extends BaseAdapter{
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(context, ShowRouteActivity.class);
-                    // TODO Alle Extras übergeben
-                    intent.putExtra("show_route_extra_route", (event.getRoute().getRouteData()).getValue());
+                    intent.putExtra(ShowRouteActivity.EXTRA_TITLE, event.getRoute().getName());
+                    intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, event.getRoute().getRouteData().getValue());
+                    ArrayList<ServerWaypoint> tmp = (ArrayList) event.getRoute().getWaypoints();
+                    intent.putExtra(ShowRouteActivity.EXTRA_WAYPOINTS, (Serializable) tmp);
                     context.startActivity(intent);
                 }
             });
