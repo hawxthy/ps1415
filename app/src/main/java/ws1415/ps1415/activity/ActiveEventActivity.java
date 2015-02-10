@@ -24,8 +24,6 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 import com.skatenight.skatenightAPI.model.Event;
 
-import com.google.gson.Gson;
-
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -73,6 +71,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         ((ScrollView) findViewById(R.id.active_event_scroll_view)).setVisibility(View.INVISIBLE);
         if (savedInstanceState != null) {
             startDate = new Date(savedInstanceState.getLong(MEMBER_START_DATE));
+            eventId = savedInstanceState.getLong(MEMBER_KEY_ID);
         }
         else {
             startDate = new Date();
@@ -80,7 +79,6 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             Intent intent = getIntent();
             if (intent != null && intent.hasExtra(EXTRA_KEY_ID)) {
                 eventId = intent.getLongExtra(EXTRA_KEY_ID, 0L);
-                new GetEventTask(this).execute(eventId);
             }
             else {
                 Log.e(LOG_TAG, "EventId is required.");
@@ -89,6 +87,8 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         }
 
 
+        new GetEventTask(this).execute(eventId);
+        
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         if (prefs.contains(String.valueOf(eventId))) {
             restoreLocalData(String.valueOf(eventId));
@@ -130,6 +130,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putLong(MEMBER_START_DATE, startDate.getTime());
+        outState.putLong(MEMBER_KEY_ID, eventId);
         super.onSaveInstanceState(outState);
     }
 
