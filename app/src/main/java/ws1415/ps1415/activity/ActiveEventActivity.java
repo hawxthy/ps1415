@@ -41,6 +41,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     public static final String EXTRA_KEY_ID = "active_event_extra_key_id";
 
     private static final String MEMBER_KEY_ID = "active_event_member_key_id";
+    private static final String MEMBER_START_DATE = "active_event_member_start_date";
 
     private LocationReceiver receiver;
 
@@ -65,7 +66,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         setProgressBarIndeterminateVisibility(true);
         ((ScrollView) findViewById(R.id.active_event_scroll_view)).setVisibility(View.INVISIBLE);
         if (savedInstanceState != null) {
-            startDate = new Date(savedInstanceState.getLong("date"));
+            startDate = new Date(savedInstanceState.getLong(MEMBER_START_DATE));
         }
         else {
             startDate = new Date();
@@ -118,7 +119,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putLong("date", startDate.getTime());
+        outState.putLong(MEMBER_START_DATE, startDate.getTime());
         super.onSaveInstanceState(outState);
     }
 
