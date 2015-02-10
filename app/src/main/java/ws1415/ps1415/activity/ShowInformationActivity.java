@@ -38,19 +38,12 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
 
     public static final String EXTRA_KEY_ID = "show_information_extra_key_id";
 
-    private static final String MEMBER_KEY_ID = "show_information_member_key_id";
-    private static final String MEMBER_ROUTE_FIELD_FIRST = "show_information_member_route_field_first";
-    private static final String MEMBER_ROUTE_FIELD_LAST = "show_information_member_route_field_last";
-    private static final String MEMBER_ATTENDING = "show_information_member_attending";
-
     // Adapter für die ListView von activity_show_information_list_view
     private ShowCursorAdapter listAdapter;
 
     // Die ListView von der xml datei activity_show_information
     private ListView listView;
     private long keyId;
-    private int routeFieldFirst;
-    private int routeFieldLast;
     private boolean attending;
 
     private SharedPreferences prefs;
@@ -71,13 +64,8 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         Intent intent;
-        if (savedInstanceState != null) {
-            keyId = savedInstanceState.getLong(MEMBER_KEY_ID);
-            routeFieldFirst = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_FIRST);
-            routeFieldLast = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_LAST);
-            attending = savedInstanceState.getBoolean(MEMBER_ATTENDING);
-        }
-        else if ((intent = getIntent()) != null) {
+
+        if ((intent = getIntent()) != null) {
             keyId = intent.getLongExtra(EXTRA_KEY_ID, 0);
             new GetEventTask(this).execute(keyId);
         }
@@ -144,17 +132,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
 
         settings=settings+"Position Senden:"+ sharedPrefs.getBoolean("prefSendLocation", false);
     }
-    
-    @Override
-     protected void onSaveInstanceState(Bundle outState) {
-        outState.putLong(MEMBER_KEY_ID, keyId);
-        outState.putInt(MEMBER_ROUTE_FIELD_FIRST, routeFieldFirst);
-        outState.putInt(MEMBER_ROUTE_FIELD_LAST, routeFieldLast);
-        outState.putBoolean(MEMBER_ATTENDING, attending);
 
-        super.onSaveInstanceState(outState);
-    }
-    
     @Override
      public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -192,12 +170,6 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
             listView.setAdapter(listAdapter);
 
 
-            if (e.getRouteFieldFirst() != null) {
-                routeFieldFirst = e.getRouteFieldFirst();
-            }
-            if (e.getRouteFieldLast() != null) {
-                routeFieldLast = e.getRouteFieldLast();
-            }
             attendButton.setEnabled(true);
 
             if (prefs.contains("accountName") && e.getMemberList() != null) {
