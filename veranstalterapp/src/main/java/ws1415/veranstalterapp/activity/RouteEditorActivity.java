@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -113,18 +114,6 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
         route = null;
 
-        if(getIntent().hasExtra(EXTRA_WAYPOINTS)) {
-            EditorMapFragment mapFragment = (EditorMapFragment) getFragmentByPosition(0);
-            waypoints = (ArrayList<HashMap>) getIntent().getSerializableExtra(EXTRA_WAYPOINTS);
-            for(int i=0; i<waypoints.size(); i++){
-                Waypoint tmp = Waypoint.create(new LatLng((Double) waypoints.get(i).get("latitude"),
-                                (Double) waypoints.get(i).get("longitude")),
-                        (String) waypoints.get(i).get("title"));
-                waypointArrayAdapter.add(tmp);
-                mapFragment.updateWaypoint(tmp);
-            }
-        }
-
         Intent intent;
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(MEMBER_NAME)) {
@@ -178,6 +167,19 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
             }
         });
+
+        MapsInitializer.initialize(getApplicationContext());
+
+        if(getIntent().hasExtra(EXTRA_WAYPOINTS)) {
+            EditorMapFragment mapFragment = (EditorMapFragment) getFragmentByPosition(0);
+            waypoints = (ArrayList<HashMap>) getIntent().getSerializableExtra(EXTRA_WAYPOINTS);
+            for(int i=0; i<waypoints.size(); i++){
+                Waypoint tmp = Waypoint.create(new LatLng((Double) waypoints.get(i).get("latitude"),
+                                (Double) waypoints.get(i).get("longitude")),
+                        (String) waypoints.get(i).get("title"));
+                waypointArrayAdapter.add(tmp);
+            }
+        }
 
         if (route == null && waypointArrayAdapter.getCount() > 1) {
             // Wir sollten eigentlich eine Route haben...
