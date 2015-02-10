@@ -5,16 +5,17 @@ import android.os.AsyncTask;
 import java.io.IOException;
 
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 
 /**
- * Created by Bernd Eissing on 30.01.2015.
+ * Created by Bernd Eissing, Martin Wrodarczyk on 30.01.2015.
  */
 public class AddUserGroupTask extends AsyncTask<String, Void, Void> {
-    AllUsergroupsFragment auf;
+    private UsergroupActivity usergroupActivity;
 
-    public AddUserGroupTask(AllUsergroupsFragment auf){
-        this.auf = auf;
+    public AddUserGroupTask(UsergroupActivity usergroupActivity){
+        this.usergroupActivity = usergroupActivity;
     }
     /**
      * Erstellt einen neuen Veranstalter auf dem Server.
@@ -37,6 +38,6 @@ public class AddUserGroupTask extends AsyncTask<String, Void, Void> {
      */
     @Override
     protected void onPostExecute(Void result) {
-        auf.refresh();
+        usergroupActivity.refresh();
     }
 }

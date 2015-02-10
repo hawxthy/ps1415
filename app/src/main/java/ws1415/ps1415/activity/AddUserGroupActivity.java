@@ -59,18 +59,11 @@ public class AddUserGroupActivity extends Activity {
                         }
                     }
                     finish();
-                    new AddUserGroupTask(allUsergroupsFragment).execute(hostName);
+                    new AddUserGroupTask(UsergroupActivity.getUserGroupActivity()).execute(hostName);
                 }
             });
         }else {
             Toast.makeText(this, "Name darf nicht leer sein", Toast.LENGTH_LONG).show();
         }
     }
-
-
-    public static void giveAllUsergroupsFragment(AllUsergroupsFragment fragment) {
-        allUsergroupsFragment = fragment;
-    }
-
-
 }
