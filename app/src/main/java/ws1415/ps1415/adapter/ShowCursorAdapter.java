@@ -24,6 +24,7 @@ import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Text;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -274,6 +275,7 @@ public class ShowCursorAdapter extends BaseAdapter {
         intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, event.getRoute().getRouteData().getValue());
         intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_FIRST, event.getRouteFieldFirst());
         intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_LAST, event.getRouteFieldLast());
+        intent.putExtra(ShowRouteActivity.EXTRA_WAYPOINTS, (Serializable) event.getRoute().getWaypoints());
         context.startActivity(intent);
     }
 }
