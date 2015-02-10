@@ -5,8 +5,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
@@ -22,6 +24,8 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 import com.skatenight.skatenightAPI.model.Event;
 
+import com.google.gson.Gson;
+
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +39,8 @@ import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.util.EventUtils;
+import ws1415.ps1415.util.LocalAnalysisData;
+import ws1415.ps1415.util.LocalStorageUtil;
 
 public class ActiveEventActivity extends Activity implements ExtendedTaskDelegate<Void, Event> {
     public static final String LOG_TAG = ActiveEventActivity.class.getSimpleName();
@@ -82,17 +88,21 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             }
         }
 
-        /*
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String email = prefs.getString("accountName", null);
-        if (email == null) {
-            Toast.makeText(getApplicationContext(), getString(R.string.active_event_no_email_message), Toast.LENGTH_SHORT).show();
-            finish();
+        if (prefs.contains(String.valueOf(eventId))) {
+            restoreLocalData(String.valueOf(eventId));
         }
-        else {
-            new QueryCurrentMemberEventTask(this, email).execute();
-        }
-        */
+
+//        String email = prefs.getString("accountName", null);
+//        if (email == null) {
+//            Toast.makeText(getApplicationContext(), getString(R.string.active_event_no_email_message), Toast.LENGTH_SHORT).show();
+//            finish();
+//        }
+//        else {
+//            new QueryCurrentMemberEventTask(this, email).execute();
+//        }
+
 
         timerTextView = (TextView) findViewById(R.id.active_event_timer_textview);
         clockTimer = new Timer(true);
@@ -240,6 +250,35 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
                 }
             });
         }
+    }
+
+    private void restoreLocalData (String id) {
+        LocalStorageUtil storeLocalData = new LocalStorageUtil(getApplicationContext());
+        LocalAnalysisData localData = new LocalAnalysisData();
+
+        localData = storeLocalData.getData(id);
+
+
+        float currentDistance = localData.getCurrentDistance();
+        TextView currentDistanceTextView = (TextView) findViewById(R.id.active_event_current_distance_textview);
+        currentDistanceTextView.setText(getString(R.string.active_event_distance_format_meters, currentDistance));
+
+        float curSpeed = 0.0f;
+        TextView curSpeedTextView = (TextView) findViewById(R.id.active_event_cur_speed_textview);
+        curSpeedTextView.setText(getString(R.string.active_event_speed_format, curSpeed));
+
+        float maxSpeed = localData.getMaxSpeed();
+        TextView maxSpeedTextView = (TextView) findViewById(R.id.active_event_max_speed_textview);
+        maxSpeedTextView.setText(getString(R.string.active_event_speed_format, maxSpeed));
+
+        float avgSpeed = localData.getAvgSpeed();
+        TextView avgSpeedTextView = (TextView) findViewById(R.id.active_event_avg_speed_textview);
+        avgSpeedTextView.setText(getString(R.string.active_event_speed_format, avgSpeed));
+
+        float elevationGain = localData.getElevationGain();
+        TextView elevationGainTextView = (TextView) findViewById(R.id.active_event_elevation_gain_textview);
+        elevationGainTextView.setText(getString(R.string.active_event_altitude_format_meters, elevationGain));
+
     }
 
     /**

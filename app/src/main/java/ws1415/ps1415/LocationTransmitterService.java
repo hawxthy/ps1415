@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.List;
 
 import ws1415.ps1415.task.UpdateLocationTask;
+import ws1415.ps1415.util.LocalAnalysisData;
+import ws1415.ps1415.util.LocalStorageUtil;
 
 /**
  * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient und diese auf den
@@ -112,6 +114,25 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
     @Override
     public void onDestroy() {
+        // Lokale Daten als LocalAnalysisData objekt
+        LocalAnalysisData localData = new LocalAnalysisData();
+        LocalStorageUtil storeLocalData = new LocalStorageUtil(getApplicationContext());
+
+        localData.setAvgSpeed(avgSpeed);
+        localData.setCurrentDistance(currentDistance);
+        localData.setCurrentWaypoint(currentWaypoint);
+        localData.setElevationGain(elevationGain);
+        localData.setId(eventId);
+        localData.setMaxSpeed(maxSpeed);
+        localData.setTimestamps(toPrimitiveLong(passedWaypointTimes));
+        localData.setVisited(toPrimitiveInt(passedWaypoints));
+        localData.setStartDate(startDate);
+        localData.setEndDate(new Date());
+
+        // Daten abspeichern
+        storeLocalData.saveObject(localData,String.valueOf(localData.getId()));
+
+
         if (gac != null) gac.disconnect();
         super.onDestroy();
     }
