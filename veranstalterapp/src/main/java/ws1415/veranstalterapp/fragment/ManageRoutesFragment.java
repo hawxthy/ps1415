@@ -144,8 +144,6 @@ public class ManageRoutesFragment extends Fragment {
                                 deleteRoute(routeList.get(position));
                                 break;
                         }
-                        if (index == 0) {
-                        }
                     }
                 });
         builder.create();

@@ -28,6 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -50,6 +51,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -81,7 +83,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     private SectionsPagerAdapter sectionsPagerAdapter;
     private ViewPager viewPager;
 
-    private List<ServerWaypoint> waypoints;
+    private List<HashMap> waypoints;
     private String name;
     private ArrayAdapter<Waypoint> waypointArrayAdapter;
     private Route route;
@@ -112,8 +114,15 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
         route = null;
 
         if(getIntent().hasExtra(EXTRA_WAYPOINTS)) {
-            waypoints = (ArrayList<ServerWaypoint>) getIntent().getSerializableExtra(EXTRA_WAYPOINTS);
-
+            EditorMapFragment mapFragment = (EditorMapFragment) getFragmentByPosition(0);
+            waypoints = (ArrayList<HashMap>) getIntent().getSerializableExtra(EXTRA_WAYPOINTS);
+            for(int i=0; i<waypoints.size(); i++){
+                Waypoint tmp = Waypoint.create(new LatLng((Double) waypoints.get(i).get("latitude"),
+                                (Double) waypoints.get(i).get("longitude")),
+                        (String) waypoints.get(i).get("title"));
+                waypointArrayAdapter.add(tmp);
+                mapFragment.updateWaypoint(tmp);
+            }
         }
 
         Intent intent;
