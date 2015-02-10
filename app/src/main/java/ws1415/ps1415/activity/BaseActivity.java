@@ -119,6 +119,14 @@ public class BaseActivity extends Activity {
         if(mDrawerToggle.onOptionsItemSelected(item)){
             return true;
         }
+
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent intent = new Intent(BaseActivity.this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
