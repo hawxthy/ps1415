@@ -6,13 +6,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import ws1415.ps1415.R;
+import ws1415.ps1415.fragment.SettingsFragment;
 
 public class SettingsActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings2);
+
+        // Zeigt das Fragment für die Einstellungen an
+        getFragmentManager().beginTransaction()
+                .replace(android.R.id.content, new SettingsFragment())
+                .commit();
+
     }
 
 
