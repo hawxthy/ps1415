@@ -1,7 +1,9 @@
 package ws1415.ps1415.model;
 
 /**
- * Created by Martin on 30.01.2015.
+ * Model-Klasse für die Elemente in dem Navigation Drawer.
+ *
+ * @author Martin Wrodarczyk
  */
 public class NavDrawerItem {
     private String title;

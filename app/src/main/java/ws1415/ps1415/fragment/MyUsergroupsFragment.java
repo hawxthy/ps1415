@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,18 +15,15 @@ import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.adapter.UsergroupAdapter;
-import ws1415.ps1415.task.DeleteUserGroupTask;
 import ws1415.ps1415.task.QueryMyUserGroupsTask;
-import ws1415.ps1415.task.QueryUserGroupsTask;
 import ws1415.ps1415.util.groupUtils;
 
 /**
  * Dies ist ein Fragment, das genutzt wird um die eigenen Gruppen und die vom Benutzer beigetretenen
  * Gruppen anzuzeigen.
  *
- * Created by Martin on 30.01.2015.
+ * @author Martin Wrodarczyk
  */
 public class MyUsergroupsFragment extends Fragment{
     private ListView groupListView;

@@ -7,7 +7,6 @@ import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +21,11 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.NavDrawerListAdapter;
 import ws1415.ps1415.model.NavDrawerItem;
 
+/**
+ * Diese Activity wird als Oberklasse für Activities genutzt, die einen Navigation Drawer anzeigen.
+ *
+ * @author Martin Wrodarczyk
+ */
 public class BaseActivity extends Activity {
     // NavigationDrawer
     private DrawerLayout mDrawerLayout;
@@ -82,15 +86,7 @@ public class BaseActivity extends Activity {
                 R.string.app_name
         ){
             public void onDrawerClosed(View view) {
-                getActionBar().setTitle(mTitle);
-                // calling onPrepareOptionsMenu() to show action bar icons
-                invalidateOptionsMenu();
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                getActionBar().setTitle(mDrawerTitle);
-                // calling onPrepareOptionsMenu() to hide action bar icons
-                invalidateOptionsMenu();
+                for(int i=0; i<navDrawerItems.size(); i++) mDrawerList.setItemChecked(0, false);
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -107,7 +103,7 @@ public class BaseActivity extends Activity {
             selectItem(position);
         }
 
-        /** Swaps fragments in the main content view */
+        /** Ruft ausgewählte Activity auf. */
         private void selectItem(int position) {
             switch(position){
                 case 0:
@@ -119,46 +115,16 @@ public class BaseActivity extends Activity {
                     startActivity(user_group_intent);
                     break;
             }
-
+            mDrawerLayout.closeDrawer(mDrawerList);
         }
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_base, menu);
-        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         if(mDrawerToggle.onOptionsItemSelected(item)){
             return true;
         }
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
-    }
-
-
-    /***
-     * Wird ausgeführt wenn invalidateOptionsMenu() gestartet wird
-     */
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        // if nav drawer is opened, hide the action items
-        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-        menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
-        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

@@ -2,7 +2,6 @@ package ws1415.ps1415.util;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
@@ -11,13 +10,15 @@ import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.UsergroupActivity;
-import ws1415.ps1415.adapter.UsergroupAdapter;
 import ws1415.ps1415.task.DeleteUserGroupTask;
 import ws1415.ps1415.task.JoinUserGroupTask;
 import ws1415.ps1415.task.LeaveUserGroupTask;
 
 /**
- * Created by Martin on 03.02.2015.
+ * Utility Klasse für die Nutzergruppen. Unterstützende Klasse um Nutzergruppen beizutreten, zu
+ * verlassen und zu löschen.
+ *
+ * @author Martin Wrodarczyk
  */
 public class groupUtils {
     /**
