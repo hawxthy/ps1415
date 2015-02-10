@@ -160,6 +160,8 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(ActiveEventActivity.this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
