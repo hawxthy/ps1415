@@ -84,6 +84,14 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     private Route route;
     private RouteLoaderTask currentTask;
 
+
+
+    private static RouteEditorActivity routeEditorActivity;
+
+    public RouteEditorActivity(){
+        routeEditorActivity = this;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -457,7 +465,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
     }
 
-    private class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -598,6 +606,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                             .position(position)
                             .draggable(true)
+
             );
         }
 
@@ -649,5 +658,13 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                 return new Waypoint[size];
             }
         };
+    }
+
+    public SectionsPagerAdapter getSectionsPagerAdapter() {
+        return sectionsPagerAdapter;
+    }
+
+    public static RouteEditorActivity getRouteEditorActivity() {
+        return routeEditorActivity;
     }
 }

@@ -121,4 +121,11 @@
     <string name="title_activity_add_host_dialog_hostname">Mail</string>
     <string name="activity_add_host_dialog_cancel">Cancel</string>
     <string name="activity_add_host_dialog_apply">Add</string>
+
+    <!--Strings zu EditWaypointDialog-->
+    <string name="activity_edit_waypoint_dialog_cancel">Cancel</string>
+    <string name="activity_edit_waypoint_dialog_delete">Delete</string>
+    <string name="activity_edit_waypoint_dialog_apply">Apply</string>
+    <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
+    <string name="title_activity_edit_waypoint_dialog">Edit Waypoint</string>
 </resources>
