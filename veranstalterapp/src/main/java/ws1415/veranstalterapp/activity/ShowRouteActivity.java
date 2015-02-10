@@ -18,6 +18,7 @@ import com.skatenight.skatenightAPI.model.ServerWaypoint;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -96,11 +97,12 @@ public class ShowRouteActivity extends Activity {
 
                 // Wegpunkte laden, falls vorhanden
                 if (intent.hasExtra(EXTRA_WAYPOINTS)) {
-                    ArrayList<ServerWaypoint> waypoints = (ArrayList<ServerWaypoint>) intent.getSerializableExtra(EXTRA_WAYPOINTS);
-                    for (ServerWaypoint wp : waypoints) {
+                    ArrayList<HashMap> waypoints = (ArrayList<HashMap>) intent.getSerializableExtra(EXTRA_WAYPOINTS);
+                    for (HashMap wp : waypoints) {
                         RouteEditorActivity.Waypoint tmp = RouteEditorActivity.Waypoint.create(
-                                new LatLng(wp.getLatitude(), wp.getLongitude()),
-                                wp.getTitle()
+                                new LatLng((Double)wp.get("latitude"), (Double)wp.get("longitude")),
+                                (String)wp.get("title")
+
                         );
                         googleMap.addMarker(tmp.getMarkerOptions());
                     }
