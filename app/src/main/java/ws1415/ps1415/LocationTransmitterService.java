@@ -143,7 +143,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
         boolean sendLocation = prefs.getBoolean("prefSendLocation", false);
 
-        // Sendet die Nutzerdaten an den Server
+        // Sendet die Nutzerdaten an den Server, wenn dies in den Einstellungen vorgesehen ist
         if (email != null && sendLocation) {
             new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
         }

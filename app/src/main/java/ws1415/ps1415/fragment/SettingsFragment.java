@@ -5,6 +5,10 @@ import android.preference.PreferenceFragment;
 
 import ws1415.ps1415.R;
 
+/**
+ * Fragment für die Einstellungen.
+ * @author Tristan Rust
+ */
 public class SettingsFragment extends PreferenceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {

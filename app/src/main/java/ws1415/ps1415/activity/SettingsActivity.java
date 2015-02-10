@@ -8,6 +8,11 @@ import android.view.MenuItem;
 import ws1415.ps1415.R;
 import ws1415.ps1415.fragment.SettingsFragment;
 
+/**
+ * Activity, in der der Nutzer Einstellungen für die App vornehmen kann.
+ *
+ * @author Tristan Rust
+ */
 public class SettingsActivity extends Activity {
 
     @Override
