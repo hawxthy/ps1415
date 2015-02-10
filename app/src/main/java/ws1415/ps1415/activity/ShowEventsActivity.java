@@ -74,7 +74,7 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
         super.onCreate(savedInstanceState);
 
         // Einstellungen müssen als erstes beim App Start geladenw werden
-
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
