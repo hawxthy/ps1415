@@ -1,14 +1,11 @@
 package ws1415.ps1415.fragment;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -20,33 +17,28 @@ import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.activity.AddUserGroupActivity;
-import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.adapter.UsergroupAdapter;
-import ws1415.ps1415.task.DeleteUserGroupTask;
-import ws1415.ps1415.task.JoinUserGroupTask;
-import ws1415.ps1415.task.LeaveUserGroupTask;
 import ws1415.ps1415.task.QueryUserGroupsTask;
 import ws1415.ps1415.util.groupUtils;
 
 /**
  * Dies ist ein Fragment, das genutzt wird um alle Gruppen auf dem Server anzuzeigen.
  *
- * Created by Martin, Bernd on 30.01.2015.
+ * @author Martin Wrodarczyk, Bernd Eissing
  */
-    public class AllUsergroupsFragment extends Fragment{
+public class AllUsergroupsFragment extends Fragment {
     private ListView userGroupListView;
     private List<UserGroup> userGroupList;
     private UsergroupAdapter mAdapter;
     private AlertDialog c_dialog;
 
     /**
-     * Fragt alle UserGroups vom Server ab und fügt diese in die Liste ein
+     * Fragt alle UserGroups vom Server ab und fügt diese in die Liste ein.
      *
      * @param savedInstanceState
      */
     @Override
-    public void onCreate(Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new QueryUserGroupsTask().execute(this);
     }
@@ -55,7 +47,7 @@ import ws1415.ps1415.util.groupUtils;
      * Setzt die Events in die Liste
      */
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         userGroupListView.setAdapter(mAdapter);
     }
@@ -80,7 +72,7 @@ import ws1415.ps1415.util.groupUtils;
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 UserGroup selectedGroup = mAdapter.getItem(i);
                 String userEmail = ServiceProvider.getEmail();
-                if(!groupUtils.isCreator(userEmail, selectedGroup)) {
+                if (!groupUtils.isCreator(userEmail, selectedGroup)) {
                     if (!groupUtils.isUserInGroup(ServiceProvider.getEmail(), selectedGroup)) {
                         c_dialog = groupUtils.createDialogJoin(AllUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
                         c_dialog.show();
@@ -117,7 +109,7 @@ import ws1415.ps1415.util.groupUtils;
     /**
      * Dient zum Refreshen der Liste der aktuellen UserGroups.
      */
-    public void refresh(){
+    public void refresh() {
         new QueryUserGroupsTask().execute(this);
     }
 
@@ -127,7 +119,7 @@ import ws1415.ps1415.util.groupUtils;
      *
      * @return Dialog
      */
-    public AlertDialog getLastDialog(){
+    public AlertDialog getLastDialog() {
         return c_dialog;
     }
 
@@ -136,7 +128,7 @@ import ws1415.ps1415.util.groupUtils;
      *
      * @return ListView
      */
-    public ListView getListView(){
+    public ListView getListView() {
         return userGroupListView;
     }
 
@@ -148,9 +140,7 @@ import ws1415.ps1415.util.groupUtils;
     public void setUserGroupsToListView(List<UserGroup> results) {
         userGroupList = results;
         mAdapter = new UsergroupAdapter(getActivity(), results);
-        if (userGroupListView != null) {
-            userGroupListView.setAdapter(mAdapter);
-        }
+        if (userGroupListView != null) userGroupListView.setAdapter(mAdapter);
     }
 
     /**
@@ -158,7 +148,7 @@ import ws1415.ps1415.util.groupUtils;
      *
      * @param usergroup die zu löschende UserGroup
      */
-    public void deleteUserGroupFromList(UserGroup usergroup){
+    public void deleteUserGroupFromList(UserGroup usergroup) {
         mAdapter.removeListItem(userGroupList.indexOf(usergroup));
         userGroupList.remove(usergroup);
     }
