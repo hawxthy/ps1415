@@ -1,7 +1,5 @@
 package ws1415.SkatenightBackend;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import java.io.Serializable;
 
 /**
@@ -9,16 +7,9 @@ import java.io.Serializable;
  * @author Richard
  */
 public class ServerWaypoint implements Serializable {
-    private LatLng position;
+    private double latitude;
+    private double longitude;
     private String title;
-
-    public LatLng getPosition() {
-        return position;
-    }
-
-    public void setPosition(LatLng position) {
-        this.position = position;
-    }
 
     public String getTitle() {
         return title;
@@ -26,5 +17,21 @@ public class ServerWaypoint implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }

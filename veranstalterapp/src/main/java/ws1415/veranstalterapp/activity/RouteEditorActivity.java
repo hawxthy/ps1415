@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.skatenight.skatenightAPI.model.RoutePoint;
+import com.skatenight.skatenightAPI.model.ServerWaypoint;
 import com.skatenight.skatenightAPI.model.Text;
 
 import org.json.JSONArray;
@@ -251,6 +252,15 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                     rt.setName(name);
                     rt.setRouteData(new Text().setValue(encoded));
                     rt.setRoutePoints(routePoints);
+                    // Wegpunkte im Route-Objekt speichern
+                    for (int i = 0; i < getArrayAdapter().getCount(); i++) {
+                        MarkerOptions mo = getArrayAdapter().getItem(i).getMarkerOptions();
+                        ServerWaypoint swp = new ServerWaypoint();
+                        swp.setTitle(mo.getTitle());
+                        swp.setLongitude(mo.getPosition().longitude);
+                        swp.setLatitude(mo.getPosition().latitude);
+                        rt.getWaypoints().add(swp);
+                    }
                     Toast.makeText(getApplicationContext(), "size: " + rt.getRoutePoints().size(), Toast.LENGTH_LONG).show();
 
                     String length;

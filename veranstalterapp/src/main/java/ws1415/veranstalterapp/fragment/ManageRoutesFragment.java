@@ -16,6 +16,7 @@ import android.widget.ListView;
 import com.skatenight.skatenightAPI.model.Route;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import ws1415.veranstalterapp.adapter.MapsCursorAdapter;
@@ -80,6 +81,7 @@ public class ManageRoutesFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), ShowRouteActivity.class);
                 intent.putExtra(ShowRouteActivity.EXTRA_TITLE, routeList.get(i).getName());
                 intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, routeList.get(i).getRouteData().getValue());
+                intent.putExtra(ShowRouteActivity.EXTRA_WAYPOINTS, (LinkedList) routeList.get(i).getWaypoints());
                 startActivity(intent);
             }
         });

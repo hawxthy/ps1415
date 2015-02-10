@@ -174,8 +174,9 @@ public class ShowCursorAdapter extends BaseAdapter{
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(context, ShowRouteActivity.class);
+                    // TODO Alle Extras übergeben
                     intent.putExtra("show_route_extra_route", (event.getRoute().getRouteData()).getValue());
-                            context.startActivity(intent);
+                    context.startActivity(intent);
                 }
             });
 
