@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.skatenight.skatenightAPI.model.ServerWaypoint;
+
 import java.util.ArrayList;
 
 import ws1415.veranstalterapp.R;
@@ -24,7 +26,7 @@ public class AddRouteDraftDialog extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_route_dialog);
 
-        wpList = (ArrayList<ServerWaypoints>) getIntent().getSerializableExtra(EXTRA_WAYPOINTS);
+        wpList = (ArrayList<ServerWaypoint>) getIntent().getSerializableExtra(EXTRA_WAYPOINTS);
         routeNameEditText = (EditText) findViewById(R.id.activity_add_route_routeName_edittext);
     }
 

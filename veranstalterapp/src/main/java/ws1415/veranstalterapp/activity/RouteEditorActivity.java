@@ -102,8 +102,6 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
         setContentView(R.layout.activity_route_editor);
         setProgressBarIndeterminateVisibility(false);
 
-        waypoints = (ArrayList<ServerWaypoints>)getIntent().getSerializableExtra(EXTRA_WAYPOINTS);
-
         name = null;
 
         waypointArrayAdapter = new WaypointAdapter(
@@ -112,6 +110,11 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                 R.id.list_view_item_waypoint_name_textview);
 
         route = null;
+
+        if(getIntent().hasExtra(EXTRA_WAYPOINTS)) {
+            waypoints = (ArrayList<ServerWaypoint>) getIntent().getSerializableExtra(EXTRA_WAYPOINTS);
+
+        }
 
         Intent intent;
         if (savedInstanceState != null) {

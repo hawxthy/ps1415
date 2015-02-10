@@ -134,8 +134,17 @@ public class ManageRoutesFragment extends Fragment {
         builder.setTitle(routeList.get(position).getName())
                 .setItems(R.array.selections_menu_manage_routes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int index) {
+                        switch(index){
+                            case 0:
+                                Intent intent = new Intent(ManageRoutesFragment.this.getActivity(), AddRouteDraftDialog.class);
+                                intent.putExtra(AddRouteDraftDialog.EXTRA_WAYPOINTS, (ArrayList<ServerWaypoint>)routeList.get(position).getWaypoints());
+                                startActivity(intent);
+                                break;
+                            case 1:
+                                deleteRoute(routeList.get(position));
+                                break;
+                        }
                         if (index == 0) {
-                            deleteRoute(routeList.get(position));
                         }
                     }
                 });
