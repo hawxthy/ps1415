@@ -49,6 +49,7 @@
     <string name="hello_blank_fragment">Hallo blank Fragment</string>
 
     <string-array name="selections_menu_manage_routes">
+        <item name="draft">Als Vorlage nutzen</item>
         <item name="delete">Löschen</item>
     </string-array>
 
