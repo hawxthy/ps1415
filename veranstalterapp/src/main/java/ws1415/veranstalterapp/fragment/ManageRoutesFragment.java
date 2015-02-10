@@ -14,11 +14,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.ServerWaypoint;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import ws1415.veranstalterapp.activity.RouteEditorActivity;
 import ws1415.veranstalterapp.AddRouteDialog;
 import ws1415.veranstalterapp.activity.AddRouteDraftDialog;
 import ws1415.veranstalterapp.adapter.MapsCursorAdapter;
@@ -83,7 +86,8 @@ public class ManageRoutesFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), ShowRouteActivity.class);
                 intent.putExtra(ShowRouteActivity.EXTRA_TITLE, routeList.get(i).getName());
                 intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, routeList.get(i).getRouteData().getValue());
-                intent.putExtra(ShowRouteActivity.EXTRA_WAYPOINTS, (LinkedList) routeList.get(i).getWaypoints());
+                ArrayList<ServerWaypoint> tmp = (ArrayList) routeList.get(i).getWaypoints();
+                intent.putExtra(ShowRouteActivity.EXTRA_WAYPOINTS, (Serializable) tmp);
                 startActivity(intent);
             }
         });
@@ -130,15 +134,8 @@ public class ManageRoutesFragment extends Fragment {
         builder.setTitle(routeList.get(position).getName())
                 .setItems(R.array.selections_menu_manage_routes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int index) {
-                        switch(index){
-                            case 0:
-                                Intent intent = new Intent(ManageRoutesFragment.this, AddRouteDraftDialog.class);
-                                intent.putExtra(AddRouteDraftDialog.EXTRA_WAYPOINTS, routeList.get(position).getWaypoints());
-                                startActivity(intent);
-                                break;
-                            case 1:
-                                deleteRoute(routeList.get(position));
-                                break;
+                        if (index == 0) {
+                            deleteRoute(routeList.get(position));
                         }
                     }
                 });

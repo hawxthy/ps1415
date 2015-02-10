@@ -33,7 +33,7 @@ public class Route {
     @Persistent
     private String length;
     @Persistent(serialized = "true", defaultFetchGroup = "true")
-    private LinkedList<ServerWaypoint> waypoints = new LinkedList<>();
+    private ArrayList<ServerWaypoint> waypoints = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -72,11 +72,11 @@ public class Route {
         return key;
     }
 
-    public LinkedList<ServerWaypoint> getWaypoints() {
+    public ArrayList<ServerWaypoint> getWaypoints() {
         return waypoints;
     }
 
-    public void setWaypoints(LinkedList<ServerWaypoint> waypoints) {
+    public void setWaypoints(ArrayList<ServerWaypoint> waypoints) {
         this.waypoints = waypoints;
     }
 }

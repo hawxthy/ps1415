@@ -50,6 +50,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -263,6 +264,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                     rt.setRouteData(new Text().setValue(encoded));
                     rt.setRoutePoints(routePoints);
                     // Wegpunkte im Route-Objekt speichern
+                    rt.setWaypoints(new ArrayList<ServerWaypoint>());
                     for (int i = 0; i < getArrayAdapter().getCount(); i++) {
                         MarkerOptions mo = getArrayAdapter().getItem(i).getMarkerOptions();
                         ServerWaypoint swp = new ServerWaypoint();
