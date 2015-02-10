@@ -24,10 +24,10 @@ public class AddRouteDraftDialog extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_route_dialog);
+        setContentView(R.layout.activity_add_route_draft_dialog);
 
         wpList = (ArrayList<ServerWaypoint>) getIntent().getSerializableExtra(EXTRA_WAYPOINTS);
-        routeNameEditText = (EditText) findViewById(R.id.activity_add_route_routeName_edittext);
+        routeNameEditText = (EditText) findViewById(R.id.activity_add_route_draft_routeName_edittext);
     }
 
     /**
