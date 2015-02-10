@@ -12,7 +12,6 @@ import java.util.List;
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.adapter.UsergroupAdapter;
-import ws1415.ps1415.fragment.UsergroupsInterface;
 import ws1415.ps1415.task.DeleteUserGroupTask;
 import ws1415.ps1415.task.JoinUserGroupTask;
 import ws1415.ps1415.task.LeaveUserGroupTask;

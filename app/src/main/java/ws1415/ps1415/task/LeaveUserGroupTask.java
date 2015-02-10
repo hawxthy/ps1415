@@ -9,7 +9,6 @@ import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 import ws1415.ps1415.fragment.MyUsergroupsFragment;
-import ws1415.ps1415.fragment.UsergroupsInterface;
 
 /**
  * Created by Bernd Eissing on 03.02.2015.
