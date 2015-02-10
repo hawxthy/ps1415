@@ -2,28 +2,20 @@ package ws1415.ps1415.activity;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -32,26 +24,18 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.skatenight.skatenightAPI.model.Event;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.common.gcm.GCMUtil;
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.EventsCursorAdapter;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.ps1415.adapter.NavDrawerListAdapter;
-import ws1415.ps1415.model.NavDrawerItem;
 import ws1415.ps1415.task.QueryEventsTask;
 
-public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDelegate<Void, List<Event>> {
-    /**
-     * Falls diese Activity einen Intent mit der REFRESH_EVENTS_ACTION erhält, wird die Liste der
-     * Events aktualisiert.
-     */
-    public static final String REFRESH_EVENTS_ACTION = "REFRESH_EVENTS";
+public class ShowEventsActivity extends Activity implements ExtendedTaskDelegate<Void, List<Event>> {
     private static final String TAG = "Skatenight";
     public static final int SETTINGS_RESULT = 1;
     public static final int REQUEST_ACCOUNT_PICKER = 2;
@@ -100,8 +84,19 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
              */
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(ShowEventsActivity.this, ShowInformationActivity.class);
-                intent.putExtra(ShowInformationActivity.EXTRA_KEY_ID, eventList.get(i).getKey().getId());
+                Event e = mAdapter.getItem(i);
+
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                Intent intent;
+                if (e.getMemberList() != null && e.getMemberList().contains(prefs.getString("accountName", null))) {
+                    Toast.makeText(getApplicationContext(), "contains", Toast.LENGTH_SHORT).show();
+                    intent = new Intent(ShowEventsActivity.this, ActiveEventActivity.class);
+                    intent.putExtra(ActiveEventActivity.EXTRA_KEY_ID, e.getKey().getId());
+                }
+                else {
+                    intent = new Intent(ShowEventsActivity.this, ShowInformationActivity.class);
+                    intent.putExtra(ShowInformationActivity.EXTRA_KEY_ID, e.getKey().getId());
+                }
                 startActivity(intent);
             }
         });
@@ -122,13 +117,6 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
             ServiceProvider.login(credential);
             initGCM();
         }
-
-        // Listener für REFRESH_EVENTS_ACTION-Intents erstellen
-        LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                new QueryEventsTask(ShowEventsActivity.this).execute();
-            }
-        }, new IntentFilter(REFRESH_EVENTS_ACTION));
 
         new QueryEventsTask(this).execute();
     }

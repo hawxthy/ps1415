@@ -5,11 +5,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +23,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.skatenight.skatenightAPI.model.Event;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -35,10 +33,15 @@ import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.ps1415.task.QueryCurrentMemberEventTask;
+import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.util.EventUtils;
 
 public class ActiveEventActivity extends Activity implements ExtendedTaskDelegate<Void, Event> {
+    public static final String LOG_TAG = ActiveEventActivity.class.getSimpleName();
+    public static final String EXTRA_KEY_ID = "active_event_extra_key_id";
+
+    private static final String MEMBER_KEY_ID = "active_event_member_key_id";
+
     private LocationReceiver receiver;
 
     private TextView timerTextView;
@@ -46,6 +49,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     private Timer clockTimer;
 
     private long eventId;
+
     private String email;
     private String encodedWaypoints;
     private List<LatLng> waypoints;
@@ -65,8 +69,19 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         }
         else {
             startDate = new Date();
+
+            Intent intent = getIntent();
+            if (intent != null && intent.hasExtra(EXTRA_KEY_ID)) {
+                eventId = intent.getLongExtra(EXTRA_KEY_ID, 0L);
+                new GetEventTask(this).execute(eventId);
+            }
+            else {
+                Log.e(LOG_TAG, "EventId is required.");
+                finish();
+            }
         }
 
+        /*
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String email = prefs.getString("accountName", null);
         if (email == null) {
@@ -76,6 +91,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         else {
             new QueryCurrentMemberEventTask(this, email).execute();
         }
+        */
 
         timerTextView = (TextView) findViewById(R.id.active_event_timer_textview);
         clockTimer = new Timer(true);
@@ -96,7 +112,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 
     @Override
     protected void onDestroy() {
-        stopService(new Intent(getBaseContext(), LocationTransmitterService.class));
+        //stopService(new Intent(getBaseContext(), LocationTransmitterService.class));
         super.onDestroy();
     }
 
@@ -181,7 +197,6 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     public void taskDidFinish(ExtendedTask task, Event event) {
         setProgressBarIndeterminateVisibility(false);
         if (!isEventNull(event)) {
-            eventId = event.getKey().getId();
             startDate = EventUtils.getInstance(this).getFusedDate(event);
 
             encodedWaypoints = event.getRoute().getRouteData().getValue();
@@ -192,11 +207,6 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
                 Toast.makeText(getApplicationContext(), "Parse failed", Toast.LENGTH_SHORT).show();
             }
 
-            Intent serviceIntent = new Intent(getBaseContext(), LocationTransmitterService.class);
-            serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, eventId);
-            serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
-            serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
-            startService(serviceIntent);
             updateTimerTextView();
 
             TextView distanceTextView = (TextView) findViewById(R.id.active_event_total_distance_textview);

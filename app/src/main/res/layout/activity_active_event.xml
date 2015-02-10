@@ -233,7 +233,7 @@
             android:id="@+id/active_event_cancel_button"
             android:layout_gravity="center_horizontal"
             android:singleLine="false"
-            android:visibility="invisible" />
+            />
 
     </LinearLayout>
 
