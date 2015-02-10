@@ -72,6 +72,10 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Einstellungen müssen als erstes beim App Start geladenw werden
+
+
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
         setContentView(R.layout.activity_show_events);
