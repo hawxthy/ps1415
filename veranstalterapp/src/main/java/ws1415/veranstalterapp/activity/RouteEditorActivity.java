@@ -70,6 +70,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     private static final String LOG_TAG = RouteEditorActivity.class.getSimpleName();
 
     public static final String EXTRA_NAME = "route_editor_activity_extra_name";
+    public static final String EXTRA_WAYPOINTS = "route_editor_activity_extra_waypoints";
     private static final String MEMBER_NAME = "route_editor_activity_member_name";
     private static final String MEMBER_WAYPOINTS = "route_editor_activity_member_waypoints";
     private static final String MEMBER_ROUTE = "route_editor_activity_member_route";
@@ -79,12 +80,11 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     private SectionsPagerAdapter sectionsPagerAdapter;
     private ViewPager viewPager;
 
+    private List<ServerWaypoint> waypoints;
     private String name;
     private ArrayAdapter<Waypoint> waypointArrayAdapter;
     private Route route;
     private RouteLoaderTask currentTask;
-
-
 
     private static RouteEditorActivity routeEditorActivity;
 
@@ -100,6 +100,8 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
         setContentView(R.layout.activity_route_editor);
         setProgressBarIndeterminateVisibility(false);
+
+        waypoints = (ArrayList<ServerWaypoints>)getIntent().getSerializableExtra(EXTRA_WAYPOINTS);
 
         name = null;
 
