@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.skatenight.skatenightAPI.model.ServerWaypoint;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -95,7 +96,7 @@ public class ShowRouteActivity extends Activity {
 
                 // Wegpunkte laden, falls vorhanden
                 if (intent.hasExtra(EXTRA_WAYPOINTS)) {
-                    LinkedList<ServerWaypoint> waypoints = (LinkedList) intent.getSerializableExtra(EXTRA_WAYPOINTS);
+                    ArrayList<ServerWaypoint> waypoints = (ArrayList<ServerWaypoint>) intent.getSerializableExtra(EXTRA_WAYPOINTS);
                     for (ServerWaypoint wp : waypoints) {
                         RouteEditorActivity.Waypoint tmp = RouteEditorActivity.Waypoint.create(
                                 new LatLng(wp.getLatitude(), wp.getLongitude()),
