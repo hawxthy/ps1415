@@ -21,11 +21,6 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.NavDrawerListAdapter;
 import ws1415.ps1415.model.NavDrawerItem;
 
-/**
- * Diese Activity wird als Oberklasse für Activities genutzt, die einen Navigation Drawer anzeigen.
- *
- * @author Martin Wrodarczyk
- */
 public class BaseActivity extends Activity {
     // NavigationDrawer
     private DrawerLayout mDrawerLayout;
@@ -103,7 +98,7 @@ public class BaseActivity extends Activity {
             selectItem(position);
         }
 
-        /** Ruft ausgewählte Activity auf. */
+        /** Swaps fragments in the main content view */
         private void selectItem(int position) {
             switch(position){
                 case 0:

@@ -138,6 +138,11 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
             startActivity(intent);
             return true;
         }
+        if (id == R.id.action_settings) {
+            Intent intent = new Intent(UsergroupActivity.this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 

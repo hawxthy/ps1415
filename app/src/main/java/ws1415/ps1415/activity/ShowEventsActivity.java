@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.media.audiofx.BassBoost;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -72,6 +73,10 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Einstellungen müssen als erstes beim App Start geladenw werden
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
         setContentView(R.layout.activity_show_events);
@@ -167,8 +172,8 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            Intent i = new Intent(getApplicationContext(), Settings.class);
-            startActivityForResult(i, SETTINGS_RESULT);
+            Intent intent = new Intent(ShowEventsActivity.this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);

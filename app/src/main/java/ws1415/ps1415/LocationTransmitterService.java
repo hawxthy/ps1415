@@ -140,9 +140,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // Holt sich die Google Mail Adresse aus den SharedPreferences, die beim Einloggen angegeben werden mussten
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String email = prefs.getString("accountName", null);
+
         boolean sendLocation = prefs.getBoolean("prefSendLocation", false);
-        Log.e(LOG_TAG, email + " - " + (sendLocation?"true":"false"));
-        Log.e(LOG_TAG, ""+prefs.getAll().keySet());
+
         // Sendet die Nutzerdaten an den Server
         if (email != null && sendLocation) {
             new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
