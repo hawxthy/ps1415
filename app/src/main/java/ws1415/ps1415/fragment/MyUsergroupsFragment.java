@@ -24,22 +24,37 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
 import ws1415.ps1415.util.groupUtils;
 
 /**
+ * Dies ist ein Fragment, das genutzt wird um die eigenen Gruppen und die vom Benutzer beigetretenen
+ * Gruppen anzuzeigen.
+ *
  * Created by Martin on 30.01.2015.
  */
 public class MyUsergroupsFragment extends Fragment{
     private ListView groupListView;
     private List<UserGroup> userGroups;
     private UsergroupAdapter mAdapter;
-    AlertDialog c_dialog;
+    private AlertDialog c_dialog;
 
+    /**
+     * Ruft die eigenen Gruppen und die beigetretenen Gruppen vom Server ab.
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         new QueryMyUserGroupsTask(this).execute();
     }
 
+    /**
+     * Initialisiert die ListView und setzt die Listener für die Funktionen an einer Gruppe.
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_my_user_groups, container, false);
 
         //ListView initialisieren
@@ -91,6 +106,11 @@ public class MyUsergroupsFragment extends Fragment{
         new QueryMyUserGroupsTask(this).execute();
     }
 
+    /**
+     * Setzt die Gruppen in die ListView.
+     *
+     * @param results Liste von Gruppen
+     */
     public void setUserGroupsToListView(List<UserGroup> results){
         userGroups = results;
         mAdapter = new UsergroupAdapter(getActivity(), results);
@@ -107,6 +127,12 @@ public class MyUsergroupsFragment extends Fragment{
         userGroups.remove(usergroup);
     }
 
+    /**
+     * Gibt den zuletzt aufgerufenen Dialog aus.
+     * Info: Wird nur für das Testen genutzt.
+     *
+     * @return Dialog
+     */
     public AlertDialog getLastDialog(){
         return c_dialog;
     }

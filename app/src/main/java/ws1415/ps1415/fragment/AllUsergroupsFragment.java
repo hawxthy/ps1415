@@ -30,13 +30,15 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
 import ws1415.ps1415.util.groupUtils;
 
 /**
+ * Dies ist ein Fragment, das genutzt wird um alle Gruppen auf dem Server anzuzeigen.
+ *
  * Created by Martin, Bernd on 30.01.2015.
  */
     public class AllUsergroupsFragment extends Fragment{
     private ListView userGroupListView;
     private List<UserGroup> userGroupList;
     private UsergroupAdapter mAdapter;
-    AlertDialog c_dialog;
+    private AlertDialog c_dialog;
 
     /**
      * Fragt alle UserGroups vom Server ab und fügt diese in die Liste ein
@@ -46,7 +48,6 @@ import ws1415.ps1415.util.groupUtils;
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-
         new QueryUserGroupsTask().execute(this);
     }
 
@@ -56,12 +57,11 @@ import ws1415.ps1415.util.groupUtils;
     @Override
     public void onResume(){
         super.onResume();
-
         userGroupListView.setAdapter(mAdapter);
     }
 
     /**
-     *
+     * Initilisiert die ListView und setzt die Listener für die Funktionen an einer Gruppe.
      *
      * @param inflater
      * @param container
@@ -70,7 +70,6 @@ import ws1415.ps1415.util.groupUtils;
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_all_user_groups, container, false);
 
         // ListView initialisieren
@@ -116,6 +115,32 @@ import ws1415.ps1415.util.groupUtils;
     }
 
     /**
+     * Dient zum Refreshen der Liste der aktuellen UserGroups.
+     */
+    public void refresh(){
+        new QueryUserGroupsTask().execute(this);
+    }
+
+    /**
+     * Gibt den zuletzt aufgerufenen Dialog aus.
+     * Info: Wird nur für das Testen genutzt.
+     *
+     * @return Dialog
+     */
+    public AlertDialog getLastDialog(){
+        return c_dialog;
+    }
+
+    /**
+     * Gibt die ListView zurück.
+     *
+     * @return ListView
+     */
+    public ListView getListView(){
+        return userGroupListView;
+    }
+
+    /**
      * Füllt die ListView mit den UserGroups vom Server.
      *
      * @param results ArrayList von UserGroups
@@ -127,7 +152,6 @@ import ws1415.ps1415.util.groupUtils;
             userGroupListView.setAdapter(mAdapter);
         }
     }
-
 
     /**
      * Löscht die UserGroup aus der Liste
@@ -147,23 +171,7 @@ import ws1415.ps1415.util.groupUtils;
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.add_user_group_plus_button, menu);
         super.onCreateOptionsMenu(menu, menuInflater);
-    }
-
-    /**
-     * Dient zum Refreshen der Liste der aktuellen UserGroups.
-     */
-    public void refresh(){
-        new QueryUserGroupsTask().execute(this);
-    }
-
-    public AlertDialog getLastDialog(){
-        return c_dialog;
-    }
-
-    public ListView getListView(){
-        return userGroupListView;
     }
 }

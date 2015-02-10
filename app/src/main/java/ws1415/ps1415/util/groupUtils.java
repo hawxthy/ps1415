@@ -53,8 +53,8 @@ public class groupUtils {
      * ausgewählt wird. In diesem Dialog kann man dann auswählen, ob man der ausgewählten
      * Gruppe beitreten möchte.
      *
-     * @param activity Activity, die refresht werden soll
-     * @param userGroup Nutzergruppe, der beigetreten werden soll
+     * @param activity Activity, der den Dialog anzeigt
+     * @param userGroup Nutzergruppe, die ausgewählt wurde
      */
     public static AlertDialog createDialogJoin(final FragmentActivity activity, final UserGroup userGroup) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -78,9 +78,9 @@ public class groupUtils {
      * Erstellt einen Dialog, welcher aufgerufen wird, wenn ein Item in der ListView lange
      * ausgewählt wird. In diesem Dialog kann man dann auswählen, ob man die ausgewählten
      * Gruppe verlassen möchte.
-
-     * @param activity Activity, die refresht werden soll
-     * @param userGroup Nutzergruppe, die verlassen werden soll
+     *
+     * @param activity Activity, der den Dialog anzeigt
+     * @param userGroup Nutzergruppe, die ausgewählt wurde
      */
     public static AlertDialog createDialogLeave(final FragmentActivity activity, final UserGroup userGroup) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -105,6 +105,9 @@ public class groupUtils {
     /**
      * Erstellt einen Dialog, der den Benutzer darauf hinweist, dass er seiner selbst erstellten
      * Gruppen nicht verlassen kann.
+     *
+     * @param activity Activity, der den Dialog anzeigt
+     * @param userGroup Nutzergruppe, die ausgewählt wurde
      */
     public static AlertDialog createDialogOwner(final FragmentActivity activity, final UserGroup userGroup){
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -121,6 +124,9 @@ public class groupUtils {
     /**
      * Erstellt einen Dialog, der den Benutzer fragt, ob die ausgewählte Gruppe gelöscht werden
      * soll.
+     *
+     * @param activity Activity, der den Dialog anzeigt
+     * @param userGroup Nutzergruppe, die ausgewählt wurde
      */
     public static AlertDialog createDialogDelete(final FragmentActivity activity, final UserGroup userGroup){
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -143,6 +149,9 @@ public class groupUtils {
     /**
      * Erstellt einen Dialog, der den Benutzer darauf hinweist, dass er die Gruppe nicht löschen
      * kann, da er nicht der Ersteller ist.
+     *
+     * @param activity Activity, der den Dialog anzeigt
+     * @param userGroup Nutzergruppe, die ausgewählt wurde
      */
     public static AlertDialog createDialogDeleteFailed(final FragmentActivity activity, final UserGroup userGroup){
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
