@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import ws1415.ps1415.adapter.TabsUsergroupsAdapter;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 import ws1415.ps1415.R;
+import ws1415.ps1415.fragment.MyUsergroupsFragment;
 import ws1415.ps1415.task.QueryUserGroupsTask;
 
 /**
@@ -22,6 +23,7 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
     private static ViewPager viewPager;
     private static TabsUsergroupsAdapter mAdapter;
     private static ActionBar actionBar;
+    private static UsergroupActivity mActivity;
     private MenuItem menuItem;
     private boolean menuCreated;
 
@@ -37,6 +39,7 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_group);
 
+        mActivity = this;
 
         // Beschrifte die Tabs
         tabs = new String[]{
@@ -54,7 +57,6 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
 
         // Adapter setzen und in der Aciton Bar die Tabs setzen
         viewPager.setAdapter(mAdapter);
-        actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // Tabs setzen
@@ -89,6 +91,23 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
     }
 
     /**
+     * Refresht die Liste aller Gruppen und eigener Gruppen.
+     */
+    public void refresh(){
+        AllUsergroupsFragment allUsergroupsFragment = (AllUsergroupsFragment)mAdapter.getItem(0);
+        MyUsergroupsFragment myUsergroupsFragment = (MyUsergroupsFragment)mAdapter.getItem(1);
+        allUsergroupsFragment.refresh();
+        myUsergroupsFragment.refresh();
+    }
+
+    /**
+     * Gibt das Activity Objekt zurück
+     */
+    public static UsergroupActivity getUserGroupActivity(){
+        return mActivity;
+    }
+
+    /**
      * Erstellt das ActionBar Menu.
      *
      * @param menu
@@ -116,7 +135,6 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
         int id = item.getItemId();
         if(id == R.id.action_add_user_group) {
             Intent intent = new Intent(this, AddUserGroupActivity.class);
-            AddUserGroupActivity.giveAllUsergroupsFragment((AllUsergroupsFragment)getAdapter().getItem(0));
             startActivity(intent);
             return true;
         }

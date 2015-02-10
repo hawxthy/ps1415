@@ -7,19 +7,20 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 import java.io.IOException;
 
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 import ws1415.ps1415.fragment.MyUsergroupsFragment;
 import ws1415.ps1415.fragment.UsergroupsInterface;
 
 /**
- * Created by Bernd Eissing on 30.01.2015.
+ * Created by Bernd Eissing, Martin Wrodarczyk on 30.01.2015.
  */
 public class DeleteUserGroupTask extends AsyncTask<UserGroup, Void, Boolean> {
-    private UsergroupsInterface fragment;
+    private UsergroupActivity usergroupActivity;
     private UserGroup usergroup;
 
-    public DeleteUserGroupTask(UsergroupsInterface fragment) {
-       this.fragment = fragment;
+    public DeleteUserGroupTask(UsergroupActivity usergroupActivity) {
+       this.usergroupActivity = usergroupActivity;
     }
 
     /**
@@ -48,7 +49,12 @@ public class DeleteUserGroupTask extends AsyncTask<UserGroup, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean result) {
         if (result == true) {
-            fragment.deleteUserGroupFromList(usergroup);
+            AllUsergroupsFragment allUsergroupsFragment =
+                    (AllUsergroupsFragment)usergroupActivity.getAdapter().getItem(0);
+            allUsergroupsFragment.deleteUserGroupFromList(usergroup);
+            MyUsergroupsFragment myUsergroupsFragment =
+                    (MyUsergroupsFragment)usergroupActivity.getAdapter().getItem(1);
+            myUsergroupsFragment.deleteUserGroupFromList(usergroup);
         }
     }
 }

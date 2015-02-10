@@ -9,6 +9,7 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 import java.io.IOException;
 
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 import ws1415.ps1415.fragment.UsergroupsInterface;
 
@@ -16,10 +17,10 @@ import ws1415.ps1415.fragment.UsergroupsInterface;
  * Created by Bernd Eissing on 03.02.2015.
  */
 public class JoinUserGroupTask extends AsyncTask<String, Void, Void>{
-    private UsergroupsInterface fragment;
+    private UsergroupActivity usergroupActivity;
 
-    public JoinUserGroupTask(UsergroupsInterface fragment){
-        this.fragment = fragment;
+    public JoinUserGroupTask(UsergroupActivity usergroupActivity){
+        this.usergroupActivity = usergroupActivity;
     }
 
     @Override
@@ -34,6 +35,6 @@ public class JoinUserGroupTask extends AsyncTask<String, Void, Void>{
 
     @Override
     protected void onPostExecute(Void voids){
-        fragment.refresh();
+        usergroupActivity.refresh();
     }
 }

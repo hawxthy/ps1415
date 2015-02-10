@@ -2,11 +2,13 @@ package ws1415.ps1415.fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,6 +20,8 @@ import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.activity.AddUserGroupActivity;
+import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.adapter.UsergroupAdapter;
 import ws1415.ps1415.task.DeleteUserGroupTask;
 import ws1415.ps1415.task.JoinUserGroupTask;
@@ -28,7 +32,7 @@ import ws1415.ps1415.util.groupUtils;
 /**
  * Created by Martin, Bernd on 30.01.2015.
  */
-    public class AllUsergroupsFragment extends Fragment implements UsergroupsInterface{
+    public class AllUsergroupsFragment extends Fragment{
     private ListView userGroupListView;
     private List<UserGroup> userGroupList;
     private UsergroupAdapter mAdapter;
@@ -79,14 +83,14 @@ import ws1415.ps1415.util.groupUtils;
                 String userEmail = ServiceProvider.getEmail();
                 if(!groupUtils.isCreator(userEmail, selectedGroup)) {
                     if (!groupUtils.isUserInGroup(ServiceProvider.getEmail(), selectedGroup)) {
-                        c_dialog = groupUtils.createDialogJoin(i, mAdapter, AllUsergroupsFragment.this);
+                        c_dialog = groupUtils.createDialogJoin(AllUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
                         c_dialog.show();
                     } else {
-                        c_dialog = groupUtils.createDialogLeave(i, mAdapter, AllUsergroupsFragment.this);
+                        c_dialog = groupUtils.createDialogLeave(AllUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
                         c_dialog.show();
                     }
                 } else {
-                    c_dialog = groupUtils.createDialogOwner(i, mAdapter, AllUsergroupsFragment.this);
+                    c_dialog = groupUtils.createDialogOwner(AllUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
                     c_dialog.show();
                 }
             }
@@ -98,10 +102,10 @@ import ws1415.ps1415.util.groupUtils;
                 String email = ServiceProvider.getEmail();
                 UserGroup group = mAdapter.getItem(i);
                 if (groupUtils.isCreator(email, group)) {
-                    c_dialog = groupUtils.createDialogDelete(i, mAdapter, AllUsergroupsFragment.this);
+                    c_dialog = groupUtils.createDialogDelete(AllUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
                     c_dialog.show();
                 } else {
-                    c_dialog = groupUtils.createDialogDeleteFailed(i, mAdapter, AllUsergroupsFragment.this);
+                    c_dialog = groupUtils.createDialogDeleteFailed(AllUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
                     c_dialog.show();
                 }
                 return true;
@@ -133,15 +137,6 @@ import ws1415.ps1415.util.groupUtils;
     public void deleteUserGroupFromList(UserGroup usergroup){
         mAdapter.removeListItem(userGroupList.indexOf(usergroup));
         userGroupList.remove(usergroup);
-    }
-
-    /**
-     * Löscht die UserGroup vom Server
-     *
-     * @param usergroup die zu löschende UserGroup
-     */
-    private void deleteUserGroup(UserGroup usergroup){
-        new DeleteUserGroupTask(this).execute(usergroup);
     }
 
     /**
