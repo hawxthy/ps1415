@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="ws1415.ps1415.fragment.MyUsergroupsFragment">
 
-    <ListView
-        android:id="@+id/fragment_my_user_groups_list_view"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </ListView>
-</FrameLayout>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context="ws1415.ps1415.fragment.MyUsergroupsFragment">
+
+
+        <TextView
+            android:id="@+id/list_view_my_user_groups_textView_title_visible"
+            android:text="@string/title_fragment_my_user_groups_visible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            style="?android:attr/listSeparatorTextViewStyle"/>
+        <ListView
+            android:id="@+id/fragment_my_user_groups_list_view_visible"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3">
+        </ListView>
+
+        <TextView
+            android:id="@+id/list_view_my_user_groups_textView_title_not_visible"
+            android:text="@string/title_fragment_my_user_groups_not_visible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            style="?android:attr/listSeparatorTextViewStyle"/>
+        <ListView
+            android:id="@+id/fragment_my_user_groups_list_view_not_visible"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4">
+        </ListView>
+    </LinearLayout>

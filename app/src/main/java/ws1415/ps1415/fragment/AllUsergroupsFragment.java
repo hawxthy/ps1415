@@ -139,7 +139,7 @@ public class AllUsergroupsFragment extends Fragment {
      */
     public void setUserGroupsToListView(List<UserGroup> results) {
         userGroupList = results;
-        mAdapter = new UsergroupAdapter(getActivity(), results);
+        mAdapter = new UsergroupAdapter(getActivity(), results, -1);
         if (userGroupListView != null) userGroupListView.setAdapter(mAdapter);
     }
 
@@ -149,7 +149,7 @@ public class AllUsergroupsFragment extends Fragment {
      * @param usergroup die zu löschende UserGroup
      */
     public void deleteUserGroupFromList(UserGroup usergroup) {
-        mAdapter.removeListItem(userGroupList.indexOf(usergroup));
+        mAdapter.removeListItem(usergroup);
         userGroupList.remove(usergroup);
     }
 
