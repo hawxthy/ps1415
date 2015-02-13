@@ -149,7 +149,7 @@ public class AllUsergroupsFragment extends Fragment {
      * @param usergroup die zu löschende UserGroup
      */
     public void deleteUserGroupFromList(UserGroup usergroup) {
-        mAdapter.removeListItem(userGroupList.indexOf(usergroup));
+        mAdapter.removeListItem(usergroup);
         userGroupList.remove(usergroup);
     }
 

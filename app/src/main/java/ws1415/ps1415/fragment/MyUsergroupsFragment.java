@@ -1,6 +1,8 @@
 package ws1415.ps1415.fragment;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.R;
@@ -26,9 +29,10 @@ import ws1415.ps1415.util.groupUtils;
  * @author Martin Wrodarczyk
  */
 public class MyUsergroupsFragment extends Fragment{
-    private ListView groupListView;
-    private List<UserGroup> userGroups;
-    private UsergroupAdapter mAdapter;
+    private ListView visibleGroupsListView;
+    private ListView notVisibleGroupsListView;
+    private UsergroupAdapter mAdapterVisible;
+    private UsergroupAdapter mAdapterNotVisible;
     private AlertDialog c_dialog;
 
     /**
@@ -54,45 +58,81 @@ public class MyUsergroupsFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_my_user_groups, container, false);
 
         //ListView initialisieren
-        groupListView = (ListView) view.findViewById(R.id.fragment_my_user_groups_list_view);
-        if(mAdapter != null) groupListView.setAdapter(mAdapter);
+        visibleGroupsListView = (ListView) view.findViewById(R.id.fragment_my_user_groups_list_view_visible);
+        notVisibleGroupsListView = (ListView) view.findViewById(R.id.fragment_my_user_groups_list_view_not_visible);
+        if(mAdapterVisible != null) visibleGroupsListView.setAdapter(mAdapterVisible);
+        if(mAdapterNotVisible != null) notVisibleGroupsListView.setAdapter(mAdapterNotVisible);
 
-        groupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        visibleGroupsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                UserGroup selectedGroup = mAdapter.getItem(i);
-                String userEmail = ServiceProvider.getEmail();
-                if(!groupUtils.isCreator(userEmail, selectedGroup)) {
-                    if (!groupUtils.isUserInGroup(ServiceProvider.getEmail(), selectedGroup)) {
-                        c_dialog = groupUtils.createDialogJoin(MyUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
-                        c_dialog.show();
-                    } else {
-                        c_dialog = groupUtils.createDialogLeave(MyUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
-                        c_dialog.show();
-                    }
-                } else {
-                    c_dialog = groupUtils.createDialogOwner(MyUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
-                    c_dialog.show();
-                }
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                createSelectionsMenu(i, mAdapterVisible);
+                return true;
             }
         });
 
-        groupListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        notVisibleGroupsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String email = ServiceProvider.getEmail();
-                UserGroup group = mAdapter.getItem(i);
-                if (groupUtils.isCreator(email, group)) {
-                    c_dialog = groupUtils.createDialogDelete(MyUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
-                    c_dialog.show();
-                } else {
-                    c_dialog = groupUtils.createDialogDeleteFailed(MyUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
-                    c_dialog.show();
-                }
+                createSelectionsMenu(i, mAdapterNotVisible);
                 return true;
             }
         });
         return view;
+    }
+
+    private void createSelectionsMenu(final int position, final UsergroupAdapter adapter){
+        final UserGroup userGroup = adapter.getItem(position);
+        String[] items;
+
+        if(groupUtils.isCreator(ServiceProvider.getEmail(), userGroup)){
+            items = new String[3];
+            items[2] = getString(R.string.context_menu_delete);
+        } else{
+            items = new String[2];
+        }
+        if (adapter == mAdapterVisible) {
+            items[0] = getString(R.string.context_menu_visible);
+        }else{
+            items[0] = getString(R.string.context_menu_not_visible);
+        }
+        items[1] = getString(R.string.context_menu_leave_usergroup);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(userGroup.getName());
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                switch(i){
+                    case 0:
+                        if(adapter == mAdapterVisible){
+                            mAdapterVisible.removeListItem(userGroup);
+                            mAdapterNotVisible.addListItem(userGroup);
+                            PrefManager.setGroupVisibility(MyUsergroupsFragment.this.getActivity(), userGroup.getName(), false);
+                        }else{
+                            mAdapterNotVisible.removeListItem(userGroup);
+                            mAdapterVisible.addListItem(userGroup);
+                            PrefManager.setGroupVisibility(MyUsergroupsFragment.this.getActivity(), userGroup.getName(), true);
+                        }
+                        break;
+                    case 1:
+                        if (!groupUtils.isCreator(ServiceProvider.getEmail(), userGroup)) {
+                            c_dialog = groupUtils.createDialogLeave(MyUsergroupsFragment.this.getActivity(), mAdapterVisible.getItem(i));
+                            c_dialog.show();
+                        }else{
+                            c_dialog = groupUtils.createDialogOwner(MyUsergroupsFragment.this.getActivity(), mAdapterVisible.getItem(i));
+                            c_dialog.show();
+                        }
+                        break;
+                    case 2:
+                        c_dialog = groupUtils.createDialogDelete(MyUsergroupsFragment.this.getActivity(), userGroup);
+                        c_dialog.show();
+                        break;
+                }
+            }
+        });
+        c_dialog = builder.create();
+        c_dialog.show();
     }
 
     /**
@@ -108,9 +148,21 @@ public class MyUsergroupsFragment extends Fragment{
      * @param results Liste von Gruppen
      */
     public void setUserGroupsToListView(List<UserGroup> results){
-        userGroups = results;
-        mAdapter = new UsergroupAdapter(getActivity(), results);
-        if(groupListView != null) groupListView.setAdapter(mAdapter);
+        // Einteilen
+        List<UserGroup> tmpVisible = new ArrayList<>();
+        List<UserGroup> tmpNotVisible = new ArrayList<>();
+
+        for(int i = 0; i < results.size(); i++){
+            if(PrefManager.getGroupVisibility(getActivity(), results.get(i).getName())){
+                tmpVisible.add(results.get(i));
+            }else{
+                tmpNotVisible.add(results.get(i));
+            }
+        }
+        mAdapterVisible = new UsergroupAdapter(getActivity(), tmpVisible);
+        mAdapterNotVisible = new UsergroupAdapter(getActivity(), tmpNotVisible);
+        if(visibleGroupsListView != null) visibleGroupsListView.setAdapter(mAdapterVisible);
+        if(notVisibleGroupsListView != null) notVisibleGroupsListView.setAdapter(mAdapterNotVisible);
     }
 
     /**
@@ -119,8 +171,8 @@ public class MyUsergroupsFragment extends Fragment{
      * @param usergroup die zu löschende UserGroup
      */
     public void deleteUserGroupFromList(UserGroup usergroup){
-        mAdapter.removeListItem(userGroups.indexOf(usergroup));
-        userGroups.remove(usergroup);
+        mAdapterVisible.removeListItem(usergroup);
+        mAdapterNotVisible.removeListItem(usergroup);
     }
 
     /**

@@ -101,12 +101,22 @@ public class UsergroupAdapter extends BaseAdapter {
     }
 
     /**
-     * Entfernt UserGroup mit der angegebenen ID.
+     * Entfernt die UserGroup.
      *
-     * @param i ID
+     * @param userGroup UserGroup
      */
-    public void removeListItem(int i) {
-        groupList.remove(i);
+    public void removeListItem(UserGroup userGroup) {
+        groupList.remove(userGroup);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Fügt die übergebene UserGroup der Liste von UserGroups hinzu.
+     *
+     * @param userGroup
+     */
+    public void addListItem(UserGroup userGroup){
+        groupList.add(userGroup);
         notifyDataSetChanged();
     }
 }

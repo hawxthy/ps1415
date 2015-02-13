@@ -102,6 +102,10 @@
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
+        <activity
+            android:name=".activity.UserGroupContextMenu"
+            android:label="@string/title_activity_user_group_context_menu" >
+        </activity>
     </application>
 
 </manifest>
