@@ -122,12 +122,13 @@ public class UsergroupAdapter extends BaseAdapter {
      *
      * @param userGroup
      */
-    public void addListItem(UserGroup userGroup){
-        if(maximum > -1 && maximum +1 < groupList.size()){
+    public boolean addListItem(UserGroup userGroup){
+        if(maximum > -1 && groupList.size() >= maximum){
             Toast.makeText(context, R.string.usergroup_adapter_maximum_reached, Toast.LENGTH_LONG).show();
-            return;
+            return false;
         }
         groupList.add(userGroup);
         notifyDataSetChanged();
+        return true;
     }
 }
