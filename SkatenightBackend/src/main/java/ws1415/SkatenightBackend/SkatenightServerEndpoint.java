@@ -10,8 +10,10 @@ import com.google.appengine.api.users.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -930,6 +932,28 @@ public class SkatenightServerEndpoint {
                 }
                 pm.makePersistent(ug);
                 pm.deletePersistent(ug);
+
+                // Notification senden
+                Sender sender = new Sender(Constants.GCM_API_KEY);
+                Message.Builder mb = new Message.Builder()
+                        // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
+                        .delayWhileIdle(false)
+                        .collapseKey("group_" + ug.getName() + "_deleted")
+                                // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
+                        .addData("type", MessageType.GROUP_DELETED_NOTIFICATION_MESSAGE.name())
+                        .addData("content", ug.getName())
+                        .addData("title", "Eine Gruppe wurde gelöscht");
+                Message m = mb.build();
+                Set<String> regids = new HashSet<>();
+                RegistrationManager rm = getRegistrationManager(pm);
+                for (String s : ug.getMembers()) {
+                    rm.getUserIds(s);
+                }
+                try {
+                    sender.send(m, new LinkedList<>(regids), 5);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             } finally {
                 pm.close();
             }
