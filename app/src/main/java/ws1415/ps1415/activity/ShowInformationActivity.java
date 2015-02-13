@@ -14,13 +14,27 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Field;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.common.util.EventUtil;
+import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.Constants;
+import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.ShowCursorAdapter;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.task.ToggleMemberEventAttendanceTask;
@@ -33,7 +47,6 @@ import ws1415.ps1415.util.FieldType;
  * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
 public class ShowInformationActivity extends Activity implements ExtendedTaskDelegate<Void, Object> {
-    public static final int SETTINGS_RESULT = 1;
     public static final int REQUEST_ACCOUNT_PICKER = 2;
 
     public static final String EXTRA_KEY_ID = "show_information_extra_key_id";
@@ -52,6 +65,12 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     private int routeFieldFirst;
     private int routeFieldLast;
     private boolean attending;
+
+    // Das aktuelle Event
+    private Event event;
+    // Ob das Event gerade aktiv
+    private boolean active;
+    private Date startDate;
 
     private SharedPreferences prefs;
     private GoogleAccountCredential credential;
@@ -100,9 +119,24 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                 }
                 else {
                     new ToggleMemberEventAttendanceTask(ShowInformationActivity.this, keyId, credential.getSelectedAccountName(), attending).execute();
+
+                    // LocaitonTransmitterService starten, wenn das Event noch aktiv ist
+                    if (active) {
+                        try {
+                            List<LatLng> waypoints = LocationUtils.decodePolyline(event.getRoute().getRouteData().getValue());
+                            Intent serviceIntent = new Intent(getBaseContext(), LocationTransmitterService.class);
+                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, keyId);
+                            serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
+                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
+                            startService(serviceIntent);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         });
+
     }
 
     /**
@@ -112,10 +146,6 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case SETTINGS_RESULT:
-                // Öffnet die Usersettings
-                displayUserSettings();
-                break;
             case REQUEST_ACCOUNT_PICKER:
                 if (data != null && data.getExtras() != null) {
                     String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
@@ -132,17 +162,6 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                 }
                 break;
         }
-    }
-
-    /**
-     * Speichert die Usersettings in einem String.
-     */
-    private void displayUserSettings() {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        String  settings = "";
-
-        settings=settings+"Position Senden:"+ sharedPrefs.getBoolean("prefSendLocation", false);
     }
     
     @Override
@@ -185,12 +204,20 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     public void setEventInformation(Event e) {
         Button attendButton = (Button) findViewById(R.id.show_info_attend_button);
         if (e != null) {
+            event = e;
             setTitle(EventUtils.getInstance(this).getUniqueField(FieldType.TITLE.getId(), e).getValue());
             listAdapter = new ShowCursorAdapter(this, e.getDynamicFields(), e);
 
             listView = (ListView) findViewById(R.id.activity_show_information_list_view);
             listView.setAdapter(listAdapter);
 
+            // Prüft, ob das aktuelle Datum nach dem Start-Datum des Events liegt.
+            // Also ob es bereits gestartet ist. Somit wird der Server gestartet.
+            startDate = EventUtils.getInstance(this.getBaseContext()).getFusedDate(e);
+            Date today = new Date();
+            if (today.after(startDate)) {
+                active = true;
+            }
 
             if (e.getRouteFieldFirst() != null) {
                 routeFieldFirst = e.getRouteFieldFirst();
@@ -208,6 +235,8 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
             }
             updateAttendButtonTitle();
         } else {
+            active = false;
+            startDate = null;
             attendButton.setEnabled(false);
             attendButton.setText(getString(R.string.show_info_button_attend));
         }
@@ -223,7 +252,6 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
             attendButton.setText(getString(R.string.show_info_button_attend));
         }
     }
-
 
     @Override
     public void taskDidFinish(ExtendedTask task, Object result) {
@@ -247,4 +275,5 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     public void taskFailed(ExtendedTask task, String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
+
 }

@@ -6,7 +6,7 @@ import android.preference.PreferenceFragment;
 import ws1415.ps1415.R;
 
 /**
- * Fragment für die Einstellungen.
+ * Fragment für das Anzeigen der Einstellungen.
  * @author Tristan Rust
  */
 public class SettingsFragment extends PreferenceFragment {

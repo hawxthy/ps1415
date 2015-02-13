@@ -71,7 +71,7 @@ public class GcmIntentService extends IntentService {
                         LocalBroadcastManager.getInstance(this).sendBroadcast(refreshIntent);
                         break;
                     case EVENT_START_MESSAGE:
-                        // LocationTransmitterService starten, wenn Einstellung entsprechend
+                        // LocationTransmitterService wird gestartet, wenn das Event gestartet wird.
                         long eventId = Long.parseLong(extras.getString("eventId"));
                         try {
                             Event e = new GetEventTask(null).execute(eventId).get();

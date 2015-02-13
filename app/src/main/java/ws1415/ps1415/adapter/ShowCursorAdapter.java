@@ -181,7 +181,8 @@ public class ShowCursorAdapter extends BaseAdapter {
                 @Override
                 public void onClick(final View view) {
                     if (event.getRoute() != null && event.getRoute().getRouteData() != null) {
-                        // Erstellt den Dialog, ob die Position gespeichert werden soll und auf der Karte angezeigt wird
+                        // Auskommentiert, weil veraltet/unnötig
+                        /*// Erstellt den Dialog, ob die Position gespeichert werden soll und auf der Karte angezeigt wird
                         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
                         if (!pref.contains("prefSendLocation")) {
                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -205,10 +206,10 @@ public class ShowCursorAdapter extends BaseAdapter {
                             // Zeigt den Dialog
                             AlertDialog dialog = builder.create();
                             dialog.show();
-                        }
-                        else {
+                        }*/
+                        //else {
                             showMap();
-                        }
+                        //}
 
                     }
                 }
