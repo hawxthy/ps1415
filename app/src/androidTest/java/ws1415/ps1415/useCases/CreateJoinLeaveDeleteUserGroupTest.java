@@ -194,7 +194,7 @@ public class CreateJoinLeaveDeleteUserGroupTest extends ActivityInstrumentationT
 
         // Da longClick nicht zu simmulieren ist, müssen wir hier den
         // Task direkt aufrufen
-        new DeleteUserGroupTask(mFragment).execute(((UserGroup) groupList.getAdapter().getItem(positionMyGroup))).get();
+        // new DeleteUserGroupTask(mFragment).execute(((UserGroup) groupList.getAdapter().getItem(positionMyGroup))).get();
 
         // Nach der Gruppe suchen und prüfen ob diese noch existiert
         found = false;
