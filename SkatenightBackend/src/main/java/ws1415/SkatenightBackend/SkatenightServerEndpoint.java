@@ -10,6 +10,8 @@ import com.google.appengine.api.users.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -1027,4 +1029,16 @@ public class SkatenightServerEndpoint {
         }
     }
 
+
+    public HashMap<Member, String> getGroupMembers(@Named("userGroupList") ArrayList<String> userGroupList){
+        HashMap<Member, String> memberSet = new HashMap<Member, String>();
+        UserGroup tmpGroup;
+        for(int i = 0; i < userGroupList.size(); i++){
+            tmpGroup = getUserGroup(userGroupList.get(i));
+            for(String s : tmpGroup.getMembers()){
+                memberSet.put(getMember(s), tmpGroup.getName());
+            }
+        }
+        return memberSet;
+    }
 }

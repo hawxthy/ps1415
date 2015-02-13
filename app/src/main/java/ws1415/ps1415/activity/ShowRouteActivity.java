@@ -23,16 +23,20 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.skatenight.skatenightAPI.model.Member;
+import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryMemberTask;
+import ws1415.ps1415.task.QueryVisibleMembersTask;
 
 
 /**
@@ -44,6 +48,7 @@ public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE_FIELD_LAST = "show_route_extra_route_field_last";
     public static final String EXTRA_WAYPOINTS = "show_route_extra_waypoints";
     public static final String EXTRA_EVENT_ID = "show_route_extra_event_id";
+    public static final String EXTRA_USERGROUPS = "show_route_extra_show_groups";
     private static final String MEMBER_ROUTE = "show_route_member_route";
     private static final String MEMBER_ROUTE_HIGHLIGHT = "show_route_member_route_highlight";
     private static final String MEMBER_ROUTE_TRACK = "show_route_member_route_track";
@@ -62,6 +67,9 @@ public class ShowRouteActivity extends Activity {
     private int fieldLast;
     private long eventId;
     private LocationReceiver receiver;
+
+    private List<UserGroup> userGroups;
+    private HashMap<Member, String> memberColors;
 
     private Location location; // Enthält die aktuelle Position, die vom Server runtergeladen wurde
 
@@ -147,7 +155,11 @@ public class ShowRouteActivity extends Activity {
                                 .draggable(true));
                     }
                 }
-
+                if (intent.hasExtra(EXTRA_USERGROUPS)){
+                    refreshVisibleMembers();
+                }
+                // TODO Weg machen
+                refreshVisibleMembers();
                 Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();
             }
             catch (ParseException e) {
@@ -352,5 +364,24 @@ public class ShowRouteActivity extends Activity {
             }
             drawTrack();
         }
+    }
+
+    private void refreshVisibleMembers(){
+        new QueryVisibleMembersTask(new ExtendedTaskDelegate<Void, HashMap<Member, String>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, HashMap<Member, String> memberStringHashMap) {
+
+            }
+
+            @Override
+            public void taskDidProgress(ExtendedTask task, Void... progress) {
+
+            }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+
+            }
+        }, this).execute();
     }
 }
