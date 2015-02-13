@@ -101,7 +101,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
             new GetEventTask(this).execute(keyId);
         }
 
-        Button attendButton = (Button) findViewById(R.id.show_info_attend_button);
+        final Button attendButton = (Button) findViewById(R.id.show_info_attend_button);
         attendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,17 +120,20 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                 else {
                     new ToggleMemberEventAttendanceTask(ShowInformationActivity.this, keyId, credential.getSelectedAccountName(), attending).execute();
 
-                    // LocaitonTransmitterService starten, wenn das Event noch aktiv ist
-                    if (active) {
-                        try {
-                            List<LatLng> waypoints = LocationUtils.decodePolyline(event.getRoute().getRouteData().getValue());
-                            Intent serviceIntent = new Intent(getBaseContext(), LocationTransmitterService.class);
-                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, keyId);
-                            serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
-                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
-                            startService(serviceIntent);
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                    // LocationTransmitterService starten, wenn das Event noch aktiv ist
+
+                    if (attendButton.getText()==getString(R.string.show_info_button_attend)) {
+                        if (active) {
+                            try {
+                                List<LatLng> waypoints = LocationUtils.decodePolyline(event.getRoute().getRouteData().getValue());
+                                Intent serviceIntent = new Intent(getBaseContext(), LocationTransmitterService.class);
+                                serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, keyId);
+                                serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
+                                serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
+                                startService(serviceIntent);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
