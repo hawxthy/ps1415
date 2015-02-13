@@ -5,11 +5,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.maps.model.LatLng;
@@ -81,6 +79,7 @@ public class GcmIntentService extends IntentService {
                             serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, eventId);
                             serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
                             serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
+                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_DISTANCE, e.getRoute().getLength());
                             startService(serviceIntent);
                         } catch (InterruptedException e1) {
                             e1.printStackTrace();

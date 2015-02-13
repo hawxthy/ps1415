@@ -9,14 +9,16 @@ public class LocalAnalysisData {
 
     private long id;
     private float currentDistance;
+    private String distance;
     private float maxSpeed;
     private float avgSpeed;
     private float elevationGain;
-    private int currentWaypoint;
+    private float progress;
     private int[] visited;
     private long[] timestamps;
     private Date startDate;
     private Date endDate;
+    private String waypoints;
 
     public LocalAnalysisData() {
     }
@@ -27,6 +29,14 @@ public class LocalAnalysisData {
 
     public void setCurrentDistance(float currentDistance) {
         this.currentDistance = currentDistance;
+    }
+
+    public String getDistance() {
+        return distance;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
     }
 
     public float getMaxSpeed() {
@@ -53,12 +63,12 @@ public class LocalAnalysisData {
         this.elevationGain = elevationGain;
     }
 
-    public int getCurrentWaypoint() {
-        return currentWaypoint;
+    public float getProgress() {
+        return progress;
     }
 
-    public void setCurrentWaypoint(int currentWaypoint) {
-        this.currentWaypoint = currentWaypoint;
+    public void setProgress(float progress) {
+        this.progress = progress;
     }
 
     public int[] getVisited() {
@@ -99,5 +109,13 @@ public class LocalAnalysisData {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public String getWaypoints() {
+        return waypoints;
+    }
+
+    public void setWaypoints(String waypoints) {
+        this.waypoints = waypoints;
     }
 }

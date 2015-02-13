@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.task.UpdateLocationTask;
 import ws1415.ps1415.util.LocalAnalysisData;
 import ws1415.ps1415.util.LocalStorageUtil;
@@ -45,6 +46,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     public static final String EXTRA_EVENT_ID = "location_transmitter_service_extra_event_id";
     public static final String EXTRA_WAYPOINTS = "location_transmitter_service_extra_waypoints";
     public static final String EXTRA_START_DATE = "location_transmitter_service_extra_start_date";
+    public static final String EXTRA_DISTANCE = "location_transmitter_service_extra_distance";
 
     public static final String NOTIFICATION_LOCATION = "location_transmitter_service_notification_location";
     public static final String NOTIFICATION_EXTRA_LOCATION = "location_transmitter_service_notification_location";
@@ -71,6 +73,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     private float maxSpeed;
     private float avgSpeed;
     private float currentDistance;
+    private String distance;
     private boolean foundFirstWaypoint;
     private float previousAlt;
     private float elevationGain;
@@ -106,6 +109,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         eventId = intent.getLongExtra(EXTRA_EVENT_ID, -1);
         waypoints = intent.getParcelableArrayListExtra(EXTRA_WAYPOINTS);
         startDate = new Date(intent.getLongExtra(EXTRA_START_DATE, 0));
+        distance = intent.getStringExtra(EXTRA_DISTANCE);
 
         Toast.makeText(getApplicationContext(), "Service start!", Toast.LENGTH_LONG).show();
 
@@ -138,7 +142,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
         localData.setAvgSpeed(avgSpeed);
         localData.setCurrentDistance(currentDistance);
-        localData.setCurrentWaypoint(currentWaypoint);
+        localData.setDistance(distance);
+        localData.setProgress((float) currentWaypoint / (float) waypoints.size());
         localData.setElevationGain(elevationGain);
         localData.setId(eventId);
         localData.setMaxSpeed(maxSpeed);
@@ -146,11 +151,11 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         localData.setVisited(toPrimitiveInt(passedWaypoints));
         localData.setStartDate(startDate);
         localData.setEndDate(new Date());
+        localData.setWaypoints(LocationUtils.encodePolyline(waypoints));
+        Toast.makeText(getApplicationContext(), localData.getWaypoints(), Toast.LENGTH_LONG).show();
 
         // Daten abspeichern
         storeLocalData.saveObject(localData,String.valueOf(localData.getId()));
-
-        Toast.makeText(getApplicationContext(), "Service stop!", Toast.LENGTH_LONG).show();
 
         if (gac != null) gac.disconnect();
         super.onDestroy();
