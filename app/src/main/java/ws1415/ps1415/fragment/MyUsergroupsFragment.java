@@ -107,21 +107,23 @@ public class MyUsergroupsFragment extends Fragment{
                 switch(i){
                     case 0:
                         if(adapter == mAdapterVisible){
-                            mAdapterVisible.removeListItem(userGroup);
-                            mAdapterNotVisible.addListItem(userGroup);
-                            PrefManager.setGroupVisibility(MyUsergroupsFragment.this.getActivity(), userGroup.getName(), false);
+                            if(mAdapterNotVisible.addListItem(userGroup)){
+                                mAdapterVisible.removeListItem(userGroup);
+                                PrefManager.setGroupVisibility(MyUsergroupsFragment.this.getActivity(), userGroup.getName(), false);
+                            }
                         }else{
-                            mAdapterNotVisible.removeListItem(userGroup);
-                            mAdapterVisible.addListItem(userGroup);
-                            PrefManager.setGroupVisibility(MyUsergroupsFragment.this.getActivity(), userGroup.getName(), true);
+                            if(mAdapterVisible.addListItem(userGroup)) {
+                                mAdapterNotVisible.removeListItem(userGroup);
+                                PrefManager.setGroupVisibility(MyUsergroupsFragment.this.getActivity(), userGroup.getName(), true);
+                            }
                         }
                         break;
                     case 1:
                         if (!groupUtils.isCreator(ServiceProvider.getEmail(), userGroup)) {
-                            c_dialog = groupUtils.createDialogLeave(MyUsergroupsFragment.this.getActivity(), mAdapterVisible.getItem(i));
+                            c_dialog = groupUtils.createDialogLeave(MyUsergroupsFragment.this.getActivity(), userGroup);
                             c_dialog.show();
                         }else{
-                            c_dialog = groupUtils.createDialogOwner(MyUsergroupsFragment.this.getActivity(), mAdapterVisible.getItem(i));
+                            c_dialog = groupUtils.createDialogOwner(MyUsergroupsFragment.this.getActivity(), userGroup);
                             c_dialog.show();
                         }
                         break;
