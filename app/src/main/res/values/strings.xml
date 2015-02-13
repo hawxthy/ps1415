@@ -94,5 +94,7 @@
     <string name="title_fragment_my_user_groups_not_visible">Invisible Groups</string>
 
 
+    <!--Strings zu ShowRouteActivity-->
+    <string name="group">"Group: "</string>
 
 </resources>

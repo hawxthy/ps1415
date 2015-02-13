@@ -367,17 +367,32 @@ public class ShowRouteActivity extends Activity {
     }
 
     private void refreshVisibleMembers(){
-        new QueryVisibleMembersTask(new ExtendedTaskDelegate<Void, HashMap<Member, Integer>>() {
+        new QueryVisibleMembersTask(new ExtendedTaskDelegate<Void, HashMap<Member, String>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, HashMap<Member, Integer> memberStringHashMap) {
+            public void taskDidFinish(ExtendedTask task, HashMap<Member, String> memberStringHashMap) {
                 for(Marker m : groupMarker){
                     m.remove();
                 }
                 groupMarker.clear();
+
+                ArrayList<Integer> farben = new ArrayList<Integer>();
+                farben.add(R.drawable.small_marker_blue);
+                farben.add(R.drawable.small_marker_green);
+                farben.add(R.drawable.small_marker_red);
+                farben.add(R.drawable.small_marker_yellow);
+                farben.add(R.drawable.small_marker_pink);
+
+                HashMap<String, Integer> gruppenFarben = new HashMap<>();
+
                 for(Member m : memberStringHashMap.keySet()){
+                    if(!gruppenFarben.containsKey(memberStringHashMap.get(m))){
+                        gruppenFarben.put(memberStringHashMap.get(m), farben.get(0));
+                        farben.remove(0);
+                    }
                     groupMarker.add(googleMap.addMarker(new MarkerOptions()
                             .title(m.getName())
-                            .icon(BitmapDescriptorFactory.fromResource(memberStringHashMap.get(m)))
+                            .snippet(getString(R.string.group) +memberStringHashMap.get(m))
+                            .icon(BitmapDescriptorFactory.fromResource(gruppenFarben.get(memberStringHashMap.get(m))))
                             .position(new LatLng(m.getLatitude(), m.getLongitude()))
                             .draggable(false)));
                 }

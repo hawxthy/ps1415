@@ -21,14 +21,14 @@ import ws1415.ps1415.util.PrefManager;
 /**
  * Created by Bernd Eissing on 13.02.2015.
  */
-public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Member, Integer>> {
+public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Member, String>> {
     private Context context;
     /**
      * Initialisiert den Task.
      *
      * @param delegate Klasse die Rückmeldungen zum Fortschritt des Task erhalten soll.
      */
-    public QueryVisibleMembersTask(ExtendedTaskDelegate<Void, HashMap<Member, Integer>> delegate, Context context) {
+    public QueryVisibleMembersTask(ExtendedTaskDelegate<Void, HashMap<Member, String>> delegate, Context context) {
         super(delegate);
         this.context = context;
     }
@@ -48,17 +48,10 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
      * @see #publishProgress
      */
     @Override
-    protected HashMap<Member, Integer> doInBackground(Void... params) {
+    protected HashMap<Member, String> doInBackground(Void... params) {
         List<UserGroup> tmpGroups = null;
         List<Member> groupMembers = new ArrayList<Member>();
-        HashMap<Member, Integer> farbenMap = new HashMap<Member, Integer> ();
-        ArrayList<Integer> farben = new ArrayList<Integer>();
-        farben.add(R.drawable.small_marker_blue);
-        farben.add(R.drawable.small_marker_green);
-        farben.add(R.drawable.small_marker_red);
-        farben.add(R.drawable.small_marker_yellow);
-        farben.add(R.drawable.small_marker_pink);
-
+        HashMap<Member, String> farbenMap = new HashMap<Member, String> ();
         try{
             tmpGroups = (ArrayList)ServiceProvider.getService().skatenightServerEndpoint().fetchMyUserGroups().execute().getItems();
         }catch( IOException e){
@@ -72,9 +65,8 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
                     e.printStackTrace();
                 }
                 for(Member m : groupMembers){
-                    farbenMap.put(m, farben.get(0));
+                    farbenMap.put(m, userGroup.getName());
                 }
-                farben.remove(0);
             }
         }
         return farbenMap;

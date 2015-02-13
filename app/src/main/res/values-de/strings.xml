@@ -93,4 +93,7 @@
     <string name="context_menu_not_visible">Zeige nicht auf der Map</string>
     <string name="title_fragment_my_user_groups_visible">Sichtbare Gruppen</string>
     <string name="title_fragment_my_user_groups_not_visible">Nicht sichtbare Gruppen</string>
+
+    <!--Strings zu ShowRouteActivity-->
+    <string name="group">"Gruppe: "</string>
 </resources>
