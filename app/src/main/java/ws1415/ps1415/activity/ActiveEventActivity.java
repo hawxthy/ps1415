@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -54,6 +55,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     private Timer clockTimer;
 
     private long eventId;
+    private boolean saved;
 
     private String email;
     private String encodedWaypoints;
@@ -86,12 +88,37 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             }
         }
 
+        timerTextView = (TextView) findViewById(R.id.active_event_timer_textview);
 
-        new GetEventTask(this).execute(eventId);
-        
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         if (prefs.contains(String.valueOf(eventId))) {
+            saved = true;
+
             restoreLocalData(String.valueOf(eventId));
+
+            Button endParticipationButton = (Button) findViewById(R.id.active_event_cancel_button);
+            ((ViewGroup) endParticipationButton.getParent()).removeView(endParticipationButton);
+        }
+        else {
+            saved = false;
+
+            clockTimer = new Timer(true);
+
+            new GetEventTask(this).execute(eventId);
+
+            Button endParticipationButton = (Button) findViewById(R.id.active_event_cancel_button);
+            endParticipationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    stopService(new Intent(getBaseContext(), LocationTransmitterService.class));
+                    stopClockTimer();
+
+                    saved = true;
+
+                    Button button = (Button) v;
+                    button.setEnabled(false);
+                }
+            });
         }
 
 //        String email = prefs.getString("accountName", null);
@@ -102,10 +129,6 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 //        else {
 //            new QueryCurrentMemberEventTask(this, email).execute();
 //        }
-
-
-        timerTextView = (TextView) findViewById(R.id.active_event_timer_textview);
-        clockTimer = new Timer(true);
 
         Button speedProfileButton = (Button) findViewById(R.id.active_event_speed_profile_button);
         speedProfileButton.setOnClickListener(new View.OnClickListener() {
@@ -137,6 +160,21 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     @Override
     protected void onStart() {
         super.onStart();
+
+        if (!saved) {
+            startClockTimer();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (!saved) {
+            stopClockTimer();
+        }
+        super.onPause();
+    }
+
+    private void startClockTimer() {
         if (clockTimerTask == null) {
             clockTimerTask = new ClockTimerTask();
             clockTimer.scheduleAtFixedRate(clockTimerTask, 0, 1000);
@@ -145,14 +183,12 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(LocationTransmitterService.NOTIFICATION_LOCATION));
     }
 
-    @Override
-    protected void onPause() {
+    private void stopClockTimer() {
         if (clockTimerTask != null) {
             clockTimerTask.cancel();
             clockTimerTask = null;
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        super.onPause();
     }
 
     @Override
@@ -177,8 +213,8 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateTimerTextView() {
-        long current = new Date().getTime()-startDate.getTime();
+    private void updateTimerTextView(Date endDate) {
+        long current = endDate.getTime()-startDate.getTime();
         current /= 1000;
 
         String sign = (current < 0) ? "-":"";
@@ -219,7 +255,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
                 Toast.makeText(getApplicationContext(), "Parse failed", Toast.LENGTH_SHORT).show();
             }
 
-            updateTimerTextView();
+            updateTimerTextView(new Date());
 
             TextView distanceTextView = (TextView) findViewById(R.id.active_event_total_distance_textview);
             distanceTextView.setText(event.getRoute().getLength());
@@ -247,7 +283,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    updateTimerTextView();
+                    updateTimerTextView(new Date());
                 }
             });
         }
@@ -279,6 +315,12 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         float elevationGain = localData.getElevationGain();
         TextView elevationGainTextView = (TextView) findViewById(R.id.active_event_elevation_gain_textview);
         elevationGainTextView.setText(getString(R.string.active_event_altitude_format_meters, elevationGain));
+
+        startDate = localData.getStartDate();
+        updateTimerTextView(localData.getEndDate());
+
+        setProgressBarIndeterminateVisibility(false);
+        ((ScrollView) findViewById(R.id.active_event_scroll_view)).setVisibility(View.VISIBLE);
 
     }
 

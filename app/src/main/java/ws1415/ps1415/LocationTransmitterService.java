@@ -1,5 +1,7 @@
 package ws1415.ps1415;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,8 +9,10 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -102,6 +106,20 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         eventId = intent.getLongExtra(EXTRA_EVENT_ID, -1);
         waypoints = intent.getParcelableArrayListExtra(EXTRA_WAYPOINTS);
         startDate = new Date(intent.getLongExtra(EXTRA_START_DATE, 0));
+
+        Toast.makeText(getApplicationContext(), "Service start!", Toast.LENGTH_LONG).show();
+
+        Intent notificationIntent = new Intent(this, LocationTransmitterService.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        Notification notification = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentText("TEST")
+                .setContentIntent(pendingIntent).build();
+
+        startForeground(5656565, notification);
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -132,6 +150,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // Daten abspeichern
         storeLocalData.saveObject(localData,String.valueOf(localData.getId()));
 
+        Toast.makeText(getApplicationContext(), "Service stop!", Toast.LENGTH_LONG).show();
 
         if (gac != null) gac.disconnect();
         super.onDestroy();
