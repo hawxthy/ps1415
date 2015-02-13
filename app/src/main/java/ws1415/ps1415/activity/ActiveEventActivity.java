@@ -290,11 +290,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     }
 
     private void restoreLocalData (String id) {
-        LocalStorageUtil storeLocalData = new LocalStorageUtil(getApplicationContext());
-        LocalAnalysisData localData = new LocalAnalysisData();
-
-        localData = storeLocalData.getData(id);
-
+        LocalAnalysisData localData = new LocalStorageUtil(getApplicationContext()).getData(id);
 
         float currentDistance = localData.getCurrentDistance();
         TextView currentDistanceTextView = (TextView) findViewById(R.id.active_event_current_distance_textview);
