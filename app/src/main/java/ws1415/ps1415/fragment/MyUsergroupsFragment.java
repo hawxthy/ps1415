@@ -151,6 +151,10 @@ public class MyUsergroupsFragment extends Fragment{
      * @param results Liste von Gruppen
      */
     public void setUserGroupsToListView(List<UserGroup> results){
+        if (results == null) {
+            results = new ArrayList<>();
+        }
+
         // Einteilen
         List<UserGroup> tmpVisible = new ArrayList<>();
         List<UserGroup> tmpNotVisible = new ArrayList<>();
