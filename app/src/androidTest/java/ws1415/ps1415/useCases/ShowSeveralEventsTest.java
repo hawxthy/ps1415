@@ -25,7 +25,7 @@ import java.util.List;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.activity.Settings;
+import ws1415.ps1415.activity.SettingsActivity;
 import ws1415.ps1415.activity.ShowEventsActivity;
 import ws1415.ps1415.activity.ShowInformationActivity;
 import ws1415.ps1415.task.CreateEventTask;

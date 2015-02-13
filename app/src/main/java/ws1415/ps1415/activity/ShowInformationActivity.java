@@ -217,6 +217,8 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
             Date today = new Date();
             if (today.after(startDate)) {
                 active = true;
+            } else {
+                active = false;
             }
 
             if (e.getRouteFieldFirst() != null) {

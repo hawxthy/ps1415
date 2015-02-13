@@ -24,7 +24,7 @@ import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.activity.Settings;
+import ws1415.ps1415.activity.SettingsActivity;
 import ws1415.ps1415.activity.ShowEventsActivity;
 import ws1415.ps1415.task.UpdateLocationTask;
 
@@ -117,7 +117,7 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
      */
     @LargeTest
     public void testUseCase() throws Exception {
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(Settings.class.getName(), null, false);
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(SettingsActivity.class.getName(), null, false);
 
         // Klick auf die Menüoption
         // Die Acitivity wird geändert, damit der Monitor für die Activity laufen kann, für die gleiche
@@ -187,7 +187,7 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
      */
     @LargeTest
     public void testUseCaseStatePause() throws InterruptedException {
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(Settings.class.getName(), null, false);
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(SettingsActivity.class.getName(), null, false);
 
         // Klick auf die Menüoption
         // Die Acitivity wird geändert, damit der Monitor für die Activity laufen kann, für die gleiche

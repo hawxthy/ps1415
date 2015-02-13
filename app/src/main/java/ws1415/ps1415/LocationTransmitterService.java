@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -146,7 +147,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // Sendet die Nutzerdaten an den Server, wenn dies in den Einstellungen vorgesehen ist
         if (email != null && sendLocation) {
             new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
+            Toast.makeText(getBaseContext(), "Sendet Position", Toast.LENGTH_SHORT).show();
         }
+        // Toast.makeText(getBaseContext(), "TransmitterService läuft", Toast.LENGTH_SHORT).show();
 
         if (waypoints != null && waypoints.size() > 0) {
             // Nur aktuelle Distanz berechnen wenn, bereits ein current Waypoint existiert

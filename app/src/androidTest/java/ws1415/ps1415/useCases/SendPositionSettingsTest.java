@@ -38,7 +38,7 @@ import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.activity.Settings;
+import ws1415.ps1415.activity.SettingsActivity;
 import ws1415.ps1415.activity.ShowEventsActivity;
 import com.skatenight.skatenightAPI.model.Event;
 
@@ -144,7 +144,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
      */
     @SmallTest
     public void testSettingsUI() throws InterruptedException {
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(Settings.class.getName(), null, false);
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(SettingsActivity.class.getName(), null, false);
 
         // Klick auf die Menüoption
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
@@ -169,7 +169,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
      */
     @SmallTest
     public void testSettingsUIStateDestroy() throws InterruptedException {
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(Settings.class.getName(), null, false);
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(SettingsActivity.class.getName(), null, false);
 
         // Klick auf die Menüoption
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
@@ -199,7 +199,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
      */
     @SmallTest
     public void testSettingsUIStatePause() throws InterruptedException {
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(Settings.class.getName(), null, false);
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(SettingsActivity.class.getName(), null, false);
 
         // Klick auf die Menüoption
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
@@ -233,7 +233,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
      */
     @LargeTest
     public void testSendPosition() throws Exception {
-        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(Settings.class.getName(), null, false);
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(SettingsActivity.class.getName(), null, false);
 
         // Klick auf die Menüoption
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
