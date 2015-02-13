@@ -9,24 +9,26 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.util.PrefManager;
 
 /**
  * Created by Bernd Eissing on 13.02.2015.
  */
-public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Member, String>> {
+public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Member, Integer>> {
     private Context context;
     /**
      * Initialisiert den Task.
      *
      * @param delegate Klasse die Rückmeldungen zum Fortschritt des Task erhalten soll.
      */
-    public QueryVisibleMembersTask(ExtendedTaskDelegate<Void, HashMap<Member, String>> delegate, Context context) {
+    public QueryVisibleMembersTask(ExtendedTaskDelegate<Void, HashMap<Member, Integer>> delegate, Context context) {
         super(delegate);
         this.context = context;
     }
@@ -46,9 +48,18 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
      * @see #publishProgress
      */
     @Override
-    protected HashMap<Member, String> doInBackground(Void... params) {
+    protected HashMap<Member, Integer> doInBackground(Void... params) {
         List<UserGroup> tmpGroups = null;
+        List<Member> groupMembers = new ArrayList<Member>();
         List<String> visibleGroups = new ArrayList<String>();
+        HashMap<Member, Integer> farbenMap = new HashMap<Member, Integer> ();
+        ArrayList<Integer> farben = new ArrayList<Integer>();
+        farben.add(R.drawable.small_marker_blue);
+        farben.add(R.drawable.small_marker_green);
+        farben.add(R.drawable.small_marker_red);
+        farben.add(R.drawable.small_marker_yellow);
+        farben.add(R.drawable.small_marker_pink);
+
         try{
             tmpGroups = (ArrayList)ServiceProvider.getService().skatenightServerEndpoint().fetchMyUserGroups().execute().getItems();
         }catch( IOException e){
@@ -57,14 +68,17 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
         for(UserGroup userGroup: tmpGroups){
             if(PrefManager.getGroupVisibility(context, userGroup.getName())){
                 visibleGroups.add(userGroup.getName());
+                try {
+                    groupMembers = ServiceProvider.getService().skatenightServerEndpoint().fetchGroupMembers(visibleGroups).execute().getItems();
+                }catch(IOException e){
+                    e.printStackTrace();
+                }
+                for(Member m : groupMembers){
+                    farbenMap.put(m, farben.get(0));
+                }
+                farben.remove(0);
             }
         }
-
-        try{
-            JsonMap map = ServiceProvider.getService().skatenightServerEndpoint().getGroupMembers(visibleGroups).execute();
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-        return null;
+        return farbenMap;
     }
 }
