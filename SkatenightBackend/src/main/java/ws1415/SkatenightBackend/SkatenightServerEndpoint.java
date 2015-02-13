@@ -928,9 +928,12 @@ public class SkatenightServerEndpoint {
 
             PersistenceManager pm = pmf.getPersistenceManager();
             try {
+                Set<String> regids = new HashSet<>();
+                RegistrationManager rm = getRegistrationManager(pm);
                 for (Member m : members) {
                     m.removeGroup(ug);
                     pm.makePersistent(m);
+                    regids.addAll(rm.getUserIds(m.getEmail()));
                 }
                 pm.makePersistent(ug);
                 pm.deletePersistent(ug);
@@ -946,11 +949,6 @@ public class SkatenightServerEndpoint {
                         .addData("content", ug.getName())
                         .addData("title", "Eine Gruppe wurde gelöscht");
                 Message m = mb.build();
-                Set<String> regids = new HashSet<>();
-                RegistrationManager rm = getRegistrationManager(pm);
-                for (String s : ug.getMembers()) {
-                    rm.getUserIds(s);
-                }
                 try {
                     sender.send(m, new LinkedList<>(regids), 5);
                 } catch (IOException ex) {
@@ -1030,15 +1028,12 @@ public class SkatenightServerEndpoint {
     }
 
 
-    public HashMap<Member, String> getGroupMembers(@Named("userGroupList") ArrayList<String> userGroupList){
-        HashMap<Member, String> memberSet = new HashMap<Member, String>();
-        UserGroup tmpGroup;
-        for(int i = 0; i < userGroupList.size(); i++){
-            tmpGroup = getUserGroup(userGroupList.get(i));
+    public ArrayList<Member> fetchGroupMembers(@Named("userGroup") String userGroup){
+        ArrayList<Member> members = new ArrayList<>();
+            UserGroup tmpGroup = getUserGroup(userGroup);
             for(String s : tmpGroup.getMembers()){
-                memberSet.put(getMember(s), tmpGroup.getName());
+                members.add(getMember(s));
             }
-        }
-        return memberSet;
+        return members;
     }
 }
