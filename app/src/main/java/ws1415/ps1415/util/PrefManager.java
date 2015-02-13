@@ -21,8 +21,12 @@ public class PrefManager {
     }
 
     public static void setGroupVisibility(Context context, String groupName, Boolean visibility){
-        final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+        SharedPreferences.Editor editor = getSharedPreferences(context).edit();
         editor.putBoolean(groupName, visibility);
         editor.commit();
+    }
+
+    public static void deleteGroupVisibility(Context context, String groupName){
+        getSharedPreferences(context).edit().remove(groupName).commit();
     }
 }
