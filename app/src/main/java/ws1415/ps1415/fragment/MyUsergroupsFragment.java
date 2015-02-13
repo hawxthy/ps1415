@@ -20,6 +20,7 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.UsergroupAdapter;
 import ws1415.ps1415.task.QueryMyUserGroupsTask;
+import ws1415.ps1415.util.PrefManager;
 import ws1415.ps1415.util.groupUtils;
 
 /**
@@ -92,9 +93,9 @@ public class MyUsergroupsFragment extends Fragment{
             items = new String[2];
         }
         if (adapter == mAdapterVisible) {
-            items[0] = getString(R.string.context_menu_visible);
-        }else{
             items[0] = getString(R.string.context_menu_not_visible);
+        }else{
+            items[0] = getString(R.string.context_menu_visible);
         }
         items[1] = getString(R.string.context_menu_leave_usergroup);
 
@@ -159,8 +160,8 @@ public class MyUsergroupsFragment extends Fragment{
                 tmpNotVisible.add(results.get(i));
             }
         }
-        mAdapterVisible = new UsergroupAdapter(getActivity(), tmpVisible);
-        mAdapterNotVisible = new UsergroupAdapter(getActivity(), tmpNotVisible);
+        mAdapterVisible = new UsergroupAdapter(getActivity(), tmpVisible, 5);
+        mAdapterNotVisible = new UsergroupAdapter(getActivity(), tmpNotVisible, -1);
         if(visibleGroupsListView != null) visibleGroupsListView.setAdapter(mAdapterVisible);
         if(notVisibleGroupsListView != null) notVisibleGroupsListView.setAdapter(mAdapterNotVisible);
     }

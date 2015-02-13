@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
 
@@ -24,14 +25,20 @@ public class UsergroupAdapter extends BaseAdapter {
     private List<UserGroup> groupList = new ArrayList<UserGroup>();
     private Context context;
     private LayoutInflater inflater;
+    private int maximum;
 
     /**
      * Konstruktor, der den Inhalt der Liste festlegt;
      *
      * @param context   Context, von dem aus der Adapter aufgerufen wird.
      * @param groupList Liste von den Nutzergruppen
+     * @param maximum Maximale Anzahl der Einträge, oder -1 für unbegrenzt.
      */
-    public UsergroupAdapter(Context context, List<UserGroup> groupList) {
+    public UsergroupAdapter(Context context, List<UserGroup> groupList, int maximum) {
+        if(maximum > -1 && maximum < groupList.size()){
+            throw new IllegalArgumentException("Liste zu groß");
+        }
+        this.maximum = maximum;
         this.context = context;
         this.groupList = groupList;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -116,6 +123,10 @@ public class UsergroupAdapter extends BaseAdapter {
      * @param userGroup
      */
     public void addListItem(UserGroup userGroup){
+        if(maximum > -1 && maximum +1 < groupList.size()){
+            Toast.makeText(context, R.string.usergroup_adapter_maximum_reached, Toast.LENGTH_LONG).show();
+            return;
+        }
         groupList.add(userGroup);
         notifyDataSetChanged();
     }

@@ -71,6 +71,7 @@
     <string name="action_add_user_group">Add Usergroup</string>
     <string name="list_view_item_usergroup_creator">Creator: </string>
     <string name="list_view_item_usergroup_membercount">Member: </string>
+    <string name="usergroup_adapter_maximum_reached">Maximum number of visible groups reached</string>
 
     <!-- Strings zu AddUserGroupActivity -->
     <string name="title_activity_add_user_group">Gruppe hinzufügen</string>
@@ -89,5 +90,9 @@
     <string name="context_menu_delete">Delete</string>
     <string name="context_menu_visible">Show on Map</string>
     <string name="context_menu_not_visible">Don\'t show on Map</string>
+    <string name="title_fragment_my_user_groups_visible">Visible Groups</string>
+    <string name="title_fragment_my_user_groups_not_visible">Invisible Groups</string>
+
+
 
 </resources>

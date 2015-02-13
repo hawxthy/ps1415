@@ -72,6 +72,7 @@
     <string name="title_fragment_all_user_groups">Gruppen</string>
     <string name="title_fragment_my_user_groups">Meine Gruppen</string>
     <string name="action_add_user_group">Usergruppe hinzufügen</string>
+    <string name="usergroup_adapter_maximum_reached">Maximale Anzahl an sichtbaren Gruppen erreicht</string>
 
     <!--Strings zu AddUserGroupActivity-->
     <string name="title_activity_add_user_group">Gruppe hinzufügen</string>
@@ -90,4 +91,6 @@
     <string name="context_menu_delete">Löschen</string>
     <string name="context_menu_visible">Zeige auf der Map</string>
     <string name="context_menu_not_visible">Zeige nicht auf der Map</string>
+    <string name="title_fragment_my_user_groups_visible">Sichtbare Gruppen</string>
+    <string name="title_fragment_my_user_groups_not_visible">Nicht sichtbare Gruppen</string>
 </resources>
