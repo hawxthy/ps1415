@@ -14,8 +14,12 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.skatenight.skatenightAPI.model.ServerWaypoint;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import ws1415.veranstalterapp.R;
@@ -29,6 +33,8 @@ import ws1415.common.util.LocationUtils;
 public class ShowRouteActivity extends Activity {
     public static final String EXTRA_TITLE = "show_route_extra_title";
     public static final String EXTRA_ROUTE = "show_route_extra_route";
+    public static final String EXTRA_WAYPOINTS = "show_route_extra_waypoints";
+
     private static final String MEMBER_ROUTE = "show_route_member_route";
 
     private GoogleMap googleMap;
@@ -87,6 +93,19 @@ public class ShowRouteActivity extends Activity {
                 catch (ParseException e) {
                     Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
+                }
+
+                // Wegpunkte laden, falls vorhanden
+                if (intent.hasExtra(EXTRA_WAYPOINTS)) {
+                    ArrayList<HashMap> waypoints = (ArrayList<HashMap>) intent.getSerializableExtra(EXTRA_WAYPOINTS);
+                    for (HashMap wp : waypoints) {
+                        RouteEditorActivity.Waypoint tmp = RouteEditorActivity.Waypoint.create(
+                                new LatLng((Double)wp.get("latitude"), (Double)wp.get("longitude")),
+                                (String)wp.get("title")
+
+                        );
+                        googleMap.addMarker(tmp.getMarkerOptions());
+                    }
                 }
             }
         }

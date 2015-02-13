@@ -26,6 +26,7 @@ import com.skatenight.skatenightAPI.model.Member;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import ws1415.common.util.LocationUtils;
@@ -41,6 +42,7 @@ public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE = "show_route_extra_route";
     public static final String EXTRA_ROUTE_FIELD_FIRST = "show_route_extra_route_field_first";
     public static final String EXTRA_ROUTE_FIELD_LAST = "show_route_extra_route_field_last";
+    public static final String EXTRA_WAYPOINTS = "show_route_extra_waypoints";
     public static final String EXTRA_EVENT_ID = "show_route_extra_event_id";
     private static final String MEMBER_ROUTE = "show_route_member_route";
     private static final String MEMBER_ROUTE_HIGHLIGHT = "show_route_member_route_highlight";
@@ -134,6 +136,16 @@ public class ShowRouteActivity extends Activity {
                 }
                 if (intent.hasExtra(EXTRA_ROUTE_FIELD_LAST)) {
                     fieldLast = intent.getIntExtra(EXTRA_ROUTE_FIELD_LAST, 0);
+                }
+                if (intent.hasExtra(EXTRA_WAYPOINTS)) {
+                    ArrayList<HashMap> waypoints = (ArrayList<HashMap>) intent.getSerializableExtra(EXTRA_WAYPOINTS);
+                    for (HashMap wp : waypoints) {
+                        googleMap.addMarker(new MarkerOptions()
+                                .title((String)wp.get("title"))
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                                .position(new LatLng((Double)wp.get("latitude"), (Double)wp.get("longitude")))
+                                .draggable(true));
+                    }
                 }
 
                 Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();

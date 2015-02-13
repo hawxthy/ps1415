@@ -1,6 +1,7 @@
 package ws1415.veranstalterapp.fragment;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.activity.EditWaypointDialog;
 import ws1415.veranstalterapp.activity.RouteEditorActivity;
 
 
@@ -31,8 +33,13 @@ public class EditorWaypointsFragment extends Fragment {
             listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getActivity(), EditWaypointDialog.class);
+                    intent.putExtra(EditWaypointDialog.EXTRA_INDEX, position);
+                    startActivityForResult(intent, 0);
+                    /*
                     RouteEditorActivity activity = (RouteEditorActivity) getActivity();
                     activity.removeWaypoint(position);
+                    */
                     return true;
                 }
             });
