@@ -51,7 +51,6 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
     protected HashMap<Member, Integer> doInBackground(Void... params) {
         List<UserGroup> tmpGroups = null;
         List<Member> groupMembers = new ArrayList<Member>();
-        List<String> visibleGroups = new ArrayList<String>();
         HashMap<Member, Integer> farbenMap = new HashMap<Member, Integer> ();
         ArrayList<Integer> farben = new ArrayList<Integer>();
         farben.add(R.drawable.small_marker_blue);
@@ -67,9 +66,8 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
         }
         for(UserGroup userGroup: tmpGroups){
             if(PrefManager.getGroupVisibility(context, userGroup.getName())){
-                visibleGroups.add(userGroup.getName());
                 try {
-                    groupMembers = ServiceProvider.getService().skatenightServerEndpoint().fetchGroupMembers(visibleGroups).execute().getItems();
+                    groupMembers = ServiceProvider.getService().skatenightServerEndpoint().fetchGroupMembers(userGroup.getName()).execute().getItems();
                 }catch(IOException e){
                     e.printStackTrace();
                 }

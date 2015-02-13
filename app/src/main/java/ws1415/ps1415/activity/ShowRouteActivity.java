@@ -19,6 +19,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -68,8 +69,7 @@ public class ShowRouteActivity extends Activity {
     private long eventId;
     private LocationReceiver receiver;
 
-    private List<UserGroup> userGroups;
-    private HashMap<Member, String> memberColors;
+    private List<Marker> groupMarker = new ArrayList<Marker>();
 
     private Location location; // Enthält die aktuelle Position, die vom Server runtergeladen wurde
 
@@ -367,10 +367,20 @@ public class ShowRouteActivity extends Activity {
     }
 
     private void refreshVisibleMembers(){
-        new QueryVisibleMembersTask(new ExtendedTaskDelegate<Void, HashMap<Member, String>>() {
+        new QueryVisibleMembersTask(new ExtendedTaskDelegate<Void, HashMap<Member, Integer>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, HashMap<Member, String> memberStringHashMap) {
-
+            public void taskDidFinish(ExtendedTask task, HashMap<Member, Integer> memberStringHashMap) {
+                for(Marker m : groupMarker){
+                    m.remove();
+                }
+                groupMarker.clear();
+                for(Member m : memberStringHashMap.keySet()){
+                    groupMarker.add(googleMap.addMarker(new MarkerOptions()
+                            .title(m.getName())
+                            .icon(BitmapDescriptorFactory.fromResource(memberStringHashMap.get(m)))
+                            .position(new LatLng(m.getLatitude(), m.getLongitude()))
+                            .draggable(false)));
+                }
             }
 
             @Override
