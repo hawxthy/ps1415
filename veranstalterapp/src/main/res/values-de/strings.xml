@@ -49,6 +49,7 @@
     <string name="hello_blank_fragment">Hallo blank Fragment</string>
 
     <string-array name="selections_menu_manage_routes">
+        <item name="draft">Als Vorlage nutzen</item>
         <item name="delete">Löschen</item>
     </string-array>
 
@@ -116,4 +117,11 @@
     <string name="title_activity_add_host_dialog_hostname">E-Mail</string>
     <string name="activity_add_host_dialog_cancel">Abbrechen</string>
     <string name="activity_add_host_dialog_apply">Hinzufügen</string>
+
+    <!--Strings zu EditWaypointDialog-->
+    <string name="activity_edit_waypoint_dialog_cancel">Abbrechen</string>
+    <string name="activity_edit_waypoint_dialog_delete">Löschen</string>
+    <string name="activity_edit_waypoint_dialog_apply">Übernehmen</string>
+    <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
+    <string name="title_activity_edit_waypoint_dialog">Editiere Wegpunkt</string>
 </resources>

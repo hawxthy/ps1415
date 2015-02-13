@@ -7,19 +7,19 @@ public class Constants {
     /**
      * Die Basisadresse des Backends.
      */
-    public static final String BASE_URL = "https://skatenight-ms.appspot.com";
+    public static final String BASE_URL = "https://skatenight-ms-jenkins.appspot.com";
     /**
      * Client-ID für die normale App.
      */
-    public static final String ANDROID_USER_CLIENT_ID = "37947570052-g006o3ovfotnjqreltom6c7cbktm7dap.apps.googleusercontent.com";
+    public static final String ANDROID_USER_CLIENT_ID = "1032268444653-kj1mpisvlrpl67e7db2fu2005aube7mu.apps.googleusercontent.com";
     /**
      * Client-ID für die Veranstalter-App.
      */
-    public static final String ANDROID_HOST_CLIENT_ID = "37947570052-4ru7asfhnrjmmqvj3qdpo2rrp31fudf3.apps.googleusercontent.com";
+    public static final String ANDROID_HOST_CLIENT_ID = "1032268444653-83ih5mp5mguh66c012u0sobqe4oqoupr.apps.googleusercontent.com";
     /**
      * Client-ID für Webaufrufe.
      */
-    public static final String WEB_CLIENT_ID = "37947570052-dk3rjhgran1s38gscv6va2rmmv2bei8r.apps.googleusercontent.com";
+    public static final String WEB_CLIENT_ID = "1032268444653-7agre4q3eosqhlh92sq62hf5fan9jbv5.apps.googleusercontent.com";
 
     /**
      * Definiert die Webclient-ID als Android Audience, da aus den Apps der Zugriff auf das Back-
@@ -48,5 +48,5 @@ public class Constants {
     /**
      * Der Public API-Key, der in der Developer Console für GCM angelegt wurde.
      */
-    public static final String GCM_API_KEY = "AIzaSyDO8mosWwYXjjGZ9besu9CZw1LDEEXrFXE";
+    public static final String GCM_API_KEY = "AIzaSyBjeKzx_vzkUgQZdT83BB0BMD3gFebpet0";
 }

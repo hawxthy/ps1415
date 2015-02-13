@@ -28,6 +28,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -35,6 +37,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.skatenight.skatenightAPI.model.RoutePoint;
+import com.skatenight.skatenightAPI.model.ServerWaypoint;
 import com.skatenight.skatenightAPI.model.Text;
 
 import org.json.JSONArray;
@@ -49,6 +52,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -69,6 +74,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     private static final String LOG_TAG = RouteEditorActivity.class.getSimpleName();
 
     public static final String EXTRA_NAME = "route_editor_activity_extra_name";
+    public static final String EXTRA_WAYPOINTS = "route_editor_activity_extra_waypoints";
     private static final String MEMBER_NAME = "route_editor_activity_member_name";
     private static final String MEMBER_WAYPOINTS = "route_editor_activity_member_waypoints";
     private static final String MEMBER_ROUTE = "route_editor_activity_member_route";
@@ -78,10 +84,17 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     private SectionsPagerAdapter sectionsPagerAdapter;
     private ViewPager viewPager;
 
+    private List<HashMap> waypoints;
     private String name;
     private ArrayAdapter<Waypoint> waypointArrayAdapter;
     private Route route;
     private RouteLoaderTask currentTask;
+
+    private static RouteEditorActivity routeEditorActivity;
+
+    public RouteEditorActivity(){
+        routeEditorActivity = this;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,6 +167,19 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
             }
         });
+
+        MapsInitializer.initialize(getApplicationContext());
+
+        if(getIntent().hasExtra(EXTRA_WAYPOINTS)) {
+            EditorMapFragment mapFragment = (EditorMapFragment) getFragmentByPosition(0);
+            waypoints = (ArrayList<HashMap>) getIntent().getSerializableExtra(EXTRA_WAYPOINTS);
+            for(int i=0; i<waypoints.size(); i++){
+                Waypoint tmp = Waypoint.create(new LatLng((Double) waypoints.get(i).get("latitude"),
+                                (Double) waypoints.get(i).get("longitude")),
+                        (String) waypoints.get(i).get("title"));
+                waypointArrayAdapter.add(tmp);
+            }
+        }
 
         if (route == null && waypointArrayAdapter.getCount() > 1) {
             // Wir sollten eigentlich eine Route haben...
@@ -251,6 +277,16 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                     rt.setName(name);
                     rt.setRouteData(new Text().setValue(encoded));
                     rt.setRoutePoints(routePoints);
+                    // Wegpunkte im Route-Objekt speichern
+                    rt.setWaypoints(new ArrayList<ServerWaypoint>());
+                    for (int i = 0; i < getArrayAdapter().getCount(); i++) {
+                        MarkerOptions mo = getArrayAdapter().getItem(i).getMarkerOptions();
+                        ServerWaypoint swp = new ServerWaypoint();
+                        swp.setTitle(mo.getTitle());
+                        swp.setLongitude(mo.getPosition().longitude);
+                        swp.setLatitude(mo.getPosition().latitude);
+                        rt.getWaypoints().add(swp);
+                    }
                     Toast.makeText(getApplicationContext(), "size: " + rt.getRoutePoints().size(), Toast.LENGTH_LONG).show();
 
                     String length;
@@ -447,7 +483,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
     }
 
-    private class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -588,6 +624,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                             .position(position)
                             .draggable(true)
+
             );
         }
 
@@ -639,5 +676,13 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                 return new Waypoint[size];
             }
         };
+    }
+
+    public SectionsPagerAdapter getSectionsPagerAdapter() {
+        return sectionsPagerAdapter;
+    }
+
+    public static RouteEditorActivity getRouteEditorActivity() {
+        return routeEditorActivity;
     }
 }
