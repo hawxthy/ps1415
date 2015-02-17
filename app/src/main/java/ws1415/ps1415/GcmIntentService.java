@@ -24,6 +24,7 @@ import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.activity.ShowEventsActivity;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.util.EventUtils;
+import ws1415.ps1415.util.FieldType;
 
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
@@ -80,6 +81,9 @@ public class GcmIntentService extends IntentService {
                             serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
                             serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
                             serviceIntent.putExtra(LocationTransmitterService.EXTRA_DISTANCE, e.getRoute().getLength());
+                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_NAME, EventUtils.getInstance(this).getUniqueField(FieldType.TITLE.getId(), e));
+                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_LOCATION, EventUtils.getInstance(this).getUniqueField(FieldType.LOCATION.getId(), e));
+
                             startService(serviceIntent);
                         } catch (InterruptedException e1) {
                             e1.printStackTrace();

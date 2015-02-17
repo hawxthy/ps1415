@@ -118,7 +118,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                 notificationIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
 
         Notification notification = new NotificationCompat.Builder(this)
-                .setLights(-65536,10,10)
+                .setLights(-16711681, 1000, 1000)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentText("TEST")
                 .setContentIntent(pendingIntent).build();
