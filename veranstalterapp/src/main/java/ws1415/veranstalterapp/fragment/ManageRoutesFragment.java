@@ -164,7 +164,7 @@ public class ManageRoutesFragment extends Fragment {
      *
      * @param route die zu löschende Route
      */
-    private void deleteRoute(Route route) {
+    public void deleteRoute(Route route) {
         new DeleteRouteTask(this).execute(route);
     }
 
