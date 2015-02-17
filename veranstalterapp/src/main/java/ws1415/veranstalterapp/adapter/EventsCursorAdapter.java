@@ -137,4 +137,8 @@ public class EventsCursorAdapter extends BaseAdapter{
         eventList.remove(i);
         notifyDataSetChanged();
     }
+
+    public List<Event> getEventList() {
+        return eventList;
+    }
 }
