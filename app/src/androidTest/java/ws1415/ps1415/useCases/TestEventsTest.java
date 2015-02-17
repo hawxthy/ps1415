@@ -27,6 +27,13 @@ import ws1415.ps1415.adapter.ShowCursorAdapter;
  */
 public class TestEventsTest extends ActivityInstrumentationTestCase2<ShowEventsActivity> {
 
+    private static final String TEST_TITLE = "trf";
+    private static final String TEST_FEE   = "55 €";
+    private static final String TEST_LOCATION = "ffg";
+    private static final String TEST_DATE = "17-02-2015 20:00";
+
+
+
     private ShowEventsActivity mActivity;
 
     private ListView mList;
@@ -125,26 +132,26 @@ public class TestEventsTest extends ActivityInstrumentationTestCase2<ShowEventsA
 
         Thread.sleep(5000); // Zeit zum Initialisieren
 
-        assertNotNull("lv", listView);
-        assertNotNull("lva", listView.getAdapter());
+        assertNotNull("listView is null!", listView);
+        assertNotNull("listViewAdapter is null!", listView.getAdapter());
 
         String temp = "";
 
         TextView title = (TextView) listView.getChildAt(0).findViewById(R.id.list_view_item_show_information_text_field_textView_content);
         temp = (String) title.getText();
-        assertEquals("trf", temp);
+        assertEquals(TEST_TITLE, temp);
 
         TextView fee = (TextView) listView.getChildAt(1).findViewById(R.id.list_view_item_show_information_text_field_textView_content);
         temp = (String) fee.getText();
-        assertEquals("55 €", temp);
+        assertEquals(TEST_FEE, temp);
 
-        TextView date = (TextView) listView.getChildAt(2).findViewById(R.id.list_view_item_show_information_text_field_textView_content);
+        TextView date = (TextView) listView.getChildAt(3).findViewById(R.id.list_view_item_show_information_text_field_textView_content);
         temp = (String) date.getText();
-        assertEquals("17-02-2015 20:00", temp);
+        assertEquals(TEST_DATE, temp);
 
-        TextView city = (TextView) listView.getChildAt(3).findViewById(R.id.list_view_item_show_information_text_field_textView_content);
-        temp = (String) date.getText();
-        assertEquals("ffg", temp);
+        TextView location = (TextView) listView.getChildAt(4).findViewById(R.id.list_view_item_show_information_text_field_textView_content);
+        temp = (String) location.getText();
+        assertEquals(TEST_LOCATION, temp);
 
 
 
