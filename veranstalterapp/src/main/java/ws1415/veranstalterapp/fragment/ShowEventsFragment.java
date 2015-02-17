@@ -31,6 +31,7 @@ import ws1415.veranstalterapp.util.EventUtils;
 public class ShowEventsFragment extends Fragment {
     private ListView eventListView;
     private List<Event> eventList;
+
     private EventsCursorAdapter mAdapter;
 
     /**
@@ -158,12 +159,16 @@ public class ShowEventsFragment extends Fragment {
      *
      * @param event das zu löschende Event
      */
-    private void deleteEvent(Event event){ new DeleteEventTask(this).execute(event);}
+    public void deleteEvent(Event event){ new DeleteEventTask(this).execute(event);}
 
 
-    private void editEvent(Event event){
+    public void editEvent(Event event){
         Intent intent = new Intent(getActivity(), EditEventActivity.class);
         intent.putExtra("event", event.getKey().getId());
         startActivity(intent);
+    }
+
+    public EventsCursorAdapter getmAdapter() {
+        return mAdapter;
     }
 }
