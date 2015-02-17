@@ -27,9 +27,6 @@ public class BaseFragmentActivity extends FragmentActivity {
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
 
-    private CharSequence mDrawerTitle;
-    private CharSequence mTitle;
-
     private String[] navMenuTitles;
     private TypedArray navMenuIcons;
 
@@ -46,9 +43,6 @@ public class BaseFragmentActivity extends FragmentActivity {
 
         getLayoutInflater().inflate(layoutResID, actContent,  true);
         super.setContentView(fullLayout);
-
-        // NavigationDrawer initialisieren
-        mTitle = mDrawerTitle = getTitle();
 
         //Slide Menu Items laden
         navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
@@ -81,7 +75,7 @@ public class BaseFragmentActivity extends FragmentActivity {
                 R.string.app_name
         ){
             public void onDrawerClosed(View view) {
-                for(int i=0; i<navDrawerItems.size(); i++) mDrawerList.setItemChecked(0, false);
+                for(int i=0; i < navDrawerItems.size(); i++) mDrawerList.setItemChecked(i, false);
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -103,10 +97,12 @@ public class BaseFragmentActivity extends FragmentActivity {
             switch(position){
                 case 0:
                     Intent show_events_intent = new Intent(BaseFragmentActivity.this, ShowEventsActivity.class);
+                    show_events_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(show_events_intent);
                     break;
                 case 1:
                     Intent user_group_intent = new Intent(BaseFragmentActivity.this, UsergroupActivity.class);
+                    user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(user_group_intent);
                     break;
             }
@@ -120,12 +116,6 @@ public class BaseFragmentActivity extends FragmentActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void setTitle(CharSequence title) {
-        mTitle = title;
-        getActionBar().setTitle(mTitle);
     }
 
     /**

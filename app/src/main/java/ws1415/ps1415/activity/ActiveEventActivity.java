@@ -5,13 +5,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -19,22 +22,20 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.skatenight.skatenightAPI.model.Event;
 
-import java.text.ParseException;
 import java.util.Date;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.util.EventUtils;
+import ws1415.ps1415.util.LocalAnalysisData;
+import ws1415.ps1415.util.LocalStorageUtil;
 
 public class ActiveEventActivity extends Activity implements ExtendedTaskDelegate<Void, Event> {
     public static final String LOG_TAG = ActiveEventActivity.class.getSimpleName();
@@ -42,6 +43,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 
     private static final String MEMBER_KEY_ID = "active_event_member_key_id";
     private static final String MEMBER_START_DATE = "active_event_member_start_date";
+    private static final String MEMBER_ENCODED_WAYPOINTS = "active_event_member_encoded_waypoints";
 
     private LocationReceiver receiver;
 
@@ -50,10 +52,9 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     private Timer clockTimer;
 
     private long eventId;
+    private boolean saved;
 
-    private String email;
     private String encodedWaypoints;
-    private List<LatLng> waypoints;
 
     private TimerTask clockTimerTask;
 
@@ -67,6 +68,8 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         ((ScrollView) findViewById(R.id.active_event_scroll_view)).setVisibility(View.INVISIBLE);
         if (savedInstanceState != null) {
             startDate = new Date(savedInstanceState.getLong(MEMBER_START_DATE));
+            eventId = savedInstanceState.getLong(MEMBER_KEY_ID);
+            encodedWaypoints = savedInstanceState.getString(MEMBER_ENCODED_WAYPOINTS);
         }
         else {
             startDate = new Date();
@@ -74,28 +77,47 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             Intent intent = getIntent();
             if (intent != null && intent.hasExtra(EXTRA_KEY_ID)) {
                 eventId = intent.getLongExtra(EXTRA_KEY_ID, 0L);
-                new GetEventTask(this).execute(eventId);
             }
             else {
                 Log.e(LOG_TAG, "EventId is required.");
                 finish();
             }
-        }
 
-        /*
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String email = prefs.getString("accountName", null);
-        if (email == null) {
-            Toast.makeText(getApplicationContext(), getString(R.string.active_event_no_email_message), Toast.LENGTH_SHORT).show();
-            finish();
+            encodedWaypoints = "";
         }
-        else {
-            new QueryCurrentMemberEventTask(this, email).execute();
-        }
-        */
 
         timerTextView = (TextView) findViewById(R.id.active_event_timer_textview);
-        clockTimer = new Timer(true);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if (prefs.contains(String.valueOf(eventId))) {
+            saved = true;
+
+            restoreLocalData(String.valueOf(eventId));
+
+            Button endParticipationButton = (Button) findViewById(R.id.active_event_cancel_button);
+            ((ViewGroup) endParticipationButton.getParent()).removeView(endParticipationButton);
+        }
+        else {
+            saved = false;
+
+            clockTimer = new Timer(true);
+
+            new GetEventTask(this).execute(eventId);
+
+            Button endParticipationButton = (Button) findViewById(R.id.active_event_cancel_button);
+            endParticipationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    stopService(new Intent(getBaseContext(), LocationTransmitterService.class));
+                    stopClockTimer();
+
+                    saved = true;
+
+                    Button button = (Button) v;
+                    button.setEnabled(false);
+                }
+            });
+        }
 
         Button speedProfileButton = (Button) findViewById(R.id.active_event_speed_profile_button);
         speedProfileButton.setOnClickListener(new View.OnClickListener() {
@@ -103,7 +125,16 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             public void onClick(View v) {
                 Intent intent = new Intent(ActiveEventActivity.this, ShowRouteActivity.class);
                 intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, encodedWaypoints);
-                intent.putExtra(ShowRouteActivity.EXTRA_EVENT_ID, eventId);
+                if (saved) {
+                    LocalStorageUtil storeLocalData = new LocalStorageUtil(getApplicationContext());
+                    LocalAnalysisData localData = storeLocalData.getData(String.valueOf(eventId));
+                    intent.putExtra(ShowRouteActivity.EXTRA_VISITED, localData.getVisited());
+                    intent.putExtra(ShowRouteActivity.EXTRA_TIMESTAMPS, localData.getTimestamps());
+                }
+                else {
+                    intent.putExtra(ShowRouteActivity.EXTRA_EVENT_ID, eventId);
+                }
+
                 startActivity(intent);
             }
         });
@@ -113,35 +144,50 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 
     @Override
     protected void onDestroy() {
-        //stopService(new Intent(getBaseContext(), LocationTransmitterService.class));
         super.onDestroy();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putLong(MEMBER_START_DATE, startDate.getTime());
+        outState.putLong(MEMBER_KEY_ID, eventId);
+        outState.putString(MEMBER_ENCODED_WAYPOINTS, encodedWaypoints);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        if (!saved) {
+            startClockTimer();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (!saved) {
+            stopClockTimer();
+        }
+        super.onPause();
+    }
+
+    private void startClockTimer() {
         if (clockTimerTask == null) {
             clockTimerTask = new ClockTimerTask();
             clockTimer.scheduleAtFixedRate(clockTimerTask, 0, 1000);
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(LocationTransmitterService.NOTIFICATION_LOCATION));
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(LocationTransmitterService.NOTIFICATION_CANCEL));
     }
 
-    @Override
-    protected void onPause() {
+    private void stopClockTimer() {
         if (clockTimerTask != null) {
             clockTimerTask.cancel();
             clockTimerTask = null;
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        super.onPause();
     }
 
     @Override
@@ -168,8 +214,8 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateTimerTextView() {
-        long current = new Date().getTime()-startDate.getTime();
+    private void updateTimerTextView(Date endDate) {
+        long current = endDate.getTime()-startDate.getTime();
         current /= 1000;
 
         String sign = (current < 0) ? "-":"";
@@ -203,14 +249,8 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             startDate = EventUtils.getInstance(this).getFusedDate(event);
 
             encodedWaypoints = event.getRoute().getRouteData().getValue();
-            try {
-                waypoints = LocationUtils.decodePolyline(event.getRoute().getRouteData().getValue());
-            }
-            catch (ParseException e) {
-                Toast.makeText(getApplicationContext(), "Parse failed", Toast.LENGTH_SHORT).show();
-            }
 
-            updateTimerTextView();
+            updateTimerTextView(new Date());
 
             TextView distanceTextView = (TextView) findViewById(R.id.active_event_total_distance_textview);
             distanceTextView.setText(event.getRoute().getLength());
@@ -238,10 +278,50 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    updateTimerTextView();
+                    updateTimerTextView(new Date());
                 }
             });
         }
+    }
+
+    private void restoreLocalData (String id) {
+        LocalAnalysisData localData = new LocalStorageUtil(getApplicationContext()).getData(id);
+
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.active_event_progressbar);
+        progressBar.setProgress((int)(localData.getProgress()*100.0f));
+        progressBar.setMax(100);
+
+        float currentDistance = localData.getCurrentDistance();
+        TextView currentDistanceTextView = (TextView) findViewById(R.id.active_event_current_distance_textview);
+        currentDistanceTextView.setText(getString(R.string.active_event_distance_format_meters, currentDistance));
+
+        TextView distanceTextView = (TextView) findViewById(R.id.active_event_total_distance_textview);
+        distanceTextView.setText(localData.getDistance());
+
+        float curSpeed = 0.0f;
+        TextView curSpeedTextView = (TextView) findViewById(R.id.active_event_cur_speed_textview);
+        curSpeedTextView.setText(getString(R.string.active_event_speed_format, curSpeed));
+
+        float maxSpeed = localData.getMaxSpeed();
+        TextView maxSpeedTextView = (TextView) findViewById(R.id.active_event_max_speed_textview);
+        maxSpeedTextView.setText(getString(R.string.active_event_speed_format, maxSpeed));
+
+        float avgSpeed = localData.getAvgSpeed();
+        TextView avgSpeedTextView = (TextView) findViewById(R.id.active_event_avg_speed_textview);
+        avgSpeedTextView.setText(getString(R.string.active_event_speed_format, avgSpeed));
+
+        float elevationGain = localData.getElevationGain();
+        TextView elevationGainTextView = (TextView) findViewById(R.id.active_event_elevation_gain_textview);
+        elevationGainTextView.setText(getString(R.string.active_event_altitude_format_meters, elevationGain));
+
+        startDate = localData.getStartDate();
+        updateTimerTextView(localData.getEndDate());
+
+        encodedWaypoints = localData.getWaypoints();
+
+        setProgressBarIndeterminateVisibility(false);
+        ((ScrollView) findViewById(R.id.active_event_scroll_view)).setVisibility(View.VISIBLE);
+
     }
 
     /**
@@ -251,40 +331,49 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     private class LocationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            TextView altitudeTextView = (TextView) findViewById(R.id.active_event_current_altitude_textview);
 
-            Location location = (Location) intent.getParcelableExtra(LocationTransmitterService.NOTIFICATION_EXTRA_LOCATION);
-            if (location.hasAltitude()) {
-                altitudeTextView.setText(getString(R.string.active_event_altitude_format_meters, location.getAltitude()));
+            if (intent.getAction().equals(LocationTransmitterService.NOTIFICATION_LOCATION)) {
+                TextView altitudeTextView = (TextView) findViewById(R.id.active_event_current_altitude_textview);
+
+                Location location = (Location) intent.getParcelableExtra(LocationTransmitterService.NOTIFICATION_EXTRA_LOCATION);
+                if (location.hasAltitude()) {
+                    altitudeTextView.setText(getString(R.string.active_event_altitude_format_meters, location.getAltitude()));
+                }
+                int currentWaypoint = intent.getIntExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_WAYPOINT, 0);
+                int waypointCount = intent.getIntExtra(LocationTransmitterService.NOTIFICATION_EXTRA_WAYPOINT_COUNT, 0);
+
+                ProgressBar progressBar = (ProgressBar) findViewById(R.id.active_event_progressbar);
+                progressBar.setProgress(currentWaypoint);
+                progressBar.setMax(waypointCount);
+
+                float currentDistance = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_DISTANCE, 0.0f);
+                TextView currentDistanceTextView = (TextView) findViewById(R.id.active_event_current_distance_textview);
+                currentDistanceTextView.setText(getString(R.string.active_event_distance_format_meters, currentDistance));
+
+                float curSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CUR_SPEED, 0.0f);
+                TextView curSpeedTextView = (TextView) findViewById(R.id.active_event_cur_speed_textview);
+                curSpeedTextView.setText(getString(R.string.active_event_speed_format, curSpeed));
+
+                float maxSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_MAX_SPEED, 0.0f);
+                TextView maxSpeedTextView = (TextView) findViewById(R.id.active_event_max_speed_textview);
+                maxSpeedTextView.setText(getString(R.string.active_event_speed_format, maxSpeed));
+
+                float avgSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_AVG_SPEED, 0.0f);
+                TextView avgSpeedTextView = (TextView) findViewById(R.id.active_event_avg_speed_textview);
+                avgSpeedTextView.setText(getString(R.string.active_event_speed_format, avgSpeed));
+
+                float elevationGain = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_ELEVATION_GAIN, 0.0f);
+                TextView elevationGainTextView = (TextView) findViewById(R.id.active_event_elevation_gain_textview);
+                elevationGainTextView.setText(getString(R.string.active_event_altitude_format_meters, elevationGain));
             }
-            int currentWaypoint = intent.getIntExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_WAYPOINT, 0);
-            int waypointCount = intent.getIntExtra(LocationTransmitterService.NOTIFICATION_EXTRA_WAYPOINT_COUNT, 0);
+            else if (intent.getAction().equals(LocationTransmitterService.NOTIFICATION_CANCEL)) {
+                stopClockTimer();
 
-            ProgressBar progressBar = (ProgressBar) findViewById(R.id.active_event_progressbar);
-            progressBar.setProgress(currentWaypoint);
-            progressBar.setMax(waypointCount);
+                saved = true;
 
-            //Toast.makeText(getApplicationContext(), currentWaypoint + "/" + waypointCount, Toast.LENGTH_SHORT).show();
-
-            float currentDistance = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_DISTANCE, 0.0f);
-            TextView currentDistanceTextView = (TextView) findViewById(R.id.active_event_current_distance_textview);
-            currentDistanceTextView.setText(getString(R.string.active_event_distance_format_meters, currentDistance));
-
-            float curSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CUR_SPEED, 0.0f);
-            TextView curSpeedTextView = (TextView) findViewById(R.id.active_event_cur_speed_textview);
-            curSpeedTextView.setText(getString(R.string.active_event_speed_format, curSpeed));
-
-            float maxSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_MAX_SPEED, 0.0f);
-            TextView maxSpeedTextView = (TextView) findViewById(R.id.active_event_max_speed_textview);
-            maxSpeedTextView.setText(getString(R.string.active_event_speed_format, maxSpeed));
-
-            float avgSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_AVG_SPEED, 0.0f);
-            TextView avgSpeedTextView = (TextView) findViewById(R.id.active_event_avg_speed_textview);
-            avgSpeedTextView.setText(getString(R.string.active_event_speed_format, avgSpeed));
-
-            float elevationGain = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_ELEVATION_GAIN, 0.0f);
-            TextView elevationGainTextView = (TextView) findViewById(R.id.active_event_elevation_gain_textview);
-            elevationGainTextView.setText(getString(R.string.active_event_altitude_format_meters, elevationGain));
+                Button button = (Button) findViewById(R.id.active_event_cancel_button);
+                button.setEnabled(false);
+            }
         }
     }
 }

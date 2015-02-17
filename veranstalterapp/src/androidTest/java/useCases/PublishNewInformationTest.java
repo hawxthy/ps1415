@@ -4,8 +4,10 @@ package useCases;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Instrumentation;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.SystemClock;
+import android.support.v4.app.Fragment;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.test.ViewAsserts;
@@ -14,6 +16,7 @@ import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
@@ -27,8 +30,13 @@ import java.util.List;
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.ServiceProvider;
+import ws1415.veranstalterapp.activity.AddHostDialog;
+import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.activity.HoldTabsActivity;
+import ws1415.veranstalterapp.adapter.EventsCursorAdapter;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
+import ws1415.veranstalterapp.fragment.ManageRoutesFragment;
+import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 import ws1415.veranstalterapp.task.AddRouteTask;
 import ws1415.veranstalterapp.task.QueryRouteTask;
 import ws1415.veranstalterapp.util.EventUtils;
@@ -36,7 +44,9 @@ import ws1415.veranstalterapp.util.FieldType;
 
 
 /**
- * Testet den Use Case "Veröffentichen neuer Informationen".
+ * Testet den Use Case "Veröffentichen neuer Informationen". Dazu wird ein neues Event erstellt
+ * und nach dem Erstellen bearbeitet. Nach dem Bearbeiten wird  dieses Event, sowie die testRoute
+ * wieder gelöscht.
  *
  * @author Tristan Rust
  */
@@ -193,7 +203,9 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     }
 
     /**
-     * Testet den UseCase.
+     * Testet den Use Case "Veröffentichen neuer Informationen". Dazu wird ein neues Event erstellt
+     * und nach dem Erstellen bearbeitet. Nach dem Bearbeiten wird  dieses Event, sowie die testRoute
+     * wieder gelöscht.
      *
      * @throws Exception
      */
@@ -288,6 +300,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
             // exception machen
         }
         assertTrue("Timeout", time < 50);
+        Thread.sleep(3000);
 
 
         final EditText editTextTitle2 = (EditText) listView.getChildAt(0).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
@@ -399,8 +412,139 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         } else {
             assertTrue("Couldn't find any events!", found);
         }
-    }
 
+        // Nun wird das Event editiert
+        swipe(Direction.Right);
+        ShowEventsFragment mFragment = (ShowEventsFragment)mActivity.getAdapter().getItem(0);
+        EventsCursorAdapter mAdapter = mFragment.getmAdapter();
+        List<Event> eventList = mAdapter.getEventList();
+
+        // Suche nach dem eben erstellten Event
+        int pos = -1;
+        found = false;
+        for(Event e : eventList){
+            pos++;
+            if(textTitle.equals(EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue())){
+                found = true;
+                break;
+            }
+
+        }
+        assertTrue("Event wurde nicht gefunden", found);
+
+        // Editiere das gefundene Event
+        mFragment.editEvent(eventList.get(pos));
+
+        // Auf die EditEventActivity warten und initialisieren der Instanz
+        Instrumentation.ActivityMonitor am = getInstrumentation().addMonitor(EditEventActivity.class.getName(), null, false);
+        EditEventActivity editEventActivity = (EditEventActivity) am.waitForActivityWithTimeout(20000);
+
+        Thread.sleep(5000);
+
+        final ListView eventFields = editEventActivity.getListView();
+
+        final EditText editTextTitleEdit = (EditText) eventFields.getChildAt(0).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
+        final EditText editTextFeeEdit = (EditText) eventFields.getChildAt(1).findViewById(R.id.list_view_item_announce_information_fee_editText);
+        final EditText editTextLocationEdit = (EditText) eventFields.getChildAt(4).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
+        final EditText editTextDescriptionEdit = (EditText) eventFields.getChildAt(6).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
+
+        final String textTitleEdit = "TestEventEdit";
+        final String textFeeEdit = "5";
+        final String textLocationEdit = "TestStadtEdit";
+        final String textDescriptionEdit = "TestBeschreibungEdit";
+        final String textDateEdit = "29.11.2014";
+        final String textTimeEdit = "15:00 Uhr";
+
+
+        // Fülle die Textfelder erneut aus
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                editTextTitleEdit.setText(textTitleEdit);
+                editTextFeeEdit.setText(textFeeEdit);
+                editTextLocationEdit.setText(textLocationEdit);
+                editTextDescriptionEdit.setText(textDescriptionEdit);
+            }
+        });
+        Thread.sleep(3000);
+
+        // Prüfen, ob die Daten verändert wurden
+        assertEquals(textTitleEdit, editTextTitleEdit.getText().toString());
+        assertEquals(textFeeEdit, editTextFeeEdit.getText().toString());
+        assertEquals(textLocationEdit, editTextLocationEdit.getText().toString());
+        assertEquals(textDescriptionEdit, editTextDescriptionEdit.getText().toString());
+
+        final Button applyEditButton = (Button) editEventActivity.findViewById(R.id.edit_event_info_apply_button);
+
+        click = false;
+        // Abbrechen wodurch alle Felder zurück gesetzt werden sollten
+        editEventActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                applyEditButton.performClick();
+                click = true;
+
+            }
+        });
+        time = 0;
+        // Warten auf den Click
+        while(!click && time < 50){
+            Thread.sleep(100);
+            time++;
+            // exception machen
+        }
+        assertTrue("Timeout", time < 50);
+
+        AlertDialog dialog = editEventActivity.getLastDialog();
+        final Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+
+        click = false;
+        // Bestätigen des Editierens des Events
+        editEventActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                positiveButton.performClick();
+                click = true;
+            }
+        });
+        time = 0;
+        // Warten auf den Click
+        while(!click && time < 50){
+            Thread.sleep(100);
+            time++;
+        }
+        assertTrue("Timeout", time < 50);
+        Thread.sleep(3000);
+
+        mAdapter = mFragment.getmAdapter();
+        eventList = mAdapter.getEventList();
+
+        // Suche nach dem eben editierten Event
+        pos = -1;
+        found = false;
+        for(Event e : eventList){
+            pos++;
+            if(textTitleEdit.equals(EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue())){
+                found = true;
+                break;
+            }
+
+        }
+        assertTrue("Event wurde nicht gefunden", found);
+
+        // Prüfen, ob die Daten verändert wurden
+        assertEquals(textTitleEdit, EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), eventList.get(pos)).getValue());
+        assertEquals(textFeeEdit, EventUtils.getInstance(mActivity).getUniqueField(FieldType.FEE.getId(), eventList.get(pos)).getValue());
+        assertEquals(textLocationEdit, EventUtils.getInstance(mActivity).getUniqueField(FieldType.LOCATION.getId(), eventList.get(pos)).getValue());
+        assertEquals(textDescriptionEdit, EventUtils.getInstance(mActivity).getUniqueField(FieldType.DESCRIPTION.getId(), eventList.get(pos)).getValue());
+
+        swipe(Direction.Left);
+
+        // Das Event und die Route löschen
+        mFragment.deleteEvent(eventList.get(pos));
+        ManageRoutesFragment fragment = (ManageRoutesFragment)mActivity.getAdapter().getItem(2);
+        fragment.deleteRoute(testRoute2);
+    }
 
     /**
      * Testet die Activity beim Beenden und wieder Neustarten.

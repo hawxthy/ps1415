@@ -65,4 +65,5 @@ dependencies {
     compile project(path: ':SkatenightBackend', configuration: 'android-endpoints')
     compile 'com.google.android.gms:play-services:6.1.+'
     compile project(':common')
+    compile files('libs/gson-2.2.2.jar')
 }

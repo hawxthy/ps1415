@@ -136,7 +136,7 @@ public class EventUtils {
      * @param type der Typ des eindeutigen Feldes
      * @return Das Feld, null falls keins gefunden wurde
      */
-    public Field getUniqueField(int type, Event event) {
+    public static Field getUniqueField(int type, Event event) {
         for (int i = 0; i < event.getDynamicFields().size(); i++) {
             if (event.getDynamicFields().get(i).getType() == type) {
                 return event.getDynamicFields().get(i);
