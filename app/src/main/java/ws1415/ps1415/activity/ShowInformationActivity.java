@@ -14,27 +14,16 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
-import com.skatenight.skatenightAPI.model.Field;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.util.EventUtil;
-import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.ShowCursorAdapter;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.task.ToggleMemberEventAttendanceTask;
@@ -107,23 +96,6 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                 }
                 else {
                     new ToggleMemberEventAttendanceTask(ShowInformationActivity.this, keyId, credential.getSelectedAccountName(), attending).execute();
-
-                    // LocationTransmitterService starten, wenn das Event noch aktiv ist
-
-                    if (attendButton.getText()==getString(R.string.show_info_button_attend)) {
-                        if (active) {
-                            try {
-                                List<LatLng> waypoints = LocationUtils.decodePolyline(event.getRoute().getRouteData().getValue());
-                                Intent serviceIntent = new Intent(getBaseContext(), LocationTransmitterService.class);
-                                serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, keyId);
-                                serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
-                                serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
-                                startService(serviceIntent);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
                 }
             }
         });
@@ -187,6 +159,14 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         return super.onOptionsItemSelected(item);
     }
 
+    public ShowCursorAdapter getShowCursorAdapter() {
+        return listAdapter;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
     /**
      * Übernimmt die Informationen aus dem übergebenen Event-Objekt in die GUI-Elemente.
      *
@@ -247,8 +227,13 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         }
         else if (task instanceof ToggleMemberEventAttendanceTask) {
             attending = (Boolean) result;
-            if (attending) Toast.makeText(getApplicationContext(), getString(R.string.show_info_toast_attending), Toast.LENGTH_SHORT).show();
-            else Toast.makeText(getApplicationContext(), R.string.show_info_toast_leaving, Toast.LENGTH_SHORT).show();
+            if (attending) {
+                Toast.makeText(getApplicationContext(), getString(R.string.show_info_toast_attending), Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(getApplicationContext(), R.string.show_info_toast_leaving, Toast.LENGTH_SHORT).show();
+                stopService(new Intent(getBaseContext(), LocationTransmitterService.class));
+            }
             updateAttendButtonTitle();
         }
     }
