@@ -1,5 +1,3 @@
-/*
-
 package ws1415.veranstalterapp.task;
 
 import android.test.AndroidTestCase;
@@ -16,29 +14,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import ws1415.common.util.EventUtil;
 import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.fragment.ShowEventsFragment;
+import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.FieldType;
 
 
-*/
 /**
  * Created by Richard Schulze, Martin Wrodarczyk on 10.11.2014.
- *//*
-
-
+ */
 public class QueryEventTaskTest extends AuthTaskTestCase {
     private Route route1, route2;
     private Event event1, event2;
     private List<Event> testEvents;
     private long time;
 
-    */
-/**
+    /**
      * Stellt eine Verbindung zum Testserver her und bereitet die Testdaten vor.
-     *//*
-
-
+     */
     public QueryEventTaskTest() {
         Date date = new Date();
         time = date.getTime();
@@ -176,15 +170,11 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
         testEvents.add(event2);
     }
 
-
-    */
-/**
+    /**
      * Überträgt die Testdaten auf den Server.
      *
      * @throws Exception
-     *//*
-
-
+     */
     public void setUp() throws Exception {
         super.setUp();
 
@@ -216,15 +206,12 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
     }
 
 
-    */
-/**
+    /**
      * Prüft, ob das durch den QueryEventTask abgerufene Event die korrekten Daten enthält.
      *
      * @throws java.util.concurrent.ExecutionException
      * @throws InterruptedException
-     *//*
-
-
+     */
     public void testTask() throws ExecutionException, InterruptedException, IOException {
         QueryEventTask task = new QueryEventTask();
         List<Event> eventList = task.execute(new ShowEventsFragment() {
@@ -238,56 +225,36 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
         assertNotNull("events are null", eventList);
         int testIndex = -1;
         for (int i = 0; i < eventList.size(); i++) {
+            String event1Title = EventUtils.getUniqueField(FieldType.TITLE.getId(), event1).getValue();
+            String selEventTitle = EventUtils.getUniqueField(FieldType.TITLE.getId(), eventList.get(i)).getValue();
+
             // Passendes Event zum Vergleich über den Titel auswählen
-            if (event1.getTitle().equals(eventList.get(i).getTitle())) {
+            if (event1Title.equals(selEventTitle)) {
                 // Event 1
                 testIndex = 0;
             } else {
                 // Event 2
                 testIndex = 1;
             }
-            for (int i = 0; i < event1.getDynamicFields().size(); i++) {
-                if (event1.getDynamicFields().get(i).getType() == FieldType.TITLE.getId()) {
-                    for (int j = 0; j < eventList.get(testIndex).getDynamicFields().size(); j++) {
-                        if (testEvent.getDynamicFields().get(j).getType() == FieldType.TITLE.getId()) {
-                            assertEquals("Der Title stimmt nicht überein", event1.getDynamicFields().get(i).getValue(), testEvent.getDynamicFields().get(j).getValue());
-                        }
-                    }
-                } else if (event1.getDynamicFields().get(i).getType() == FieldType.FEE.getId()) {
-                    for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
-                        if (testEvent.getDynamicFields().get(j).getType() == FieldType.FEE.getId()) {
-                            assertEquals("Die Fee stimmt nicht überein", event1.getDynamicFields().get(i).getValue(), testEvent.getDynamicFields().get(j).getValue());
-                        }
-                    }
-                } else if (event1.getDynamicFields().get(i).getType() == FieldType.LOCATION.getId()) {
-                    for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
-                        if (testEvent.getDynamicFields().get(j).getType() == FieldType.LOCATION.getId()) {
-                            assertEquals("Die Location stimmt nicht überein", event1.getDynamicFields().get(i).getValue(), testEvent.getDynamicFields().get(j).getValue());
-                        }
-                    }
-                } else if (event1.getDynamicFields().get(i).getType() == FieldType.DESCRIPTION.getId()) {
-                    for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
-                        if (testEvent.getDynamicFields().get(j).getType() == FieldType.DESCRIPTION.getId()) {
-                            assertEquals("Die Beschreibung stimmt nicht überein", event1.getDynamicFields().get(i).getValue(), testEvent.getDynamicFields().get(j).getValue());
-                        }
-                    }
-                } else if (event1.getDynamicFields().get(i).getType() == FieldType.ROUTE.getId()) {
-                    for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
-                        if (testEvent.getDynamicFields().get(j).getType() == FieldType.ROUTE.getId()) {
-                            assertEquals("Der Routenname stimmt nicht überein", event1.getDynamicFields().get(i), testEvent.getDynamicFields().get(j));
-                        }
-                    }
-                }
-            }
-            assertEquals(i + ".event: wrong title", eventList.get(i).getTitle(), testEvents.get(testIndex).getTitle());
-            // Datum verändert sich manchmal um 1ms, daher kleine Bweichung zulassen
-            assertTrue(i + ".event: wrong date", testEvents.get(testIndex).getDate().getValue() - 20 < eventList.get(i).getDate().getValue()
-                    && eventList.get(i).getDate().getValue() < testEvents.get(testIndex).getDate().getValue() + 20);
-            assertEquals(i + ".event: wrong fee", eventList.get(i).getFee(), testEvents.get(testIndex).getFee());
-            assertEquals(i + ".event: wrong location", eventList.get(i).getLocation(), testEvents.get(testIndex).getLocation());
-            assertNotNull(i + ".event: event description is null", eventList.get(i).getDescription());
-            assertEquals(i + ".event: wrong description", eventList.get(i).getDescription().getValue(),
-                    testEvents.get(testIndex).getDescription().getValue());
+
+            String selectedEventTitle = EventUtils.getUniqueField(FieldType.TITLE.getId(), testEvents.get(testIndex)).getValue();
+            long selectedEventDate = Long.parseLong(EventUtils.getUniqueField(FieldType.DATE.getId(), testEvents.get(testIndex)).getValue());
+            String selectedEventFee = EventUtils.getUniqueField(FieldType.FEE.getId(), testEvents.get(testIndex)).getValue();
+            String selectedEventLocation = EventUtils.getUniqueField(FieldType.LOCATION.getId(), testEvents.get(testIndex)).getValue();
+            String selectedEventDescription = EventUtils.getUniqueField(FieldType.DESCRIPTION.getId(), testEvents.get(testIndex)).getValue();
+
+            String serverEventTitle = EventUtils.getUniqueField(FieldType.TITLE.getId(), eventList.get(i)).getValue();
+            long serverEventDate = Long.parseLong(EventUtils.getUniqueField(FieldType.DATE.getId(), eventList.get(i)).getValue());
+            String serverEventFee = EventUtils.getUniqueField(FieldType.FEE.getId(), eventList.get(i)).getValue();
+            String serverEventLocation = EventUtils.getUniqueField(FieldType.LOCATION.getId(), eventList.get(i)).getValue();
+            String serverEventDescription = EventUtils.getUniqueField(FieldType.DESCRIPTION.getId(), eventList.get(i)).getValue();
+
+            assertEquals(i + ".event: wrong title", serverEventTitle, selectedEventTitle);
+            // Datum kann Millisekunden abweichen, diese Abweichung zulassen
+            assertTrue(i + ".event: wrong date", serverEventDate > selectedEventDate -20 && serverEventDate < selectedEventDate + 20);
+            assertEquals(i + ".event: wrong fee", serverEventFee, selectedEventFee);
+            assertEquals(i + ".event: wrong location", serverEventLocation, selectedEventLocation);
+            assertEquals(i + ".event: wrong description", serverEventDescription, selectedEventDescription);
             assertNotNull(i + ".event: route is null", eventList.get(i).getRoute());
             assertEquals(i + ".event: wrong route name", eventList.get(i).getRoute().getName(), testEvents.get(testIndex).getRoute().getName());
             assertEquals(i + ".event: wrong route length", eventList.get(i).getRoute().getLength(), testEvents.get(testIndex).getRoute().getLength());
@@ -296,7 +263,27 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
                     testEvents.get(testIndex).getRoute().getRouteData().getValue());
         }
 
+        // Bestehende Events löschen
+        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+                .execute().getItems();
+        if (events != null) {
+            for (Event e : events) {
+                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                        .execute();
+            }
+        }
+
+        // Bestehende Routen löschen
+        List<Route> routes = ServiceProvider.getService().skatenightServerEndpoint().getRoutes()
+                .execute().getItems();
+        if (routes != null) {
+            for (Route r : routes) {
+                ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey()
+                        .getId()).execute();
+            }
+        }
+
     }
 }
 
-*/
+
