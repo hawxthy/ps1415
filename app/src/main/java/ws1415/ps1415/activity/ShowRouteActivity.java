@@ -162,7 +162,6 @@ public class ShowRouteActivity extends Activity {
                 }
                 if (intent.hasExtra(EXTRA_USERGROUPS)){
                     mHandler = new Handler();
-                    startRepeatingTask();
                     refreshVisibleMembers();
                 }
                 Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();
@@ -208,6 +207,7 @@ public class ShowRouteActivity extends Activity {
         if (receiver != null) {
             LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(LocationTransmitterService.NOTIFICATION_LOCATION));
         }
+        startRepeatingTask();
     }
 
     @Override
@@ -215,13 +215,8 @@ public class ShowRouteActivity extends Activity {
         if (receiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         }
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
         stopRepeatingTask();
+        super.onStop();
     }
 
     @Override

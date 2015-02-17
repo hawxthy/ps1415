@@ -76,7 +76,7 @@
 
     <!--Strings zu AddUserGroupActivity-->
     <string name="title_activity_add_user_group">Gruppe hinzufügen</string>
-    <string name="title_activity_add_user_group_title">Groupname</string>
+    <string name="title_activity_add_user_group_title">Gruppenname</string>
     <string name="activity_add_user_group_cancel_text">Abbrechen</string>
     <string name="activity_add_user_group_apply_text">Ok</string>
     <string name="dialog_join_group">Möchten Sie der Gruppe beitreten?</string>
