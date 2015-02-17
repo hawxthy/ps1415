@@ -23,6 +23,10 @@ import ws1415.ps1415.fragment.AllUsergroupsFragment;
 import ws1415.ps1415.task.DeleteUserGroupTask;
 
 /**
+ * Dieser Test erstellt eine Gruppe, betritt eine andere Gruppe und verlässt diese. Die erstellte Gruppe
+ * wird gelöscht. Funktioniert nur, wenn eine Gruppe exitstiert, bei der der Ausführer noch kein Mitglied ist
+ * und nicht der Ersteller ist.
+ *
  * Created by Bernd Eissing on 03.02.2015.
  */
 public class CreateJoinLeaveDeleteUserGroupTest extends ActivityInstrumentationTestCase2<UsergroupActivity> {

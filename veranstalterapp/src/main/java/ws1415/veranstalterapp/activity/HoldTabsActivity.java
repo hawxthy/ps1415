@@ -26,8 +26,6 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
     private static ViewPager viewPager;
     private static TabsPagerAdapter mAdapter;
     private static ActionBar actionBar;
-    private MenuItem menuItem;
-    private boolean menuCreated;
 
     private String[] tabs;
 
@@ -103,7 +101,6 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.hold_tabs, menu);
-        menuItem = menu.findItem(R.id.action_add_route);
         return true;
     }
 
