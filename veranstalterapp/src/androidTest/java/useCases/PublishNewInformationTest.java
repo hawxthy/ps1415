@@ -44,7 +44,9 @@ import ws1415.veranstalterapp.util.FieldType;
 
 
 /**
- * Testet den Use Case "Veröffentichen neuer Informationen".
+ * Testet den Use Case "Veröffentichen neuer Informationen". Dazu wird ein neues Event erstellt
+ * und nach dem Erstellen bearbeitet. Nach dem Bearbeiten wird  dieses Event, sowie die testRoute
+ * wieder gelöscht.
  *
  * @author Tristan Rust
  */
@@ -201,7 +203,9 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     }
 
     /**
-     * Testet den UseCase.
+     * Testet den Use Case "Veröffentichen neuer Informationen". Dazu wird ein neues Event erstellt
+     * und nach dem Erstellen bearbeitet. Nach dem Bearbeiten wird  dieses Event, sowie die testRoute
+     * wieder gelöscht.
      *
      * @throws Exception
      */
