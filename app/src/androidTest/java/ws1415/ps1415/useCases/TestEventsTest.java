@@ -49,7 +49,7 @@ public class TestEventsTest extends ActivityInstrumentationTestCase2<ShowEventsA
     }
 
     /**
-     * Loggt den User ein und wechselt auf die ShowEventsActivity.
+     * Loggt den User ein und führt die ShowEventsActivity aus.
      */
     @Override
     protected void setUp() throws Exception {
@@ -90,7 +90,6 @@ public class TestEventsTest extends ActivityInstrumentationTestCase2<ShowEventsA
         super.tearDown();
     }
 
-
     /**
      * Prüft, ob diese Views wirklich in der Activity exisiteren.
      */
@@ -115,7 +114,12 @@ public class TestEventsTest extends ActivityInstrumentationTestCase2<ShowEventsA
         }
     }
 
-
+    /**
+     * UseCase der überprüft, ob das zuvor angelegte Element aus der Veranstalter App hier auch
+     * wirklich sichtbar ist.
+     *
+     * @throws InterruptedException
+     */
     public void testUseCase() throws InterruptedException {
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(ShowInformationActivity.class.getName(), null, false);
 
@@ -128,9 +132,11 @@ public class TestEventsTest extends ActivityInstrumentationTestCase2<ShowEventsA
             }
         });
 
+        // ShowInformationActivity wird gestartet
         ShowInformationActivity showInformationActivity = (ShowInformationActivity) getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 20000);
         assertNotNull("ShowInformationActivity started", showInformationActivity);
 
+        // Liste, die die TextView enthält
         ListView listView = (ListView) showInformationActivity.findViewById(R.id.activity_show_information_list_view);
         assertNotNull("listView is null!", listView);
         listView.setAdapter(showInformationActivity.getShowCursorAdapter());
@@ -140,8 +146,10 @@ public class TestEventsTest extends ActivityInstrumentationTestCase2<ShowEventsA
         assertNotNull("listView is null!", listView);
         assertNotNull("listViewAdapter is null!", listView.getAdapter());
 
+        // Enthält die jeweiligen Eventinformationen
         String temp = "";
 
+        // Prüfen, ob die Eventinformationen mit denen des TestEvents übereinstimmen
         TextView title = (TextView) listView.getChildAt(0).findViewById(R.id.list_view_item_show_information_text_field_textView_content);
         temp = (String) title.getText();
         assertEquals(TEST_TITLE, temp);
@@ -158,8 +166,7 @@ public class TestEventsTest extends ActivityInstrumentationTestCase2<ShowEventsA
         temp = (String) location.getText();
         assertEquals(TEST_LOCATION, temp);
 
-
-
+        // Beenden der Activity
         showInformationActivity.finish();
 
 
