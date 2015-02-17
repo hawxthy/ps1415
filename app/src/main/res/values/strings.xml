@@ -97,4 +97,6 @@
     <!--Strings zu ShowRouteActivity-->
     <string name="group">"Group: "</string>
 
+    <!-- Strings zu LocationTransmitterService -->
+    <string name="location_transmitter_button_stop">Stop</string>
 </resources>

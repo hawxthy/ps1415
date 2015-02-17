@@ -27,6 +27,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.skatenight.skatenightAPI.model.Event;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import ws1415.common.gcm.GCMUtil;
@@ -37,6 +38,7 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.EventsCursorAdapter;
 import ws1415.ps1415.task.QueryEventsTask;
+import ws1415.ps1415.util.EventUtils;
 
 public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDelegate<Void, List<Event>> {
     /**
@@ -96,8 +98,22 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
              */
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(ShowEventsActivity.this, ShowInformationActivity.class);
-                intent.putExtra(ShowInformationActivity.EXTRA_KEY_ID, eventList.get(i).getKey().getId());
+                Event e = mAdapter.getItem(i);
+
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+                Intent intent;
+
+                if (new Date().after(EventUtils.getInstance(ShowEventsActivity.this).getFusedDate(e)) &&
+                        e.getMemberList() != null &&
+                        e.getMemberList().contains(prefs.getString("accountName", null))) {
+                    intent = new Intent(ShowEventsActivity.this, ActiveEventActivity.class);
+                    intent.putExtra(ActiveEventActivity.EXTRA_KEY_ID, e.getKey().getId());
+                }
+                else {
+                    intent = new Intent(ShowEventsActivity.this, ShowInformationActivity.class);
+                    intent.putExtra(ShowInformationActivity.EXTRA_KEY_ID, e.getKey().getId());
+                }
                 startActivity(intent);
             }
         });
