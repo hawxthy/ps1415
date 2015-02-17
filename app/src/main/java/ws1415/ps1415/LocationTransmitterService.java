@@ -47,6 +47,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     public static final String EXTRA_WAYPOINTS = "location_transmitter_service_extra_waypoints";
     public static final String EXTRA_START_DATE = "location_transmitter_service_extra_start_date";
     public static final String EXTRA_DISTANCE = "location_transmitter_service_extra_distance";
+    public static final String EXTRA_NAME = "location_transmitter_service_extra_name";
+    public static final String EXTRA_LOCATION = "location_transmitter_service_extra_location";
 
     public static final String NOTIFICATION_LOCATION = "location_transmitter_service_notification_location";
     public static final String NOTIFICATION_EXTRA_LOCATION = "location_transmitter_service_notification_location";
@@ -111,6 +113,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         startDate = new Date(intent.getLongExtra(EXTRA_START_DATE, 0));
         distance = intent.getStringExtra(EXTRA_DISTANCE);
 
+
         Toast.makeText(getApplicationContext(), "Service start!", Toast.LENGTH_LONG).show();
 
         Intent notificationIntent = new Intent(this, LocationTransmitterService.class);
@@ -120,8 +123,13 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         Notification notification = new NotificationCompat.Builder(this)
                 .setLights(-16711681, 1000, 1000)
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setContentText("TEST")
+                .setContentTitle(intent.getStringExtra(EXTRA_NAME))
+                .setContentText(intent.getStringExtra(EXTRA_LOCATION))
+                .setSubText(startDate.toString())
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent).build();
+
+
 
 
 

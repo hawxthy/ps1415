@@ -81,8 +81,8 @@ public class GcmIntentService extends IntentService {
                             serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
                             serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
                             serviceIntent.putExtra(LocationTransmitterService.EXTRA_DISTANCE, e.getRoute().getLength());
-                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_NAME, EventUtils.getInstance(this).getUniqueField(FieldType.TITLE.getId(), e));
-                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_LOCATION, EventUtils.getInstance(this).getUniqueField(FieldType.LOCATION.getId(), e));
+                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_NAME, EventUtils.getInstance(this).getUniqueField(FieldType.TITLE.getId(), e).getValue());
+                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_LOCATION, EventUtils.getInstance(this).getUniqueField(FieldType.LOCATION.getId(), e).getValue());
 
                             startService(serviceIntent);
                         } catch (InterruptedException e1) {
