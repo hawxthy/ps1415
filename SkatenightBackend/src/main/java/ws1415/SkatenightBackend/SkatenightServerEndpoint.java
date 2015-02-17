@@ -541,35 +541,37 @@ public class SkatenightServerEndpoint {
 
             updateEvent(event);
 
-            PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
-                    "transactions-optional");
-            PersistenceManager pm = pmf.getPersistenceManager();
-            RegistrationManager registrationManager;
-            Query q = pm.newQuery(RegistrationManager.class);
-            List<RegistrationManager> result = (List<RegistrationManager>) q.execute();
-            if (!result.isEmpty()) {
-                registrationManager = result.get(0);
-            } else {
-                registrationManager = new RegistrationManager();
-            }
+            if (event.isNotificationSend()) {
+                PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
+                        "transactions-optional");
+                PersistenceManager pm = pmf.getPersistenceManager();
+                RegistrationManager registrationManager;
+                Query q = pm.newQuery(RegistrationManager.class);
+                List<RegistrationManager> result = (List<RegistrationManager>) q.execute();
+                if (!result.isEmpty()) {
+                    registrationManager = result.get(0);
+                } else {
+                    registrationManager = new RegistrationManager();
+                }
 
-            Set<String> ids = new HashSet<>();
-            ids.addAll(registrationManager.getUserIds(email));
+                Set<String> ids = new HashSet<>();
+                ids.addAll(registrationManager.getUserIds(email));
 
-            Sender sender = new Sender(Constants.GCM_API_KEY);
-            Message m = new Message.Builder()
-                    .delayWhileIdle(false)
-                    .timeToLive(3600)
-                    .addData("type", MessageType.EVENT_START_MESSAGE.name())
-                    .addData("eventId", Long.toString(keyId))
-                    .build();
-            try {
-                sender.send(m, new LinkedList<>(ids), 5);
-            }
-            catch (IOException e) {
+                Sender sender = new Sender(Constants.GCM_API_KEY);
+                Message m = new Message.Builder()
+                        .delayWhileIdle(false)
+                        .timeToLive(3600)
+                        .addData("type", MessageType.EVENT_START_MESSAGE.name())
+                        .addData("eventId", Long.toString(keyId))
+                        .build();
+                try {
+                    sender.send(m, new LinkedList<>(ids), 5);
+                }
+                catch (IOException e) {
 
+                }
+                if (pm != null) pm.close();
             }
-            if (pm != null) pm.close();
         }
     }
 
