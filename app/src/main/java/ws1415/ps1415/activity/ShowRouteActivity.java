@@ -207,7 +207,9 @@ public class ShowRouteActivity extends Activity {
         if (receiver != null) {
             LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(LocationTransmitterService.NOTIFICATION_LOCATION));
         }
-        startRepeatingTask();
+        if (mHandler != null) {
+            startRepeatingTask();
+        }
     }
 
     @Override
@@ -215,7 +217,9 @@ public class ShowRouteActivity extends Activity {
         if (receiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         }
-        stopRepeatingTask();
+        if (mHandler != null) {
+            stopRepeatingTask();
+        }
         super.onStop();
     }
 
