@@ -50,6 +50,8 @@ public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE_FIELD_LAST = "show_route_extra_route_field_last";
     public static final String EXTRA_WAYPOINTS = "show_route_extra_waypoints";
     public static final String EXTRA_EVENT_ID = "show_route_extra_event_id";
+    public static final String EXTRA_VISITED = "show_route_extra_visited";
+    public static final String EXTRA_TIMESTAMPS = "show_route_extra_timestamps";
     public static final String EXTRA_USERGROUPS = "show_route_extra_show_groups";
     private static final String MEMBER_ROUTE = "show_route_member_route";
     private static final String MEMBER_ROUTE_HIGHLIGHT = "show_route_member_route_highlight";
@@ -150,6 +152,13 @@ public class ShowRouteActivity extends Activity {
                 if (intent.hasExtra(EXTRA_ROUTE_FIELD_LAST)) {
                     fieldLast = intent.getIntExtra(EXTRA_ROUTE_FIELD_LAST, 0);
                 }
+                if (intent.hasExtra(EXTRA_VISITED) && intent.hasExtra(EXTRA_TIMESTAMPS)) {
+                    int[] visited = intent.getIntArrayExtra(EXTRA_VISITED);
+                    long[] timestamps = intent.getLongArrayExtra(EXTRA_TIMESTAMPS);
+
+                    createRouteHighlight(visited, timestamps);
+                }
+
                 if (intent.hasExtra(EXTRA_WAYPOINTS)) {
                     ArrayList<HashMap> waypoints = (ArrayList<HashMap>) intent.getSerializableExtra(EXTRA_WAYPOINTS);
                     for (HashMap wp : waypoints) {
@@ -294,6 +303,55 @@ public class ShowRouteActivity extends Activity {
         }
     }
 
+    private void createRouteHighlight(int[] visited, long[] timestamps) {
+        routeTrack.clear();
+
+        if (visited.length > 0 && visited.length == timestamps.length) {
+            List<LatLng> waypoints = route.getPoints();
+
+            PolylineOptions opt = new PolylineOptions();
+            opt.add(waypoints.get(visited[0]));
+            Float prevSpeed = null;
+
+            for (int i = 1; i < visited.length; i++) {
+                long elapsedMs = timestamps[i]-timestamps[i-1];
+
+                LatLng curWaypoint = waypoints.get(visited[i]);
+                LatLng prevWaypoint = waypoints.get(visited[i-1]);
+
+                float[] output = new float[1];
+                Location.distanceBetween(curWaypoint.latitude, curWaypoint.longitude, prevWaypoint.latitude, prevWaypoint.longitude, output);
+                float distanceM = output[0];
+
+                float elapsedH = elapsedMs/3.6e6f;
+                float distanceKm = distanceM/1000.0f;
+
+                float speed = distanceKm/elapsedH;
+                    /*
+                    if (i == visited.length-2) {
+                        ((TextView) findViewById(R.id.textView)).setText("" + speed);
+                        ((TextView) findViewById(R.id.textView2)).setText("" + distanceM);
+                        ((TextView) findViewById(R.id.textView3)).setText("" + elapsedMs);
+                    }
+                    */
+
+                int color = colorForSpeed(speed);
+                if ((prevSpeed != null && color != colorForSpeed(prevSpeed)) || i == visited.length-1) {
+                    opt.color(colorForSpeed((prevSpeed == null)?0.0f:prevSpeed));
+                    opt.add(waypoints.get(visited[i]));
+                    routeTrack.add(opt);
+
+                    opt = new PolylineOptions();
+                }
+
+                opt.add(waypoints.get(visited[i]));
+
+                prevSpeed = speed;
+            }
+        }
+        drawTrack();
+    }
+
     private void highlightRoute(int first, int last) {
         List<LatLng> highlight = route.getPoints().subList(first, last);
         if (routeHighlightLine != null) routeHighlightLine.remove();
@@ -342,54 +400,11 @@ public class ShowRouteActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            routeTrack.clear();
+
             int[] visited = intent.getIntArrayExtra(LocationTransmitterService.NOTIFICATION_EXTRA_PASSED_WAYPOINTS);
             long[] timestamps = intent.getLongArrayExtra(LocationTransmitterService.NOTIFICATION_EXTRA_PASSED_WAYPOINT_TIME);
 
-            if (visited.length > 0 && visited.length == timestamps.length) {
-                List<LatLng> waypoints = route.getPoints();
-
-                PolylineOptions opt = new PolylineOptions();
-                opt.add(waypoints.get(visited[0]));
-                Float prevSpeed = null;
-
-                for (int i = 1; i < visited.length; i++) {
-                    long elapsedMs = timestamps[i]-timestamps[i-1];
-
-                    LatLng curWaypoint = waypoints.get(visited[i]);
-                    LatLng prevWaypoint = waypoints.get(visited[i-1]);
-
-                    float[] output = new float[1];
-                    Location.distanceBetween(curWaypoint.latitude, curWaypoint.longitude, prevWaypoint.latitude, prevWaypoint.longitude, output);
-                    float distanceM = output[0];
-
-                    float elapsedH = elapsedMs/3.6e6f;
-                    float distanceKm = distanceM/1000.0f;
-
-                    float speed = distanceKm/elapsedH;
-                    /*
-                    if (i == visited.length-2) {
-                        ((TextView) findViewById(R.id.textView)).setText("" + speed);
-                        ((TextView) findViewById(R.id.textView2)).setText("" + distanceM);
-                        ((TextView) findViewById(R.id.textView3)).setText("" + elapsedMs);
-                    }
-                    */
-
-                    int color = colorForSpeed(speed);
-                    if ((prevSpeed != null && color != colorForSpeed(prevSpeed)) || i == visited.length-1) {
-                        opt.color(colorForSpeed((prevSpeed == null)?0.0f:prevSpeed));
-                        opt.add(waypoints.get(visited[i]));
-                        routeTrack.add(opt);
-
-                        opt = new PolylineOptions();
-                    }
-
-                    opt.add(waypoints.get(visited[i]));
-
-                    prevSpeed = speed;
-                }
-            }
-            drawTrack();
+            createRouteHighlight(visited, timestamps);
         }
     }
 

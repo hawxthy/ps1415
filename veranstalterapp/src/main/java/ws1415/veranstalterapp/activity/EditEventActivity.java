@@ -31,6 +31,8 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
     // Adapter für die ListView von activity_edit_event_list_view
     private AnnounceCursorAdapter listAdapter;
 
+    AlertDialog c_dialog;
+
     // Die ListView von der xml datei activity_edit_event
     private ListView listView;
 
@@ -150,8 +152,8 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
             public void onClick(DialogInterface dialog, int id) {
             }
         });
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        c_dialog = builder.create();
+        c_dialog.show();
     }
 
 
@@ -193,5 +195,13 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
         // Hier wird der RequestCOde dazu verwendet die Positions des zu ändernden dynamischen Feldes
         // zu übergeben.
         listAdapter.processImage(requestCode, data);
+    }
+
+    public ListView getListView() {
+        return listView;
+    }
+
+    public AlertDialog getLastDialog() {
+        return c_dialog;
     }
 }

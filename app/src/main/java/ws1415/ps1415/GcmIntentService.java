@@ -5,11 +5,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.maps.model.LatLng;
@@ -24,9 +22,11 @@ import java.util.concurrent.ExecutionException;
 import ws1415.common.gcm.MessageType;
 import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.activity.ShowEventsActivity;
+import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.util.EventUtils;
 import ws1415.ps1415.util.PrefManager;
+import ws1415.ps1415.util.FieldType;
 
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
@@ -82,6 +82,10 @@ public class GcmIntentService extends IntentService {
                             serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, eventId);
                             serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
                             serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
+                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_DISTANCE, e.getRoute().getLength());
+                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_NAME, EventUtils.getInstance(this).getUniqueField(FieldType.TITLE.getId(), e).getValue());
+                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_LOCATION, EventUtils.getInstance(this).getUniqueField(FieldType.LOCATION.getId(), e).getValue());
+
                             startService(serviceIntent);
                         } catch (InterruptedException e1) {
                             e1.printStackTrace();
@@ -95,6 +99,12 @@ public class GcmIntentService extends IntentService {
                         sendNotification(extras);
                         // Einstellung für die Gruppe entfernen, falls vorhanden
                         PrefManager.deleteGroupVisibility(this, extras.getString("content"));
+                        break;
+                    case GROUP_CREATED_NOTIFICATION_MESSAGE:
+                        // Gruppen-Listen in den Fragmenten von UserGroupActivity aktualisieren
+                        Intent refreshGroupsIntent = new Intent(UsergroupActivity.REFRESH_GROUPS_ACTION);
+                        LocalBroadcastManager.getInstance(this).sendBroadcast(refreshGroupsIntent);
+                        break;
                 }
             }
         }

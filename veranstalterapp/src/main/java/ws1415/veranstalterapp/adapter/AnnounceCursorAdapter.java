@@ -35,19 +35,18 @@ import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
-import ws1415.veranstalterapp.activity.ChooseRouteActivity;
-import ws1415.veranstalterapp.activity.EditEventActivity;
-import ws1415.veranstalterapp.util.EventUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.activity.ChooseRouteActivity;
+import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
+import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.FieldType;
 import ws1415.veranstalterapp.util.ImageUtil;
 
@@ -562,7 +561,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
 
     public Date getDate() {
         Calendar cal = Calendar.getInstance();
-        cal.set(year, month, day, hour, minute);
+        cal.set(year, month, day, hour, minute, 0);
         return cal.getTime();
     }
 
