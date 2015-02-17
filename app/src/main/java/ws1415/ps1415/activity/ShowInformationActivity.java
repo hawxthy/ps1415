@@ -199,6 +199,14 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         return super.onOptionsItemSelected(item);
     }
 
+    public ShowCursorAdapter getShowCursorAdapter() {
+        return listAdapter;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
     /**
      * Übernimmt die Informationen aus dem übergebenen Event-Objekt in die GUI-Elemente.
      *
