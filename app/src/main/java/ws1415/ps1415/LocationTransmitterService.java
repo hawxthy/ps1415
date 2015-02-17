@@ -147,11 +147,13 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     public void onCreate() {
         super.onCreate();
 
+        Log.d(LOG_TAG, "create");
         broadcastManager = LocalBroadcastManager.getInstance(this);
     }
 
     @Override
     public void onDestroy() {
+        Log.d(LOG_TAG, "destroyA");
         // Lokale Daten als LocalAnalysisData objekt
         LocalAnalysisData localData = new LocalAnalysisData();
         LocalStorageUtil storeLocalData = new LocalStorageUtil(getApplicationContext());
@@ -173,6 +175,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         storeLocalData.saveObject(localData,String.valueOf(localData.getId()));
 
         sendCancelUpdate();
+
+        Log.d(LOG_TAG, "destroyB");
 
         if (gac != null) gac.disconnect();
         super.onDestroy();
@@ -199,6 +203,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
      * @param location Die aktuell ermittelt Position
      */
     public void onLocationChanged(Location location) {
+        Log.d(LOG_TAG, "update");
+
         // Holt sich die Google Mail Adresse aus den SharedPreferences, die beim Einloggen angegeben werden mussten
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String email = prefs.getString("accountName", null);
@@ -208,9 +214,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         // Sendet die Nutzerdaten an den Server, wenn dies in den Einstellungen vorgesehen ist
         if (email != null && sendLocation) {
             new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
-            Toast.makeText(getBaseContext(), "Sendet Position", Toast.LENGTH_SHORT).show();
         }
-        // Toast.makeText(getBaseContext(), "TransmitterService läuft", Toast.LENGTH_SHORT).show();
 
         if (waypoints != null && waypoints.size() > 0) {
             // Nur aktuelle Distanz berechnen wenn, bereits ein current Waypoint existiert

@@ -10,8 +10,6 @@ import com.google.appengine.api.users.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -542,6 +540,36 @@ public class SkatenightServerEndpoint {
             event.setMemberList(memberKeys);
 
             updateEvent(event);
+
+            PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
+                    "transactions-optional");
+            PersistenceManager pm = pmf.getPersistenceManager();
+            RegistrationManager registrationManager;
+            Query q = pm.newQuery(RegistrationManager.class);
+            List<RegistrationManager> result = (List<RegistrationManager>) q.execute();
+            if (!result.isEmpty()) {
+                registrationManager = result.get(0);
+            } else {
+                registrationManager = new RegistrationManager();
+            }
+
+            Set<String> ids = new HashSet<>();
+            ids.addAll(registrationManager.getUserIds(email));
+
+            Sender sender = new Sender(Constants.GCM_API_KEY);
+            Message m = new Message.Builder()
+                    .delayWhileIdle(false)
+                    .timeToLive(3600)
+                    .addData("type", MessageType.EVENT_START_MESSAGE.name())
+                    .addData("eventId", Long.toString(keyId))
+                    .build();
+            try {
+                sender.send(m, new LinkedList<>(ids), 5);
+            }
+            catch (IOException e) {
+
+            }
+            if (pm != null) pm.close();
         }
     }
 
