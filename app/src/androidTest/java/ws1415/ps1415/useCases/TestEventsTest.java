@@ -23,19 +23,24 @@ import ws1415.ps1415.activity.ShowInformationActivity;
 import ws1415.ps1415.adapter.ShowCursorAdapter;
 
 /**
- * Created by thy on 13.02.2015.
+ * Testet den Use Case "Anzeigen mehrerer Veranstaltungen".
+ * <p><strong>Hierfür muss zuerst der Test PublishNewInformationTest in der
+ * VeranstalterApp ausgeführt worden sein.</strong></p>
+ *
+ * @author Tristan Rust
  */
 public class TestEventsTest extends ActivityInstrumentationTestCase2<ShowEventsActivity> {
 
-    private static final String TEST_TITLE = "trf";
-    private static final String TEST_FEE   = "55 €";
-    private static final String TEST_LOCATION = "ffg";
+    // Test Event-Daten
+    private static final String TEST_TITLE = "TestEventEdit";
+    private static final String TEST_FEE   = "5 €";
+    private static final String TEST_LOCATION = "TestStadtEdit";
     private static final String TEST_DATE = "17-02-2015 20:00";
 
-
-
+    // Die ShowEventsActivity
     private ShowEventsActivity mActivity;
 
+    // ShowEventActivity UI Elemente
     private ListView mList;
     private ListAdapter mListData;
 
