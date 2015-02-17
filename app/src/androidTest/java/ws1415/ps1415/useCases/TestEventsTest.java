@@ -67,7 +67,7 @@ public class TestEventsTest extends ActivityInstrumentationTestCase2<ShowEventsA
         assertEquals(1, 1);
     }
 
-    public  void testUseCase() {
+    public void testUseCase() {
         // Instrumentation.ActivityMonitor am = getInstrumentation().addMonitor(ShowInformationActivity.class.getName(), null, false);
         assertEquals(1,1);
 
