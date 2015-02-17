@@ -1,6 +1,5 @@
 package ws1415.ps1415.activity;
 
-
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
@@ -32,8 +31,8 @@ import ws1415.ps1415.util.FieldType;
 
 /**
  * Activity zum Begutachten der Metainformationen der erstellten Veranstaltung.
- * <p/>
- * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
+ *
+ * @authro Bernd Eissing, Marting Wrodarczyk
  */
 public class ShowInformationActivity extends Activity implements ExtendedTaskDelegate<Void, Object> {
     public static final int REQUEST_ACCOUNT_PICKER = 2;

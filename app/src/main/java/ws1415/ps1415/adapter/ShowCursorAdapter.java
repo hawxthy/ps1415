@@ -37,7 +37,7 @@ import ws1415.ps1415.util.FieldType;
 import ws1415.ps1415.util.ImageUtil;
 
 /**
- * Created by Bernd Eissing on 28.11.2014.
+ * @author Bernd Eissing, Martin Wrodarczyk, Richard Schulze
  */
 public class ShowCursorAdapter extends BaseAdapter {
     private List<Field> fieldList = new ArrayList<Field>();
@@ -45,9 +45,8 @@ public class ShowCursorAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private Event event;
 
-
     /**
-     * Cache für die Bilder des Eevnts, damit diese nicht bei jedem Scrollen neu skaliert werden müssen.
+     * Cache für die Bilder des Events, damit diese nicht bei jedem Scrollen neu skaliert werden müssen.
      */
     private HashMap<Field, Bitmap> bitmapCache = new HashMap<Field, Bitmap>();
 
@@ -64,7 +63,7 @@ public class ShowCursorAdapter extends BaseAdapter {
     }
 
     /**
-     * Gibt die Anzhl der bearbeitenden EventFelder in der Liste zurück.
+     * Gibt die Anzahl der bearbeitenden EventFelder in der Liste zurück.
      *
      * @return Anzahl der EventFelder
      */
@@ -142,7 +141,6 @@ public class ShowCursorAdapter extends BaseAdapter {
             holder.title.setText(fieldList.get(position).getTitle());
             if(contentValue != null) holder.content.setText(contentValue);
             else holder.content.setText("n/a");
-
         } else if (getItem(position).getType() == FieldType.PICTURE.getId()) {
             HolderImageField holder = new HolderImageField();
             view = inflater.inflate(R.layout.list_view_item_show_information_image_field, viewGroup, false);

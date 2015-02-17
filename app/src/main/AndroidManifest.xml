@@ -79,7 +79,8 @@
         <activity
             android:name=".activity.AddUserGroupActivity"
             android:label="@string/title_activity_add_user_group"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Dialog">
         </activity>
         <receiver
             android:name=".GcmBroadcastReceiver"
