@@ -27,6 +27,7 @@ import ws1415.ps1415.util.groupUtils;
  * @author Martin Wrodarczyk, Bernd Eissing
  */
 public class AllUsergroupsFragment extends Fragment {
+
     private ListView userGroupListView;
     private List<UserGroup> userGroupList;
     private UsergroupAdapter mAdapter;

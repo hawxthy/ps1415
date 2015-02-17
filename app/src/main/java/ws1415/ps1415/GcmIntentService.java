@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import ws1415.common.gcm.MessageType;
 import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.activity.ShowEventsActivity;
+import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.util.EventUtils;
 import ws1415.ps1415.util.PrefManager;
@@ -95,6 +96,12 @@ public class GcmIntentService extends IntentService {
                         sendNotification(extras);
                         // Einstellung für die Gruppe entfernen, falls vorhanden
                         PrefManager.deleteGroupVisibility(this, extras.getString("content"));
+                        break;
+                    case GROUP_CREATED_NOTIFICATION_MESSAGE:
+                        // Gruppen-Listen in den Fragmenten von UserGroupActivity aktualisieren
+                        Intent refreshGroupsIntent = new Intent(UsergroupActivity.REFRESH_GROUPS_ACTION);
+                        LocalBroadcastManager.getInstance(this).sendBroadcast(refreshGroupsIntent);
+                        break;
                 }
             }
         }

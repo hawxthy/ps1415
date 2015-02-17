@@ -897,6 +897,17 @@ public class SkatenightServerEndpoint {
             member.addGroup(ug);
             pm.makePersistent(member);
             pm.makePersistent(ug);
+            RegistrationManager rm = getRegistrationManager(pm);
+            Message m = new Message.Builder()
+                    .collapseKey("createUserGroup")
+                    .timeToLive(6000)
+                    .delayWhileIdle(false)
+                    .addData("type", MessageType.GROUP_CREATED_NOTIFICATION_MESSAGE.name())
+                    .build();
+            Sender s = new Sender(Constants.GCM_API_KEY);
+            s.send(m, rm.getRegisteredUser(), 5);
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             pm.close();
         }
