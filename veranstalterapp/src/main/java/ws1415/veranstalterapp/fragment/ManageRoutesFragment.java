@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -39,6 +40,7 @@ public class ManageRoutesFragment extends Fragment {
     private ListView routeListView;
     private List<Route> routeList;
     private MapsCursorAdapter mAdapter;
+    private MenuItem menuItemAddRoute;
 
     /**
      * Ruft Methode auf, um das add_route_item in der ActionBar zu setzen.
@@ -164,7 +166,7 @@ public class ManageRoutesFragment extends Fragment {
      *
      * @param route die zu löschende Route
      */
-    private void deleteRoute(Route route) {
+    public void deleteRoute(Route route) {
         new DeleteRouteTask(this).execute(route);
     }
 
@@ -178,6 +180,15 @@ public class ManageRoutesFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.manage_routes, menu);
+        menuItemAddRoute = menu.findItem(R.id.action_add_route);
         super.onCreateOptionsMenu(menu, menuInflater);
+    }
+
+    public MenuItem getMenuItemAddRoute() {
+        return menuItemAddRoute;
+    }
+
+    public List<Route> getRouteList() {
+        return routeList;
     }
 }

@@ -36,6 +36,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.RoutePoint;
 import com.skatenight.skatenightAPI.model.ServerWaypoint;
 import com.skatenight.skatenightAPI.model.Text;
@@ -91,6 +92,9 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     private RouteLoaderTask currentTask;
 
     private static RouteEditorActivity routeEditorActivity;
+    private MenuItem menuItemAddWaypoint;
+
+    private AlertDialog lastDialog;
 
     public RouteEditorActivity(){
         routeEditorActivity = this;
@@ -207,6 +211,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.route_editor, menu);
+        menuItemAddWaypoint = menu.findItem(R.id.action_add_waypoint);
         return true;
     }
 
@@ -321,8 +326,8 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                 }
             });
 
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            lastDialog = builder.create();
+            lastDialog.show();
         }
         else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -337,8 +342,8 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
                 }
             });
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            lastDialog = builder.create();
+            lastDialog.show();
         }
     }
 
@@ -481,6 +486,10 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
             currentTask = null;
         }
 
+    }
+
+    public MenuItem getMenuItemAddWaypoint() {
+        return menuItemAddWaypoint;
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -684,5 +693,9 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
     public static RouteEditorActivity getRouteEditorActivity() {
         return routeEditorActivity;
+    }
+
+    public AlertDialog getLastDialog() {
+        return lastDialog;
     }
 }
