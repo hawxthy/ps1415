@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,20 +20,25 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.skatenight.skatenightAPI.model.Member;
+import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryMemberTask;
+import ws1415.ps1415.task.QueryVisibleMembersTask;
 
 
 /**
@@ -44,6 +50,7 @@ public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE_FIELD_LAST = "show_route_extra_route_field_last";
     public static final String EXTRA_WAYPOINTS = "show_route_extra_waypoints";
     public static final String EXTRA_EVENT_ID = "show_route_extra_event_id";
+    public static final String EXTRA_USERGROUPS = "show_route_extra_show_groups";
     private static final String MEMBER_ROUTE = "show_route_member_route";
     private static final String MEMBER_ROUTE_HIGHLIGHT = "show_route_member_route_highlight";
     private static final String MEMBER_ROUTE_TRACK = "show_route_member_route_track";
@@ -63,7 +70,13 @@ public class ShowRouteActivity extends Activity {
     private long eventId;
     private LocationReceiver receiver;
 
+    private List<Marker> groupMarker = new ArrayList<Marker>();
+
     private Location location; // Enthält die aktuelle Position, die vom Server runtergeladen wurde
+
+    // Handler für das updaten der gruppenmitglieder
+    private int mInterval = 30000;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,7 +160,10 @@ public class ShowRouteActivity extends Activity {
                                 .draggable(true));
                     }
                 }
-
+                if (intent.hasExtra(EXTRA_USERGROUPS)){
+                    mHandler = new Handler();
+                    refreshVisibleMembers();
+                }
                 Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();
             }
             catch (ParseException e) {
@@ -168,12 +184,30 @@ public class ShowRouteActivity extends Activity {
         new QueryMemberTask().execute((ShowRouteActivity) this);
     }
 
+    Runnable mStatusChecker = new Runnable(){
+        @Override
+        public void run(){
+            Toast.makeText(ShowRouteActivity.this, "Updating...", Toast.LENGTH_SHORT).show();
+            refreshVisibleMembers();
+            mHandler.postDelayed(mStatusChecker, mInterval);
+        }
+    };
+
+    void startRepeatingTask(){
+        mStatusChecker.run();
+    }
+
+    void stopRepeatingTask(){
+        mHandler.removeCallbacks(mStatusChecker);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
         if (receiver != null) {
             LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(LocationTransmitterService.NOTIFICATION_LOCATION));
         }
+        startRepeatingTask();
     }
 
     @Override
@@ -181,6 +215,7 @@ public class ShowRouteActivity extends Activity {
         if (receiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         }
+        stopRepeatingTask();
         super.onStop();
     }
 
@@ -352,5 +387,49 @@ public class ShowRouteActivity extends Activity {
             }
             drawTrack();
         }
+    }
+
+    private void refreshVisibleMembers(){
+        new QueryVisibleMembersTask(new ExtendedTaskDelegate<Void, HashMap<Member, String>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, HashMap<Member, String> memberStringHashMap) {
+                for(Marker m : groupMarker){
+                    m.remove();
+                }
+                groupMarker.clear();
+
+                ArrayList<Integer> farben = new ArrayList<Integer>();
+                farben.add(R.drawable.small_marker_blue);
+                farben.add(R.drawable.small_marker_green);
+                farben.add(R.drawable.small_marker_red);
+                farben.add(R.drawable.small_marker_yellow);
+                farben.add(R.drawable.small_marker_pink);
+
+                HashMap<String, Integer> gruppenFarben = new HashMap<>();
+
+                for(Member m : memberStringHashMap.keySet()){
+                    if(!gruppenFarben.containsKey(memberStringHashMap.get(m))){
+                        gruppenFarben.put(memberStringHashMap.get(m), farben.get(0));
+                        farben.remove(0);
+                    }
+                    groupMarker.add(googleMap.addMarker(new MarkerOptions()
+                            .title(m.getName())
+                            .snippet(getString(R.string.group) +memberStringHashMap.get(m))
+                            .icon(BitmapDescriptorFactory.fromResource(gruppenFarben.get(memberStringHashMap.get(m))))
+                            .position(new LatLng(m.getLatitude(), m.getLongitude()))
+                            .draggable(false)));
+                }
+            }
+
+            @Override
+            public void taskDidProgress(ExtendedTask task, Void... progress) {
+
+            }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+
+            }
+        }, this).execute();
     }
 }

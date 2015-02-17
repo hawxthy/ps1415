@@ -91,6 +91,7 @@ public class groupUtils {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 new LeaveUserGroupTask((UsergroupActivity) activity).execute(userGroup.getName());
+                PrefManager.setGroupVisibility(activity, userGroup.getName(), false);
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
