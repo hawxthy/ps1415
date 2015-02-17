@@ -72,10 +72,11 @@
     <string name="title_fragment_all_user_groups">Gruppen</string>
     <string name="title_fragment_my_user_groups">Meine Gruppen</string>
     <string name="action_add_user_group">Usergruppe hinzufügen</string>
+    <string name="usergroup_adapter_maximum_reached">Maximale Anzahl an sichtbaren Gruppen erreicht</string>
 
     <!--Strings zu AddUserGroupActivity-->
     <string name="title_activity_add_user_group">Gruppe hinzufügen</string>
-    <string name="title_activity_add_user_group_title">Groupname</string>
+    <string name="title_activity_add_user_group_title">Gruppenname</string>
     <string name="activity_add_user_group_cancel_text">Abbrechen</string>
     <string name="activity_add_user_group_apply_text">Ok</string>
     <string name="dialog_join_group">Möchten Sie der Gruppe beitreten?</string>
@@ -86,5 +87,13 @@
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="ok">OK</string>
+    <string name="context_menu_leave_usergroup">Gruppe verlassen</string>
+    <string name="context_menu_delete">Löschen</string>
+    <string name="context_menu_visible">Zeige auf der Map</string>
+    <string name="context_menu_not_visible">Zeige nicht auf der Map</string>
+    <string name="title_fragment_my_user_groups_visible">Sichtbare Gruppen</string>
+    <string name="title_fragment_my_user_groups_not_visible">Nicht sichtbare Gruppen</string>
 
+    <!--Strings zu ShowRouteActivity-->
+    <string name="group">"Gruppe: "</string>
 </resources>

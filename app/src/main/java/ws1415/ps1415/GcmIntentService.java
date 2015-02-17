@@ -26,6 +26,7 @@ import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.activity.ShowEventsActivity;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.util.EventUtils;
+import ws1415.ps1415.util.PrefManager;
 
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
@@ -90,6 +91,10 @@ public class GcmIntentService extends IntentService {
                             e.printStackTrace();
                         }
                         break;
+                    case GROUP_DELETED_NOTIFICATION_MESSAGE:
+                        sendNotification(extras);
+                        // Einstellung für die Gruppe entfernen, falls vorhanden
+                        PrefManager.deleteGroupVisibility(this, extras.getString("content"));
                 }
             }
         }

@@ -10,8 +10,12 @@ import com.google.appengine.api.users.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -745,14 +749,20 @@ public class SkatenightServerEndpoint {
     }
 
     /**
-     * Wird von den Benutzer-Apps aufgerufen,
+     * Wird von den Benutzer-Apps aufgerufen, wenn der Benutzer noch kein zu verwendendes Konto an-
+     * gegeben hat. Es wird außerdem ein Member-Objekt für den Benutzer erstellt, falls es noch nicht
+     * existiert.
      * @param user
      * @param regid
      */
     public void registerForGCM(User user, @Named("regid") String regid) throws OAuthRequestException {
         if (user != null) {
-            RegistrationManager registrationManager;
+            Member m = getMember(user.getEmail());
+            if (m == null) {
+                createMember(user.getEmail());
+            }
 
+            RegistrationManager registrationManager;
             // Den GCM-Manager abrufen, falls er existiert, sonst einen neuen Manager anlegen.
             PersistenceManager pm = pmf.getPersistenceManager();
             try {
@@ -924,12 +934,32 @@ public class SkatenightServerEndpoint {
 
             PersistenceManager pm = pmf.getPersistenceManager();
             try {
+                Set<String> regids = new HashSet<>();
+                RegistrationManager rm = getRegistrationManager(pm);
                 for (Member m : members) {
                     m.removeGroup(ug);
                     pm.makePersistent(m);
+                    regids.addAll(rm.getUserIds(m.getEmail()));
                 }
                 pm.makePersistent(ug);
                 pm.deletePersistent(ug);
+
+                // Notification senden
+                Sender sender = new Sender(Constants.GCM_API_KEY);
+                Message.Builder mb = new Message.Builder()
+                        // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
+                        .delayWhileIdle(false)
+                        .collapseKey("group_" + ug.getName() + "_deleted")
+                                // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
+                        .addData("type", MessageType.GROUP_DELETED_NOTIFICATION_MESSAGE.name())
+                        .addData("content", ug.getName())
+                        .addData("title", "Eine Gruppe wurde geloescht");
+                Message m = mb.build();
+                try {
+                    sender.send(m, new LinkedList<>(regids), 5);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             } finally {
                 pm.close();
             }
@@ -1003,4 +1033,13 @@ public class SkatenightServerEndpoint {
         }
     }
 
+
+    public ArrayList<Member> fetchGroupMembers(@Named("userGroup") String userGroup){
+        ArrayList<Member> members = new ArrayList<>();
+            UserGroup tmpGroup = getUserGroup(userGroup);
+            for(String s : tmpGroup.getMembers()){
+                members.add(getMember(s));
+            }
+        return members;
+    }
 }
