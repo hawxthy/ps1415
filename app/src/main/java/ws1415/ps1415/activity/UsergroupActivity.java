@@ -3,12 +3,19 @@ package ws1415.ps1415.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.skatenight.skatenightAPI.model.UserGroup;
 
 import ws1415.ps1415.adapter.TabsUsergroupsAdapter;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
@@ -20,6 +27,8 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
  * Created by Bernd.
  */
 public class UsergroupActivity extends BaseFragmentActivity implements ActionBar.TabListener {
+    public static final String REFRESH_GROUPS_ACTION = "REFRESH_GROUPS";
+
     private static ViewPager viewPager;
     private static TabsUsergroupsAdapter mAdapter;
     private static ActionBar actionBar;
@@ -88,6 +97,13 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
 
             }
         });
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                refresh();
+            }
+        }, new IntentFilter(REFRESH_GROUPS_ACTION));
     }
 
     /**
@@ -96,8 +112,8 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
     public void refresh(){
         AllUsergroupsFragment allUsergroupsFragment = (AllUsergroupsFragment)mAdapter.getItem(0);
         MyUsergroupsFragment myUsergroupsFragment = (MyUsergroupsFragment)mAdapter.getItem(1);
-        allUsergroupsFragment.refresh();
-        myUsergroupsFragment.refresh();
+        if(allUsergroupsFragment != null) allUsergroupsFragment.refresh();
+        if(myUsergroupsFragment != null) myUsergroupsFragment.refresh();
     }
 
     /**

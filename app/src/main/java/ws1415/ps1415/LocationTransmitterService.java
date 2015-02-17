@@ -1,12 +1,17 @@
 package ws1415.ps1415;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -22,7 +27,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.task.UpdateLocationTask;
+import ws1415.ps1415.util.LocalAnalysisData;
+import ws1415.ps1415.util.LocalStorageUtil;
 
 /**
  * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient und diese auf den
@@ -40,6 +48,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     public static final String EXTRA_EVENT_ID = "location_transmitter_service_extra_event_id";
     public static final String EXTRA_WAYPOINTS = "location_transmitter_service_extra_waypoints";
     public static final String EXTRA_START_DATE = "location_transmitter_service_extra_start_date";
+    public static final String EXTRA_DISTANCE = "location_transmitter_service_extra_distance";
+    public static final String EXTRA_NAME = "location_transmitter_service_extra_name";
+    public static final String EXTRA_LOCATION = "location_transmitter_service_extra_location";
 
     public static final String NOTIFICATION_LOCATION = "location_transmitter_service_notification_location";
     public static final String NOTIFICATION_EXTRA_LOCATION = "location_transmitter_service_notification_location";
@@ -53,6 +64,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     public static final String NOTIFICATION_EXTRA_ELEVATION_GAIN = "location_transmitter_service_notification_elevation_gain";
     public static final String NOTIFICATION_EXTRA_PASSED_WAYPOINTS = "location_transmitter_service_notification_passed_waypoints";
     public static final String NOTIFICATION_EXTRA_PASSED_WAYPOINT_TIME = "location_transmitter_service_notification_passed_waypoint_time";
+
+    public static final String NOTIFICATION_CANCEL = "location_transmitter_service_notification_cancel";
     private LocalBroadcastManager broadcastManager;
 
     private GoogleApiClient gac;
@@ -66,6 +79,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     private float maxSpeed;
     private float avgSpeed;
     private float currentDistance;
+    private String distance;
     private boolean foundFirstWaypoint;
     private float previousAlt;
     private float elevationGain;
@@ -101,6 +115,31 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         eventId = intent.getLongExtra(EXTRA_EVENT_ID, -1);
         waypoints = intent.getParcelableArrayListExtra(EXTRA_WAYPOINTS);
         startDate = new Date(intent.getLongExtra(EXTRA_START_DATE, 0));
+        distance = intent.getStringExtra(EXTRA_DISTANCE);
+
+        Intent deleteIntent = new Intent(this, CancelServiceReceiver.class);
+        PendingIntent pendingIntentCancel = PendingIntent.getBroadcast(this, 0, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent notificationIntent = new Intent(this, LocationTransmitterService.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        Notification notification = new NotificationCompat.Builder(this)
+                .setLights(-16711681, 1000, 1000)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentTitle(intent.getStringExtra(EXTRA_NAME))
+                .setContentText(intent.getStringExtra(EXTRA_LOCATION))
+                .setSubText(startDate.toString())
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setContentIntent(pendingIntent)
+                .addAction(R.drawable.ic_action_stop, getString(R.string.location_transmitter_button_stop), pendingIntentCancel).build();
+
+
+
+
+
+        startForeground(5656565, notification);
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -113,6 +152,28 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
     @Override
     public void onDestroy() {
+        // Lokale Daten als LocalAnalysisData objekt
+        LocalAnalysisData localData = new LocalAnalysisData();
+        LocalStorageUtil storeLocalData = new LocalStorageUtil(getApplicationContext());
+
+        localData.setAvgSpeed(avgSpeed);
+        localData.setCurrentDistance(currentDistance);
+        localData.setDistance(distance);
+        localData.setProgress((float) currentWaypoint / (float) waypoints.size());
+        localData.setElevationGain(elevationGain);
+        localData.setId(eventId);
+        localData.setMaxSpeed(maxSpeed);
+        localData.setTimestamps(toPrimitiveLong(passedWaypointTimes));
+        localData.setVisited(toPrimitiveInt(passedWaypoints));
+        localData.setStartDate(startDate);
+        localData.setEndDate(new Date());
+        localData.setWaypoints(LocationUtils.encodePolyline(waypoints));
+
+        // Daten abspeichern
+        storeLocalData.saveObject(localData,String.valueOf(localData.getId()));
+
+        sendCancelUpdate();
+
         if (gac != null) gac.disconnect();
         super.onDestroy();
     }
@@ -218,6 +279,11 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         }
     }
 
+    private void sendCancelUpdate() {
+        Intent intent = new Intent(NOTIFICATION_CANCEL);
+        broadcastManager.sendBroadcast(intent);
+    }
+
     private int[] toPrimitiveInt(List<Integer> list) {
         int[] out = new int[list.size()];
         for (int i = 0; i < list.size(); i++) {
@@ -303,5 +369,16 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         float distanceW1W2 = distance(w1.latitude, w1.longitude, w2.latitude, w2.longitude);
 
         return distanceW1W2;
+    }
+
+    /**
+     * BroadcastReceiver der von der Notification des LocationTransmitterService aufgerufen wird
+     * wenn der "Stop" Button gedrückt wird.
+     */
+    public static class CancelServiceReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            context.stopService(new Intent(context, LocationTransmitterService.class));
+        }
     }
 }

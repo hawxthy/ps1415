@@ -2,7 +2,6 @@ package ws1415.ps1415.task;
 
 import android.content.Context;
 
-import com.skatenight.skatenightAPI.model.JsonMap;
 import com.skatenight.skatenightAPI.model.Member;
 import com.skatenight.skatenightAPI.model.UserGroup;
 

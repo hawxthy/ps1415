@@ -22,5 +22,9 @@ public enum MessageType {
     /**
      * Wird an alle Mitglieder einer Gruppe gesendet, wenn die Gruppe gelöscht wird.
      */
-    GROUP_DELETED_NOTIFICATION_MESSAGE;
+    GROUP_DELETED_NOTIFICATION_MESSAGE,
+    /**
+     * Wird an alle Mitglieder einer Gruppe gesendet, wenn eine Gruppe erstellt wird.
+     */
+    GROUP_CREATED_NOTIFICATION_MESSAGE;
 }
