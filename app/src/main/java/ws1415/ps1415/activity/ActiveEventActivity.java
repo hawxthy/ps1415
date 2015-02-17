@@ -119,15 +119,6 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             });
         }
 
-//        String email = prefs.getString("accountName", null);
-//        if (email == null) {
-//            Toast.makeText(getApplicationContext(), getString(R.string.active_event_no_email_message), Toast.LENGTH_SHORT).show();
-//            finish();
-//        }
-//        else {
-//            new QueryCurrentMemberEventTask(this, email).execute();
-//        }
-
         Button speedProfileButton = (Button) findViewById(R.id.active_event_speed_profile_button);
         speedProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -325,7 +316,6 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         updateTimerTextView(localData.getEndDate());
 
         encodedWaypoints = localData.getWaypoints();
-        Toast.makeText(getApplicationContext(), localData.getWaypoints(), Toast.LENGTH_LONG).show();
 
         setProgressBarIndeterminateVisibility(false);
         ((ScrollView) findViewById(R.id.active_event_scroll_view)).setVisibility(View.VISIBLE);
@@ -353,8 +343,6 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
                 ProgressBar progressBar = (ProgressBar) findViewById(R.id.active_event_progressbar);
                 progressBar.setProgress(currentWaypoint);
                 progressBar.setMax(waypointCount);
-
-                //Toast.makeText(getApplicationContext(), currentWaypoint + "/" + waypointCount, Toast.LENGTH_SHORT).show();
 
                 float currentDistance = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_DISTANCE, 0.0f);
                 TextView currentDistanceTextView = (TextView) findViewById(R.id.active_event_current_distance_textview);

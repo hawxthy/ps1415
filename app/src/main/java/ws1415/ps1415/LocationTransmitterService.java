@@ -14,7 +14,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -117,8 +116,6 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         startDate = new Date(intent.getLongExtra(EXTRA_START_DATE, 0));
         distance = intent.getStringExtra(EXTRA_DISTANCE);
 
-        Toast.makeText(getApplicationContext(), "Service start!", Toast.LENGTH_LONG).show();
-
         Intent deleteIntent = new Intent(this, CancelServiceReceiver.class);
         PendingIntent pendingIntentCancel = PendingIntent.getBroadcast(this, 0, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -170,7 +167,6 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         localData.setStartDate(startDate);
         localData.setEndDate(new Date());
         localData.setWaypoints(LocationUtils.encodePolyline(waypoints));
-        Toast.makeText(getApplicationContext(), localData.getWaypoints(), Toast.LENGTH_LONG).show();
 
         // Daten abspeichern
         storeLocalData.saveObject(localData,String.valueOf(localData.getId()));

@@ -102,7 +102,6 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
                 if (new Date().after(EventUtils.getInstance(ShowEventsActivity.this).getFusedDate(e)) &&
                         e.getMemberList() != null &&
                         e.getMemberList().contains(prefs.getString("accountName", null))) {
-                    Toast.makeText(getApplicationContext(), "contains", Toast.LENGTH_SHORT).show();
                     intent = new Intent(ShowEventsActivity.this, ActiveEventActivity.class);
                     intent.putExtra(ActiveEventActivity.EXTRA_KEY_ID, e.getKey().getId());
                 }
