@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -72,6 +73,10 @@ public class ShowRouteActivity extends Activity {
     private List<Marker> groupMarker = new ArrayList<Marker>();
 
     private Location location; // Enthält die aktuelle Position, die vom Server runtergeladen wurde
+
+    // Handler für das updaten der gruppenmitglieder
+    private int mInterval = 30000;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,10 +161,10 @@ public class ShowRouteActivity extends Activity {
                     }
                 }
                 if (intent.hasExtra(EXTRA_USERGROUPS)){
+                    mHandler = new Handler();
+                    startRepeatingTask();
                     refreshVisibleMembers();
                 }
-                // TODO Weg machen
-                refreshVisibleMembers();
                 Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();
             }
             catch (ParseException e) {
@@ -180,6 +185,23 @@ public class ShowRouteActivity extends Activity {
         new QueryMemberTask().execute((ShowRouteActivity) this);
     }
 
+    Runnable mStatusChecker = new Runnable(){
+        @Override
+        public void run(){
+            Toast.makeText(ShowRouteActivity.this, "Updating...", Toast.LENGTH_SHORT).show();
+            refreshVisibleMembers();
+            mHandler.postDelayed(mStatusChecker, mInterval);
+        }
+    };
+
+    void startRepeatingTask(){
+        mStatusChecker.run();
+    }
+
+    void stopRepeatingTask(){
+        mHandler.removeCallbacks(mStatusChecker);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -194,6 +216,12 @@ public class ShowRouteActivity extends Activity {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
         }
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopRepeatingTask();
     }
 
     @Override
