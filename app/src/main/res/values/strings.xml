@@ -87,4 +87,6 @@
     <string name="no">No</string>
     <string name="ok">OK</string>
 
+    <!-- Strings zu LocationTransmitterService -->
+    <string name="location_transmitter_button_stop">Stop</string>
 </resources>

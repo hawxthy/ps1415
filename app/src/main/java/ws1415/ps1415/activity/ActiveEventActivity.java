@@ -153,7 +153,6 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 
     @Override
     protected void onDestroy() {
-        //stopService(new Intent(getBaseContext(), LocationTransmitterService.class));
         super.onDestroy();
     }
 
@@ -189,6 +188,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(LocationTransmitterService.NOTIFICATION_LOCATION));
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(LocationTransmitterService.NOTIFICATION_CANCEL));
     }
 
     private void stopClockTimer() {
@@ -339,40 +339,51 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     private class LocationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            TextView altitudeTextView = (TextView) findViewById(R.id.active_event_current_altitude_textview);
 
-            Location location = (Location) intent.getParcelableExtra(LocationTransmitterService.NOTIFICATION_EXTRA_LOCATION);
-            if (location.hasAltitude()) {
-                altitudeTextView.setText(getString(R.string.active_event_altitude_format_meters, location.getAltitude()));
+            if (intent.getAction().equals(LocationTransmitterService.NOTIFICATION_LOCATION)) {
+                TextView altitudeTextView = (TextView) findViewById(R.id.active_event_current_altitude_textview);
+
+                Location location = (Location) intent.getParcelableExtra(LocationTransmitterService.NOTIFICATION_EXTRA_LOCATION);
+                if (location.hasAltitude()) {
+                    altitudeTextView.setText(getString(R.string.active_event_altitude_format_meters, location.getAltitude()));
+                }
+                int currentWaypoint = intent.getIntExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_WAYPOINT, 0);
+                int waypointCount = intent.getIntExtra(LocationTransmitterService.NOTIFICATION_EXTRA_WAYPOINT_COUNT, 0);
+
+                ProgressBar progressBar = (ProgressBar) findViewById(R.id.active_event_progressbar);
+                progressBar.setProgress(currentWaypoint);
+                progressBar.setMax(waypointCount);
+
+                //Toast.makeText(getApplicationContext(), currentWaypoint + "/" + waypointCount, Toast.LENGTH_SHORT).show();
+
+                float currentDistance = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_DISTANCE, 0.0f);
+                TextView currentDistanceTextView = (TextView) findViewById(R.id.active_event_current_distance_textview);
+                currentDistanceTextView.setText(getString(R.string.active_event_distance_format_meters, currentDistance));
+
+                float curSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CUR_SPEED, 0.0f);
+                TextView curSpeedTextView = (TextView) findViewById(R.id.active_event_cur_speed_textview);
+                curSpeedTextView.setText(getString(R.string.active_event_speed_format, curSpeed));
+
+                float maxSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_MAX_SPEED, 0.0f);
+                TextView maxSpeedTextView = (TextView) findViewById(R.id.active_event_max_speed_textview);
+                maxSpeedTextView.setText(getString(R.string.active_event_speed_format, maxSpeed));
+
+                float avgSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_AVG_SPEED, 0.0f);
+                TextView avgSpeedTextView = (TextView) findViewById(R.id.active_event_avg_speed_textview);
+                avgSpeedTextView.setText(getString(R.string.active_event_speed_format, avgSpeed));
+
+                float elevationGain = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_ELEVATION_GAIN, 0.0f);
+                TextView elevationGainTextView = (TextView) findViewById(R.id.active_event_elevation_gain_textview);
+                elevationGainTextView.setText(getString(R.string.active_event_altitude_format_meters, elevationGain));
             }
-            int currentWaypoint = intent.getIntExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_WAYPOINT, 0);
-            int waypointCount = intent.getIntExtra(LocationTransmitterService.NOTIFICATION_EXTRA_WAYPOINT_COUNT, 0);
+            else if (intent.getAction().equals(LocationTransmitterService.NOTIFICATION_CANCEL)) {
+                stopClockTimer();
 
-            ProgressBar progressBar = (ProgressBar) findViewById(R.id.active_event_progressbar);
-            progressBar.setProgress(currentWaypoint);
-            progressBar.setMax(waypointCount);
+                saved = true;
 
-            //Toast.makeText(getApplicationContext(), currentWaypoint + "/" + waypointCount, Toast.LENGTH_SHORT).show();
-
-            float currentDistance = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CURRENT_DISTANCE, 0.0f);
-            TextView currentDistanceTextView = (TextView) findViewById(R.id.active_event_current_distance_textview);
-            currentDistanceTextView.setText(getString(R.string.active_event_distance_format_meters, currentDistance));
-
-            float curSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_CUR_SPEED, 0.0f);
-            TextView curSpeedTextView = (TextView) findViewById(R.id.active_event_cur_speed_textview);
-            curSpeedTextView.setText(getString(R.string.active_event_speed_format, curSpeed));
-
-            float maxSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_MAX_SPEED, 0.0f);
-            TextView maxSpeedTextView = (TextView) findViewById(R.id.active_event_max_speed_textview);
-            maxSpeedTextView.setText(getString(R.string.active_event_speed_format, maxSpeed));
-
-            float avgSpeed = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_AVG_SPEED, 0.0f);
-            TextView avgSpeedTextView = (TextView) findViewById(R.id.active_event_avg_speed_textview);
-            avgSpeedTextView.setText(getString(R.string.active_event_speed_format, avgSpeed));
-
-            float elevationGain = intent.getFloatExtra(LocationTransmitterService.NOTIFICATION_EXTRA_ELEVATION_GAIN, 0.0f);
-            TextView elevationGainTextView = (TextView) findViewById(R.id.active_event_elevation_gain_textview);
-            elevationGainTextView.setText(getString(R.string.active_event_altitude_format_meters, elevationGain));
+                Button button = (Button) findViewById(R.id.active_event_cancel_button);
+                button.setEnabled(false);
+            }
         }
     }
 }
