@@ -7,12 +7,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.UiThreadTest;
 import android.test.ViewAsserts;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.test.suitebuilder.annotation.SmallTest;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -61,9 +58,12 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
         mActivity = getActivity();
         // Löschen der Voreinstellungen
         // Alles in den SharedPreferences löschen
+        /*
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear().commit();
+        editor.clear().commit();*/
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+        sharedPreferences.edit().putBoolean("prefSendLocation", true).apply();
 
         // Nutzer einloggen
         GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getActivity(), "server:client_id:"+ Constants.WEB_CLIENT_ID);
@@ -122,7 +122,6 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
         // Klick auf die Menüoption
         // Die Acitivity wird geändert, damit der Monitor für die Activity laufen kann, für die gleiche
         // kann kein Neuer Monitor erezeugt werden.
-        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
         getInstrumentation().invokeMenuActionSync(mActivity, R.id.action_settings, 0);
 
         // Die Einstellungen setzen zum Senden, hat jedoch auf das Folgende keinen Einfluss, da die UI nicht getestet wird
@@ -192,7 +191,6 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
         // Klick auf die Menüoption
         // Die Acitivity wird geändert, damit der Monitor für die Activity laufen kann, für die gleiche
         // kann kein Neuer Monitor erezeugt werden.
-        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
         getInstrumentation().invokeMenuActionSync(mActivity, R.id.action_settings, 0);
 
         // Die Einstellungen setzen zum Senden, hat jedoch auf das Folgende keinen Einfluss, da die UI nicht getestet wird

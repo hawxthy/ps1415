@@ -83,6 +83,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     private float previousAlt;
     private float elevationGain;
 
+    private boolean serviceWithExtras; // Flag, ob der Service mit Extras aufgerufen wurde oder nicht
+
     public LocationTransmitterService() {
         foundFirstWaypoint = false;
         currentDistance = 0.0f;
@@ -133,8 +135,14 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                 .setContentIntent(pendingIntent)
                 .addAction(R.drawable.ic_action_stop, getString(R.string.location_transmitter_button_stop), pendingIntentCancel).build();
 
-
-
+        if (intent != null) {
+            if (intent.getExtras() != null) {
+                serviceWithExtras = (intent.getExtras().size() > 0);
+            } else
+                serviceWithExtras = false;
+        } else {
+            serviceWithExtras = false;
+        }
 
 
         startForeground(5656565, notification);
@@ -152,32 +160,35 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
     @Override
     public void onDestroy() {
-        Log.d(LOG_TAG, "destroyA");
-        // Lokale Daten als LocalAnalysisData objekt
-        LocalAnalysisData localData = new LocalAnalysisData();
-        LocalStorageUtil storeLocalData = new LocalStorageUtil(getApplicationContext());
+        // Falls der Service mit Extras für die lokale Auswertung aufgerufen wurde
+        if (serviceWithExtras) {
+            Log.d(LOG_TAG, "destroyA");
+            // Lokale Daten als LocalAnalysisData objekt
+            LocalAnalysisData localData = new LocalAnalysisData();
+            LocalStorageUtil storeLocalData = new LocalStorageUtil(getApplicationContext());
 
-        localData.setAvgSpeed(avgSpeed);
-        localData.setCurrentDistance(currentDistance);
-        localData.setDistance(distance);
-        localData.setProgress((float) currentWaypoint / (float) waypoints.size());
-        localData.setElevationGain(elevationGain);
-        localData.setId(eventId);
-        localData.setMaxSpeed(maxSpeed);
-        localData.setTimestamps(toPrimitiveLong(passedWaypointTimes));
-        localData.setVisited(toPrimitiveInt(passedWaypoints));
-        localData.setStartDate(startDate);
-        localData.setEndDate(new Date());
-        localData.setWaypoints(LocationUtils.encodePolyline(waypoints));
+            localData.setAvgSpeed(avgSpeed);
+            localData.setCurrentDistance(currentDistance);
+            localData.setDistance(distance);
+            localData.setProgress((float) currentWaypoint / (float) waypoints.size());
+            localData.setElevationGain(elevationGain);
+            localData.setId(eventId);
+            localData.setMaxSpeed(maxSpeed);
+            localData.setTimestamps(toPrimitiveLong(passedWaypointTimes));
+            localData.setVisited(toPrimitiveInt(passedWaypoints));
+            localData.setStartDate(startDate);
+            localData.setEndDate(new Date());
+            localData.setWaypoints(LocationUtils.encodePolyline(waypoints));
 
-        // Daten abspeichern
-        storeLocalData.saveObject(localData,String.valueOf(localData.getId()));
+            // Daten abspeichern
+            storeLocalData.saveObject(localData, String.valueOf(localData.getId()));
 
-        sendCancelUpdate();
+            sendCancelUpdate();
 
-        Log.d(LOG_TAG, "destroyB");
+            Log.d(LOG_TAG, "destroyB");
 
-        if (gac != null) gac.disconnect();
+            if (gac != null) gac.disconnect();
+        }
         super.onDestroy();
     }
 
