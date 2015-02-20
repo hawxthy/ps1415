@@ -38,6 +38,7 @@
 
     <!-- Strings zu activity showEvents -->
     <string name="title_activity_show_events">Events</string>
+    <string name="action_refresh_events">Refresh</string>
 
     <string-array name="selections_menu">
         <item name="delete">Delete</item>
@@ -53,6 +54,7 @@
     <string name="active_event_header_current_altitude">Current altitude</string>
     <string name="active_event_header_elevation_gain">Elevation gain</string>
     <string name="active_event_button_speed_profile">Speed profile</string>
+    <string name="active_event_button_map">Map</string>
     <string name="active_event_button_end">End participation</string>
     <string name="active_event_no_email_message">Please register for an event first.</string>
     <string name="active_event_timer_format"><xliff:g id="sign">%1$s</xliff:g><xliff:g id="hours">%2$02d</xliff:g>:<xliff:g id="minutes">%3$02d</xliff:g>:<xliff:g id="seconds">%4$02d</xliff:g></string>
@@ -69,6 +71,7 @@
     <string name="title_fragment_all_user_groups">Groups</string>
     <string name="title_fragment_my_user_groups">My Groups</string>
     <string name="action_add_user_group">Add Usergroup</string>
+    <string name="action_refresh_user_groups">Refresh</string>
     <string name="list_view_item_usergroup_creator">Creator: </string>
     <string name="list_view_item_usergroup_membercount">Member: </string>
     <string name="usergroup_adapter_maximum_reached">Maximum number of visible groups reached</string>

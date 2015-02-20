@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
 
@@ -31,6 +32,8 @@ public class AllUsergroupsFragment extends Fragment {
     private List<UserGroup> userGroupList;
     private UsergroupAdapter mAdapter;
     private AlertDialog c_dialog;
+
+    private ProgressBar mProgressBarRefresh;
 
     /**
      * Fragt alle UserGroups vom Server ab und fügt diese in die Liste ein.
@@ -58,6 +61,7 @@ public class AllUsergroupsFragment extends Fragment {
      * @param inflater
      * @param container
      * @param savedInstanceState
+     *
      * @return
      */
     @Override
@@ -66,6 +70,7 @@ public class AllUsergroupsFragment extends Fragment {
 
         // ListView initialisieren
         userGroupListView = (ListView) view.findViewById(R.id.fragment_show_user_groups_list_view);
+        mProgressBarRefresh = (ProgressBar) view.findViewById(R.id.fragment_show_user_groups_progress_bar);
 
         userGroupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -110,6 +115,7 @@ public class AllUsergroupsFragment extends Fragment {
      * Dient zum Refreshen der Liste der aktuellen UserGroups.
      */
     public void refresh() {
+        if(mProgressBarRefresh != null) mProgressBarRefresh.setVisibility(View.VISIBLE);
         new QueryUserGroupsTask().execute(this);
     }
 
@@ -141,6 +147,7 @@ public class AllUsergroupsFragment extends Fragment {
         userGroupList = results;
         mAdapter = new UsergroupAdapter(getActivity(), results, -1);
         if (userGroupListView != null) userGroupListView.setAdapter(mAdapter);
+        if(mProgressBarRefresh != null) mProgressBarRefresh.setVisibility(View.GONE);
     }
 
     /**
@@ -161,7 +168,7 @@ public class AllUsergroupsFragment extends Fragment {
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
-        menuInflater.inflate(R.menu.add_user_group_plus_button, menu);
+        menuInflater.inflate(R.menu.menu_user_group, menu);
         super.onCreateOptionsMenu(menu, menuInflater);
     }
 }

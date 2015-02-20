@@ -7,4 +7,9 @@
         android:title="@string/action_add_user_group"
         android:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_new" />
+    <item
+        android:id="@+id/action_refresh_groups"
+        android:title="@string/action_refresh_user_groups"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_refresh" />
 </menu>

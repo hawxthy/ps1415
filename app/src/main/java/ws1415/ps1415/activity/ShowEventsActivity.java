@@ -145,6 +145,11 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
         new QueryEventsTask(this).execute();
     }
 
+    private void refresh(){
+        setProgressBarIndeterminateVisibility(true);
+        new QueryEventsTask(ShowEventsActivity.this).execute();
+    }
+
     private void initGCM() {
         // GCM initialisieren
         context = this;
@@ -191,6 +196,8 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
             Intent intent = new Intent(ShowEventsActivity.this, SettingsActivity.class);
             startActivity(intent);
             return true;
+        } else if (id == R.id.action_refresh_events) {
+            refresh();
         }
         return super.onOptionsItemSelected(item);
     }

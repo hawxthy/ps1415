@@ -434,6 +434,17 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
     }
 
     /**
+     * Zeichnet die Route, die zurzeit hinterlegt ist, neu. Die Route wird dabei nicht neu berechnet.
+     */
+    public void repaintWayppoint(Waypoint w) {
+        EditorMapFragment mapFragment = (EditorMapFragment) getFragmentByPosition(0);
+        if (mapFragment == null) {
+            return;
+        }
+        mapFragment.updateWaypoint(w);
+    }
+
+    /**
      * Liefert die aktuelle Route. Falls keine Route vorhanden ist, wird null zurückgegeben.
      *
      * @return Aktuelle Route.

@@ -51,6 +51,7 @@ public class EditWaypointDialog extends Activity {
             finish();
             routeEditorActivity.getArrayAdapter().getItem(index).getMarkerOptions().title(waypointName);
             routeEditorActivity.getArrayAdapter().notifyDataSetChanged();
+            routeEditorActivity.repaintWayppoint(routeEditorActivity.getArrayAdapter().getItem(index));
         } else {
             Toast.makeText(this, "Name darf nicht leer sein", Toast.LENGTH_LONG).show();
         }
