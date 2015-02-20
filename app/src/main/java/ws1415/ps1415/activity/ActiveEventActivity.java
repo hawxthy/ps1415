@@ -139,6 +139,16 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             }
         });
 
+        Button mapButton = (Button) findViewById(R.id.active_event_map_button);
+        mapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ActiveEventActivity.this, ShowRouteActivity.class);
+                intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, encodedWaypoints);
+                startActivity(intent);
+            }
+        });
+
         receiver = new LocationReceiver();
     }
 
