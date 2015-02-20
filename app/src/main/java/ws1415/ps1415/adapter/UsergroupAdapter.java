@@ -19,7 +19,7 @@ import ws1415.ps1415.R;
 /**
  * Dieser Adapter wird für das Anzeigen der Usergruppen in der Liste genutzt.
  *
- * Created by Martin on 30.01.2015.
+ * @author Martin Wrodarczyk
  */
 public class UsergroupAdapter extends BaseAdapter {
     private List<UserGroup> groupList = new ArrayList<UserGroup>();
@@ -77,7 +77,7 @@ public class UsergroupAdapter extends BaseAdapter {
     }
 
     /**
-     * Klasse zum Halten der GUI Element, damit keine Kopien erstellt werden.
+     * Klasse zum Halten der GUI Elemente, damit convertView die alten Objekte übernehmen kann.
      */
     private class Holder {
         private TextView groupName;

@@ -11,7 +11,9 @@ import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.fragment.EditorWaypointsFragment;
 
 /**
- * Created by Bernd Eissing on 10.02.2015.
+ * Dialog um einen vorher ausgewählten Wegpunkt einer Route zu editieren.
+ *
+ * @author Bernd Eissing
  */
 public class EditWaypointDialog extends Activity {
     public static final String EXTRA_INDEX = "index";

@@ -22,12 +22,11 @@ import ws1415.ps1415.task.QueryUserGroupsTask;
 import ws1415.ps1415.util.groupUtils;
 
 /**
- * Dies ist ein Fragment, das genutzt wird um alle Gruppen auf dem Server anzuzeigen.
+ * Dies ist ein Fragment, das genutzt wird um alle Gruppen vom Server anzuzeigen.
  *
  * @author Martin Wrodarczyk, Bernd Eissing
  */
 public class AllUsergroupsFragment extends Fragment {
-
     private ListView userGroupListView;
     private List<UserGroup> userGroupList;
     private UsergroupAdapter mAdapter;

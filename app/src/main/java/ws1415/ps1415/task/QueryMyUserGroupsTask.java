@@ -12,7 +12,10 @@ import ws1415.ps1415.fragment.AllUsergroupsFragment;
 import ws1415.ps1415.fragment.MyUsergroupsFragment;
 
 /**
- * Created by Martin on 03.02.2015.
+ * Klasse welche mit dem SkatenightBackend kommuniziert um die die eigenen Nutzergruppen und
+ * beigetretene Gruppen vom Server abzurufen.
+ *
+ * @author Martin Wrodarczyk
  */
 public class QueryMyUserGroupsTask extends AsyncTask<Void, Void, List<UserGroup>> {
     private MyUsergroupsFragment view;
@@ -20,6 +23,7 @@ public class QueryMyUserGroupsTask extends AsyncTask<Void, Void, List<UserGroup>
     public QueryMyUserGroupsTask(MyUsergroupsFragment view){
         this.view = view;
     }
+
     /**
      * Ruft die aktuellen UserGroup-Objekte vom Server ab.
      *

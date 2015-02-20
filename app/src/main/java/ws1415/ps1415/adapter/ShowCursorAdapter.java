@@ -39,7 +39,7 @@ import ws1415.ps1415.util.ImageUtil;
 /**
  * Adapter zum füllen der ListView in der ShowInformationActivity.
  *
- * Created by Bernd Eissing on 28.11.2014.
+ * @author Bernd Eissing, Martin Wrodarczyk, Richard Schulze
  */
 public class ShowCursorAdapter extends BaseAdapter {
     private List<Field> fieldList = new ArrayList<Field>();

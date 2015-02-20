@@ -30,7 +30,7 @@ import ws1415.veranstalterapp.util.FieldType;
 /**
  * Fragment zum Veröffentlichen von neuen Veranstaltungen.
  *
- * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
+ * @author Bernd Eissing, Marting Wrodarczyk
  */
 public class AnnounceInformationFragment extends Fragment implements AnnounceCursorAdapter.PictureChooserActivity {
     //Adapter für die ListView listView
@@ -198,11 +198,6 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
     public AnnounceCursorAdapter getAdapter(){
         return listAdapter;
     }
-    
-    public void setRoute(Route selectedRoute) {
-        //route = selectedRoute;
-        //routePickerButton.setText(selectedRoute.getName());
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -221,8 +216,4 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
         return listView;
     }
 
-    public Event getCurrentEvent(){
-        return event;
-    }
-    
 }

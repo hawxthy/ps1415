@@ -14,7 +14,9 @@ import java.util.ArrayList;
 
 import ws1415.veranstalterapp.R;
 
-
+/**
+ * Dialog für das Erstellen einer neuen Gruppe anhand einer vorher gewählten Route als Vorlage.
+ */
 public class AddRouteDraftDialog extends Activity {
     public static final String EXTRA_WAYPOINTS = "route_draft_dialog_extra_waypoints";
 
@@ -39,6 +41,12 @@ public class AddRouteDraftDialog extends Activity {
         finish();
     }
 
+    /**
+     * Startet die RouteEditorActivity mit den Informationen des eingegebenen Names und der
+     * Wegpunkte der Routenvorlage.
+     *
+     * @param view
+     */
     public void apply(View view) {
         String routeName = routeNameEditText.getText().toString();
         if (!routeName.equals("")) {
