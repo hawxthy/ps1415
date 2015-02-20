@@ -16,11 +16,11 @@ import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.task.QueryEventTask;
 
 /**
- * Die Activity, welche beim starten der Veranstalter App ausgeführt wird. Diese Activity
- * dient zum halten von Fragmenten, dem ShowInformationFragment, AnnounceInformationFragment und dem
+ * Die Activity, welche beim Starten der Veranstalter App ausgeführt wird. Diese Activity
+ * dient zum Halten von Fragmenten, dem ShowInformationFragment, AnnounceInformationFragment und dem
  * ManageRoutesFragment.
  *
- * Created by Bernd Eissing, Martin Wrodarczyk.
+ * @author Bernd Eissing, Martin Wrodarczyk
  */
 public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabListener {
     private static ViewPager viewPager;
@@ -75,7 +75,6 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
              */
             @Override
             public void onPageSelected(int position) {
-                // Wechsel Tab, wenn Seite beim Swipen verändert wird.
                 actionBar.setSelectedNavigationItem(position);
             }
 
@@ -99,7 +98,6 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.hold_tabs, menu);
         return true;
     }

@@ -24,7 +24,10 @@ import ws1415.ps1415.fragment.MyUsergroupsFragment;
 import ws1415.ps1415.task.QueryUserGroupsTask;
 
 /**
- * Created by Bernd.
+ * Diese Activity wird zum verwalten der Nutzergruppen genutzt. Sie zeigt das All- und
+ * MyUserGroupsFragment an.
+ *
+ * @author Bernd Eissing, Martin Wrodarczyk
  */
 public class UsergroupActivity extends BaseFragmentActivity implements ActionBar.TabListener {
     public static final String REFRESH_GROUPS_ACTION = "REFRESH_GROUPS";
@@ -132,7 +135,6 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.add_user_group_plus_button, menu);
         menuItem = menu.findItem(R.id.action_add_user_group);
         return true;
@@ -185,14 +187,6 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
     }
 
     /**
-     * Updated die Informationen in dem Tab "ShowEventsFragment", diese Methode wird aufgerufen,
-     * wenn die Informationen im "AnnounceInformationFragment" gesetzt und abgeschickt werden.
-     */
-    public static void updateInformation(){
-        new QueryUserGroupsTask().execute((AllUsergroupsFragment) mAdapter.getItem(0));
-    }
-
-    /**
      * Gibt den Adapter zurück, der die Tabs verwaltet.
      *
      * @return Der Adapter
@@ -201,15 +195,10 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
         return mAdapter;
     }
 
-    /**
-     * Gibt den ViewPager zurück.
-     *
-     * @return
-     */
-    public static ViewPager getViewPager(){
-        return viewPager;
-    }
 
+    /**
+     * @return das MenuItem
+     */
     public MenuItem getMenuItem(){
         return menuItem;
     }

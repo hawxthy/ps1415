@@ -27,7 +27,6 @@ import ws1415.ps1415.model.NavDrawerItem;
  * @author Martin Wrodarczyk
  */
 public class BaseActivity extends Activity {
-    // NavigationDrawer
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -42,7 +41,9 @@ public class BaseActivity extends Activity {
     protected FrameLayout actContent;
 
     /**
-     * 
+     * Setzt den Navigation Drawer(fullLayout) und erwartet eine layout Id die im eigentlichen
+     * Content gesetzt wird.
+     *
      * @param layoutResID
      */
     @Override

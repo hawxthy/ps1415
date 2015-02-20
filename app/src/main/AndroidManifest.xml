@@ -68,7 +68,7 @@
                 android:value="ws1415.ps1415.activity.ShowEventsActivity" />
         </activity>
         <activity
-            android:name=".activity.Settings"
+            android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
         <activity

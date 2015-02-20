@@ -14,9 +14,9 @@ import ws1415.veranstalterapp.task.GetEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
 
 /**
- * Activity zum Begutachten der Metainformationen der erstellten Veranstaltung.
+ * Activity zum Anzeigen der Metainformationen der erstellten Veranstaltung.
  *
- * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
+ * @author Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
  */
 public class ShowInformationActivity extends Activity {
     // Adapter für die ListView von activity_show_information_list_view

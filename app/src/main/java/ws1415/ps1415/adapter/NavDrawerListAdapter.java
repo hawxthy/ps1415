@@ -43,12 +43,20 @@ public class NavDrawerListAdapter extends BaseAdapter {
         return position;
     }
 
+    /**
+     * Setzt das Icon und den Text für das ausgewählte Navigation Drawer Element.
+     *
+     * @param position Position des Items
+     * @param convertView
+     * @param parent
+     * @return Navigation Drawer ItemView
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater mInflater = (LayoutInflater)
                     context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-            convertView = mInflater.inflate(R.layout.drawer_list_item, null);
+            convertView = mInflater.inflate(R.layout.drawer_list_item, parent, false);
         }
 
         ImageView imgIcon = (ImageView) convertView.findViewById(R.id.icon);
