@@ -26,7 +26,7 @@ public class RegistrationManager {
      * Speichert für jede Mail-Adresse (für jeden Benutzer) eine Liste der zugehörigen IDs.
      */
     @Persistent(serialized = "true", defaultFetchGroup = "true")
-    private Map<String, Set<String>> userIDs = new HashMap<>();
+    private Map<String, String> userIDs = new HashMap<>();
 
     public List<String> getRegisteredUser() {
         return new ArrayList<>(registeredUser);
@@ -39,15 +39,14 @@ public class RegistrationManager {
      */
     public void addRegistrationId(String email, String regid) {
         registeredUser.add(regid);
-        Set<String> ids = userIDs.get(email);
-        if (ids == null) {
-            ids = new HashSet<>();
-            userIDs.put(email, ids);
+        String oldID = userIDs.get(email);
+        if (oldID != null) {
+            registeredUser.remove(oldID);
         }
-        ids.add(regid);
+        userIDs.put(email, regid);
     }
 
-    public Set<String> getUserIds(String mail) {
+    public String getUserIdByMail(String mail) {
         return userIDs.get(mail);
     }
 }

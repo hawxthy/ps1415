@@ -546,7 +546,7 @@ public class SkatenightServerEndpoint {
                 }
 
                 Set<String> ids = new HashSet<>();
-                ids.addAll(registrationManager.getUserIds(email));
+                ids.add(registrationManager.getUserIdByMail(email));
 
                 Sender sender = new Sender(Constants.GCM_API_KEY);
                 Message m = new Message.Builder()
@@ -989,7 +989,7 @@ public class SkatenightServerEndpoint {
                 for (Member m : members) {
                     m.removeGroup(ug);
                     pm.makePersistent(m);
-                    regids.addAll(rm.getUserIds(m.getEmail()));
+                    regids.add(rm.getUserIdByMail(m.getEmail()));
                 }
                 pm.makePersistent(ug);
                 pm.deletePersistent(ug);
@@ -1108,9 +1108,7 @@ public class SkatenightServerEndpoint {
         try {
             RegistrationManager rm = getRegistrationManager(pm);
             ArrayList<CharSequence> result = new ArrayList<>();
-            for (String s : rm.getUserIds(mail)) {
-                result.add(s);
-            }
+            result.add(rm.getUserIdByMail(mail));
             return result;
         } finally {
             pm.close();
