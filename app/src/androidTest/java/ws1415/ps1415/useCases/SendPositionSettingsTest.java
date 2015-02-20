@@ -2,37 +2,20 @@ package ws1415.ps1415.useCases;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.FragmentManager;
 import android.app.Instrumentation;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.CheckBoxPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.TouchUtils;
-import android.test.UiThreadTest;
 import android.test.ViewAsserts;
 import android.test.suitebuilder.annotation.LargeTest;
-import android.test.suitebuilder.annotation.MediumTest;
 import android.test.suitebuilder.annotation.SmallTest;
-import android.text.method.Touch;
-import android.view.KeyEvent;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.plus.model.people.Person;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Member;
-import com.skatenight.skatenightAPI.model.Route;
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
@@ -40,17 +23,8 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.SettingsActivity;
 import ws1415.ps1415.activity.ShowEventsActivity;
-import com.skatenight.skatenightAPI.model.Event;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import ws1415.ps1415.activity.ShowInformationActivity;
-import ws1415.ps1415.activity.ShowRouteActivity;
-import ws1415.ps1415.task.QueryMemberTask;
 import ws1415.ps1415.task.UpdateLocationTask;
-import ws1415.ps1415.util.EventUtils;
 
 /**
  * Testet den Use Case "Handhabung der aktuellen Position".
@@ -86,9 +60,11 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         mActivity = getActivity();
         // Löschen der Voreinstellungen
         // Alles in den SharedPreferences löschen
+        // SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+        // SharedPreferences.Editor editor = sharedPreferences.edit();
+        // editor.clear().commit();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear().commit();
+        sharedPreferences.edit().putBoolean("prefSendLocation", true).apply();
 
         // Nutzer einloggen
         GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getActivity(), "server:client_id:"+ Constants.WEB_CLIENT_ID);
@@ -106,7 +82,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
      */
     public void testPreConditions() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-        assertEquals("false", sharedPreferences.getString("prefSendLocation", "false"));
+        assertEquals(true, sharedPreferences.getBoolean("prefSendLocation", true));
     }
 
     protected void tearDown() throws Exception {
@@ -147,7 +123,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(SettingsActivity.class.getName(), null, false);
 
         // Klick auf die Menüoption
-        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
+        // getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
         getInstrumentation().invokeMenuActionSync(mActivity, R.id.action_settings, 0);
 
         // UI Elemente lassen sich hier nicht ansprechen
@@ -173,7 +149,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(SettingsActivity.class.getName(), null, false);
 
         // Klick auf die Menüoption
-        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
+        // getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
         getInstrumentation().invokeMenuActionSync(mActivity, R.id.action_settings, 0);
 
         // UI Elemente lassen sich hier nicht ansprechen
@@ -203,7 +179,6 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(SettingsActivity.class.getName(), null, false);
 
         // Klick auf die Menüoption
-        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
         getInstrumentation().invokeMenuActionSync(mActivity, R.id.action_settings, 0);
 
         // UI Elemente lassen sich hier nicht ansprechen
@@ -235,9 +210,9 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
     @LargeTest
     public void testSendPosition() throws Exception {
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(SettingsActivity.class.getName(), null, false);
+        assertNotNull("activityMonitor didn't start!", activityMonitor);
 
         // Klick auf die Menüoption
-        getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_MENU);
         getInstrumentation().invokeMenuActionSync(mActivity, R.id.action_settings, 0);
 
         // UI Elemente lassen sich hier nicht ansprechen
@@ -245,12 +220,13 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         sharedPreferences.edit().putBoolean("prefSendLocation", true).apply();
 
         // Acitivty Monitor starten
-        Activity am = getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 2000);
+        Activity am = getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 10000);
+        assertNotNull("SettingsActivity didn't start!", am);
         Thread.sleep(2500); // Zeit zum initialisieren
 
         // Setzen der Position auf den Server
         new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude).execute();
-        Thread.sleep(2000); // Zeit zum initialisieren
+        Thread.sleep(5000); // Zeit zum initialisieren
 
         // Teilnehmer, der seine Position an den Server senden wird
         Member m = ServiceProvider.getService().skatenightServerEndpoint().getMember(TEST_EMAIL).execute();
@@ -279,7 +255,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
 
         // Übertragenden Service stoppen
         mActivity.stopService(service);
-
+        Thread.sleep(2000); // Zeit zum stoppen
         // Gibt an, ob der Service noch läuft
         boolean running = false;
 

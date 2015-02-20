@@ -52,6 +52,7 @@ import ws1415.veranstalterapp.util.FieldType;
  */
 
 public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<HoldTabsActivity> {
+    // UI Elemente
     private volatile boolean click;
     private EditText editTextTitle;
     private EditText editTextFee;
@@ -64,6 +65,15 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     private Button cancelButton;
     private Button routePickerButton;
 
+    private static final String TEST_TITLE = "TestEvent";
+    private static final String TEST_FEE = "10";
+    private static final String TEST_LOCATION = "TestStadt";
+    private static final String TEST_DESCRIPTION = "TestBeschreibung";
+    private static final String TEST_DATE = "29.12.2014";
+    private static final String TEST_TIME = "14:00 Uhr";
+    private static final String TEST_ROUTE = "test";
+
+    // Test Daten für den Test State Destroy
     private static final String TEST_STATE_DESTROY_TITLE = "TestEventDestroy";
     private static final String TEST_STATE_DESTROY_FEE = "500";
     private static final String TEST_STATE_DESTROY_LOCATION = "Whatever";

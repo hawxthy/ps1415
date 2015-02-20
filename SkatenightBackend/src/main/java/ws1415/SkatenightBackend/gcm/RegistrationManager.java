@@ -41,6 +41,10 @@ public class RegistrationManager {
         registeredUser.add(regid);
         String oldID = userIDs.get(email);
         if (oldID != null) {
+            if (oldID.equals(regid)) {
+                // Nichts tun, wenn ID bereits bekannt
+                return;
+            }
             registeredUser.remove(oldID);
         }
         userIDs.put(email, regid);
