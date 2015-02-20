@@ -10,6 +10,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -24,8 +25,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Member;
-import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
+import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.task.QueryMemberTask;
 import ws1415.ps1415.task.QueryVisibleMembersTask;
 
@@ -45,6 +47,8 @@ import ws1415.ps1415.task.QueryVisibleMembersTask;
  * Zeigt die Strecke des aktuellen Events auf einer Karte an.
  */
 public class ShowRouteActivity extends Activity {
+    private static final String LOG_TAG = ShowRouteActivity.class.getSimpleName();
+
     public static final String EXTRA_ROUTE = "show_route_extra_route";
     public static final String EXTRA_ROUTE_FIELD_FIRST = "show_route_extra_route_field_first";
     public static final String EXTRA_ROUTE_FIELD_LAST = "show_route_extra_route_field_last";
@@ -414,12 +418,13 @@ public class ShowRouteActivity extends Activity {
     private class LocationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            long id = intent.getLongExtra(LocationTransmitterService.NOTIFICATION_EXTRA_EVENT_ID, 0);
+            if (id > 0 && id == eventId) {
+                int[] visited = intent.getIntArrayExtra(LocationTransmitterService.NOTIFICATION_EXTRA_PASSED_WAYPOINTS);
+                long[] timestamps = intent.getLongArrayExtra(LocationTransmitterService.NOTIFICATION_EXTRA_PASSED_WAYPOINT_TIME);
 
-
-            int[] visited = intent.getIntArrayExtra(LocationTransmitterService.NOTIFICATION_EXTRA_PASSED_WAYPOINTS);
-            long[] timestamps = intent.getLongArrayExtra(LocationTransmitterService.NOTIFICATION_EXTRA_PASSED_WAYPOINT_TIME);
-
-            createRouteHighlight(visited, timestamps);
+                createRouteHighlight(visited, timestamps);
+            }
         }
     }
 
@@ -471,6 +476,24 @@ public class ShowRouteActivity extends Activity {
      * Aktualisiert die Anzeige des aktuellen Felds.
      */
     private void refreshField() {
-        // TODO
+        new GetEventTask(new ExtendedTaskDelegate<Void, Event>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Event event) {
+                fieldFirst = event.getRouteFieldFirst();
+                fieldLast = event.getRouteFieldLast();
+                highlightRoute(fieldFirst, fieldLast);
+                Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void taskDidProgress(ExtendedTask task, Void[] progress) {
+
+            }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                Log.e(LOG_TAG, message);
+            }
+        });
     }
 }
