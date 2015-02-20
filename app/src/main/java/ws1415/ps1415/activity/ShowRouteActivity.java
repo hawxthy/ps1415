@@ -54,6 +54,7 @@ public class ShowRouteActivity extends Activity {
     public static final String EXTRA_ROUTE_FIELD_LAST = "show_route_extra_route_field_last";
     public static final String EXTRA_WAYPOINTS = "show_route_extra_waypoints";
     public static final String EXTRA_EVENT_ID = "show_route_extra_event_id";
+    public static final String EXTRA_SPEED_PROFILE = "show_route_extra_speed_profile";
     public static final String EXTRA_VISITED = "show_route_extra_visited";
     public static final String EXTRA_TIMESTAMPS = "show_route_extra_timestamps";
     public static final String EXTRA_USERGROUPS = "show_route_extra_show_groups";
@@ -75,6 +76,7 @@ public class ShowRouteActivity extends Activity {
     private int fieldLast;
     private long eventId;
     private LocationReceiver receiver;
+    private boolean showSpeedProfile;
 
     private List<Marker> groupMarker = new ArrayList<Marker>();
 
@@ -115,7 +117,7 @@ public class ShowRouteActivity extends Activity {
                 fieldLast = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_LAST);
             }
             if (savedInstanceState.containsKey(MEMBER_EVENT_ID)) {
-                eventId = savedInstanceState.getInt(MEMBER_EVENT_ID);
+                eventId = savedInstanceState.getLong(MEMBER_EVENT_ID);
 
                 if (eventId > 0) {
                     receiver = new LocationReceiver();
@@ -159,6 +161,10 @@ public class ShowRouteActivity extends Activity {
                 if (intent.hasExtra(EXTRA_ROUTE_FIELD_LAST)) {
                     fieldLast = intent.getIntExtra(EXTRA_ROUTE_FIELD_LAST, 0);
                 }
+                if (intent.hasExtra(EXTRA_SPEED_PROFILE)) {
+                    showSpeedProfile = true;
+                }
+
                 if (intent.hasExtra(EXTRA_VISITED) && intent.hasExtra(EXTRA_TIMESTAMPS)) {
                     int[] visited = intent.getIntArrayExtra(EXTRA_VISITED);
                     long[] timestamps = intent.getLongArrayExtra(EXTRA_TIMESTAMPS);
@@ -180,6 +186,7 @@ public class ShowRouteActivity extends Activity {
                     if (mHandler == null) {
                         mHandler = new Handler();
                     }
+                    updateUsergroups = true;
                     refreshVisibleMembers();
                 }
                 Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();
@@ -199,6 +206,7 @@ public class ShowRouteActivity extends Activity {
                     mHandler = new Handler();
                 }
                 refreshField();
+                updateField = true;
             }
         }
 
@@ -419,7 +427,7 @@ public class ShowRouteActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             long id = intent.getLongExtra(LocationTransmitterService.NOTIFICATION_EXTRA_EVENT_ID, 0);
-            if (id > 0 && id == eventId) {
+            if (id > 0 && id == eventId && showSpeedProfile) {
                 int[] visited = intent.getIntArrayExtra(LocationTransmitterService.NOTIFICATION_EXTRA_PASSED_WAYPOINTS);
                 long[] timestamps = intent.getLongArrayExtra(LocationTransmitterService.NOTIFICATION_EXTRA_PASSED_WAYPOINT_TIME);
 
@@ -476,6 +484,7 @@ public class ShowRouteActivity extends Activity {
      * Aktualisiert die Anzeige des aktuellen Felds.
      */
     private void refreshField() {
+        Toast.makeText(getApplicationContext(), "refresh", Toast.LENGTH_SHORT).show();
         new GetEventTask(new ExtendedTaskDelegate<Void, Event>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Event event) {

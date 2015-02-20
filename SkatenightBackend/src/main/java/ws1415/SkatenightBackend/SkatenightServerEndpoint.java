@@ -522,9 +522,6 @@ public class SkatenightServerEndpoint {
      */
     public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
         Event event = getEvent(keyId);
-
-        //  Andern des currentEvent entfernen!
-
         ArrayList<String> memberKeys = event.getMemberList();
         if (!memberKeys.contains(email)) {
             memberKeys.add(email);
@@ -533,20 +530,16 @@ public class SkatenightServerEndpoint {
             updateEvent(event);
 
             if (event.isNotificationSend()) {
-                PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
-                        "transactions-optional");
+                // CurrentEventID setzen
+                Member member = getMember(email);
+                member.setCurrentEventId(keyId);
+
                 PersistenceManager pm = pmf.getPersistenceManager();
-                RegistrationManager registrationManager;
-                Query q = pm.newQuery(RegistrationManager.class);
-                List<RegistrationManager> result = (List<RegistrationManager>) q.execute();
-                if (!result.isEmpty()) {
-                    registrationManager = result.get(0);
-                } else {
-                    registrationManager = new RegistrationManager();
-                }
+                pm.makePersistent(member);
+                RegistrationManager registrationManager = getRegistrationManager(pm);
 
                 Set<String> ids = new HashSet<>();
-                ids.addAll(registrationManager.getUserIds(email));
+                ids.add(registrationManager.getUserIdByMail(email));
 
                 Sender sender = new Sender(Constants.GCM_API_KEY);
                 Message m = new Message.Builder()
@@ -989,7 +982,7 @@ public class SkatenightServerEndpoint {
                 for (Member m : members) {
                     m.removeGroup(ug);
                     pm.makePersistent(m);
-                    regids.addAll(rm.getUserIds(m.getEmail()));
+                    regids.add(rm.getUserIdByMail(m.getEmail()));
                 }
                 pm.makePersistent(ug);
                 pm.deletePersistent(ug);
@@ -1108,9 +1101,7 @@ public class SkatenightServerEndpoint {
         try {
             RegistrationManager rm = getRegistrationManager(pm);
             ArrayList<CharSequence> result = new ArrayList<>();
-            for (String s : rm.getUserIds(mail)) {
-                result.add(s);
-            }
+            result.add(rm.getUserIdByMail(mail));
             return result;
         } finally {
             pm.close();

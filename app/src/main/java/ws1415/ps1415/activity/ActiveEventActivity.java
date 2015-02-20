@@ -134,6 +134,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
                 }
                 else {
                     intent.putExtra(ShowRouteActivity.EXTRA_EVENT_ID, eventId);
+                    intent.putExtra(ShowRouteActivity.EXTRA_SPEED_PROFILE, true);
                 }
 
                 startActivity(intent);
@@ -147,6 +148,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
                 Intent intent = new Intent(ActiveEventActivity.this, ShowRouteActivity.class);
                 intent.putExtra(ShowRouteActivity.EXTRA_USERGROUPS, true);
                 intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, encodedWaypoints);
+                intent.putExtra(ShowRouteActivity.EXTRA_EVENT_ID, eventId);
                 startActivity(intent);
             }
         });
