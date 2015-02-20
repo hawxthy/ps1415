@@ -41,6 +41,7 @@
     <string-array name="selections_menu">
         <item name="delete">Löschen</item>
     </string-array>
+    <string name="action_refresh_events">Aktualisiere</string>
 
     <!-- Strings zu activity activeEvent -->
     <string name="title_activity_active_event">Lokale Auswertung</string>
@@ -72,6 +73,7 @@
     <string name="title_fragment_all_user_groups">Gruppen</string>
     <string name="title_fragment_my_user_groups">Meine Gruppen</string>
     <string name="action_add_user_group">Usergruppe hinzufügen</string>
+    <string name="action_refresh_user_groups">Aktualisiere</string>
     <string name="usergroup_adapter_maximum_reached">Maximale Anzahl an sichtbaren Gruppen erreicht</string>
 
     <!--Strings zu AddUserGroupActivity-->

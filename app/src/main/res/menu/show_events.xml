@@ -5,4 +5,9 @@
         android:title="@string/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never" />
+    <item
+        android:id="@+id/action_refresh_events"
+        android:title="@string/action_refresh_events"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_refresh" />
 </menu>
