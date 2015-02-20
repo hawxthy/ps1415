@@ -313,7 +313,6 @@ public class ShowRouteActivity extends Activity {
                     .icon(BitmapDescriptorFactory
                             .defaultMarker(markerColor)));
 
-            Toast.makeText(getApplicationContext(), "" + m.getCurrentWaypoint(), Toast.LENGTH_SHORT).show();
         } else {
             location = null;
         }
