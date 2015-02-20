@@ -52,15 +52,17 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
         }catch( IOException e){
             e.printStackTrace();
         }
-        for(UserGroup userGroup: tmpGroups){
-            if(PrefManager.getGroupVisibility(context, userGroup.getName())){
-                try {
-                    groupMembers = ServiceProvider.getService().skatenightServerEndpoint().fetchGroupMembers(userGroup.getName()).execute().getItems();
-                }catch(IOException e){
-                    e.printStackTrace();
-                }
-                for(Member m : groupMembers){
-                    farbenMap.put(m, userGroup.getName());
+        if (tmpGroups != null) {
+            for(UserGroup userGroup: tmpGroups){
+                if(PrefManager.getGroupVisibility(context, userGroup.getName())){
+                    try {
+                        groupMembers = ServiceProvider.getService().skatenightServerEndpoint().fetchGroupMembers(userGroup.getName()).execute().getItems();
+                    }catch(IOException e){
+                        e.printStackTrace();
+                    }
+                    for(Member m : groupMembers){
+                        farbenMap.put(m, userGroup.getName());
+                    }
                 }
             }
         }
