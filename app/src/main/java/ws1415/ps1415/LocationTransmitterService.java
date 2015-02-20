@@ -44,6 +44,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     public static final float MAX_NEXT_WAYPOINT_DISTANCE = 10.0f;
     public static final float MAX_ANY_WAYPOINT_DISTANCE = 60.0f;
 
+    public static final long UPDATE_INTERVAL = 30000;
+
     public static final String EXTRA_EVENT_ID = "location_transmitter_service_extra_event_id";
     public static final String EXTRA_WAYPOINTS = "location_transmitter_service_extra_waypoints";
     public static final String EXTRA_START_DATE = "location_transmitter_service_extra_start_date";
@@ -84,6 +86,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     private float elevationGain;
 
     private boolean serviceWithExtras; // Flag, ob der Service mit Extras aufgerufen wurde oder nicht
+
+    private long updateTime;
 
     public LocationTransmitterService() {
         foundFirstWaypoint = false;
@@ -155,6 +159,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         super.onCreate();
 
         Log.d(LOG_TAG, "create");
+        updateTime = System.currentTimeMillis();
         broadcastManager = LocalBroadcastManager.getInstance(this);
     }
 
@@ -222,8 +227,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         boolean sendLocation = prefs.getBoolean("prefSendLocation", false);
 
         // Sendet die Nutzerdaten an den Server, wenn dies in den Einstellungen vorgesehen ist
-        if (email != null && sendLocation) {
+        if (email != null && sendLocation && System.currentTimeMillis() - updateTime >= UPDATE_INTERVAL) {
             new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
+            updateTime = System.currentTimeMillis();
         }
 
         if (waypoints != null && waypoints.size() > 0) {
