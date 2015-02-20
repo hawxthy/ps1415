@@ -1,16 +1,11 @@
 package ws1415.ps1415.adapter;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -262,6 +257,7 @@ public class ShowCursorAdapter extends BaseAdapter {
         intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_FIRST, event.getRouteFieldFirst());
         intent.putExtra(ShowRouteActivity.EXTRA_ROUTE_FIELD_LAST, event.getRouteFieldLast());
         intent.putExtra(ShowRouteActivity.EXTRA_WAYPOINTS, (Serializable) event.getRoute().getWaypoints());
+        intent.putExtra(ShowRouteActivity.EXTRA_EVENT_ID, event.getKey().getId());
         context.startActivity(intent);
     }
 }
