@@ -296,6 +296,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
 
     }
 
+
 }
 
 
