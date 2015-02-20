@@ -232,7 +232,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
      * @throws java.lang.Exception
      */
     @LargeTest
-    public void testSendPosition() throws Exception {z
+    public void testSendPosition() throws Exception {
         Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(SettingsActivity.class.getName(), null, false);
 
         // Klick auf die Menüoption
