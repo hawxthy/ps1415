@@ -522,9 +522,6 @@ public class SkatenightServerEndpoint {
      */
     public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
         Event event = getEvent(keyId);
-
-        //  Andern des currentEvent entfernen!
-
         ArrayList<String> memberKeys = event.getMemberList();
         if (!memberKeys.contains(email)) {
             memberKeys.add(email);
@@ -533,17 +530,13 @@ public class SkatenightServerEndpoint {
             updateEvent(event);
 
             if (event.isNotificationSend()) {
-                PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
-                        "transactions-optional");
+                // CurrentEventID setzen
+                Member member = getMember(email);
+                member.setCurrentEventId(keyId);
+
                 PersistenceManager pm = pmf.getPersistenceManager();
-                RegistrationManager registrationManager;
-                Query q = pm.newQuery(RegistrationManager.class);
-                List<RegistrationManager> result = (List<RegistrationManager>) q.execute();
-                if (!result.isEmpty()) {
-                    registrationManager = result.get(0);
-                } else {
-                    registrationManager = new RegistrationManager();
-                }
+                pm.makePersistent(member);
+                RegistrationManager registrationManager = getRegistrationManager(pm);
 
                 Set<String> ids = new HashSet<>();
                 ids.add(registrationManager.getUserIdByMail(email));

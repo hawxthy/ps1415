@@ -115,7 +115,7 @@ public class ShowRouteActivity extends Activity {
                 fieldLast = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_LAST);
             }
             if (savedInstanceState.containsKey(MEMBER_EVENT_ID)) {
-                eventId = savedInstanceState.getInt(MEMBER_EVENT_ID);
+                eventId = savedInstanceState.getLong(MEMBER_EVENT_ID);
 
                 if (eventId > 0) {
                     receiver = new LocationReceiver();
