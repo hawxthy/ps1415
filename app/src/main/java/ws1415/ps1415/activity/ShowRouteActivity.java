@@ -76,9 +76,12 @@ public class ShowRouteActivity extends Activity {
 
     private Location location; // Enthält die aktuelle Position, die vom Server runtergeladen wurde
 
-    // Handler für das updaten der gruppenmitglieder
+    // Handler für das regelmäßige Aktualisierungen
     private int mInterval = 30000;
     private Handler mHandler;
+
+    private boolean updateUsergroups;
+    private boolean updateField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,7 +173,9 @@ public class ShowRouteActivity extends Activity {
                     }
                 }
                 if (intent.hasExtra(EXTRA_USERGROUPS)){
-                    mHandler = new Handler();
+                    if (mHandler == null) {
+                        mHandler = new Handler();
+                    }
                     refreshVisibleMembers();
                 }
                 Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();
@@ -184,6 +189,12 @@ public class ShowRouteActivity extends Activity {
 
             if (eventId > 0) {
                 receiver = new LocationReceiver();
+
+                // Falls ein Event übergeben wurde, dann regelmäßige Aktualisierung des Felds starten
+                if (mHandler == null) {
+                    mHandler = new Handler();
+                }
+                refreshField();
             }
         }
 
@@ -197,7 +208,12 @@ public class ShowRouteActivity extends Activity {
         @Override
         public void run(){
             Toast.makeText(ShowRouteActivity.this, "Updating...", Toast.LENGTH_SHORT).show();
-            refreshVisibleMembers();
+            if (updateUsergroups) {
+                refreshVisibleMembers();
+            }
+            if (updateField) {
+                refreshField();
+            }
             mHandler.postDelayed(mStatusChecker, mInterval);
         }
     };
@@ -450,5 +466,12 @@ public class ShowRouteActivity extends Activity {
 
             }
         }, this).execute();
+    }
+
+    /**
+     * Aktualisiert die Anzeige des aktuellen Felds.
+     */
+    private void refreshField() {
+        // TODO
     }
 }
