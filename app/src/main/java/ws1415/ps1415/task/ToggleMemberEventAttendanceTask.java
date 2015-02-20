@@ -1,10 +1,15 @@
 package ws1415.ps1415.task;
 
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
+
 import java.io.IOException;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.activity.ShowEventsActivity;
 
 /**
  * Created by Daniel on 21.11.2014.
@@ -13,12 +18,14 @@ public class ToggleMemberEventAttendanceTask extends ExtendedTask<Void, Void, Bo
     private long keyId;
     private String email;
     private boolean attending;
+    private Context context;
 
-    public ToggleMemberEventAttendanceTask(ExtendedTaskDelegate delegate, long keyId, String email, boolean attending) {
+    public ToggleMemberEventAttendanceTask(ExtendedTaskDelegate delegate, long keyId, String email, boolean attending, Context context) {
         super(delegate);
         this.keyId = keyId;
         this.email = email;
         this.attending = attending;
+        this.context = context;
     }
 
     @Override
@@ -44,4 +51,11 @@ public class ToggleMemberEventAttendanceTask extends ExtendedTask<Void, Void, Bo
         }
         return null;
     }
+
+    @Override
+    public void onPostExecute(Boolean result) {
+        Intent refreshIntent = new Intent(ShowEventsActivity.REFRESH_EVENTS_ACTION);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(refreshIntent);
+    }
+
 }
