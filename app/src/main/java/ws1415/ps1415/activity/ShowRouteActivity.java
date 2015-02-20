@@ -476,6 +476,7 @@ public class ShowRouteActivity extends Activity {
      * Aktualisiert die Anzeige des aktuellen Felds.
      */
     private void refreshField() {
+        Toast.makeText(getApplicationContext(), "refresh", Toast.LENGTH_SHORT).show();
         new GetEventTask(new ExtendedTaskDelegate<Void, Event>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Event event) {

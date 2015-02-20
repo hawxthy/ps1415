@@ -145,6 +145,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             public void onClick(View v) {
                 Intent intent = new Intent(ActiveEventActivity.this, ShowRouteActivity.class);
                 intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, encodedWaypoints);
+                intent.putExtra(ShowRouteActivity.EXTRA_EVENT_ID, eventId);
                 startActivity(intent);
             }
         });
