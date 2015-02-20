@@ -134,6 +134,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
                 }
                 else {
                     intent.putExtra(ShowRouteActivity.EXTRA_EVENT_ID, eventId);
+                    intent.putExtra(ShowRouteActivity.EXTRA_SPEED_PROFILE, true);
                 }
 
                 startActivity(intent);
