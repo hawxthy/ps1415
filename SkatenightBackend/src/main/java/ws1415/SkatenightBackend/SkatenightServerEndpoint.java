@@ -1083,4 +1083,42 @@ public class SkatenightServerEndpoint {
             }
         return members;
     }
+
+    /**
+     * Dient nur DEBUG-Zwecken. Es kann eine Liste ller GCM-IDs für eine Mail-Adresse abgerufen werden.
+     * @param mail
+     * @return
+     */
+    public ArrayList<CharSequence> debugGetIDs(@Named("mail") String mail) {
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            RegistrationManager rm = getRegistrationManager(pm);
+            ArrayList<CharSequence> result = new ArrayList<>();
+            for (String s : rm.getUserIds(mail)) {
+                result.add(s);
+            }
+            return result;
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Dient DEBUG-Zwecken. Schickt die angegebene Nachricht and die angegebene ID als Notification.
+     * @param id
+     * @param msg
+     */
+    public void debugSendGCM(@Named("id") String id, @Named("msg") String msg) throws IOException {
+        Sender sender = new Sender(Constants.GCM_API_KEY);
+        Message m = new Message.Builder()
+                .delayWhileIdle(false)
+                .timeToLive(3600)
+                .addData("type", MessageType.NOTIFICATION_MESSAGE.name())
+                .addData("title", "DEBUG")
+                .addData("content", msg)
+                .build();
+        sender.send(m, id, 5);
+
+    }
+
 }
