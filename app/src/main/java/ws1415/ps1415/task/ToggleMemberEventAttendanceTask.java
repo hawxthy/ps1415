@@ -54,6 +54,7 @@ public class ToggleMemberEventAttendanceTask extends ExtendedTask<Void, Void, Bo
 
     @Override
     public void onPostExecute(Boolean result) {
+        super.onPostExecute(result);
         Intent refreshIntent = new Intent(ShowEventsActivity.REFRESH_EVENTS_ACTION);
         LocalBroadcastManager.getInstance(context).sendBroadcast(refreshIntent);
     }
