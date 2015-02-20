@@ -78,6 +78,7 @@ public class EventStartServlet extends HttpServlet {
                         q.declareParameters("String emailParam");
                         List<Member> results = (List<Member>) q.execute(s);
                         if (!results.isEmpty()) {
+                            _logger.info("DEBUG");
                             member = results.get(0);
                             member.setCurrentEventId(e.getKey().getId());
                             pm.makePersistent(member);
