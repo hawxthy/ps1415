@@ -71,7 +71,7 @@ public class EventStartServlet extends HttpServlet {
                 Member member;
                 Set<String> ids = new HashSet<>();
                 for (String s : e.getMemberList()) {
-                    ids.addAll(registrationManager.getUserIds(s));
+                    ids.add(registrationManager.getUserIdByMail(s));
                     try {
                         q = pm.newQuery(Member.class);
                         q.setFilter("email == emailParam");
