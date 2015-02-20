@@ -180,6 +180,7 @@ public class ShowRouteActivity extends Activity {
                     if (mHandler == null) {
                         mHandler = new Handler();
                     }
+                    updateUsergroups = true;
                     refreshVisibleMembers();
                 }
                 Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();
@@ -199,6 +200,7 @@ public class ShowRouteActivity extends Activity {
                     mHandler = new Handler();
                 }
                 refreshField();
+                updateField = true;
             }
         }
 
