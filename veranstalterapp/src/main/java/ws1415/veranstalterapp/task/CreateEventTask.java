@@ -9,15 +9,15 @@ import java.io.IOException;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**
- * Klasse welche mit SkatenightBackend kommuniziert um auf den Server zu zugreifen.
+ * Klasse welche mit SkatenightBackend kommuniziert um ein neues Event zu erstellen.
  *
  * Created by Bernd Eissing, Marting Wrodarczyk on 24.10.2014.
  */
 public class CreateEventTask extends AsyncTask<Event, Void, Void> {
     /**
-     * Schreibt die neuen Informationen in das Event.
+     * Erstellt ein neues Event auf dem Server
      *
-     * @param params Das in der Activity erstelle Event
+     * @param params Das in dem Fragment erstellte Event
      */
     protected Void doInBackground(Event... params){
         try{

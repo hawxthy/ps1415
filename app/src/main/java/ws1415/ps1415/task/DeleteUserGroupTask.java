@@ -12,18 +12,21 @@ import ws1415.ps1415.fragment.AllUsergroupsFragment;
 import ws1415.ps1415.fragment.MyUsergroupsFragment;
 
 /**
+ * Klasse welche mit SkatenightBackend kommunizert um eine Gruppe zu löschen.
+ *
  * Created by Bernd Eissing, Martin Wrodarczyk on 30.01.2015.
  */
 public class DeleteUserGroupTask extends AsyncTask<UserGroup, Void, Boolean> {
     private UsergroupActivity usergroupActivity;
     private UserGroup usergroup;
 
+
     public DeleteUserGroupTask(UsergroupActivity usergroupActivity) {
        this.usergroupActivity = usergroupActivity;
     }
 
     /**
-     * Löscht die UserGroup vom Server
+     * Löscht die UserGroup vom Server.
      *
      * @param params Die UserGroup die gelöscht werden soll
      */

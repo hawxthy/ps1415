@@ -3,6 +3,7 @@ package ws1415.SkatenightBackend;
 import java.io.Serializable;
 
 /**
+ * Datenmodell für einen Wegpunkt auf einer Route.
  *
  * @author Richard
  */

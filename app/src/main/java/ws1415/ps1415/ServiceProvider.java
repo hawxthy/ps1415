@@ -30,6 +30,11 @@ public abstract class ServiceProvider {
         return service;
     }
 
+    /**
+     * Erstellt ein neues API Objekt mit den angegebenen Credentials.
+     *
+     * @param credential Die zu verwendenen Credentials
+     */
     public static void login(GoogleAccountCredential credential) {
         SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
                 AndroidHttp.newCompatibleTransport(),

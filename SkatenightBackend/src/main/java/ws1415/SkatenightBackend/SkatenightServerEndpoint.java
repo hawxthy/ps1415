@@ -221,29 +221,11 @@ public class SkatenightServerEndpoint {
     }
 
     /**
-     * Dient Testzwecken, damit das Event ohne credentials gesetzt werden kann.
+     * Erstellt ein Member-Objekt für die angegebene
+     * E-Mail.
+     *
+     * @param mail
      */
-    public void setEventTestMethod(Event e) {
-        PersistenceManager pm = pmf.getPersistenceManager();
-        try {
-            // Altes Event-Objekt löschen
-            List<Event> events = (List<Event>) pm.newQuery(Event.class).execute();
-            pm.deletePersistentAll(events);
-            if (e != null) {
-                Query q = pm.newQuery(Route.class);
-                q.setFilter("name == nameParam");
-                q.declareParameters("String nameParam");
-                List<Route> results = (List<Route>) q.execute(e.getRoute().getName());
-                if (!results.isEmpty()) {
-                    e.setRoute(results.get(0));
-                }
-                pm.makePersistent(e);
-            }
-        } finally {
-            pm.close();
-        }
-    }
-
     public void createMember(@Named("mail") String mail) {
         Member m = getMember(mail);
         if (m == null) {
@@ -488,6 +470,12 @@ public class SkatenightServerEndpoint {
         return distance;
     }
 
+    /**
+     * Gibt die Events des Teilnehmers mit der übergebenen E-Mail zurück.
+     *
+     * @param email die E-Mail des Teilnehmers
+     * @return Liste von Events, an denen der Teilnehmer teilnimmt
+     */
     public List<Event> getCurrentEventsForMember(@Named("email") String email) {
         //  Nur Events ausgeben die auch JETZT stattfinden.
         List<Event> out = new ArrayList<Event>();
@@ -527,7 +515,10 @@ public class SkatenightServerEndpoint {
     }
 
     /**
+     * Fügt einen Member zu einem Event hinzu.
      *
+     * @param keyId Die ID des Events
+     * @param email die E-Mail des Teilnehmers
      */
     public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
         Event event = getEvent(keyId);
@@ -573,6 +564,12 @@ public class SkatenightServerEndpoint {
         }
     }
 
+    /**
+     * Entfernt einen Member von einem Event.
+     *
+     * @param keyId Die ID des Events
+     * @param email Die E-Mail des Members
+     */
     public void removeMemberFromEvent(@Named("id") long keyId, @Named("email") String email) {
         Event event = getEvent(keyId);
 
@@ -585,6 +582,12 @@ public class SkatenightServerEndpoint {
         }
     }
 
+    /**
+     * Gibt eine Liste von allen Membern, welche an dem übergenen Event teilnehmen.
+     *
+     * @param keyId die Id von dem Event
+     * @return List von Teilnehmern
+     */
     public List<Member> getMembersFromEvent(@Named("id") long keyId) {
         Event event = getEvent(keyId);
 
@@ -720,6 +723,12 @@ public class SkatenightServerEndpoint {
         return new BooleanWrapper(false);
     }
 
+    /**
+     * Ändert das bestehende Event auf dem Server mit den Daten von
+     * dem übergebenen Event.
+     *
+     * @param event Das zu ändernde Event
+     */
     private void updateEvent(Event event) {
         PersistenceManager pm = pmf.getPersistenceManager();
 
@@ -1072,7 +1081,12 @@ public class SkatenightServerEndpoint {
         }
     }
 
-
+    /**
+     * Gibt eine Liste der Mitglieder der übergebenen Gruppe zurück.
+     *
+     * @param userGroup
+     * @return
+     */
     public ArrayList<Member> fetchGroupMembers(@Named("userGroup") String userGroup){
         ArrayList<Member> members = new ArrayList<>();
             UserGroup tmpGroup = getUserGroup(userGroup);

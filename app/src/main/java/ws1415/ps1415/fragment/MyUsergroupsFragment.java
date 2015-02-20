@@ -82,6 +82,13 @@ public class MyUsergroupsFragment extends Fragment{
         return view;
     }
 
+    /**
+     * Erstellt das ContextMenu mit den Funktionen welche man auf einer Gruppe
+     * anwenden kann.
+     *
+     * @param position Position des ausgewählten Elements
+     * @param adapter Der UsergroupAdapter
+     */
     private void createSelectionsMenu(final int position, final UsergroupAdapter adapter){
         final UserGroup userGroup = adapter.getItem(position);
         String[] items;

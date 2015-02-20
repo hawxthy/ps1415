@@ -37,6 +37,8 @@ import ws1415.ps1415.util.FieldType;
 import ws1415.ps1415.util.ImageUtil;
 
 /**
+ * Adapter zum füllen der ListView in der ShowInformationActivity.
+ *
  * Created by Bernd Eissing on 28.11.2014.
  */
 public class ShowCursorAdapter extends BaseAdapter {
@@ -123,6 +125,15 @@ public class ShowCursorAdapter extends BaseAdapter {
         ImageView image;
     }
 
+    /**
+     * Fügt die Items der ListView hinzu. Hier wird nach Typen unterschieden und
+     * je Typ ein anderes Item hinzugefügt.
+     *
+     * @param position Position der ListView
+     * @param convertView
+     * @param viewGroup
+     * @return
+     */
     @Override
     public View getView(final int position, View convertView, ViewGroup viewGroup) {
         View view = null;
@@ -182,36 +193,7 @@ public class ShowCursorAdapter extends BaseAdapter {
                 @Override
                 public void onClick(final View view) {
                     if (event.getRoute() != null && event.getRoute().getRouteData() != null) {
-                        // Auskommentiert, weil veraltet/unnötig
-                        /*// Erstellt den Dialog, ob die Position gespeichert werden soll und auf der Karte angezeigt wird
-                        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-                        if (!pref.contains("prefSendLocation")) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage("Darf deine Position an den Server geschickt werden?");
-                            builder.setPositiveButton(Html.fromHtml("<font color='#1FB1FF'>Ja</font>"), new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    // Leite wieter auf die Karte
-                                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-                                    pref.edit().putBoolean("prefSendLocation", true).apply();
-                                    showMap();
-                                }
-                            });
-                            builder.setNegativeButton(Html.fromHtml("<font color='#1FB1FF'>Nein</font>"), new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-                                    pref.edit().putBoolean("prefSendLocation", false).apply();
-                                    showMap();
-                                }
-                            });
-
-                            // Zeigt den Dialog
-                            AlertDialog dialog = builder.create();
-                            dialog.show();
-                        }*/
-                        //else {
-                            showMap();
-                        //}
-
+                        showMap();
                     }
                 }
             });
@@ -270,6 +252,9 @@ public class ShowCursorAdapter extends BaseAdapter {
         return view;
     }
 
+    /**
+     * Öffnet die Map mit der Route für das Event.
+     */
     private void showMap() {
         // Leite wieter auf die Karte
         Intent intent = new Intent(context, ShowRouteActivity.class);

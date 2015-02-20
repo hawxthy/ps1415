@@ -10,7 +10,7 @@ import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.activity.PermissionManagementActivity;
 
 /**
- * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.
+ * Klasse, welche mit SkatenightBackend kommunizert um einen neuen Veranstalter auf dem Server zu erstellen.
  *
  * Created by Martin on 06.01.2015.
  */
@@ -37,7 +37,7 @@ public class AddHostTask extends AsyncTask<String, Void, Void>{
     }
 
     /**
-     * Aktualisiert die Liste mit dem neuen Host.
+     * Aktualisiert die Liste mit dem neuen Veranstaltern.
      */
     @Override
     protected void onPostExecute(Void result) {

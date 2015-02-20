@@ -34,6 +34,8 @@ import ws1415.veranstalterapp.util.FieldType;
 import ws1415.veranstalterapp.util.ImageUtil;
 
 /**
+ *
+ *
  * Created by Bernd Eissing on 28.11.2014.
  */
 public class ShowCursorAdapter extends BaseAdapter{
@@ -119,6 +121,15 @@ public class ShowCursorAdapter extends BaseAdapter{
         ImageView image;
     }
 
+    /**
+     * Fügt die Items der ListView hinzu. Hier wird nach Typen unterschieden und
+     * je Typ ein anderes Item hinzugefügt.
+     *
+     * @param position Position der ListView
+     * @param convertView
+     * @param viewGroup
+     * @return
+     */
     @Override
     public View getView(final int position, View convertView, ViewGroup viewGroup){
         View view = null;

@@ -9,6 +9,9 @@ import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 
 /**
+ * Task zum erstellen und speichern einer neuen Gruppe. Die neue Gruppe mit allen anderen wird
+ * dann in der Liste der Gruppen in dem AllUsergroupsFragment angezeigt.
+ *
  * Created by Bernd Eissing, Martin Wrodarczyk on 30.01.2015.
  */
 public class AddUserGroupTask extends AsyncTask<String, Void, Void> {
@@ -18,7 +21,7 @@ public class AddUserGroupTask extends AsyncTask<String, Void, Void> {
         this.usergroupActivity = usergroupActivity;
     }
     /**
-     * Erstellt einen neuen Veranstalter auf dem Server.
+     * Erstellt eine neue Gruppe auf dem Server
      *
      * @param params E-Mail vom Veranstalter, der erstellt wird
      * @return
@@ -34,7 +37,7 @@ public class AddUserGroupTask extends AsyncTask<String, Void, Void> {
     }
 
     /**
-     * Aktualisiert die Liste mit dem neuen Host.
+     * Aktualisiert die Liste zuzüglich der neuen Gruppen
      */
     @Override
     protected void onPostExecute(Void result) {

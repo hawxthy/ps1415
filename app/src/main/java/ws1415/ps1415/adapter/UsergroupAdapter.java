@@ -85,6 +85,14 @@ public class UsergroupAdapter extends BaseAdapter {
         private TextView groupCount;
     }
 
+    /**
+     * Methode zum Füllen der ListView mit Items.
+     *
+     * @param position
+     * @param convertView
+     * @param viewGroup
+     * @return
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup viewGroup) {
         Holder holder;

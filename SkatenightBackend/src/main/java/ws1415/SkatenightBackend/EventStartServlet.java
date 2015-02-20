@@ -31,6 +31,13 @@ import ws1415.SkatenightBackend.gcm.Sender;
 public class EventStartServlet extends HttpServlet {
     private static final Logger _logger = Logger.getLogger(EventStartServlet.class.getName());
 
+    /**
+     * Verarbeitet ankommende Get-Anfragen.
+     *
+     * @param req
+     * @param resp
+     * @throws IOException
+     */
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         PersistenceManager pm = null;
         try {
