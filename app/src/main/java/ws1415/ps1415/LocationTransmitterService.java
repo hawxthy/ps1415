@@ -228,7 +228,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
         // Sendet die Nutzerdaten an den Server, wenn dies in den Einstellungen vorgesehen ist
         if (email != null && sendLocation && System.currentTimeMillis() - updateTime >= UPDATE_INTERVAL) {
-            new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
+            new UpdateLocationTask(email, location.getLatitude(), location.getLongitude(), eventId).execute();
             updateTime = System.currentTimeMillis();
         }
 

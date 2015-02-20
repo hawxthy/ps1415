@@ -15,11 +15,13 @@ public class UpdateLocationTask extends AsyncTask<Void, Void, Void> {
     private String email;
     private double latitude;
     private double longitude;
+    private long currentEventId;
 
-    public UpdateLocationTask(String email, double latitude, double longitude) {
+    public UpdateLocationTask(String email, double latitude, double longitude, long currentEventId) {
         this.email = email;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.currentEventId = currentEventId;
     }
 
     /**
@@ -32,7 +34,7 @@ public class UpdateLocationTask extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... params) {
         try {
             //Log.e("Err", "Err start");
-            ServiceProvider.getService().skatenightServerEndpoint().updateMemberLocation(email, latitude, longitude).execute();
+            ServiceProvider.getService().skatenightServerEndpoint().updateMemberLocation(email, latitude, longitude, currentEventId).execute();
         } catch (IOException e) {
             //Log.e("Err", "Err error");
             e.printStackTrace();

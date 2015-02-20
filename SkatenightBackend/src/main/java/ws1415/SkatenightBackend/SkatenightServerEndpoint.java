@@ -251,12 +251,14 @@ public class SkatenightServerEndpoint {
      */
     public void updateMemberLocation(@Named("mail") String mail,
                                      @Named("latitude") double latitude,
-                                     @Named("longitude") double longitude) {
+                                     @Named("longitude") double longitude,
+                                     @Named("currentEventId") long currentEventId) {
         if (mail != null) {
             Member m = getMember(mail);
             m.setLatitude(latitude);
             m.setLongitude(longitude);
             m.setUpdatedAt(new Date());
+            m.setCurrentEventId(currentEventId);
 
             calculateCurrentWaypoint(m);
 
