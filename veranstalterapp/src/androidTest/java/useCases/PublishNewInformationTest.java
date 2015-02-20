@@ -541,9 +541,10 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         swipe(Direction.Left);
 
         // Das Event und die Route löschen
-        //mFragment.deleteEvent(eventList.get(pos));
-        //ManageRoutesFragment fragment = (ManageRoutesFragment)mActivity.getAdapter().getItem(2);
-        //fragment.deleteRoute(testRoute2);
+        // Auskommentiert, damit das hier angelegte Event in der App auch sichtbar ist
+        // mFragment.deleteEvent(eventList.get(pos));
+        // ManageRoutesFragment fragment = (ManageRoutesFragment)mActivity.getAdapter().getItem(2);
+        // fragment.deleteRoute(testRoute2);
     }
 
     /**
