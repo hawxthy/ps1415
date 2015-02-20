@@ -83,6 +83,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     private float previousAlt;
     private float elevationGain;
 
+    private long updateTime;
+    private long updateInterval;
+
     public LocationTransmitterService() {
         foundFirstWaypoint = false;
         currentDistance = 0.0f;
@@ -133,10 +136,6 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                 .setContentIntent(pendingIntent)
                 .addAction(R.drawable.ic_action_stop, getString(R.string.location_transmitter_button_stop), pendingIntentCancel).build();
 
-
-
-
-
         startForeground(5656565, notification);
 
         return super.onStartCommand(intent, flags, startId);
@@ -147,6 +146,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         super.onCreate();
 
         Log.d(LOG_TAG, "create");
+        updateTime = System.currentTimeMillis();
+        updateInterval = 30000;
         broadcastManager = LocalBroadcastManager.getInstance(this);
     }
 
@@ -202,65 +203,69 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
      * @param location Die aktuell ermittelt Position
      */
     public void onLocationChanged(Location location) {
-        Log.d(LOG_TAG, "update");
 
-        // Holt sich die Google Mail Adresse aus den SharedPreferences, die beim Einloggen angegeben werden mussten
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String email = prefs.getString("accountName", null);
+            Log.d(LOG_TAG, "update");
 
-        boolean sendLocation = prefs.getBoolean("prefSendLocation", false);
+            // Holt sich die Google Mail Adresse aus den SharedPreferences, die beim Einloggen angegeben werden mussten
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            String email = prefs.getString("accountName", null);
 
-        // Sendet die Nutzerdaten an den Server, wenn dies in den Einstellungen vorgesehen ist
-        if (email != null && sendLocation) {
-            new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
-        }
+            boolean sendLocation = prefs.getBoolean("prefSendLocation", false);
 
-        if (waypoints != null && waypoints.size() > 0) {
-            // Nur aktuelle Distanz berechnen wenn, bereits ein current Waypoint existiert
-            int oldWaypoint = -1;
-            if (foundFirstWaypoint) {
-                oldWaypoint = currentWaypoint;
-            }
-            calculateCurrentWaypoint(new LatLng(location.getLatitude(), location.getLongitude()));
-            foundFirstWaypoint = true;
-
-            // CurrentWaypoint in die passedWaypoint Liste eintragen
-            if (passedWaypoints.isEmpty() || (passedWaypoints.get(passedWaypoints.size()-1) != currentWaypoint)) {
-                passedWaypoints.add(currentWaypoint);
-
-                // vergangene Zeit in der passedWaypointTime liste speichern
-                passedWaypointTimes.add(new Date().getTime());
+            // Sendet die Nutzerdaten an den Server, wenn dies in den Einstellungen vorgesehen ist
+            if (email != null && sendLocation && System.currentTimeMillis() - updateTime >= updateInterval) {
+                new UpdateLocationTask(email, location.getLatitude(), location.getLongitude()).execute();
+                updateTime = System.currentTimeMillis();
             }
 
+            if (waypoints != null && waypoints.size() > 0) {
+                // Nur aktuelle Distanz berechnen wenn, bereits ein current Waypoint existiert
+                int oldWaypoint = -1;
+                if (foundFirstWaypoint) {
+                    oldWaypoint = currentWaypoint;
+                }
+                calculateCurrentWaypoint(new LatLng(location.getLatitude(), location.getLongitude()));
+                foundFirstWaypoint = true;
 
-            Log.d(LOG_TAG, "current: " + currentWaypoint);
+                // CurrentWaypoint in die passedWaypoint Liste eintragen
+                if (passedWaypoints.isEmpty() || (passedWaypoints.get(passedWaypoints.size() - 1) != currentWaypoint)) {
+                    passedWaypoints.add(currentWaypoint);
 
-            // Aktuelle Distance aktualisieren
-            if (oldWaypoint != -1) {
-                currentDistance += distance(oldWaypoint, currentWaypoint);
-            }
-        }
-        if (location.hasSpeed()) {
-            curSpeed = mpsTokph(location.getSpeed());
-            maxSpeed = Math.max(curSpeed, maxSpeed);
-        }
+                    // vergangene Zeit in der passedWaypointTime liste speichern
+                    passedWaypointTimes.add(new Date().getTime());
+                }
 
-        if (location.hasAltitude()) {
-            if (!Float.isNaN(previousAlt)) {
-                if (location.getAltitude() > previousAlt) {
-                    elevationGain += location.getAltitude()-previousAlt;
+
+                Log.d(LOG_TAG, "current: " + currentWaypoint);
+
+                // Aktuelle Distance aktualisieren
+                if (oldWaypoint != -1) {
+                    currentDistance += distance(oldWaypoint, currentWaypoint);
                 }
             }
+            if (location.hasSpeed()) {
+                curSpeed = mpsTokph(location.getSpeed());
+                maxSpeed = Math.max(curSpeed, maxSpeed);
+            }
 
-            previousAlt = (float)location.getAltitude();
-        }
+            if (location.hasAltitude()) {
+                if (!Float.isNaN(previousAlt)) {
+                    if (location.getAltitude() > previousAlt) {
+                        elevationGain += location.getAltitude() - previousAlt;
+                    }
+                }
 
-        float elapsedTimeH = (new Date().getTime()-startDate.getTime())/3.6e6f;
-        // currentDistance/1000.0f -> km
-        // elapsedTimeH -> verstrichene Zeit in h
-        avgSpeed = (currentDistance/1000.0f)/elapsedTimeH;
+                previousAlt = (float) location.getAltitude();
+            }
 
-        sendLocationUpdate(location);
+            float elapsedTimeH = (new Date().getTime() - startDate.getTime()) / 3.6e6f;
+            // currentDistance/1000.0f -> km
+            // elapsedTimeH -> verstrichene Zeit in h
+            avgSpeed = (currentDistance / 1000.0f) / elapsedTimeH;
+
+            sendLocationUpdate(location);
+
+
     }
 
     private void sendLocationUpdate(Location location) {
