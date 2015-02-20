@@ -135,7 +135,7 @@ public class CreateEventTaskTest extends AuthTaskTestCase {
         }).get();
 
         assertNotNull("eventList is null", eventList);
-        assertTrue("eventList != 1 events", eventList.size() != 1);
+        assertTrue("eventList != 1 events", eventList.size() == 1);
 
         Event serverEvent = eventList.get(0);
 
