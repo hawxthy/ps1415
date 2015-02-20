@@ -152,6 +152,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
 
         // UI Elemente lassen sich hier nicht ansprechen
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+        assertNotNull("Could not initialize sharedPreferences!", sharedPreferences);
         sharedPreferences.edit().putBoolean("prefSendLocation", true).apply();
 
         Activity am = getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 2000);
