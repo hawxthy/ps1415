@@ -9,7 +9,7 @@ import java.io.IOException;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**
- * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.
+ * Klasse, welche mit SkatenightBackend kommunizert um eine Route auf dem Server zu erstellen.
  *
  * Created by Bernd Eissing, Martin Wrodarczyk on 04.11.2014.
  */

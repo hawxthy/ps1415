@@ -12,7 +12,7 @@ import ws1415.veranstalterapp.fragment.ShowInformationActivity;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**
- * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.
+ * Klasse, welche mit SkatenightBackend kommunizert um ein Event vom Server abzurufen.
  *
  * Created by Bernd Eissing, Martin Wrodarczyk on 04.11.2014.
  */
@@ -40,6 +40,12 @@ public class GetEventTask extends AsyncTask<Long, Void, Event> {
         return null;
     }
 
+    /**
+     * Überprüft, welche Ativity den Task aufgerufen hat und setzt dann
+     * die Informationen in die View der Klasse.
+     *
+     * @param event
+     */
     @Override
     protected void onPostExecute(Event event) {
         if (a instanceof ShowInformationActivity) {

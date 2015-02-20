@@ -1,6 +1,5 @@
 package ws1415.ps1415.activity;
 
-
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Intent;
@@ -32,8 +31,8 @@ import ws1415.ps1415.util.FieldType;
 
 /**
  * Activity zum Begutachten der Metainformationen der erstellten Veranstaltung.
- * <p/>
- * Created by Bernd Eissing, Marting Wrodarczyk on 21.10.2014.
+ *
+ * @author Bernd Eissing, Marting Wrodarczyk, Pascal Otto
  */
 public class ShowInformationActivity extends Activity implements ExtendedTaskDelegate<Void, Object> {
     public static final int REQUEST_ACCOUNT_PICKER = 2;
@@ -139,17 +138,12 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
 
     @Override
      public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.example, menu);
-
+        getMenuInflater().inflate(R.menu.menu_show_information, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             Intent intent = new Intent(ShowInformationActivity.this, SettingsActivity.class);

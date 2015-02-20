@@ -21,6 +21,12 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.NavDrawerListAdapter;
 import ws1415.ps1415.model.NavDrawerItem;
 
+/**
+ * Diese Activity ist die Oberklasse von allen FragmentActivities die einen Navigation Drawer
+ * enthalten.
+ *
+ * @author Martin Wrodarczyk
+ */
 public class BaseFragmentActivity extends FragmentActivity {
     // NavigationDrawer
     private DrawerLayout mDrawerLayout;
@@ -36,6 +42,12 @@ public class BaseFragmentActivity extends FragmentActivity {
     protected LinearLayout fullLayout;
     protected FrameLayout actContent;
 
+    /**
+     * Setzt den Navigation Drawer(fullLayout) und erwartet eine layout Id die im eigentlichen
+     * Content gesetzt wird.
+     *
+     * @param layoutResID
+     */
     @Override
     public void setContentView(final int layoutResID){
         fullLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.activity_base, null);

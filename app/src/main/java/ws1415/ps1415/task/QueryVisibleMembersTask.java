@@ -18,10 +18,14 @@ import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.util.PrefManager;
 
 /**
- * Created by Bernd Eissing on 13.02.2015.
+ * Klasse welche mit dem SkatenightBackend kommuniziert um die Mitglieder der eigenen sichtbaren
+ * Gruppen vom Server abzurufen.
+ *
+ * @author Bernd Eissing
  */
 public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Member, String>> {
     private Context context;
+
     /**
      * Initialisiert den Task.
      *
@@ -32,19 +36,11 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
         this.context = context;
     }
 
+
     /**
-     * Override this method to perform a computation on a background thread. The
-     * specified parameters are the parameters passed to {@link #execute}
-     * by the caller of this task.
-     * <p/>
-     * This method can call {@link #publishProgress} to publish updates
-     * on the UI thread.
+     * Ruft die sichtbaren Mitglieder vom Server ab.
      *
-     * @param params The parameters of the task.
-     * @return A result, defined by the subclass of this task.
-     * @see #onPreExecute()
-     * @see #onPostExecute
-     * @see #publishProgress
+     * @return Member mit der dazugehörigen Bezeichnung der Gruppe
      */
     @Override
     protected HashMap<Member, String> doInBackground(Void... params) {

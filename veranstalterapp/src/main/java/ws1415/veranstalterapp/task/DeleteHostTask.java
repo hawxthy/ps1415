@@ -8,7 +8,7 @@ import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.activity.PermissionManagementActivity;
 
 /**
- * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.
+ * Klasse, welche mit SkatenightBackend kommunizert um einen Veranstalter vom Server zu löschen.
  *
  * Created by Martin on 06.01.2015.
  */

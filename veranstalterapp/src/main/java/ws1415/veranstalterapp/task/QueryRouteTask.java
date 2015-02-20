@@ -12,16 +12,17 @@ import ws1415.veranstalterapp.fragment.ManageRoutesFragment;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**
- * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.
+ * Klasse, welche mit SkatenightBackend kommunizert um alle Routen vom Server abzurufen.
  *
- * Created by Bernd Eissing, Martin Wrodarczyk on 04.11.2014.
+ * @author Bernd Eissing, Martin Wrodarczyk
  */
 public class QueryRouteTask extends AsyncTask<ManageRoutesFragment, Void, List<Route>> {
     private ManageRoutesFragment view;
 
     /**
-     * Ruft die Liste der Routen vom Server ab und gibt diese aus
-     * @return die Liste der Routen vom Server
+     * Ruft die Liste der Routen vom Server ab und gibt diese aus.
+     *
+     * @return Liste der Routen vom Server
      */
     @Override
     protected List<Route> doInBackground(ManageRoutesFragment... params){

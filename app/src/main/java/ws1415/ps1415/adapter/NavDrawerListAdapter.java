@@ -15,7 +15,9 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.model.NavDrawerItem;
 
 /**
- * Created by Martin on 30.01.2015.
+ * Dieser Adapter wird genutzt, um die Liste im NavigationDrawer mit Items zu füllen.
+ *
+ * @author Martin Wrodarczyk
  */
 public class NavDrawerListAdapter extends BaseAdapter {
     private Context context;
@@ -41,29 +43,27 @@ public class NavDrawerListAdapter extends BaseAdapter {
         return position;
     }
 
+    /**
+     * Setzt das Icon und den Text für das ausgewählte Navigation Drawer Element.
+     *
+     * @param position Position des Items
+     * @param convertView
+     * @param parent
+     * @return Navigation Drawer ItemView
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater mInflater = (LayoutInflater)
                     context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-            convertView = mInflater.inflate(R.layout.drawer_list_item, null);
+            convertView = mInflater.inflate(R.layout.drawer_list_item, parent, false);
         }
 
         ImageView imgIcon = (ImageView) convertView.findViewById(R.id.icon);
         TextView txtTitle = (TextView) convertView.findViewById(R.id.title);
-        TextView txtCount = (TextView) convertView.findViewById(R.id.counter);
 
         imgIcon.setImageResource(navDrawerItems.get(position).getIcon());
         txtTitle.setText(navDrawerItems.get(position).getTitle());
-
-        // displaying count
-        // check whether it set visible or not
-        if(navDrawerItems.get(position).getCounterVisibility()){
-            txtCount.setText(navDrawerItems.get(position).getCount());
-        }else{
-            // hide the counter view
-            txtCount.setVisibility(View.GONE);
-        }
 
         return convertView;
     }

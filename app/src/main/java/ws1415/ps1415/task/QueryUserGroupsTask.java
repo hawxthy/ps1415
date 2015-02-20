@@ -11,15 +11,19 @@ import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 
 /**
- * Created by Bernd Eissing on 30.01.2015.
+ * Klasse welche mit dem SkatenightBackend kommuniziert um die alle Nutzergruppen vom Server
+ * abzurufen.
+ *
+ * @author Bernd Eissing
  */
 public class QueryUserGroupsTask extends AsyncTask<AllUsergroupsFragment, Void, List<UserGroup>> {
     private AllUsergroupsFragment view;
 
     /**
      * Ruft die aktuellen UserGroup-Objekte vom Server ab.
+     *
      * @param params Das zu befüllende Fragment
-     * @return Die abgerufene UserGroup-Liste.
+     * @return abgerufene UserGroup-Liste.
      */
     @Override
     protected List<UserGroup> doInBackground(AllUsergroupsFragment... params) {
@@ -34,7 +38,8 @@ public class QueryUserGroupsTask extends AsyncTask<AllUsergroupsFragment, Void, 
 
     /**
      * Übergibt die abgerufene UserGroup-Liste an die View.
-     * @param results Die abgerufene UserGroup-Liste.
+     *
+     * @param results abgerufene UserGroup-Liste.
      */
     @Override
     protected void onPostExecute(List<UserGroup> results) {

@@ -24,9 +24,9 @@ import ws1415.veranstalterapp.task.QueryEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
 
 /**
- * Klasse, welche eine Liste von Events bereitstellt.
- * <p/>
- * Created by Bernd Eissing, Martin Wrodarczyk.
+ * Dieses Fragment wird dazu genutzt, eine Liste von Veranstaltungen anzuzeigen.
+ *
+ * @author Bernd Eissing, Martin Wrodarczyk
  */
 public class ShowEventsFragment extends Fragment {
     private ListView eventListView;
@@ -42,7 +42,6 @@ public class ShowEventsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-
         new QueryEventTask().execute(this);
     }
 
@@ -52,12 +51,11 @@ public class ShowEventsFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-
         eventListView.setAdapter(mAdapter);
     }
 
     /**
-     *
+     * Initialisiert die ListView und setzt die Listener auf die ListView.
      *
      * @param inflater
      * @param container
@@ -66,10 +64,8 @@ public class ShowEventsFragment extends Fragment {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_show_events, container, false);
 
-        // ListView initialisieren
         eventListView = (ListView) view.findViewById(R.id.fragment_show_events_list_view);
 
         eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

@@ -3,13 +3,14 @@ package ws1415.veranstalterapp.util;
 import android.graphics.BitmapFactory;
 
 /**
- * @author Richard
+ * @author Richard Schulze
  */
 public abstract class ImageUtil {
 
     /**
      * Berechnet eine passende Sample-Size für Bilder mit der in options angegebenen Auflösung und
      * der Zielgröße reqWidht.
+     *
      * @param options Die Größe und Auflösung des Bildes.
      * @param reqWidth Die Zielbreite
      * @return Eine passende SampleSIze, die zum Dekodieren des Bildes genutzt werden kann

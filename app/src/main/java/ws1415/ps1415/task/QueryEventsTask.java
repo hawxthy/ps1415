@@ -11,10 +11,11 @@ import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.ShowEventsActivity;
 
 /**
- * Created by Richard on 21.10.2014.
+ * Klasse welche mit dem SkatenightBackend kommuniziert um die alle Events vom Server abzurufen.
+ *
+ * @author Richard Schulze
  */
 public class QueryEventsTask extends ExtendedTask<Void, Void, List<Event>> {
-    private ShowEventsActivity view;
 
     public QueryEventsTask(ExtendedTaskDelegate delegate) {
         super(delegate);
@@ -22,8 +23,9 @@ public class QueryEventsTask extends ExtendedTask<Void, Void, List<Event>> {
 
     /**
      * Ruft die aktuellen Event-Objekte vom Server ab.
+     *
      * @param params
-     * @return Die abgerufene Event-Liste.
+     * @return abgerufene Event-Liste
      */
     @Override
     protected List<Event> doInBackground(Void... params) {

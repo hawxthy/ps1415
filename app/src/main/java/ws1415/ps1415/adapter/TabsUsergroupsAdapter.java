@@ -11,7 +11,9 @@ import ws1415.ps1415.fragment.AllUsergroupsFragment;
 import ws1415.ps1415.fragment.MyUsergroupsFragment;
 
 /**
- * Created by Martin on 30.01.2015.
+ * Dieser Adapter wird genutzt, um die Fragmente der UsergroupsActivity zu verwalten.
+ *
+ * @author Martin Wrodarczyk
  */
 public class TabsUsergroupsAdapter extends FragmentPagerAdapter {
     private List<Fragment> myTabs = new ArrayList<Fragment>();

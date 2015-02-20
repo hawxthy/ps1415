@@ -11,6 +11,11 @@ import android.widget.Toast;
 import ws1415.veranstalterapp.activity.RouteEditorActivity;
 
 
+/**
+ * Dialog zum Hinzufügen einer Route.
+ *
+ * @author Bernd Eissing, Martin Wrodarczyk
+ */
 public class AddRouteDialog extends Activity {
     private EditText routeNameEditText;
 

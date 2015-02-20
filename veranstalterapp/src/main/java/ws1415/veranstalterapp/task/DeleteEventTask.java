@@ -11,8 +11,8 @@ import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**
- * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.
- * <p/>
+ * Klasse, welche mit SkatenightBackend kommunizert um ein Event zu löschen.
+ *
  * Created by Bernd Eissing, Martin Wrodarczyk on 18.11.2014.
  */
 public class DeleteEventTask extends AsyncTask<Event, Void, Boolean> {
@@ -24,7 +24,7 @@ public class DeleteEventTask extends AsyncTask<Event, Void, Boolean> {
     }
 
     /**
-     * Löscht die Route vom Server
+     * Löscht das Event vom Server
      *
      * @param params Die Route die gelöscht werden soll
      */
@@ -41,7 +41,7 @@ public class DeleteEventTask extends AsyncTask<Event, Void, Boolean> {
     }
 
     /**
-     * Löscht Route aus der Liste, falls diese nicht schon einer Versanstaltung zugewiesen ist,
+     * Löscht das Event aus der Liste, falls diese nicht schon einer Versanstaltung zugewiesen ist,
      * andernfalls wird eine Fehlermeldung ausgegeben.
      *
      * @param result true, bei erfolgreicher Löschung, false andernfalls
