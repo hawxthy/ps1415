@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.Event;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -144,6 +145,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ActiveEventActivity.this, ShowRouteActivity.class);
+                intent.putExtra(ShowRouteActivity.EXTRA_USERGROUPS, true);
                 intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, encodedWaypoints);
                 intent.putExtra(ShowRouteActivity.EXTRA_EVENT_ID, eventId);
                 startActivity(intent);

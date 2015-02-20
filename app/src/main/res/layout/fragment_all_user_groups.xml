@@ -5,6 +5,12 @@
     android:layout_height="match_parent"
     tools:context="ws1415.veranstalterapp.Fragments.ShowEventsFragment">
 
+    <ProgressBar
+        android:id="@+id/fragment_show_user_groups_progress_bar"
+        android:layout_gravity="center"
+        android:layout_width="56dp"
+        android:layout_height="56dp" />
+
     <ListView
         android:id="@+id/fragment_show_user_groups_list_view"
         android:layout_width="match_parent"

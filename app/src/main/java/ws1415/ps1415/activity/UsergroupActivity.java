@@ -1,27 +1,22 @@
 package ws1415.ps1415.activity;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
-
-import com.skatenight.skatenightAPI.model.UserGroup;
+import android.view.Window;
 
 import ws1415.ps1415.adapter.TabsUsergroupsAdapter;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 import ws1415.ps1415.R;
 import ws1415.ps1415.fragment.MyUsergroupsFragment;
-import ws1415.ps1415.task.QueryUserGroupsTask;
 
 /**
  * Diese Activity wird zum verwalten der Nutzergruppen genutzt. Sie zeigt das All- und
@@ -135,7 +130,7 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.add_user_group_plus_button, menu);
+        getMenuInflater().inflate(R.menu.menu_user_group, menu);
         menuItem = menu.findItem(R.id.action_add_user_group);
         return true;
     }
@@ -155,11 +150,12 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
             Intent intent = new Intent(this, AddUserGroupActivity.class);
             startActivity(intent);
             return true;
-        }
-        if (id == R.id.action_settings) {
+        } else if (id == R.id.action_settings) {
             Intent intent = new Intent(UsergroupActivity.this, SettingsActivity.class);
             startActivity(intent);
             return true;
+        } else if(id == R.id.action_refresh_groups) {
+            refresh();
         }
         return super.onOptionsItemSelected(item);
     }

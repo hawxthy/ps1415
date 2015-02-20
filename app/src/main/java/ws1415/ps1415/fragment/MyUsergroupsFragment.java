@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
 
@@ -35,6 +36,8 @@ public class MyUsergroupsFragment extends Fragment{
     private UsergroupAdapter mAdapterVisible;
     private UsergroupAdapter mAdapterNotVisible;
     private AlertDialog c_dialog;
+
+    private ProgressBar mProgressBarRefresh;
 
     /**
      * Ruft die eigenen Gruppen und die beigetretenen Gruppen vom Server ab.
@@ -63,6 +66,8 @@ public class MyUsergroupsFragment extends Fragment{
         notVisibleGroupsListView = (ListView) view.findViewById(R.id.fragment_my_user_groups_list_view_not_visible);
         if(mAdapterVisible != null) visibleGroupsListView.setAdapter(mAdapterVisible);
         if(mAdapterNotVisible != null) notVisibleGroupsListView.setAdapter(mAdapterNotVisible);
+
+        mProgressBarRefresh = (ProgressBar) view.findViewById(R.id.fragment_my_user_groups_progress_bar);
 
         visibleGroupsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -149,6 +154,7 @@ public class MyUsergroupsFragment extends Fragment{
      * Aktualisiert die Liste mit den Gruppen.
      */
     public void refresh(){
+        if(mProgressBarRefresh != null) mProgressBarRefresh.setVisibility(View.VISIBLE);
         new QueryMyUserGroupsTask(this).execute();
     }
 
@@ -177,6 +183,7 @@ public class MyUsergroupsFragment extends Fragment{
         mAdapterNotVisible = new UsergroupAdapter(getActivity(), tmpNotVisible, -1);
         if(visibleGroupsListView != null) visibleGroupsListView.setAdapter(mAdapterVisible);
         if(notVisibleGroupsListView != null) notVisibleGroupsListView.setAdapter(mAdapterNotVisible);
+        if(mProgressBarRefresh != null) mProgressBarRefresh.setVisibility(View.GONE);
     }
 
     /**
