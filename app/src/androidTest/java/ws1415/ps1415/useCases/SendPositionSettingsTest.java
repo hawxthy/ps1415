@@ -296,6 +296,25 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
 
     }
 
+    public void testPref() {
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(ShowInformationActivity.class.getName(), null, false);
+
+        // Es wird ein neuer UI Thread gestartet & das erste Event ausgewählt und anschließend die showInformationActivity gestartet
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int firstEvent = 0;
+                mList.performItemClick(mList.getAdapter().getView(firstEvent, null, mList), firstEvent, mList.getAdapter().getItemId(firstEvent));
+            }
+        });
+
+        // ShowInformationActivity wird gestartet
+        ShowInformationActivity showInformationActivity = (ShowInformationActivity) getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 20000);
+        assertNotNull("ShowInformationActivity started", showInformationActivity);
+
+
+
+    }
 
 }
 

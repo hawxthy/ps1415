@@ -14,16 +14,27 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Field;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.common.util.EventUtil;
+import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.ShowCursorAdapter;
 import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.task.ToggleMemberEventAttendanceTask;
@@ -40,12 +51,19 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
 
     public static final String EXTRA_KEY_ID = "show_information_extra_key_id";
 
+    private static final String MEMBER_KEY_ID = "show_information_member_key_id";
+    private static final String MEMBER_ROUTE_FIELD_FIRST = "show_information_member_route_field_first";
+    private static final String MEMBER_ROUTE_FIELD_LAST = "show_information_member_route_field_last";
+    private static final String MEMBER_ATTENDING = "show_information_member_attending";
+
     // Adapter für die ListView von activity_show_information_list_view
     private ShowCursorAdapter listAdapter;
 
     // Die ListView von der xml datei activity_show_information
     private ListView listView;
     private long keyId;
+    private int routeFieldFirst;
+    private int routeFieldLast;
     private boolean attending;
 
     // Das aktuelle Event
@@ -72,8 +90,13 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         Intent intent;
-
-        if ((intent = getIntent()) != null) {
+        if (savedInstanceState != null) {
+            keyId = savedInstanceState.getLong(MEMBER_KEY_ID);
+            routeFieldFirst = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_FIRST);
+            routeFieldLast = savedInstanceState.getInt(MEMBER_ROUTE_FIELD_LAST);
+            attending = savedInstanceState.getBoolean(MEMBER_ATTENDING);
+        }
+        else if ((intent = getIntent()) != null) {
             keyId = intent.getLongExtra(EXTRA_KEY_ID, 0);
             new GetEventTask(this).execute(keyId);
         }
@@ -96,9 +119,27 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                 }
                 else {
                     new ToggleMemberEventAttendanceTask(ShowInformationActivity.this, keyId, credential.getSelectedAccountName(), attending).execute();
+
+                    // LocationTransmitterService starten, wenn das Event noch aktiv ist
+
+                    if (attendButton.getText()==getString(R.string.show_info_button_attend)) {
+                        if (active) {
+                            try {
+                                List<LatLng> waypoints = LocationUtils.decodePolyline(event.getRoute().getRouteData().getValue());
+                                Intent serviceIntent = new Intent(getBaseContext(), LocationTransmitterService.class);
+                                serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, keyId);
+                                serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
+                                serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
+                                startService(serviceIntent);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 }
             }
         });
+
     }
 
     /**
@@ -126,19 +167,18 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         }
     }
 
-    /**
-     * Speichert die Usersettings in einem String.
-     */
-    private void displayUserSettings() {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putLong(MEMBER_KEY_ID, keyId);
+        outState.putInt(MEMBER_ROUTE_FIELD_FIRST, routeFieldFirst);
+        outState.putInt(MEMBER_ROUTE_FIELD_LAST, routeFieldLast);
+        outState.putBoolean(MEMBER_ATTENDING, attending);
 
-        String  settings = "";
-
-        settings=settings+"Position Senden:"+ sharedPrefs.getBoolean("prefSendLocation", false);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
-     public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.example, menu);
 
@@ -157,14 +197,6 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public ShowCursorAdapter getShowCursorAdapter() {
-        return listAdapter;
-    }
-
-    public Event getEvent() {
-        return event;
     }
 
     /**
@@ -192,6 +224,12 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                 active = false;
             }
 
+            if (e.getRouteFieldFirst() != null) {
+                routeFieldFirst = e.getRouteFieldFirst();
+            }
+            if (e.getRouteFieldLast() != null) {
+                routeFieldLast = e.getRouteFieldLast();
+            }
             attendButton.setEnabled(true);
 
             if (prefs.contains("accountName") && e.getMemberList() != null) {
@@ -227,13 +265,8 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         }
         else if (task instanceof ToggleMemberEventAttendanceTask) {
             attending = (Boolean) result;
-            if (attending) {
-                Toast.makeText(getApplicationContext(), getString(R.string.show_info_toast_attending), Toast.LENGTH_SHORT).show();
-            }
-            else {
-                Toast.makeText(getApplicationContext(), R.string.show_info_toast_leaving, Toast.LENGTH_SHORT).show();
-                stopService(new Intent(getBaseContext(), LocationTransmitterService.class));
-            }
+            if (attending) Toast.makeText(getApplicationContext(), getString(R.string.show_info_toast_attending), Toast.LENGTH_SHORT).show();
+            else Toast.makeText(getApplicationContext(), R.string.show_info_toast_leaving, Toast.LENGTH_SHORT).show();
             updateAttendButtonTitle();
         }
     }
@@ -247,4 +280,5 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     public void taskFailed(ExtendedTask task, String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
+
 }
