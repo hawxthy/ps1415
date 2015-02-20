@@ -7,8 +7,9 @@ import java.io.IOException;
 import ws1415.ps1415.ServiceProvider;
 
 /**
- * Created by Richard on 03.11.2014.
  * Erwartet die Mail-Adresse des Benutzers und seine Position und schickt diese Daten an den Server.
+ *
+ * @author Richard Schulze
  */
 public class UpdateLocationTask extends AsyncTask<Void, Void, Void> {
     private String email;
@@ -23,6 +24,7 @@ public class UpdateLocationTask extends AsyncTask<Void, Void, Void> {
 
     /**
      * Schickt eine Mail-Adresse und die dazu gehörige Position an den Server.
+     *
      * @param params
      * @return null
      */

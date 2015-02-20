@@ -4,6 +4,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
+ * Enum Klasse für die verschiedenen Typen an dynamischen Feldern eines
+ * Events.
+ *
  * Created by Bernd Eissing on 05.12.2014.
  */
 public enum FieldType {

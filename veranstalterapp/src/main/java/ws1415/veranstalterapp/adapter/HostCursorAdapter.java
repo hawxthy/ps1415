@@ -61,10 +61,10 @@ public class HostCursorAdapter extends BaseAdapter {
     }
 
     /**
-     * Gibt die Id des Events in der Liste zurück.
+     * Gibt die Id des Veranstalters in der Liste zurück.
      *
-     * @param i Stelle des Events
-     * @return Id des Events
+     * @param i Stelle des Veranstalters
+     * @return Id des Veranstalters
      */
     public long getItemId(int i){
         return i;

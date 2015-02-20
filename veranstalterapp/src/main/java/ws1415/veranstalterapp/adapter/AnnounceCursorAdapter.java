@@ -159,19 +159,17 @@ public class AnnounceCursorAdapter extends BaseAdapter {
     }
 
     /**
-     * Klasse zum Halten der GUI um Felder für ein TextField.
+     * Klassen zum Halten der GUI um Felder für ein TextField.
      */
     private class HolderUniqueTextField {
         TextView title;
         EditText content;
     }
-
     private class HolderSimpleTextField {
         TextView title;
         EditText content;
         Button deleteButton;
     }
-
     private class HolderPictureField {
         TextView title;
         Button button;

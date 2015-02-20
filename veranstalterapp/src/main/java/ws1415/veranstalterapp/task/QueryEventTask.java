@@ -12,6 +12,8 @@ import ws1415.veranstalterapp.fragment.ShowInformationActivity;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**
+ * Klasse welche mit dem Server kommunizert um alle Events abzufragen.
+ *
  * Created by Richard on 21.10.2014.
  */
 public class QueryEventTask extends AsyncTask<ShowEventsFragment, Void, List<Event>> {

@@ -16,7 +16,7 @@ import ws1415.veranstalterapp.task.AddHostTask;
 /**
  * Dialog zum Hinzufügen eines neuen Veranstalters.
  *
- * Created by Bernd Eissing, Martin Wrodarczyk.
+ * @author Bernd Eissing, Martin Wrodarczyk.
  */
 public class AddHostDialog extends Activity {
     private EditText addHostEditText;

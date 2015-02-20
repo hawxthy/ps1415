@@ -19,7 +19,7 @@ import ws1415.ps1415.util.EventUtils;
 import ws1415.ps1415.util.FieldType;
 
 /**
- * Klasse zum Füllen der ListView in ShowEventsFragment.
+ * Klasse zum Füllen der ListView in ShowEventsActivity.
  *
  * Created by Bernd Eissing, Martin Wrodarczyk on 18.11.2014.
  */

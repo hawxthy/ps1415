@@ -10,6 +10,9 @@ import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 import ws1415.veranstalterapp.ServiceProvider;
 
 /**
+ * Klasse welche mit dem Server kommunizert um die Attribute eins bestehenden Events zu
+ * verändern.
+ *
  * Created by Bernd Eissing on 18.11.2014.
  */
 public class EditEventTask extends AsyncTask<Event, Void, Boolean> {

@@ -32,9 +32,9 @@ import ws1415.veranstalterapp.task.DeleteRouteTask;
 import ws1415.veranstalterapp.task.QueryRouteTask;
 
 /**
- * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.
+ * Dieses Fragment wird dazu genutzt um die Routen zu verwalten.
  *
- * Created by Bernd Eissing, Martin Wrodarczyk.
+ * @author Bernd Eissing, Martin Wrodarczyk
  */
 public class ManageRoutesFragment extends Fragment {
     private ListView routeListView;
@@ -61,8 +61,9 @@ public class ManageRoutesFragment extends Fragment {
         super.onResume();
         new QueryRouteTask().execute(this);
     }
+
     /**
-     * Ruft die Routen von Server ab, setzt die Listener für die List Items.
+     * Initialisiert die ListView und setzt die Listener auf die ListView.
      *
      * @param inflater
      * @param container
@@ -178,7 +179,6 @@ public class ManageRoutesFragment extends Fragment {
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.manage_routes, menu);
         menuItemAddRoute = menu.findItem(R.id.action_add_route);
         super.onCreateOptionsMenu(menu, menuInflater);

@@ -13,6 +13,9 @@ import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 
 /**
+ * Klasse welche mit dem SkatenightBackend kommunizert um die E-Mail eines Benutzers
+ * in die Liste der Mitglieder von einer Gruppe einzutragen.
+ *
  * Created by Bernd Eissing on 03.02.2015.
  */
 public class JoinUserGroupTask extends AsyncTask<String, Void, Void>{
@@ -22,6 +25,12 @@ public class JoinUserGroupTask extends AsyncTask<String, Void, Void>{
         this.usergroupActivity = usergroupActivity;
     }
 
+    /**
+     * Ruft die joinUserGroup Methode auf dem Server auf.
+     *
+     * @param params
+     * @return
+     */
     @Override
     protected Void doInBackground(String... params){
         try{
@@ -32,6 +41,13 @@ public class JoinUserGroupTask extends AsyncTask<String, Void, Void>{
         return null;
     }
 
+
+    /**
+     * Ruft die refresh() Methode in der UsergroupActivity auf, welche die Listen aller Gruppen
+     * und eigener Gruppen aktualisiert.
+     *
+     * @param voids
+     */
     @Override
     protected void onPostExecute(Void voids){
         usergroupActivity.refresh();

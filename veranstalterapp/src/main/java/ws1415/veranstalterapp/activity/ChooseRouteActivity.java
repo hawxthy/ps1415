@@ -21,7 +21,7 @@ import ws1415.veranstalterapp.ServiceProvider;
 /**
  * Activity zum Auswählen einer Route für das zu erstellende Event.
  *
- * Created by Bernd Eissing, Marting Wrodarczyk on 21.11.2014.
+ * @author Bernd Eissing, Marting Wrodarczyk on 21.11.2014.
  */
 public class ChooseRouteActivity extends Activity {
     private ListView lv;

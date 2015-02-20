@@ -12,15 +12,17 @@ import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.ShowRouteActivity;
 
 /**
- * Created by Tristan Rust on 21.10.2014.
- * Dient zum Abrufen der Nutzerinformationen.
+ * Klasse welche mit dem SkatenightBackend kommuniziert um Nutzerinformationen vom Server
+ * abzurufen.
  *
+ * @author Tristan Rust
  */
 public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> {
      private ShowRouteActivity view;
 
     /**
      * Ruft das aktuelle Member-Objekt vom Server ab.
+     *
      * @param params Die zu befüllende Activity
      * @return Das Member-Objekt
      */
@@ -40,10 +42,10 @@ public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> 
         return null;
     }
 
+    /**
+     * Ruft den Befehl zum Zeichnen des Members auf die Karte auf.
+     */
      @Override
-     /**
-      * Ruft den Befehl zum zeichnen des Members auf die Karte auf
-      */
      protected void onPostExecute(Member m) {
          view.drawMembers(m);
      }

@@ -24,7 +24,7 @@ import ws1415.veranstalterapp.activity.RouteEditorActivity;
 import ws1415.veranstalterapp.fragment.ManageRoutesFragment;
 
 /**
- * Prüft das Anlegen einer Route.
+ * Prüft das Anlegen und Löschen einer Route.
  *
  * @author Richard
  */

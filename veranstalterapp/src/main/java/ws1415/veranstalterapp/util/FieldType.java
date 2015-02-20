@@ -1,7 +1,7 @@
 package ws1415.veranstalterapp.util;
 
 /**
- * Created by Bernd Eissing on 05.12.2014.
+ * Enum-Klasse zum Identifizieren des Typs der dynamischen Felder.
  */
 public enum FieldType {
     SIMPLETEXT(1),

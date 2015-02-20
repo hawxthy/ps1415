@@ -8,7 +8,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 /**
  * Singleton-Klasse, die den Zweck eines zentralen Zugriffspunkts auf das Backend erfüllt.
  *
- * Created by Richard on 21.10.2014.
+ * @author Richard Schulze
  */
 public abstract class ServiceProvider {
     private static SkatenightAPI service;

@@ -17,7 +17,7 @@ import ws1415.veranstalterapp.R;
  * Utility Singleton Klasse für die Klasse Event. Unterstützende Klasse um dynamische Felder für
  * zu erstellende oder zu editierende Events hinzuzufügen oder zu löschen.
  *
- * Created by Bernd Eissing on 28.11.2014.
+ * @author Bernd Eissing
  */
 public class EventUtils {
     private static EventUtils instance;

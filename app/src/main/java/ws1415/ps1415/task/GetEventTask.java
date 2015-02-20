@@ -9,7 +9,7 @@ import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.ps1415.ServiceProvider;
 
 /**
- * Klasse, welche mit SkatenightBackend kommunizert um auf den Server zuzugreifen.
+ * Klasse, welche mit SkatenightBackend kommunizert um ein Event vom Server abhzurufen.
  *
  * Created by Bernd Eissing, Martin Wrodarczyk on 04.11.2014.
  */

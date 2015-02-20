@@ -18,7 +18,7 @@ import ws1415.veranstalterapp.task.LoginTask;
  * Zeigt einen Login-Bildschirm an, mit dem sich ein Veranstalter einloggen muss, bevor er Zugriff
  * auf die Event-Informationen hat.
  *
- * @author Richard, Daniel
+ * @author Richard Schulze, Daniel Papoutzis
  */
 public class LoginActivity extends Activity {
     static final int REQUEST_ACCOUNT_PICKER = 2;
@@ -87,6 +87,7 @@ public class LoginActivity extends Activity {
 
     /**
      * Gibt die GoogleAccountCredentials zurück, die in dieser Activity verwaltet werden.
+     *
      * @return
      */
     public GoogleAccountCredential getCredential() {

@@ -61,7 +61,7 @@
             android:parentActivityName=".activity.HoldTabsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ws1415.ps1415.HoldTabsActivity" />
+                android:value="ws1415.veranstalterapp.activity.HoldTabsActivity" />
         </activity>
         <activity
             android:name=".activity.EditEventActivity"

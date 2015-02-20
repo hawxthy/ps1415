@@ -22,10 +22,10 @@ import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.FieldType;
 
 /**
- * Die Activity zum ändern der Attribute eines Events und zum eventuellen hinzufügen weiterer
+ * Die Activity zum Ändern der Attribute eines Events und zum eventuellen Hinzufügen weiterer
  * dynamischer Felder.
  *
- * Created by Bernd Eissing, Martin Wrodarczyk.
+ * @author Bernd Eissing, Martin Wrodarczyk.
  */
 public class EditEventActivity extends Activity implements AnnounceCursorAdapter.PictureChooserActivity {
     // Adapter für die ListView von activity_edit_event_list_view
@@ -57,7 +57,6 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_event);
-
 
         new GetEventTask(this).execute(getIntent().getLongExtra("event", 0));
         ChooseRouteActivity.giveEditEventActivity(this);
