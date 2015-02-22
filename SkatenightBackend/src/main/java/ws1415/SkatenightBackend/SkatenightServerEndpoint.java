@@ -291,6 +291,7 @@ public class SkatenightServerEndpoint {
                                      @Named("longitudes") double[] longitude,
                                      @Named("currentEventId") long currentEventId) {
         if (mail != null && latitude != null && longitude != null) {
+            Event event = getEvent(currentEventId);
             int count = Math.min(mail.length, Math.min(latitude.length, longitude.length));
 
             PersistenceManager pm = pmf.getPersistenceManager();
@@ -308,13 +309,19 @@ public class SkatenightServerEndpoint {
                     } else {
                         member = new Member();
                         member.setEmail(mail[i]);
+                        member.setName(mail[i]);
                     }
                     member.setLatitude(latitude[i]);
                     member.setLongitude(longitude[i]);
                     member.setUpdatedAt(new Date());
                     member.setCurrentEventId(currentEventId);
+                    // Member zum Event hinzufügen, falls noch nicht geschehen
+                    if (!event.getMemberList().contains(member.getEmail())) {
+                        event.getMemberList().add(member.getEmail());
+                    }
                     pm.makePersistent(member);
                 }
+                pm.makePersistent(event);
             } finally {
                 pm.close();
             }
