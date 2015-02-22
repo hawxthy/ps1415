@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -281,15 +282,34 @@ public class SkatenightServerEndpoint {
      * Hilfsmethode, die für den normalen Betireb nicht benötigt wird. Stellt eine Schnittstelle für
      * Simulationen her, die eine große Anzahl an Positionen auf dem Server aktualisieren ohne, dass
      * dabei pro Akutalisierung ein Serveraufruf notwendig ist.
-     * @param mail Die Mail-Adressen der zu Aktualisierenden Member-Objekte.
-     * @param latitude Die neuen Latituden
-     * @param longitude Die neuen Longituden
+     * Die Mails, Latituden und Logituden werden als Strings mit = als Trennzeichen kodiert, da ein
+     * Aufruf mit Arrays nicht funktioniert hat.
+     * @param mailParam Die Mail-Adressen der zu Aktualisierenden Member-Objekte als String, durch = getrennt.
+     * @param latitudeParam Die neuen Latituden als String, durch = getrennt
+     * @param longitudeParam Die neuen Longituden, durch = getrennt
      * @param currentEventId Die Event-ID, die für die Member gesetzt werden soll.
      */
-    public void simulateMemberLocations(@Named("mails") String[] mail,
-                                     @Named("latitudes") double[] latitude,
-                                     @Named("longitudes") double[] longitude,
+    public void simulateMemberLocations(@Named("mails") String mailParam,
+                                     @Named("latitudes") String latitudeParam,
+                                     @Named("longitudes") String longitudeParam,
                                      @Named("currentEventId") long currentEventId) {
+        StringTokenizer st = new StringTokenizer(mailParam, "=");
+        String[] mail = new String[st.countTokens()];
+        for (int i = 0; i < mail.length; i++) {
+            mail[i] = st.nextToken();
+        }
+        st = new StringTokenizer(latitudeParam, "=");
+        double[] latitude = new double[st.countTokens()];
+        for (int i = 0; i < mail.length; i++) {
+            latitude[i] = Double.parseDouble(st.nextToken());
+        }
+        st = new StringTokenizer(longitudeParam, "=");
+        double[] longitude = new double[st.countTokens()];
+        for (int i = 0; i < mail.length; i++) {
+            longitude[i] = Double.parseDouble(st.nextToken());
+        }
+
+
         if (mail != null && latitude != null && longitude != null) {
             Event event = getEvent(currentEventId);
             int count = Math.min(mail.length, Math.min(latitude.length, longitude.length));
