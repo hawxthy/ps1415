@@ -277,6 +277,56 @@ public class SkatenightServerEndpoint {
         }
     }
 
+    /**
+     * Hilfsmethode, die für den normalen Betireb nicht benötigt wird. Stellt eine Schnittstelle für
+     * Simulationen her, die eine große Anzahl an Positionen auf dem Server aktualisieren ohne, dass
+     * dabei pro Akutalisierung ein Serveraufruf notwendig ist.
+     * @param mail Die Mail-Adressen der zu Aktualisierenden Member-Objekte.
+     * @param latitude Die neuen Latituden
+     * @param longitude Die neuen Longituden
+     * @param currentEventId Die Event-ID, die für die Member gesetzt werden soll.
+     */
+    public void simulateMemberLocations(@Named("mails") String[] mail,
+                                     @Named("latitudes") double[] latitude,
+                                     @Named("longitudes") double[] longitude,
+                                     @Named("currentEventId") long currentEventId) {
+        if (mail != null && latitude != null && longitude != null) {
+            int count = Math.min(mail.length, Math.min(latitude.length, longitude.length));
+
+            PersistenceManager pm = pmf.getPersistenceManager();
+            try {
+                // Member-Objekte laden. Falls für eine angegebene Mail-Adresse kein Objekt besteht,
+                // so wird es angelegt
+                Member member;
+                for (int i = 0; i < count; i++) {
+                    Query q = pm.newQuery(Member.class);
+                    q.setFilter("email == emailParam");
+                    q.declareParameters("String emailParam");
+                    List<Member> results = (List<Member>) q.execute(mail[i]);
+                    if (!results.isEmpty()) {
+                        member = results.get(0);
+                    } else {
+                        member = new Member();
+                        member.setEmail(mail[i]);
+                    }
+                    member.setLatitude(latitude[i]);
+                    member.setLongitude(longitude[i]);
+                    member.setUpdatedAt(new Date());
+                    member.setCurrentEventId(currentEventId);
+                    pm.makePersistent(member);
+                }
+            } finally {
+                pm.close();
+            }
+        }
+
+        // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
+        if (System.currentTimeMillis()-lastFieldUpdateTime >= 300000) {
+            calculateField(currentEventId);
+            lastFieldUpdateTime = System.currentTimeMillis();
+        }
+    }
+
     private void calculateCurrentWaypoint(Member member) {
         Long eventId = member.getCurrentEventId();
         if (eventId != null) {
