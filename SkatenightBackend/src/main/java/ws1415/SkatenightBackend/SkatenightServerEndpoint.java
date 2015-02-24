@@ -41,6 +41,9 @@ import ws1415.SkatenightBackend.gcm.Sender;
     audiences = {Constants.ANDROID_AUDIENCE},
     namespace = @ApiNamespace(ownerDomain = "skatenight.com", ownerName = "skatenight"))
 public class SkatenightServerEndpoint {
+    public static final int FIELD_UPDATE_INTERVAL = 30000;
+    public static final Logger logger = Logger.getLogger(SkatenightServerEndpoint.class.getName());
+
     private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
     private long lastFieldUpdateTime = 0;
@@ -260,19 +263,21 @@ public class SkatenightServerEndpoint {
             m.setLatitude(latitude);
             m.setLongitude(longitude);
             m.setUpdatedAt(new Date());
-            m.setCurrentEventId(currentEventId);
-
-            calculateCurrentWaypoint(m);
+            if (m.getCurrentEventId() == null || m.getCurrentEventId() != currentEventId) {
+                m.setCurrentEventId(currentEventId);
+                m.setCurrentWaypoint(0);
+            }
 
             PersistenceManager pm = pmf.getPersistenceManager();
             try {
+                calculateCurrentWaypoint(pm, m);
                 pm.makePersistent(m);
             } finally {
                 pm.close();
             }
 
             // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
-            if (System.currentTimeMillis()-lastFieldUpdateTime >= 300000) {
+            if (System.currentTimeMillis()-lastFieldUpdateTime >= FIELD_UPDATE_INTERVAL) {
                 calculateField(m.getCurrentEventId());
                 lastFieldUpdateTime = System.currentTimeMillis();
             }
@@ -330,13 +335,10 @@ public class SkatenightServerEndpoint {
                 // so wird es angelegt
                 Member member;
                 for (int i = 0; i < count; i++) {
-                    Query q = pm.newQuery(Member.class);
-                    q.setFilter("email == emailParam");
-                    q.declareParameters("String emailParam");
-                    List<Member> results = (List<Member>) q.execute(mail[i]);
-                    if (!results.isEmpty()) {
-                        member = results.get(0);
-                    } else {
+                    try {
+                        member = pm.getObjectById(Member.class, mail[i]);
+                    } catch (Exception ex) {
+                        // Skater nicht gefunden
                         member = new Member();
                         member.setEmail(mail[i]);
                         member.setName(mail[i]);
@@ -346,7 +348,7 @@ public class SkatenightServerEndpoint {
                         event.getMemberList().add(member.getEmail());
                     }
                     // Member in die Testgruppe aufnehmen, falls noch nicht geschehen
-                    if (!member.getGroups().contains("Simulationsgruppe")) {
+                    if (!member.getGroups().contains(group.getName())) {
                         member.addGroup(group);
                     }
                     pm.makePersistent(member);
@@ -363,10 +365,10 @@ public class SkatenightServerEndpoint {
         }
     }
 
-    private void calculateCurrentWaypoint(Member member) {
+    private void calculateCurrentWaypoint(PersistenceManager pm, Member member) {
         Long eventId = member.getCurrentEventId();
         if (eventId != null) {
-            Event event = getEvent(member.getCurrentEventId());
+            Event event = pm.getObjectById(Event.class, eventId);
             if (event != null) {
                 Integer currentWaypoint = member.getCurrentWaypoint();
                 if (currentWaypoint == null) {
@@ -418,58 +420,61 @@ public class SkatenightServerEndpoint {
      */
     private void calculateField(long id) {
         PersistenceManager pm = pmf.getPersistenceManager();
-        Event event = getEvent(id);
-        List<RoutePoint> points = event.getRoute().getRoutePoints();
-        List<Member> members = getMembersFromEvent(event.getKey().getId());
+        try {
+            Event event = pm.getObjectById(Event.class, id);
+            List<RoutePoint> points = event.getRoute().getRoutePoints();
+            List<Member> members = getMembersFromEvent(event.getKey().getId());
 
-        // array erstellen welches an der stelle n die Anzahl der Member enthält welche am RoutePoint n sind.
-        Logger log = Logger.getLogger(SkatenightServerEndpoint.class.getName());
-        log.info("Points.size(): " + points.size());
-        int memberCountPerRoutePoint[] = new int[points.size()];
-        for (Member member : members) {
-            if (member.getCurrentEventId() != null && member.getCurrentEventId() == event.getKey().getId() && member.getCurrentWaypoint() != null) {
-                memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()]+1;
+            logger.info("points.size(): " + points.size());
+            // array erstellen welches an der stelle n die Anzahl der Member enthält welche am RoutePoint n sind.
+            int memberCountPerRoutePoint[] = new int[points.size()];
+            for (Member member : members) {
+                if (member.getCurrentEventId() != null && member.getCurrentEventId() == event.getKey().getId() && member.getCurrentWaypoint() != null) {
+                    memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()]+1;
+                }
             }
-        }
 
-        // Den index des RoutePoints speichern an welchen die meisten Member sind.
-        //int mostMemberPerWaypoint = -1;
-        int mostMemberIndex = 0;
-        for (int i = 0; i < memberCountPerRoutePoint.length; i++) {
-            if (memberCountPerRoutePoint[i] > memberCountPerRoutePoint[mostMemberIndex]) {
-                mostMemberIndex = i;
+            // Den index des RoutePoints speichern an welchen die meisten Member sind.
+            //int mostMemberPerWaypoint = -1;
+            int mostMemberIndex = 0;
+            for (int i = 0; i < memberCountPerRoutePoint.length; i++) {
+                if (memberCountPerRoutePoint[i] > memberCountPerRoutePoint[mostMemberIndex]) {
+                    mostMemberIndex = i;
+                }
             }
-        }
 
-        // Vom mostMemberIndex rückwärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
-        // als 5 Member haben
-        int first = mostMemberIndex;
-        while (first > 0) {
-            if (memberCountPerRoutePoint[first-1] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
-                first--;
-            } else if(first > 1 && memberCountPerRoutePoint[first-2] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
-                first-=2;
-            } else {
-                break;
+            // Vom mostMemberIndex rückwärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
+            // als 5 Member haben
+            int first = mostMemberIndex;
+            while (first > 0) {
+                if (memberCountPerRoutePoint[first-1] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
+                    first--;
+                } else if(first > 1 && memberCountPerRoutePoint[first-2] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
+                    first-=2;
+                } else {
+                    break;
+                }
             }
-        }
 
-        // Vom mostMemberIndex vorwaärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
-        // als 5 Member haben
-        int last = mostMemberIndex;
-        while (last < memberCountPerRoutePoint.length-1) {
-            if (memberCountPerRoutePoint[last+1] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
-                last++;
-            } else if(last < memberCountPerRoutePoint.length-2 && memberCountPerRoutePoint[last+2] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
-                last+=2;
-            } else {
-                break;
+            // Vom mostMemberIndex vorwaärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
+            // als 5 Member haben
+            int last = mostMemberIndex;
+            while (last < memberCountPerRoutePoint.length-1) {
+                if (memberCountPerRoutePoint[last+1] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
+                    last++;
+                } else if(last < memberCountPerRoutePoint.length-2 && memberCountPerRoutePoint[last+2] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
+                    last+=2;
+                } else {
+                    break;
+                }
             }
-        }
 
-        event.setRouteFieldFirst(first);
-        event.setRouteFieldLast(last);
-        updateEvent(event);
+            event.setRouteFieldFirst(first);
+            event.setRouteFieldLast(last);
+            pm.makePersistent(event);
+        } finally {
+            pm.close();
+        }
     }
 
     /**
@@ -622,7 +627,10 @@ public class SkatenightServerEndpoint {
             if (event.isNotificationSend()) {
                 // CurrentEventID setzen
                 Member member = getMember(email);
-                member.setCurrentEventId(keyId);
+                if (member.getCurrentEventId() == null || member.getCurrentEventId() != keyId) {
+                    member.setCurrentEventId(keyId);
+                    member.setCurrentWaypoint(0);
+                }
 
                 PersistenceManager pm = pmf.getPersistenceManager();
                 pm.makePersistent(member);
@@ -771,13 +779,13 @@ public class SkatenightServerEndpoint {
      * @return Das Event, null falls keins gefunden wurde
      */
     public Event getEvent(@Named("id") long keyId) {
-        List<Event> eventList = getAllEvents();
-        for (int i = 0; i < eventList.size(); i++) {
-            if (eventList.get(i).getKey().getId() == keyId) {
-                return eventList.get(i);
-            }
+        PersistenceManager pm = pmf.getPersistenceManager();
+        try {
+            pm.getFetchPlan().setMaxFetchDepth(3);
+            return (Event) pm.getObjectById(Event.class, keyId);
+        } finally {
+            pm.close();
         }
-        return null;
     }
 
     /**
@@ -858,16 +866,23 @@ public class SkatenightServerEndpoint {
     public List<Event> getAllEvents() {
         PersistenceManager pm = pmf.getPersistenceManager();
 
+        List<Event> result = null;
         try {
-            List<Event> result = (List<Event>) pm.newQuery(Event.class).execute();
-            if (result.isEmpty()) {
-                return new ArrayList<Event>();
-            } else {
-                return result;
-            }
+            result = (List<Event>) pm.newQuery(Event.class).execute();
         } finally {
             pm.close();
         }
+        if (result != null) {
+            // Events nocheinmal abrufen, da die Route nicht vollständig über ein QUery abgerufen werden kann
+            List<Event> events = new ArrayList<>();
+            for (Event e : result) {
+                events.add(getEvent(e.getKey().getId()));
+            }
+            return events;
+        } else {
+            result = new ArrayList<>();
+        }
+        return result;
     }
 
     /**
@@ -1005,7 +1020,6 @@ public class SkatenightServerEndpoint {
         }
         Member member = getMember(user.getEmail());
         if (member == null) {
-            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
             throw new IllegalArgumentException("user is not registered");
         }
         if (getUserGroup(name) != null) {
@@ -1049,7 +1063,6 @@ public class SkatenightServerEndpoint {
         }
         Member member = getMember(user.getEmail());
         if (member == null) {
-            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
             throw new IllegalArgumentException("user is not registered");
         }
         UserGroup ug = getUserGroup(name);
@@ -1113,7 +1126,6 @@ public class SkatenightServerEndpoint {
         }
         Member member = getMember(user.getEmail());
         if (member == null) {
-            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
             throw new IllegalArgumentException("user is not registered");
         }
 
@@ -1145,7 +1157,6 @@ public class SkatenightServerEndpoint {
         }
         Member member = getMember(user.getEmail());
         if (member == null) {
-            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
             throw new IllegalArgumentException("user is not registered");
         }
 
