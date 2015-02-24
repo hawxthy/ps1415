@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -251,12 +252,14 @@ public class SkatenightServerEndpoint {
      */
     public void updateMemberLocation(@Named("mail") String mail,
                                      @Named("latitude") double latitude,
-                                     @Named("longitude") double longitude) {
+                                     @Named("longitude") double longitude,
+                                     @Named("currentEventId") long currentEventId) {
         if (mail != null) {
             Member m = getMember(mail);
             m.setLatitude(latitude);
             m.setLongitude(longitude);
             m.setUpdatedAt(new Date());
+            m.setCurrentEventId(currentEventId);
 
             calculateCurrentWaypoint(m);
 
@@ -272,6 +275,82 @@ public class SkatenightServerEndpoint {
                 calculateField(m.getCurrentEventId());
                 lastFieldUpdateTime = System.currentTimeMillis();
             }
+        }
+    }
+
+    /**
+     * Hilfsmethode, die für den normalen Betireb nicht benötigt wird. Stellt eine Schnittstelle für
+     * Simulationen her, die eine große Anzahl an Positionen auf dem Server aktualisieren ohne, dass
+     * dabei pro Akutalisierung ein Serveraufruf notwendig ist.
+     * Die Mails, Latituden und Logituden werden als Strings mit = als Trennzeichen kodiert, da ein
+     * Aufruf mit Arrays nicht funktioniert hat.
+     * @param mailParam Die Mail-Adressen der zu Aktualisierenden Member-Objekte als String, durch = getrennt.
+     * @param latitudeParam Die neuen Latituden als String, durch = getrennt
+     * @param longitudeParam Die neuen Longituden, durch = getrennt
+     * @param currentEventId Die Event-ID, die für die Member gesetzt werden soll.
+     */
+    public void simulateMemberLocations(@Named("mails") String mailParam,
+                                     @Named("latitudes") String latitudeParam,
+                                     @Named("longitudes") String longitudeParam,
+                                     @Named("currentEventId") long currentEventId) {
+        StringTokenizer st = new StringTokenizer(mailParam, "=");
+        String[] mail = new String[st.countTokens()];
+        for (int i = 0; i < mail.length; i++) {
+            mail[i] = st.nextToken();
+        }
+        st = new StringTokenizer(latitudeParam, "=");
+        double[] latitude = new double[st.countTokens()];
+        for (int i = 0; i < mail.length; i++) {
+            latitude[i] = Double.parseDouble(st.nextToken());
+        }
+        st = new StringTokenizer(longitudeParam, "=");
+        double[] longitude = new double[st.countTokens()];
+        for (int i = 0; i < mail.length; i++) {
+            longitude[i] = Double.parseDouble(st.nextToken());
+        }
+
+
+        if (mail != null && latitude != null && longitude != null) {
+            Event event = getEvent(currentEventId);
+            int count = Math.min(mail.length, Math.min(latitude.length, longitude.length));
+
+            PersistenceManager pm = pmf.getPersistenceManager();
+            try {
+                // Member-Objekte laden. Falls für eine angegebene Mail-Adresse kein Objekt besteht,
+                // so wird es angelegt
+                Member member;
+                for (int i = 0; i < count; i++) {
+                    Query q = pm.newQuery(Member.class);
+                    q.setFilter("email == emailParam");
+                    q.declareParameters("String emailParam");
+                    List<Member> results = (List<Member>) q.execute(mail[i]);
+                    if (!results.isEmpty()) {
+                        member = results.get(0);
+                    } else {
+                        member = new Member();
+                        member.setEmail(mail[i]);
+                        member.setName(mail[i]);
+                    }
+                    member.setLatitude(latitude[i]);
+                    member.setLongitude(longitude[i]);
+                    member.setUpdatedAt(new Date());
+                    member.setCurrentEventId(currentEventId);
+                    // Member zum Event hinzufügen, falls noch nicht geschehen
+                    if (!event.getMemberList().contains(member.getEmail())) {
+                        event.getMemberList().add(member.getEmail());
+                    }
+                    pm.makePersistent(member);
+                }
+                pm.makePersistent(event);
+            } finally {
+                pm.close();
+            }
+        }
+
+        // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
+        if (System.currentTimeMillis()-lastFieldUpdateTime >= 300000) {
+            calculateField(currentEventId);
+            lastFieldUpdateTime = System.currentTimeMillis();
         }
     }
 

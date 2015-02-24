@@ -52,17 +52,19 @@ public class AddUserGroupActivity extends Activity {
             new QueryUserGroupsTask().execute(new AllUsergroupsFragment() {
                 @Override
                 public void setUserGroupsToListView(List<UserGroup> groupList) {
-                    for (int i = 0; i < groupList.size(); i++) {
-                        if (groupList.get(i).getName().equals(groupName)) {
-                            Toast.makeText(AddUserGroupActivity.this, "Name darf nicht schon vergeben sein", Toast.LENGTH_LONG).show();
-                            return;
+                    if (groupList != null) {
+                        for (int i = 0; i < groupList.size(); i++) {
+                            if (groupList.get(i).getName().equals(groupName)) {
+                                Toast.makeText(AddUserGroupActivity.this, "Name darf nicht schon vergeben sein", Toast.LENGTH_LONG).show();
+                                return;
+                            }
                         }
                     }
                     finish();
                     new AddUserGroupTask(UsergroupActivity.getUserGroupActivity()).execute(groupName);
                 }
             });
-        }else {
+        } else {
             Toast.makeText(this, "Name darf nicht leer sein", Toast.LENGTH_LONG).show();
         }
     }

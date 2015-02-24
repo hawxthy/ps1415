@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -94,7 +95,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                     startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
                 }
                 else {
-                    new ToggleMemberEventAttendanceTask(ShowInformationActivity.this, keyId, credential.getSelectedAccountName(), attending).execute();
+                    new ToggleMemberEventAttendanceTask(ShowInformationActivity.this, keyId, credential.getSelectedAccountName(), attending, ShowInformationActivity.this).execute();
                 }
             }
         });
@@ -118,7 +119,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                         editor.putString("accountName", accountName);
                         editor.commit();
 
-                        new ToggleMemberEventAttendanceTask(this, keyId, credential.getSelectedAccountName(), attending).execute();
+                        new ToggleMemberEventAttendanceTask(this, keyId, credential.getSelectedAccountName(), attending, this).execute();
                     }
                 }
                 break;
