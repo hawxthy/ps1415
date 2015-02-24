@@ -173,6 +173,23 @@ public class GetEventTaskTest extends AuthTaskTestCase {
                 }
             }
         }
+
+        // Bestehende Events löschen
+        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+                .execute().getItems();
+        if (events != null) {
+            for (Event e : events) {
+                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                        .execute();
+            }
+        }
+
+        // Bestehende Routen löschen
+        for (Route r : ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute()
+                .getItems()) {
+            ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey().getId())
+                    .execute();
+        }
     }
 }
 

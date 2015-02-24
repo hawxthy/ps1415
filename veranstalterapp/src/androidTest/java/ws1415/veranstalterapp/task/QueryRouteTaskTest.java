@@ -6,6 +6,7 @@ import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -104,7 +105,7 @@ public class QueryRouteTaskTest extends AuthTaskTestCase {
     /**
      * Testet, ob die Routen vollständig und korrekt abgerufen werden.
      */
-    public void testTask() throws ExecutionException, InterruptedException {
+    public void testTask() throws ExecutionException, InterruptedException, IOException {
         QueryRouteTask task = new QueryRouteTask();
         List<Route> routes = task.execute(new ManageRoutesFragment() {
             public void setRoutesToListView(ArrayList<Route> results) {
@@ -144,6 +145,16 @@ public class QueryRouteTaskTest extends AuthTaskTestCase {
         assertNotNull("route3: no route data", route3.getRouteData());
         assertEquals("route3: wrong route data", testRoute3.getRouteData().getValue(),
                 route3.getRouteData().getValue());
+
+        // Bestehende Routen löschen
+        List<Route> routes2 = ServiceProvider.getService().skatenightServerEndpoint().getRoutes()
+                .execute().getItems();
+        if (routes != null) {
+            for (Route r : routes2) {
+                ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey()
+                        .getId()).execute();
+            }
+        }
     }
 
 }

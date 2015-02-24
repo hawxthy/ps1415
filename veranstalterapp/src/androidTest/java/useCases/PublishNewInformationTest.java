@@ -378,7 +378,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
             e.printStackTrace();
         }
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getName().equals(routename)) {
+            if (routename.equals(list.get(i).getName())) {
                 testRoute1 = list.get(i);
                 break;
             }
@@ -524,7 +524,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
             time++;
         }
         assertTrue("Timeout", time < 50);
-        Thread.sleep(3000);
+        Thread.sleep(5000);
 
         mAdapter = mFragment.getmAdapter();
         eventList = mAdapter.getEventList();

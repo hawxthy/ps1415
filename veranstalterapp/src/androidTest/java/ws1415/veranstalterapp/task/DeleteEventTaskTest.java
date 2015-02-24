@@ -126,6 +126,7 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
             }
         }
 
+        // Zwei Events erstellen
         ServiceProvider.getService().skatenightServerEndpoint().createEvent(event1).execute();
         ServiceProvider.getService().skatenightServerEndpoint().createEvent(event2).execute();
 

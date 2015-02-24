@@ -19,7 +19,7 @@ import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.FieldType;
 
 /**
- * Created by Martin Wrodarczyk on 10.11.2014.
+ * Created by Martin Wrodarczyk  on 10.11.2014.
  */
 public class CreateEventTaskTest extends AuthTaskTestCase {
     private Route route;
@@ -164,7 +164,7 @@ public class CreateEventTaskTest extends AuthTaskTestCase {
                 event.getRoute().getRouteData().getValue());
 
         // Route und Event löschen
-        ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(serverEvent.getKey().getId());
+        ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(serverEvent.getKey().getId()).execute();
         ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(serverEvent.getRoute().getKey()
                 .getId()).execute();
     }
