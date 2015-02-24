@@ -309,12 +309,21 @@ public class SkatenightServerEndpoint {
             longitude[i] = Double.parseDouble(st.nextToken());
         }
 
-
         if (mail != null && latitude != null && longitude != null) {
             Event event = getEvent(currentEventId);
             int count = Math.min(mail.length, Math.min(latitude.length, longitude.length));
 
+            Member admin = getMember("richard-schulze@online.de");
+
             PersistenceManager pm = pmf.getPersistenceManager();
+            UserGroup group = getUserGroup(pm, "Simulationsgruppe");
+            if (group == null) {
+                UserGroup ug = new UserGroup(admin);
+                ug.setName("Simulationsgruppe");
+                admin.addGroup(ug);
+                pm.makePersistent(admin);
+                pm.makePersistent(ug);
+            }
             try {
                 // Member-Objekte laden. Falls für eine angegebene Mail-Adresse kein Objekt besteht,
                 // so wird es angelegt
@@ -339,25 +348,35 @@ public class SkatenightServerEndpoint {
                     if (!event.getMemberList().contains(member.getEmail())) {
                         event.getMemberList().add(member.getEmail());
                     }
+                    // Member in die Testgruppe aufnehmen, falls noch nicht geschehen
+                    if (!member.getGroups().contains("Simulationsgruppe")) {
+                        member.addGroup(group);
+                    }
                     pm.makePersistent(member);
+                    calculateCurrentWaypoint(event, member);
                 }
                 pm.makePersistent(event);
+                pm.makePersistent(group);
+
+                // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
+                if (System.currentTimeMillis()-lastFieldUpdateTime >= 300000) {
+                    calculateField(event);
+                    lastFieldUpdateTime = System.currentTimeMillis();
+                }
             } finally {
                 pm.close();
             }
         }
-
-        // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
-        if (System.currentTimeMillis()-lastFieldUpdateTime >= 300000) {
-            calculateField(currentEventId);
-            lastFieldUpdateTime = System.currentTimeMillis();
-        }
     }
 
     private void calculateCurrentWaypoint(Member member) {
+        calculateCurrentWaypoint(getEvent(member.getCurrentEventId()), member);
+    }
+
+    private void calculateCurrentWaypoint(Event event, Member member) {
         Long eventId = member.getCurrentEventId();
         if (eventId != null) {
-            Event event = getEvent(member.getCurrentEventId());
+            //Event event = getEvent(member.getCurrentEventId());
             if (event != null) {
                 Integer currentWaypoint = member.getCurrentWaypoint();
                 if (currentWaypoint == null) {
@@ -402,21 +421,26 @@ public class SkatenightServerEndpoint {
         }
     }
 
+    private void calculateField(long id) {
+        Event event = getEvent(id);
+        calculateField(event);
+        updateEvent(event);
+    }
     /**
      * Berechnet anhand der aktuellen Positionen der Member das Feld.
      * Wobei das Feld um den Wegpunkte herum gebaut wird, welcher die meisten Member enthält
      * @param id event Id
      */
-    private void calculateField(@Named("id") long id) {
-        PersistenceManager pm = pmf.getPersistenceManager();
-        Event event = getEvent(id);
+    private void calculateField(Event event) {
+        //PersistenceManager pm = pmf.getPersistenceManager();
+        //Event event = getEvent(id);
         List<RoutePoint> points = event.getRoute().getRoutePoints();
         List<Member> members = getMembersFromEvent(event.getKey().getId());
 
         // array erstellen welches an der stelle n die Anzahl der Member enthält welche am RoutePoint n sind.
         int memberCountPerRoutePoint[] = new int[points.size()];
         for (Member member : members) {
-            if (member.getCurrentEventId() != null && member.getCurrentEventId() == id && member.getCurrentWaypoint() != null) {
+            if (member.getCurrentEventId() != null && member.getCurrentEventId() == event.getKey().getId() && member.getCurrentWaypoint() != null) {
                 memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()]+1;
             }
         }
@@ -458,7 +482,7 @@ public class SkatenightServerEndpoint {
 
         event.setRouteFieldFirst(first);
         event.setRouteFieldLast(last);
-        updateEvent(event);
+        //updateEvent(event);
     }
 
     /**
