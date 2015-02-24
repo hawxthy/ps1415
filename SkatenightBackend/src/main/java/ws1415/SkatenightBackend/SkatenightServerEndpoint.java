@@ -1005,7 +1005,6 @@ public class SkatenightServerEndpoint {
         }
         Member member = getMember(user.getEmail());
         if (member == null) {
-            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
             throw new IllegalArgumentException("user is not registered");
         }
         if (getUserGroup(name) != null) {
@@ -1049,7 +1048,6 @@ public class SkatenightServerEndpoint {
         }
         Member member = getMember(user.getEmail());
         if (member == null) {
-            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
             throw new IllegalArgumentException("user is not registered");
         }
         UserGroup ug = getUserGroup(name);
@@ -1113,7 +1111,6 @@ public class SkatenightServerEndpoint {
         }
         Member member = getMember(user.getEmail());
         if (member == null) {
-            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
             throw new IllegalArgumentException("user is not registered");
         }
 
@@ -1145,7 +1142,6 @@ public class SkatenightServerEndpoint {
         }
         Member member = getMember(user.getEmail());
         if (member == null) {
-            // TODO Benutzer existiert noch nicht. Eigentlich nicht möglich.
             throw new IllegalArgumentException("user is not registered");
         }
 
