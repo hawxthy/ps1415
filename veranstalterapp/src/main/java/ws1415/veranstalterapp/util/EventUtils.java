@@ -22,6 +22,7 @@ import ws1415.veranstalterapp.R;
 public class EventUtils {
     private static EventUtils instance;
     private static Context context;
+
     private EventUtils(Context context){
         this.context = context;
     }

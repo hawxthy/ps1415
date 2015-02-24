@@ -43,7 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.activity.ChooseRouteActivity;
+import ws1415.veranstalterapp.dialog.ChooseRouteDialog;
 import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
 import ws1415.veranstalterapp.util.EventUtils;
@@ -513,7 +513,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent chooseRouteIntent = new Intent(context, ChooseRouteActivity.class);
+                Intent chooseRouteIntent = new Intent(context, ChooseRouteDialog.class);
                 context.startActivity(chooseRouteIntent);
             }
         });

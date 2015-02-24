@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -16,6 +15,7 @@ import com.skatenight.skatenightAPI.model.Route;
 
 import ws1415.veranstalterapp.adapter.AnnounceCursorAdapter;
 import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.dialog.ChooseRouteDialog;
 import ws1415.veranstalterapp.task.EditEventTask;
 import ws1415.veranstalterapp.task.GetEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
@@ -59,7 +59,7 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
         setContentView(R.layout.activity_edit_event);
 
         new GetEventTask(this).execute(getIntent().getLongExtra("event", 0));
-        ChooseRouteActivity.giveEditEventActivity(this);
+        ChooseRouteDialog.giveEditEventActivity(this);
 
         // Initialisiere die Buttons
         applyButton = (Button) findViewById(R.id.edit_event_info_apply_button);
