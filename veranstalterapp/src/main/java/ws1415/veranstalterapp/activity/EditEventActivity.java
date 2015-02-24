@@ -135,7 +135,7 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
                     new EditEventTask().execute(event);
 
                     // Benachrichtige den Benutzer mit einem Toast
-                    Toast.makeText(EditEventActivity.this, getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();
+                    Toast.makeText(EditEventActivity.this, getResources().getString(R.string.eventedited), Toast.LENGTH_LONG).show();
 
                     finish();
 
