@@ -189,7 +189,6 @@ public class ShowRouteActivity extends Activity {
                     updateUsergroups = true;
                     refreshVisibleMembers();
                 }
-                Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();
             }
             catch (ParseException e) {
                 Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
@@ -484,14 +483,12 @@ public class ShowRouteActivity extends Activity {
     * Aktualisiert die Anzeige des aktuellen Felds.
     */
     private void refreshField() {
-        Toast.makeText(getApplicationContext(), "refresh", Toast.LENGTH_SHORT).show();
         new GetEventTask(new ExtendedTaskDelegate<Void, Event>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Event event) {
                 fieldFirst = event.getRouteFieldFirst();
                 fieldLast = event.getRouteFieldLast();
                 highlightRoute(fieldFirst, fieldLast);
-                Toast.makeText(getApplicationContext(), fieldFirst + " " + fieldLast, Toast.LENGTH_LONG).show();
             }
 
             @Override
