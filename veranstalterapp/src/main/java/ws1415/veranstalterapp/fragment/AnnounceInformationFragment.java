@@ -80,11 +80,6 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
         return view;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-    }
-
     /**
      * Methode zum setzen der Listener für die Buttons "timePickerButton", "datePickerButton",
      * "applyButton", "cancelButton", "routePickerButton".
