@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.media.audiofx.BassBoost;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -34,6 +33,7 @@ import ws1415.common.gcm.GCMUtil;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.ps1415.Constants;
+import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.EventsCursorAdapter;
@@ -104,9 +104,15 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
 
                 Intent intent;
 
-                if (new Date().after(EventUtils.getInstance(ShowEventsActivity.this).getFusedDate(e)) &&
+                Date startDate = EventUtils.getInstance(ShowEventsActivity.this).getFusedDate(e);
+                if (new Date().after(startDate) &&
                         e.getMemberList() != null &&
                         e.getMemberList().contains(prefs.getString("accountName", null))) {
+
+                    if (!prefs.getBoolean(e.getKey().getId()+"-started", false)) {
+                        LocationTransmitterService.ScheduleService(ShowEventsActivity.this, e.getKey().getId(), startDate);
+                    }
+
                     intent = new Intent(ShowEventsActivity.this, ActiveEventActivity.class);
                     intent.putExtra(ActiveEventActivity.EXTRA_KEY_ID, e.getKey().getId());
                 }
