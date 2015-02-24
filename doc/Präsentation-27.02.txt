@@ -1,0 +1,29 @@
+Vorbereitung:
+	- Auf den Release-Server wechseln
+	- Position der simulierten Skater auf 0 zurücksetzen
+	- Events und Routen löschen
+	- Simulationsgruppe löschen
+	- Anderes Handy eine Testgruppe erstellen lassen
+	- Lockito vorbereiten (10 km/h, Strecke um die Uni)
+	- Vorlagenstrecke erstellen mit 2 Wegpunkten, die halb um die Uni führen
+	
+Präsentation:
+	- Normale App starten
+	- Gruppen anzeigen
+	- Gruppe erstellen: Simulationsgruppe
+	- Testgruppe beitreten
+	- Beide Gruppen sichtbar machen
+	
+	- Veranstalter-App starten
+	- Route erstellen aus Vorlagenstrecke: Uni-Route (führt einmal um die Uni), Wegpunkte benennen
+	- Route anzeigen mit benannten Wegpunkten
+	- Event mit der Uni-Route erstellen, das 3 Min in der Zukunft liegt
+	- Zur normalen App wechseln
+	
+	- Aktualisierte Eventliste zeigen
+	- Am Event teilnehmen
+	- Warten bis Event beginnt, in der Zeit Simulation öffnen(10 km/h)
+	- Lockito bei den Handys starten
+	- Simulation starten
+	- Karte in der normalen App zeigen
+	- lokale Auswertung zeigen	
