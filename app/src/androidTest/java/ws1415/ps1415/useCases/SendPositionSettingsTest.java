@@ -6,7 +6,6 @@ import android.app.Instrumentation;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.ViewAsserts;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -20,7 +19,6 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Member;
 
-import java.util.List;
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
