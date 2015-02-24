@@ -1,13 +1,9 @@
 package ws1415.ps1415.useCases;
 
 import android.app.Instrumentation;
-import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.UiThreadTest;
 import android.test.ViewAsserts;
 import android.test.suitebuilder.annotation.SmallTest;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,10 +13,8 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.activity.AddUserGroupActivity;
 import ws1415.ps1415.activity.ShowEventsActivity;
 import ws1415.ps1415.activity.ShowInformationActivity;
-import ws1415.ps1415.adapter.ShowCursorAdapter;
 
 /**
  * Testet den Use Case "Anzeigen mehrerer Veranstaltungen".
