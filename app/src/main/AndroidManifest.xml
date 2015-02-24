@@ -90,6 +90,7 @@
                 <category android:name="ws1415.ps1415" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".LocationTransmitterService$StartServiceReceiver"/>
         <receiver android:name=".LocationTransmitterService$CancelServiceReceiver"/>
         <service android:name=".GcmIntentService" />
     </application>

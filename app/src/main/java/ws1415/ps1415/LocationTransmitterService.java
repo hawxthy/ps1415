@@ -1,5 +1,6 @@
 package ws1415.ps1415;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -21,13 +22,21 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.skatenight.skatenightAPI.model.Event;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.util.LocationUtils;
+import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.task.UpdateLocationTask;
+import ws1415.ps1415.util.EventUtils;
+import ws1415.ps1415.util.FieldType;
 import ws1415.ps1415.util.LocalAnalysisData;
 import ws1415.ps1415.util.LocalStorageUtil;
 
@@ -123,7 +132,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         distance = intent.getStringExtra(EXTRA_DISTANCE);
 
         Intent deleteIntent = new Intent(this, CancelServiceReceiver.class);
-        PendingIntent pendingIntentCancel = PendingIntent.getBroadcast(this, 0, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntentCancel = PendingIntent.getBroadcast(this, 0, deleteIntent, PendingIntent.FLAG_ONE_SHOT);
 
         Intent notificationIntent = new Intent(this, LocationTransmitterService.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
@@ -389,6 +398,92 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         float distanceW1W2 = distance(w1.latitude, w1.longitude, w2.latitude, w2.longitude);
 
         return distanceW1W2;
+    }
+
+    public static void ScheduleService(Context context, long keyId, Date date) {
+        Log.e(LOG_TAG, "ScheduleService");
+        int alarmId = (int)System.currentTimeMillis();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        Intent intent = new Intent(context, StartServiceReceiver.class);
+        intent.putExtra(StartServiceReceiver.EXTRA_EVENT_ID, keyId);
+        intent.putExtra(StartServiceReceiver.EXTRA_ALARM_ID, alarmId);
+        PendingIntent appIntent = PendingIntent.getBroadcast(context, alarmId, intent, 0);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+        if (prefs.contains(keyId + "-alarm")) {
+
+        }
+
+        prefs.edit().putInt(keyId + "-alarm", alarmId).commit();
+
+        AlarmManager am = (AlarmManager) context.getApplicationContext().getSystemService(ALARM_SERVICE);
+        am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), appIntent);
+
+        Log.e(LOG_TAG, "Schedule: " + alarmId + " on " + calendar.getTime());
+    }
+
+    public static class StartServiceReceiver extends BroadcastReceiver {
+        public static final String EXTRA_EVENT_ID = "start_service_receiver_extra_event_id";
+        public static final String EXTRA_ALARM_ID = "start_service_receiver_extra_alarm_id";
+
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            final long keyId = intent.getLongExtra(EXTRA_EVENT_ID, 0);
+            final int alarmId = intent.getIntExtra(EXTRA_ALARM_ID, 0);
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+            final boolean responsible = (prefs.getInt(keyId + "-alarm", 0) == alarmId);
+            final boolean started = prefs.getBoolean(keyId + "-started", false);
+
+            Log.v(LOG_TAG, "Received alarm: " + keyId + " " + alarmId + " " + responsible + " " + started);
+
+            if (keyId != 0 && alarmId != 0 && responsible && !started) {
+                new GetEventTask(new ExtendedTaskDelegate<Void, Event>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Event e) {
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+                        prefs.edit().putBoolean(keyId + "-started", true).commit();
+
+                        Date startDate = EventUtils.getInstance(context).getFusedDate(e);
+
+                        List<LatLng> waypoints;
+                        try {
+                            waypoints = LocationUtils.decodePolyline(e.getRoute().getRouteData().getValue());
+                        }
+                        catch (ParseException ex) {
+                            Log.e(LOG_TAG, "Unable to start service.", ex);
+                            return;
+                        }
+
+                        Intent serviceIntent = new Intent(context, LocationTransmitterService.class);
+                        serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, keyId);
+                        serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
+                        serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
+                        serviceIntent.putExtra(LocationTransmitterService.EXTRA_DISTANCE, e.getRoute().getLength());
+                        serviceIntent.putExtra(LocationTransmitterService.EXTRA_NAME, EventUtils.getInstance(context).getUniqueField(FieldType.TITLE.getId(), e).getValue());
+                        serviceIntent.putExtra(LocationTransmitterService.EXTRA_LOCATION, EventUtils.getInstance(context).getUniqueField(FieldType.LOCATION.getId(), e).getValue());
+
+                        context.startService(serviceIntent);
+                    }
+
+                    @Override
+                    public void taskDidProgress(ExtendedTask task, Void[] progress) {
+
+                    }
+
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        Log.e(LOG_TAG, "Unable to start service " + keyId + ": " + message);
+                    }
+                }).execute(keyId);
+            }
+            else {
+                Log.v(LOG_TAG, "Ignore alarm.");
+            }
+        }
     }
 
     /**

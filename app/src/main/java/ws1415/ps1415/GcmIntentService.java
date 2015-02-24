@@ -10,23 +10,11 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.maps.model.LatLng;
-import com.skatenight.skatenightAPI.model.Event;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import ws1415.common.gcm.MessageType;
-import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.activity.ShowEventsActivity;
 import ws1415.ps1415.activity.UsergroupActivity;
-import ws1415.ps1415.task.GetEventTask;
-import ws1415.ps1415.util.EventUtils;
 import ws1415.ps1415.util.PrefManager;
-import ws1415.ps1415.util.FieldType;
 
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
@@ -68,28 +56,6 @@ public class GcmIntentService extends IntentService {
                         LocalBroadcastManager.getInstance(this).sendBroadcast(refreshIntent);
                         break;
                     case EVENT_START_MESSAGE:
-                        // LocationTransmitterService wird gestartet, wenn das Event gestartet wird.
-                        long eventId = Long.parseLong(extras.getString("eventId"));
-                        try {
-                            Event e = new GetEventTask(null).execute(eventId).get();
-                            Date startDate = EventUtils.getInstance(this).getFusedDate(e);
-                            List<LatLng> waypoints = LocationUtils.decodePolyline(e.getRoute().getRouteData().getValue());
-                            Intent serviceIntent = new Intent(getBaseContext(), LocationTransmitterService.class);
-                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_EVENT_ID, eventId);
-                            serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
-                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
-                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_DISTANCE, e.getRoute().getLength());
-                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_NAME, EventUtils.getInstance(this).getUniqueField(FieldType.TITLE.getId(), e).getValue());
-                            serviceIntent.putExtra(LocationTransmitterService.EXTRA_LOCATION, EventUtils.getInstance(this).getUniqueField(FieldType.LOCATION.getId(), e).getValue());
-
-                            startService(serviceIntent);
-                        } catch (InterruptedException e1) {
-                            e1.printStackTrace();
-                        } catch (ExecutionException e1) {
-                            e1.printStackTrace();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
                         break;
                     case GROUP_DELETED_NOTIFICATION_MESSAGE:
                         sendNotification(extras);

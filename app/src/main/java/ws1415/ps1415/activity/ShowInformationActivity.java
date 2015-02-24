@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +35,8 @@ import ws1415.ps1415.util.FieldType;
  * @author Bernd Eissing, Marting Wrodarczyk, Pascal Otto
  */
 public class ShowInformationActivity extends Activity implements ExtendedTaskDelegate<Void, Object> {
+    private static final String LOG_TAG = ShowInformationActivity.class.getSimpleName();
+    
     public static final int REQUEST_ACCOUNT_PICKER = 2;
 
     public static final String EXTRA_KEY_ID = "show_information_extra_key_id";
@@ -224,10 +225,34 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
             attending = (Boolean) result;
             if (attending) {
                 Toast.makeText(getApplicationContext(), getString(R.string.show_info_toast_attending), Toast.LENGTH_SHORT).show();
+
+                if (prefs.contains(Long.toString(keyId))) {
+                    prefs.edit().remove(Long.toString(keyId))
+                            .commit();
+                }
+                new GetEventTask(new ExtendedTaskDelegate<Void, Event>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Event e) {
+                        Date startDate = EventUtils.getInstance(ShowInformationActivity.this).getFusedDate(e);
+                        LocationTransmitterService.ScheduleService(ShowInformationActivity.this, keyId, startDate);
+                    }
+
+                    @Override
+                    public void taskDidProgress(ExtendedTask task, Void[] progress) {
+
+                    }
+
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        Log.e(LOG_TAG, "Unable to register alarm (" + keyId + "): " + message);
+                    }
+                }).execute(keyId);
+
             }
             else {
                 Toast.makeText(getApplicationContext(), R.string.show_info_toast_leaving, Toast.LENGTH_SHORT).show();
                 stopService(new Intent(getBaseContext(), LocationTransmitterService.class));
+                prefs.edit().putBoolean(keyId + "-started", false).commit();
             }
             updateAttendButtonTitle();
         }
