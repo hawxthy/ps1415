@@ -481,8 +481,8 @@ public class ShowRouteActivity extends Activity {
     }
 
     /**
-     * Aktualisiert die Anzeige des aktuellen Felds.
-     */
+    * Aktualisiert die Anzeige des aktuellen Felds.
+    */
     private void refreshField() {
         Toast.makeText(getApplicationContext(), "refresh", Toast.LENGTH_SHORT).show();
         new GetEventTask(new ExtendedTaskDelegate<Void, Event>() {
@@ -503,6 +503,6 @@ public class ShowRouteActivity extends Activity {
             public void taskFailed(ExtendedTask task, String message) {
                 Log.e(LOG_TAG, message);
             }
-        });
+        }).execute(eventId);
     }
 }
