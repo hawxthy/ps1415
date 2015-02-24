@@ -51,7 +51,7 @@ public class ShowEventsFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        //eventListView.setAdapter(mAdapter);
+        eventListView.setAdapter(mAdapter);
     }
 
     /**
