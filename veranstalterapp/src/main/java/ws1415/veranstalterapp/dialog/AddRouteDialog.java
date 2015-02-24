@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.activity;
+package ws1415.veranstalterapp.dialog;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,28 +8,24 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.skatenight.skatenightAPI.model.ServerWaypoint;
-
-import java.util.ArrayList;
-
 import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.activity.RouteEditorActivity;
+
 
 /**
- * Dialog für das Erstellen einer neuen Gruppe anhand einer vorher gewählten Route als Vorlage.
+ * Dialog zum Hinzufügen einer Route.
+ *
+ * @author Bernd Eissing, Martin Wrodarczyk
  */
-public class AddRouteDraftDialog extends Activity {
-    public static final String EXTRA_WAYPOINTS = "route_draft_dialog_extra_waypoints";
-
-    private ArrayList<ServerWaypoint> wpList;
+public class AddRouteDialog extends Activity {
     private EditText routeNameEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_route_draft_dialog);
+        setContentView(R.layout.activity_add_route_dialog);
 
-        wpList = (ArrayList<ServerWaypoint>) getIntent().getSerializableExtra(EXTRA_WAYPOINTS);
-        routeNameEditText = (EditText) findViewById(R.id.activity_add_route_draft_routeName_edittext);
+        routeNameEditText = (EditText) findViewById(R.id.activity_add_route_routeName_edittext);
     }
 
     /**
@@ -41,20 +37,13 @@ public class AddRouteDraftDialog extends Activity {
         finish();
     }
 
-    /**
-     * Startet die RouteEditorActivity mit den Informationen des eingegebenen Names und der
-     * Wegpunkte der Routenvorlage.
-     *
-     * @param view
-     */
-    public void apply(View view) {
+    public void apply(View view){
         String routeName = routeNameEditText.getText().toString();
-        if (!routeName.equals("")) {
+        if(!routeName.equals("")) {
             finish();
             Log.d("routeName", routeNameEditText.getText().toString());
             Intent intent = new Intent(this, RouteEditorActivity.class);
             intent.putExtra(RouteEditorActivity.EXTRA_NAME, routeNameEditText.getText().toString());
-            intent.putExtra(RouteEditorActivity.EXTRA_WAYPOINTS, wpList);
             startActivity(intent);
         } else {
             Toast.makeText(this, "Routenname darf nicht leer sein", Toast.LENGTH_LONG).show();

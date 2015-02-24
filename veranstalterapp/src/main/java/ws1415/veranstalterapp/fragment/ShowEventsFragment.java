@@ -67,6 +67,7 @@ public class ShowEventsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_show_events, container, false);
 
         eventListView = (ListView) view.findViewById(R.id.fragment_show_events_list_view);
+        eventListView.setAdapter(mAdapter);
 
         eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             /**
