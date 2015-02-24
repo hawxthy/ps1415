@@ -157,7 +157,7 @@ public class SkatenightServerEndpoint {
      * @param e    Das neue Event-Objekt.
      */
     public void createEvent(User user, Event e) throws OAuthRequestException, IOException {
-        createEvent(user, e, false);
+        createEvent(user, e, false, false);
     }
 
     /**
@@ -169,8 +169,10 @@ public class SkatenightServerEndpoint {
      * @param editing   true, wenn das Event editiert wurde, false, wenn es sich um ein neues Event
      *                  handelt. Hat Auswirkungen auf die Notification, die an die Benutzer gesendet
      *                  wird.
+     * @param dateChanged true, wenn das Event geändert wurde und sich die Startzeit geändert hat,
+     *                    sonst false.
      */
-    private void createEvent(User user, Event e, boolean editing) throws OAuthRequestException, IOException {
+    private void createEvent(User user, Event e, boolean editing, boolean dateChanged) throws OAuthRequestException, IOException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
@@ -209,6 +211,11 @@ public class SkatenightServerEndpoint {
                             .addData("content", eventTitle);
                     if (editing) {
                         mb.addData("title", "Ein Event wurde angepasst.");
+                        mb.addData("date_changed", Boolean.toString(dateChanged));
+                        if (dateChanged) {
+                            mb.addData("event_id", Long.toString(e.getKey().getId()));
+                            mb.addData("new_date", Long.toString(FieldType.getFusedDate(e).getTime()));
+                        }
                     } else {
                         mb.addData("title", "Ein neues Event wurde erstellt.");
                     }
@@ -272,14 +279,14 @@ public class SkatenightServerEndpoint {
             try {
                 calculateCurrentWaypoint(pm, m);
                 pm.makePersistent(m);
+
+                // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
+                if (System.currentTimeMillis()-lastFieldUpdateTime >= FIELD_UPDATE_INTERVAL) {
+                    calculateField(pm, m.getCurrentEventId());
+                    lastFieldUpdateTime = System.currentTimeMillis();
+                }
             } finally {
                 pm.close();
-            }
-
-            // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
-            if (System.currentTimeMillis()-lastFieldUpdateTime >= FIELD_UPDATE_INTERVAL) {
-                calculateField(m.getCurrentEventId());
-                lastFieldUpdateTime = System.currentTimeMillis();
             }
         }
     }
@@ -418,63 +425,61 @@ public class SkatenightServerEndpoint {
      * Wobei das Feld um den Wegpunkte herum gebaut wird, welcher die meisten Member enthält
      * @param id event Id
      */
-    private void calculateField(long id) {
-        PersistenceManager pm = pmf.getPersistenceManager();
-        try {
-            Event event = pm.getObjectById(Event.class, id);
-            List<RoutePoint> points = event.getRoute().getRoutePoints();
-            List<Member> members = getMembersFromEvent(event.getKey().getId());
+    private void calculateField(PersistenceManager pm, long id) {
+        Event event = pm.getObjectById(Event.class, id);
+        List<RoutePoint> points = event.getRoute().getRoutePoints();
+        List<Member> members = getMembersFromEvent(event.getKey().getId());
 
-            logger.info("points.size(): " + points.size());
-            // array erstellen welches an der stelle n die Anzahl der Member enthält welche am RoutePoint n sind.
-            int memberCountPerRoutePoint[] = new int[points.size()];
-            for (Member member : members) {
-                if (member.getCurrentEventId() != null && member.getCurrentEventId() == event.getKey().getId() && member.getCurrentWaypoint() != null) {
-                    memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()]+1;
-                }
+        logger.info("points.size(): " + points.size());
+        // array erstellen welches an der stelle n die Anzahl der Member enthält welche am RoutePoint n sind.
+        int memberCountPerRoutePoint[] = new int[points.size()];
+        for (Member member : members) {
+            if (member.getCurrentEventId() != null && member.getCurrentEventId() == event.getKey().getId() && member.getCurrentWaypoint() != null) {
+                memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()] + 1;
             }
-
-            // Den index des RoutePoints speichern an welchen die meisten Member sind.
-            //int mostMemberPerWaypoint = -1;
-            int mostMemberIndex = 0;
-            for (int i = 0; i < memberCountPerRoutePoint.length; i++) {
-                if (memberCountPerRoutePoint[i] > memberCountPerRoutePoint[mostMemberIndex]) {
-                    mostMemberIndex = i;
-                }
-            }
-
-            // Vom mostMemberIndex rückwärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
-            // als 5 Member haben
-            int first = mostMemberIndex;
-            while (first > 0) {
-                if (memberCountPerRoutePoint[first-1] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
-                    first--;
-                } else if(first > 1 && memberCountPerRoutePoint[first-2] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
-                    first-=2;
-                } else {
-                    break;
-                }
-            }
-
-            // Vom mostMemberIndex vorwaärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
-            // als 5 Member haben
-            int last = mostMemberIndex;
-            while (last < memberCountPerRoutePoint.length-1) {
-                if (memberCountPerRoutePoint[last+1] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
-                    last++;
-                } else if(last < memberCountPerRoutePoint.length-2 && memberCountPerRoutePoint[last+2] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
-                    last+=2;
-                } else {
-                    break;
-                }
-            }
-
-            event.setRouteFieldFirst(first);
-            event.setRouteFieldLast(last);
-            pm.makePersistent(event);
-        } finally {
-            pm.close();
         }
+
+        // Den index des RoutePoints speichern an welchen die meisten Member sind.
+        //int mostMemberPerWaypoint = -1;
+        int mostMemberIndex = 0;
+        for (int i = 0; i < memberCountPerRoutePoint.length; i++) {
+            if (memberCountPerRoutePoint[i] > memberCountPerRoutePoint[mostMemberIndex]) {
+                mostMemberIndex = i;
+            }
+        }
+
+        // Vom mostMemberIndex rückwärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
+        // als 5 Member haben
+        int first = mostMemberIndex;
+        while (first > 0) {
+            if (memberCountPerRoutePoint[first - 1] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
+                first--;
+            } else if (first > 1 && memberCountPerRoutePoint[first - 2] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
+                first -= 2;
+            } else {
+                break;
+            }
+        }
+
+        // Vom mostMemberIndex vorwaärts gehen bis 2 aufeinanderfolgende RoutePoints jeweils weniger
+        // als 5 Member haben
+        int last = mostMemberIndex;
+        while (last < memberCountPerRoutePoint.length - 1) {
+            if (memberCountPerRoutePoint[last + 1] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
+                last++;
+            } else if (last < memberCountPerRoutePoint.length - 2 && memberCountPerRoutePoint[last + 2] >= Constants.MIN_WAYPOINT_MEMBER_COUNT) {
+                last += 2;
+            } else {
+                break;
+            }
+        }
+
+        event.setRouteFieldFirst(first);
+        event.setRouteFieldLast(last);
+        if (event.getRoute().getRoutePoints().size() == 0) {
+            logger.info("RoutePoints wurden gelöscht!");
+        }
+        pm.makePersistent(event);
     }
 
     /**
@@ -850,9 +855,12 @@ public class SkatenightServerEndpoint {
      */
     public BooleanWrapper editEvent(Event event, User user) throws OAuthRequestException, IOException {
         long keyId = event.getKey().getId();
+        Date oldDate = FieldType.getFusedDate(getEvent(keyId));
+        Date newDate = FieldType.getFusedDate(event);
+        boolean dateChanged = oldDate.equals(newDate);
         BooleanWrapper b = deleteEvent(keyId, user);
         if(b.value) {
-            createEvent(user, event, true);
+            createEvent(user, event, true, dateChanged);
         }
 
         return new BooleanWrapper(b.value);

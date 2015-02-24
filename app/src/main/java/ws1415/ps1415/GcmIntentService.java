@@ -11,6 +11,8 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import java.util.Date;
+
 import ws1415.common.gcm.MessageType;
 import ws1415.ps1415.activity.ShowEventsActivity;
 import ws1415.ps1415.activity.UsergroupActivity;
@@ -54,6 +56,14 @@ public class GcmIntentService extends IntentService {
                         // Event-Liste in der ShowEventsActivity aktualisieren
                         Intent refreshIntent = new Intent(ShowEventsActivity.REFRESH_EVENTS_ACTION);
                         LocalBroadcastManager.getInstance(this).sendBroadcast(refreshIntent);
+
+                        // Falls sich die Startzeit geändert hat, dann Alarm aktualisieren
+                        boolean dateChanged = Boolean.parseBoolean(extras.getString("date_changed"));
+                        if (dateChanged) {
+                            long newDate = Long.parseLong(extras.getString("new_date"));
+                            long eventId = Long.parseLong(extras.getString("event_id"));
+                            LocationTransmitterService.ScheduleService(this, eventId, new Date(newDate));
+                        }
                         break;
                     case EVENT_START_MESSAGE:
                         break;
