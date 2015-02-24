@@ -17,7 +17,7 @@ import com.skatenight.skatenightAPI.model.Host;
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.ServiceProvider;
-import ws1415.veranstalterapp.activity.AddHostDialog;
+import ws1415.veranstalterapp.dialog.AddHostDialog;
 import ws1415.veranstalterapp.activity.PermissionManagementActivity;
 import ws1415.veranstalterapp.task.DeleteHostTask;
 

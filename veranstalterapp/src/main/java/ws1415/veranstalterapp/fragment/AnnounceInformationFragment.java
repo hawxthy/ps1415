@@ -80,11 +80,6 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
         return view;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-    }
-
     /**
      * Methode zum setzen der Listener für die Buttons "timePickerButton", "datePickerButton",
      * "applyButton", "cancelButton", "routePickerButton".
@@ -142,7 +137,7 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
                 EventUtils.getInstance(getActivity()).setEventInfo(event, listView);
 
                 // Initialisiere Pflichtfelder
-                String eventTitle = EventUtils.getInstance(AnnounceInformationFragment.this.getActivity()).getUniqueField(FieldType.TITLE.getId(), event).getValue();
+                String eventTitle = EventUtils.getUniqueField(FieldType.TITLE.getId(), event).getValue();
                 Route eventRoute = event.getRoute();
 
                 if (!eventTitle.equals("") && eventRoute != null){

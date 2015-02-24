@@ -10,7 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.activity.EditWaypointDialog;
+import ws1415.veranstalterapp.dialog.EditWaypointDialog;
 import ws1415.veranstalterapp.activity.RouteEditorActivity;
 
 

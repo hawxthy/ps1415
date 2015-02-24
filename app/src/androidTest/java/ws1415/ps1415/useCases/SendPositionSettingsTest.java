@@ -6,6 +6,7 @@ import android.app.Instrumentation;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.ViewAsserts;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -16,7 +17,10 @@ import android.widget.ListView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Member;
+
+import java.util.List;
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
@@ -45,6 +49,9 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
     // ShowEventsActivty UI Elemente
     private ListView mList;
     private ListAdapter mListData;
+
+    // Das zu testende Event
+    private Event mEvent;
 
     public SendPositionSettingsTest() {
         super(ShowEventsActivity.class);
@@ -77,6 +84,9 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         // Holt sich die Event Listen-Elemente
         mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
         mListData = mList.getAdapter();
+        Thread.sleep(2000); // Zeit zum initialisieren
+
+        mEvent = (Event) mListData.getItem(0);
     }
 
     /**
@@ -232,7 +242,8 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         Thread.sleep(2500); // Zeit zum initialisieren
 
         // Setzen der Position auf den Server
-        new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude).execute();
+        new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute();
+
         Thread.sleep(5000); // Zeit zum initialisieren
 
         // Teilnehmer, der seine Position an den Server senden wird
@@ -301,7 +312,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         assertTrue(active);
 
         // Setzen der Position auf den Server
-        new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude).execute();
+        new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute().get();
         Thread.sleep(5000); // Zeit zum initialisieren
 
         // Teilnehmer, der seine Position an den Server senden wird
