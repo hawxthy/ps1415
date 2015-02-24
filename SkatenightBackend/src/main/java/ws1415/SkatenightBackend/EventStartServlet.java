@@ -80,7 +80,10 @@ public class EventStartServlet extends HttpServlet {
                         if (!results.isEmpty()) {
                             _logger.info("DEBUG");
                             member = results.get(0);
-                            member.setCurrentEventId(e.getKey().getId());
+                            if (member.getCurrentEventId() ==  null ||member.getCurrentEventId() != e.getKey().getId()) {
+                                member.setCurrentEventId(e.getKey().getId());
+                                member.setCurrentWaypoint(0);
+                            }
                             pm.makePersistent(member);
                         }
                     } catch (JDOObjectNotFoundException ex) {
