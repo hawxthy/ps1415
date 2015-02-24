@@ -274,10 +274,6 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                         routePoints.add(routePoint);
                     }
 
-
-                    Toast.makeText(getApplicationContext(), "size: " + routePoints.size(), Toast.LENGTH_LONG).show();
-
-
                     com.skatenight.skatenightAPI.model.Route rt = new com.skatenight.skatenightAPI.model.Route();
                     rt.setName(name);
                     rt.setRouteData(new Text().setValue(encoded));
@@ -292,7 +288,6 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
                         swp.setLatitude(mo.getPosition().latitude);
                         rt.getWaypoints().add(swp);
                     }
-                    Toast.makeText(getApplicationContext(), "size: " + rt.getRoutePoints().size(), Toast.LENGTH_LONG).show();
 
                     String length;
                     if (route.getDistance() < 1000) {
