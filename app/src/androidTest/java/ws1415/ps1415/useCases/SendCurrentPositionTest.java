@@ -15,6 +15,7 @@ import android.widget.ListView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Member;
 
 import ws1415.ps1415.Constants;
@@ -38,6 +39,9 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
     // ShowEventsActivity UI Elemente
     private ListView mList;
     private ListAdapter mListData;
+
+    // Das zu testende Event
+    private Event mEvent;
 
     // Test Daten zur positionsübertragung
     private final String TEST_EMAIL        = "tristan.rust@googlemail.com";
@@ -74,6 +78,9 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
         // Holt sich die Event Listen-Elemente
         mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
         mListData = mList.getAdapter();
+        Thread.sleep(2000); // Zeit zum initialisieren
+
+        mEvent = (Event) mListData.getItem(0);
     }
 
     /**
@@ -134,7 +141,7 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
         Thread.sleep(2500); // Zeit zum initialisieren
 
         // Setzen der Position auf den Server
-        new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude).execute();
+        new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute();
         Thread.sleep(2000); // Zeit zum initialisieren
 
         // Teilnehmer, der seine Position an den Server senden wird
