@@ -19,12 +19,9 @@ import com.skatenight.skatenightAPI.model.ServerWaypoint;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import ws1415.veranstalterapp.activity.RouteEditorActivity;
-import ws1415.veranstalterapp.AddRouteDialog;
-import ws1415.veranstalterapp.activity.AddRouteDraftDialog;
+import ws1415.veranstalterapp.dialog.AddRouteDraftDialog;
 import ws1415.veranstalterapp.adapter.MapsCursorAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.activity.ShowRouteActivity;
