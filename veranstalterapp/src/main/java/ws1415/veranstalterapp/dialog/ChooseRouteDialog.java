@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.activity;
+package ws1415.veranstalterapp.dialog;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ws1415.veranstalterapp.activity.EditEventActivity;
+import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.adapter.MapsCursorAdapter;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
 import ws1415.veranstalterapp.R;
@@ -23,7 +25,7 @@ import ws1415.veranstalterapp.ServiceProvider;
  *
  * @author Bernd Eissing, Marting Wrodarczyk on 21.11.2014.
  */
-public class ChooseRouteActivity extends Activity {
+public class ChooseRouteDialog extends Activity {
     private ListView lv;
     private List<Route> routeList;
     private MapsCursorAdapter mAdapter;
@@ -44,7 +46,7 @@ public class ChooseRouteActivity extends Activity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ((AnnounceInformationFragment)HoldTabsActivity.getAdapter().getItem(1)).getAdapter().setRouteAndText(routeList.get(i));
+                ((AnnounceInformationFragment) HoldTabsActivity.getAdapter().getItem(1)).getAdapter().setRouteAndText(routeList.get(i));
                 if(activity != null){
                     activity.getAdapter().setRouteAndText(routeList.get(i));
                 }
@@ -71,15 +73,15 @@ public class ChooseRouteActivity extends Activity {
      *
      * Created by Bernd Eissing, Martin Wrodarczyk on 04.11.2014.
      */
-    private class PrivateQueryRouteTask extends AsyncTask<ChooseRouteActivity, Void, List<Route>> {
-        private ChooseRouteActivity view;
+    private class PrivateQueryRouteTask extends AsyncTask<ChooseRouteDialog, Void, List<Route>> {
+        private ChooseRouteDialog view;
 
         /**
          * Ruft die Liste der Routen vom Server ab und gibt diese aus
          * @return die Liste der Routen vom Server
          */
         @Override
-        protected List<Route> doInBackground(ChooseRouteActivity... params){
+        protected List<Route> doInBackground(ChooseRouteDialog... params){
             view =params[0];
             try{
                 return ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute().getItems();

@@ -7,16 +7,15 @@ import android.app.Instrumentation;
 import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.SystemClock;
-import android.support.v4.app.Fragment;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.UiThreadTest;
 import android.test.ViewAsserts;
+import android.test.suitebuilder.annotation.LargeTest;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
@@ -30,27 +29,22 @@ import java.util.List;
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.ServiceProvider;
-import ws1415.veranstalterapp.activity.AddHostDialog;
 import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.adapter.EventsCursorAdapter;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
-import ws1415.veranstalterapp.fragment.ManageRoutesFragment;
 import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 import ws1415.veranstalterapp.task.AddRouteTask;
-import ws1415.veranstalterapp.task.QueryRouteTask;
 import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.FieldType;
 
 
 /**
  * Testet den Use Case "Veröffentichen neuer Informationen". Dazu wird ein neues Event erstellt
- * und nach dem Erstellen bearbeitet. Nach dem Bearbeiten wird  dieses Event, sowie die testRoute
- * wieder gelöscht.
+ * und nach dem Erstellen bearbeitet. <strong> Es muss eine Internetverbingung bestehen.</strong>
  *
  * @author Tristan Rust
  */
-
 public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<HoldTabsActivity> {
     // UI Elemente
     private volatile boolean click;
@@ -65,6 +59,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     private Button cancelButton;
     private Button routePickerButton;
 
+    // Test Daten die beim Erstellen eines Events verwendet werden
     private static final String TEST_TITLE = "TestEvent";
     private static final String TEST_FEE = "10";
     private static final String TEST_LOCATION = "TestStadt";
@@ -72,6 +67,15 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     private static final String TEST_DATE = "29.12.2014";
     private static final String TEST_TIME = "14:00 Uhr";
     private static final String TEST_ROUTE = "test";
+
+    // Test Daten für die Bearbeitung eines Events
+    private static final String TEST_TITLE_EDIT = "TestEventEdit";
+    private static final String TEST_FEE_EDIT = "5";
+    private static final String TEST_LOCATION_EDIT = "TestStadtEdit";
+    private static final String TEST_DESCRIPTION_EDIT = "TestBeschreibungEdit";
+    private static final String TEST_DATE_EDIT = "29.11.2014";
+    private static final String TEST_TIME_EDIT = "15:00 Uhr";
+    private static final String TEST_ROUTE_EDIT = "test";
 
     // Test Daten für den Test State Destroy
     private static final String TEST_STATE_DESTROY_TITLE = "TestEventDestroy";
@@ -93,6 +97,10 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
 
     public PublishNewInformationTest() {
         super(HoldTabsActivity.class);
+    }
+
+    protected void tearDown() throws Exception {
+        super.tearDown();
     }
 
     /**
@@ -137,7 +145,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     }
 
     /**
-     * Swipt auf dem Bildschirm.
+     * Swipt auf dem Bildschirm in die angegebenen Richtung.
      *
      * @param direction Die Richtung (links oder recths)
      */
@@ -145,32 +153,31 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         Instrumentation inst = getInstrumentation();
         Point size = new Point();
         mActivity.getWindowManager().getDefaultDisplay().getSize(size);
+        // Bildschirmbreite
         int width = size.x;
 
-        // Festellen in welche Richtung
+        // Festellen in welche Richtung geswipt wird
         long downTime = SystemClock.uptimeMillis();
         float xStart = ((direction == Direction.Left) ? (width - 10) : 10);
         float xEnd = ((direction == Direction.Left) ? 10 : (width - 10));
 
-        // Der Wert für die y verändert sich nicht
+        // Der Wert für die y verändert sich nicht. Swipe über die Instrumentation ausführen
         inst.sendPointerSync(MotionEvent.obtain(downTime, SystemClock.uptimeMillis(),
-                MotionEvent.ACTION_DOWN, xStart, size.y / 2, 0));
+                             MotionEvent.ACTION_DOWN, xStart, size.y / 2, 0));
         inst.sendPointerSync(MotionEvent.obtain(downTime, SystemClock.uptimeMillis(),
-                MotionEvent.ACTION_MOVE, xEnd, size.y / 2, 0));
+                             MotionEvent.ACTION_MOVE, xEnd, size.y / 2, 0));
         inst.sendPointerSync(MotionEvent.obtain(downTime, SystemClock.uptimeMillis() + 1000,
-                MotionEvent.ACTION_UP, xEnd, size.y / 2, 0));
+                             MotionEvent.ACTION_UP, xEnd, size.y / 2, 0));
     }
 
-
     /**
-     * Prüfen, ob alle Tabs vorhanden sind
+     * Prüfen, ob alle Tabs vorhanden sind.
      */
     @SmallTest
     public void testPreConditions() {
         assertEquals(ActionBar.NAVIGATION_MODE_TABS, mActionBar.getNavigationMode());
         assertEquals(3, mActionBar.getNavigationItemCount());
     }
-
 
     /**
      * Prüft, ob diese Views wirklich in der Activity existieren.
@@ -188,7 +195,6 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         assertNotNull(cancelButton);
         assertNotNull(routePickerButton);
     }
-
 
     /**
      * Prüft, ob die Elemente in der Activity wirklich gerendert werden.
@@ -208,17 +214,14 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         ViewAsserts.assertOnScreen(mActivity.getWindow().getDecorView(), routePickerButton);
     }
 
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     /**
      * Testet den Use Case "Veröffentichen neuer Informationen". Dazu wird ein neues Event erstellt
-     * und nach dem Erstellen bearbeitet. Nach dem Bearbeiten wird  dieses Event, sowie die testRoute
-     * wieder gelöscht.
+     * und nach dem Erstellen bearbeitet. Large Test, da auf Ressourcen eines Servers, bzw.
+     * anderen Netzwerkes zugegriffen wird.
      *
      * @throws Exception
      */
+    @LargeTest
     public void testUseCase() throws Exception {
         // Prüfen, ob alle Tabs vorhanden sind
         assertEquals(ActionBar.NAVIGATION_MODE_TABS, mActionBar.getNavigationMode());
@@ -246,15 +249,6 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         mActionBar.selectTab(tab1);
         assertEquals(1, mActionBar.getSelectedNavigationIndex());
 
-        // Testdaten
-        final String textTitle = "TestEvent";
-        final String textFee = "10";
-        final String textLocation = "TestStadt";
-        final String textDescription = "TestBeschreibung";
-        final String textDate = "29.12.2014";
-        final String textTime = "14:00 Uhr";
-        final String textRoute = "test";
-
         final EditText editTextTitle = (EditText) listView.getChildAt(0).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
         final EditText editTextFee = (EditText) listView.getChildAt(1).findViewById(R.id.list_view_item_announce_information_fee_editText);
         final EditText editTextLocation = (EditText) listView.getChildAt(4).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
@@ -267,30 +261,30 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         final Button cancelButton = (Button) mActivity.findViewById(R.id.announce_info_cancel_button);
         final Button routePickerButton = (Button) listView.getChildAt(5).findViewById(R.id.list_view_item_announce_information_button_button);
 
-        // TEST ABBRECHEN
+        // TEST: ABBRECHEN
         // Es wird ein neuer UI Thread gestartet & die Textfelder werden ausgefüllt
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                editTextTitle.setText(textTitle);
-                editTextFee.setText(textFee);
-                editTextLocation.setText(textLocation);
-                editTextDescription.setText(textDescription);
-                datePickerButton.setText(textDate);
-                timePickerButton.setText(textTime);
-                routePickerButton.setText(textRoute);
+                editTextTitle.setText(TEST_TITLE);
+                editTextFee.setText(TEST_FEE);
+                editTextLocation.setText(TEST_LOCATION);
+                editTextDescription.setText(TEST_DESCRIPTION);
+                datePickerButton.setText(TEST_DATE);
+                timePickerButton.setText(TEST_TIME);
+                routePickerButton.setText(TEST_ROUTE);
             }
         });
-        Thread.sleep(3000);
+        Thread.sleep(5000); // Zeit zum initialisieren
 
         // Prüfen, ob die Daten jetzt eingefügt wurden
-        assertEquals(textTitle, editTextTitle.getText().toString());
-        assertEquals(textFee, editTextFee.getText().toString());
-        assertEquals(textLocation, editTextLocation.getText().toString());
-        assertEquals(textDescription, editTextDescription.getText().toString());
-        assertEquals(textDate, datePickerButton.getText().toString());
-        assertEquals(textTime, timePickerButton.getText().toString());
-        assertEquals(textRoute, routePickerButton.getText().toString());
+        assertEquals(TEST_TITLE, editTextTitle.getText().toString());
+        assertEquals(TEST_FEE, editTextFee.getText().toString());
+        assertEquals(TEST_LOCATION, editTextLocation.getText().toString());
+        assertEquals(TEST_DESCRIPTION, editTextDescription.getText().toString());
+        assertEquals(TEST_DATE, datePickerButton.getText().toString());
+        assertEquals(TEST_TIME, timePickerButton.getText().toString());
+        assertEquals(TEST_ROUTE, routePickerButton.getText().toString());
 
         click = false;
         // Abbrechen wodurch alle Felder zurück gesetzt werden sollten
@@ -310,8 +304,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
             // exception machen
         }
         assertTrue("Timeout", time < 50);
-        Thread.sleep(3000);
-
+        Thread.sleep(3000); // Zeit zum initialisieren
 
         final EditText editTextTitle2 = (EditText) listView.getChildAt(0).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
         final EditText editTextFee2 = (EditText) listView.getChildAt(1).findViewById(R.id.list_view_item_announce_information_fee_editText);
@@ -323,12 +316,13 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         final Button datePickerButton2 = (Button) listView.getChildAt(2).findViewById(R.id.list_view_item_announce_information_button_button);
         final Button routePickerButton2 = (Button) listView.getChildAt(5).findViewById(R.id.list_view_item_announce_information_button_button);
 
+        // Verwendet für den Test das aktuelle Datum & die Zeit
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
 
-        // Prüfen, ob die Daten jetzt wieder resettet wurden
+        // Prüfen, ob die Daten jetzt wieder resettet wurden, nach dem der Test abgebrochen wurde
         assertEquals("", editTextTitle2.getText().toString());
         assertEquals("", editTextFee2.getText().toString());
         assertEquals("", editTextLocation2.getText().toString());
@@ -337,39 +331,41 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         assertEquals("20:00 Uhr", timePickerButton2.getText());
         assertEquals("Wähle Route", routePickerButton2.getText().toString());
 
-        // TEST ERSTELLEN
+        // TEST: ERSTELLEN
         // Fülle die Textfelder erneut aus
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                editTextTitle2.setText(textTitle);
-                editTextFee2.setText(textFee);
-                editTextLocation2.setText(textLocation);
-                editTextDescription2.setText(textDescription);
+                editTextTitle2.setText(TEST_TITLE);
+                editTextFee2.setText(TEST_FEE);
+                editTextLocation2.setText(TEST_LOCATION);
+                editTextDescription2.setText(TEST_DESCRIPTION);
 
-                datePickerButton2.setText(textDate);
-                timePickerButton2.setText(textTime);
-                routePickerButton2.setText(textRoute);
+                datePickerButton2.setText(TEST_DATE);
+                timePickerButton2.setText(TEST_TIME);
+                routePickerButton2.setText(TEST_ROUTE);
             }
         });
-        Thread.sleep(3000);
+        Thread.sleep(5000); // Zeit zum initialisieren
 
         // Prüfen, ob die Daten jetzt eingefügt wurden
-        assertEquals(textTitle, editTextTitle2.getText().toString());
-        assertEquals(textFee, editTextFee2.getText().toString());
-        assertEquals(textLocation, editTextLocation2.getText().toString());
-        assertEquals(textDescription, editTextDescription2.getText().toString());
-        assertEquals(textDate, datePickerButton2.getText().toString());
-        assertEquals(textTime, timePickerButton2.getText().toString());
-        assertEquals(textRoute, routePickerButton2.getText().toString());
+        assertEquals(TEST_TITLE, editTextTitle2.getText().toString());
+        assertEquals(TEST_FEE, editTextFee2.getText().toString());
+        assertEquals(TEST_LOCATION, editTextLocation2.getText().toString());
+        assertEquals(TEST_DESCRIPTION, editTextDescription2.getText().toString());
+        assertEquals(TEST_DATE, datePickerButton2.getText().toString());
+        assertEquals(TEST_TIME, timePickerButton2.getText().toString());
+        assertEquals(TEST_ROUTE, routePickerButton2.getText().toString());
 
-        // Route bauen
+        // Erstellt eine vordefinierte Testroute
         Route testRoute1;
-        String routename = Long.toString(System.currentTimeMillis());
+        String routeName = Long.toString(System.currentTimeMillis());
         testRoute1 = new Route();
-        testRoute1.setName(routename);
+        testRoute1.setName(routeName);
         testRoute1.setLength("5 km");
         testRoute1.setRouteData(new Text().setValue("{sb|Hyamm@Ma@So@EKIWuFyPa@wAESYaAYmA]gB??LWLa@J]Fe@Fg@Bk@NcB@SBO@QDa@@K?K@I?KFoABi@FiALmDFcADiAJmC@Y???_@y@QC?OCOCI?ODYBUDa@Jc@Nc@RKFMJQPOTa@d@_BvB_@d@UXSPSLSJOFG@SDKB_@Dw@FQGs@DqBNK@QBO@OAWC_AMMC]Gg@IQCOA[CWAa@?m@@e@@mBJI@SBO@c@FSD_@HC@g@L_@L[LOHC@_@PKFWNMHOLIJGFGJEFGJEJA?CFENKd@Qp@CHIXK\\[v@Yr@OXaAtA[f@_@f@qCfEUZ??_@RYZWZGJMJKFIBIBUDsCCo@?y@?}@AI?U?aBDaBFcELoADiABi@B??GsEKmEEiDAi@SiMGsDGuBEoBCoEGmE?iCAsB@y@??SCIAc@C]@]FUBMDMFC@KFIFKHEDGHORWd@KPGLQ\\_@p@ABQPIFUNy@n@UPuB|A??IOGGk@SSG{C_A]I_@C_@EICQEi@Qe@M_@IKCGAG?S@Q@SBQBE?s@J}ARI@"));
+
+        // Testroute auf dem Server speichern
         new AddRouteTask().execute(testRoute1).get();
         List<Route> list = null;
         try {
@@ -378,12 +374,14 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
             e.printStackTrace();
         }
         for (int i = 0; i < list.size(); i++) {
-            if (routename.equals(list.get(i).getName())) {
+            if (routeName.equals(list.get(i).getName())) {
                 testRoute1 = list.get(i);
                 break;
             }
         }
+        // Route muss final sein im UI Thread
         final Route testRoute2 = testRoute1;
+
         // Erstellen des Events
         mActivity.runOnUiThread(new Runnable() {
             @Override
@@ -392,7 +390,8 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
                 applyButton.performClick();
             }
         });
-        Thread.sleep(3000);
+        Thread.sleep(5000); // Zeit zum initialisieren
+
         final Button okButton = ((AnnounceInformationFragment) mActivity.getAdapter().getItem(1)).getLastDialog().getButton(AlertDialog.BUTTON_POSITIVE);
         mActivity.runOnUiThread(new Runnable() {
             @Override
@@ -400,8 +399,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
                 okButton.performClick();
             }
         });
-        Thread.sleep(3000);
-
+        Thread.sleep(5000); // Zeit zum initialisieren
 
         // Suche das neu angelegte Event
         List<Event> list2 = null;
@@ -410,10 +408,11 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         boolean found = false;
         if (list2 != null) {
             for (Event e : list2) {
-                if (EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue().equals(textTitle)) {
+                if (EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue().equals(TEST_TITLE)) {
                     found = true;
                     break;
                 }
@@ -423,24 +422,24 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
             assertTrue("Couldn't find any events!", found);
         }
 
-        // Nun wird das Event editiert
+        // TEST: EVENT Editieren
         swipe(Direction.Right);
         ShowEventsFragment mFragment = (ShowEventsFragment)mActivity.getAdapter().getItem(0);
         EventsCursorAdapter mAdapter = mFragment.getmAdapter();
         List<Event> eventList = mAdapter.getEventList();
 
-        // Suche nach dem eben erstellten Event
+        // Eben erstelltes Event suchen
         int pos = -1;
         found = false;
         for(Event e : eventList){
             pos++;
-            if(textTitle.equals(EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue())){
+            if(TEST_TITLE.equals(EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue())){
                 found = true;
                 break;
             }
 
         }
-        assertTrue("Event wurde nicht gefunden", found);
+        assertTrue("Couldn't find the event!", found);
 
         // Editiere das gefundene Event
         mFragment.editEvent(eventList.get(pos));
@@ -449,7 +448,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         Instrumentation.ActivityMonitor am = getInstrumentation().addMonitor(EditEventActivity.class.getName(), null, false);
         EditEventActivity editEventActivity = (EditEventActivity) am.waitForActivityWithTimeout(20000);
 
-        Thread.sleep(5000);
+        Thread.sleep(5000); // Zeit zum initalisieren
 
         final ListView eventFields = editEventActivity.getListView();
 
@@ -458,31 +457,23 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         final EditText editTextLocationEdit = (EditText) eventFields.getChildAt(4).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
         final EditText editTextDescriptionEdit = (EditText) eventFields.getChildAt(6).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
 
-        final String textTitleEdit = "TestEventEdit";
-        final String textFeeEdit = "5";
-        final String textLocationEdit = "TestStadtEdit";
-        final String textDescriptionEdit = "TestBeschreibungEdit";
-        final String textDateEdit = "29.11.2014";
-        final String textTimeEdit = "15:00 Uhr";
-
-
         // Fülle die Textfelder erneut aus
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                editTextTitleEdit.setText(textTitleEdit);
-                editTextFeeEdit.setText(textFeeEdit);
-                editTextLocationEdit.setText(textLocationEdit);
-                editTextDescriptionEdit.setText(textDescriptionEdit);
+                editTextTitleEdit.setText(TEST_TITLE_EDIT);
+                editTextFeeEdit.setText(TEST_FEE_EDIT);
+                editTextLocationEdit.setText(TEST_LOCATION_EDIT);
+                editTextDescriptionEdit.setText(TEST_DESCRIPTION_EDIT);
             }
         });
         Thread.sleep(3000);
 
         // Prüfen, ob die Daten verändert wurden
-        assertEquals(textTitleEdit, editTextTitleEdit.getText().toString());
-        assertEquals(textFeeEdit, editTextFeeEdit.getText().toString());
-        assertEquals(textLocationEdit, editTextLocationEdit.getText().toString());
-        assertEquals(textDescriptionEdit, editTextDescriptionEdit.getText().toString());
+        assertEquals(TEST_TITLE_EDIT, editTextTitleEdit.getText().toString());
+        assertEquals(TEST_FEE_EDIT, editTextFeeEdit.getText().toString());
+        assertEquals(TEST_LOCATION_EDIT, editTextLocationEdit.getText().toString());
+        assertEquals(TEST_DESCRIPTION_EDIT, editTextDescriptionEdit.getText().toString());
 
         final Button applyEditButton = (Button) editEventActivity.findViewById(R.id.edit_event_info_apply_button);
 
@@ -534,23 +525,22 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         found = false;
         for(Event e : eventList){
             pos++;
-            if(textTitleEdit.equals(EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue())){
+            if(TEST_TITLE_EDIT.equals(EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue())){
                 found = true;
                 break;
             }
 
         }
-        assertTrue("Event wurde nicht gefunden", found);
+        assertTrue("Couldn't find the event!", found);
 
         // Prüfen, ob die Daten verändert wurden
-        assertEquals(textTitleEdit, EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), eventList.get(pos)).getValue());
-        assertEquals(textFeeEdit, EventUtils.getInstance(mActivity).getUniqueField(FieldType.FEE.getId(), eventList.get(pos)).getValue());
-        assertEquals(textLocationEdit, EventUtils.getInstance(mActivity).getUniqueField(FieldType.LOCATION.getId(), eventList.get(pos)).getValue());
-        assertEquals(textDescriptionEdit, EventUtils.getInstance(mActivity).getUniqueField(FieldType.DESCRIPTION.getId(), eventList.get(pos)).getValue());
+        assertEquals(TEST_TITLE_EDIT, EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), eventList.get(pos)).getValue());
+        assertEquals(TEST_FEE_EDIT, EventUtils.getInstance(mActivity).getUniqueField(FieldType.FEE.getId(), eventList.get(pos)).getValue());
+        assertEquals(TEST_LOCATION_EDIT, EventUtils.getInstance(mActivity).getUniqueField(FieldType.LOCATION.getId(), eventList.get(pos)).getValue());
+        assertEquals(TEST_DESCRIPTION_EDIT, EventUtils.getInstance(mActivity).getUniqueField(FieldType.DESCRIPTION.getId(), eventList.get(pos)).getValue());
 
         swipe(Direction.Left);
 
-        // Das Event und die Route löschen
         // Auskommentiert, damit das hier angelegte Event in der App auch sichtbar ist
         // mFragment.deleteEvent(eventList.get(pos));
         // ManageRoutesFragment fragment = (ManageRoutesFragment)mActivity.getAdapter().getItem(2);
@@ -560,19 +550,8 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     /**
      * Testet die Activity beim Beenden und wieder Neustarten.
      */
-
     @SmallTest
     public void testUseCaseStateDestroy() throws Exception{
-
-        // Testdaten
-        final String textTitle = "TestEventDestroy";
-        final String textFee = "500";
-        final String textLocation = "Whatever";
-        final String textDescription = "Beschreibung";
-        final String textDate = "31.12.2014";
-        final String textTime = "12:00 Uhr";
-        final String textRoute = "test";
-
         final EditText editTextTitle = (EditText) listView.getChildAt(0).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
         final EditText editTextFee = (EditText) listView.getChildAt(1).findViewById(R.id.list_view_item_announce_information_fee_editText);
         final EditText editTextLocation = (EditText) listView.getChildAt(4).findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
@@ -588,22 +567,22 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                editTextTitle.setText(textTitle);
-                editTextFee.setText(textFee);
-                editTextLocation.setText(textLocation);
-                editTextDescription.setText(textDescription);
-                datePickerButton.setText(textDate);
-                timePickerButton.setText(textTime);
-                routePickerButton.setText(textRoute);
+                editTextTitle.setText(TEST_STATE_DESTROY_TITLE);
+                editTextFee.setText(TEST_STATE_DESTROY_FEE);
+                editTextLocation.setText(TEST_STATE_DESTROY_LOCATION);
+                editTextDescription.setText(TEST_STATE_DESTROY_DESCRIPTION);
+                datePickerButton.setText(TEST_STATE_DESTROY_DATE);
+                timePickerButton.setText(TEST_STATE_DESTROY_TIME);
+                routePickerButton.setText(TEST_STATE_DESTROY_ROUTE);
             }
         });
-        Thread.sleep(3000);
+        Thread.sleep(3000); // Zeit zum initalisieren
+
         // Beenden & Neustarten der Activity
         mActivity.finish();
         mActivity = this.getActivity();
 
         // Abrufen der aktuellen Werte
-
         String currentTitle = editTextTitle.getText().toString();
         String currentFee = editTextFee.getText().toString();
         String currentLocation = editTextLocation.getText().toString();
@@ -611,7 +590,6 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         String currentDate = datePickerButton.getText().toString();
         String currentTime = timePickerButton.getText().toString();
         String currentRoute = routePickerButton.getText().toString();
-
 
         // Testen der aktuellen Werte mit den Testwerten
         assertEquals("Current title incorrect!", TEST_STATE_DESTROY_TITLE, currentTitle);
@@ -660,39 +638,30 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         mActionBar.selectTab(tab1);
         assertEquals(1, mActionBar.getSelectedNavigationIndex());
 
-        // Testdaten
-        final String textTitle = "TestEvent";
-        final String textFee = "10";
-        final String textLocation = "TestStadt";
-        final String textDescription = "TestBeschreibung";
-        final String textDate = "29.12.2014";
-        final String textTime = "14:00 Uhr";
-        final String textRoute = "test";
-
-        // TEST DATEN EINFÜGEN
+        // TEST: DATEN EINFÜGEN & DIE APP PAUSIEREN
         // Es wird ein neuer UI Thread gestartet & fülle die Textfelder aus
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                editTextTitle.setText(textTitle);
-                editTextFee.setText(textFee);
-                editTextLocation.setText(textLocation);
-                editTextDescription.setText(textDescription);
+                editTextTitle.setText(TEST_TITLE);
+                editTextFee.setText(TEST_FEE);
+                editTextLocation.setText(TEST_LOCATION);
+                editTextDescription.setText(TEST_DESCRIPTION);
 
-                datePickerButton.setText(textDate);
-                timePickerButton.setText(textTime);
-                routePickerButton.setText(textRoute);
+                datePickerButton.setText(TEST_DATE);
+                timePickerButton.setText(TEST_TIME);
+                routePickerButton.setText(TEST_ROUTE);
             }
         });
 
         // Prüfen, ob die Daten jetzt eingefügt wurden
-        assertEquals("Title not added!", textTitle, editTextTitle.getText().toString());
-        assertEquals("Fee not added!", textFee, editTextFee.getText().toString());
-        assertEquals("Location not added!", textLocation, editTextLocation.getText().toString());
-        assertEquals("Description not added!", textDescription, editTextDescription.getText().toString());
-        assertEquals("Date not added!", textDate, datePickerButton.getText().toString());
-        assertEquals("Time not added!", textTime, timePickerButton.getText().toString());
-        assertEquals("Route not added!", textRoute, routePickerButton.getText().toString());
+        assertEquals("Title not added!", TEST_TITLE, editTextTitle.getText().toString());
+        assertEquals("Fee not added!", TEST_FEE, editTextFee.getText().toString());
+        assertEquals("Location not added!", TEST_LOCATION, editTextLocation.getText().toString());
+        assertEquals("Description not added!", TEST_DESCRIPTION, editTextDescription.getText().toString());
+        assertEquals("Date not added!", TEST_DATE, datePickerButton.getText().toString());
+        assertEquals("Time not added!", TEST_TIME, timePickerButton.getText().toString());
+        assertEquals("Route not added!", TEST_ROUTE, routePickerButton.getText().toString());
 
         // Pausieren
         instrumentation.callActivityOnPause(mActivity);
@@ -701,13 +670,13 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         instrumentation.callActivityOnResume(mActivity);
 
         // Prüfen, ob die gleichen Daten noch in den Feldern/Buttons stehen wie vor dem pausieren
-        assertEquals("Title not equal!", textTitle, editTextTitle.getText().toString());
-        assertEquals("Fee not equal!", textFee, editTextFee.getText().toString());
-        assertEquals("Location not equal!", textLocation, editTextLocation.getText().toString());
-        assertEquals("Description not equal!", textDescription, editTextDescription.getText().toString());
-        assertEquals("Date not equal!", textDate, datePickerButton.getText().toString());
-        assertEquals("Time not equal!", textTime, timePickerButton.getText().toString());
-        assertEquals("Route not equal!", textRoute, routePickerButton.getText().toString());
+        assertEquals("Title not equal!", TEST_TITLE, editTextTitle.getText().toString());
+        assertEquals("Fee not equal!", TEST_FEE, editTextFee.getText().toString());
+        assertEquals("Location not equal!", TEST_LOCATION, editTextLocation.getText().toString());
+        assertEquals("Description not equal!", TEST_DESCRIPTION, editTextDescription.getText().toString());
+        assertEquals("Date not equal!", TEST_DATE, datePickerButton.getText().toString());
+        assertEquals("Time not equal!", TEST_TIME, timePickerButton.getText().toString());
+        assertEquals("Route not equal!", TEST_ROUTE, routePickerButton.getText().toString());
     }
 }
 

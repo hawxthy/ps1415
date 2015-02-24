@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -277,6 +279,90 @@ public class SkatenightServerEndpoint {
         }
     }
 
+    /**
+     * Hilfsmethode, die für den normalen Betireb nicht benötigt wird. Stellt eine Schnittstelle für
+     * Simulationen her, die eine große Anzahl an Positionen auf dem Server aktualisieren ohne, dass
+     * dabei pro Akutalisierung ein Serveraufruf notwendig ist.
+     * Die Mails, Latituden und Logituden werden als Strings mit = als Trennzeichen kodiert, da ein
+     * Aufruf mit Arrays nicht funktioniert hat.
+     * @param mailParam Die Mail-Adressen der zu Aktualisierenden Member-Objekte als String, durch = getrennt.
+     * @param latitudeParam Die neuen Latituden als String, durch = getrennt
+     * @param longitudeParam Die neuen Longituden, durch = getrennt
+     * @param currentEventId Die Event-ID, die für die Member gesetzt werden soll.
+     */
+    public void simulateMemberLocations(@Named("mails") String mailParam,
+                                     @Named("latitudes") String latitudeParam,
+                                     @Named("longitudes") String longitudeParam,
+                                     @Named("currentEventId") long currentEventId) {
+        StringTokenizer st = new StringTokenizer(mailParam, "=");
+        String[] mail = new String[st.countTokens()];
+        for (int i = 0; i < mail.length; i++) {
+            mail[i] = st.nextToken();
+        }
+        st = new StringTokenizer(latitudeParam, "=");
+        double[] latitude = new double[st.countTokens()];
+        for (int i = 0; i < mail.length; i++) {
+            latitude[i] = Double.parseDouble(st.nextToken());
+        }
+        st = new StringTokenizer(longitudeParam, "=");
+        double[] longitude = new double[st.countTokens()];
+        for (int i = 0; i < mail.length; i++) {
+            longitude[i] = Double.parseDouble(st.nextToken());
+        }
+
+        if (mail != null && latitude != null && longitude != null) {
+            Event event = getEvent(currentEventId);
+            int count = Math.min(mail.length, Math.min(latitude.length, longitude.length));
+
+            Member admin = getMember("richard-schulze@online.de");
+
+            PersistenceManager pm = pmf.getPersistenceManager();
+            UserGroup group = getUserGroup(pm, "Simulationsgruppe");
+            if (group == null) {
+                UserGroup ug = new UserGroup(admin);
+                ug.setName("Simulationsgruppe");
+                admin.addGroup(ug);
+                pm.makePersistent(admin);
+                pm.makePersistent(ug);
+            }
+            try {
+                // Member-Objekte laden. Falls für eine angegebene Mail-Adresse kein Objekt besteht,
+                // so wird es angelegt
+                Member member;
+                for (int i = 0; i < count; i++) {
+                    Query q = pm.newQuery(Member.class);
+                    q.setFilter("email == emailParam");
+                    q.declareParameters("String emailParam");
+                    List<Member> results = (List<Member>) q.execute(mail[i]);
+                    if (!results.isEmpty()) {
+                        member = results.get(0);
+                    } else {
+                        member = new Member();
+                        member.setEmail(mail[i]);
+                        member.setName(mail[i]);
+                    }
+                    // Member zum Event hinzufügen, falls noch nicht geschehen
+                    if (!event.getMemberList().contains(member.getEmail())) {
+                        event.getMemberList().add(member.getEmail());
+                    }
+                    // Member in die Testgruppe aufnehmen, falls noch nicht geschehen
+                    if (!member.getGroups().contains("Simulationsgruppe")) {
+                        member.addGroup(group);
+                    }
+                    pm.makePersistent(member);
+                }
+                pm.makePersistent(event);
+                pm.makePersistent(group);
+            } finally {
+                pm.close();
+            }
+
+            for (int i = 0; i < count; i++) {
+                updateMemberLocation(mail[i], latitude[i], longitude[i], currentEventId);
+            }
+        }
+    }
+
     private void calculateCurrentWaypoint(Member member) {
         Long eventId = member.getCurrentEventId();
         if (eventId != null) {
@@ -330,16 +416,18 @@ public class SkatenightServerEndpoint {
      * Wobei das Feld um den Wegpunkte herum gebaut wird, welcher die meisten Member enthält
      * @param id event Id
      */
-    private void calculateField(@Named("id") long id) {
+    private void calculateField(long id) {
         PersistenceManager pm = pmf.getPersistenceManager();
         Event event = getEvent(id);
         List<RoutePoint> points = event.getRoute().getRoutePoints();
         List<Member> members = getMembersFromEvent(event.getKey().getId());
 
         // array erstellen welches an der stelle n die Anzahl der Member enthält welche am RoutePoint n sind.
+        Logger log = Logger.getLogger(SkatenightServerEndpoint.class.getName());
+        log.info("Points.size(): " + points.size());
         int memberCountPerRoutePoint[] = new int[points.size()];
         for (Member member : members) {
-            if (member.getCurrentEventId() != null && member.getCurrentEventId() == id && member.getCurrentWaypoint() != null) {
+            if (member.getCurrentEventId() != null && member.getCurrentEventId() == event.getKey().getId() && member.getCurrentWaypoint() != null) {
                 memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()]+1;
             }
         }

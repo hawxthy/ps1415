@@ -6,16 +6,21 @@ import android.app.Instrumentation;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.ViewAsserts;
 import android.test.suitebuilder.annotation.LargeTest;
 import android.test.suitebuilder.annotation.SmallTest;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Member;
+
+import java.util.List;
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
@@ -24,6 +29,7 @@ import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.SettingsActivity;
 import ws1415.ps1415.activity.ShowEventsActivity;
 
+import ws1415.ps1415.activity.ShowInformationActivity;
 import ws1415.ps1415.task.UpdateLocationTask;
 
 /**
@@ -44,6 +50,9 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
     private ListView mList;
     private ListAdapter mListData;
 
+    // Das zu testende Event
+    private Event mEvent;
+
     public SendPositionSettingsTest() {
         super(ShowEventsActivity.class);
     }
@@ -58,7 +67,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         // Die ShowEventsActivity starten
         getInstrumentation().getTargetContext().getApplicationContext();
         mActivity = getActivity();
-        // Löschen der Voreinstellungen
+        // Löschen der Voreinstellungen // wird nicht mehr benötigt
         // Alles in den SharedPreferences löschen
         // SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
         // SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -75,14 +84,21 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         // Holt sich die Event Listen-Elemente
         mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
         mListData = mList.getAdapter();
+        Thread.sleep(2000); // Zeit zum initialisieren
+
+        mEvent = (Event) mListData.getItem(0);
     }
 
     /**
-     * Prüfen, ob die Einstellungen zurück gesetzt wurden.
+     * Prüfen, ob die Events in der Liste vorhanden sind, bzw. die UI Elemente initialisiert wurden.
      */
+    @SmallTest
     public void testPreConditions() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
-        assertEquals(true, sharedPreferences.getBoolean("prefSendLocation", true));
+        assertNotNull("selection listener on events list initialized", mList.getOnItemClickListener());
+        assertNotNull("adapter for events initialized", mListData);
+
+        // Mindestens ein Event muss existieren
+        assertTrue("at least one event exists", mListData.getCount() > 0);
     }
 
     protected void tearDown() throws Exception {
@@ -171,7 +187,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
 
     /**
      * Testet, ob die Activity weiter läuft, wenn diese pausiert hat. Large Test, da auf Ressourcen eines Servers, bzw.
-     * anderen Netzwerkes abgerufen werden. <strong>GPS muss hierfür aktiviert sein.</strong>
+     * anderen Netzwerkes zugegriffen wird. <strong>GPS muss hierfür aktiviert sein.</strong>
      * @throws java.lang.InterruptedException
      */
     @SmallTest
@@ -185,6 +201,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
         sharedPreferences.edit().putBoolean("prefSendLocation", true).apply();
 
+        // Settings Activity starten und auf die Instanz warten
         Activity am = getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 2000);
         Thread.sleep(2500);
 
@@ -225,7 +242,8 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         Thread.sleep(2500); // Zeit zum initialisieren
 
         // Setzen der Position auf den Server
-        new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude).execute();
+        new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute();
+
         Thread.sleep(5000); // Zeit zum initialisieren
 
         // Teilnehmer, der seine Position an den Server senden wird
@@ -272,6 +290,81 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         am.finish();
 
     }
+
+    /**
+     * Testet, ob die Position an den Server übertragen wird, wenn der User dies aktiviert hat
+     * und an einem Event teilnimmt.
+     * Large Test, da auf Ressourcen eines Servers, bzw. anderen Netzwerkes zugegriffen wird.
+     * <strong>GPS muss hierfür aktiviert sein.</strong>
+     *
+     * @throws java.lang.Exception
+     */
+    @LargeTest
+    public void testAttend() throws Exception {
+        Instrumentation.ActivityMonitor activityMonitor = getInstrumentation().addMonitor(ShowInformationActivity.class.getName(), null, false);
+
+        // UI Elemente lassen sich hier nicht ansprechen - Senden in den Einstellungen aktivieren
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+        sharedPreferences.edit().putBoolean("prefSendLocation", true).apply();
+
+        // Prüfen, ob das Senden aktiviert ist
+        boolean active = sharedPreferences.getBoolean("prefSendLocation", true);
+        assertTrue(active);
+
+        // Setzen der Position auf den Server
+        new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute().get();
+        Thread.sleep(5000); // Zeit zum initialisieren
+
+        // Teilnehmer, der seine Position an den Server senden wird
+        Member m = ServiceProvider.getService().skatenightServerEndpoint().getMember(TEST_EMAIL).execute();
+        assertEquals(TEST_POSITION.latitude, m.getLatitude());
+        assertEquals(TEST_POSITION.longitude, m.getLongitude());
+
+        // Es wird ein neuer UI Thread gestartet & das erste Event ausgewählt und anschließend die showInformationActivity gestartet
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int firstEvent = 0;
+                mList.performItemClick(mList.getAdapter().getView(firstEvent, null, mList), firstEvent, mList.getAdapter().getItemId(firstEvent));
+            }
+        });
+
+        // ShowInformationActivity wird gestartet
+        ShowInformationActivity showInformationActivity = (ShowInformationActivity) getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 20000);
+        assertNotNull("ShowInformationActivity started", showInformationActivity);
+
+        // Liste, die die TextView enthält
+        ListView listView = (ListView) showInformationActivity.findViewById(R.id.activity_show_information_list_view);
+        assertNotNull("listView is null!", listView);
+        listView.setAdapter(showInformationActivity.getShowCursorAdapter());
+
+        Thread.sleep(3000); // Zeit zum Initialisieren
+        assertNotNull("listViewAdapter is null!", listView.getAdapter());
+
+       final Button attendButton = (Button) showInformationActivity.findViewById(R.id.show_info_attend_button);
+
+        // Es wird ein neuer UI Thread gestartet & das erste Event ausgewählt und anschließend die showInformationActivity gestartet
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Teilnehmen an dem Event
+                attendButton.performClick();
+            }
+        });
+
+        Thread.sleep(10000); // Zeit zum senden an den Server
+
+        // Prüfen, ob die neuen Positionen auf dem Server übernommen worden sind
+        assertNotSame("Position not updated!", TEST_POSITION.latitude, m.getLatitude());
+        assertNotSame("Position not updated!", TEST_POSITION.longitude, m.getLongitude());
+
+       showInformationActivity.finish();
+
+    }
+
+
+
+
 
 
 }

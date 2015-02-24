@@ -35,7 +35,7 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
     private static final String TEST_TITLE = "TestEventEdit";
     private static final String TEST_FEE   = "5 €";
     private static final String TEST_LOCATION = "TestStadtEdit";
-    private static final String TEST_DATE = "17-02-2015 20:00";
+    private static final String TEST_DATE = "24-02-2015 20:00";
 
     // Die ShowEventsActivity
     private ShowEventsActivity mActivity;
@@ -60,10 +60,11 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
         credential.setSelectedAccountName(credential.getAllAccounts()[0].name);
         ServiceProvider.login(credential);
 
-        //touchmode ausschalten, damit auch die UI Elemente getestet werden können
+        // touchmode ausschalten, damit auch die UI Elemente getestet werden können
         setActivityInitialTouchMode(false);
 
         Thread.sleep(5000); // Zeit zum initialisieren
+
         // Die ShowEventsActivity wird gestartet
         mActivity = getActivity();
 
@@ -142,8 +143,6 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
         listView.setAdapter(showInformationActivity.getShowCursorAdapter());
 
         Thread.sleep(5000); // Zeit zum Initialisieren
-
-        assertNotNull("listView is null!", listView);
         assertNotNull("listViewAdapter is null!", listView.getAdapter());
 
         // Enthält die jeweiligen Eventinformationen

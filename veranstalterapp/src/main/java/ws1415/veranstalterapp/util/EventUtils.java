@@ -22,6 +22,7 @@ import ws1415.veranstalterapp.R;
 public class EventUtils {
     private static EventUtils instance;
     private static Context context;
+
     private EventUtils(Context context){
         this.context = context;
     }
@@ -43,7 +44,7 @@ public class EventUtils {
      * @param title Titel des DateFields
      * @param type Der Type des Feldes
      */
-    public void addDynamicField(String title, FieldType type, Event event, int pos){
+    public static void addDynamicField(String title, FieldType type, Event event, int pos){
         Field tmpField = new Field();
         tmpField.setType(type.getId());
         tmpField.setTitle(title);
@@ -56,7 +57,7 @@ public class EventUtils {
      * @param event Event
      * @param pos Position in der Liste der Felder
      */
-    public void deleteDynamicField(Event event, int pos){
+    public static void deleteDynamicField(Event event, int pos){
         event.getDynamicFields().remove(pos);
     }
 
@@ -118,7 +119,7 @@ public class EventUtils {
      * Verbindet die beiden Datumsangaben des Events zu einem.
      * @return Das zusammengefügte Date.
      */
-    public Date getFusedDate(Event event) {
+    public static Date getFusedDate(Event event) {
         Date time = new Date(Long.parseLong(getUniqueField(4, event).getValue()));
         Date date = new Date(Long.parseLong(getUniqueField(3, event).getValue()));
         Calendar cal1 = Calendar.getInstance();

@@ -15,7 +15,7 @@ import com.skatenight.skatenightAPI.model.Route;
 
 import java.util.List;
 
-import ws1415.veranstalterapp.AddRouteDialog;
+import ws1415.veranstalterapp.dialog.AddRouteDialog;
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.ServiceProvider;
