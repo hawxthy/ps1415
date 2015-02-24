@@ -219,6 +219,7 @@ public class CreateAndDeleteRouteTest extends ActivityInstrumentationTestCase2<H
 
         // Route löschen
         manageRoutesFragment.deleteRoute(createdRoute);
+        Thread.sleep(5000);
     }
 
 }
