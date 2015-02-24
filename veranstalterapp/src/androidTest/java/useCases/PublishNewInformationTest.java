@@ -112,7 +112,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     protected void setUp() throws Exception {
         super.setUp();
 
-        // Nutzer einloggen
+        // Nutzer verbinden, NICHT einloggen
         GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getActivity(), "server:client_id:" + Constants.WEB_CLIENT_ID);
         credential.setSelectedAccountName(credential.getAllAccounts()[0].name);
         ServiceProvider.login(credential);
@@ -374,7 +374,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
             e.printStackTrace();
         }
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getName().equals(routeName)) {
+            if (routeName.equals(list.get(i).getName())) {
                 testRoute1 = list.get(i);
                 break;
             }
@@ -515,7 +515,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
             time++;
         }
         assertTrue("Timeout", time < 50);
-        Thread.sleep(3000);
+        Thread.sleep(5000);
 
         mAdapter = mFragment.getmAdapter();
         eventList = mAdapter.getEventList();

@@ -75,7 +75,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     private List<Integer> passedWaypoints;
     private List<Long> passedWaypointTimes;
     private Date startDate;
-    private int currentWaypoint; // TODO: currentWaypoint speichern!
+    private int currentWaypoint;
     private float curSpeed;
     private float maxSpeed;
     private float avgSpeed;

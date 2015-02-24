@@ -35,7 +35,7 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
     private static final String TEST_TITLE = "TestEventEdit";
     private static final String TEST_FEE   = "5 €";
     private static final String TEST_LOCATION = "TestStadtEdit";
-    private static final String TEST_DATE = "24-02-2015 20:00";
+    // private static final String TEST_DATE = "24-02-2015 20:00";
 
     // Die ShowEventsActivity
     private ShowEventsActivity mActivity;
@@ -157,9 +157,9 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
         temp = (String) fee.getText();
         assertEquals(TEST_FEE, temp);
 
-        TextView date = (TextView) listView.getChildAt(3).findViewById(R.id.list_view_item_show_information_text_field_textView_content);
-        temp = (String) date.getText();
-        assertEquals(TEST_DATE, temp);
+        // TextView date = (TextView) listView.getChildAt(3).findViewById(R.id.list_view_item_show_information_text_field_textView_content);
+        // temp = (String) date.getText();
+        // assertEquals(TEST_DATE, temp);
 
         TextView location = (TextView) listView.getChildAt(4).findViewById(R.id.list_view_item_show_information_text_field_textView_content);
         temp = (String) location.getText();
