@@ -29,14 +29,6 @@ public class LocationTransmitterServiceTest extends ServiceTestCase<LocationTran
         super.setUp();
     }
 
-    @SmallTest
-    /**
-     * Wenn dieser Test nicht funktioniert, wurde der Test Case nicht ordnungsgemäß
-     * aufgesetzt.
-     */
-    public void testPreconditions() {
-    }
-
     /**
      * Testet startup des Services.
      */
