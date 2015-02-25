@@ -515,7 +515,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
             time++;
         }
         assertTrue("Timeout", time < 50);
-        Thread.sleep(5000);
+        Thread.sleep(7000);
 
         mAdapter = mFragment.getmAdapter();
         eventList = mAdapter.getEventList();

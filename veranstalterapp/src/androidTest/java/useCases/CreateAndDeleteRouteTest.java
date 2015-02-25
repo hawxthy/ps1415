@@ -206,10 +206,12 @@ public class CreateAndDeleteRouteTest extends ActivityInstrumentationTestCase2<H
         Route createdRoute = null;
         while (timeout > 0 && createdRoute == null) {
             List<Route> routes = manageRoutesFragment.getRouteList();
-            for (Route r : routes) {
-                if (r != null && ROUTE_NAME.equals(r.getName())) {
-                    createdRoute = r;
-                    break;
+            if (routes != null) {
+                for (Route r : routes) {
+                    if (r != null && ROUTE_NAME.equals(r.getName())) {
+                        createdRoute = r;
+                        break;
+                    }
                 }
             }
             Thread.sleep(1000);

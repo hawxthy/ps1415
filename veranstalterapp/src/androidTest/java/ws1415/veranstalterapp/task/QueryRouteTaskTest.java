@@ -91,10 +91,13 @@ public class QueryRouteTaskTest extends AuthTaskTestCase {
         }
 
         // Bestehende Routen löschen
-        for (Route r : ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute()
-                .getItems()) {
-            ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey().getId())
-                    .execute();
+        List<Route> routes = ServiceProvider.getService().skatenightServerEndpoint().getRoutes()
+                .execute().getItems();
+        if (routes != null) {
+            for (Route r : routes) {
+                ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey().getId())
+                        .execute();
+            }
         }
         // Testrouten auf den Server schreiben
         ServiceProvider.getService().skatenightServerEndpoint().addRoute(testRoute1).execute();

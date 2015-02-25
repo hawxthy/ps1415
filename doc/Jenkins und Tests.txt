@@ -1,0 +1,19 @@
+Zur problemlosen Ausführung der Tests sollten die folgenden Vorbedingungen erfüllt sein:
+	- In der build.gradle der beiden Apps muss die Build-Variante eingestellt sein, für die die Apps getestet werden sollen. Standardmäßig ist das jenkins. Über die Zeile
+			testBuildType "{Build-Variante}"
+		kann das geändert werden.
+	- Die Use-Case-Tests der Veranstalter-App müssen vor den Use-Case Tests der User-App ausgeführt werden, damit für die User-App ein vordefiniertes Event existiert
+	- Die Task-Tests sollten zum Schluss ausgeführt werden, da diese teilweise die gesamten auf dem Server vorhandenen Events/Routen löschen
+	- Auf dem Server muss der Benutzer des Test-Handys als Host eingetragen sein.
+	- Auf dem Server sollten keine Events oder Routen existieren
+	- Auf dem Server muss eine Gruppe existieren, die nicht vom Benutzer des Handys erstellt wurde, das die Tests ausführt (damit das Verlassen einer Gruppe getestet werden kann)
+	
+Ausführen der Tests:
+	Die Tests können entweder aus Android Studio heraus oder per Konsole ausgeführt werden
+	Zur Ausführung aus Android Studio: Rechtsklick auf Test oder Paket -> Run -> {Test}
+	Zur Ausführung per Konsole:
+		Zum Ausführen der Tests per Konsole kann der Befehl "connectedCheck" in der Gradle-Konsole eingegeben werden. Die Tests werden anschließend auf allen angeschlossenen Android-Geräten ausgeführt. Die Ergebnisse der Tests sind im Verzeichnis "app\build\outputs\reports\androidTests\connected" bzw. "veranstalterapp\build\outputs\reports\androidTests\connected" hinterlegt. Damit die Tests in der benötigten Reihenfolge ausgeführt werden, sollten die folgenden Testpakete nacheinander ausgeführt werden:
+		1. useCases-Paket der Veranstalter-App
+		2. useCases-Paket der User-App
+		3. task-Paket der Veranstalter-App
+		4. task-Paket der User-App

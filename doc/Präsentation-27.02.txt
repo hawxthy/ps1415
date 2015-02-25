@@ -6,6 +6,7 @@ Vorbereitung:
 	- Anderes Handy eine Testgruppe erstellen lassen
 	- Lockito vorbereiten (10 km/h, Strecke um die Uni)
 	- Vorlagenstrecke erstellen mit 2 Wegpunkten, die halb um die Uni führen
+	-gcm-IDs auf dem Server und in den teilnehmenden Handys löschen und neu berechnen lassen
 	
 Präsentation:
 	- Normale App starten

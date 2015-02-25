@@ -434,7 +434,7 @@ public class SkatenightServerEndpoint {
         // array erstellen welches an der stelle n die Anzahl der Member enthält welche am RoutePoint n sind.
         int memberCountPerRoutePoint[] = new int[points.size()];
         for (Member member : members) {
-            if (member.getCurrentEventId() != null && member.getCurrentEventId() == event.getKey().getId() && member.getCurrentWaypoint() != null) {
+            if (member.getCurrentEventId() != null && member.getCurrentEventId() == event.getKey().getId() && member.getCurrentWaypoint() != null && member.getCurrentWaypoint() < memberCountPerRoutePoint.length) {
                 logger.info(member.getEmail() + " current waypoint: " + member.getCurrentWaypoint());
                 memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()] + 1;
             }
