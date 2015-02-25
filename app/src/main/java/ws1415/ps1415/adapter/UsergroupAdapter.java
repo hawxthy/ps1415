@@ -41,7 +41,9 @@ public class UsergroupAdapter extends BaseAdapter {
         this.maximum = maximum;
         this.context = context;
         this.groupList = groupList;
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (context != null) {
+            inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
     }
 
     /**

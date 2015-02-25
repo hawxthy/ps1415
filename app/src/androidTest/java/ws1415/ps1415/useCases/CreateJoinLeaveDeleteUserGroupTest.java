@@ -139,10 +139,12 @@ public class CreateJoinLeaveDeleteUserGroupTest extends ActivityInstrumentationT
         // Gruppe beitreten
         found = false;
         int position = -1;
+        UserGroup notOwnedGroup = null;
         for (int i = 0; i < groupList.getAdapter().getCount(); i++) {
             if (!((UserGroup) groupList.getAdapter().getItem(i)).getMembers().contains(ServiceProvider.getEmail())) {
                 position = i;
                 found = true;
+                notOwnedGroup = (UserGroup) groupList.getAdapter().getItem(i);
             }
         }
         assertTrue("Es existiert keine Gruppe, bei der man nicht der Ersteller/Member ist", found);
@@ -190,6 +192,15 @@ public class CreateJoinLeaveDeleteUserGroupTest extends ActivityInstrumentationT
         Thread.sleep(3000);
 
         found = true;
+        position = -1;
+        // Nach Test-Gruppe im aktualisierten Adapter suchen
+        for (int i = 0; i < groupList.getAdapter().getCount(); i++) {
+            if (((UserGroup) groupList.getAdapter().getItem(i)).getName().equals(notOwnedGroup.getName())) {
+                position = i;
+                break;
+            }
+        }
+        assertTrue("test group not found", position != -1);
         if (!((UserGroup) groupList.getAdapter().getItem(position)).getMembers().contains(ServiceProvider.getEmail())) {
             found = false;
         }
@@ -198,7 +209,7 @@ public class CreateJoinLeaveDeleteUserGroupTest extends ActivityInstrumentationT
 
         // Da longClick nicht zu simmulieren ist, müssen wir hier den
         // Task direkt aufrufen
-        // new DeleteUserGroupTask(mFragment).execute(((UserGroup) groupList.getAdapter().getItem(positionMyGroup))).get();
+        new DeleteUserGroupTask(mActivity).execute(((UserGroup) groupList.getAdapter().getItem(positionMyGroup))).get();
 
         // Nach der Gruppe suchen und prüfen ob diese noch existiert
         found = false;

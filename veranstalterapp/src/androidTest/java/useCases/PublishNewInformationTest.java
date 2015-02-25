@@ -64,7 +64,9 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
     private static final String TEST_FEE = "10";
     private static final String TEST_LOCATION = "TestStadt";
     private static final String TEST_DESCRIPTION = "TestBeschreibung";
-    private static final String TEST_DATE = "29.12.2014";
+    // Hohes Datum, damit sichergestellt ist, dass das Event noch nicht begonnen hat. Das ist notwendig,
+    // damit bei den Tests der User-App nach einem Klick auf Teilnehmer immer noch die ShowEventsActivity gezeigt wird
+    private static final String TEST_DATE = "29.12.2016";
     private static final String TEST_TIME = "14:00 Uhr";
     private static final String TEST_ROUTE = "test";
 
@@ -344,6 +346,9 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
                 datePickerButton2.setText(TEST_DATE);
                 timePickerButton2.setText(TEST_TIME);
                 routePickerButton2.setText(TEST_ROUTE);
+
+                // Hohes Datum für das Event setzen, damit es auf jeden Fall in der Zukunft beginnt
+                ((AnnounceInformationFragment) mActivity.getAdapter().getItem(1)).getAdapter().setYear(2016);
             }
         });
         Thread.sleep(5000); // Zeit zum initialisieren
@@ -427,6 +432,13 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         ShowEventsFragment mFragment = (ShowEventsFragment)mActivity.getAdapter().getItem(0);
         EventsCursorAdapter mAdapter = mFragment.getmAdapter();
         List<Event> eventList = mAdapter.getEventList();
+        int timeout = 100;
+        while (timeout > 0 && eventList == null) {
+            eventList = mAdapter.getEventList();
+            timeout--;
+            Thread.sleep(100);
+        }
+        assertTrue("timeout reached", timeout > 0);
 
         // Eben erstelltes Event suchen
         int pos = -1;

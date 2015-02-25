@@ -4,9 +4,11 @@ Zur problemlosen Ausführung der Tests sollten die folgenden Vorbedingungen erfül
 		kann das geändert werden.
 	- Die Use-Case-Tests der Veranstalter-App müssen vor den Use-Case Tests der User-App ausgeführt werden, damit für die User-App ein vordefiniertes Event existiert
 	- Die Task-Tests sollten zum Schluss ausgeführt werden, da diese teilweise die gesamten auf dem Server vorhandenen Events/Routen löschen
-	- Auf dem Server muss der Benutzer des Test-Handys als Host eingetragen sein.
-	- Auf dem Server sollten keine Events oder Routen existieren
-	- Auf dem Server muss eine Gruppe existieren, die nicht vom Benutzer des Handys erstellt wurde, das die Tests ausführt (damit das Verlassen einer Gruppe getestet werden kann)
+	- Auf dem Server:
+		- muss der Benutzer des Test-Handys als Host eingetragen sein.
+		- sollten keine Events oder Routen existieren
+		- muss eine Gruppe existieren, die nicht vom Benutzer des Handys erstellt wurde, das die Tests ausführt (damit das Verlassen einer Gruppe getestet werden kann)
+		- darf die Gruppe "TestGroup" nicht existieren
 	
 Ausführen der Tests:
 	Die Tests können entweder aus Android Studio heraus oder per Konsole ausgeführt werden

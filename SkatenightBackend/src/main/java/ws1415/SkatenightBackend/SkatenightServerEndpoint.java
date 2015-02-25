@@ -221,7 +221,7 @@ public class SkatenightServerEndpoint {
                     }
                     Message m = mb.build();
                     try {
-                        sender.send(m, getRegistrationManager(pm).getRegisteredUser(), 5);
+                        sender.send(m, getRegistrationManager(pm).getRegisteredUser(), 1);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -375,7 +375,13 @@ public class SkatenightServerEndpoint {
     private void calculateCurrentWaypoint(PersistenceManager pm, Member member) {
         Long eventId = member.getCurrentEventId();
         if (eventId != null) {
-            Event event = pm.getObjectById(Event.class, eventId);
+            Event event;
+            try {
+                event = pm.getObjectById(Event.class, eventId);
+            } catch(Exception ex) {
+                // Falls event nicht gefunden wurde
+                event = null;
+            }
             if (event != null) {
                 Integer currentWaypoint = member.getCurrentWaypoint();
                 if (currentWaypoint == null) {
@@ -426,7 +432,13 @@ public class SkatenightServerEndpoint {
      * @param id event Id
      */
     private void calculateField(PersistenceManager pm, long id) {
-        Event event = pm.getObjectById(Event.class, id);
+        Event event;
+        try {
+            event = pm.getObjectById(Event.class, id);
+        } catch(Exception ex) {
+            // Falls Event nicht gefunden wurde, dann Feldberechnung abbrechen
+            return;
+        }
         List<RoutePoint> points = event.getRoute().getRoutePoints();
         List<Member> members = getMembersFromEvent(event.getKey().getId());
 
@@ -653,7 +665,7 @@ public class SkatenightServerEndpoint {
                         .addData("eventId", Long.toString(keyId))
                         .build();
                 try {
-                    sender.send(m, new LinkedList<>(ids), 5);
+                    sender.send(m, new LinkedList<>(ids), 1);
                 }
                 catch (IOException e) {
 
@@ -788,7 +800,12 @@ public class SkatenightServerEndpoint {
         PersistenceManager pm = pmf.getPersistenceManager();
         try {
             pm.getFetchPlan().setMaxFetchDepth(3);
-            return (Event) pm.getObjectById(Event.class, keyId);
+            try {
+                return (Event) pm.getObjectById(Event.class, keyId);
+            } catch (Exception ex) {
+                // Wenn Event nicht gefunden wurde, dann null zurückgeben
+                return null;
+            }
         } finally {
             pm.close();
         }
@@ -832,7 +849,12 @@ public class SkatenightServerEndpoint {
         PersistenceManager pm = pmf.getPersistenceManager();
 
         Key key = event.getRoute().getKey();
-        Route route = pm.getObjectById(Route.class, key);
+        Route route;
+        try {
+            route = pm.getObjectById(Route.class, key);
+        } catch(Exception ex) {
+            route = null;
+        }
         if (route != null) {
             event.setRoute(route);
         }
@@ -1050,7 +1072,7 @@ public class SkatenightServerEndpoint {
                     .addData("type", MessageType.GROUP_CREATED_NOTIFICATION_MESSAGE.name())
                     .build();
             Sender s = new Sender(Constants.GCM_API_KEY);
-            s.send(m, rm.getRegisteredUser(), 5);
+            s.send(m, rm.getRegisteredUser(), 1);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -1111,7 +1133,7 @@ public class SkatenightServerEndpoint {
                         .addData("title", "Eine Gruppe wurde geloescht");
                 Message m = mb.build();
                 try {
-                    sender.send(m, new LinkedList<>(regids), 5);
+                    sender.send(m, new LinkedList<>(regids), 1);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -1232,7 +1254,7 @@ public class SkatenightServerEndpoint {
                 .addData("title", "DEBUG")
                 .addData("content", msg)
                 .build();
-        sender.send(m, id, 5);
+        sender.send(m, id, 1);
 
     }
 

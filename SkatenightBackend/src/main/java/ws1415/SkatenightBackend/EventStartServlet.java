@@ -101,7 +101,7 @@ public class EventStartServlet extends HttpServlet {
                             .addData("type", MessageType.EVENT_START_MESSAGE.name())
                             .addData("eventId", Long.toString(e.getKey().getId()))
                             .build();
-                    sender.send(m, new LinkedList<>(ids), 5);
+                    sender.send(m, new LinkedList<>(ids), 1);
 
                     String event_title = FieldType.getUniqueField(FieldType.TITLE.getId(), e).getValue();
                     m = new Message.Builder()
@@ -111,7 +111,7 @@ public class EventStartServlet extends HttpServlet {
                             .addData("title", "Event beginnt")
                             .addData("content", "Das Event " + event_title + " startet!")
                             .build();
-                    sender.send(m, new LinkedList<>(ids), 5);
+                    sender.send(m, new LinkedList<>(ids), 1);
                 }
                 e.setNotificationSend(true);
                 pm.makePersistent(e);

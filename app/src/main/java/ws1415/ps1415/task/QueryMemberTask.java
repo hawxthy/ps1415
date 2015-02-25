@@ -17,8 +17,12 @@ import ws1415.ps1415.activity.ShowRouteActivity;
  *
  * @author Tristan Rust
  */
-public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> {
+public class QueryMemberTask extends AsyncTask<String, Void, Member> {
      private ShowRouteActivity view;
+
+    public QueryMemberTask(ShowRouteActivity view) {
+        this.view = view;
+    }
 
     /**
      * Ruft das aktuelle Member-Objekt vom Server ab.
@@ -27,12 +31,10 @@ public class QueryMemberTask extends AsyncTask<ShowRouteActivity, Void, Member> 
      * @return Das Member-Objekt
      */
     @Override
-    protected Member doInBackground(ShowRouteActivity... params) {
-        view = params[0];
+    protected Member doInBackground(String... params) {
+        String email = params[0];
 
         try {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(view.getApplicationContext());
-            String email = prefs.getString("accountName", null);
             if (email != null) {
                 return ServiceProvider.getService().skatenightServerEndpoint().getMember(email).execute();
             }

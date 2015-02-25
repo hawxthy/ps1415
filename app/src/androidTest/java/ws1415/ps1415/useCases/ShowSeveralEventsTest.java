@@ -90,7 +90,7 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
      */
     @SmallTest
     public void testViews() {
-        assertNotNull(getActivity());
+        assertNotNull(mActivity);
         assertNotNull(mList);
         assertNotNull(mListData);
     }
@@ -129,7 +129,7 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
 
         // ShowInformationActivity wird gestartet
         ShowInformationActivity showInformationActivity = (ShowInformationActivity) getInstrumentation().waitForMonitorWithTimeout(activityMonitor, 20000);
-        assertNotNull("ShowInformationActivity started", showInformationActivity);
+        assertNotNull("ShowInformationActivity not started", showInformationActivity);
 
         // Liste, die die TextView enthält
         ListView listView = (ListView) showInformationActivity.findViewById(R.id.activity_show_information_list_view);
