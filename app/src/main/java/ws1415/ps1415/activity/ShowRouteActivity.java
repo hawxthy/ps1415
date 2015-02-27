@@ -387,7 +387,7 @@ public class ShowRouteActivity extends Activity {
         if (routeHighlightLine != null) routeHighlightLine.remove();
         routeHighlight = new PolylineOptions()
                 .addAll(highlight)
-                .width(8.0f)
+                .width(16.0f)
                 .color(Color.GREEN);
 
         routeHighlightLine = googleMap.addPolyline(routeHighlight);
