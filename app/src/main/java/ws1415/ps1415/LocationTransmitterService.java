@@ -132,7 +132,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
         distance = intent.getStringExtra(EXTRA_DISTANCE);
 
         Intent deleteIntent = new Intent(this, CancelServiceReceiver.class);
-        PendingIntent pendingIntentCancel = PendingIntent.getBroadcast(this, 0, deleteIntent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntentCancel = PendingIntent.getBroadcast(this, 0, deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         Intent notificationIntent = new Intent(this, LocationTransmitterService.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
