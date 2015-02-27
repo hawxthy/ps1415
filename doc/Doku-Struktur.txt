@@ -1,0 +1,34 @@
+Alle	<1	- Einleitung (Projektvorstellung, Grob die App beschreiben)
+Tri,Ric	<1	- Vorgehensweise (IDE, Git, SCRUM, Jenkins)
+Daniel	2-3	- Feautures der Apps (Beschreiben, was die Apps für Funktionen haben)
+Pascal	1	- Android vorstellen
+Richard	8	- Backend (Server)
+Pas,Dan	2		- Feldberechnung
+			- Frontend
+Ma,Be	<1		- Beschreibung App-Gerüst (Gemeinsamkeiten beider Apps)
+				- Beschreibung Veranstalter-App
+Ma,Be	1-2			- Gerüst
+Bernd	<1			- Hosts
+Pascal	2			- Routen
+Bernd	<1			- Routen aus Vorlage erstellen, Wegpunkte benennen (zum Schluss evtl. an Routen anhängen)
+Martin	5-8			- Events
+				- Beschreibung User-App
+Martin	<1			- Gerüst(NavigationDrawer, ...)
+Martin	<1			- Event-Anzeige
+Bernd	2			- Nutzergruppen
+Pas,Dan	4			- Lokale Auswertung
+Tristan	1			- Einstellungen
+			- Tests
+Tristan	2		- Einleitung (Reihenfolge, Vorbedingungen, Funktionsweise der Tests)
+Bernd	1		- Task-Tests (Ein Abschnitt, jeden TaskTest kurz erklären)
+				- Use-Case-Tests
+		3			- Veranstalter-App:
+Bernd					- AddAndDeleteHostTest
+Bernd					- AuthenticationOrganizerTest
+Richard					- CreateAndDeleteRouteTest
+Tristan					- PublishNewInformationTest
+		3			- User-App:
+Bernd					- CreateJoinLeaveDeleteUserGroupTest
+Tristan					- SendCurrentPositionTest
+Tristan					- SendPositionSettingsTest
+Tristan					- ShowSeveralEventsTest
