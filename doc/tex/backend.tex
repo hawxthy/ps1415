@@ -1,0 +1,23 @@
+\subsection{Anforderungen}
+\AUTHOR{Richard}
+Zur Kommunikation der Apps, aber auch zur zentralen Speicherung der Veranstaltungen, Routen, Nutzern und Nutzergruppen ist ein Backend notwendig, das eine öffentlich erreichbare Schnittstelle zur Verfügung stellt. Neben der Speicherung von Daten ist aber auch notwendig, dass der Server eigene Berechnungen durchführen kann. So wird zum Beispiel das Feld, das den Benutzern in der User-App angezeigt wird, zentral auf dem Server berechnet und von den User-Apps abgerufen (siehe Abschnitt \ref{subsec:Feldberechnung}).
+
+Eine weitere wichtige Anforderung war für uns, dass der Server kostenlos nutzbar ist und nach Möglichkeit bereits ein Grundgerüst bietet, über das aus Android-Apps möglichst einfach auf die Server-API zugreifen können. Wir wollten Hauptaugenmerk auf die Entwicklung der Apps legen und die Zeit zur Entwicklung des Backends möglichst gering halten. Das Google App Engine Projekt bietet diese Möglichkeit, da es von den realen Servern vollkommen abstrahiert. Zusätzlich dazu werden einige nützliche APIs angeboten, die unter anderem Funktionalität zur Speicherung von Daten bereitstellen und die Definition von Kommunikations-Endpunkten, sowie die Kommunikation vom Server zum Handy ermöglichen.
+
+% TODO Absatz zur Verwendung der Build-varianten schreiben: release, debug, jenkins
+
+\subsection{Klassenstruktur der Skatenight API}
+Das Backend, im folgenden auch Skatenight API genannt, ist eine in Java geschriebene Anwendung, die sich im Projektordner in dem Modul \glqq SkatenightBackend\grqq\ befindet. 
+
+\subsection{Datenmodell}
+\AUTHOR{Richard}
+
+\subsection{Verfügbare API-Aufrufe}
+\AUTHOR{Richard}
+
+\subsection{Google Cloud Messaging}
+\AUTHOR{Richard}
+
+\subsection{Feldberechnung}
+\label{subsec:Feldberechnung}
+\AUTHOR{Pascal}

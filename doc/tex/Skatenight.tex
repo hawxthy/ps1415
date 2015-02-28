@@ -1,0 +1,55 @@
+\documentclass[a4paper, titlepage]{scrartcl}
+
+% Deutscher Text
+\usepackage{ngerman}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% Grafiken
+\usepackage{graphicx}
+
+% Titelseite
+\titlehead{\begin{center}\includegraphics{graphics/ic_launcher.png}\end{center}}
+\title{Projektbericht Skatenight-App}
+\subtitle{Projektseminar \glqq Android-Programmierung\grqq\ im WS 14/15}
+\author{Bernd Eissing, Pascal Otto, Daniel Papoutzis,\\Tristan Rust, Richard Schulze, Martin Wrodarczyk}
+\date{}
+
+% Code-Listings
+\usepackage{listings}
+
+% Hyperlinks
+\usepackage{hyperref}
+
+% Befehl für Angabe des Authors eines Abschnitts definieren
+\newcommand{\AUTHOR}[1]{
+	von #1 \\ \\
+}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{Einleitung}
+
+\section{Vorgehensweise}
+\AUTHOR{Tristan, Richard}
+
+\section{Features der Apps}
+\AUTHOR{Daniel}
+
+\section{Das Android-SDK}
+\AUTHOR{Pascal}
+
+\section{Server-Backend}
+\input{backend}
+
+\section{Frontend}
+\input{frontend}
+
+\section{Testing}
+\input{testing}
+
+\end{document}
