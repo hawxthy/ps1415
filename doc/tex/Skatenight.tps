@@ -17,8 +17,8 @@ Class=LaTeXView
 Document=Skatenight.tex
 
 [Frame0_View0,0]
-TopLine=9
-Cursor=690
+TopLine=0
+Cursor=253
 
 [Frame1]
 Flags=0
@@ -35,8 +35,8 @@ Class=LaTeXView
 Document=backend.tex
 
 [Frame1_View0,0]
-TopLine=0
-Cursor=1362
+TopLine=87
+Cursor=8164
 
 [SessionInfo]
 FrameCount=2

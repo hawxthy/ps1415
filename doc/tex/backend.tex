@@ -1,16 +1,101 @@
 \subsection{Anforderungen}
 \AUTHOR{Richard}
-Zur Kommunikation der Apps, aber auch zur zentralen Speicherung der Veranstaltungen, Routen, Nutzern und Nutzergruppen ist ein Backend notwendig, das eine öffentlich erreichbare Schnittstelle zur Verfügung stellt. Neben der Speicherung von Daten ist aber auch notwendig, dass der Server eigene Berechnungen durchführen kann. So wird zum Beispiel das Feld, das den Benutzern in der User-App angezeigt wird, zentral auf dem Server berechnet und von den User-Apps abgerufen (siehe Abschnitt \ref{subsec:Feldberechnung}).
+Zur Kommunikation der Apps, aber auch zur zentralen Speicherung der Veranstaltungen, Routen, Nutzern und Nutzergruppen ist ein Backend, im folgenden auch Skatenight API genannt, notwendig, das eine öffentlich erreichbare Schnittstelle zur Verfügung stellt. Neben der Speicherung von Daten ist aber auch notwendig, dass der Server eigene Berechnungen durchführen kann. So wird zum Beispiel das Feld, das den Benutzern in der User-App angezeigt wird, zentral auf dem Server berechnet und von den User-Apps abgerufen (siehe Abschnitt \ref{subsec:Feldberechnung}).
 
 Eine weitere wichtige Anforderung war für uns, dass der Server kostenlos nutzbar ist und nach Möglichkeit bereits ein Grundgerüst bietet, über das aus Android-Apps möglichst einfach auf die Server-API zugreifen können. Wir wollten Hauptaugenmerk auf die Entwicklung der Apps legen und die Zeit zur Entwicklung des Backends möglichst gering halten. Das Google App Engine Projekt bietet diese Möglichkeit, da es von den realen Servern vollkommen abstrahiert. Zusätzlich dazu werden einige nützliche APIs angeboten, die unter anderem Funktionalität zur Speicherung von Daten bereitstellen und die Definition von Kommunikations-Endpunkten, sowie die Kommunikation vom Server zum Handy ermöglichen.
 
-% TODO Absatz zur Verwendung der Build-varianten schreiben: release, debug, jenkins
+\subsection{Server, Keys und Build-Varianten}
+\AUTHOR{Richard}
+Während der Entwicklung der Apps ist uns schnell aufgefallen, dass aufgrund der verschiedenen Features, die jeweils auf eigenen Branches entwickelt wurden, auch der Server von mehr als einer Person angepasst wurde. Damit einher ging, dass zwischenzeitlich verschiedene Versionen des Servers notwendig waren, damit jede Teilgruppe des Teams das eigene Feature implementieren konnte, ohne die Entwicklung anderer Teammitglieder zu stören. Aus diesem Grund haben wir mehrere Projekte bei der Google App Engine angelegt, zwischen denen relativ einfach gewechselt werden kann. In unserem Projekt in den Modulen \glqq app\grqq\ und \glqq veranstalterapp\grqq\ gibt es entsprechende Build-Varianten, mit denen der gewünschte Server ausgewählt werden kann. Da es im Modul \glqq SkatenightBackend\grqq\ nicht die Möglichkeit gibt Build-Varianten zu definieren, gibt es dort die Befehle \glqq applyProductionserverConfig\grqq, \glqq applyTestserverConfig\grqq\ und \glqq applyJenkinsserverConfig\grqq. Diese kopieren jeweils aus den entsprechenden Unterordnern des src-Ordners die Konfigurationsdateien, die für einen Server-Wechsel notwendig sind, in den main-Ordner. Bei einem Serverwechsel wird die \glqq Constants.java\grqq\ und die Projekt-ID in der Datei \glqq appengine-web.xml\grqq\ ausgetauscht. Wenn anschließend der Befehl \glqq appengineUpdate\grqq\ zur Aktualisierung des Servers aufgerufen wird, wird der Server aktualisiert, dessen Projekt-ID in der \glqq appengine-web.xml\grqq\ steht. Die folgende Tabelle listet nocheinmal die Details zu den einzelnen Google App Eingine Projekten und auch die notwendigen Keys auf, mit denen sich die Apps gegenüber dem Backend und anderen Diensten identifizieren.
+
+% TODO Tabelle richtig platzieren
+\noindent
+\begin{tabular}{|c|l|l|}
+	\hline
+	\multicolumn{3}{|p{15cm}|}{
+		Web-Client ID: Dient der Authentifizierung über OAuth2, das die gesicherten API-Funktionen, wie beispielsweise das Anlegen eines Events schützt.
+	} \\
+	\hline
+	\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & 37947570052-dk3rjhgran1s38gscv6va2rmmv2bei8r.apps.googleusercontent.com \\
+	\cline{2-3}
+	& Debug & 644721617929-unb9em0kl73b9evdv2h52ufn26fao20p.apps.googleusercontent.com \\
+	\cline{2-3}
+	& Jenkins & 1032268444653-7agre4q3eosqhlh92sq62hf5fan9jbv5.apps.googleusercontent.com \\
+	\hline
+	\hline
+	\multicolumn{3}{|p{15cm}|}{
+		Client-ID der User-App: Dient der Identifikation der User-App am Backend.
+	} \\
+	\hline
+	\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & 37947570052-g006o3ovfotnjqreltom6c7cbktm7dap.apps.googleusercontent.com \\
+	\cline{2-3}
+	& Debug & 644721617929-mk0do3jm5lec1dasijdj3220ot87gbn7.apps.googleusercontent.com \\
+	\cline{2-3}
+	& Jenkins & 1032268444653-kj1mpisvlrpl67e7db2fu2005aube7mu.apps.googleusercontent.com \\
+	\hline
+	\hline
+	\multicolumn{3}{|p{15cm}|}{
+		Client-ID der Veranstalter-App: Dient der Identifikation der Veranstalter-App am Backend.
+	} \\
+	\hline
+	\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & 37947570052-4ru7asfhnrjmmqvj3qdpo2rrp31fudf3.apps.googleusercontent.com \\
+	\cline{2-3}
+	& Debug & 644721617929-kbcha00vb3j30sh9at05sagm73iltqqo.apps.googleusercontent.com \\
+	\cline{2-3}
+	& Jenkins & 1032268444653-83ih5mp5mguh66c012u0sobqe4oqoupr.apps.googleusercontent.com \\
+	\hline
+	\hline
+	\multicolumn{3}{|p{15cm}|}{
+		Google-Maps API-Key für die User-App: Wird zur Nutzung der Google-Maps API in der User-App benötigt.
+	} \\
+	\hline
+	\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & AIzaSyBKGVQHij0JcjgHyCnT0ZrLihbCn8Av2jg \\
+	\cline{2-3}
+	& Debug & AIzaSyDQgEKF42jjm57x7kgnY7EI62CcXW\_zDS0 \\
+	\cline{2-3}
+	& Jenkins & AIzaSyAQ47zRjgPRk1sxJYifd2URQdEnk5HvnRw \\
+	\hline
+	\hline
+	\multicolumn{3}{|p{15cm}|}{
+		Google-Maps API-Key für die Veranstalter-App: Wird zur Nutzung der Google-Maps API in der Veranstalter-App benötigt.
+	} \\
+	\hline
+	\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & AIzaSyBedRi4A--p3LNQLy5lgOsBEdIdKuLbi2U \\
+	\cline{2-3}
+	& Debug & AIzaSyAO4zGlaKexByZmEiFKLbo18Y\_I-t9KbMc \\
+	\cline{2-3}
+	& Jenkins & AIzaSyBes8RSzVdqcQY-vnj9GLWxCLBKAFCzh98 \\
+	\hline
+	\hline
+	\multicolumn{3}{|p{15cm}|}{
+		Google Cloud Messaging API-Key: Dient der Registrierung beim GCM-Dienst von Google in der User-App.
+	} \\
+	\hline
+	\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & AIzaSyDO8mosWwYXjjGZ9besu9CZw1LDEEXrFXE \\
+	\cline{2-3}
+	& Debug & AIzaSyCpwhxda1Lb5E61\_fybZq2iSJgViZu3QNM \\
+	\cline{2-3}
+	& Jenkins & AIzaSyBjeKzx\_vzkUgQZdT83BB0BMD3gFebpet0 \\
+	\hline
+\end{tabular}
 
 \subsection{Klassenstruktur der Skatenight API}
-Das Backend, im folgenden auch Skatenight API genannt, ist eine in Java geschriebene Anwendung, die sich im Projektordner in dem Modul \glqq SkatenightBackend\grqq\ befindet. 
+\AUTHOR{Richard}
+Das Backend ist eine in Java geschriebene Anwendung, die sich im Projektordner in dem Modul \glqq SkatenightBackend\grqq\ befindet. Das für die Apps zugängliche Interface wird in der Klasse \glqq SkatenightServerEndpoint\grqq\ beschrieben. Alle darin implementierten öffentlichen Methoden sind über die generierten Client-Libraries aufrufbar.
+
+Die Klasse \glqq EventStartServlet\grqq wird über einen Cron-Job, der in der Datei \glqq cron.xml\grqq\ im WEB-INF-Ordner des Moduls definiert ist, alle zwei Minuten aufgerufen. Ihre Aufgabe ist es nach Events zu suchen, die kürzlich begonnen haben und für die noch keine GCM-Nachricht an die teilnehmenden Benutzer versandt wurde. Problematisch war, dass Cron-Jobs bei einem Google App Engine Projekt nicht dynamisch zur Laufzeit erstellt werden können. Die zunächst angedachte Lösung für jedes Event einen eigenen Cron-Job anzulegen, der genau zum Startzeitpunkt des Events aufgerufen wird, ist dadurch nicht möglich. Wir haben uns deshalb dafür entschieden, die Events mit einem Boolean zu markieren, wenn sie gestartet sind, sodass in der \glqq doGet()\grqq -Methode nach Events gesucht werden kann, für die diese Markierung noch nicht gesetzt wurde. Für jedes startende Event kann dann eine Liste der GCM-IDs der Benutzer erstellt werden, die über das Event benachrichtigt werden müssen. Gleichzeitig wird für die Benutzer auch die aktuelle Event-ID(\glqq currentEventId\grqq) gesetzt, die für die Berechnung des Feldes relevant ist.
 
 \subsection{Datenmodell}
 \AUTHOR{Richard}
+Abbildung \ref{fig:backend_er} zeigt das auf dem Server repräsentierte Datenmodell. Die Attribute, die mit einer dickeren Linie gestrichelt umrandet sind Listen von Objekten, die serialisiert werden und nicht als eigener Typ in der Datenbank existieren. Die Veranstalter werden als Hosts in der Datenbank abgespeichert, haben jedoch keine weiteren Beziehungen zu anderen Entitätsklassen.
+
+\begin{figure}[htb]
+\includegraphics[width=\textwidth]{graphics/backend_er.png}
+\caption{ER-Modell der Daten, die auf dem Server gespeichert werden}
+\label{fig:backend_er}
+\end{figure}
+
+% TODO Absatz über jdo und DataNucleus
 
 \subsection{Verfügbare API-Aufrufe}
 \AUTHOR{Richard}

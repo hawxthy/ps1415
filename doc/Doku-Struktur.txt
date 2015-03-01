@@ -20,6 +20,7 @@ Pas,Dan	4			- Lokale Auswertung
 Tristan	1			- Einstellungen
 			- Tests
 Tristan	2		- Einleitung (Reihenfolge, Vorbedingungen, Funktionsweise der Tests)
+Richard	<1		- Simulator
 Bernd	1		- Task-Tests (Ein Abschnitt, jeden TaskTest kurz erklären)
 				- Use-Case-Tests
 		3			- Veranstalter-App:
