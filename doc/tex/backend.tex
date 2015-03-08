@@ -87,7 +87,7 @@ Die Klasse \glqq EventStartServlet\grqq wird über einen Cron-Job, der in der Da
 
 \subsection{Datenmodell}
 \AUTHOR{Richard}
-Abbildung \ref{fig:backend_er} zeigt das auf dem Server repräsentierte Datenmodell. Die Attribute, die mit einer dickeren Linie gestrichelt umrandet sind Listen von Objekten, die serialisiert werden und nicht als eigener Typ in der Datenbank existieren. Die Veranstalter werden als Hosts in der Datenbank abgespeichert, haben jedoch keine weiteren Beziehungen zu anderen Entitätsklassen.
+Abbildung \ref{fig:backend_er} zeigt das auf dem Server repräsentierte Datenmodell. Die Attribute, die mit einer dickeren Linie gestrichelt umrandet sind, sind Listen von Objekten, die serialisiert werden und nicht als eigener Typ in der Datenbank existieren. Die Veranstalter werden als Hosts in der Datenbank abgespeichert, haben jedoch keine weiteren Beziehungen zu anderen Entitätsklassen.
 
 \begin{figure}[htb]
 \includegraphics[width=\textwidth]{graphics/backend_er.png}
@@ -95,10 +95,107 @@ Abbildung \ref{fig:backend_er} zeigt das auf dem Server repräsentierte Datenmod
 \label{fig:backend_er}
 \end{figure}
 
-% TODO Absatz über jdo und DataNucleus
+Wie auf der Abbildung gezeigt, werden zu einem Event auch die teilnehmenden Member gespeichert. In dem Event existieren dazu jedoch nicht direkt die Member-Objekte, sondern nur Strings, die auf den Primary Key der Klasse Member (\glqq email\grqq) zeigen. Dies ist notwendig, da aufgrund der Struktur des Google Datastore die Member nicht existentiell von den Events abhängen dürfen. Im Datastore kann für jeden Datensatz ein übergeordneter Datensatz definiert werden. Würde dies das Event sein, so würden beim Löschen des Events auch alle teilnehmenden Member-Datensätze gelöscht werden. Analog sind auch die Benutzergruppen implementiert. Damit beim Löschen einer Benutzergruppe die Benutzer nicht ebenfalls gelöscht werden, enthalten die Benutzergruppen ebenfalls nur eine Liste von Strings, die auf die E-Mails der enthaltenen Benutzer zeigen.
+
+Die Umsetzung des Klassenmodells des Backends weicht etwas von der in der Datenbank gewählten Struktur ab. Hauptunterschied ist, dass mehr Klassen zur Repräsentation der Daten definiert wurden. So gibt es beispielsweise zusätzlich zu den Routen auch die Klassen \glqq RoutePoint\grqq zur Repräsentation eines feinen Wegpunktes auf der Strecke, sowie die Klasse \glqq ServerWaypoint\grqq, die die beim Erstellen der Strecke gesetzten Marker speichert. Einen genauen Überblick über das Klassenmodell bietet Abbildung \ref{fig:backend_uml}.
+
+% TODO UML Diagramm fertigstellen
+\begin{figure}[htb]
+\includegraphics[width=\textwidth]{graphics/backend_uml.png}
+\caption{UML-Modell der Klassenstruktur des Backends}
+\label{fig:backend_uml}
+\end{figure}
 
 \subsection{Verfügbare API-Aufrufe}
 \AUTHOR{Richard}
+
+Zur Kommunikation der User- und Veranstalter-App mit dem Backend existieren einige API-Aufrufe auf dem Backend. Ein wichtiges Kriterium bei der Implementierung war, dass nicht jeder Benutzer die gleichen Rechte hat. So kann ein Veranstalter z.B. Events erstellen und löschen, ein normaler Skatenight-Teilnehmer sollte dies jedoch nicht können. Aufgrund dieser Anforderungen haben wir uns für die OAuth2-API von Google entschieden. Mit ihr ist es einfach, eine Authentifizierung der Benutzer zu implementieren, da sie auch in Google Cloud Endpoints gut integriert ist. Auf dem Server werden alle Methoden, die eine Authentifizierung benötigen, um einen Parameter vom Typ \glqq com.google.appengine.api.users.User\grqq\ erweitert. Beim Verbindungsaufbau in der App wird der am Handy angemeldete Benutzer ausgelesen und bei jedem Aufruf an das Backend nun automatisch übergeben. Hinzu kommt, dass die Authentifikation über den Google-Account geschieht. Da die App für Android-Geräte entwickelt wurde, ist sichergestellt, dass jeder Benutzer der App auch ein entsprechendes Konto besitzt.
+Die folgende Liste beschreibt diese Aufrufe und stellt auch kurz dar, in welchem Zusammenhang diese in der Apps verwendet werden.
+
+\subsubsection*{addHost}
+Die Methode addHost dient dem Hinzufügen von Veranstaltern. Durch den User-Parameter in der Signatur der Methode ist der Aufruf so geschützt, dass nur bereits eingetragene Veranstalter neue Veranstalter hinzufügen können. In der Veranstalter-App ist diese Funktion in der Rechteverwaltung zugänglich.
+
+\subsubsection*{removeHost}
+Ähnlich wie die addHost-Methode ist die removeHost-Methode wieder über ein User-Parameter geschützt. Die Methode löscht den angegebenen Veranstalter, sofern der aufrufende Benutzer ein bereits eingetragener Veranstalter ist. Auch diese Funktion ist in der Rechteverwaltung der Veranstalter-App zugänglich.
+
+\subsubsection*{isHost}
+Die isHost-Methode prüft für den angegebenen Benutzer, ob dieser ein eingetragener Veranstalter ist. Dies ist z.B. bei der Anmeldung in der Veranstalter-App notwendig.
+
+\subsubsection*{getHosts}
+Diese Methode liefert eine Liste aller Veranstalter zurück, die zurzeit auf dem Server hinterlegt sind.
+
+\subsubsection*{createEvent}
+
+
+\subsubsection*{createMember}
+
+
+\subsubsection*{updateMemberLocation}
+
+
+\subsubsection*{simulateMemberLocations}
+
+
+\subsubsection*{getCurrentEventsForMember}
+
+
+\subsubsection*{getMember}
+
+
+\subsubsection*{addMemberToEvent}
+
+
+\subsubsection*{removeMemberFromEvent}
+
+
+\subsubsection*{getMembersFromEvent}
+
+
+\subsubsection*{addRoute}
+
+
+\subsubsection*{getRoutes}
+
+
+\subsubsection*{deleteRoute}
+
+
+\subsubsection*{getEvent}
+
+
+\subsubsection*{deleteEvent}
+
+
+\subsubsection*{editEvent}
+
+
+\subsubsection*{getAllEvents}
+
+
+\subsubsection*{registerForGCM}
+
+
+\subsubsection*{getAllUserGroups}
+
+
+\subsubsection*{fetchMyUserGroups}
+
+
+\subsubsection*{createUserGroup}
+
+
+\subsubsection*{deleteUserGroup}
+
+
+\subsubsection*{joinUserGroup}
+
+
+\subsubsection*{leaveUserGroup}
+
+
+\subsubsection*{fetchGroupMembers}
+
+
 
 \subsection{Google Cloud Messaging}
 \AUTHOR{Richard}
