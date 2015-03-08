@@ -6,78 +6,80 @@ Eine weitere wichtige Anforderung war für uns, dass der Server kostenlos nutzba
 
 \subsection{Server, Keys und Build-Varianten}
 \AUTHOR{Richard}
-Während der Entwicklung der Apps ist uns schnell aufgefallen, dass aufgrund der verschiedenen Features, die jeweils auf eigenen Branches entwickelt wurden, auch der Server von mehr als einer Person angepasst wurde. Damit einher ging, dass zwischenzeitlich verschiedene Versionen des Servers notwendig waren, damit jede Teilgruppe des Teams das eigene Feature implementieren konnte, ohne die Entwicklung anderer Teammitglieder zu stören. Aus diesem Grund haben wir mehrere Projekte bei der Google App Engine angelegt, zwischen denen relativ einfach gewechselt werden kann. In unserem Projekt in den Modulen \glqq app\grqq\ und \glqq veranstalterapp\grqq\ gibt es entsprechende Build-Varianten, mit denen der gewünschte Server ausgewählt werden kann. Da es im Modul \glqq SkatenightBackend\grqq\ nicht die Möglichkeit gibt Build-Varianten zu definieren, gibt es dort die Befehle \glqq applyProductionserverConfig\grqq, \glqq applyTestserverConfig\grqq\ und \glqq applyJenkinsserverConfig\grqq. Diese kopieren jeweils aus den entsprechenden Unterordnern des src-Ordners die Konfigurationsdateien, die für einen Server-Wechsel notwendig sind, in den main-Ordner. Bei einem Serverwechsel wird die \glqq Constants.java\grqq\ und die Projekt-ID in der Datei \glqq appengine-web.xml\grqq\ ausgetauscht. Wenn anschließend der Befehl \glqq appengineUpdate\grqq\ zur Aktualisierung des Servers aufgerufen wird, wird der Server aktualisiert, dessen Projekt-ID in der \glqq appengine-web.xml\grqq\ steht. Die folgende Tabelle listet nocheinmal die Details zu den einzelnen Google App Eingine Projekten und auch die notwendigen Keys auf, mit denen sich die Apps gegenüber dem Backend und anderen Diensten identifizieren.
 
-% TODO Tabelle richtig platzieren
-\noindent
-\begin{tabular}{|c|l|l|}
-	\hline
-	\multicolumn{3}{|p{15cm}|}{
-		Web-Client ID: Dient der Authentifizierung über OAuth2, das die gesicherten API-Funktionen, wie beispielsweise das Anlegen eines Events schützt.
-	} \\
-	\hline
-	\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & 37947570052-dk3rjhgran1s38gscv6va2rmmv2bei8r.apps.googleusercontent.com \\
-	\cline{2-3}
-	& Debug & 644721617929-unb9em0kl73b9evdv2h52ufn26fao20p.apps.googleusercontent.com \\
-	\cline{2-3}
-	& Jenkins & 1032268444653-7agre4q3eosqhlh92sq62hf5fan9jbv5.apps.googleusercontent.com \\
-	\hline
-	\hline
-	\multicolumn{3}{|p{15cm}|}{
-		Client-ID der User-App: Dient der Identifikation der User-App am Backend.
-	} \\
-	\hline
-	\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & 37947570052-g006o3ovfotnjqreltom6c7cbktm7dap.apps.googleusercontent.com \\
-	\cline{2-3}
-	& Debug & 644721617929-mk0do3jm5lec1dasijdj3220ot87gbn7.apps.googleusercontent.com \\
-	\cline{2-3}
-	& Jenkins & 1032268444653-kj1mpisvlrpl67e7db2fu2005aube7mu.apps.googleusercontent.com \\
-	\hline
-	\hline
-	\multicolumn{3}{|p{15cm}|}{
-		Client-ID der Veranstalter-App: Dient der Identifikation der Veranstalter-App am Backend.
-	} \\
-	\hline
-	\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & 37947570052-4ru7asfhnrjmmqvj3qdpo2rrp31fudf3.apps.googleusercontent.com \\
-	\cline{2-3}
-	& Debug & 644721617929-kbcha00vb3j30sh9at05sagm73iltqqo.apps.googleusercontent.com \\
-	\cline{2-3}
-	& Jenkins & 1032268444653-83ih5mp5mguh66c012u0sobqe4oqoupr.apps.googleusercontent.com \\
-	\hline
-	\hline
-	\multicolumn{3}{|p{15cm}|}{
-		Google-Maps API-Key für die User-App: Wird zur Nutzung der Google-Maps API in der User-App benötigt.
-	} \\
-	\hline
-	\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & AIzaSyBKGVQHij0JcjgHyCnT0ZrLihbCn8Av2jg \\
-	\cline{2-3}
-	& Debug & AIzaSyDQgEKF42jjm57x7kgnY7EI62CcXW\_zDS0 \\
-	\cline{2-3}
-	& Jenkins & AIzaSyAQ47zRjgPRk1sxJYifd2URQdEnk5HvnRw \\
-	\hline
-	\hline
-	\multicolumn{3}{|p{15cm}|}{
-		Google-Maps API-Key für die Veranstalter-App: Wird zur Nutzung der Google-Maps API in der Veranstalter-App benötigt.
-	} \\
-	\hline
-	\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & AIzaSyBedRi4A--p3LNQLy5lgOsBEdIdKuLbi2U \\
-	\cline{2-3}
-	& Debug & AIzaSyAO4zGlaKexByZmEiFKLbo18Y\_I-t9KbMc \\
-	\cline{2-3}
-	& Jenkins & AIzaSyBes8RSzVdqcQY-vnj9GLWxCLBKAFCzh98 \\
-	\hline
-	\hline
-	\multicolumn{3}{|p{15cm}|}{
-		Google Cloud Messaging API-Key: Dient der Registrierung beim GCM-Dienst von Google in der User-App.
-	} \\
-	\hline
-	\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & AIzaSyDO8mosWwYXjjGZ9besu9CZw1LDEEXrFXE \\
-	\cline{2-3}
-	& Debug & AIzaSyCpwhxda1Lb5E61\_fybZq2iSJgViZu3QNM \\
-	\cline{2-3}
-	& Jenkins & AIzaSyBjeKzx\_vzkUgQZdT83BB0BMD3gFebpet0 \\
-	\hline
-\end{tabular}
+\begin{table}[htb]
+	\begin{tabular}{|c|l|l|}
+		\hline
+		\multicolumn{3}{|p{15cm}|}{
+			Web-Client ID: Dient der Authentifizierung über OAuth2, das die gesicherten API-Funktionen, wie beispielsweise das Anlegen eines Events schützt.
+		} \\
+		\hline
+		\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & 37947570052-dk3rjhgran1s38gscv6va2rmmv2bei8r.apps.googleusercontent.com \\
+		\cline{2-3}
+		& Debug & 644721617929-unb9em0kl73b9evdv2h52ufn26fao20p.apps.googleusercontent.com \\
+		\cline{2-3}
+		& Jenkins & 1032268444653-7agre4q3eosqhlh92sq62hf5fan9jbv5.apps.googleusercontent.com \\
+		\hline
+		\hline
+		\multicolumn{3}{|p{15cm}|}{
+			Client-ID der User-App: Dient der Identifikation der User-App am Backend.
+		} \\
+		\hline
+		\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & 37947570052-g006o3ovfotnjqreltom6c7cbktm7dap.apps.googleusercontent.com \\
+		\cline{2-3}
+		& Debug & 644721617929-mk0do3jm5lec1dasijdj3220ot87gbn7.apps.googleusercontent.com \\
+		\cline{2-3}
+		& Jenkins & 1032268444653-kj1mpisvlrpl67e7db2fu2005aube7mu.apps.googleusercontent.com \\
+		\hline
+		\hline
+		\multicolumn{3}{|p{15cm}|}{
+			Client-ID der Veranstalter-App: Dient der Identifikation der Veranstalter-App am Backend.
+		} \\
+		\hline
+		\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & 37947570052-4ru7asfhnrjmmqvj3qdpo2rrp31fudf3.apps.googleusercontent.com \\
+		\cline{2-3}
+		& Debug & 644721617929-kbcha00vb3j30sh9at05sagm73iltqqo.apps.googleusercontent.com \\
+		\cline{2-3}
+		& Jenkins & 1032268444653-83ih5mp5mguh66c012u0sobqe4oqoupr.apps.googleusercontent.com \\
+		\hline
+		\hline
+		\multicolumn{3}{|p{15cm}|}{
+			Google-Maps API-Key für die User-App: Wird zur Nutzung der Google-Maps API in der User-App benötigt.
+		} \\
+		\hline
+		\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & AIzaSyBKGVQHij0JcjgHyCnT0ZrLihbCn8Av2jg \\
+		\cline{2-3}
+		& Debug & AIzaSyDQgEKF42jjm57x7kgnY7EI62CcXW\_zDS0 \\
+		\cline{2-3}
+		& Jenkins & AIzaSyAQ47zRjgPRk1sxJYifd2URQdEnk5HvnRw \\
+		\hline
+		\hline
+		\multicolumn{3}{|p{15cm}|}{
+			Google-Maps API-Key für die Veranstalter-App: Wird zur Nutzung der Google-Maps API in der Veranstalter-App benötigt.
+		} \\
+		\hline
+		\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & AIzaSyBedRi4A--p3LNQLy5lgOsBEdIdKuLbi2U \\
+		\cline{2-3}
+		& Debug & AIzaSyAO4zGlaKexByZmEiFKLbo18Y\_I-t9KbMc \\
+		\cline{2-3}
+		& Jenkins & AIzaSyBes8RSzVdqcQY-vnj9GLWxCLBKAFCzh98 \\
+		\hline
+		\hline
+		\multicolumn{3}{|p{15cm}|}{
+			Google Cloud Messaging API-Key: Dient der Registrierung beim GCM-Dienst von Google in der User-App.
+		} \\
+		\hline
+		\multirow{3}{3mm}{\begin{sideways}Key\end{sideways}} & Release & AIzaSyDO8mosWwYXjjGZ9besu9CZw1LDEEXrFXE \\
+		\cline{2-3}
+		& Debug & AIzaSyCpwhxda1Lb5E61\_fybZq2iSJgViZu3QNM \\
+		\cline{2-3}
+		& Jenkins & AIzaSyBjeKzx\_vzkUgQZdT83BB0BMD3gFebpet0 \\
+		\hline
+	\end{tabular}
+	\caption{Eine Liste aller verwendeter IDs und Keys, die zur Authentifizierung der Apps und Server notwendig sind.}
+	\label{tab:keys}
+\end{table}
+Während der Entwicklung der Apps ist uns schnell aufgefallen, dass aufgrund der verschiedenen Features, die jeweils auf eigenen Branches entwickelt wurden, auch der Server von mehr als einer Person angepasst wurde. Damit einher ging, dass zwischenzeitlich verschiedene Versionen des Servers notwendig waren, damit jede Teilgruppe des Teams das eigene Feature implementieren konnte, ohne die Entwicklung anderer Teammitglieder zu stören. Aus diesem Grund haben wir mehrere Projekte bei der Google App Engine angelegt, zwischen denen relativ einfach gewechselt werden kann. In unserem Projekt in den Modulen \glqq app\grqq\ und \glqq veranstalterapp\grqq\ gibt es entsprechende Build-Varianten, mit denen der gewünschte Server ausgewählt werden kann. Da es im Modul \glqq SkatenightBackend\grqq\ nicht die Möglichkeit gibt Build-Varianten zu definieren, gibt es dort die Befehle \glqq applyProductionserverConfig\grqq, \glqq applyTestserverConfig\grqq\ und \glqq applyJenkinsserverConfig\grqq. Diese kopieren jeweils aus den entsprechenden Unterordnern des src-Ordners die Konfigurationsdateien, die für einen Server-Wechsel notwendig sind, in den main-Ordner. Bei einem Serverwechsel wird die \glqq Constants.java\grqq\ und die Projekt-ID in der Datei \glqq appengine-web.xml\grqq\ ausgetauscht. Wenn anschließend der Befehl \glqq appengineUpdate\grqq\ zur Aktualisierung des Servers aufgerufen wird, wird der Server aktualisiert, dessen Projekt-ID in der \glqq appengine-web.xml\grqq\ steht. Tabelle \ref{tab:keys} listet nocheinmal die Details zu den einzelnen Google App Eingine Projekten und auch die notwendigen Keys auf, mit denen sich die Apps gegenüber dem Backend und anderen Diensten identifizieren.
 
 \subsection{Klassenstruktur der Skatenight API}
 \AUTHOR{Richard}
@@ -122,84 +124,84 @@ Die Methode addHost dient dem Hinzufügen von Veranstaltern. Durch den User-Para
 Die isHost-Methode prüft für den angegebenen Benutzer, ob dieser ein eingetragener Veranstalter ist. Dies ist z.B. bei der Anmeldung in der Veranstalter-App notwendig.
 
 \subsubsection*{getHosts}
-Diese Methode liefert eine Liste aller Veranstalter zurück, die zurzeit auf dem Server hinterlegt sind.
+Diese Methode liefert eine Liste aller Veranstalter zurück, die zurzeit auf dem Server hinterlegt sind. Die Liste der Veranstalter kann nur von bereits eingetragenen Veranstaltern abgerufen werden.
 
 \subsubsection*{createEvent}
-
+Zum Erstellen eines Events dient die Methode createEvent, die von eingetragenen Veranstaltern aufgerufen werden kann. Zusätzlich zu dem Event kann angegeben werden, ob es sich um einen Editiervorgang handelt und, ob das Datum des Events geändert wurde. Diese Daten sind notwendig, da Benutzer der User-App so über die Änderungen per GCM benachrichtigt werden können.
 
 \subsubsection*{createMember}
-
+Die createMember-Methode wird aus der User-App heraus aufgerufen. Über diese Funktion wird sichergestellt, dass auf dem Server für den Benutzer ein Member-Objekt existiert, das unter anderem die Liste der Events speichert, an dem der Benutzer teilnimmt, und auch die aktuell gemeldete Position des Benutzers.
 
 \subsubsection*{updateMemberLocation}
-
+Über die Methode updateMemberLocation können die Positionen der Benutzer der User-App an den Server übermittelt werden. Neben der neuen Position des Benutzers wird auch die ID des Events, an dem der Benutzer gerade teilnimmt, übertragen. Dies ist für die Feldberechnung auf dem Server notwendig, die ebenfalls über diese Methode angestoßen wird, falls die letzte Feldberechnung länger als einen gewissen Wert zurückliegt.
 
 \subsubsection*{simulateMemberLocations}
-
+Für Präsentationen der App und der Feldauswertung haben wir neben den beiden Apps einen Simulator für Benutzer der Skatenight-App entwickelt. Zunächst war geplant, dass dieser Simulator genau wie die User-App die updateMemberLocation-Methode aufruft. Da bei bis zu 100 simulierten Teilnehmern die Anzahl der Serverzugriffe jedoch sehr hoch und damit nicht mehr im kostenlosen Rahmen der Google App Engine lag, haben wir uns dafür entschieden eine gesonderte Methode zur Simulation der Positionen zu erstellen. Diese kann mit nur einem Aufruf eine Liste von Teilnehmern und deren Positionen entgegen nehmen, sodass nun die Anzahl der Serveraufrufe unabhängig von der simulierten Teilnehmerzahl ist. Intern wird jedoch nach wie vor die updateMemberLocation-Methode aufgerufen.
 
 \subsubsection*{getCurrentEventsForMember}
-
+Da im Datenmodell in den Member-Objekten die Liste der Events, an denen der Benutzer teilnimmt, nicht gespeichert werden, kann über diese Methode eine Liste der entsprechenden Events für einen Teilnehmer abgerufen werden.
 
 \subsubsection*{getMember}
-
+Die getMember-Methode dient dem Abrufen der Member-Objekte zu entsprechenden E-Mail-Adressen.
 
 \subsubsection*{addMemberToEvent}
-
+Die addMemberToEvent-Methode fügt einen Teilnehmer anhand seiner Mail zu dem Event mit der angegebenen ID hinzu. Dabei wird außerdem geprüft, ob das Event bereits begonnen hat und der Teilnehmer in diesem Fall per GCM informiert.
 
 \subsubsection*{removeMemberFromEvent}
-
+Neben dem Teilnehmen an einem Event muss der Benutzer auch die Möglichkeit haben, das Event wieder zu verlassen. Die Methode removeMemberFromEvent realisiert diese Funktion und wird in der User-App aufgerufen.
 
 \subsubsection*{getMembersFromEvent}
-
+Analog zur getCurrentEventsForMember-Methode ruft die Methode getMembersFromEvent die Liste der Teilnehmer eines Events ab. Zwar werden diese in der Klasse Event gespeichert, jedoch nur als Referenz über die Mail-Adresse. Diese Methode wandelt die Mail-Adressen in eine Liste von Member-Objekten um, die anschließend zurück gegeben werden.
 
 \subsubsection*{addRoute}
-
+Die addRoute-Methode ist wieder eine Methode, die nur von eingetragenen Veranstaltern aufgerufen werden kann. Sie speichert die übergebene Route in der Datenbank und wird aus der Veranstalter-App nach dem Anlegen einer neuen Route aufgerufen.
 
 \subsubsection*{getRoutes}
-
+Diese Methode gibt eine Liste der auf dem Server gespeicherten Routen zurück. Sie wird sowohl aus der User- als auch aus der Veranstalter-App aufgerufen, da in beiden Apps eine Liste der Routen angezeigt werden kann.
 
 \subsubsection*{deleteRoute}
-
+Die deleteRoute-Methode bildet das Gegenstück zur addRoute-Methode. Sie löscht die angegebene Route, falls es sich bei dem aufrufenden Benutzer um einen eingetragenen Veranstalter handelt.
 
 \subsubsection*{getEvent}
-
+getEvent gibt das Event-Objekt mit der angegebenen ID zurück. Die Methode wird sowohl aus der Veranstalter- als auch aus der User-App aufgerufen, wenn der Anwender auf ein Event klickt.
 
 \subsubsection*{deleteEvent}
-
+Die deleteEvent-Methode kann von eingetragenen Veranstaltern zum Löschen eines Events aus der Veranstalter-App heraus aufgerufen werden. Die Methode gibt als Boolean-Wert zurück, ob das Event gelöscht werden konnte oder nicht. Da durch die Google Cloud Endpoints die Menge der verwendbaren Rückgabetypen für Methoden eingeschränkt ist, sind unter anderem primitive Datentypen wie boolean oder der durch Java vorgegebene Standardwrapper Boolean nicht möglich. Aus diesem Grund haben wir einen eigenen Boolean-Wrapper implementiert, der als einzigen Zweck das Kapseln eines Boolean-Wertes erfüllt.
 
 \subsubsection*{editEvent}
-
+Um ein Event anzupassen, können Veranstalter die editEvent-methode aufrufen. Die Implementation dieser Methode löscht zunächst das alte Event und legt es anschließend über die createEvent-Methode mit den neuen Daten wieder an.
 
 \subsubsection*{getAllEvents}
-
+Für Benutzer der beiden Apps ist die Methode getAllEvents ohne Authentifikation zugänglich. Sie gibt eine Liste aller auf dem Server gespeicherter Events zurück. Da durch die Nuztung von JDO und DataNucleus die in den Events eingebetteten Routen jedoch nicht abgerufen werden konnten, wird nach dem Ermitteln der Eventliste jedes Event nocheinmal einzeln abgerufen. So sind auch die Routen in den Event-Objekten initialisiert.
 
 \subsubsection*{registerForGCM}
-
+Von der User-App wird bei jedem Appstart die registerForGCM-Methode aufgerufen. Sie übermittelt die aktuelle GCM-ID an den Server, die zur Kommunikation über den Google Cloud Messaging Dienst benötigt wird. Die GCM-ID eines Teilnehmers wird in seinem Member-Objekt gespeichert.
 
 \subsubsection*{getAllUserGroups}
-
+getAllUserGroups ruft die Liste aller Benutzergruppen ab. Sie wird von der User-App benutzt.
 
 \subsubsection*{fetchMyUserGroups}
-
+Diese Methode ruft ebenfalls eine Liste der Benutzergruppen ab, schränkt diese jedoch auf Benutzergruppen des angegebenen Benutzers ein. Zusätzlich prüft die Methode, ob Member-Objekte auf Gruppen verweisen, die nicht mehr existieren und bereinigt die Daten, falls entsprechende Gruppen gefunden werden.
 
 \subsubsection*{createUserGroup}
-
+Die createUserGroup-Methode legt eine Benutzergruppe mit dem angegebenen Namen und dem aufrufenden Benutzer als Ersteller an. Zusätzlich werden die User-Apps der Benutzer per GCM über die neue Gruppe informiert, damit die Liste der Benutzergruppen in bereits geöffneten Apps aktualisiert werden kann. Für den Benutzer ist diese Nachricht allerdings nicht sichtbar.
 
 \subsubsection*{deleteUserGroup}
-
+Die deleteUserGroup-Methode löscht die Benutzergruppe mit dem angegebenen Namen, sofern der aufrufende Benutzer Ersteller der Gruppe ist.
 
 \subsubsection*{joinUserGroup}
-
+Über die joinUserGroup-Methode haben Benutzer der User-App die Möglichkeit, Benutzergruppen anderer Benutzer beizutreten.
 
 \subsubsection*{leaveUserGroup}
-
+Die leaveUserGroup-Methode entfernt den Benutzer wieder aus der angegebenen Gruppe. Dies ist nur dann Möglich, wenn der aufrufende Benutzer nicht Ersteller der Gruppe ist, aus der er austreten möchte.
 
 \subsubsection*{fetchGroupMembers}
-
+Mithilfe der fetchGroupMembers-Methode kann eine Liste aller Member abgerufen werden, die sich in der angegebenen Benutzergruppe befinden. Dies wird benötigt, wenn die Gruppenmitglieder der eigenen Gruppen auf der Karte während eines Events angezeigt werden sollen.
 
 
 \subsection{Google Cloud Messaging}
 \AUTHOR{Richard}
 
 \subsection{Feldberechnung}
-\label{subsec:Feldberechnung}
 \AUTHOR{Pascal}
+\label{subsec:Feldberechnung}
