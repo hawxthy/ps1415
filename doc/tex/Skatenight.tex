@@ -5,6 +5,10 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 
+% Seitenränder auf 2,5 cm
+\usepackage{geometry}
+\geometry{a4paper, top=25mm, left=25mm, right=25mm, bottom=25mm, headsep=10mm, footskip=12mm}
+
 % Mehrere Zeilen einer Tabelle Zusammenfassen
 \usepackage{multirow}
 
@@ -53,6 +57,16 @@
 
 \section{Vorgehensweise}
 \AUTHOR{Tristan, Richard}
+
+Zum kontinuierlichen Bauen der Apps und des Backends wurde ein Jenkinsserver eingesetzt. Da es einige Schwierigkeiten bei der Durchführung von Tests auf dem Jenkinsserver gab, haben wir bei unserer Projektarbeit nur sehr selten den Jenkinsserver in Anspruch genommen. Dennoch besteht eine Möglichkeit das Projekt auf dem Jenkinsserver zu bauen. Der Ablauf ist dabei wie folgt:
+
+\begin{enumerate}
+	\item Säubern des Projekts mit dem Befehl \glqq clean\grqq
+	\item Anpassen der Versionsnummer der Build-Tools von 1.9.17 auf 1.9.8 in der Gradle-Builddatei für das Backend, da das Bauen des Backends sonst fehlschlägt.
+	\item Bauen und Hochladen des Backend auf den Release-Server
+	\item Zurücksetzen der Änderungen in der Build-Datei.
+	\item Bauen und Signieren der User- und Veranstalter-App in der Release-Konfiguration.
+\end{enumerate}
 
 \section{Features der Apps}
 \AUTHOR{Daniel}

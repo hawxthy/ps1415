@@ -6,7 +6,6 @@ Eine weitere wichtige Anforderung war für uns, dass der Server kostenlos nutzba
 
 \subsection{Server, Keys und Build-Varianten}
 \AUTHOR{Richard}
-
 \begin{table}[htb]
 	\begin{tabular}{|c|l|l|}
 		\hline
@@ -101,7 +100,6 @@ Wie auf der Abbildung gezeigt, werden zu einem Event auch die teilnehmenden Memb
 
 Die Umsetzung des Klassenmodells des Backends weicht etwas von der in der Datenbank gewählten Struktur ab. Hauptunterschied ist, dass mehr Klassen zur Repräsentation der Daten definiert wurden. So gibt es beispielsweise zusätzlich zu den Routen auch die Klassen \glqq RoutePoint\grqq zur Repräsentation eines feinen Wegpunktes auf der Strecke, sowie die Klasse \glqq ServerWaypoint\grqq, die die beim Erstellen der Strecke gesetzten Marker speichert. Einen genauen Überblick über das Klassenmodell bietet Abbildung \ref{fig:backend_uml}.
 
-% TODO UML Diagramm fertigstellen
 \begin{figure}[htb]
 \includegraphics[width=\textwidth]{graphics/backend_uml.png}
 \caption{UML-Modell der Klassenstruktur des Backends}
@@ -110,7 +108,6 @@ Die Umsetzung des Klassenmodells des Backends weicht etwas von der in der Datenb
 
 \subsection{Verfügbare API-Aufrufe}
 \AUTHOR{Richard}
-
 Zur Kommunikation der User- und Veranstalter-App mit dem Backend existieren einige API-Aufrufe auf dem Backend. Ein wichtiges Kriterium bei der Implementierung war, dass nicht jeder Benutzer die gleichen Rechte hat. So kann ein Veranstalter z.B. Events erstellen und löschen, ein normaler Skatenight-Teilnehmer sollte dies jedoch nicht können. Aufgrund dieser Anforderungen haben wir uns für die OAuth2-API von Google entschieden. Mit ihr ist es einfach, eine Authentifizierung der Benutzer zu implementieren, da sie auch in Google Cloud Endpoints gut integriert ist. Auf dem Server werden alle Methoden, die eine Authentifizierung benötigen, um einen Parameter vom Typ \glqq com.google.appengine.api.users.User\grqq\ erweitert. Beim Verbindungsaufbau in der App wird der am Handy angemeldete Benutzer ausgelesen und bei jedem Aufruf an das Backend nun automatisch übergeben. Hinzu kommt, dass die Authentifikation über den Google-Account geschieht. Da die App für Android-Geräte entwickelt wurde, ist sichergestellt, dass jeder Benutzer der App auch ein entsprechendes Konto besitzt.
 Die folgende Liste beschreibt diese Aufrufe und stellt auch kurz dar, in welchem Zusammenhang diese in der Apps verwendet werden.
 
@@ -201,6 +198,19 @@ Mithilfe der fetchGroupMembers-Methode kann eine Liste aller Member abgerufen we
 
 \subsection{Google Cloud Messaging}
 \AUTHOR{Richard}
+An mehreren Stellen der User-App wird die Google Cloud Messaging API genutzt. Sie ermöglicht es, Nachrichten vom Backend an registrierte Handys zu senden. Dies ist vor allem dann nützlich, wenn sich Daten auf dem Server ändern und der Benutzer darüber informiert werden muss. An folgenden Stellen benutzen wir das Google Cloud Messaging:
+
+\begin{itemize}
+\item Zur Benachrichtigung aller Benutzer, wenn ein neues Event erstellt wurde. In diesem Fall wird die Liste der Events in der User-App automatisch aktualisiert, falls sie geöffnet ist. Ebenfalls wird dem Benutzer eine Notification-Nachricht angezeigt, die von überall im Handy über die obere Statusleiste abrufbar ist.
+\item Zur Benachrichtigung aller Benutzer, wenn eine neue Benutzergruppe erstellt wurde. Dabei wird jedoch keine Notification erstellt, sondern lediglich die Liste der Gruppen aktualisiert.
+\item Zu Benachrichtigung aller Benutzer, wenn eine Benutzergruppe gelöscht wurde. Dies ist notwendig, damit gegebenenfalls die Einstellung beim Benutzer, dass die gelöschte Gruppe auf der Karte an gezeigt werden soll, ebenfalls gelöscht wird. Bei dieser Benachrichtigung erhält der Benutzer außerdem eine Notification.
+\end{itemize}
+
+Die ID, die zur Identifikation und damit zur KOntaktaufnahme mit den Benutzern per GCM notwendig ist, wird beim Start der User-App auf dem Handy generiert. Dieses sendet die ID dann an den Server, der die ID für den aufrufenden Benutzer hinterlegt. Zur Verwaltung der GCM-IDs gibt es auf dem Server die Klasse \glqq RegistrationManager\grqq. Diese speichert zu jeder Nutzer-Mail-Adresse eine ID ab, kann aber auch eine Liste aller registrierter GCM-IDs zurückgeben.
+
+Zur Unterscheidung der einzelnen Nachrichten-Typen, die vom Server zu der User-App gesendet werden, existiert die Enumeration MessageType. Alle vom Skatenight-Backend generierten Nachrichten enthalten als Payload mindestens das Attribut \glqq type\grqq, das als Wert den Namen des Enumeration-Eintrags hat. Anhand dieses Typs wird auf dem Handy die Nachricht dann durch den GcmIntentService weiter verarbeitet.
+
+Um eine GCM-Nachricht vom Backend zu Senden, wird zunächst ein Message-Objekt erstellt. Dieses erhält Daten wie den \glqq collapseKey\grqq, über den mehrere Nachrichten zusammengefasst werden können, falls sie stoßweise beim Benutzer ankommen. Ebenfalls kann die Gültigkeitsdauer der Nachricht angegeben werden. Falls die Nachricht innerhalb dieser Zeitspanne nicht ausgeliefert wurde, wird sie verworfen. Als weitere Einstellung kann angegeben werden, ob die Nachricht direkt zugestellt werden soll oder erst, wenn der Benutzer sein Handy aktiviert. Über ein Objekt vom Typ \glqq Sender\grqq\ kann die Nachricht dann verschickt werden.
 
 \subsection{Feldberechnung}
 \AUTHOR{Pascal}

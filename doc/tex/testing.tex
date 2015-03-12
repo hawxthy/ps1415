@@ -1,0 +1,42 @@
+\subsection{Einleitung}
+\AUTHOR{Tristan}
+
+\subsection{Simulator}
+\AUTHOR{Richard}
+Zu besseren Testbarkeit der App ist während der Entwicklung auch ein Simulator für eine Skatenight entstanden. Der Simulator ist in JavaScript geschrieben und benutzt JQuery, sowie die Google Maps API v3 als Bibliotheken.
+
+Im Quelltext des Simulators kann in Zeile 50 die Adresse des Backends eingegeben werden, dass zur Simulation genutzt werden soll. So hat man die Möglichkeit, nicht nur auf dem Debug-Server sondern auch auf dem Jenkins- und Release-Server Felder zu simulieren. Nach dem Starten des Simulators werden dann die Events des entsprechenden Servers automatisch heruntergeladen und in dem Dropdown-Menü angezeigt. Wenn ein Event ausgewählt wird, wird die Strecke des Events als roter Polygonenzug auf der Karte dargestellt. Es kann unterhalb der Dropdownliste angegeben werden, wieviele Skater simuliert werden sollen, wie schnell sie fahren, wie groß das Feld ist, also auf welcher Fläche sie sich verteilen sollen, und in welchen Abständen die Position der Skater auf den Server übertragen werden soll. Mit den Schaltfläche \glqq Start\grqq, \glqq Pause\grqq\ und \glqq Stop\grqq\ kann die Simulation gesteuert werden.
+
+Zur Simulation der Skater wird auf dem Server die Methode \glqq simulateMemberLocations\grqq\ aufgerufen. Diese nimmt die Positionen für viele Skater gleichzeitig entgegen und ruft anschließend jeweils die eigentliche Methode zur Aktualisierung der Position \glqq updateMemberLocation\grqq\ auf. Wir haben uns für diese Lösung entschieden, da Probleme auftraten, wenn der Simulator direkt die updateMemberLocation-Methode nutzte. Die zu große Anzahl Anfragen hat den kostenlosen Rahmen der Google App Engine innerhalb einer sehr kurzen Zeit aufgebraucht. Über die Methode zur Simulation der Positionen wird unabhängig von der Anzahl der Skater immer nur eine Anfrage gestellt.
+
+\subsection{Task-Tests}
+\AUTHOR{Bernd}
+
+\subsection{Use-Case-Tests: Veranstalter-App}
+\subsubsection{AddAndDeleteHostTest}
+\AUTHOR{Bernd}
+
+\subsubsection{AuthenticationOrganizerTest}
+\AUTHOR{Bernd}
+
+\subsubsection{CreateAndDeleteRouteTest}
+\AUTHOR{Richard}
+Der CreateAndDeleteRouteTest legt, wie der Name schon sagt, eine Route an und löscht sie anschließend wieder. Da es sich um einen Use-Case-Tests handelt, werden die Abläufe vollständig über die GUI gesteuert. Lediglich beim Löschen der Route wird nicht über die GUI-Elemente das Löschen angestoßen, sondern direkt die entsprechende Methode auf dem Fragment zur Verwaltung der Routen aufgerufen. Dies ist notwendig, da wir in den Tests das Auswählen von Optionen in einem Kontextmenü nicht an allen Stellen simulieren konnten. Der weitere Ablauf des Löschens wird aber exakt wie in der Veranstalter-App abgearbeitet.
+
+Im Test wird nach einer kurzen Wartezeit in der initialisierten View auf den Plus-Button im ManageRoutesFragment gedrückt. Es öffnet sich dadurch der Dialog, der den Namen der neuen Route entgegennimmt. Nach Eintragen eines Teststrings, wird mit der OK-Taste bestätigt und es öffnet sich der Routeneditor. Nach einer erneuten Wartezeit ist die Route vollständig geladen und es werden zwei Wegpunkte über den Plus-Button in der ActionBar erstellt. Nach Erstellung des ersten Wegpunktes wird die Karte ein Stück verschoben, damit sich der zweite Wegpunkt an einer anderen Position befindet. Durch die Simulation eines Zurück-Tastenklicks wird der Sicherungsdialog angezeigt, der bestätigt und damit geschlossen wird. Der Test wartet dann, bis die neue Route angelegt wurde und löscht diese über den bereits erwähnten Aufruf beim ManageRoutesFragment.
+
+\subsubsection{PublishNewInformationTest}
+\AUTHOR{Tristan}
+
+\subsection{Use-Case-Tests: User-App}
+\subsubsection{CreateJoinLeaveDeleteUserGroupTest}
+\AUTHOR{Bernd}
+
+\subsubsection{SendCurrentPositionTest}
+\AUTHOR{Tristan}
+
+\subsubsection{SendPositionSettingsTest}
+\AUTHOR{Tristan}
+
+\subsubsection{ShowSeveralEventsTest}
+\AUTHOR{Tristan}
