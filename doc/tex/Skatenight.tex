@@ -47,6 +47,23 @@
 	von #1 \\ \\
 }
 
+% Befehle zur einheitlichen Hervorhebung von Dateien, Klassen, Methoden und Attributen
+\newcommand{\DATEI}[1]{
+	\emph{#1}
+}
+\newcommand{\KLASSE}[1]{
+	\emph{#1}
+}
+\newcommand{\METHODE}[1]{
+	\emph{#1}
+}
+\newcommand{\ATTRIBUT}[1]{
+	\emph{#1}
+}
+
+% Erste Zeile eines Absatzes nicht einrücken
+\setlength{\parindent}{0em}
+
 \begin{document}
 \maketitle
 
@@ -60,6 +77,19 @@
 
 \section{Vorgehensweise}
 \AUTHOR{Tristan, Richard}
+Am Anfang des Projektes haben wir uns darauf geeinigt alle die gleiche Integrierte Entwicklungsumgebung (IDE) \glqq Android Studio\grqq\ von Google zu nutzen, welches die offizielle Entwicklungsumgebung für Android ist, damit es nicht zu Problemen innerhalb des Projektes kommt.
+Weiterhin haben wir uns für die freie Software \glqq Git\grqq\ zur Versionsverwaltung des Projekts entschieden. Hierfür gab es einen Master Branch auf dem sich immer eine lauffähige Version der Apps befunden hat. Für die Entwicklung einzelner Funktionen, wie zum Beispiel die \glqq lokale Auswertung\grqq wurden extra Branches angelegt.
+Für das Vorgehen im Projekt wurde das Rahmenwerk Scrum verwendet. Die Rolle des Product Owners wurde von den Betreuern übernommen. Außerdem hat die Rolle des Scrum Masters nach jedem einzelnen Sprint, der in der Regel 4 Wochen betrug, ein anderes Mitglied des Entwicklungsteams übernommen. Zudem wurden die einzelnen Aufgaben für das Sprint Backlog vor jedem Sprint bzw. nach dem Sprint Review in Tasks aufgeteilt. Damit ein Task wirklich als bearbeitet (\glqq done\grqq) gilt wurde vor dem Projekt definiert, ab wann ein Task als dies gelten darf:
+
+\begin{itemize}
+	\item Programmierung abgeschlossen
+	\item Funktion getestet
+	\item Ein Code Review durchgeführt wurde
+	\item Die Feature-Branch auf den master-Branch gemerged wurden
+	\item Die Dokumentation (Java Doc) geschrieben wurde
+\end{itemize}
+
+Außerdem wurde regelmäßig das Daily Scrum durchgeführt, wodurch wir uns gegenseitig Informiert haben, wer gerade an was arbeitet, ob Probleme aufgetreten sind oder Hilfe benötigt wird.
 
 Zum kontinuierlichen Bauen der Apps und des Backends wurde ein Jenkinsserver eingesetzt. Da es einige Schwierigkeiten bei der Durchführung von Tests auf dem Jenkinsserver gab, haben wir bei unserer Projektarbeit nur sehr selten den Jenkinsserver in Anspruch genommen. Dennoch besteht eine Möglichkeit das Projekt auf dem Jenkinsserver zu bauen. Der Ablauf ist dabei wie folgt:
 

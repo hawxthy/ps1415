@@ -2,7 +2,7 @@
 \AUTHOR{Richard}
 Zur Kommunikation der Apps, aber auch zur zentralen Speicherung der Veranstaltungen, Routen, Nutzern und Nutzergruppen ist ein Backend, im folgenden auch Skatenight API genannt, notwendig, das eine öffentlich erreichbare Schnittstelle zur Verfügung stellt. Neben der Speicherung von Daten ist aber auch notwendig, dass der Server eigene Berechnungen durchführen kann. So wird zum Beispiel das Feld, das den Benutzern in der User-App angezeigt wird, zentral auf dem Server berechnet und von den User-Apps abgerufen (siehe Abschnitt \ref{subsec:Feldberechnung}).
 
-Eine weitere wichtige Anforderung war für uns, dass der Server kostenlos nutzbar ist und nach Möglichkeit bereits ein Grundgerüst bietet, über das aus Android-Apps möglichst einfach auf die Server-API zugreifen können. Wir wollten Hauptaugenmerk auf die Entwicklung der Apps legen und die Zeit zur Entwicklung des Backends möglichst gering halten. Das Google App Engine Projekt bietet diese Möglichkeit, da es von den realen Servern vollkommen abstrahiert. Zusätzlich dazu werden einige nützliche APIs angeboten, die unter anderem Funktionalität zur Speicherung von Daten bereitstellen und die Definition von Kommunikations-Endpunkten, sowie die Kommunikation vom Server zum Handy ermöglichen.
+Eine weitere wichtige Anforderung war für uns, dass der Server kostenlos nutzbar ist und nach Möglichkeit bereits ein Grundgerüst bietet, über das aus Android-Apps möglichst einfach auf die Server-API zugegriffen werden kann. Wir wollten Hauptaugenmerk auf die Entwicklung der Apps legen und die Zeit zur Entwicklung des Backends möglichst gering halten. Das Google App Engine Projekt bietet diese Möglichkeit, da es von den realen Servern vollkommen abstrahiert. Zusätzlich dazu werden einige nützliche APIs angeboten, die unter anderem Funktionalität zur Speicherung von Daten bereitstellen und die Definition von Kommunikations-Endpunkten, sowie die Kommunikation vom Server zum Handy ermöglichen.
 
 \subsection{Server, Keys und Build-Varianten}
 \AUTHOR{Richard}
@@ -78,13 +78,13 @@ Eine weitere wichtige Anforderung war für uns, dass der Server kostenlos nutzba
 	\caption{Eine Liste aller verwendeter IDs und Keys, die zur Authentifizierung der Apps und Server notwendig sind.}
 	\label{tab:keys}
 \end{table}
-Während der Entwicklung der Apps ist uns schnell aufgefallen, dass aufgrund der verschiedenen Features, die jeweils auf eigenen Branches entwickelt wurden, auch der Server von mehr als einer Person angepasst wurde. Damit einher ging, dass zwischenzeitlich verschiedene Versionen des Servers notwendig waren, damit jede Teilgruppe des Teams das eigene Feature implementieren konnte, ohne die Entwicklung anderer Teammitglieder zu stören. Aus diesem Grund haben wir mehrere Projekte bei der Google App Engine angelegt, zwischen denen relativ einfach gewechselt werden kann. In unserem Projekt in den Modulen \glqq app\grqq\ und \glqq veranstalterapp\grqq\ gibt es entsprechende Build-Varianten, mit denen der gewünschte Server ausgewählt werden kann. Da es im Modul \glqq SkatenightBackend\grqq\ nicht die Möglichkeit gibt Build-Varianten zu definieren, gibt es dort die Befehle \glqq applyProductionserverConfig\grqq, \glqq applyTestserverConfig\grqq\ und \glqq applyJenkinsserverConfig\grqq. Diese kopieren jeweils aus den entsprechenden Unterordnern des src-Ordners die Konfigurationsdateien, die für einen Server-Wechsel notwendig sind, in den main-Ordner. Bei einem Serverwechsel wird die \glqq Constants.java\grqq\ und die Projekt-ID in der Datei \glqq appengine-web.xml\grqq\ ausgetauscht. Wenn anschließend der Befehl \glqq appengineUpdate\grqq\ zur Aktualisierung des Servers aufgerufen wird, wird der Server aktualisiert, dessen Projekt-ID in der \glqq appengine-web.xml\grqq\ steht. Tabelle \ref{tab:keys} listet nocheinmal die Details zu den einzelnen Google App Eingine Projekten und auch die notwendigen Keys auf, mit denen sich die Apps gegenüber dem Backend und anderen Diensten identifizieren.
+Während der Entwicklung der Apps ist uns schnell aufgefallen, dass aufgrund der verschiedenen Features, die jeweils auf eigenen Branches entwickelt wurden, auch der Server von mehr als einer Person angepasst wurde. Damit einher ging, dass zwischenzeitlich verschiedene Versionen des Servers notwendig waren, damit jede Teilgruppe des Teams das eigene Feature implementieren konnte, ohne die Entwicklung anderer Teammitglieder zu stören. Aus diesem Grund haben wir mehrere Projekte bei der Google App Engine angelegt, zwischen denen relativ einfach gewechselt werden kann. In unserem Projekt in den Modulen \glqq app\grqq\ und \glqq veranstalterapp\grqq\ gibt es entsprechende Build-Varianten, mit denen der gewünschte Server ausgewählt werden kann. Da es im Modul \glqq SkatenightBackend\grqq\ nicht die Möglichkeit gibt Build-Varianten zu definieren, gibt es dort die Befehle \glqq applyProductionserverConfig\grqq, \glqq applyTestserverConfig\grqq\ und \glqq applyJenkinsserverConfig\grqq. Diese kopieren jeweils aus den entsprechenden Unterordnern des src-Ordners die Konfigurationsdateien, die für einen Server-Wechsel notwendig sind, in den main-Ordner. Bei einem Serverwechsel wird die \DATEI{Constants.java} und die Projekt-ID in der Datei \DATEI{appengine-web.xml} ausgetauscht. Wenn anschließend der Befehl \glqq appengineUpdate\grqq\ zur Aktualisierung des Servers aufgerufen wird, wird der Server aktualisiert, dessen Projekt-ID in der \DATEI{appengine-web.xml} steht. Tabelle \ref{tab:keys} listet nocheinmal die Details zu den einzelnen Google App Eingine Projekten und auch die notwendigen Keys auf, mit denen sich die Apps gegenüber dem Backend und anderen Diensten identifizieren.
 
 \subsection{Klassenstruktur der Skatenight API}
 \AUTHOR{Richard}
-Das Backend ist eine in Java geschriebene Anwendung, die sich im Projektordner in dem Modul \glqq SkatenightBackend\grqq\ befindet. Das für die Apps zugängliche Interface wird in der Klasse \glqq SkatenightServerEndpoint\grqq\ beschrieben. Alle darin implementierten öffentlichen Methoden sind über die generierten Client-Libraries aufrufbar.
+Das Backend ist eine in Java geschriebene Anwendung, die sich im Projektordner in dem Modul \glqq SkatenightBackend\grqq\ befindet. Das für die Apps zugängliche Interface wird in der Klasse \KLASSE{SkatenightServerEndpoint} beschrieben. Alle darin implementierten öffentlichen Methoden sind über die generierten Client-Libraries aufrufbar.
 
-Die Klasse \glqq EventStartServlet\grqq wird über einen Cron-Job, der in der Datei \glqq cron.xml\grqq\ im WEB-INF-Ordner des Moduls definiert ist, alle zwei Minuten aufgerufen. Ihre Aufgabe ist es nach Events zu suchen, die kürzlich begonnen haben und für die noch keine GCM-Nachricht an die teilnehmenden Benutzer versandt wurde. Problematisch war, dass Cron-Jobs bei einem Google App Engine Projekt nicht dynamisch zur Laufzeit erstellt werden können. Die zunächst angedachte Lösung für jedes Event einen eigenen Cron-Job anzulegen, der genau zum Startzeitpunkt des Events aufgerufen wird, ist dadurch nicht möglich. Wir haben uns deshalb dafür entschieden, die Events mit einem Boolean zu markieren, wenn sie gestartet sind, sodass in der \glqq doGet()\grqq -Methode nach Events gesucht werden kann, für die diese Markierung noch nicht gesetzt wurde. Für jedes startende Event kann dann eine Liste der GCM-IDs der Benutzer erstellt werden, die über das Event benachrichtigt werden müssen. Gleichzeitig wird für die Benutzer auch die aktuelle Event-ID(\glqq currentEventId\grqq) gesetzt, die für die Berechnung des Feldes relevant ist.
+Die Klasse \KLASSE{EventStartServlet} wird über einen Cron-Job, der in der Datei \DATEI{cron.xml} im WEB-INF-Ordner des Moduls definiert ist, alle zwei Minuten aufgerufen. Ihre Aufgabe ist es nach Events zu suchen, die kürzlich begonnen haben und für die noch keine GCM-Nachricht an die teilnehmenden Benutzer versandt wurde. Problematisch war, dass Cron-Jobs bei einem Google App Engine Projekt nicht dynamisch zur Laufzeit erstellt werden können. Die zunächst angedachte Lösung für jedes Event einen eigenen Cron-Job anzulegen, der genau zum Startzeitpunkt des Events aufgerufen wird, ist dadurch nicht möglich. Wir haben uns deshalb dafür entschieden, die Events mit einem Boolean zu markieren, wenn sie gestartet sind, sodass in der \METHODE{doGet()}-Methode nach Events gesucht werden kann, für die diese Markierung noch nicht gesetzt wurde. Für jedes startende Event kann dann eine Liste der GCM-IDs der Benutzer erstellt werden, die über das Event benachrichtigt werden müssen. Gleichzeitig wird für die Benutzer auch die aktuelle Event-ID(\ATTRIBUT{currentEventId}) gesetzt, die für die Berechnung des Feldes relevant ist.
 
 \subsection{Datenmodell}
 \AUTHOR{Richard}
@@ -96,9 +96,9 @@ Abbildung \ref{fig:backend_er} zeigt das auf dem Server repräsentierte Datenmod
 \label{fig:backend_er}
 \end{figure}
 
-Wie auf der Abbildung gezeigt, werden zu einem Event auch die teilnehmenden Member gespeichert. In dem Event existieren dazu jedoch nicht direkt die Member-Objekte, sondern nur Strings, die auf den Primary Key der Klasse Member (\glqq email\grqq) zeigen. Dies ist notwendig, da aufgrund der Struktur des Google Datastore die Member nicht existentiell von den Events abhängen dürfen. Im Datastore kann für jeden Datensatz ein übergeordneter Datensatz definiert werden. Würde dies das Event sein, so würden beim Löschen des Events auch alle teilnehmenden Member-Datensätze gelöscht werden. Analog sind auch die Benutzergruppen implementiert. Damit beim Löschen einer Benutzergruppe die Benutzer nicht ebenfalls gelöscht werden, enthalten die Benutzergruppen ebenfalls nur eine Liste von Strings, die auf die E-Mails der enthaltenen Benutzer zeigen.
+Wie auf der Abbildung gezeigt, werden zu einem Event auch die teilnehmenden \KLASSE{Member} gespeichert. In dem Event existieren dazu jedoch nicht direkt die Member-Objekte, sondern nur Strings, die auf den Primary Key der Klasse \KLASSE{Member} (\ATTRIBUT{email}) zeigen. Dies ist notwendig, da aufgrund der Struktur des Google Datastore die Member nicht existentiell von den Events abhängen dürfen. Im Datastore kann für jeden Datensatz ein übergeordneter Datensatz definiert werden. Würde dies das Event sein, so würden beim Löschen des Events auch alle teilnehmenden Member-Datensätze gelöscht werden. Analog sind auch die Benutzergruppen implementiert. Damit beim Löschen einer Benutzergruppe die Benutzer nicht ebenfalls gelöscht werden, enthalten die Benutzergruppen ebenfalls nur eine Liste von Strings, die auf die E-Mails der enthaltenen Benutzer zeigen.
 
-Die Umsetzung des Klassenmodells des Backends weicht etwas von der in der Datenbank gewählten Struktur ab. Hauptunterschied ist, dass mehr Klassen zur Repräsentation der Daten definiert wurden. So gibt es beispielsweise zusätzlich zu den Routen auch die Klassen \glqq RoutePoint\grqq zur Repräsentation eines feinen Wegpunktes auf der Strecke, sowie die Klasse \glqq ServerWaypoint\grqq, die die beim Erstellen der Strecke gesetzten Marker speichert. Einen genauen Überblick über das Klassenmodell bietet Abbildung \ref{fig:backend_uml}.
+Die Umsetzung des Klassenmodells des Backends weicht etwas von der in der Datenbank gewählten Struktur ab. Hauptunterschied ist, dass mehr Klassen zur Repräsentation der Daten definiert wurden. So gibt es beispielsweise zusätzlich zu den Routen auch die Klassen \KLASSE{RoutePoint} zur Repräsentation eines feinen Wegpunktes auf der Strecke, sowie die Klasse \KLASSE{ServerWaypoint}, die die beim Erstellen der Strecke gesetzten Marker speichert. Einen genauen Überblick über das Klassenmodell bietet Abbildung \ref{fig:backend_uml}.
 
 \begin{figure}[htb]
 \includegraphics[width=\textwidth]{graphics/backend_uml.png}
@@ -108,92 +108,92 @@ Die Umsetzung des Klassenmodells des Backends weicht etwas von der in der Datenb
 
 \subsection{Verfügbare API-Aufrufe}
 \AUTHOR{Richard}
-Zur Kommunikation der User- und Veranstalter-App mit dem Backend existieren einige API-Aufrufe auf dem Backend. Ein wichtiges Kriterium bei der Implementierung war, dass nicht jeder Benutzer die gleichen Rechte hat. So kann ein Veranstalter z.B. Events erstellen und löschen, ein normaler Skatenight-Teilnehmer sollte dies jedoch nicht können. Aufgrund dieser Anforderungen haben wir uns für die OAuth2-API von Google entschieden. Mit ihr ist es einfach, eine Authentifizierung der Benutzer zu implementieren, da sie auch in Google Cloud Endpoints gut integriert ist. Auf dem Server werden alle Methoden, die eine Authentifizierung benötigen, um einen Parameter vom Typ \glqq com.google.appengine.api.users.User\grqq\ erweitert. Beim Verbindungsaufbau in der App wird der am Handy angemeldete Benutzer ausgelesen und bei jedem Aufruf an das Backend nun automatisch übergeben. Hinzu kommt, dass die Authentifikation über den Google-Account geschieht. Da die App für Android-Geräte entwickelt wurde, ist sichergestellt, dass jeder Benutzer der App auch ein entsprechendes Konto besitzt.
-Die folgende Liste beschreibt diese Aufrufe und stellt auch kurz dar, in welchem Zusammenhang diese in der Apps verwendet werden.
+Zur Kommunikation der User- und Veranstalter-App mit dem Backend existieren einige API-Aufrufe auf dem Backend. Ein wichtiges Kriterium bei der Implementierung war, dass nicht jeder Benutzer die gleichen Rechte hat. So kann ein Veranstalter z.B. Events erstellen und löschen, ein normaler Skatenight-Teilnehmer sollte dies jedoch nicht können. Aufgrund dieser Anforderungen haben wir uns für die OAuth2-API von Google entschieden. Mit ihr ist es einfach, eine Authentifizierung der Benutzer zu implementieren, da sie in Google Cloud Endpoints bereits integriert ist. Auf dem Server werden alle Methoden, die eine Authentifizierung benötigen, um einen Parameter vom Typ \KLASSE{com.google.appengine.api.users.User} erweitert. Beim Verbindungsaufbau in der App wird der am Handy angemeldete Benutzer ausgelesen und bei jedem Aufruf an das Backend nun automatisch übergeben. Hinzu kommt, dass die Authentifikation über den Google-Account geschieht. Da die App für Android-Geräte entwickelt wurde, ist sichergestellt, dass jeder Benutzer der App auch ein entsprechendes Konto besitzt.
+Die folgende Liste beschreibt die verfügbaren API-Aufrufe und stellt auch kurz dar, in welchem Zusammenhang diese in den Apps verwendet werden.
 
 \subsubsection*{addHost}
-Die Methode addHost dient dem Hinzufügen von Veranstaltern. Durch den User-Parameter in der Signatur der Methode ist der Aufruf so geschützt, dass nur bereits eingetragene Veranstalter neue Veranstalter hinzufügen können. In der Veranstalter-App ist diese Funktion in der Rechteverwaltung zugänglich.
+Die Methode \METHODE{addHost} dient dem Hinzufügen von Veranstaltern. Durch den User-Parameter in der Signatur der Methode ist der Aufruf so geschützt, dass nur bereits eingetragene Veranstalter neue Veranstalter hinzufügen können. In der Veranstalter-App ist diese Funktion in der Rechteverwaltung zugänglich.
 
 \subsubsection*{removeHost}
-Ähnlich wie die addHost-Methode ist die removeHost-Methode wieder über ein User-Parameter geschützt. Die Methode löscht den angegebenen Veranstalter, sofern der aufrufende Benutzer ein bereits eingetragener Veranstalter ist. Auch diese Funktion ist in der Rechteverwaltung der Veranstalter-App zugänglich.
+Ähnlich wie die \METHODE{addHost}-Methode ist die \METHODE{removeHost}-Methode wieder über ein User-Parameter geschützt. Die Methode löscht den angegebenen Veranstalter, sofern der aufrufende Benutzer ein bereits eingetragener Veranstalter ist. Auch diese Funktion ist in der Rechteverwaltung der Veranstalter-App zugänglich.
 
 \subsubsection*{isHost}
-Die isHost-Methode prüft für den angegebenen Benutzer, ob dieser ein eingetragener Veranstalter ist. Dies ist z.B. bei der Anmeldung in der Veranstalter-App notwendig.
+Die \METHODE{isHost}-Methode prüft für den angegebenen Benutzer, ob dieser ein eingetragener Veranstalter ist. Dies ist z.B. bei der Anmeldung in der Veranstalter-App notwendig.
 
 \subsubsection*{getHosts}
 Diese Methode liefert eine Liste aller Veranstalter zurück, die zurzeit auf dem Server hinterlegt sind. Die Liste der Veranstalter kann nur von bereits eingetragenen Veranstaltern abgerufen werden.
 
 \subsubsection*{createEvent}
-Zum Erstellen eines Events dient die Methode createEvent, die von eingetragenen Veranstaltern aufgerufen werden kann. Zusätzlich zu dem Event kann angegeben werden, ob es sich um einen Editiervorgang handelt und, ob das Datum des Events geändert wurde. Diese Daten sind notwendig, da Benutzer der User-App so über die Änderungen per GCM benachrichtigt werden können.
+Zum Erstellen eines Events dient die Methode \METHODE{createEvent}, die von eingetragenen Veranstaltern aufgerufen werden kann. Zusätzlich zu dem Event kann angegeben werden, ob es sich um einen Editiervorgang handelt und, ob das Datum des Events geändert wurde. Diese Daten sind notwendig, da Benutzer der User-App so über die Änderungen per GCM benachrichtigt werden können.
 
 \subsubsection*{createMember}
-Die createMember-Methode wird aus der User-App heraus aufgerufen. Über diese Funktion wird sichergestellt, dass auf dem Server für den Benutzer ein Member-Objekt existiert, das unter anderem die Liste der Events speichert, an dem der Benutzer teilnimmt, und auch die aktuell gemeldete Position des Benutzers.
+Die \METHODE{createMember}-Methode wird aus der User-App heraus aufgerufen. Über diese Funktion wird sichergestellt, dass auf dem Server für den Benutzer ein \KLASSE{Member}-Objekt existiert, das unter anderem die Liste der Events speichert, an dem der Benutzer teilnimmt, und auch die aktuell gemeldete Position des Benutzers.
 
 \subsubsection*{updateMemberLocation}
-Über die Methode updateMemberLocation können die Positionen der Benutzer der User-App an den Server übermittelt werden. Neben der neuen Position des Benutzers wird auch die ID des Events, an dem der Benutzer gerade teilnimmt, übertragen. Dies ist für die Feldberechnung auf dem Server notwendig, die ebenfalls über diese Methode angestoßen wird, falls die letzte Feldberechnung länger als einen gewissen Wert zurückliegt.
+Über die Methode \METHODE{updateMemberLocation} können die Positionen der Benutzer der User-App an den Server übermittelt werden. Neben der neuen Position des Benutzers wird auch die ID des Events, an dem der Benutzer gerade teilnimmt, übertragen. Dies ist für die Feldberechnung auf dem Server notwendig, die ebenfalls über diese Methode angestoßen wird, falls die letzte Feldberechnung länger als einen gewissen Wert zurückliegt.
 
 \subsubsection*{simulateMemberLocations}
-Für Präsentationen der App und der Feldauswertung haben wir neben den beiden Apps einen Simulator für Benutzer der Skatenight-App entwickelt. Zunächst war geplant, dass dieser Simulator genau wie die User-App die updateMemberLocation-Methode aufruft. Da bei bis zu 100 simulierten Teilnehmern die Anzahl der Serverzugriffe jedoch sehr hoch und damit nicht mehr im kostenlosen Rahmen der Google App Engine lag, haben wir uns dafür entschieden eine gesonderte Methode zur Simulation der Positionen zu erstellen. Diese kann mit nur einem Aufruf eine Liste von Teilnehmern und deren Positionen entgegen nehmen, sodass nun die Anzahl der Serveraufrufe unabhängig von der simulierten Teilnehmerzahl ist. Intern wird jedoch nach wie vor die updateMemberLocation-Methode aufgerufen.
+Für Präsentationen der App und der Feldauswertung haben wir neben den beiden Apps einen Simulator für Benutzer der Skatenight-App entwickelt. Zunächst war geplant, dass dieser Simulator genau wie die User-App die \METHODE{updateMemberLocation}-Methode aufruft. Da bei bis zu 100 simulierten Teilnehmern die Anzahl der Serverzugriffe jedoch sehr hoch und damit nicht mehr im kostenlosen Rahmen der Google App Engine lag, haben wir uns dafür entschieden eine gesonderte Methode zur Simulation der Positionen zu erstellen. Diese kann mit nur einem Aufruf eine Liste von Teilnehmern und deren Positionen entgegen nehmen, sodass nun die Anzahl der Serveraufrufe unabhängig von der simulierten Teilnehmerzahl ist. Intern wird jedoch nach wie vor die \METHODE{updateMemberLocation}-Methode aufgerufen.
 
 \subsubsection*{getCurrentEventsForMember}
-Da im Datenmodell in den Member-Objekten die Liste der Events, an denen der Benutzer teilnimmt, nicht gespeichert werden, kann über diese Methode eine Liste der entsprechenden Events für einen Teilnehmer abgerufen werden.
+Da im Datenmodell in den \KLASSE{Member}-Objekten die Liste der Events, an denen der Benutzer teilnimmt, nicht gespeichert werden, kann über diese Methode eine Liste der entsprechenden Events für einen Teilnehmer abgerufen werden.
 
 \subsubsection*{getMember}
-Die getMember-Methode dient dem Abrufen der Member-Objekte zu entsprechenden E-Mail-Adressen.
+Die \METHODE{getMember}-Methode dient dem Abrufen der Member-Objekte zu entsprechenden E-Mail-Adressen.
 
 \subsubsection*{addMemberToEvent}
-Die addMemberToEvent-Methode fügt einen Teilnehmer anhand seiner Mail zu dem Event mit der angegebenen ID hinzu. Dabei wird außerdem geprüft, ob das Event bereits begonnen hat und der Teilnehmer in diesem Fall per GCM informiert.
+Die \METHODE{addMemberToEvent}-Methode fügt einen Teilnehmer anhand seiner Mail zu dem Event mit der angegebenen ID hinzu. Dabei wird außerdem geprüft, ob das Event bereits begonnen hat und der Teilnehmer in diesem Fall per GCM informiert.
 
 \subsubsection*{removeMemberFromEvent}
-Neben dem Teilnehmen an einem Event muss der Benutzer auch die Möglichkeit haben, das Event wieder zu verlassen. Die Methode removeMemberFromEvent realisiert diese Funktion und wird in der User-App aufgerufen.
+Neben dem Teilnehmen an einem Event muss der Benutzer auch die Möglichkeit haben, das Event wieder zu verlassen. Die Methode \METHODE{removeMemberFromEvent} realisiert diese Funktion und wird in der User-App aufgerufen.
 
 \subsubsection*{getMembersFromEvent}
-Analog zur getCurrentEventsForMember-Methode ruft die Methode getMembersFromEvent die Liste der Teilnehmer eines Events ab. Zwar werden diese in der Klasse Event gespeichert, jedoch nur als Referenz über die Mail-Adresse. Diese Methode wandelt die Mail-Adressen in eine Liste von Member-Objekten um, die anschließend zurück gegeben werden.
+Analog zur \METHODE{getCurrentEventsForMember}-Methode ruft die Methode \METHODE{getMembersFromEvent} die Liste der Teilnehmer eines Events ab. Zwar werden diese in der Klasse \KLASSE{Event} gespeichert, jedoch nur als Referenz über die Mail-Adresse. Diese Methode wandelt die Mail-Adressen in eine Liste von \KLASSE{Member}-Objekten um, die anschließend zurück gegeben werden.
 
 \subsubsection*{addRoute}
-Die addRoute-Methode ist wieder eine Methode, die nur von eingetragenen Veranstaltern aufgerufen werden kann. Sie speichert die übergebene Route in der Datenbank und wird aus der Veranstalter-App nach dem Anlegen einer neuen Route aufgerufen.
+Die \METHODE{addRoute}-Methode ist eine Methode, die nur von eingetragenen Veranstaltern aufgerufen werden kann. Sie speichert die übergebene Route in der Datenbank und wird aus der Veranstalter-App nach dem Anlegen einer neuen Route aufgerufen.
 
 \subsubsection*{getRoutes}
 Diese Methode gibt eine Liste der auf dem Server gespeicherten Routen zurück. Sie wird sowohl aus der User- als auch aus der Veranstalter-App aufgerufen, da in beiden Apps eine Liste der Routen angezeigt werden kann.
 
 \subsubsection*{deleteRoute}
-Die deleteRoute-Methode bildet das Gegenstück zur addRoute-Methode. Sie löscht die angegebene Route, falls es sich bei dem aufrufenden Benutzer um einen eingetragenen Veranstalter handelt.
+Die \METHODE{deleteRoute}-Methode bildet das Gegenstück zur \METHODE{addRoute}-Methode. Sie löscht die angegebene Route, falls es sich bei dem aufrufenden Benutzer um einen eingetragenen Veranstalter handelt.
 
 \subsubsection*{getEvent}
-getEvent gibt das Event-Objekt mit der angegebenen ID zurück. Die Methode wird sowohl aus der Veranstalter- als auch aus der User-App aufgerufen, wenn der Anwender auf ein Event klickt.
+\METHODE{getEvent} gibt das \KLASSE{Event}-Objekt mit der angegebenen ID zurück. Die Methode wird sowohl aus der Veranstalter- als auch aus der User-App aufgerufen, wenn der Anwender auf ein Event klickt.
 
 \subsubsection*{deleteEvent}
-Die deleteEvent-Methode kann von eingetragenen Veranstaltern zum Löschen eines Events aus der Veranstalter-App heraus aufgerufen werden. Die Methode gibt als Boolean-Wert zurück, ob das Event gelöscht werden konnte oder nicht. Da durch die Google Cloud Endpoints die Menge der verwendbaren Rückgabetypen für Methoden eingeschränkt ist, sind unter anderem primitive Datentypen wie boolean oder der durch Java vorgegebene Standardwrapper Boolean nicht möglich. Aus diesem Grund haben wir einen eigenen Boolean-Wrapper implementiert, der als einzigen Zweck das Kapseln eines Boolean-Wertes erfüllt.
+Die \METHODE{deleteEvent}-Methode kann von eingetragenen Veranstaltern zum Löschen eines Events aus der Veranstalter-App heraus aufgerufen werden. Die Methode gibt als Boolean-Wert zurück, ob das Event gelöscht werden konnte oder nicht. Da durch die Google Cloud Endpoints die Menge der verwendbaren Rückgabetypen für Methoden eingeschränkt ist, sind unter anderem primitive Datentypen wie boolean oder der durch Java vorgegebene Standardwrapper Boolean nicht möglich. Aus diesem Grund haben wir einen eigenen Boolean-Wrapper implementiert, der als einzigen Zweck das Kapseln eines Boolean-Wertes erfüllt.
 
 \subsubsection*{editEvent}
-Um ein Event anzupassen, können Veranstalter die editEvent-methode aufrufen. Die Implementation dieser Methode löscht zunächst das alte Event und legt es anschließend über die createEvent-Methode mit den neuen Daten wieder an.
+Um ein Event anzupassen, können Veranstalter die \METHODE{editEvent}-Methode aufrufen. Die Implementation dieser Methode löscht zunächst das alte Event und legt es anschließend über die \METHODE{createEvent}-Methode mit den neuen Daten wieder an.
 
 \subsubsection*{getAllEvents}
-Für Benutzer der beiden Apps ist die Methode getAllEvents ohne Authentifikation zugänglich. Sie gibt eine Liste aller auf dem Server gespeicherter Events zurück. Da durch die Nuztung von JDO und DataNucleus die in den Events eingebetteten Routen jedoch nicht abgerufen werden konnten, wird nach dem Ermitteln der Eventliste jedes Event nocheinmal einzeln abgerufen. So sind auch die Routen in den Event-Objekten initialisiert.
+Für Benutzer der beiden Apps ist die Methode \METHODE{getAllEvents} ohne Authentifikation zugänglich. Sie gibt eine Liste aller auf dem Server gespeicherter Events zurück. Da durch die Nuztung von JDO und DataNucleus die in den Events eingebetteten Routen jedoch nicht abgerufen werden konnten, wird nach dem Ermitteln der Eventliste jedes Event nocheinmal einzeln abgerufen. So sind auch die Routen in den Event-Objekten initialisiert.
 
 \subsubsection*{registerForGCM}
-Von der User-App wird bei jedem Appstart die registerForGCM-Methode aufgerufen. Sie übermittelt die aktuelle GCM-ID an den Server, die zur Kommunikation über den Google Cloud Messaging Dienst benötigt wird. Die GCM-ID eines Teilnehmers wird in seinem Member-Objekt gespeichert.
+Von der User-App wird bei jedem Appstart die \METHODE{registerForGCM}-Methode aufgerufen. Sie übermittelt die aktuelle GCM-ID an den Server, die zur Kommunikation über den Google Cloud Messaging Dienst benötigt wird. Die GCM-ID eines Teilnehmers wird in seinem \KLASSE{Member}-Objekt gespeichert.
 
 \subsubsection*{getAllUserGroups}
-getAllUserGroups ruft die Liste aller Benutzergruppen ab. Sie wird von der User-App benutzt.
+\METHODE{getAllUserGroups} ruft die Liste aller Benutzergruppen ab. Sie wird von der User-App benutzt.
 
 \subsubsection*{fetchMyUserGroups}
-Diese Methode ruft ebenfalls eine Liste der Benutzergruppen ab, schränkt diese jedoch auf Benutzergruppen des angegebenen Benutzers ein. Zusätzlich prüft die Methode, ob Member-Objekte auf Gruppen verweisen, die nicht mehr existieren und bereinigt die Daten, falls entsprechende Gruppen gefunden werden.
+Diese Methode ruft ebenfalls eine Liste der Benutzergruppen ab, schränkt diese jedoch auf Benutzergruppen des angegebenen Benutzers ein. Zusätzlich prüft die Methode, ob \KLASSE{Member}-Objekte auf Gruppen verweisen, die nicht mehr existieren und bereinigt die Daten, falls entsprechende Gruppen gefunden werden.
 
 \subsubsection*{createUserGroup}
-Die createUserGroup-Methode legt eine Benutzergruppe mit dem angegebenen Namen und dem aufrufenden Benutzer als Ersteller an. Zusätzlich werden die User-Apps der Benutzer per GCM über die neue Gruppe informiert, damit die Liste der Benutzergruppen in bereits geöffneten Apps aktualisiert werden kann. Für den Benutzer ist diese Nachricht allerdings nicht sichtbar.
+Die \METHODE{createUserGroup}-Methode legt eine Benutzergruppe mit dem angegebenen Namen und dem aufrufenden Benutzer als Ersteller an. Zusätzlich werden die User-Apps der Benutzer per GCM über die neue Gruppe informiert, damit die Liste der Benutzergruppen in bereits geöffneten Apps aktualisiert werden kann. Für den Benutzer ist diese Nachricht nicht sichtbar.
 
 \subsubsection*{deleteUserGroup}
-Die deleteUserGroup-Methode löscht die Benutzergruppe mit dem angegebenen Namen, sofern der aufrufende Benutzer Ersteller der Gruppe ist.
+Die \METHODE{deleteUserGroup}-Methode löscht die Benutzergruppe mit dem angegebenen Namen, sofern der aufrufende Benutzer Ersteller der Gruppe ist.
 
 \subsubsection*{joinUserGroup}
-Über die joinUserGroup-Methode haben Benutzer der User-App die Möglichkeit, Benutzergruppen anderer Benutzer beizutreten.
+Über die \METHODE{joinUserGroup}-Methode haben Benutzer der User-App die Möglichkeit, Benutzergruppen anderer Benutzer beizutreten.
 
 \subsubsection*{leaveUserGroup}
-Die leaveUserGroup-Methode entfernt den Benutzer wieder aus der angegebenen Gruppe. Dies ist nur dann Möglich, wenn der aufrufende Benutzer nicht Ersteller der Gruppe ist, aus der er austreten möchte.
+Die \METHODE{leaveUserGroup}-Methode entfernt den Benutzer wieder aus der angegebenen Gruppe. Dies ist nur dann Möglich, wenn der aufrufende Benutzer nicht Ersteller der Gruppe ist, aus der er austreten möchte.
 
 \subsubsection*{fetchGroupMembers}
-Mithilfe der fetchGroupMembers-Methode kann eine Liste aller Member abgerufen werden, die sich in der angegebenen Benutzergruppe befinden. Dies wird benötigt, wenn die Gruppenmitglieder der eigenen Gruppen auf der Karte während eines Events angezeigt werden sollen.
+Mithilfe der \METHODE{fetchGroupMembers}-Methode kann eine Liste aller Member abgerufen werden, die sich in der angegebenen Benutzergruppe befinden. Dies wird benötigt, wenn die Gruppenmitglieder der eigenen Gruppen auf der Karte während eines Events angezeigt werden sollen.
 
 
 \subsection{Google Cloud Messaging}
@@ -203,14 +203,14 @@ An mehreren Stellen der User-App wird die Google Cloud Messaging API genutzt. Si
 \begin{itemize}
 \item Zur Benachrichtigung aller Benutzer, wenn ein neues Event erstellt wurde. In diesem Fall wird die Liste der Events in der User-App automatisch aktualisiert, falls sie geöffnet ist. Ebenfalls wird dem Benutzer eine Notification-Nachricht angezeigt, die von überall im Handy über die obere Statusleiste abrufbar ist.
 \item Zur Benachrichtigung aller Benutzer, wenn eine neue Benutzergruppe erstellt wurde. Dabei wird jedoch keine Notification erstellt, sondern lediglich die Liste der Gruppen aktualisiert.
-\item Zu Benachrichtigung aller Benutzer, wenn eine Benutzergruppe gelöscht wurde. Dies ist notwendig, damit gegebenenfalls die Einstellung beim Benutzer, dass die gelöschte Gruppe auf der Karte an gezeigt werden soll, ebenfalls gelöscht wird. Bei dieser Benachrichtigung erhält der Benutzer außerdem eine Notification.
+\item Zu Benachrichtigung aller Benutzer, wenn eine Benutzergruppe gelöscht wurde. Dies ist notwendig, damit gegebenenfalls die Einstellung beim Benutzer, dass die gelöschte Gruppe auf der Karte angezeigt werden soll, ebenfalls gelöscht wird. Bei dieser Benachrichtigung erhält der Benutzer außerdem eine Notification.
 \end{itemize}
 
-Die ID, die zur Identifikation und damit zur KOntaktaufnahme mit den Benutzern per GCM notwendig ist, wird beim Start der User-App auf dem Handy generiert. Dieses sendet die ID dann an den Server, der die ID für den aufrufenden Benutzer hinterlegt. Zur Verwaltung der GCM-IDs gibt es auf dem Server die Klasse \glqq RegistrationManager\grqq. Diese speichert zu jeder Nutzer-Mail-Adresse eine ID ab, kann aber auch eine Liste aller registrierter GCM-IDs zurückgeben.
+Die ID, die zur Identifikation und damit zur Kontaktaufnahme mit den Benutzern per GCM notwendig ist, wird beim Start der User-App auf dem Handy generiert. Dieses sendet die ID dann an den Server, der die ID für den aufrufenden Benutzer hinterlegt. Zur Verwaltung der GCM-IDs gibt es auf dem Server die Klasse \KLASSE{RegistrationManager}. Diese speichert zu jeder Nutzer-Mail-Adresse eine ID ab, kann aber auch eine Liste aller registrierter GCM-IDs zurückgeben.
 
-Zur Unterscheidung der einzelnen Nachrichten-Typen, die vom Server zu der User-App gesendet werden, existiert die Enumeration MessageType. Alle vom Skatenight-Backend generierten Nachrichten enthalten als Payload mindestens das Attribut \glqq type\grqq, das als Wert den Namen des Enumeration-Eintrags hat. Anhand dieses Typs wird auf dem Handy die Nachricht dann durch den GcmIntentService weiter verarbeitet.
+Zur Unterscheidung der einzelnen Nachrichten-Typen, die vom Server zu der User-App gesendet werden, existiert die Enumeration \KLASSE{MessageType}. Alle vom Skatenight-Backend generierten Nachrichten enthalten als Payload mindestens das Attribut \ATTRIBUT{type}, das als Wert den Namen des Enumeration-Eintrags hat. Anhand dieses Typs wird auf dem Handy die Nachricht dann durch den GcmIntentService weiter verarbeitet.
 
-Um eine GCM-Nachricht vom Backend zu Senden, wird zunächst ein Message-Objekt erstellt. Dieses erhält Daten wie den \glqq collapseKey\grqq, über den mehrere Nachrichten zusammengefasst werden können, falls sie stoßweise beim Benutzer ankommen. Ebenfalls kann die Gültigkeitsdauer der Nachricht angegeben werden. Falls die Nachricht innerhalb dieser Zeitspanne nicht ausgeliefert wurde, wird sie verworfen. Als weitere Einstellung kann angegeben werden, ob die Nachricht direkt zugestellt werden soll oder erst, wenn der Benutzer sein Handy aktiviert. Über ein Objekt vom Typ \glqq Sender\grqq\ kann die Nachricht dann verschickt werden.
+Um eine GCM-Nachricht vom Backend zu Senden, wird zunächst ein \KLASSE{Message}-Objekt erstellt. Dieses erhält Daten wie den \ATTRIBUT{collapseKey}, über den mehrere Nachrichten zusammengefasst werden können, falls sie stoßweise beim Benutzer ankommen. Ebenfalls kann die Gültigkeitsdauer der Nachricht angegeben werden. Falls die Nachricht innerhalb dieser Zeitspanne nicht ausgeliefert wurde, wird sie verworfen. Als weitere Einstellung kann angegeben werden, ob die Nachricht direkt zugestellt werden soll oder erst, wenn der Benutzer sein Handy aktiviert. Über ein Objekt vom Typ \KLASSE{Sender} kann die Nachricht dann an die gewünschten GCM-IDs verschickt werden.
 
 \subsection{Feldberechnung}
 \AUTHOR{Pascal}

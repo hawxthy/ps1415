@@ -1,5 +1,42 @@
 \subsection{Einleitung}
 \AUTHOR{Tristan}
+In dem Projekt gibt es zwei Arten von Tests, die \glqq Task Tests\grqq\ und die \glqq Anwendungsfalltests\grqq\ (Use Case Tests).
+Die Tasks Tests dienen hierbei zum Testen einer bestimmten Funktionalität, wie zu Beispiel dem Hinzufügen oder Löschen einer Route (\KLASSE{AddRouteTaskTest} und \KLASSE{DeleteRouteTaskTest}).
+Die Anwendungsfalltests sollen im Gegensatz zu den Tasks Tests nicht nur eine Funktionalität sondern ganze Anwendungsabläufe Testen, was die UI mit einschließt.
+Beide Tests, der Task Test und Anwendungsfalltest bestehen aus einem Konstruktor zum Initialisieren oder Aufsetzen der Testdaten, welcher einmalig im Test aufgerufen wird und einer \METHODE{setUp}-Methode, die vor jedem einzelnen Test aufgerufen wird. Sie dient dazu Variablen zu initialisieren und Daten von vorherigen Tests \glqq aufzuräumen\grqq. Weiterhin gibt es  bei dem Task Test eine einzige Methode, die ausschließlich die Funktion testet, für die der Test bestimmt ist (\METHODE{testTask}-Methode).
+
+\subsection{Funktionsweise der Anwendungsfalltests}
+\AUTHOR{Tristan}
+Da die TaskTests an anderer Stelle genauer beschrieben werden und nicht die Komplexität der Anwendungsfalltests aufweisen, wird hier der allgemeine Ablaufe sowie die Funktionsweise dieser Tests genauer beschrieben.
+
+Einfachheitshalber werden die Anwendungsfalltests ab jetzt nur noch als Tests bezeichnet und beziehen sich nur auf diesen Abschnitt. Die Testklassen verwenden als \glqq Base Test Case Class\grqq\ die \KLASSE{ActivityInstrumentationTestCase2} Klasse, welche Methoden zur Interaktion mit der UI unter Testbedingungen zur Verfügung stellt und in dem Paket \glqq android.test\grqq\ enthalten ist.
+Der Test erbt also von dieser Klasse. Zusätzlich wird hierbei die Activity angegeben, in der der Test starten soll. Zum Beispiel startet der Test bei \KLASSE{ActivityInstrumentationTestCase2<HoldTabsActivity>} in der \KLASSE{HoldtabsActivity}. Zudem ist die Reihenfolge, in der die Tests ausgeführt werden nicht vorgegeben und kann variieren.
+
+\subsubsection*{Konstruktor}
+Weiterhin wird im Konstruktor lediglich der superclass Konstruktor auf gerufen und die Klasse der Start Activity übergeben (HoldtabsActivity.class).
+
+\subsubsection*{setUp Methode}
+Die \METHODE{setUp}-Methode wird vor jedem Test aufgerufen und dient wie bereits erwähnt der Initialisierung und dem Löschen der Testdaten vorheriger Tests, da ein Anwendungsfall mehrere Test Methoden enthalten kann. Zuerst wird die superclass-Methode aufgerufen (super.setUp) und anschließen folgt der Initialisierungscode. Um die UI ohne Fehler von außen Testen zu können wird der Touch Mode mit \METHODE{setActivityInitialTouchMode(false)} ausgeschaltet. In der Regel wird hier auch die Activity gestartet, falls dies noch nicht der Fall sein sollte (\METHODE{getActivity()}) und einem Klassenattribut \ATTRIBUT{mActivity} zugewiesen.
+
+\subsubsection*{testPreConditions Test}
+Stellt sicher, dass die Vorbedingungen für die Anwendung fehlerfrei initialisiert wurden. Dazu gehören unter anderem die UI Elemente und das Starten der Activity.
+
+\subsubsection*{testUseCase Test}
+Alle Tests, die auch die UI Testen, laufen auf einem extra dafür vorgesehen Thread, dem UiThread. Auf diesem werden alle Interaktionen wie Buttonklicks oder Swipen simuliert. In den meisten Fällen werden Key Events simuliert mit \METHODE{sendKeys} in dem UIThread und anschließen folgt die Überprüfung mit Hilfe von \glqq Asserts\grqq\ wie in Junit. Diese prüfen, ob die Werte zum Beispiel die über den UI Thread eingegebenen Daten in Editfelder mit den erwarteten Werten übereinstimmen. Ist dies der Fall fährt der Test fort und endet, wenn alle Asserts fehlerfrei waren. Sollte jedoch ein Assert fehlschlagen, wird die Methode \METHODE{testUseCase} abgebrochen und gilt somit als nicht bestanden. Außerdem können innerhalb des Tests auch andere Activities gestartet werden. Diese laufen dann über einen \KLASSE{Instrumentation.ActivityMonitor} über den die gestartete Activity überwacht wird, anschließen wird der Test Code ausgeführt und die Activity wieder geschlossen mit dem Befehl \METHODE{finish()}. Sollte diese Activiy an dieser Stelle nicht über \METHODE{finish()} beendet werden und der \METHODE{testUseCase()} erfolgreich abgeschlossen worden sein, läuft diese Activity im Hintergrund über den Monitor weiter und kann zu fehlerhaften Ergebnissen in anderen Tests führen.
+
+\subsubsection*{State Management Tests}
+Diese Art von Tests verifizieren die Activity in den Status \glqq Pausieren\grqq\ oder \glqq Beendet\grqq. Folglich das Verhalten der Activity nach dem Fortsetzen oder Neustarten. Diese Art von Tests sind nicht in allen Anwendungsfalltests enthalten.
+Der Test \METHODE{testStateDestroy} verwendet die von der Klasse \KLASSE{InstrumentationTestCase2} bereit gestellte Methode \METHODE{fininsh} (\METHODE{mActivity.finish()}) zum Beenden der Activity und der Test \METHODE{testStatePause} die Methoden \METHODE{callActivityOnPause} und \METHODE{callActivityOnResume}. Diese halten die App an, was beispielsweise ein Klick des Nutzers auf den \glqq Home Screen Button\grqq\ sein könnte.
+
+Innerhalb des Tests wurde häufiger der Befehl \METHODE{Thead.sleep(Zeitangabe)} verwendet, was den Hintergrund hat bei zeitkritischen Abschnitten eine bestimmte Zeit lang zu warten, damit zum Beispiel Daten vom Server über Netzwerkverbindungen, UI Elemente rechtzeitig initialisiert werden (die Zeit kann Testgeräte abhängig sein) oder die GPS Position ermittelt werden kann.
+
+Auch kommen in den Testklassen die Begriffe \glqq Small\grqq, \glqq Medium\grqq\ und \glqq Large\grqq\ – Test vor. Deren Zweck ist es über den \glqq Scope\grqq, Abhängigkeiten und Performance Faktoren der Tests zu informieren, die Code-Qualität sowie System Instandhaltung zu verbessern.
+
+\textbf{Small (Unit):} Verifiziert kleine \glqq low-level\grqq\ Logik meist im Bereich einer Methode oder Klasse und bezieht sich auf keine externen Ressourcen. Die Ausführungszeit sollte im Sekunden (besser Millisekunden) Bereich liegen.
+
+\textbf{Medium (Integration):} Kann mehrere Interaktionen zwischen Komponenten enthalten und auch auf externe Datei Systeme zugreifen oder mehrere Prozesse laufen lassen. Die Ausführungszeit kann Minuten betragen (vorzugsweise Sekunden).
+
+\textbf{Large (System):} Hier kann es sein das der Test auch auf externe Ressourcen, wie Server über das Internet zu greifen muss. Die Ausführungszeit kann hier also etwas länger betragen, von Sekunden, Minuten oder Stunden.
 
 \subsection{Simulator}
 \AUTHOR{Richard}
@@ -7,7 +44,7 @@ Zu besseren Testbarkeit der App ist während der Entwicklung auch ein Simulator 
 
 Im Quelltext des Simulators kann in Zeile 50 die Adresse des Backends eingegeben werden, dass zur Simulation genutzt werden soll. So hat man die Möglichkeit, nicht nur auf dem Debug-Server sondern auch auf dem Jenkins- und Release-Server Felder zu simulieren. Nach dem Starten des Simulators werden dann die Events des entsprechenden Servers automatisch heruntergeladen und in dem Dropdown-Menü angezeigt. Wenn ein Event ausgewählt wird, wird die Strecke des Events als roter Polygonenzug auf der Karte dargestellt. Es kann unterhalb der Dropdownliste angegeben werden, wieviele Skater simuliert werden sollen, wie schnell sie fahren, wie groß das Feld ist, also auf welcher Fläche sie sich verteilen sollen, und in welchen Abständen die Position der Skater auf den Server übertragen werden soll. Mit den Schaltfläche \glqq Start\grqq, \glqq Pause\grqq\ und \glqq Stop\grqq\ kann die Simulation gesteuert werden.
 
-Zur Simulation der Skater wird auf dem Server die Methode \glqq simulateMemberLocations\grqq\ aufgerufen. Diese nimmt die Positionen für viele Skater gleichzeitig entgegen und ruft anschließend jeweils die eigentliche Methode zur Aktualisierung der Position \glqq updateMemberLocation\grqq\ auf. Wir haben uns für diese Lösung entschieden, da Probleme auftraten, wenn der Simulator direkt die updateMemberLocation-Methode nutzte. Die zu große Anzahl Anfragen hat den kostenlosen Rahmen der Google App Engine innerhalb einer sehr kurzen Zeit aufgebraucht. Über die Methode zur Simulation der Positionen wird unabhängig von der Anzahl der Skater immer nur eine Anfrage gestellt.
+Zur Simulation der Skater wird auf dem Server die Methode \METHODE{simulateMemberLocations} aufgerufen. Diese nimmt die Positionen für viele Skater gleichzeitig entgegen und ruft anschließend jeweils die eigentliche Methode zur Aktualisierung der Position \METHODE{updateMemberLocation} auf. Wir haben uns für diese Lösung entschieden, da Probleme auftraten, wenn der Simulator direkt die \METHODE{updateMemberLocation}-Methode nutzte. Die zu große Anzahl Anfragen hat den kostenlosen Rahmen der Google App Engine innerhalb einer sehr kurzen Zeit aufgebraucht. Über die Methode zur Simulation der Positionen wird unabhängig von der Anzahl der Skater immer nur eine Anfrage gestellt.
 
 \subsection{Task-Tests}
 \AUTHOR{Bernd}
@@ -21,9 +58,9 @@ Zur Simulation der Skater wird auf dem Server die Methode \glqq simulateMemberLo
 
 \subsubsection{CreateAndDeleteRouteTest}
 \AUTHOR{Richard}
-Der CreateAndDeleteRouteTest legt, wie der Name schon sagt, eine Route an und löscht sie anschließend wieder. Da es sich um einen Use-Case-Tests handelt, werden die Abläufe vollständig über die GUI gesteuert. Lediglich beim Löschen der Route wird nicht über die GUI-Elemente das Löschen angestoßen, sondern direkt die entsprechende Methode auf dem Fragment zur Verwaltung der Routen aufgerufen. Dies ist notwendig, da wir in den Tests das Auswählen von Optionen in einem Kontextmenü nicht an allen Stellen simulieren konnten. Der weitere Ablauf des Löschens wird aber exakt wie in der Veranstalter-App abgearbeitet.
+Der \KLASSE{CreateAndDeleteRouteTest} legt, wie der Name schon sagt, eine Route an und löscht sie anschließend wieder. Da es sich um einen Use-Case-Tests handelt, werden die Abläufe vollständig über die GUI gesteuert. Lediglich beim Löschen der Route wird nicht über die GUI-Elemente das Löschen angestoßen, sondern direkt die entsprechende Methode auf dem Fragment zur Verwaltung der Routen aufgerufen. Dies ist notwendig, da wir in den Tests das Auswählen von Optionen in einem Kontextmenü nicht an allen Stellen simulieren konnten. Der weitere Ablauf des Löschens wird aber exakt wie in der Veranstalter-App abgearbeitet.
 
-Im Test wird nach einer kurzen Wartezeit in der initialisierten View auf den Plus-Button im ManageRoutesFragment gedrückt. Es öffnet sich dadurch der Dialog, der den Namen der neuen Route entgegennimmt. Nach Eintragen eines Teststrings, wird mit der OK-Taste bestätigt und es öffnet sich der Routeneditor. Nach einer erneuten Wartezeit ist die Route vollständig geladen und es werden zwei Wegpunkte über den Plus-Button in der ActionBar erstellt. Nach Erstellung des ersten Wegpunktes wird die Karte ein Stück verschoben, damit sich der zweite Wegpunkt an einer anderen Position befindet. Durch die Simulation eines Zurück-Tastenklicks wird der Sicherungsdialog angezeigt, der bestätigt und damit geschlossen wird. Der Test wartet dann, bis die neue Route angelegt wurde und löscht diese über den bereits erwähnten Aufruf beim ManageRoutesFragment.
+Im Test wird nach einer kurzen Wartezeit in der initialisierten View auf den Plus-Button im \KLASSE{ManageRoutesFragment} gedrückt. Es öffnet sich dadurch der Dialog, der den Namen der neuen Route entgegennimmt. Nach Eintragen eines Teststrings, wird mit der OK-Taste bestätigt und es öffnet sich der Routeneditor. Nach einer erneuten Wartezeit ist die Route vollständig geladen und es werden zwei Wegpunkte über den Plus-Button in der ActionBar erstellt. Nach Erstellung des ersten Wegpunktes wird die Karte ein Stück verschoben, damit sich der zweite Wegpunkt an einer anderen Position befindet. Durch die Simulation eines Zurück-Tastenklicks wird der Sicherungsdialog angezeigt, der bestätigt und damit geschlossen wird. Der Test wartet dann, bis die neue Route angelegt wurde und löscht diese über den bereits erwähnten Aufruf beim \KLASSE{ManageRoutesFragment}.
 
 \subsubsection{PublishNewInformationTest}
 \AUTHOR{Tristan}
