@@ -1,0 +1,370 @@
+\subsection{Beschreibung App-Gerüst (Gemeinsamkeiten beider Apps)}
+\label{sec:appGeruest}
+\AUTHOR{Martin und Bernd}
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth]{graphics/Interaktionsmodell.png}
+\caption{Ein Interaktionsmodell der User- und Veranstalter-App}
+\label{fig:UserAppUndVeranstalterAppInteraktionsmodell}
+\end{figure}
+Das Projekt umfasst zwei Apps, eine App für die Veranstalter(Veranstalterapp) von Skatenights und eine App für die Teilnehmer(Userapp) von Skatenights. In beiden Apps hat man eine Liste von Veranstaltungen gegeben und man kann einzelne Veranstaltungen aus dieser Liste betrachten. In der Veranstalterapp hält ein Fragment, das \KLASSE{ShowEventsFragment}, die Liste von Veranstaltungen und in der Userapp wird dies mit einer Activity, der \KLASSE{ShowEventsActivity}, realisiert. Die Liste ist ein \KLASSE{ListView} Element, welches in der dazugehörigen xml Datei des Fragments/ der Activity definiert wird, das über einen Adapter gefüllt wird. In beiden Apps wird dazu der gleiche Adapter, der \KLASSE{EventsCursorAdapter}, benutzt. Auf den Adapter wird näher in Abschnitt \ref{sec:adapter} eingegangen. Nach dem Auswählen einer Veranstaltung aus der Liste wird eine Activity gestartet, um die Informationen der Veranstaltung anzuzeigen. In den Informationen einer Veranstaltung kann man sich die Karte über eine neue Activity anschauen. Um auf den Server zuzugreifen benutzen beide Apps sogenannte Tasks. Ein Task ist eine Java Klasse, welche \KLASSE{AsyncTask} erweitert und bei Aufruf einen neuen Thread erstellt um mit dem Server zu kommunizieren. Ein Task hat meist zwei implementierte Methoden, die \METHODE{doInBackground(...)} und die \METHODE{onPostExecute(...)}. Der Server Zugriff erfolgt meist in der \METHODE{doInBackground(...)} Methode, die \METHODE{onPostExecute(...)} Methode wird erst nach kompletten Durchlauf der \METHODE{doInBackground(...)} Methode aufgerufen. Diese Methode wird meistens dazu genutzt um das Ergebnis des Tasks an die Userapp bzw. an die Veranstalterapp zu übergeben. Folgende Tasks werden sowohl in der Userapp als auch in der Veranstalterapp genutzt: 
+
+\KLASSE{GetEventTask}: Dieser Task erwartet die ID einer Veranstaltung und ruft dann die dazu passende Veranstaltung vom Server ab, null falls keine Veranstaltung mit der angegebenen ID existiert. Der Aufruf erfolgt, wenn ein Benutzer eine Veranstaltung in der Liste auswählt um sich die Informationen anzeigen zu lassen.
+
+\KLASSE{QueryEventsTask}: Dieser Task ruft die komplette Liste von Veranstaltungen vom Server ab und gibt diese aus, null falls keine Veranstaltungen auf dem Server existieren. Der Aufruf erfolgt, wenn ein Benutzer die Userapp bzw. die Veranstalterapp startet oder die Liste in der Userapp aktualisiert wird.
+
+\subsection{Beschreibung Veranstalter-App}
+\subsubsection{Gerüst}
+\AUTHOR{Martin und Bernd}
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth]{graphics/veranstalterapp_events.png}
+\caption{Eine Übersicht über die in der Veranstalter-App angebotenen Fragments}
+\label{fig:veranstalterapp_fragments}
+\end{figure}
+
+Um zu den eigentlichen Funktionen der Veranstalterapp zu gelangen muss man sich zu Beginn in der LoginActivity mit seinem Google-Account einloggen. Ist der Login erfolgreich, so wird die \KLASSE{HoldTabsActivity} gestartet.
+
+Die Veranstalterapp besteht aus einer Activity, der \KLASSE{HoldTabsActivity}, die einen Viewpager nutzt um zwischen den Funktionalitäten der App zu navigieren. Ein Viewpager ist eine UI-Komponente, welche dafür sorgt, dass man zwischen verschiedenen Tabs über horizontales Scrollen bzw. über Klicken der Tabs in der Tab-Leiste (siehe Abbildung) wechseln kann. Jeder einzelne Tab ist in dem Fall ein einzelnes Fragment. Dazu ist ein Adapter erforderlich, der entscheidet welches Fragment angezeigt werden soll, wenn gescrollt wird, bzw. wenn auf einen der Tabs geklickt wird. Dieser Adapter(\KLASSE{TabsPagerAdapter}) ist eine Klasse, welche \KLASSE{FragmentPagerAdapter} erweitert und zwei Methoden benötigt um Fragmente zu verwalten. Der \KLASSE{TabsPagerAdapter} hält eine Liste der Fragmente die im Konstruktor dieser hinzugefügt werden. Eine der beiden Methoden ist die \METHODE{getItem(...)} Methode. Diese wird aufgerufen, wenn ein Tab berührt wird oder in einem Fragment horizontal gescrollt wird und liefert das Fragment mit dem übergebenen Index in der Liste zurück. Durch die \METHODE{getCount(...)} Methode weiß der Adapter wie viele Tabs höchstens angezeigt werden sollen. Wenn die Activity gestartet wird, dann wird in der \METHODE{onCreate(...)} Methode der ViewPager, der Adapter(\KLASSE{TabsPagerAdapter}) und die Namen der Tabs initialisiert. Anschließend muss dieser Adapter dem ViewPager hinzugefügt werden, damit die Fragmente angezeigt werden können. Es werden insgesamt drei Fragmente dem Adapter hinzugefügt. Das \KLASSE{ShowEventsFragment} dient dem Anzeigen aller Veranstaltungen und ist das Fragment, das beim Start der Veranstalterapp angezeigt wird. In der Liste von Veranstaltungen kann man genauere Informationen einzelner Veranstaltungen durch das Auswählen betrachten, ändern und auch löschen. Das \KLASSE{AnnounceInformationFragment} dient zum Erstellen neuer Veranstaltungen. Man hat hier die Möglichkeit weitere Angaben zu der Veranstaltung hinzuzufügen, als die standardmäßig festgelegten. Dies wird in Abschnitt \ref{sec:events} genauer beschrieben. Das \KLASSE{ManageRoutesFragment} dient zum Verwalten aller auf dem Server vorhandenen Routen. Man hat hier die Möglichkeit Routen hinzuzufügen, zu löschen und als Vorlage für neue Routen zu benutzen. Des weiteren ist nur wenn dieses Fragment angezeigt wird der \glqq Routen hinzufügen\grqq-Button in der ActionBar sichtbar. Dazu erweitert das \KLASSE{ManageRoutesFragment} das OptionsMenu der \KLASSE{HoldTabsActivity} um den zusätzlichen Button in der \METHODE{onCreateOptionsMenu(...)} Methode. Damit dies umgesetzt wird muss beim Erstellen des Fragmentes in der \METHODE{onCreate(...)} Methode mit dem Aufruf \METHODE{setHasOptionsMenu(...)} signalisiert werden, dass eine Erweiterung der ActionBar vorliegt. Die \KLASSE{HoldTabsActivity} bietet die Möglichkeit über das Menu der ActionBar die Rechteverwaltung aufzurufen. 
+
+\FloatBarrier
+\subsubsection{Hosts}
+\AUTHOR{Bernd}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=6cm]{graphics/Hosts.png}
+\caption{Die Liste der eingetragenen Veranstalter}
+\label{fig:hosts}
+\end{figure}
+
+Ein Host ist ein Veranstalter, welcher autorisiert ist die Veranstalterapp zu starten und die dortigen Funktionen zu nutzen. Ein Host ist eine Klasse auf dem Server, mit einem Attribut Key für den Schlüssel eines Hostobjekts und einem String für die E-Mail. In der Veranstalterapp ist es Hosts erlaubt andere Hosts hinzuzufügen und auch zu löschen. Um dies zu tun muss man die Veanstalterapp starten und dann das Optionsmenü aufrufen. Dort kann man dann \glqq Rechte\grqq\ auswählen und man wird zu der Recheverwaltung weitergeleitet. Die Rechteverwaltung ist lediglich eine Activity(\KLASSE{PermissionManagementActivity}) mit einer ListView für die Liste der Hosts, die zum Zeitpunkt des Aufrufs der Activity auf dem Server existieren. Wenn die Activity gestartet wird, fragt diese in der \METHODE{onCreate(..)} Methode alle Hosts vom Server ab. Dazu wird der \KLASSE{QueryHostsTask} aufgerufen, welcher die Liste vom Server in der \METHODE{doInBackground(...)} Methode abfragt, und diese dann in der \METHODE{onPostExecute(...)} an die Activity weiter gibt, indem der Task die \METHODE{setHostsToListView(...)} in der Activity aufruft. Diese Methode in der Activity erstellt einen neuen Adapter(\KLASSE{HostCursorAdapter}) welcher der ListView hinzugefügt wird.\\
+\FloatBarrier
+
+\PARAGRAPH{Hinzufügen und Löschen von Hosts}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=12cm]{graphics/Host_hinzufuegen_loeschen.png}
+\caption{GUI zum Hinzufügen und Löschen von Veranstaltern}
+\label{fig:hosts_hinzufuegen_Loeschen}
+\end{figure}
+
+Es sind Optionen zum Hinzufügen und Löschen von Hosts vorhanden. Zum Löschen eines Hosts muss man im Actionmenu den Plusbutton betätigen. Dadurch wird eine neue Activity(\KLASSE{AddHostDialog}) gestartet, welche einen EditText für die E-Mail des neuen Host und zwei Buttons für das Abbrechen und das Bestätigen des Vorgangs hat. An dieser Stelle wird nicht geprüft, ob es sich bei dem angegebenen Text um eine E-Mail handelt oder nicht; es wird lediglich abgefragt, ob der angegebene Text nicht leer ist. Der Abbrechen-Button beendet den Vorgang. Bei Eingabe und Bestätigung durch Drücken des Hinzufügen Buttons wird die \METHODE{apply(...)} Methode aufgerufen, welche den \KLASSE{AddHostTask} startet. Dieser Task erwartet einen String und ruft dann auf dem Server die \METHODE{addHost(...)} Methode auf. Veranstalter können auch aus der Liste von Veranstalter gelöscht werden. Dazu muss man die gewünschte E-Mail eines Veranstalters in der Liste berühren. Es wird ein AlertDialog gestartet, welcher als Überschrift die E-Mail des ausgewählten Veranstalters hat und einen Löschen Button. Bei Betätigung des Löschen Buttons wird der \KLASSE{DeleteHostTask} aufgerufen, welcher einen String für die E-Mail eines Hosts erwartet und damit dann in der \METHODE{doInBackground(...)} Methode die \METHODE{removeHost(...)} Methode auf dem Server aufruft. In der \METHODE{onPostExecute(...)} Methode wird dann die Liste von Veranstaltern  in der Activity durch den Aufruf von \METHODE{refresh(...)} aktualisiert. Momentan kann jeder Veranstalter alle möglichen Strings als Veranstalter hinzufügen, da nicht geprüft wird ob es sich um den angegebenen Text um eine E-Mail handelt. Des weiteren kann ein Veranstalter sich selber löschen, was dazu führt, dass dieser in der Veranstalterapp keine Funktionen mehr betätigen kann aber dennoch eingeloggt ist.
+\FloatBarrier
+
+\subsubsection{Routen}
+\AUTHOR{Pascal}
+Das Erstellen und Bearbeiten von Routen ist ein integraler Bestandteil der Veranstalter-App. Dem Nutzer sollte es möglich sein auf intuitive Weise Strecken zu erstellen ohne diese selber abzulaufen oder umständlich manuell auf der Karte zu zeichnen. Stattdessen sollte die Strecke möglichst automatisch über die bestehenden Straßen gelegt werden. Da das Erstellen einer Strecke eine einzelne unabhängige Aktivität darstellt, wird mit der \KLASSE{RouteEditorActivity} eine eigene Activity bereitgestellt die sich allein mit dieser Aufgabe beschäftigt. Diese Activity beinhaltet einen ViewPager welcher zwei Fragments verwaltet zwischen denen sowohl über die Tab Leiste, als auch durch horizontales wischen gewechselt werden kann (genauere Beschreibung in Abschnitt \ref{sec:appGeruest}). Verwaltet werden das \KLASSE{EditorMapFragment}, welches die Darstellung und Bearbeitung der Strecke auf der Karte ermöglicht und das \KLASSE{EditorWaypointsFragment}, welches die Bearbeitung einzelner Wegpunkte in der Liste ermöglicht. Die Fragment Klassen beinhalten lediglich die Methoden zur Abstraktion des UI welche von der eigentlichen Programmlogik in der \KLASSE{RouteEditorActivity} aufgerufen werden.
+
+Von der \KLASSE{RouteEditorActivity} verwaltete Daten werden hauptsächlich durch zwei statische innere Klassen repräsentiert. Diese kombinieren die von der \glqq Google Maps Android API v2\grqq\ gestellten Klassen zur Darstellung der Daten auf der Strecke mit zusätzlichen Metainformationen. Um die Verwendung dieser Klassen zu erleichtern implementieren sie das Parcelable Interface. Somit können sie beispielsweise in der \METHODE{onSaveInstanceState(Bundle)} problemlos im Bundle hinterlegt werden. Referenzen auf UI Elemente werden jedoch nicht gespeichert (siehe Abschnitt \ref{par:GoogleMapsAndroidAPI}). Die erste dieser Klassen ist die \KLASSE{RouteEditorActivity.Route}, welche den Streckenverlauf der berechneten Route darstellt. Sie kombiniert die von Google Maps genutzten \KLASSE{PolylineOptions} und \KLASSE{Polyline} mit der als int gespeicherten Länge der Strecke in Metern. Die zweite der Klassen ist die \KLASSE{RouteEditorActivity.Waypoint}, welche einen einzelnen Wegpunkt auf der Strecke darstellt. Diese bestehen aus den von Google Maps genutzten \KLASSE{MarkerOptions} und \KLASSE{Marker}.
+
+\PARAGRAPH{Google Maps Android API v2}
+\label{par:GoogleMapsAndroidAPI}
+Die Google Maps Android API v2 ist Teil der Google Play Services und bietet die Möglichkeit einfach zu verwendende, interaktive Karten in Android Apps zu verwenden. Kernstück der API ist die \KLASSE{GoogleMap} Klasse, welche Interaktion mit der dargestellten Karte ermöglicht. Zugriff erfolgt wahlweise über die \METHODE{getMap()} Methoden der \KLASSE{MapView} oder \KLASSE{MapFragment} Klassen, welche zur Darstellung der Karte verwendet werden. Da die Karte Zugriff auf den Activity-Lifecycle benötigt, wird von Google die Verwendung des \KLASSE{MapFragment} empfohlen. Die \KLASSE{GoogleMap} stellt eine Vielzahl von Möglichkeiten bereit die Karte der erforderten Nutzung anzupassen. Insgesamt werden 6 mögliche Varianten für Kartenannotationen bereitgestellt: Circle, GroundOverlay, Marker, Polygon, Polyline und TileOverlay. Für die Planung der Route benötigen wir jedoch lediglich \KLASSE{Marker} für die Darstellung von Wegpunkten und eine \KLASSE{Polyline} für die Darstellung des Streckenverlaufs. Diese Annotationen bestehen jeweils aus zwei Teilen. So repräsentiert die \KLASSE{MarkerOptions} Klasse Anweisungen um einen \KLASSE{Marker} auf der Karte darstellen zu können. Um diesen tatsächlich darzustellen wird die \METHODE{addMarker(MarkerOptions)} Methode der \KLASSE{GoogleMap} aufgerufen. Diese liefert eine Referenz auf das gezeichnete \KLASSE{Marker} Objekt zurück. Da die \KLASSE{MarkerOptions} lediglich die Anweisungen zum Zeichnen des Markers repräsentieren, müssen Änderungen wie z.B. ein neuer Titel an das \KLASSE{Marker} Objekt übermittelt werden. Da die \METHODE{addMarker(MarkerOptions)} die einzige Möglichkeit darstellt auf dieses zuzugreifen, ist es wichtig das Objekt für eine mögliche spätere Verwendung zu behalten. Zudem muss bedacht werden, dass die \KLASSE{Marker} nur zeitlich begrenzt gültig sind. Wird z.B. durch drehen des Gerätes das UI neu gezeichnet, werden die Marker ungültig. Für diesen Fall sollten die \KLASSE{MarkerOptions} gespeichert werden um die erneute Darstellung zu ermöglichen. Dieses Konzept überträgt sich auf die anderen Annotationstypen z.B. mit \KLASSE{PolygonOptions} und \KLASSE{Polygon}, \KLASSE{PolylineOptions} und \KLASSE{Polyline}, usw. Diese bieten jeweils eigene Schnittstellen um sie auf die Bedürfnisse der Anwendung anzupassen.
+
+Ein Marker besteht aus einem Bild, welches auf der Karte angezeigt wird. Bei Berührung des Bildes wird der Titel des Markers angezeigt. Die Position des Bildes kann mithilfe eines \KLASSE{LatLng} Objektes gesetzt werden, welches aus jeweils einem double Wert für Längen- und Breitengrad besteht. Marker können zudem, falls dies erfordert wird, vom Nutzer nächträglich per drag-and-drop verschoben werden. Die Funktionalität wird über ein einzelnes Flag gesteuert, auf welches man mithilfe der \METHODE{draggable(boolean)} Methode des \KLASSE{Marker} bzw. \KLASSE{MarkerOptions} Objektes zugegreifen kann. Auf die neue Position kann über die \METHODE{getPosition()} Methode zugegriffen werden. Zudem besteht die Möglichkeit vom \KLASSE{GoogleMap} Objekt über Veränderungen der Marker durch den Nutzer benachrichtigt zu werden. Dies wird mithilfe des \KLASSE{GoogleMap.OnMarkerDragListener} Interfaces realisiert, welches beim \KLASSE{GoogleMap} Objekt über die \METHODE{setOnMarkerDragListener(GoogleMap.OnMarkerDragListener)} Methode registriert werden kann. Bei Änderungen eines Markers werden danach die \METHODE{onMarkerDragStart(Marker)}, \METHODE{onMarkerDrag(Marker)} und \METHODE{onMarkerDragEnd(Marker)} Methoden aufgerufen.
+	
+Eine \KLASSE{Polyline} stellt eine Linie dar die auf der Karte gezeichnet wird. Sie besteht hauptsächlich aus einer Farbe, welche die Farbe der Linie kontrolliert und einem float Wert, der die Breite der Linie kontrolliert. Der Verlauf der Linie kann mithilfe der \METHODE{addAll(List<LatLng>)} Methode festgelegt werden. Zugriff auf diese Liste ist über die \METHODE{getPoints()} Methode möglich.
+
+\PARAGRAPHOPT{Google Directions API}{Google Directions API\footnote{https://developers.google.com/maps/documentation/directions/}}
+\label{par:GoogleDirectionsAPI}
+Über die Google Directions API stellt Google die in Google Maps integrierte Funktionalität zur Planung von Routen zur Verfügung. Per HTTP-Anfrage kann die benötigte Route wahlweise im XML oder JSON Format angefordert werden. Android verfügt bereits über die Funktionalität zum parsen von XML und JSON, sodass wir uns nach der Empfehlung von Google richten und das JSON Format verwenden. In der kostenlosen Variante sind die Anzahl der Anfragen auf 2500 pro Tag limitiert. Da die API jedoch ausschließlich beim Eintragen der Route durch die Veranstalter genutzt wird, kann dies vernachlässigt werden. API Anfragen richten sich an \glqq http://maps.googleapis.com/maps/api/directions/\grqq\ gefolgt von dem gewünschten Ausgabeformat. In diesem Fall folgt also \glqq.../directions/json?\grqq. Anschließend können eine Reihe von Parametern in beliebiger Reihenfolge übergeben werden, die durch \glqq\&\grqq\ getrennt werden. Zunächst gibt es jeweils einen Parameter für Ausgangs- und Zielpunkt. Diese können als \glqq origin=\grqq\ und \glqq destination=\grqq\ gefolgt von den gewünschten Adressen übergeben werden. Adressen werden automatisch zu Koordinaten umgewandelt. Alternativ können die Koordinaten auch direkt als Längen- und Breitengrad getrennt durch ein \glqq,\grqq\ übergeben werden. Um den Routenverlauf genauer zu Steuern, können zusätzlich Wegpunkte übermittelt werden. Dies erfolgt mithilfe des \glqq waypoints=\grqq\ Parameters gefolgt von einer Reihe von Adressen, die das gleiche Format wie Start- und Endpunkt unterstützen. Die einzelnen Adressen werden durch ein \glqq|\grqq\ getrennt. Übergebene Wegpunkte werden in der angegebenen Reihenfolge in die Route integriert. An dieser Stelle fällt bei der kostenlosen Variante der API eine weitere Einschränkung an. So dürfen neben dem Start und Endpunkt maximal 8 Wegpunkte angegeben werden. Zuletzt gibt es noch den \glqq sensor=\grqq\ Paramter welcher der API über einen Boolean Wert mitteilt ob das Gerät über die Möglichkeit verfügt seinen Standort zu ermitteln. Eine einfache Route an der Straße um das Hörsaalgebäude an der Einsteinstraße über zwei Wegpunkte lässt sich somit über die folgende Anfrage planen:
+
+http://maps.googleapis.com/maps/api/directions/json?origin=51.965516,7.603414
+
+\&destination=51.965674,7.604188\&waypoints=51.968710,7.603574|51.967477,7.606374
+
+\&sensor=true
+
+Der zurückgegebene JSON String enthält ein Objekt \glqq status\grqq, welches den Statuscode der Anfrage enthält, und ein Array \glqq routes\grqq, welches die gefundenen Routen enthält. Konnte keine Route gefunden werden, ist \glqq routes\grqq\ leer und Status enthält den Grund für den Fehler. Die genauen Fehlercodes finden sich in der Dokumentation unter \glqq Statuscodes\grqq. Gefundene Routen bestehen aus einer Anzahl von Metainformationen und einer detaillierten Beschreibung der Route. Da für die Anwendung lediglich der Streckenverlauf relevant ist, können die meisten dieser Informationen ignoriert werden. Die Beschreibung der Route ist unterteilt in mehrere Streckenabschnitte, die sich im \glqq legs\grqq\ Array der Route befinden. Diese Streckenabschnitte enthalten neben einer Zusammenfassung des Abschnittes die genauen Anweisungen im \glqq steps\grqq\ Array. Jede Anweisung besteht unter anderem aus dem genauen Straßenverlauf (\glqq polyline.points\grqq), Informationen über den Abschnitt (z.B. \glqq distance.value\grqq) und einer textuellen Fahranweisung (\glqq html\_instructions\grqq).
+
+\PARAGRAPH{RouteEditorActivity Funktionalität}
+Die \KLASSE{RouteEditorActivity} ist die Zentrale Klasse des Interface zum Erstellen von Routen. Beim starten der Activity wird der Name der Route als String Extra (\ATTRIBUT{RouteEditorActivity.EXTRA\_NAME}) erwartet. Dieser wird im Member \ATTRIBUT{name} gespeichert. Mithilfe des \ATTRIBUT{RouteEditorActivity.EXTRA\_WAYPOINTS} können außerdem Wegpunkte als Ausgangspunkt für die Strecke übergeben werden. Zur Verwaltung der Wegpunkte wird mit dem \KLASSE{WaypointAdapter} ein modifizierter ArrayAdapter verwendet, welcher angepasst wurde um die Namen der Wegpunkte aus den \KLASSE{MarkerOptions} des \KLASSE{Waypoint} zu lesen. Das \KLASSE{Route} Objekt, welches die aktuell berechnete Strecke repräsentiert wird im Member \ATTRIBUT{route} hinterlegt. Falls keine Route vorhanden ist, nimmt dieses den Wert null an. Damit beim Drehen des Bildschirms keine Berechnungen verloren gehen, werden Name, Route und Wegpunkte im Bundle gespeichert. Da die \KLASSE{Route} und \KLASSE{Waypoint} Klassen das Parcelable Interface implementieren, können diese im Bundle mithilfe der \METHODE{putParcelable(String, Parcelable)} bzw. \METHODE{putParcelableArray(String, Parcelable[])} gespeichert werden. Um eine Strecke zu erstellen müssen zunächst mindestens zwei Wegpunkte hinzugefügt werden. Das Erstellen neuer Wegpunkte geschieht mithilfe der \METHODE{addWaypoint()} Methode. Diese kann von beliebiger Stelle aufgerufen werden. In der App geschieht dies ausschließlich über einen Button in der ActionBar. Der neue \KLASSE{Waypoint} wird mithilfe der \METHODE{addWaypoint(int)} Methode des \KLASSE{EditorMapFragment} erstellt, welche den Mittelpunkt der Karte ermittelt und diesen als Position des Waypoints übernimmt. Außerdem wird der Titel des \KLASSE{Waypoint} gemäß des übergebenen Index auf \glqq Wegpunkt X\grqq\ gesetzt. Mithilfe des \KLASSE{MarkerOptions} Objektes des \KLASSE{Waypoint} kann der Wegpunkt nun der Karte hinzugefügt werden. Die Referenz für das entstehende \KLASSE{Marker} Objekt wird im \KLASSE{Waypoint} gespeichert. Anschließend versucht die \KLASSE{RouteEditorActivity} die Strecke durch den Aufruf der \METHODE{loadRoute()} Methode zu berechnen. Diese entfernt zunächst mithilfe der \METHODE{setRoute(Route)} Methode die aktuell angezeigte Strecke von der Karte und berechnet anschließend mithilfe des \KLASSE{RouteLoaderTask} eine aktuelle Route, wenn nach der Änderung mindestens zwei Wegpunkte vorhanden sind. Damit der Nutzer weiß, dass die Route berechnet wird, wird in der ActionBar eine auf \ATTRIBUT{indeterminate} gesetzte ProgressBar angezeigt. Beim Beenden des Task, sei es durch Erfolg oder Fehler, wird diese ausgeblendet und die neue Strecke bzw. eine Fehlermeldung angezeigt. Erfolgt ein weiterer Aufruf der Methode, bevor der Task beendet wird, so wird nicht auf dessen Ende gewartet. Stattdessen wird sein Ergebnis ignoriert und auf das Ergebnis des neuen Tasks gewartet. Im Member \ATTRIBUT{currentTask} wird dafür eine Referenz auf den Task behalten, dessen Ergebnis dem zeitlich neuesten Aufruf der \METHODE{loadRoute()} Methode entspricht. 
+
+Da die Wegpunkte im \KLASSE{WaypointAdapter} gespeichert werden, spiegeln sich Änderungen direkt in der ListView im \KLASSE{EditorWaypointsFragment} wieder.
+	
+Das Fragment behandelt insgesamt nur zwei Funktionalitäten. Zum einen wird ein \KLASSE{AdapterView.OnItemClickListener} verwendet, welcher beim Berühren eines Wegpunktes in der Liste das \KLASSE{EditorMapFragment} im ViewPager aktiviert und mithilfe dessen \METHODE{showWaypoint(Waypoint)} Methode den Wegpunkt auf der Karte vergrößert und dessen Titel anzeigt. Außerdem wird ein \KLASSE{AdapterView.OnItemLongClickListener} verwendet, welcher bei seiner Aktivierung durch ein langes drücken auf einen der Wegpunkte in der Liste die Option zum Benennen und Löschen dieses Wegpunktes anzeigt.  Beim Löschen wird die \METHODE{removeWaypoint(int)} Methode der \KLASSE{RouteEditorActivity} aufgerufen welche den Wegpunkt aus dem Adapter entfernt, ihn beim \KLASSE{EditorMapFragment} mithilfe der \METHODE{removeWaypoint(Waypoint)} von der Karte entfernt, die Indizes der folgenden Wegpunkte aktualisiert und mithilfe der \METHODE{loadRoute()} falls möglich eine neue Route berechnet.
+
+Auch das \KLASSE{EditorMapFragment} bietet eine Möglichkeit den Streckenverlauf zu ändern. So implementiert dieses das \KLASSE{GoogleMap.OnMarkerDragListener} Interface, welches von der \KLASSE{GoogleMap} über das Verschieben eines der Marker benachrichtigt wird. Wir müssen lediglich auf den Aufruf der \METHODE{onMarkerDragEnd(Marker)} Methode warten, um den \KLASSE{Waypoint} über die Positionsänderung zu benachrichtigen. Da beim Verschieben des Marker lediglich die Position des Marker beeinflusst wird, muss diese Änderung auf das \KLASSE{PolylineOptions} Objekt übertragen werden. Anschließend wird noch die \METHODE{loadRoute()} Methode der \KLASSE{RouteEditorActivity} aufgerufen damit diese die geänderte Route berechnen kann.
+
+\PARAGRAPH{RouteLoaderTask Funktionalität}
+Der \KLASSE{RouteLoaderTask} ist für die eigentliche Routenberechnung verantwortlich. Er interagiert dafür mithilfe von HTTP-Anfragen mit der Google Directions API. Da es sich bei diesen Interaktionen um Netzwerkanfragen handelt, die möglicherweise längere Ladezeiten mit sich bringen, dürfen diese nicht auf dem UI-Thread ausgeführt werden, damit dieser nicht unnötig blockiert wird. Das Android SDK stellt hier in Form des \KLASSE{AsyncTask} eine nützliche Klasse bereit, welche eine zusammenhängende Berechnung auf einem Hintergrund-Thread repräsentiert. In seiner ursprünglichen Form bietet der \KLASSE{AsyncTask} mithilfe der \METHODE{onProgress(Progress)} und \METHODE{onPostExecute(Result)} Methoden die Interaktion mit dem GUI. In der \DATEI{common} Bibliothek findet sich mit dem \KLASSE{ExtendedTask} eine Unterklasse des \KLASSE{AsyncTask}, welcher um die Funktionalität erweitert wurde den Fortschritt, das Ergebnis und mögliche Fehlermeldungen direkt an ein \KLASSE{ExtendedTaskDelegate} zu übertragen. Die \KLASSE{RouteEditorActivity} implementiert dieses Interface zu diesem Zweck. 
+
+In der \METHODE{doInBackground(ArrayAdapter<Waypoint>...)} Methode findet die Routenberechnung und die anschließende Auswertung statt. Diese wird im Hintergrund-Thread des \KLASSE{ExtendedTask} ausgeführt. Mithilfe der \METHODE{publishProgress(Progress)} und \METHODE{publishError(String)} Methoden kann mit der \KLASSE{ExtendedTaskDelegate} interagiert werden. Dabei ist zu beachten, dass nach einem Aufruf der \METHODE{publishError(String)} Methode ein eventuell übergebenes Ergebnis nicht an die Delegate weitergeleitet wird. Die erste Aufgabe des Task ist die Erstellung der HTTP-Anfrage, nach dem in Kapitel \ref{par:GoogleDirectionsAPI} beschriebenen Schema. Dafür wird der von Android bereitgestellte \KLASSE{Uri.Builder} verwendet. Dieser kann von einer Base-URL ausgehend Parameter automatisch korrekt formatieren. Es werden dafür lediglich der Name des Parameters und der zugehörige Wert als String benötigt. In diesem Fall werden automatisch der erste Wegpunkt des übergebenen ArrayAdapter als \glqq origin\grqq\ und der letzte als \glqq destination\grqq\ verwendet. Für die Umwandlung von \KLASSE{LatLng} zu String steht die \METHODE{positionToString(LatLng)} Methode zur Verfügung. Sie wandelt Längen- und Breitengrad von double Werten in Strings um und kombiniert diese, getrennt durch ein \glqq,\grqq\ zu einem einzelnen String. Die \METHODE{waypointsToString(ArrayAdapter<Waypoint>)} Methode kombiniert mithilfe der \METHODE{positionToString(LatLng)} Methode die enthaltenen Wegpunkte zu einem String, indem sie diese mit dem Trennzeichen „|“ kombiniert. Da es sich beim 1. und letzten Wegpunkt um den Start- und Endpunkt handelt, werden diese nicht berücksichtigt. Der resultierende String wird im \KLASSE{Uri.Builder} für den Parameter \glqq waypoints\grqq\ eingetragen. Zuletzt wird durch \glqq sensor=true\grqq\ signalisiert, dass das Gerät über einen Standortsensor verfügt. Mit der entstandenen Uri kann nun ein URL Objekt erstellt werden, welches über die \METHODE{openConnection()} Methode eine HTTP Verbindung öffnet. An diese Verbindung wird nun eine \glqq GET\grqq\ Anfrage geschickt. Als Antwort erhalten wir das Ergebnis der geforderten Routenberechnung formatiert als JSON-String. Dieser kann mithilfe der \METHODE{parseJSONString(String)} Methode geparst werden. Als Ergebnis erhalten wir ein Route Objekt mit dem berechneten Streckenverlauf. Die Methode legt zunächst ein JSONObject mit dem empfangenen String an, welches Teil des Android SDK ist. Dieses Objekt stellt unter anderem zwei Methoden zur Verfügung, die entsprechend der Objekthierarchie Zugriff auf unterliegende JSON Objekte bzw. Arrays bietet. Mit der \METHODE{getJSONArray(String)} Methode erhalten wir das JSONArray, welches die einzelnen Routen beinhaltet. Hier reicht es aus die erste enthaltene Route zu verwenden. Die Route enthält in \glqq overview\_polyline.points\grqq\ eine als String codierte Linie, welche den gesamten Routenverlauf umfasst. Diese Linien werden mithilfe des Polyline Algorithmus codiert, welcher es ermöglicht diese kompakt zu speichern. Der Algorithmus ist in der Google Maps Dokumentation\footnote{https://developers.google.com/maps/documentation/utilities/polylinealgorithm} genauer beschrieben; Die Implementation in der \KLASSE{LocationUtils} liefert zudem eine genaue Beschreibung der Funktion. Bei kurzen Strecken entspricht diese Übersichtsstrecke dem tatsächlichen Streckenverlauf, bei längeren Strecken ist dies jedoch nicht garantiert. Aus diesem Grund decodieren wir stattdessen die Strecken der einzelnen Routenanweisungen. Die Anweisungen befinden sich als Array \glqq steps\grqq\ in den Streckenabschnitten, die als Array \glqq legs\grqq\ vorhanden sind. Um also den gesamten Routenverlauf zu erhalten wird im JSONObject welches die Route repräsentiert jedes \glqq legs[i].steps[j].polyline.points\grqq\ decodiert und einer Liste mit \KLASSE{LatLng} Objekten hinzugefügt. Diese wird anschließend dem \KLASSE{PolylineOptions} Objekt des Route Objekts hinzugefügt. Um die Gesamtlänge der Strecke zu erhalten wird dabei auch die im \glqq legs[i].steps[j].distance.value\grqq\ enthaltene Strecke in Metern aufaddiert. Das entstehende Route Objekt wird der \KLASSE{RouteEditorActivity} anschließend als Ergebnis übermittelt.
+
+\PARAGRAPH{Routen als Vorlage nutzen und das Benennen von Wegpunkten}
+\AUTHOR{Bernd}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=12cm]{graphics/Route_als_Vorlage_nutzen_Wegpunkte_benennen.png}
+\caption{Erstellen einer Route aus einer Vorlage und das Umbenennen von Wegpunkten}
+\label{fig:route_aus_vorlage}
+\end{figure}
+
+Man kann bestehende Routen benutzen um aus diesen neue Routen zu erstellen. Dazu muss man im \KLASSE{ManageRoutesFragment} eine  Route aus der Liste auswählen und einen Longclick darauf machen. Es erscheint ein AlertDialog dessen Überschrift den Namen der Route darstellt. Man hat nun als Auswahl die Route zu löschen oder diese als Vorlage zu nutzen. Wählt man letzteres, so wird die Activity \KLASSE{AddRouteDraftDialog} gestartet. Des weiteren werden als Extras dem Intent die Waypoints der ausgewählten Route beigefügt. Ein Waypoint einer Route ist eine Klasse auf dem Server mit dem Namen \KLASSE{ServerWaypoint}. Ein \KLASSE{ServerWaypoint} hat die Attribute für den Titel eines Waypoints und dessen Latitude und Longitude. Eine Route hat eine Liste von \KLASSE{ServerWaypoints} und diese werden der Route hinzugefügt, wenn die Route erstellt wird, das heißt wenn der AlertDialog zum Speichern einer Route aufgerufen wird. Dort wird dann der \KLASSE{ArrayAdapter} durchlaufen und für jeden Waypoint wird ein \KLASSE{ServerWaypoint} erstellt. Dem ServerWaypoint werden dann der Titel, die Longitude und die Latitude gesetzt und er wird der Liste von ServerWaypoints hinzugefügt. Der Dialog ist eine Activity, in der man ein Feld für den Namen der Route zusammen mit zwei Buttons zum Abbrechen und Bestätigen der Aktion. Gibt man einen Namen für die neue Route ein und bestätigt dies, so wird in der Activity ein Intent gestartet und ihm in den Extras die Waypoints der Route übergeben. Dann wird die \KLASSE{RouteEditorActivity} mit diesem Intent gestartet. In der \METHODE{onCreate(...)} Methode von der \KLASSE{RouteEditorActivitiy} wird dann abgefragt, ob der Intent Extras besitzt und auch, ob dies Waypoints sind. Ist dies der Fall, so  werden die übergebenen Waypoints aus den Extras in ein Attribut gespeichert. Für jeden Waypoint wird dann ein neuer Waypoint erstellt und diesem dann die Latitude,  die Longitude und der Titel gesetzt. Der neue Waypoint wird dann auch noch dem WaypointAdapter hinzugefügt. Der WaypointAdapter erweitert den ArrayAdapter mit dem generischen Typ Waypoint und überschreibt die \METHODE{getView(...)} Methode, sodass für jeden Waypoint eine custom xml Datei angezeigt wird. In dieser Datei bedindet sich eine TextView zum Anzeigen des Namens des Wayoints und dieser wird für jeden Waypoint gesetzt.
+\FloatBarrier
+
+\subsubsection{Events}
+\label{sec:events}
+\AUTHOR{Martin}
+Dieser Abschnitt beschäftigt sich mit der Realisierung der Veranstaltungen in der Veranstalter-App. Veranstaltungen können nur von eingetragenen Veranstaltern in der Veranstalter-App erstellt und verwaltet werden und können nach der Erstellung von den Benutzern in der User-App und von allen Veranstaltern in der Veranstalter-App betrachtet werden. Dazu werden die erstellten Veranstaltungen persistent auf dem Server abgespeichert. Zu Beginn des Projekts hatte eine Veranstaltung noch eine feste Anzahl an Informationen, d.h. die Model-Klasse \glqq Event\grqq, die eine Veranstaltung beschreibt, hatte Attribute für den Titel, für die Gebühr, für die Beschreibung usw. Durch Einführung der Features \glqq Veröffentlichen von Informationen 2.0\grqq\ und \glqq Anzeigen von Informationen 2.0\grqq\ musste die Umsetzung überarbeitet werden, da die Anzahl der Informationen zu einer Veranstaltung variabel wurde. Die Realisierung erfolgte nun über dynamische Felder, die eine abstrakte Darstellung einer Information einer Veranstaltung ist. Diese Umsetzung wird im Folgenden behandelt.
+
+\PARAGRAPH{Model-Klasse Event}
+Die Klasse Event in unserem Projekt stellt eine Veranstaltung dar. Ein Objekt dieser Klasse beinhaltet alle Informationen einer Veranstaltung.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth]{graphics/Model_Klassen.png}
+\caption{Die verwendeten Klassen zur Repräsentation von Veranstaltungen}
+\label{fig:modelEvents}
+\end{figure}
+
+Zu Beginn werde ich auf die dynamischen Felder und auf die Arten der dynamischen Felder eingehen, die durch die Klassen \KLASSE{Field} und \KLASSE{FieldType} realisiert wurden.
+
+\textbf{Klasse Field:}
+
+Ein Objekt der Klasse \KLASSE{Field} stellt ein dynamisches Feld dar. Ein dynamisches Feld wird genutzt um eine Veranstaltung zu beschreiben. Jedes dynamische Feld stellt genau eine Information zu einer Veranstaltung dar und besteht aus:
+
+\begin{itemize}
+	\item title: Bezeichnung der Information (z.B. \glqq Titel\grqq, \glqq Gebühr\grqq)
+	\item value: Wert der Informationen in Form einer Zeichenkette
+	\item data: Feld, das nur für die Speicherung einer Routeninformation genutzt wird, leer bei jeder anderen Information
+	\item type: Art des Feldes, ein Enum-Objekt des Enums \KLASSE{FieldTypes}
+\end{itemize}
+
+\textbf{Enum FieldType:}
+
+Es existieren zehn verschiedene Arten von dynamischen Feldern, die durch das Enum \KLASSE{FieldType} identifiziert werden können. Folgende Arten von dynamischen Feldern existieren:
+
+\begin{itemize}
+	\item Title: Titel
+	\item Fee: Gebühr
+	\item Date: Datum des Startzeitpunkts
+	\item Time: Uhrzeit des Startzeitpunkts
+	\item Location: Startpunkt
+	\item Description: Beschreibung
+	\item Route: Route, die in der Veranstaltung abgefahren wird
+	\item Simpletext: Ergänzende Text-Information
+	\item Link: Verweis auf Webseite
+	\item Picture: Bild
+\end{itemize}
+
+\textbf{Klasse Event:}
+
+Ein Event-Objekt beinhaltet alle Information zu einer Veranstaltung. Folgende Informationen ergeben sich:
+
+\begin{itemize}
+	\item key: Eindeutige Nummer, die eine Veranstaltung identifiziert
+	\item dynamicFields: Liste von dynamischen Feldern
+	\item memberList: Liste von E-Mail Adressen der Teilnehmer
+	\item routeFieldFirst: erster Wegpunkt des Feldes(siehe Abschnitt \ref{subsec:Feldberechnung})
+	\item routeFieldLast: letzter Wegpunkt des Feldes(siehe Abschnitt \ref{subsec:Feldberechnung})
+	\item notificationSend: identifiziert, ob die GCM-Nachricht für das Starten einer Veranstaltung gesendet wurde
+\end{itemize}
+
+Wird ein neues Event auf dem Server erstellt, wird automatisch eine Key-ID generiert sodass wir uns nicht um die Generierung einer ID kümmern müssen. Da wir eine variable Anzahl an dynamischen Feldern abspeichern wollen, haben wir uns dazu entschieden, die dynamischen Felder in einer Liste abzuspeichern. Jedes dynamische Feld hat einen eigenen Typen, wobei sich die Typen \glqq Simpletext\grqq, \glqq Link\grqq\ und \glqq Picture\grqq\ von den restlichen Typen unterscheiden, da ein Objekt mit diesen Typen mehrmals in der Liste auftreten können. Die restlichen Typen sind einzigartig und treten nur ein einziges Mal in der Liste auf. Die beiden Felder \ATTRIBUT{routeFieldFirst} und \ATTRIBUT{routeFieldLast} werden für die Feldberechnung genutzt, um den Start und  das Ende des Feldes zu speichern
+(siehe Abschnitt \ref{subsec:Feldberechnung}). Das letzte Attribut \ATTRIBUT{notificationSend} speichert ob jemals schon eine Notification, die den Start der Veranstaltung ankündigt, gesendet wurde.
+
+\textbf{EventUtils:}
+
+Um den Zugriff und die Verwaltung der dynamischen Felder einer Veranstaltung zu vereinfachen haben wir uns dazu entschieden eine Singleton-Klasse \KLASSE{EventUtils} zu erstellen.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth]{graphics/EventUtils_long.png}
+\label{fig:eventutils}
+\end{figure}
+
+Folgende Funktionen bietet die Klasse \KLASSE{EventUtils} an:
+
+\begin{itemize}
+	\item addDynamicField: Fügt ein dynamisches Feld mit dem übergebenen Titel und Typ dem Event an der Position \glqq pos\grqq\ hinzu.
+	\item deleteDynamicField: Löscht ein dynamisches Feld an der Position \glqq pos\grqq\ aus dem Event.
+	\item setStandardFields: Setzt die dynamischen Felder die zu Beginn der Erstellung initialisiert werden sollen(Titel, Gebühr, Startdatum, Startuhrzeit, Ort, Beschreibung, Route).
+	\item setEventInfo: Setzt die dynamischen Felder der übergebenen ListView in das übergebene Event-Objekt.
+	\item getUniqueFieldId: Gibt die Position des eindeutigen dynamischen Feldes mit dem FieldType \glqq type\grqq\ in der Liste der dynamischen Felder des übergebenen Events zurück.
+	\item getFusedDate: Bestimmt aus Startdatum und Startuhrzeit das Datum des Starts mit der Uhrzeit.
+	\item getUniqueField: Gibt das einzigartige dynamisches Feld mit dem \KLASSE{FieldType} \glqq type\grqq\ zurück.
+\end{itemize}
+
+\PARAGRAPH{Erstellen einer Veranstaltung}
+Das Erstellen einer neuen Veranstaltung ist nur in der Veranstalter-App durch einen eingetragenen Veranstalter möglich. Die Klasse, die die Erstellung verwaltet, ist ein Fragment, das \KLASSE{AnnounceInformationFragment}, welches man über das Navigieren des \KLASSE{ViewPagers} erreichen kann. Das angezeigte Fragment ist auf Abbildung \ref{fig:VeranstaltungErstellen} dargestellt.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=12 cm]{graphics/Fragment_Veranstaltung_erstellen.png}
+\caption{Das Fragment zur Erstellung von Veranstaltungen(links ohne, rechts mit aktiviertem Editiermodus}
+\label{fig:VeranstaltungErstellen}
+\end{figure}
+
+Vor der Einführung der 2.0 Features war die grafische Umsetzung der Erstellung einfach, da wir eine feste Anzahl von grafischen Elementen hatten, die angezeigt werden mussten um die eingegebenen Informationen vom Veranstalter zu registrieren. Nach der Einführung musste es auch möglich sein grafische Elemente zu ergänzen, da weitere Angaben, wie z.B. zusätzliche Textfelder möglich waren. Wir haben uns dazu entschieden, dies mit einer ListView und einem Adapter, dem \KLASSE{AnnounceCursorAdapter}, zu realisieren, da ein Adapter relativ einfach um eine Datenmenge erweitern kann. Der Adapter hat als Datenmenge eine Liste von dynamischen Feldern, da diese genau eine Information zu einer Veranstaltung darstellen, und erstellt zu jedem dynamischen Feld ein grafisches View-Element und fügt es in die ListView ein. Da verschiedene Typen von dynamischen Feldern existieren, haben wir uns vor der codetechnischen Umsetzung erst verschiedene Layouts mit Hilfe von xml-Dateien erstellt, sodass der Adapter Typ-abhängig die Layouts für die Elemente der ListView setzen kann. Damit die Felder jetzt in der ListView angezeigt werden, wird in der \METHODE{getCount}-Methode die Anzahl der angezeigten Elemente auf die Größe der Liste der dynamischen Felder gesetzt. Anschließend wird für jedes dynamische Feld die \METHODE{getView}-Methode aufgerufen, die den Typ des dynamischen Feldes an der aktuellen Position in der Liste abfragt, wurde der richtige Typ gefunden, wird die passende Layout xml-Datei gesetzt. Die Realisierung der Erweiterung von Informationen haben wir mit einem Editiermodus gelöst. Wird der Editiermodus über den Button \glqq Starte Editieren\grqq\ gestartet erscheint über und unter jedem Element ein \glqq$+$\grqq-Button. Dazu wird in der \METHODE{getCount}-Methode im Adapter die Anzahl verdoppelt und in der \METHODE{getView}-Methode wird bei jedem zweiten Element dieser Button gezeichnet. Wird dieser gedrückt, so kann man Auswählen welches dynamische Feld an diese Stelle ergänzt werden soll. Nach der Auswahl wird die Bezeichnung des dynamischen Feldes festgelegt. Anschließend wird im Adapter die Liste mit den dynamischen Feldern um das neue Feld an der bestimmten Position ergänzt und der Adapter zeichnet die Felder neu.
+
+Wird nun also das Fragment erstellt wird ein neues Event erstellt und die dynamischen Standard-Felder werden mit Hilfe der \KLASSE{EventUtils} in dem Event gespeichert. Dann wird der Adapter mit den dynamischen Feldern des Events initialisiert und dieser wird dann in der ListView gesetzt. Am Ende zeichnet der Adapter wie zuvor beschrieben die dynamischen Felder, indem er die \METHODE{getView}-Methode iteriert bis die Anzahl von der \METHODE{getCount}-Methode erreicht wird. Hat man nun alle notwendigen Informationen angegeben wird mit Hilfe der \METHODE{setEventInfo}-Methode aus den \KLASSE{EventUtils} die Informationen des Adapters an das Event übergeben. Danach wird der \KLASSE{CreateEventTask} aufgerufen, der im Hintergrund-Thread auf dem Server die neue Veranstaltung erstellt. Am Ende wird das Fragment in den Anfangszustand gesetzt und die Liste der Veranstaltungen im \KLASSE{ShowEventsFragment} wird aktualisiert.
+
+\PARAGRAPH{Veranstaltungen editieren und löschen}
+Um eine Veranstaltungen zu editieren, muss man die zu bearbeitende Veranstaltung lange berühren. Dann öffnet sich ein Menü, in dem man auswählen kann, ob man die Veranstaltung editieren oder löschen möchte. Wählt man \glqq Löschen\grqq\ so wird der \KLASSE{DeleteEventTask} aufgerufen, der die Veranstaltung im Hintergrund-Thread vom Server löscht und anschließend aus der ListView entfernt. Wählt man \glqq Editieren\grqq\ so wird ein Intent mit der \KLASSE{EditEventActivity} erstellt und dem Intent wird die ID der Veranstaltung übergeben. Anschließend wird die Activity mit dem Intent gestartet. In der Activity wird zunächst in der \METHODE{onCreate}-Methode die Veranstaltung mit der übergebenen ID vom Server  mit Hilfe der \METHODE{getEventTask} Methode abgerufen. Diese Activity sieht genau so aus wie das \KLASSE{AnnounceInformationFragment} und hat die gleiche Funktionsweise. Auch hier wird der \KLASSE{AnnounceCursorAdapter} verwendet um die Informationen der Veranstaltung anzuzeigen. Jedoch werden hier in der \KLASSE{EditEventActivity} nicht die Standard-Felder in den \KLASSE{AnnounceCursorAdapter} geladen, sondern die dynamischen Felder der abgerufenen Veranstaltung. Nun kann man wie auch schon beim Erstellen einer Veranstaltung weitere Felder über den Editiermodus ergänzen. Ist man fertig mit dem Bearbeiten der Veranstaltung und berührt den Button \glqq Speichern\grqq\ wird mit Hilfe der \KLASSE{EventUtils} die Daten der dynamischen Felder in das Event-Objekt gespeichert, das nach dem Abrufen der Veranstaltung vom Server erstellt wurde. Dann wird ein \KLASSE{EditEventTask} mit dem Event-Objekt gestartet, der die neuen Informationen der Veranstaltung im Hintergrund-Thread in das Event-Objekt auf dem Server schreibt.
+
+\PARAGRAPH{Veranstaltungen anzeigen}
+\begin{figure}[htb]
+\centering
+\includegraphics[width=12 cm]{graphics/show_events_veranstalter_app.png}
+\caption{Anzeige von Veranstaltungen in der Veranstalter-App}
+\label{fig:VeranstaltungAnzeigenVeranstalterapp}
+\end{figure}
+
+Die Veranstaltungen werden in einer ListView angezeigt, die mit einem Adapter, dem \KLASSE{EventsCursorAdapter}, mit Inhalt gefüllt wird. In der Veranstalter-App haben wir ein Fragment, das \KLASSE{ShowEventsFragment}, das die ListView anzeigt. Dieses Fragment wird geladen wenn man den ersten Tab in der Tab-Leiste auswählt und wird beim Start der App automatisch ausgewählt. Die Layout xml-Datei eines Elements der ListView enthält die wichtigsten Informationen der Veranstaltung: den Titel, der Ort, der Startzeitpunkt und die Gebühr. Wird nun das Fragment angezeigt wird der \KLASSE{QueryEventsTask} ausgeführt, der im Hintergrund-Thread die Liste der Veranstaltungen vom Server abruft. Hat der Thread seine Arbeit getan, wird ein Adapter-Objekt erstellt, die Liste der Veranstaltungen wird diesem übergeben und die ListView wird mit dem Adapter gesetzt. Anschließend wird über die \METHODE{getView}-Methode iteriert, die die passenden View-Elemente zu den Veranstaltungen erstellt und diese werden dann in der ListView angezeigt. Zusätzlich wird ein \KLASSE{OnItemClickListener} auf die ListView gesetzt, der prüft ob ein Element der ListView gedrückt wird. Wird ein Element gedrückt wird eine neue Activity, die \KLASSE{ShowInformationActivity}, gestartet. Dem Intent wird zusätzlich noch die Event-Id übergeben, da die Activity alle Informationen der Veranstaltung anzeigen soll. Da die Anzahl variabel ist, haben wir uns wieder dazu entschieden, diese Angaben in einer ListView mit einem Adapter anzuzeigen. Nach Start der Activity wird zunächst über den Intent die Event-Id ermittelt. Mit der Id wird der \KLASSE{GetEventTask} ausgeführt, der das Event-Objekt zu der Veranstaltung vom Server abruft. Abschließend wird ein \KLASSE{EventsCursorAdapter}-Objekt mit den dynamischen Feldern der Veranstaltung erstellt und diese ListView wird mit dem Adapter gesetzt. Der \KLASSE{EventsCursorAdapter} funktioniert ähnlich wie der \KLASSE{AnnounceCursorAdapter}. Wir haben wieder verschiedene Layout xml-Dateien für die verschiedenen Typen, wobei eine Layout Datei jeweils immer eine Header-TextView mit der Bezeichnung der Information hat. Dann wird in der \METHODE{getView}-Methode abgefragt um welchen Typ es sich bei dem dynamischen Feld handelt und es wird die entsprechende Layout Datei geladen und die Informationen werden gesetzt. Diese Methode wird für jedes dynamische Feld in der Liste aufgerufen. Eine spezielles dynamisches Feld ist das Feld für die Route, da in dem Fall eine Layout-Datei geladen wird, die einen Button enthält, der beim Auslösen eine neue Activity, die \KLASSE{ShowRouteActivity}, startet, die die Route der Veranstaltung anzeigt. 
+
+\subsection{Beschreibung User-App}
+\subsubsection{Gerüst}
+\AUTHOR{Martin}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=6cm]{graphics/navigation_drawer.png}
+\caption{Der ausgeklappte Navigation Drawer}
+\label{fig:navigation_drawer}
+\end{figure}
+
+Die User-App besteht aus einer Activity, der \KLASSE{ShowEventsActivity}, die alle Veranstaltungen auf dem Server anzeigt und aus einer FragmentActivity, der \KLASSE{UsergroupActivitiy}, die alle Gruppen auf dem Server und alle Gruppen denen man beigetreten ist in zwei Tabs anzeigt. Um zwischen den beiden Activities zu navigieren haben wir uns entschieden einen Navigation Drawer zu verwenden. Ein Navigation Drawer ist ein Fragment, das sich von der linken Kante des Bildschirms in das Hauptfenster schiebt und die wichtigsten Navigationsmöglichkeiten der App anzeigt. Damit der Drawer angezeigt wird, muss man entweder vom linken äußersten Rand zur Mitte swipen oder das App-Icon in der ActionBar berühren. Klickt man auf eines der Felder im Navigation Drawer startet die dazugehörige Activity oder sie wird in den Vordergrund geschoben wenn bereits eine Instanz der Activity existiert. Um dies zu realisieren, haben wir eine \KLASSE{BaseActivity} und \KLASSE{BaseFragmentActivity} erstellt, die als Oberklasse jeder Activity bzw. FragmentActivity dient, die einen Navigation Drawer nutzt. In diesen Oberklassen wird die \METHODE{setContentView(int layoutResId)} Methode überschrieben. Diese Methode wird von jeder Activity in der \METHODE{onCreate}-Methode aufgerufen um das Layout zu setzen. In der überschriebenen \METHODE{setContentView}-Methode wird ein DrawerLayout geladen, in dem eine ListView existiert, die bei Start nicht sichtbar ist und außerhalb des Bildschirms liegt und ein FrameLayout, das den ganzen Platz des Bildschirms nutzt. Das Layout das von der Unterklasse mit \METHODE{setContentView} gesetzt wird, wird in dieses FrameLayout geladen sodass am Ende dann der Inhalt der Activity angezeigt wird. In der Base- bzw. BaseFragmentActivity wird in der \METHODE{setContentView}-Methode auch noch die ListView initialisiert, d.h. es werden die Menü-Titel und Menü-Icons der ListView hinzugefügt und ein ItemClickListener gesetzt, der prüft, ob ein Item berührt wurde, sodass die dazugehörige Activity geladen werden kann.
+\FloatBarrier
+
+\subsubsection{Eventanzeige}
+\AUTHOR{Martin}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=12cm]{graphics/show_events_user_app.png}
+\caption{Die Event-Anzeige der User-App}
+\label{fig:show_events_user_app}
+\end{figure}
+
+Veranstaltungen werden in der User-App in der \KLASSE{ShowEventsActivity} angezeigt. Diese wird bei Start der User-App angezeigt. Zusätzlich kann man zu ihr über den Navigation Drawer navigieren. Die Anzeige der Veranstaltungen funktioniert genau so wie in der Veranstalter-App(Kapitel ...), jedoch haben wir eine Activity und kein Fragment in der die ListView angezeigt wird. Wird also die Activity gestartet, wird in der \METHODE{onCreate}-Methode die Liste der Veranstaltungen vom Server mit Hilfe des \KLASSE{QueryEventsTask} abgerufen und anschließend wird die ListView mit den Informationen gefüllt. Auch hier haben wir eine \KLASSE{ShowInformationActivity}, die gestartet wird, wenn man ein Element der ListView berührt. Die \KLASSE{ShowInformationActivity} unterscheidet sich aber in der User-App von der Veranstalter-App, da man in der User-App auch noch zusätzlich in der Activity entscheiden kann ob man an der Veranstaltung teilnehmen möchte. Dazu existiert ein Button unter der ListView, der \glqq Teilnehmen\grqq-Button, der im Fall der Teilnahme \glqq Verlassen\grqq\ heißt. Wird der \glqq Teilnehmen\grqq-Button ausgelöst, wird der Benutzer mit seiner Email-Adresse in der Veranstaltung eingetragen. Außerdem wird in dieser Activity auch die Lokale Auswertung umgesetzt. Wurde an der Veranstaltung teilgenommen und der Veranstaltungszeitpunkt wurde erreicht wird hier die lokale Auswertung geladen. Dies wird im Abschnitt der lokalen Auswertung (\ref{sec:lokaleAuswertung}) näher behandelt.
+\FloatBarrier
+
+\subsubsection{Nutzergruppen}
+\AUTHOR{Bernd}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=12cm]{graphics/Usergroups_Fragments.png}
+\caption{Verwaltung von Nutzergruppen}
+\label{fig:usergroup_fragments}
+\end{figure}
+
+In der Userapp kann ein Benutzer eigene Nutzergruppen verwalten, anderen Nutzergruppen beitreten oder diese verlassen. Um in der Userapp zu den Nutzergruppen zu gelangen, muss der NavigationDrawer bedient werden und dort kann man dann Nutzergruppen auswählen. Die Nutzergruppen werden über eine Activity(\KLASSE{UsergroupActivity}) angezeigt, welche zwei Fragmente(das \KLASSE{AllUsergroupsFragment} und das \KLASSE{MyUsergroupsFragment}) hält. Das \KLASSE{AllUsergoupsFragment} hält eine Liste mit allen auf dem Server vorhandenen Nutzergruppen. Wenn dieses Fragment aufgerufen wird, dann wird der \KLASSE{QueryUserGroupsTask} aufgerufen, welcher in der \METHODE{doInBackground(...)} Methode alle Nutzergruppen vom Server abruft und diese dann in der \METHODE{onPostExecute(...)} Methode der ListView des Fragments hinzufügt. Der Adapter für die ListView ist der \KLASSE{UsergroupAdapter}. Dieser setzt für jede Nutzergruppe, die der ListView hinzugefügt wurden, deren Namen, Ersteller und Anzahl an Mitgliedern im Item(\DATEI{list\_view\_item\_usergroup.xml}). Der Adapter wird in der \METHODE{onResume(...)} Methode des \KLASSE{AllUsergroupsFragment} gesetzt.\\
+\FloatBarrier
+
+\PARAGRAPH{Neue Nutzergruppe erstellen}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=6cm]{graphics/Nutzergruppen_neue_erstellen.png}
+\caption{GUI zum Hinzufügen von Benutzergruppen}
+\label{fig:usergroups_hinzufuegen}
+\end{figure}
+
+Man  hat im \KLASSE{AllUsergroupsFragment} die Möglichkeit neue Nutzergruppen zu erstellen, indem man im Optionsmenü den Plus Button betätigt. Dies führt zum Aufruf von der \METHODE{onOptionsItemSelected(...)} Methode in der  \KLASSE{UsergroupActivity}. Hier wird die \KLASSE{AddUsergroupActivity} aufgerufen, was lediglich einen Dialog darstellen soll. Die Activity hat ein Feld für den Namen der neuen Nutzergruppe, einen Button zum Abbrechen und einen Button zum Bestätigen der Aktion. Wird ein Name einer Nutzergruppe eingegeben, der nicht leer ist so wird die \METHODE{apply(...)} Methode in der \KLASSE{AddUsergroupActivity} aufgerufen. Diese Methode führt den \KLASSE{QueryUserGroupsTask} aus, welcher eine Instanz vom \KLASSE{AllUsergropusFragment} erwartet. In dem hier übergebenen Fragment wird die \METHODE{setUserGroupsToListView(...)} Methode neu definiert da diese von dem \KLASSE{QueryUserGroupsTask} in der \METHODE{onPostExecute(...)} Methode aufgerufen wird. Es werden alle Nutzergruppen nach Namen durchsucht und überprüft, ob der angegebene Name bereits vergeben ist. Ist dies nicht der Fall wird der \KLASSE{AddUserGroupTask} aufgerufen, welcher eine neue Nutzergruppe in der \METHODE{doInBackground(...)} Methode erstellt und dann die \METHODE{refresh(...)} Methode in der \KLASSE{UsergroupActivity} aufruft um die Liste mit den Nutzergruppen zu aktualisieren.
+\FloatBarrier
+
+\PARAGRAPH{Listen aktualisieren}
+Die \METHODE{referesh(...)} Methode kann auch manuell aufgerufen werden, dazu muss man im Optionsmenü den Refresh Button betätigen. Die \METHODE{refresh(...)} Methode in der \KLASSE{UsergroupActivity} ruft die \METHODE{refresh(...)} Methode in dem \KLASSE{AllUsergroupsFragment} und in dem \KLASSE{MyUsergroupsFragment} auf. Dort wird der \KLASSE{QueryUserGroupsTask} im \KLASSE{AllUsergroupsFragment} und der \KLASSE{QueryMyUserGroupsTask} im \KLASSE{MyUsergroupsFragment} aufgerufen um die Liste von Nutzergruppen zu aktualisieren. 
+
+\PARAGRAPH{Nutzergruppen beitreten und verlassen}
+\label{sec:nutzergruppeBeitretenVerlassen}
+Mit einem einfachen Klick auf eine Nutzergruppe in der Liste kann man dieser beitreten oder diese verlassen, solange man nicht der Ersteller ist. Beim Verlassen und beim Beitreten wird ein AlertDialog angezeigt dessen Überschrift den Namen der Gruppe darstellt zusammen mit der Frage, ob man die ausgewählte Nutzergruppe verlassen möchte und zwei Buttons zum Bestätigen und zum Abbrechen der Vorgangs. Verlässt man eine Nutzergruppe so führt dies zu zum Aufruft der \METHODE{createDialogLeave(...)} Methode in der \KLASSE{GroupUtils} Klasse. Beim Bestätigen wird der \KLASSE{LeaveUserGroupTask} mit dem Namen der ausgewählten Nutzergruppe aufgerufen. Dieser Task ruft auf dem Server die \METHODE{leaveUserGroup(...)} Methode in der \METHODE{doInBackground(...)} Methode und anschließend in der \METHODE{onPostExecute(...)} Methode die \METHODE{refresh(...)} Methode der \KLASSE{UsergroupActivity} auf, um die Änderung sichtbar zu machen. Beim Verlassen wird die \METHODE{createDialogJoin(...)} Methode in \KLASSE{GroupUtils} aufgerufen. Diese ruft bei Bestätigung den \KLASSE{JoinUserGroupTask} auf welcher die \METHODE{joinUserGroup(...)} Methode auf dem Server aufruft und abschließend die \METHODE{refresh(...)} Methode ausführt, um die Änderung sichtbar zu machen. Ist man der Ersteller der augewählten Nutzergruppe so wird die \METHODE{createDialogOwner(...)} Methode aufgerufen welche einen AlertDialog erstellt der darüber informiert, dass man der Ersteller der Nutzergruppe ist und man diese weder verlassen noch dieser beitreten kann.
+
+\PARAGRAPH{Nutzergruppen auf der Karte sichtbar machen und löschen}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=6cm]{graphics/Nutzergruppen_selections_menu.png}
+\caption{Das Auswahlmenü auf einer Gruppe}
+\label{fig:usergroups_selections_menu}
+\end{figure}
+
+Das \KLASSE{MyUsergroupsFragment} enthält zwei ListViews, welche sich jeweils die Hälfte des Bildschirms teilen. Die erste ListView kann maximal fünf Nutzergruppen halten und dient dazu Nutzergruppen auf der Karte sichtbar zu machen. Die zweite ListView zeigt alle Nutergruppen an bei denen man entweder Mitglied oder Ersteller ist. Beide ListViews benztzen den \KLASSE{UsergroupAdapter} als Adapter, sie unterscheiden sich jedoch in ihren Namen. Der eine ist für die sichtbaren und der andere für die nicht sichtbaren Nutzergruppen. Mit einem Long Click auf eine Nutzergruppe in entweder der Liste der sichtbaren oder der Liste aller Nutzergruppen führt dies zu einem Aufruft der \METHODE{createSelectionsMenu(...)} Methode im \KLASSE{MyUsergroupsFragment}. Diese Methode überprüft zunächst aus welchem Adapter der Aufruft kommt und ob der Aufrufer auch gleichzeitig der Ersteller der Nutzergruppe ist. Dann wird ein AlertDialog angezeigt mit dem Namen der Nutzergruppe als Überschrift und zwei weiteren Optionen, falls man nicht der Ersteller dieser ist. Die erste Option ist es die Nutzergruppe auf der Map sichtbar oder unsichtbar zu machen. Wählt man diese Option, so wird im \KLASSE{PrefManager} die \METHODE{setGroupVisibility(...)} Methode aufgerufen, welche die Nutzergruppe sichtbar oder unsichtbar macht. Diese Methode speichert in den SharedPreferences des Smartphones die Sichtbarkeit jeder Gruppe. Die SharedPreferences sind ein lokaler Speicher der zu Key-Einträgen Werte lokal auf dem Smartphone speichert. Die zweite Option ist es die Gruppe zu verlassen; das Auswählen dieser Funktion wurde bereits in Abschnitt \ref{sec:nutzergruppeBeitretenVerlassen} erklärt. Die dritte Option ist es die Nutzergruppe zu löschen, welche nur angezeigt wird wenn man der Ersteller dieser ist. Wenn diese Option ausgewählt wird, wird die \METHODE{createDialogDelete(...)} Methode in \KLASSE{GroupUtils} aufgerufen. Hier wird ein neuer AlertDialog erstellt, dessen Überschrift der Name der Nutzergruppe ist und als Text die Frage ob man die Nutzergruppe löschen möchte zusammen mit Buttons zum Bestätigen und Abbrechen der Aktion enthält. Wird das Löschen bestätigt, so wird der \KLASSE{DeleteUserGroupTask} aufgerufen, welcher in der \METHODE{doInBackground(...)} Methode die Nutzergruppe vom Server löscht und in der \METHODE{onPostExecute(...)} Methode die Änderungen aktualisiert. 
+\FloatBarrier
+
+
+\subsubsection{Lokale Auswertung}
+\label{sec:lokaleAuswertung}
+\AUTHOR{Pascal und Daniel}
+
+Die Lokale-Auswertung soll dem Benutzer ermöglichen statistische Daten zu erfassen, visualisieren und auszuwerten. 
+Zu diesen Daten zählen: 
+
+\begin{itemize}
+	\item Der aktuelle Fortschritt auf der Strecke
+	\item Die Zeit die seit dem Start des Events vergangen ist
+	\item Die bereits zurück gelegte Distanz, sowie die Gesamtdistanz
+	\item Die aktuelle, maximale und durchschnittliche Geschwindigkeit
+	\item Die aktuelle Höhe und die zurückgelegten Höhenmeter
+	\item Das Geschwindigkeitsprofil
+\end{itemize}
+
+Diese Daten sollen dem Benutzer auf intuitive Weise präsentiert werden, sodass dieser sie einfach während des Events ablesen kann. Eine besondere Herausforderung ist zu garantieren, dass die Daten unabhängig vom Status der App erfasst werden. So sollen die Daten auch aufgezeichnet werden wenn die App nicht gestartet wurde oder vorzeitig beendet wird. Desweiteren sollten sie möglichst kompakt und persistent gespeichert werden um sicherzustellen, dass die Daten auch nach Abschluss des Events analysiert werden können. Weiterhin soll die Auswertung unabhängig von der globalen Auswertung (siehe Kapitel \ref{subsec:Feldberechnung}) stattfinden, ohne die Notwendigkeit Positionsdaten an den Server zu übermitteln.
+
+\PARAGRAPH{LocationTransmitterService}
+Der \KLASSE{LocationTransmitterService} ist ein Vordergrundservice der für die Erhebung und Analyse der Positionsdaten verantwortlich ist. Dieser wird automatisch zu Beginn des Events gestartet und vom Nutzer gestoppt, sobald dieser seine Teilnahme beendet. Hier muss der Lifecycle von Services beachtet werden.  Einige unerwünschte Ereignisse könnten den Service vorzeitig beenden, was den Verlust der Daten herbeiführen würde. Um dies zu verhindern muss der \KLASSE{LocationTransmitterService} ein Vordergrundservice sein, der bei der Resourcenfreigabe durch das System besonders berücksichtigt wird. Der Service wird um eine Notification erweitert, welche den Nutzer über seine Aktivität informiert und in Form eines \glqq Stopp\grqq\ Buttons eine Interaktion mit dem Benutzer ermöglicht (Abb. \ref{fig:LokaleAuswertungNotification}).
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=6cm]{graphics/LokaleAuswertung_Notification.png}
+\caption{Anzeige der Notification zur Kontrolle des \KLASSE{LocationTransmitterService}}
+\label{fig:LokaleAuswertungNotification}
+\end{figure}
+
+Durch den Aufruf der \METHODE{startForeground(int, Notification)} Methode, mit einer einzigartigen ID und besagter Notification, wird der Service in einen Vordergrund Status versetzt. Dies geschieht nach der Initialisierung in der \METHODE{onStartCommand(Intent, int, int)} Methode des Services.
+
+Der Service sollte ursprünglich mit Hilfe eine Push-Notification gestartet werden, dies konnte allerdings nicht verlässlich realisiert werden, da diese teilweise garnicht oder zu häufig gesendet wurden. Um dennoch eine konsistente Datenerhebung zu gewährleisten, ohne einen Start der App vorauszusetzen, muss der Service automatisch vom System zur passenden Zeit gestartet werden. Dies ist mit Hilfe des Android AlarmManager eingeschränkt möglich. Da keine Referenzen auf registrierten Alarmzeiten gespeichert werden können, ist es nicht möglich diese nachträglich zu ändern. Da jedoch die Möglichkeit besteht, den Startzeitpunkt eines Events zu verändern, muss diese Funktionalität vorhanden sein. Gelöst haben wir dieses Problem, indem bei jeder Startzeitänderung ein neuer Alarm mit einzigartiger ID erstellt wird welche in den SharedPreferences für das Event gespeichert wird. Der ausgelöste Alarm ruft den \KLASSE{StartServiceReceiver} auf welcher zunächst überprüft ob die AlarmID mit der für das Event gespeicherten ID übereinstimmt. Ist dies nicht der Fall, so bedeutet dies eine Änderung der Alarmzeit. Es existiert also bereits ein aktuellerer Alarm. Falls der Alarm verantwortlich ist und der Service noch nicht gestartet wurde, wird dies nun erledigt.
+
+Das betätigen des \glqq Stopp\grqq\ Buttons der Notification ruft den \KLASSE{CancelServiceReceiver} auf, welcher den Service beendet.
+
+Der \KLASSE{LocationTransmitterService} benötigt diverse Metainformationen, wie z.B. die Routendaten und Eventinformationen, zum Ausführen der Datenanalyse. Diese werden beim Starten des Services als Extras übergeben. Zur Ermittlung der Position wird die LocationServices API der Google Play Services verwendet, bei der wir möglichst genaue Positionen im 1-Sekunden Intervall abfragen. Im Falle eines erfassten Positionswechsels ruft die LocationServices API die \METHODE{onLocationChanged(Location)} Methode des \KLASSE{LocationTransmitterService} auf.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=6cm]{graphics/location_update.png}
+\caption{Verarbeitung einer Positionsänderung}
+\label{fig:positionsaenderung}
+\end{figure}
+
+Zunächst wird mithilfe des durch die \METHODE{calculateCurrentWaypoint(LatLong)} Methode aufgerufenen Routenpunktberechnungsalgorithmus (siehe Kapitel \ref{subsubsec:Routenpunktberechnungsalgorithmus}) der aktuelle Routenpunkt des Nutzers ermittelt und anschließend, falls sich der neu berechnete Routenpunkt vom bereits hinterlegten unterscheidet, zusammen mit der aktuellen Systemzeit, in Millisekunden seit Mitternacht des 1. Januar 1970 (UTC), abgespeichert. Nun werden die optional in der Location enthaltenen Informationen, Geschwindigkeit und Höhe, verarbeitet. Falls die Location diese Informationen enthält, wird zunächst die Geschwindigkeit von m/s auf Km/h umgerechnet und mit der bisher maximal festgestellten Geschwindigkeit verglichen. Wenn bei der Höhe eine positive Änderung erfasst wird, so wird diese Änderung zu den zurückgelegten Höhenmetern addiert. Die durchschnittliche Geschwindigkeit wird berechnet indem die bereits zurückgelegte Strecke durch die Zeit seit dem Start des Events dividiert wird. Die so ermittelten Daten werden an die registrierten BroadcastReceiver gesendet.
+
+Beim ordentlichen Beenden des \KLASSE{LocationTransmitterService} wird dessen \METHODE{onDestroy()} Methode aufgerufen. Hier werden die erhobenen Daten in ein \KLASSE{LocalAnalysisData} Objekt überführt und anschließend mithilfe der \KLASSE{LocalStorageUtil} Klasse in den SharedPreferences persistent gespeichert. Die \KLASSE{LocalStorageUtil} verwendet hierfür die externe Bibliothek \DATEI{gson-2.2.2.jar} welche beliebige Objekte zu JSON-Strings umwandeln kann.
+
+\PARAGRAPH{ActiveEventActivity}
+Die \KLASSE{ActiveEventActivity} ist für das Anzeigen der sowohl in Echtzeit ermittelten als auch der gespeicherten Daten verantwortlich. Sie wird von der \KLASSE{ShowEventsActivity} als Alternative für die \KLASSE{ShowInformationActivity} aufgerufen, wenn das gewünschte Event bereits stattfindet und der Benutzer als Teilnehmer für dieses Event eingetragen ist. 
+
+Da die Berechnung der Daten im  \KLASSE{LocationTransmitterService} stattfindet müssen diese lediglich in das GUI eingetragen werden. Alle Daten, bis auf die Fortschrittsanzeige, werden als einfache TextViews dargestellt, die Fortschrittsanzeige hingegen wird als Progressbar realisiert. Die beiden Buttons \glqq Geschwindigkeitsprofil\grqq\ und \glqq Karte\grqq\ rufen die \KLASSE{ShowRouteActivity} mit jeweils anderen Parametern auf.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=6cm]{graphics/LokaleAuswertung.png}
+\caption{Anzeige der lokalen Auswertung}
+\label{fig:LokaleAuswertung}
+\end{figure}
+
+\PARAGRAPH{Geschwindigkeitsprofil}
+Das Geschwindigkeitsprofil gibt sowohl Auskunft über die tatsächlich zurückgelegte Strecke, als auch über die Durchschnittsgeschwindigkeit welche der Teilnehmer zwischen den einzelnen Streckenabschnitten erreichte. Dies wird dargestellt, indem eine farbige Polyline über die besuchten Wegpunkte gelegt wird. Anhand dieser Einfärbung kann der Benutzer eine Abschätzung über sein  Geschwindigkeitsprofil treffen und zwar werden langsame Abschnitte Rot, mittelschnelle Grün und schnelle Cyan unterlegt. 
+
+Die \KLASSE{ShowRouteActivity} welche für diese Darstellung verantwortlich ist unterscheidet zwischen einem bereits aufgezeichneten Profil und einem gerade entstehenden. Für eine bereits aufgezeichnete Strecke übergibt die \KLASSE{ActiveEventActivity} die Indizes der besuchten Routenpunkte und die dazugehörigen Zeitstempel. Diese Daten werden benötigt um das Geschwindigkeitsprofil mithilfe der \METHODE{createRouteHightlight(int[], long[])} Methode zu rekonstruieren. Wird das Profil noch aufgezeichnet, so werden stattdessen die Extras \ATTRIBUT{EventID} und \ATTRIBUT{SpeedProfile (boolean)} übergeben. In diesem Fall registriert sich die \KLASSE{ShowRouteActivity} als BroadcastReveiver für die Positionsänderungen des \KLASSE{LocationTransmitterService}. Wenn eine Positionsänderung stattfindet werden die besuchten Routenpunkte und Zeitstempel an die \KLASSE{ShowRouteActivity} weitergeleitet.
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=6cm]{graphics/LokaleAuswertung_GeschwindigkeitsProfil.png}
+\caption{Anzeige des Geschwindigkeitsprofils}
+\label{fig:LokaleAuswertungGeschwindigkeitsprofil}
+\end{figure}
+
+Die \METHODE{createRouteHightlight(int[], long[])} Methode zeichnet den zurückgelegten Weg auf der Karte ein. Sie ermittelt mithilfe der Zeitstempel und der Distanz zwischen den Routenpunkten die Durchschnittsgeschwindigkeit des Skater. Da Polylines nur eine einzelne Farbe unterstützen, werden bei Änderung der Geschwindigkeit neue Polylines an die bereits gezeichneten angehängt. Die Methode \METHODE{colorForSpeed(float)} ermittelt die benötigte Farbe abhängig von der übergebenen Geschwindigkeit in Km/h.
+
+\subsubsection{Einstellungen}
+\AUTHOR{Tristan}
+Die \KLASSE{SettingsActivity} zeigt dem Nutzer das Einstellungsmenü an. Hier kann er auswählen, ob seine Position innerhalb der App an den Server gesendet werden darf oder nicht. Zudem nutzt die \KLASSE{SettingsActivity} ein \KLASSE{PreferenceFragment}. Dies ist für Android 3.0 (API Level 11) und höher bestimmt. Für Versionen vor Android 3.0 hätte die \KLASSE{SettingsActivity} von der \KLASSE{PreferenceActivity} erben müssen, was hier jedoch nicht der Fall ist, da Fragmente eine flexiblere Architektur für die Anwendung bereitstellen im Vergleich zu der Acitivity alleine.
+
+Das hier genutzte Fragment ist das \KLASSE{SettingsFragment}, welches das Menü über eine XML Datei \DATEI{preferences.xml} unter \DATEI{res/xml/preferences.xml} generiert.
+Für die Einstellung zum Senden der eigenen Position wurde eine Checkbox verwendet, deren Standardwert auf true gesetzt ist. D.h. beim erstmaligen Starten der App ist das Senden der eigenen Position aktiviert.
+Die Einstellungen werden in den \KLASSE{SharedPreferences} als boolean gespeichert unter dem Namen \glqq prefSendLocation\grqq.

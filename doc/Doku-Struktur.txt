@@ -33,3 +33,12 @@ Bernd					- CreateJoinLeaveDeleteUserGroupTest
 Tristan					- SendCurrentPositionTest
 Tristan					- SendPositionSettingsTest
 Tristan					- ShowSeveralEventsTest
+
+
+\begin{figure}[htb]
+\centering
+
+\caption{}
+\label{fig:}
+\end{figure}
+\FloatBarrier

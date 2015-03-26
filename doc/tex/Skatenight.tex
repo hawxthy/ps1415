@@ -17,6 +17,8 @@
 
 % Grafiken
 \usepackage{graphicx}
+\usepackage{placeins}
+
 % Gleitumgebung so anpassen, dass wenige große Bilder gut eingepasst werden
 \renewcommand{\topfraction}{0.9}
 \renewcommand{\bottomfraction}{0.5}
@@ -46,6 +48,9 @@
 \newcommand{\AUTHOR}[1]{
 	von #1 \\ \\
 }
+\newcommand{\AUTHORNOSPACE}[1]{
+	von #1
+}
 
 % Befehle zur einheitlichen Hervorhebung von Dateien, Klassen, Methoden und Attributen
 \newcommand{\DATEI}[1]{
@@ -64,6 +69,17 @@
 % Erste Zeile eines Absatzes nicht einrücken
 \setlength{\parindent}{0em}
 
+% Befehl für einen Paragraph mit Zeilenumbruch nach der Überschrift
+\newcommand{\PARAGRAPH}[1]{
+	\paragraph{#1}$\;$ \\
+}
+\newcommand{\PARAGRAPHOPT}[2]{
+	\paragraph[#1]{#2}$\;$ \\
+}
+
+% Auch \paragraph im Inhaltsverzeichnis anzeigen
+\setcounter{tocdepth}{4} 
+
 \begin{document}
 \maketitle
 
@@ -76,7 +92,7 @@
 
 
 \section{Vorgehensweise}
-\AUTHOR{Tristan, Richard}
+\AUTHOR{Tristan und Richard}
 Am Anfang des Projektes haben wir uns darauf geeinigt alle die gleiche Integrierte Entwicklungsumgebung (IDE) \glqq Android Studio\grqq\ von Google zu nutzen, welches die offizielle Entwicklungsumgebung für Android ist, damit es nicht zu Problemen innerhalb des Projektes kommt.
 Weiterhin haben wir uns für die freie Software \glqq Git\grqq\ zur Versionsverwaltung des Projekts entschieden. Hierfür gab es einen Master Branch auf dem sich immer eine lauffähige Version der Apps befunden hat. Für die Entwicklung einzelner Funktionen, wie zum Beispiel die \glqq lokale Auswertung\grqq wurden extra Branches angelegt.
 Für das Vorgehen im Projekt wurde das Rahmenwerk Scrum verwendet. Die Rolle des Product Owners wurde von den Betreuern übernommen. Außerdem hat die Rolle des Scrum Masters nach jedem einzelnen Sprint, der in der Regel 4 Wochen betrug, ein anderes Mitglied des Entwicklungsteams übernommen. Zudem wurden die einzelnen Aufgaben für das Sprint Backlog vor jedem Sprint bzw. nach dem Sprint Review in Tasks aufgeteilt. Damit ein Task wirklich als bearbeitet (\glqq done\grqq) gilt wurde vor dem Projekt definiert, ab wann ein Task als dies gelten darf:
@@ -104,8 +120,115 @@ Zum kontinuierlichen Bauen der Apps und des Backends wurde ein Jenkinsserver ein
 \section{Features der Apps}
 \AUTHOR{Daniel}
 
+Die Anforderungen und Features der Apps wurden von Sprint 1 bis Sprint 4 stetig erweitert. Angefangen mit eher simplen Anforderungen, gewannen diese im Laufe des Projektseminars immer mehr an Komplexität. Wie durch Scrumm vorgegeben werden diese Anforderungen vom Product Owner gestellt und in Zusammenarbeit mit dem Team ins Sprint Backlog übertragen. Dabei wird über die einzelnen Features des Sprint diskutiert und evtl. an ihrer Priorisierung gearbeitet. Ein Sprint dauerte 4 Wochen, in welchen das Team Zeit hat alle Punkte des Sprint Backlogs abzuarbeiten. Im folgenden werden die Anforderungen an die Apps pro Sprint aufgelistet und erläutert.
+
+\subsection{Sprint 1}
+Im ersten Sprint ging es darum ein Grundgerüst zu erstellen und rudimentäre Features zu implementieren. Diese wurden in den folgenden Sprints erweitert und ausgebaut.
+
+\textbf{Aktuelle Informationen anzeigen:}
+
+Es soll eine Möglichkeit geben, sich das aktuelle Event in der Benutzer App anzeigen zu lassen. Dieses besteht aus vorgegebenen Informationen, wie z.B. Name, Ort, Datum, Kosten, Beschreibung, usw. Die Informationen sollten dabei jedes mal vom Server heruntergeladen werden.
+
+\textbf{Aktuelle Strecke anzeigen:}
+
+Um eine Strecke anzuzeigen muss diese auf dem Server gespeichert und anschließend in der App durch eine Google Map visualisiert werden.
+
+\textbf{Veröffentlichen neuer Informationen:}
+
+In der Veranstalter App soll es möglich sein die Daten für die \glqq Aktuellen Informationen\grqq\ einzutragen und zu verändern.
+
+\textbf{Erstellen neuer Strecken:}
+
+Für das Erstellen neuer Strecken muss die Veranstalter App ein Interface bereitstellen, indem auf einer Google Map interaktiv Strecken erstellt werden können, sodass diese zum Anzeigen in der Benutzer App verwendet werden.
+
+\textbf{Authentifikation des Veranstalters:}
+
+Sicherheitshalber muss eine Authentifizierung des Veranstalters stattfinden, damit nur befugte Benutzer Zugriff auf die Veranstalter App erhalten. Um dies zu gewährleisten soll eine Liste mit berechtigten E-Mail-Adressen auf dem Server hinterlegt werden und anschließend beim Ausführen der App die Authentifizierung des Benutzers überprüft werden.
+
+\textbf{Anzeigen der Position:}
+
+Die \glqq Aktuelle Strecke anzeigen\grqq\ soll erweitert werden, sodass die, vom GPS ermittelte Position des Benutzers, angezeigt wird.
+
+\textbf{Übertragung der GPS-Daten an den Server:}
+
+Anschließen sollen die GPS Daten der Benutzer an den Server gesendet und gespeichert werden.
+
+
+
+
+\subsection{Sprint 2}
+Der Fokus des zweiten Sprints lag auf der logischen Weiterentwicklung der im ersten Sprint implementierten Features. Die Apps sollten mehr Möglichkeiten sowohl für Veranstalter als auch Benutzer bieten.
+
+\textbf{Anzeigen mehrerer Veranstaltungen:}
+
+Die Möglichkeit Aktuelle Informationen anzeigen zu lassen, sollte nun erweitert werden, sodass zwischen mehreren Veranstaltungen ausgewählt werden kann und zu jeder die hinterlegten Informationen abgerufen werden können.
+
+\textbf{Veröffentlichen mehrerer Veranstaltungen:}
+
+Sowie in der Benutzer App mehrere Veranstaltungen angezeigt werden sollen, muss auch für die Veranstalter eine Option bestehen mehrere Veranstaltungen anzulegen und zu verwalten.
+
+\textbf{Globale Auswertung der Positionen der Teilnehmer:}
+
+Die im ersten Sprint übertragenen Positionen der Teilnehmer sollen nun ausgewertet werden können um diese als Feld auf der Karte zu visualisieren. Dabei sollen regelmäßige Aktualisierungen dafür sorgen, dass der ständige Fortschritt der Skater während des Events verfolgt werden kann.
+
+\textbf{Lokale Auswertung der Position:}
+
+Anders als die Globale Auswertung bietet die Lokale Auswertung dem Nutzer viele nützliche Informationen ohne die Notwendigkeit seine Position an den Server zu übermitteln. Er kann seinen Fortschritt auf der Strecke nachvollziehen und weiter Informationen über seine Geschwindigkeit, Leistung usw. erhalten.
+
+\textbf{Veröffentlichen neuer Informationen 2.0:}
+
+Das Informationen Veröffentlichen 2.0 hat einige Features gefordert, die sich vom bisherigen Veröffentlichen unterscheiden. Zum einen soll es nun möglich sein bereits erstellte Veranstaltungen im Nachhinein zu bearbeiten. Zum anderen sollen frei definierbar neue Informationsfelder zu den Veranstaltungen hinzugefügt werden können, sowie z.B. Bilder, Links zu Webseiten usw.
+
+
+
+\subsection{Sprint 3}
+Da aus Zeitmangel im zweiten Sprint leider nicht alle Anforderungen erfüllt werden konnten, wurden einige in den dritten Sprint übertragen. So gab es insbesondere Probleme die \glqq Veröffentlichen neuer Informationen 2.0\grqq\ fehlerfrei mit den anderen Programmteilen zu verbinden. Zusätzlich war es nicht gelungen alle Aspekte der Lokalen Auswertung vollständig in die Benutzer App zu integrieren.
+
+\textbf{Lokale Auswertung der Position 2.0:}
+
+Die Anforderungen aus dem zweiten Sprint wurden übernommen und erweitert, so soll es nun dem Benutzer ermöglicht werden seine Fahrt aufzuzeichnen und sein Geschwindigkeitsprofil anzeigen zu lassen.
+
+\textbf{Push-Notifications / Broadcast-Receiver:}
+
+Die Benutzer sollen automatisch per Notification darüber informiert werden ob ein neues Event erstellt wurde.
+
+\textbf{Handhabung der Position:}
+
+Es gibt Einstellungsmöglichkeite, die es den Benutzern erlauben das Senden ihrer Position an den Server zu unterbinde.
+
+\textbf{Rechteverwaltung für Veranstalter:}
+
+Veranstalter können Nutzer zu der Liste der authentifizierten Veranstalter hinzufügen, was diesen Zugriff auf die Veranstalter App ermöglicht.
+
+
+
+\subsection{Sprint 4}
+Der vierte Sprint war der Abschluss des Projektseminars und fiel aufgrund der Klausurenphase kürzer aus als die übrigen Sprints. So wurde die Fertigstellung, Fehlerbehebung und reibungslose Integration aller Programmteile in diesem Sprint priorisiert.
+
+\textbf{Lokale Auswertung der Position 3.0:}
+
+Die Daten der Lokalen Auswertung sollen auch nach dem Ende eines Events erhalten bleiben, sodass Benutzer auch in der Zukunft die Aufzeichnung vergangener Events anschauen können.
+
+\textbf{Aktuelle Informationen $+$ Notifications:}
+
+Die Benutzer sollen per Notification darüber informiert werden, wenn ein Event, an dem sie teilnehmen geändert wurde oder startet.
+
+\textbf{Nutzergruppen:}
+
+Die Anwender der User App können Nutzergruppen erstellen, beitreten um sich anschließend die Benutzer ihrer Gruppen auf der Karten anzeigen zu lassen. So ist es möglich ein Überblick darüber zu erhalten auf welchem Teil der Strecke sich die verschiedenen Gruppenmitglieder aufhalten. 
+
+\textbf{Erstellen neuer Strecken 2.0:}
+
+Es soll für Veranstalter möglich sein Wegpunkte zu Strecken hinzuzufügen. Diese können anschließend in der Benutzer App angezeigt werden, sodass sich die Skater eine Übersicht über Start, Pausen, Checkpoints usw. machen können.
+
+
 \section{Vorstellung von Android}
 \AUTHOR{Pascal}
+
+\subsection{Beschreibung von Adaptern im Zusammenhang mit ListViews}
+\label{sec:adapter}
+\AUTHOR{Martin und Bernd}
+Eine ListView ist eine UI-Komponente die eine scrollende Liste mit einzelnen Einträgen darstellt. Ein Eintrag in der ListView wird meist als Item betrachtet. Ein Item ist ein View-Objekt, das häufig durch eine eigene xml-Datei beschrieben wird. Eine ListView-Instanz benötigt einen Adapter um die Einträge der ListView mit Inhalt zu füllen. Ein Adapter ist eine Java-Klasse, die eine Liste von Datenmodell-Objekten hält und diese über die \METHODE{getView(...)} Methode zur Anzeige aufbereitet. Diese Methode wird für jedes Item immer dann aufgerufen, wenn es sichtbar wird.
 
 \section{Server-Backend}
 \input{backend}

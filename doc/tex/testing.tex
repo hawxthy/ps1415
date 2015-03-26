@@ -3,7 +3,7 @@
 In dem Projekt gibt es zwei Arten von Tests, die \glqq Task Tests\grqq\ und die \glqq Anwendungsfalltests\grqq\ (Use Case Tests).
 Die Tasks Tests dienen hierbei zum Testen einer bestimmten Funktionalität, wie zu Beispiel dem Hinzufügen oder Löschen einer Route (\KLASSE{AddRouteTaskTest} und \KLASSE{DeleteRouteTaskTest}).
 Die Anwendungsfalltests sollen im Gegensatz zu den Tasks Tests nicht nur eine Funktionalität sondern ganze Anwendungsabläufe Testen, was die UI mit einschließt.
-Beide Tests, der Task Test und Anwendungsfalltest bestehen aus einem Konstruktor zum Initialisieren oder Aufsetzen der Testdaten, welcher einmalig im Test aufgerufen wird und einer \METHODE{setUp}-Methode, die vor jedem einzelnen Test aufgerufen wird. Sie dient dazu Variablen zu initialisieren und Daten von vorherigen Tests \glqq aufzuräumen\grqq. Weiterhin gibt es  bei dem Task Test eine einzige Methode, die ausschließlich die Funktion testet, für die der Test bestimmt ist (\METHODE{testTask}-Methode).
+Beide Tests, der Task Test und Anwendungsfalltest bestehen aus einem Konstruktor zum Initialisieren oder Aufsetzen der Testdaten, welcher einmalig im Test aufgerufen wird und einer \METHODE{setUp}-Methode, die vor jedem einzelnen Test aufgerufen wird. Sie dient dazu Variablen zu initialisieren und Daten von vorherigen Tests \glqq aufzuräumen\grqq. Weiterhin gibt es  bei dem Task Test eine einzige Methode, die ausschließlich die Funktion testet, für die der Test bestimmt ist (\METHODE{testTask()}-Methode).
 
 \subsection{Funktionsweise der Anwendungsfalltests}
 \AUTHOR{Tristan}
@@ -48,6 +48,21 @@ Zur Simulation der Skater wird auf dem Server die Methode \METHODE{simulateMembe
 
 \subsection{Task-Tests}
 \AUTHOR{Bernd}
+Fast alle TaskTests befinden sich in der Veranstalterapp angefangen mit dem \KLASSE{AddRouteTaskTest}. Dieser Test erstellt eine neue Route und löscht als Vorbereitung alle Routen und Veranstaltungen vom Server. Im eigentlichen Test wird dann die erstellte Route mit dem \KLASSE{AddRouteTask} dem Server hinzugefügt und es wird geprüft, ob diese dann auf dem Server gespeichert ist, indem die \METHODE{getRoutes(...)} Methode auf dem Server aufgerufen wird.
+
+Der \KLASSE{CreateEventTaskTest} ist ähnlich wie der AddRouteTaskTest. Er erstellt eine Route, eine Veranstaltung und fügt der Veranstaltung die Route hinzu, da Veranstaltungen nicht ohne Routen gespeichert werden können. Als Vorbereitung werden auch hier alle Routen und Veranstaltungen gelöscht und es wird auf dem Server die \METHODE{addRoute(...)}  Methode und die \METHODE{createEvent(...)} Methode aufgerufen. Im eigentlichen Test wird dann auf dem Server der \KLASSE{QueryEventTask} aufgerufen, um die erstellte Veranstaltung zu überprüfen. 
+
+Der \KLASSE{DeleteEventTaskTest} erstellt eine Route und zwei Veranstaltungen. Als Vorbereitung werden wieder alle Veranstaltungen und Routen vom Server gelöscht und dann die beiden Veranstaltungen mit der Route auf dem Server gespeichert. Im eigentlichen Test wird dann eine Veranstaltung vom Server durch Aufrufen des \KLASSE{DeleteEventsTasks} gelöscht und es wird überprüft, ob die übrig gebliebene Veranstaltung die richtige ist.
+
+Der \KLASSE{DeleteRouteTaskTest} erstellt drei Routen und als Vorbereitung werden alle Routen und Veranstaltungen vom Server gelöscht und die drei Routen dem Server hinzugefügt. Im eigentlichen Test wird dann eine Route vom Server durch Aufrufen des \KLASSE{DeleteRouteTasks} gelöscht und es wird geprüft, ob die gelöschte Route noch auf dem Server vorhanden ist. Dies geschieht, indem auf dem Server die \METHODE{getRoutes(...)} Methode aufgerufen wird und die erhaltene Liste von Routen auf die gelöschte Route untersucht wird.
+
+Der \KLASSE{EditEventTaskTest} erstellt eine Veranstaltung und zwei Routen. Als Vorbereitung werden alle Veranstaltungen vom Server gelöscht und die neue Veranstaltung dem Server hinzugefügt. Im eigentlichen Test werden die Daten der angelegten Veranstaltung geändert und es wird der \KLASSE{EditEventTask} aufgerufen. Abschließend werden die veränderten Daten der Veranstaltung überprüft. 
+
+Der \KLASSE{GetEventTaskTest} erstellt eine Veranstaltung und eine Route. Als Vorbereitung werden alle Veranstaltungen vom Server gelöscht und die neue Veranstaltung dem Server hinzugefügt. Im eigentlichen Test wird dann die \METHODE{getEvent(...)} Methode auf dem Server aufgerufen und die Daten der erhaltenen Verantstaltung mit der erstellten verglichen. Abschließend werden alle Routen und Veranstaltungen vom Server gelöscht.
+
+Der \KLASSE{QueryEventTaskTest} erstellt zwei Veranstaltungen und zwei Routen. Als Vorbereitung werden alle Veranstaltungen und Routen vom Server gelöscht und die beiden Veranstaltungen mit den beiden Routen auf dem Server gespeichert. Im eigentlichen Test werden dann alle Veranstaltungen vom Server mit dem \KLASSE{QueryEventTask} abgefragt und es wird überprüft, ob die erhaltene Liste von Veranstaltungen die beiden erstellten Veranstaltungen beinhaltet. Abschließend werden alle Veranstaltungen und Routen vom Server gelöscht. 
+
+Der \KLASSE{QueryRouteTaskTest} erstellt drei Routen. Als Vorbereitung werden alle Routen und Veranstaltungen vom Server gelöscht und die drei erstellten Routen dem Server hinzugefügt. Im eigentlichen Test werden die Routen vom Server abgefragt indem der \KLASSE{QueryRouteTask} aufgerufen wird und die erhaltene Liste von Routen auf die drei erstellten Routen untersucht wird. Abschließend werden alle Routen vom Server gelöscht.
 
 \subsection{Use-Case-Tests: Veranstalter-App}
 \subsubsection{AddAndDeleteHostTest}
@@ -63,17 +78,158 @@ Der \KLASSE{CreateAndDeleteRouteTest} legt, wie der Name schon sagt, eine Route 
 Im Test wird nach einer kurzen Wartezeit in der initialisierten View auf den Plus-Button im \KLASSE{ManageRoutesFragment} gedrückt. Es öffnet sich dadurch der Dialog, der den Namen der neuen Route entgegennimmt. Nach Eintragen eines Teststrings, wird mit der OK-Taste bestätigt und es öffnet sich der Routeneditor. Nach einer erneuten Wartezeit ist die Route vollständig geladen und es werden zwei Wegpunkte über den Plus-Button in der ActionBar erstellt. Nach Erstellung des ersten Wegpunktes wird die Karte ein Stück verschoben, damit sich der zweite Wegpunkt an einer anderen Position befindet. Durch die Simulation eines Zurück-Tastenklicks wird der Sicherungsdialog angezeigt, der bestätigt und damit geschlossen wird. Der Test wartet dann, bis die neue Route angelegt wurde und löscht diese über den bereits erwähnten Aufruf beim \KLASSE{ManageRoutesFragment}.
 
 \subsubsection{PublishNewInformationTest}
-\AUTHOR{Tristan}
+\AUTHORNOSPACE{Tristan}
+\paragraph{Anwendungsfallbeschreibung:} Veröffentlichen neuer Informationen 2.0
+
+\textbf{Beteiligte Akteure:}
+	Veranstalter
+	
+\textbf{Anfangsbedingungen:}
+	Der Veranstalter hat die Veranstalter-App geöffnet, ist bereits eingeloggt und befindet sich in der \KLASSE{HoldTabsActivity} auf dem Veranstaltungen Tab.
+	
+\textbf{Ereignisfluss:}
+	\begin{enumerate}
+		\item Es wird  auf das Tab zum Event erstellen geswipet.
+		\item Es werden alle Felder für das Event ausgefüllt bzw. neue Eigenschaften hinzugefügt.
+		\item Über „Erstellen“ wird das Event erstellt.
+		\item Die Erstellung wird über einen Dialog nochmal bestätigt.
+		\item Ab dem ersten Schritt wiederholen, um mehrere Events anzulegen.
+		\item Es wird zu dem Veranstaltungen Tab geswipet.
+		\item Von den angezeigten Events wird eines ausgewählt.
+		\item Es wird ein Menü zur Bearbeitung des ausgewählten Events angezeigt.
+		\item Bereits existierende Informationen können bearbeitet oder über den Button „Editiere Event Eigenschaften“ neue Eigenschaften hinzugefügt werden.
+		\item Das Event wird über den Speichern Button editiert.
+	\end{enumerate}
+	
+\textbf{Abschlussbedingungen:}
+	Neue Veranstaltung anlegen und diese anschließend editieren.
+	
+\textbf{Ausnahmen:}
+	Keine
+	
+\textbf{Spezielle Anforderungen:}
+	Internetverbindung
+
+\paragraph{Testablauf:}
+Vorbedingung für den Test ist eine bestehende Internetverbindung, damit das anzulegende Event auf dem Server gespeichert werden kann.
+Die Test Daten für die Klasse sind als private, statische sowie konstante Member der Klasse definiert (TEST\_TITLE etc.). Dabei sind die Daten mit dem Präfix TEST\_ für den normalen useCase Test und StatePaueResume Test vorgesehen und die mit dem Präfix TEST\_STATE\_DESTROY für den StateDestroy Test. Zudem sind die UI Elemente als private Member deklariert.
+Der Test läuft über die HoldTabsActivity der \glqq VeranstalterApp\grqq. Das hier angelegte Test Event wird an anderer Stelle in einem Test der User-App \KLASSE{ShowServeralEventsTest}  verifiziert und wird somit nach Beendigung des Tests nicht gelöscht.
+
+\textbf{setUp():} Hier wird für den Nutzer das Google Konto ausgewählt zu Authentifizierung, zum „Veranstaltungen Erstellen“ Tab geswipt sowie die App gestartet.
+
+\textbf{Swipe(Direction):} Da die InstrumentationTestCase2 Klasse keine Methoden zum swipen für das wechseln der Tabs bereitstellt, wird diese Funktionalität hier definiert. Es kann entweder right oder left (privates enum) der Klasse übergeben werden und führt dann die entsprechende Tätigkeit aus.
+
+\textbf{testViews():} Activity, Testet, ob alle UI Elemente, Edits, Buttons, TimePicker etc. initialisiert wurden in der setUp Methode mit Hilfe von assertNotNull(UIElement).
+
+\textbf{testViewsVisible():} Verifiziert lediglich ob die Elemente auch auf dem Smartphone Screen sichtbar sind (assertOnScreen bereitsgellte Methode der InstrumentationTestCase2).
+
+\textbf{testPreConditions():} Prüft, ob alle Tabas in der ActionBar (mActionBar) enthalten sind.
+
+\textbf{testUseCase():} Kann eine Exception werfen auf Grund des UI Threads. Hier wird der Anwendungsfall verifiziert. Hierzu wird auf das Tab zum erstellen geswipt, die Test Daten eingegeben und abgebrochen um auch diese Funktionalität zu testen. Danach werden die Test Daten erneut eingegeben und auf den „Erstellen“ Button gedrückt und mit einem auftauchenden Dialog nochmal bestätigt wird. Es wird geprüft, ob das Event auf dem Server gespeichert wurde. Danach wird zu den Veranstaltungen Tab geswipt und das eben angelegt Event mit einem Long Touch zum Editieren ausgewählt. Die Testen zum Editieren werden eingegeben und wie vorhin wird Bestätigt und zu dem Veranstaltung Tab geswipt sowie geprüft, ob das editierte Event auch auf dem Server gespeichert wurde.
+
+\textbf{State Tests:} Hier wird getestet, ob die Daten beim Beenden der App aus den Eingabefelder gelöscht werden, falls welche beim Erstellen schon eingegeben worden sind oder bestehen bleiben, beim Pausieren der App.
+
+\textbf{Anmerkung:} Die weiteren Tests \KLASSE{SendCurrentPositionTest}, \KLASSE{SendPositionSettingsTest} und \KLASSE{ShowSeveralEventsTest} werden nicht so genau geschrieben, sondern auf JavaDoc und Inline Kommentare verwiesen.
+
 
 \subsection{Use-Case-Tests: User-App}
 \subsubsection{CreateJoinLeaveDeleteUserGroupTest}
 \AUTHOR{Bernd}
+Dieser Test ist ein Use-Case in dem eine Nutzergruppe erstellt wird, einer anderen Nutzergruppe, bei der man noch nicht Mitglied ist, beigetreten wird, diese dann wieder verlässt und die erstellte Nutzergruppe zum Schluss wieder gelöscht wird. Damit dieser Test funktioniert muss vor Ausführung schon eine Nutzergruppe existieren, bei der der auf dem Testhandy angemeldete Benutzer nicht schon ein Mitglied ist. Des weiteren darf noch keine Nutzergruppe mit dem Namen \glqq TestGroup\grqq\ auf dem Server existieren.
+
+Zu Beginn des Tests wird der Benutzer mit dem Server verbunden, das heißt es wird seine E-Mail an den Server gesendet und es wird die \KLASSE{UsergroupActivity} gestartet. Im ersten Teil des Tests werden die Views getestet, das heißt es wird geprüft, ob sowohl die ActionBar als auch der sich darauf befindende Plus Button richtig referenziert wurden. Im zweiten Teil beginnnt der Use-Case, in dem als erstet ein Klick auf den Plus Button simuliert wird. Es wird dann so lange gewartet, bis sich die \KLASSE{AddUserGroupActivity} gestartet hat und dort wird dann in das Feld für die Nutzergruppe der Name \glqq TestGroup\grqq\ eingetragen und es wird ein Klick auf den \glqq Ok\grqq-Button simmuliert. Es wird dann wieder auf die \KLASSE{AddUserGroupActivity} gewartet und in der ListView vom \KLASSE{AllUsergroupsFragment} nach der Nutzergruppe mit dem Namen \glqq TestGroup\grqq\ gesucht. Ist die Suche erfolglos so schlägt der Test fehl, bei erfolgreichem Suchen läuft der Test weiter. Als nächstes wird die ListView nach einer Nutzergruppe durchsucht, bei der der Benutzer noch nicht als Mitglied eingetragen ist. Ist keine vorhanden, so schlägt der Test mit einer Fehlermeldung fehl. Ist eine Nutzergruppe vorhanden, bei der der Benutzer noch kein Mitglied ist so wird ein Klick auf die Stelle in der ListView simuliert, bei der die Nutzergruppe gefunden wurde. Dies startet dann einen AlertDialog zum beitreten einer Nutzergruppe. Es wird so lange gewartet, bist der Dialog angezeigt wird. Es wird ein Klick auf den Ja Button simuliert um der Nutzergruppe beizutreten. Darauf hin wird überprüft, ob der Bediener nun in der Liste von Mitgliedern der soeben beigetretenen Nutzergruppe enthalten ist. Ist dies nicht der Fall, so schlägt der Test fehl ansonsten läuft der Test weiter. Nun wird ein Klick auf die Stelle in der ListView simuliert, bei der sich die Nutzergruppe befindet der man soeben beigetreten ist. Auch hier wird ein AlertDialog zum Verlassen der Nutzergruppe angezeigt. Es wird wieder so lange gewartet, bis der AlertDialog erscheint. Hier wird wieder ein Klick auf den Ja Button simuliert um die Nutzergruppe zu verlassen. Nun wird überprüft, ob der Benutzer in der Liste von Mitgliedern der Nutzergruppe enthalten ist. Ist dies der Fall so schlägt der Test fehl ansonsten läuft der Test weiter. Zum Schluss sollte an der Stelle in der ListView an der sich die erstellte Nutzergruppe befindet ein \glqq Longclick\grqq\ simuliert werden, damit der AlertDialog zum Löschen einer Nutzergruppe erscheint. Dies konnte von uns in dem automatischen Test jedoch nicht umgesetzt werden. Als Lösung wurde dann an dieser Stelle der \KLASSE{DeleteUserGroupTask} aufgerufen. Zum Schluss wird noch geprüft ob die Nutzergruppe noch auf dem Server existiert. Ist dies der Fall so schlägt der Test fehl ansonsten wird der Test erfolgreich beendet.
 
 \subsubsection{SendCurrentPositionTest}
-\AUTHOR{Tristan}
+\AUTHORNOSPACE{Tristan}
+\paragraph{Anwendungsfallbeschreibung:} Übertragung der aktuellen Position an den Server
+
+\textbf{Beteiligte Akteure:}
+	Teilnehmer
+	
+\textbf{Anfangsbedingungen:}
+	Der Teilnehmer hat die User-App geöffnet, ist bereits eingeloggt und befindet sich in der \KLASSE{ShowEventsActivity}.
+	
+\textbf{Ereignisfluss:}
+	\begin{enumerate}
+		\item Erfassen der Position in der App mittels GPS bzw. WLAN.
+		\item Regelmäßige Übertragung der Position an den Server.
+	\end{enumerate}
+	
+\textbf{Abschlussbedingungen:}
+	Regelmäßige Übertragung des Teilnehmerstandortes an den Server, wenn der Teilnehmer dies aktiviert hat.
+	
+\textbf{Ausnahmen:}
+	Keine
+	
+\textbf{Spezielle Anforderungen:}
+	Internetverbindung, GPS
+
+\paragraph{Testablauf:}
+In diesem Test steht das Senden der Position mit Hilfe des \KLASSE{LocationTransmitterService} im Vordergrund und nicht der Ablauf der Anwendung des Nutzers, d.h. es wird auf eine korrekte Reihenfolge (Starten, Einstellungsmenü) verzichtet.
+Es wird in der \KLASSE{SettingsAcitivty} gestartet und die Checkbox für die Übertragung aktiviert, worauf hin der \KLASSE{LocationTransmitterService} gestartet wird. Anschließend wird die Checkbox wieder deaktiviert und geprüft, ob der \KLASSE{LocationTransmitterService}  auch wirklich gestoppt wird. Weiterhin wird getestet ob die Position an den Server gesendet wird, selbst wenn die App pausiert.
+
+Anmerkung: Da das Menü über eine xml. Datei generiert wird, lassen sich die einzelnen UI Elemente nicht genau ansprechen.
+
+
 
 \subsubsection{SendPositionSettingsTest}
-\AUTHOR{Tristan}
+\AUTHORNOSPACE{Tristan}
+\paragraph{Anwendungsfallbeschreibung:} Handhabung der aktuellen Position
+
+\textbf{Beteiligte Akteure:}
+	Teilnehmer
+	
+\textbf{Anfangsbedingungen:}
+	Der Teilnehmer hat die User-App geöffnet, ist bereits eingeloggt und befindet sich in der \KLASSE{ShowEventsActivity}.
+	
+\textbf{Ereignisfluss:}
+	\begin{enumerate}
+		\item Es wird mit einem Klick in dem Einstellungsmenü \glqq Einstellungen\grqq\ ausgewählt.
+		\item Es wird die Checkbox zum Übertragen der Informationen an ausgewählt oder auch nicht.
+	\end{enumerate}
+	
+\textbf{Abschlussbedingungen:}
+	Die Teilnehmer-Position wird je nach Einstellung an den Server gesendet oder nicht.
+	
+\textbf{Ausnahmen:}
+	Keine
+	
+\textbf{Spezielle Anforderungen:}
+	Internetverbindung, GPS
+
+\paragraph{Testablauf:}
+Diese Klasse besteht aus verschiedenen Tests. Den UI Tests und einem Anwendungsfalltest. Die UI Tests dienen lediglich dem Überprüfen der Funktionalität des Einstellungsmenüs. Hierzu wird in der \KLASSE{SettingsActivity} die Checkbox aktiviert, geprüft ob die Position an den Server gesendet wird. Danach wird die Checkbox wieder deaktiviert, wodurch die Position sich auf dem Server nicht verändert sollte. Vor jedem Test werden die Positionsdaten auf dem Server zurückgesetzt damit es nicht zu Fehlern kommen kann. Die unveränderte Position befindet sich in China. Der Test schlägt nur fehl, wenn sich das Testgerät genau an dieser Position aufhält, da der \KLASSE{LocationsTransmitterService} die Position nicht auf dem Server verändert.
+
+Der eigentliche UseCaseTest läuft wie in dem Ereignisfluss in der Anwendungsfallbeschreibung ab. Zusätzlich gibt es noch einen Teilnehmen \METHODE{testAttend()} Test. Hier wird in der \KLASSE{ShowEventsActivity} gestartet, anschließend ein Event ausgewählt, auf die \KLASSE{ShowInformationActivity} gewechselt und der Teilnehmen-Button bestätigt. Vor dem Test wird sichergestellt, dass das Senden in den Einstellungen aktiviert ist. Anschließend wird geprüft, ob an den Server gesendet wird. Dies hat den Hintergrund, dass der \KLASSE{LocationTransmitterService} zum Senden gestartet wird, wenn man an an einem Event teilnimmt, das bereitsgestartet ist.
+
 
 \subsubsection{ShowSeveralEventsTest}
-\AUTHOR{Tristan}
+\AUTHORNOSPACE{Tristan}
+\paragraph{Anwendungsfallbeschreibung:} Anzeigen mehrerer Veranstaltungen
+
+\textbf{Beteiligte Akteure:}
+	Teilnehmer
+	
+\textbf{Anfangsbedingungen:}
+	Der Teilnehmer hat die User-App geöffnet, ist bereits eingeloggt und befindet sich in der \KLASSE{ShowEventsActivity}.
+	
+\textbf{Ereignisfluss:}
+	\begin{enumerate}
+		\item Es wird eine Liste aller Veranstaltungen angezeigt.
+		\item Auswahl einer Veranstaltung.
+		\item Die Veranstaltung wird detailliert mit allen Informationen angezeigt.
+	\end{enumerate}
+	
+\textbf{Abschlussbedingungen:}
+	Anzeigen aller Veranstaltungen. Auswahl einer Veranstaltung und Anzeigen von Informationen zu dieser.
+	
+\textbf{Ausnahmen:}
+	Keine
+	
+\textbf{Spezielle Anforderungen:}
+	Internetverbindung
+
+\paragraph{Testablauf:}
+Vorbedingung für den Test ist eine bestehende Internetverbindung, damit die Events von dem Server abgerufen werden können.
+Für diesen Test muss zuerst der \KLASSE{PublishNewInformationTest} in der Veranstalter-App ausgeführt worden sein. Dieser Test wird in der User-App ausgeführt und soll überprüfen, ob das Event, das durch den \KLASSE{PublishNewInformationTest} angelegt wurde, auch in dieser App abrufbar und fehlerfrei ist.
+Es wird zuerst die App gestartet und die Liste aller verfügbaren Events angezeigt. Es wird das erste Event ausgewählt (welches das aus dem anderen Test sein sollte). Anschließend werden die Details zu dem Event genauer angezeigt in der \KLASSE{ShowInformationActivity} und die Daten aus der Veranstalter-App verglichen.

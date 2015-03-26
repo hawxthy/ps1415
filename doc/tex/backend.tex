@@ -91,6 +91,7 @@ Die Klasse \KLASSE{EventStartServlet} wird über einen Cron-Job, der in der Date
 Abbildung \ref{fig:backend_er} zeigt das auf dem Server repräsentierte Datenmodell. Die Attribute, die mit einer dickeren Linie gestrichelt umrandet sind, sind Listen von Objekten, die serialisiert werden und nicht als eigener Typ in der Datenbank existieren. Die Veranstalter werden als Hosts in der Datenbank abgespeichert, haben jedoch keine weiteren Beziehungen zu anderen Entitätsklassen.
 
 \begin{figure}[htb]
+\centering
 \includegraphics[width=\textwidth]{graphics/backend_er.png}
 \caption{ER-Modell der Daten, die auf dem Server gespeichert werden}
 \label{fig:backend_er}
@@ -101,6 +102,7 @@ Wie auf der Abbildung gezeigt, werden zu einem Event auch die teilnehmenden \KLA
 Die Umsetzung des Klassenmodells des Backends weicht etwas von der in der Datenbank gewählten Struktur ab. Hauptunterschied ist, dass mehr Klassen zur Repräsentation der Daten definiert wurden. So gibt es beispielsweise zusätzlich zu den Routen auch die Klassen \KLASSE{RoutePoint} zur Repräsentation eines feinen Wegpunktes auf der Strecke, sowie die Klasse \KLASSE{ServerWaypoint}, die die beim Erstellen der Strecke gesetzten Marker speichert. Einen genauen Überblick über das Klassenmodell bietet Abbildung \ref{fig:backend_uml}.
 
 \begin{figure}[htb]
+\centering
 \includegraphics[width=\textwidth]{graphics/backend_uml.png}
 \caption{UML-Modell der Klassenstruktur des Backends}
 \label{fig:backend_uml}
@@ -215,3 +217,26 @@ Um eine GCM-Nachricht vom Backend zu Senden, wird zunächst ein \KLASSE{Message}
 \subsection{Feldberechnung}
 \AUTHOR{Pascal}
 \label{subsec:Feldberechnung}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth]{graphics/Feldberechnung.png}
+\caption{Rot: GPS-Aufzeichnung, Blau: tatsächlich zurückgelegte Strecke}
+\label{fig:feldberechnung}
+\end{figure}
+
+Die Feldberechnung soll einen schnellen Überblick über die aktuelle Lage der teilnehmenden Skater ermöglichen. Ursprünglich erschien es logisch den Teil der Strecke farbig hervorzuheben, der zwischen dem ersten und dem letzten Skater liegt. Bei diesem Ansatz ergaben sich jedoch einige Probleme welche die Aussagekraft dieser Daten infrage stellten. Zum Beispiel würde ein Skater, der die offizielle Strecke verlässt und diese später auf einem anderen Streckenabschnitt wieder betritt, das Feld künstlich in die Länge ziehen, da sich an der markierten Strecke keine Skater befinden. Ein ähnliches Phänomen würde auftreten, wenn ein Teilnehmer z.B. durch einen Unfall am Weiterfahren gehindert werden würde. Das errechnete Feld hätte in diesen Fällen keinen praktischen Nutzen. Es wird somit ein intelligenter Feldberechnungsalgorithmus benötigt, welcher eine automatische Fehlerkorrektur durchführt. Ein weiteres Problem ist die relative Ungenauigkeit der vom GPS ermittelten Positionen. Diese führt zu einer falschen Darstellung der Strecke (siehe Abb. \ref{fig:feldberechnung}). Um dieses Problem zu beheben liegt es nahe die ermittelten Positionen der Teilnehmer auf die tatsächliche Strecke zu projizieren.
+
+Unser Algorithmus besteht aus zwei Teilen: Der Berechnung des aktuellen Routenpunktes auf der Strecke und der anschließenden Berechnung des Feldes.
+
+\subsubsection{Routenpunktberechnungsalgorithmus}
+\label{subsubsec:Routenpunktberechnungsalgorithmus}
+Jeder Teilnehmer sendet in regelmäßigen Abständen mithilfe der \METHODE{updateMemberLocation(String, double, double, long)} im \KLASSE{SkatenightServerEndpoint} seine Position an den Server. An dieser Stelle berechnet der Server mit der \METHODE{calculateCurrentWaypoint(PersistenceManager, Member)} dessen aktuellen Routenpunkt.
+
+Zunächst wird überprüft ob sich der Teilnehmer bereits an einem Routenpunkt befindet. Falls dies nicht zutrifft, wird er temporär dem ersten Routenpunkt der Strecke zugeordnet. Wenn der aktuelle Routenpunkt des Teilnehmers nicht der Endpunkt der Route ist, wird nun der tatsächliche Routenpunkt ermittelt. Es wird nun die Distanz zwischen den GPS-Koordinaten des Teilnehmers und denen des aktuellen und sequentiell nächsten Routenpunktes ermittelt. Ist die Distanz zum nächsten Routenpunkt kleiner als die zum Aktuellen und kleiner als \ATTRIBUT{MAX-\_NEXT\_WAYPOINT\_DISTANCE} (10 m), wird der nächste Routenpunkt als Aktueller gesetzt. Falls dies nicht der Fall ist, wird überprüft ob sich der Teilnehmer noch am aktuellen Routenpunkt befindet indem die Distanz zu diesem ebenfalls mit der \ATTRIBUT{MAX\_NEXT\_WAYPOINT-\_DISTANCE} verglichen wird. Ist beides nicht der Fall, wird unter allen noch folgenden Routenpunkten der Strecke nach dem am nächsten liegenden gesucht, der nicht mehr als \ATTRIBUT{MAX\_ANY-\_WAYPOINT\_DISTANCE} (50) Meter entfernt ist. Andernfalls hat der Teilnehmer die Strecke verlassen.
+
+\subsubsection{Feldberechnungsalgorithmus}
+Der Feldberechnungsalgorithmus wird ebenfalls von der \METHODE{updateMemberLocation(String, double, double, long)} Methode des \KLASSE{SkatenightServerEndpoint} aufgerufen. Nachdem der aktuelle Routenpunkt des Teilnehmers berechnet wurde, wird überprüft ob die letzte Berechnung des Feldes mehr als 30 Sekunden in der Vergangenheit liegt. Ist dies der Fall, wird das Feld neu berechnet.
+
+Da der Routenpunktberechnungsalgorithmus die Positionen der Teilnehmer auf die Strecke projiziert können wir nun das Feld anhand der Routenpunkte berechnen. Allerdings würden in diesem Zustand die Positionen einzelner Skater noch zu stark gewichtet. Um das Problem zu lösen nutzen wir für die Feldberechnung zusätzlich zu den Positionen auch die Anzahl der teilnehmenden Skater die sich gleichzeitig an einem Routenpunkt befinden.
+Zunächst wird eine Liste von Integern erstellt, welche an der Stelle n die Anzahl der Teilnehmer enthält die sich an dem Routenpunkt n befinden. Es wird nun der Routenpunkt zum Feld hinzugefügt, an dem sich die meisten Teilnehmer befinden. Von diesem Routenpunkt ausgehend werden umliegende Routenpunkte zum Feld hinzugefügt an denen sich mindestens \ATTRIBUT{MIN\_WAYPOINT\_MEMBER\_COUNT} (5) Teilnehmer befinden. Ist zwischen zwei Routenpunkten mit mindestens \ATTRIBUT{MIN\_WAYPOINT\_MEMBER-\_COUNT} (5) Teilnehmern ein Punkt mit weniger Skatern, so wird dieser trotzdem im Feld berücksichtigt. Bei praktischen Tests ist uns aufgefallen, dass durch die kurze Distanz zwischen einigen Routenpunkten das Limit von einem Routenpunkt der weniger als \ATTRIBUT{MIN\_WAYPOINT-\_MEMBER\_COUNT} (5) Skater beherbergt möglicherweise nicht ausreicht um die präziseste Berechnung des Feldes zu gewährleisten. Basierend auf dieser Berechnung werden jeweils der erste und der letzte Routenpunktindex des Feldes im Event als \ATTRIBUT{routeFieldFirst} und \ATTRIBUT{routeFieldLast} hinterlegt.
