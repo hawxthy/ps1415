@@ -53,18 +53,10 @@
 }
 
 % Befehle zur einheitlichen Hervorhebung von Dateien, Klassen, Methoden und Attributen
-\newcommand{\DATEI}[1]{
-	\emph{#1}
-}
-\newcommand{\KLASSE}[1]{
-	\emph{#1}
-}
-\newcommand{\METHODE}[1]{
-	\emph{#1}
-}
-\newcommand{\ATTRIBUT}[1]{
-	\emph{#1}
-}
+\newcommand{\DATEI}[1]{\emph{#1}}
+\newcommand{\KLASSE}[1]{\emph{#1}}
+\newcommand{\METHODE}[1]{\emph{#1}}
+\newcommand{\ATTRIBUT}[1]{\emph{#1}}
 
 % Erste Zeile eines Absatzes nicht einrücken
 \setlength{\parindent}{0em}
@@ -88,20 +80,21 @@
 
 \section{Einleitung}
 \AUTHOR{allen}
+Der folgende Projektbericht beschreibt das Projektseminar \glqq Android-Programmierung\grqq\ an der Wilhelms Universität Münster im Wintersemester 14/15.
 
-
+Das Ziel des Projekts ist die Erstellung zweier Android-Applikationen und eines dazugehörigen Server-Backends zur Organisation und Durchführung von Skatenight-Veranstal\-tun\-gen. Bei einer Skatenight handelt es sich um eine Freizeitveranstaltung, bei der sich viele Skater versammeln und gemeinsam auf einer offiziellen Route durch die Stadt fahren. Die User-App ist die Android-Applikation für Teilnehmer und stellt organisatorische Informationen zu Veranstaltungen zur Verfügung und begleitet die Skater bei ihrer Teilnahme. Die Veranstalter-App dient den Veranstaltern zur Erstellung, Bekanntmachung und Durchführung von Skatenights. Das entwickelte Server-Backend übernimmt dabei die Kommunikation zwischen den beiden Apps.
 
 \section{Vorgehensweise}
 \AUTHOR{Tristan und Richard}
 Am Anfang des Projektes haben wir uns darauf geeinigt alle die gleiche Integrierte Entwicklungsumgebung (IDE) \glqq Android Studio\grqq\ von Google zu nutzen, welches die offizielle Entwicklungsumgebung für Android ist, damit es nicht zu Problemen innerhalb des Projektes kommt.
-Weiterhin haben wir uns für die freie Software \glqq Git\grqq\ zur Versionsverwaltung des Projekts entschieden. Hierfür gab es einen Master Branch auf dem sich immer eine lauffähige Version der Apps befunden hat. Für die Entwicklung einzelner Funktionen, wie zum Beispiel die \glqq lokale Auswertung\grqq wurden extra Branches angelegt.
+Weiterhin haben wir uns für die freie Software \glqq Git\grqq\ zur Versionsverwaltung des Projekts entschieden. Hierfür gab es einen Master Branch auf dem sich immer eine lauffähige Version der Apps befunden hat. Für die Entwicklung einzelner Funktionen, wie zum Beispiel die \glqq lokale Auswertung\grqq\ wurden extra Branches angelegt.
 Für das Vorgehen im Projekt wurde das Rahmenwerk Scrum verwendet. Die Rolle des Product Owners wurde von den Betreuern übernommen. Außerdem hat die Rolle des Scrum Masters nach jedem einzelnen Sprint, der in der Regel 4 Wochen betrug, ein anderes Mitglied des Entwicklungsteams übernommen. Zudem wurden die einzelnen Aufgaben für das Sprint Backlog vor jedem Sprint bzw. nach dem Sprint Review in Tasks aufgeteilt. Damit ein Task wirklich als bearbeitet (\glqq done\grqq) gilt wurde vor dem Projekt definiert, ab wann ein Task als dies gelten darf:
 
 \begin{itemize}
 	\item Programmierung abgeschlossen
 	\item Funktion getestet
 	\item Ein Code Review durchgeführt wurde
-	\item Die Feature-Branch auf den master-Branch gemerged wurden
+	\item Die Feature-Branch auf den Master-Branch gemerged wurden
 	\item Die Dokumentation (Java Doc) geschrieben wurde
 \end{itemize}
 
@@ -120,14 +113,14 @@ Zum kontinuierlichen Bauen der Apps und des Backends wurde ein Jenkinsserver ein
 \section{Features der Apps}
 \AUTHOR{Daniel}
 
-Die Anforderungen und Features der Apps wurden von Sprint 1 bis Sprint 4 stetig erweitert. Angefangen mit eher simplen Anforderungen, gewannen diese im Laufe des Projektseminars immer mehr an Komplexität. Wie durch Scrumm vorgegeben werden diese Anforderungen vom Product Owner gestellt und in Zusammenarbeit mit dem Team ins Sprint Backlog übertragen. Dabei wird über die einzelnen Features des Sprint diskutiert und evtl. an ihrer Priorisierung gearbeitet. Ein Sprint dauerte 4 Wochen, in welchen das Team Zeit hat alle Punkte des Sprint Backlogs abzuarbeiten. Im folgenden werden die Anforderungen an die Apps pro Sprint aufgelistet und erläutert.
+Die Anforderungen und Features der Apps wurden von Sprint 1 bis Sprint 4 stetig erweitert. Angefangen mit eher simplen Anforderungen, gewannen diese im Laufe des Projektseminars immer mehr an Komplexität. Wie durch Scrum vorgegeben werden diese Anforderungen vom Product Owner gestellt und in Zusammenarbeit mit dem Team ins Sprints Backlog übertragen. Dabei wird über die einzelnen Features des Sprint diskutiert und evtl. an ihrer Priorisierung gearbeitet. Ein Sprint dauerte 4 Wochen, in welchen das Team Zeit hatte alle Punkte des Sprint Backlogs abzuarbeiten. Im folgenden werden die Anforderungen an die Apps pro Sprint aufgelistet und erläutert.
 
 \subsection{Sprint 1}
 Im ersten Sprint ging es darum ein Grundgerüst zu erstellen und rudimentäre Features zu implementieren. Diese wurden in den folgenden Sprints erweitert und ausgebaut.
 
 \textbf{Aktuelle Informationen anzeigen:}
 
-Es soll eine Möglichkeit geben, sich das aktuelle Event in der Benutzer App anzeigen zu lassen. Dieses besteht aus vorgegebenen Informationen, wie z.B. Name, Ort, Datum, Kosten, Beschreibung, usw. Die Informationen sollten dabei jedes mal vom Server heruntergeladen werden.
+Es soll eine Möglichkeit geben, sich das aktuelle Event in der User-App anzeigen zu lassen. Dieses besteht aus vorgegebenen Informationen, wie z.B. Name, Ort, Datum, Kosten, Beschreibung, usw. Die Informationen sollten dabei jedes mal vom Server heruntergeladen werden.
 
 \textbf{Aktuelle Strecke anzeigen:}
 
@@ -139,7 +132,7 @@ In der Veranstalter App soll es möglich sein die Daten für die \glqq Aktuellen
 
 \textbf{Erstellen neuer Strecken:}
 
-Für das Erstellen neuer Strecken muss die Veranstalter App ein Interface bereitstellen, indem auf einer Google Map interaktiv Strecken erstellt werden können, sodass diese zum Anzeigen in der Benutzer App verwendet werden.
+Für das Erstellen neuer Strecken muss die Veranstalter App ein Interface bereitstellen. Dieses Interface ermöglicht es auf einer Google Map interaktiv Strecken anzulegen, welche anschließend in der User-App angezeigt werden können.
 
 \textbf{Authentifikation des Veranstalters:}
 
@@ -147,14 +140,11 @@ Sicherheitshalber muss eine Authentifizierung des Veranstalters stattfinden, dam
 
 \textbf{Anzeigen der Position:}
 
-Die \glqq Aktuelle Strecke anzeigen\grqq\ soll erweitert werden, sodass die, vom GPS ermittelte Position des Benutzers, angezeigt wird.
+Die \glqq Aktuelle Strecke anzeigen\grqq\ soll erweitert werden, sodass die vom GPS ermittelte Position des Benutzers angezeigt wird.
 
 \textbf{Übertragung der GPS-Daten an den Server:}
 
-Anschließen sollen die GPS Daten der Benutzer an den Server gesendet und gespeichert werden.
-
-
-
+Anschließend sollen die GPS Daten der Benutzer an den Server gesendet und dort gespeichert werden.
 
 \subsection{Sprint 2}
 Der Fokus des zweiten Sprints lag auf der logischen Weiterentwicklung der im ersten Sprint implementierten Features. Die Apps sollten mehr Möglichkeiten sowohl für Veranstalter als auch Benutzer bieten.
@@ -165,7 +155,7 @@ Die Möglichkeit Aktuelle Informationen anzeigen zu lassen, sollte nun erweitert
 
 \textbf{Veröffentlichen mehrerer Veranstaltungen:}
 
-Sowie in der Benutzer App mehrere Veranstaltungen angezeigt werden sollen, muss auch für die Veranstalter eine Option bestehen mehrere Veranstaltungen anzulegen und zu verwalten.
+Sowie in der User-App mehrere Veranstaltungen angezeigt werden sollen, muss auch für die Veranstalter eine Option bestehen mehrere Veranstaltungen anzulegen und zu verwalten.
 
 \textbf{Globale Auswertung der Positionen der Teilnehmer:}
 
@@ -182,7 +172,7 @@ Das Informationen Veröffentlichen 2.0 hat einige Features gefordert, die sich v
 
 
 \subsection{Sprint 3}
-Da aus Zeitmangel im zweiten Sprint leider nicht alle Anforderungen erfüllt werden konnten, wurden einige in den dritten Sprint übertragen. So gab es insbesondere Probleme die \glqq Veröffentlichen neuer Informationen 2.0\grqq\ fehlerfrei mit den anderen Programmteilen zu verbinden. Zusätzlich war es nicht gelungen alle Aspekte der Lokalen Auswertung vollständig in die Benutzer App zu integrieren.
+Da aus Zeitmangel im zweiten Sprint leider nicht alle Anforderungen erfüllt werden konnten, wurden einige in den dritten Sprint übertragen. So gab es insbesondere Probleme die \glqq Veröffentlichen neuer Informationen 2.0\grqq\ fehlerfrei mit den anderen Programmteilen zu verbinden. Zusätzlich war es nicht gelungen alle Aspekte der Lokalen Auswertung vollständig in die User-App zu integrieren.
 
 \textbf{Lokale Auswertung der Position 2.0:}
 
@@ -194,7 +184,7 @@ Die Benutzer sollen automatisch per Notification darüber informiert werden ob e
 
 \textbf{Handhabung der Position:}
 
-Es gibt Einstellungsmöglichkeite, die es den Benutzern erlauben das Senden ihrer Position an den Server zu unterbinde.
+Es gibt Einstellungsmöglichkeiten, die es den Benutzern erlauben das Senden ihrer Position an den Server zu unterbinde.
 
 \textbf{Rechteverwaltung für Veranstalter:}
 
@@ -219,7 +209,7 @@ Die Anwender der User App können Nutzergruppen erstellen, beitreten um sich ans
 
 \textbf{Erstellen neuer Strecken 2.0:}
 
-Es soll für Veranstalter möglich sein Wegpunkte zu Strecken hinzuzufügen. Diese können anschließend in der Benutzer App angezeigt werden, sodass sich die Skater eine Übersicht über Start, Pausen, Checkpoints usw. machen können.
+Es soll für Veranstalter möglich sein Wegpunkte zu Strecken hinzuzufügen. Diese können anschließend in der User-App angezeigt werden, sodass sich die Skater eine Übersicht über Start, Pausen, Checkpoints usw. machen können.
 
 
 \section{Vorstellung von Android}

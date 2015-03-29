@@ -1,0 +1,6 @@
+- Tests von Bernd in die PDF einfügen
+- Android-Einleitung von Daniel einfügen
+x- Formatierung von Schlüsselwörtern ohne Leerzeichen
+x- Benutzer-App durch User-App ersetzen
+- Lange Konstanten richtig umbrechen
+x- Rechtschreibprüfung
