@@ -10,9 +10,9 @@ MinPos.y=-1
 MaxPos.x=-1
 MaxPos.y=-1
 NormalPos.left=4
-NormalPos.top=32
-NormalPos.right=1596
-NormalPos.bottom=569
+NormalPos.top=26
+NormalPos.right=917
+NormalPos.bottom=811
 Class=LaTeXView
 Document=backend.tex
 
@@ -28,9 +28,9 @@ MinPos.y=-1
 MaxPos.x=-1
 MaxPos.y=-1
 NormalPos.left=4
-NormalPos.top=32
-NormalPos.right=1596
-NormalPos.bottom=569
+NormalPos.top=26
+NormalPos.right=917
+NormalPos.bottom=811
 Class=LaTeXView
 Document=Skatenight.tex
 
@@ -46,15 +46,15 @@ MinPos.y=-1
 MaxPos.x=-1
 MaxPos.y=-1
 NormalPos.left=4
-NormalPos.top=32
-NormalPos.right=1596
-NormalPos.bottom=569
+NormalPos.top=26
+NormalPos.right=917
+NormalPos.bottom=811
 Class=LaTeXView
 Document=frontend.tex
 
 [Frame2_View0,0]
-TopLine=170
-Cursor=27942
+TopLine=708
+Cursor=52388
 
 [Frame3]
 Flags=0
@@ -64,17 +64,17 @@ MinPos.y=-1
 MaxPos.x=-1
 MaxPos.y=-1
 NormalPos.left=4
-NormalPos.top=32
-NormalPos.right=1596
-NormalPos.bottom=569
+NormalPos.top=26
+NormalPos.right=917
+NormalPos.bottom=811
 Class=LaTeXView
 Document=testing.tex
 
 [Frame3_View0,0]
-TopLine=142
-Cursor=17665
+TopLine=192
+Cursor=13870
 
 [SessionInfo]
 FrameCount=4
-ActiveFrame=0
+ActiveFrame=3
 
