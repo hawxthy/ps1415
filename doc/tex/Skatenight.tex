@@ -85,6 +85,7 @@ Der folgende Projektbericht beschreibt das Projektseminar \glqq Android-Programm
 Das Ziel des Projekts ist die Erstellung zweier Android-Applikationen und eines dazugehörigen Server-Backends zur Organisation und Durchführung von Skatenight-Veranstal\-tun\-gen. Bei einer Skatenight handelt es sich um eine Freizeitveranstaltung, bei der sich viele Skater versammeln und gemeinsam auf einer offiziellen Route durch die Stadt fahren. Die User-App ist die Android-Applikation für Teilnehmer und stellt organisatorische Informationen zu Veranstaltungen zur Verfügung und begleitet die Skater bei ihrer Teilnahme. Die Veranstalter-App dient den Veranstaltern zur Erstellung, Bekanntmachung und Durchführung von Skatenights. Das entwickelte Server-Backend übernimmt dabei die Kommunikation zwischen den beiden Apps.
 
 \section{Vorgehensweise}
+\label{sec:vorgehensweise}
 \AUTHOR{Tristan und Richard}
 Am Anfang des Projektes haben wir uns darauf geeinigt alle die gleiche Integrierte Entwicklungsumgebung (IDE) \glqq Android Studio\grqq\ von Google zu nutzen, welches die offizielle Entwicklungsumgebung für Android ist, damit es nicht zu Problemen innerhalb des Projektes kommt.
 Weiterhin haben wir uns für die freie Software \glqq Git\grqq\ zur Versionsverwaltung des Projekts entschieden. Hierfür gab es einen Master Branch auf dem sich immer eine lauffähige Version der Apps befunden hat. Für die Entwicklung einzelner Funktionen, wie zum Beispiel die \glqq lokale Auswertung\grqq\ wurden extra Branches angelegt.
@@ -213,7 +214,34 @@ Es soll für Veranstalter möglich sein Wegpunkte zu Strecken hinzuzufügen. Die
 
 
 \section{Vorstellung von Android}
-\AUTHOR{Pascal}
+\AUTHOR{Daniel}
+Android ist ein Betriebsystem auf Basis von Linux, welches für alle möglichen Arten von mobilen Geräten, wie z.B. Smartphones, Netbooks, Tablets usw. Verwendung findet. Es handelt sich hierbei um eine von der Open Handset Alliance entwickelte freie, quelloffene Software. Das bedeutet zum einen, dass die Software frei verbreitet werden kann ohne z.B. restriktive Lizenzen erwerben zu müssen. Zum anderen bedeutet es, dass es jedem Dritten möglich ist den Quellcode einzusehen, zu verändern und neue Software daraus zu erstellen. Android ist mittlerweile das am meisten genutzte Betriebsystem für Smartphones und somit unverzichtbar wenn man einen Einblick in die Programmierung von Mobile Apps erhalten will. Android benutzt, ähnlich wie Java, eine Virutal-Machine um geschriebene Programme zu kompilieren. Da sich die Android-Klassenbibliotheken sehr an den Java-Standard-Bibliotheken orientieren, ist es möglich normalen mit dem Java-Compiler kompilierten Code, mithilfe eines Cross-Assemblers, auf die für Android verwendete VM anzupassen. 
+
+Wie bereits im Abschnitt \ref{sec:vorgehensweise} (Vorgehensweise) erwähnt, haben wir die von Google entwickelte freie Integrierte Entwicklungsumgebung \glqq Android Studio\grqq\ verwendet. Diese bietet bereits viele integrierte Komponenten, wie z.B. Texteditor, Compiler, Debuger, Build-Tools, usw. So war es uns einfach möglich alle IDEs auf dem gleichen Stand zu halten, ohne einzelne Plugins zusätzlich installieren zu müssen. Android Studio bietet außerdem die Möglichkeit entwickelte Programme auf Virtuellen Geräten zu Testen. Leider war diese Variante für uns keine Option, da die virtuellen Geräte nur unzuverlässig und langsam funktionierten. Außerdem boten sie keine native Möglichkeit die Google Play Services zu verwenden, welche wir für die Routendarstellung benötigten. So mussten wir zum Testen echte Android-Geräte verwenden, was ohne Probleme funktionierte.
+
+\subsection{Grundlegender Aufbau}
+Eine Android-App besteht aus \glqq Activities\grqq. Dabei repräsentiert jede \glqq Activity\grqq\ ein sichtbares Benutzerinterface der App. Eine \glqq Activity\grqq\ kann in ihrem Lebenszyklus mehrere Zustände annehmen und mithilfe von \glqq Intents\grqq\ andere \glqq Activities\grqq\ aufrufen. 
+
+Diese Zustände sind:
+
+\begin{itemize}
+	\item Created: Nachdem die \glqq Activity\grqq\ das erste mal erstellt wurde.
+	\item Started: Die \glqq Activity\grqq\ wurde gestartet und ist nun für den User sichtbar.
+	\item Resumed: In diesem Zustand befindet sich die \glqq Activity\grqq\ wenn der User mit ihr interagiert.
+	\item Paused: Die \glqq Activity\grqq\ kann keinen Code ausführen und es wird gerade eine andere \glqq Activity\grqq\ ausgeführt.
+	\item Stopped: Angehaltene \glqq Activities\grqq\ sind nicht mehr für den User sichtbar.
+	\item Destroyed: Nachdem die \glqq Activity\grqq\ beendet wurde.
+\end{itemize}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.5\textwidth]{graphics/Intent.png}
+\caption{Kommunikation unter Activities durch Intents}
+\label{fig:intent}
+\end{figure}
+
+Nicht für jeden dieser Zustände muss explizit definiert werden wie sich die \glqq Activity\grqq\ verhalten soll. Es ist jedoch wichtig zu wissen, was jeder Zustand bedeuted, um, wenn nötig, das Verhalten selbst bestimmen zu können.
+
 
 \subsection{Beschreibung von Adaptern im Zusammenhang mit ListViews}
 \label{sec:adapter}
