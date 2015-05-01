@@ -21,10 +21,10 @@ import com.skatenight.skatenightAPI.model.Member;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
+import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.activity.SettingsActivity;
 import ws1415.ps1415.activity.ShowEventsActivity;
-import ws1415.ps1415.task.UpdateLocationTask;
+import ws1415.common.task.UpdateLocationTask;
 
 /**
  * Testet den User Case "Übertragung der aktuellen Position an den Server".

@@ -12,7 +12,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
+import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.activity.ShowEventsActivity;
 import ws1415.ps1415.activity.ShowInformationActivity;
 

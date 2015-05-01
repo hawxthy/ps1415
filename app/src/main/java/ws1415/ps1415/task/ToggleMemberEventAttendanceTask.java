@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.ps1415.ServiceProvider;
+import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.activity.ShowEventsActivity;
 
 /**
@@ -35,13 +35,13 @@ public class ToggleMemberEventAttendanceTask extends ExtendedTask<Void, Void, Bo
             return null;
         }
         try {
-            ServiceProvider.getService().skatenightServerEndpoint().createMember(email).execute();
+            ServiceProvider.getService().userEndpoint().createMember(email).execute();
             if (!attending) {
-                ServiceProvider.getService().skatenightServerEndpoint().addMemberToEvent(keyId, email).execute();
+                ServiceProvider.getService().eventEndpoint().addMemberToEvent(keyId, email).execute();
                 return !attending;
             }
             else {
-                ServiceProvider.getService().skatenightServerEndpoint().removeMemberFromEvent(keyId, email).execute();
+                ServiceProvider.getService().eventEndpoint().removeMemberFromEvent(keyId, email).execute();
                 return !attending;
             }
 

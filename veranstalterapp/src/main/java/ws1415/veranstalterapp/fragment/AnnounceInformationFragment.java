@@ -1,8 +1,6 @@
 package ws1415.veranstalterapp.fragment;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,10 +18,11 @@ import com.skatenight.skatenightAPI.model.Route;
 
 import java.util.ArrayList;
 
+import ws1415.common.task.CreateEventTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.adapter.AnnounceCursorAdapter;
-import ws1415.veranstalterapp.task.CreateEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.FieldType;
 
@@ -142,7 +141,7 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
 
                 if (!eventTitle.equals("") && eventRoute != null){
                     // Erstelle Event auf dem Server
-                    new CreateEventTask().execute(event);
+                    new CreateEventTask(null).execute(event);
 
                     // Benachrichtige den Benutzer mit einem Toast
                     Toast.makeText(getActivity(), getResources().getString(R.string.eventcreated), Toast.LENGTH_LONG).show();

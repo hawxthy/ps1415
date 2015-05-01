@@ -7,8 +7,8 @@ import com.skatenight.skatenightAPI.model.Member;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.task.UpdateLocationTask;
+import ws1415.common.net.ServiceProvider;
+import ws1415.common.task.UpdateLocationTask;
 
 /**
  * ACHTUNG: Test läuft über den normalen Google-Server, da das @-Zeichen bei einer Anfrage an den

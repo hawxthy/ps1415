@@ -7,12 +7,16 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
+import ws1415.common.net.ServiceProvider;
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.task.LoginTask;
+import ws1415.common.task.LoginTask;
 
 /**
  * Zeigt einen Login-Bildschirm an, mit dem sich ein Veranstalter einloggen muss, bevor er Zugriff
@@ -51,8 +55,25 @@ public class LoginActivity extends Activity {
                     String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
                         credential.setSelectedAccountName(accountName);
-                        LoginTask loginTask = new LoginTask();
-                        loginTask.execute(this);
+                        ServiceProvider.login(credential);
+                        LoginTask loginTask = new LoginTask(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+                            @Override
+                            public void taskDidFinish(ExtendedTask task, Boolean isHost) {
+                                if (isHost != null && isHost == true) {
+                                    // Activity starten
+                                    Intent i = new Intent(getApplicationContext(),
+                                            HoldTabsActivity.class);
+                                    startActivity(i);
+                                } else {
+                                    // Fehler anzeigen
+                                    Toast.makeText(getApplicationContext(),
+                                            R.string.not_authorized,
+                                            Toast.LENGTH_LONG
+                                    ).show();
+                                }
+                            }
+                        });
+                        loginTask.execute(credential);
                     }
                 }
                 break;

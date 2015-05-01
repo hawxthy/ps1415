@@ -13,11 +13,13 @@ import android.widget.Toast;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.veranstalterapp.adapter.AnnounceCursorAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.dialog.ChooseRouteDialog;
-import ws1415.veranstalterapp.task.EditEventTask;
-import ws1415.veranstalterapp.task.GetEventTask;
+import ws1415.common.task.EditEventTask;
+import ws1415.common.task.GetEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.FieldType;
 
@@ -58,7 +60,13 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_event);
 
-        new GetEventTask(this).execute(getIntent().getLongExtra("event", 0));
+        new GetEventTask(new ExtendedTaskDelegateAdapter<Void, Event>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Event event) {
+                setEventDataToView(event);
+            }
+        }).execute(getIntent().getLongExtra("event", 0));
+
         ChooseRouteDialog.giveEditEventActivity(this);
 
         // Initialisiere die Buttons
@@ -132,15 +140,20 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
                     EventUtils.getInstance(EditEventActivity.this).setEventInfo(event, listView);
 
                     // Erstelle Event auf dem Server
-                    new EditEventTask().execute(event);
-
-                    // Benachrichtige den Benutzer mit einem Toast
-                    Toast.makeText(EditEventActivity.this, getResources().getString(R.string.eventedited), Toast.LENGTH_LONG).show();
-
-                    finish();
-
-                    // Update die Informationen in ShowInformationFragment
-                    HoldTabsActivity.updateInformation();
+                    new EditEventTask(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+                        @Override
+                        public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                            if (aBoolean != null && aBoolean == true) {
+                                // Benachrichtige den Benutzer mit einem Toast
+                                Toast.makeText(EditEventActivity.this, getResources().getString(R.string.eventedited), Toast.LENGTH_LONG).show();
+                                finish();
+                                // Update die Informationen in ShowInformationFragment
+                                HoldTabsActivity.updateInformation();
+                            } else {
+                                Toast.makeText(EditEventActivity.this, getResources().getString(R.string.eventediting_failed), Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }).execute(event);
                 } else {
                     cancelInfo(false);
                 }

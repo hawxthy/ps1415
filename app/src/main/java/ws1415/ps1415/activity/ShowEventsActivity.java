@@ -35,9 +35,9 @@ import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
+import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.adapter.EventsCursorAdapter;
-import ws1415.ps1415.task.QueryEventsTask;
+import ws1415.common.task.QueryEventsTask;
 import ws1415.ps1415.util.EventUtils;
 
 public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDelegate<Void, List<Event>> {
@@ -359,7 +359,7 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    ServiceProvider.getService().skatenightServerEndpoint().registerForGCM(regid).execute();
+                    ServiceProvider.getService().userEndpoint().registerForGCM(regid).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

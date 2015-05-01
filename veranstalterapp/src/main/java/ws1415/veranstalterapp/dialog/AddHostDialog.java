@@ -1,18 +1,16 @@
 package ws1415.veranstalterapp.dialog;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.activity.PermissionManagementActivity;
-import ws1415.veranstalterapp.task.AddHostTask;
+import ws1415.common.task.AddHostTask;
 
 /**
  * Dialog zum Hinzufügen eines neuen Veranstalters.
@@ -50,7 +48,12 @@ public class AddHostDialog extends Activity {
         String hostName = addHostEditText.getText().toString();
         if(!hostName.equals("")) {
             finish();
-            new AddHostTask(pmActivity).execute(hostName);
+            new AddHostTask(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                    pmActivity.refresh();
+                }
+            }).execute(hostName);
         } else {
             Toast.makeText(this, "Mail darf nicht leer sein", Toast.LENGTH_LONG).show();
         }

@@ -3,7 +3,6 @@ package ws1415.ps1415.useCases;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Instrumentation;
-import android.content.DialogInterface;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.view.MenuItem;
@@ -16,11 +15,11 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
+import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.activity.AddUserGroupActivity;
 import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
-import ws1415.ps1415.task.DeleteUserGroupTask;
+import ws1415.common.task.DeleteUserGroupTask;
 
 /**
  * Dieser Test erstellt eine Gruppe, betritt eine andere Gruppe und verlässt diese. Die erstellte Gruppe

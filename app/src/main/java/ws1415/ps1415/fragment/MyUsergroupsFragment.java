@@ -2,7 +2,6 @@ package ws1415.ps1415.fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,10 +16,13 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
+import ws1415.common.net.ServiceProvider;
+import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.adapter.UsergroupAdapter;
-import ws1415.ps1415.task.QueryMyUserGroupsTask;
+import ws1415.common.task.QueryMyUserGroupsTask;
 import ws1415.ps1415.util.PrefManager;
 import ws1415.ps1415.util.groupUtils;
 
@@ -47,7 +49,7 @@ public class MyUsergroupsFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        new QueryMyUserGroupsTask(this).execute();
+        refresh();
     }
 
     /**
@@ -140,7 +142,7 @@ public class MyUsergroupsFragment extends Fragment{
                         }
                         break;
                     case 2:
-                        c_dialog = groupUtils.createDialogDelete(MyUsergroupsFragment.this.getActivity(), userGroup);
+                        c_dialog = groupUtils.createDialogDelete((UsergroupActivity) MyUsergroupsFragment.this.getActivity(), userGroup);
                         c_dialog.show();
                         break;
                 }
@@ -155,7 +157,12 @@ public class MyUsergroupsFragment extends Fragment{
      */
     public void refresh(){
         if(mProgressBarRefresh != null) mProgressBarRefresh.setVisibility(View.VISIBLE);
-        new QueryMyUserGroupsTask(this).execute();
+        new QueryMyUserGroupsTask(new ExtendedTaskDelegateAdapter<Void, List<UserGroup>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserGroup> userGroups) {
+                setUserGroupsToListView(userGroups);
+            }
+        }).execute();
     }
 
     /**

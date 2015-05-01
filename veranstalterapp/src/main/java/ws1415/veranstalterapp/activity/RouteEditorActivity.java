@@ -11,8 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -28,7 +26,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -36,25 +33,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.RoutePoint;
 import com.skatenight.skatenightAPI.model.ServerWaypoint;
 import com.skatenight.skatenightAPI.model.Text;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -64,10 +49,7 @@ import ws1415.veranstalterapp.R;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.util.LocationUtils;
-import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.fragment.EditorMapFragment;
-import ws1415.veranstalterapp.fragment.EditorWaypointsFragment;
-import ws1415.veranstalterapp.task.AddRouteTask;
+import ws1415.common.task.AddRouteTask;
 import ws1415.veranstalterapp.task.RouteLoaderTask;
 
 
@@ -300,7 +282,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
                     rt.setLength(length);
 
-                    new AddRouteTask().execute(rt);
+                    new AddRouteTask(null).execute(rt);
 
                     if (backButtonPressed) {
                         RouteEditorActivity.super.onBackPressed();

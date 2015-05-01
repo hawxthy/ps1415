@@ -9,11 +9,17 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.skatenight.skatenightAPI.model.Event;
+
+import java.util.List;
+
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.common.task.QueryEventsTask;
 import ws1415.veranstalterapp.dialog.AddRouteDialog;
 import ws1415.veranstalterapp.adapter.TabsPagerAdapter;
 import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.task.QueryEventTask;
 
 /**
  * Die Activity, welche beim Starten der Veranstalter App ausgeführt wird. Diese Activity
@@ -151,7 +157,12 @@ public class HoldTabsActivity extends FragmentActivity implements ActionBar.TabL
      * wenn die Informationen im "AnnounceInformationFragment" gesetzt und abgeschickt werden.
      */
     public static void updateInformation(){
-        new QueryEventTask().execute((ShowEventsFragment) mAdapter.getItem(0));
+        new QueryEventsTask(new ExtendedTaskDelegateAdapter<Void, List<Event>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<Event> events) {
+                ((ShowEventsFragment) mAdapter.getItem(0)).setEventsToListView(events);
+            }
+        }).execute();
     }
 
     /**

@@ -33,8 +33,8 @@ import java.util.List;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.util.LocationUtils;
-import ws1415.ps1415.task.GetEventTask;
-import ws1415.ps1415.task.UpdateLocationTask;
+import ws1415.common.task.GetEventTask;
+import ws1415.common.task.UpdateLocationTask;
 import ws1415.ps1415.util.EventUtils;
 import ws1415.ps1415.util.FieldType;
 import ws1415.ps1415.util.LocalAnalysisData;
@@ -237,7 +237,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
         // Sendet die Nutzerdaten an den Server, wenn dies in den Einstellungen vorgesehen ist
         if (email != null && sendLocation && System.currentTimeMillis() - updateTime >= UPDATE_INTERVAL) {
-            new UpdateLocationTask(email, location.getLatitude(), location.getLongitude(), eventId).execute();
+            new UpdateLocationTask(null, email, location.getLatitude(), location.getLongitude(), eventId).execute();
             updateTime = System.currentTimeMillis();
         }
 

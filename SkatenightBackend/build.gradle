@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.google.appengine:gradle-appengine-plugin:1.9.17' // 1.9.8
+        classpath 'com.google.appengine:gradle-appengine-plugin:1.9.19'
     }
 }
 
@@ -45,8 +45,9 @@ appengine {
     getDiscoveryDocsOnBuild = true
   }
   enhancer {
-    version = "v2"
-    enhanceOnBuild = true
+      version = "v2"
+      api = "jdo"
+      enhanceOnBuild = true
   }
 }
 war.dependsOn appengineEnhance

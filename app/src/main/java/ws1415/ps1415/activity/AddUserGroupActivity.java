@@ -10,10 +10,11 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.util.List;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
-import ws1415.ps1415.fragment.AllUsergroupsFragment;
-import ws1415.ps1415.task.AddUserGroupTask;
-import ws1415.ps1415.task.QueryUserGroupsTask;
+import ws1415.common.task.AddUserGroupTask;
+import ws1415.common.task.QueryUserGroupsTask;
 
 /**
  * Diese Activity ist ein Dialog, der einen Gruppennamen erwartet und eine Gruppe anschließend
@@ -49,21 +50,26 @@ public class AddUserGroupActivity extends Activity {
     public void apply(View view) throws Exception {
         final String groupName = addGroupEditText.getText().toString();
         if (!groupName.equals("")) {
-            new QueryUserGroupsTask().execute(new AllUsergroupsFragment() {
+            new QueryUserGroupsTask(new ExtendedTaskDelegateAdapter<Void, List<UserGroup>>() {
                 @Override
-                public void setUserGroupsToListView(List<UserGroup> groupList) {
-                    if (groupList != null) {
-                        for (int i = 0; i < groupList.size(); i++) {
-                            if (groupList.get(i).getName().equals(groupName)) {
+                public void taskDidFinish(ExtendedTask task, List<UserGroup> userGroups) {
+                    if (userGroups != null) {
+                        for (int i = 0; i < userGroups.size(); i++) {
+                            if (userGroups.get(i).getName().equals(groupName)) {
                                 Toast.makeText(AddUserGroupActivity.this, "Name darf nicht schon vergeben sein", Toast.LENGTH_LONG).show();
                                 return;
                             }
                         }
                     }
                     finish();
-                    new AddUserGroupTask(UsergroupActivity.getUserGroupActivity()).execute(groupName);
+                    new AddUserGroupTask(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                        @Override
+                        public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                            UsergroupActivity.getUserGroupActivity().refresh();
+                        }
+                    }).execute(groupName);
                 }
-            });
+            }).execute();
         } else {
             Toast.makeText(this, "Name darf nicht leer sein", Toast.LENGTH_LONG).show();
         }

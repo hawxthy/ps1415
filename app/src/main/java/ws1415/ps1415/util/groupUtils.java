@@ -8,11 +8,15 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.util.List;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.UsergroupActivity;
-import ws1415.ps1415.task.DeleteUserGroupTask;
-import ws1415.ps1415.task.JoinUserGroupTask;
-import ws1415.ps1415.task.LeaveUserGroupTask;
+import ws1415.common.task.DeleteUserGroupTask;
+import ws1415.common.task.JoinUserGroupTask;
+import ws1415.common.task.LeaveUserGroupTask;
+import ws1415.ps1415.fragment.AllUsergroupsFragment;
+import ws1415.ps1415.fragment.MyUsergroupsFragment;
 
 /**
  * Utility Klasse für die Nutzergruppen. Unterstützende Klasse um Nutzergruppen beizutreten, zu
@@ -64,7 +68,12 @@ public class groupUtils {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                new JoinUserGroupTask((UsergroupActivity) activity).execute(userGroup.getName());
+                new JoinUserGroupTask(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                        ((UsergroupActivity) activity).refresh();
+                    }
+                }).execute(userGroup.getName());
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -90,7 +99,12 @@ public class groupUtils {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                new LeaveUserGroupTask((UsergroupActivity) activity).execute(userGroup.getName());
+                new LeaveUserGroupTask(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                        ((UsergroupActivity) activity).refresh();
+                    }
+                }).execute(userGroup.getName());
                 PrefManager.setGroupVisibility(activity, userGroup.getName(), false);
             }
         });
@@ -130,14 +144,26 @@ public class groupUtils {
      * @param activity Activity, der den Dialog anzeigt
      * @param userGroup Nutzergruppe, die ausgewählt wurde
      */
-    public static AlertDialog createDialogDelete(final FragmentActivity activity, final UserGroup userGroup){
+    public static AlertDialog createDialogDelete(final UsergroupActivity activity, final UserGroup userGroup){
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(userGroup.getName());
         builder.setMessage(R.string.dialog_delete_group);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                new DeleteUserGroupTask((UsergroupActivity)activity).execute(userGroup);
+                new DeleteUserGroupTask(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                        if (aBoolean != null && aBoolean == true) {
+                            AllUsergroupsFragment allUsergroupsFragment =
+                                    (AllUsergroupsFragment)activity.getAdapter().getItem(0);
+                            allUsergroupsFragment.deleteUserGroupFromList(userGroup);
+                            MyUsergroupsFragment myUsergroupsFragment =
+                                    (MyUsergroupsFragment)activity.getAdapter().getItem(1);
+                            myUsergroupsFragment.deleteUserGroupFromList(userGroup);
+                        }
+                    }
+                }).execute(userGroup);
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

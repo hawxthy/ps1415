@@ -16,11 +16,13 @@ import com.skatenight.skatenightAPI.model.Event;
 
 import java.util.List;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.common.task.QueryEventsTask;
 import ws1415.veranstalterapp.adapter.EventsCursorAdapter;
 import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.task.DeleteEventTask;
-import ws1415.veranstalterapp.task.QueryEventTask;
+import ws1415.common.task.DeleteEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
 
 /**
@@ -42,7 +44,12 @@ public class ShowEventsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        new QueryEventTask().execute(this);
+        new QueryEventsTask(new ExtendedTaskDelegateAdapter<Void, List<Event>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<Event> events) {
+                setEventsToListView(events);
+            }
+        }).execute();
     }
 
     /**
@@ -142,21 +149,21 @@ public class ShowEventsFragment extends Fragment {
     }
 
     /**
-     * Löscht das Event aus der Liste
-     *
-     * @param event das zu löschende Event
-     */
-    public void deleteEventFromList(Event event){
-        mAdapter.removeListItem(eventList.indexOf(event));
-        eventList.remove(event);
-    }
-
-    /**
      * Löscht das Event vom Server
      *
      * @param event das zu löschende Event
      */
-    public void deleteEvent(Event event){ new DeleteEventTask(this).execute(event);}
+    public void deleteEvent(final Event event){
+        new DeleteEventTask(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                if (aBoolean != null && aBoolean == true) {
+                    mAdapter.removeListItem(eventList.indexOf(event));
+                    eventList.remove(event);
+                }
+            }
+        }).execute(event);
+    }
 
 
     public void editEvent(Event event){

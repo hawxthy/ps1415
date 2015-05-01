@@ -15,11 +15,13 @@ import com.skatenight.skatenightAPI.model.Host;
 
 import java.util.List;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.adapter.HostCursorAdapter;
 import ws1415.veranstalterapp.dialog.AddHostDialog;
-import ws1415.veranstalterapp.task.DeleteHostTask;
-import ws1415.veranstalterapp.task.QueryHostsTask;
+import ws1415.common.task.DeleteHostTask;
+import ws1415.common.task.QueryHostsTask;
 
 /**
  * Klasse zum Verwalten von Veranstaltern und deren Rechten.
@@ -46,7 +48,7 @@ public class PermissionManagementActivity extends Activity {
             }
         });
 
-        new QueryHostsTask().execute(this);
+        refresh();
     }
 
 
@@ -91,7 +93,12 @@ public class PermissionManagementActivity extends Activity {
      * Dient zum refreshen der Liste der aktuellen Hosts.
      */
     public void refresh(){
-        new QueryHostsTask().execute(this);
+        new QueryHostsTask(new ExtendedTaskDelegateAdapter<Void, List<Host>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<Host> hosts) {
+                setHostsToListView(hosts);
+            }
+        }).execute();
     }
 
     /**
@@ -107,7 +114,12 @@ public class PermissionManagementActivity extends Activity {
                 .setItems(R.array.selections_menu_manage_hosts, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int index) {
                         if (index == 0) {
-                            new DeleteHostTask(PermissionManagementActivity.this).execute(hostList.get(position).getEmail());
+                            new DeleteHostTask(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                                @Override
+                                public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                                    refresh();
+                                }
+                            }).execute(hostList.get(position).getEmail());
                         }
                     }
                 });

@@ -1,16 +1,13 @@
 package ws1415.ps1415.task;
 
-import android.content.SharedPreferences;
 import android.test.AndroidTestCase;
 
 import com.skatenight.skatenightAPI.model.Member;
 
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.activity.ShowRouteActivity;
+import ws1415.common.net.ServiceProvider;
+import ws1415.common.task.QueryMemberTask;
 
 /**
  * Prüft, ob das Member-Objekt für die Test-Email mit den richtigen Parametern heruntergeladen wird,

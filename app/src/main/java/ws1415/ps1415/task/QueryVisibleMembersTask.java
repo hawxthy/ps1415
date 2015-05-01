@@ -8,13 +8,11 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
+import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.util.PrefManager;
 
 /**
@@ -48,7 +46,7 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
         List<Member> groupMembers = new ArrayList<Member>();
         HashMap<Member, String> farbenMap = new HashMap<Member, String> ();
         try{
-            tmpGroups = (ArrayList)ServiceProvider.getService().skatenightServerEndpoint().fetchMyUserGroups().execute().getItems();
+            tmpGroups = (ArrayList)ServiceProvider.getService().groupEndpoint().fetchMyUserGroups().execute().getItems();
         }catch( IOException e){
             e.printStackTrace();
         }
@@ -56,7 +54,7 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
             for(UserGroup userGroup: tmpGroups){
                 if(PrefManager.getGroupVisibility(context, userGroup.getName())){
                     try {
-                        groupMembers = ServiceProvider.getService().skatenightServerEndpoint().fetchGroupMembers(userGroup.getName()).execute().getItems();
+                        groupMembers = ServiceProvider.getService().groupEndpoint().fetchGroupMembers(userGroup.getName()).execute().getItems();
                     }catch(IOException e){
                         e.printStackTrace();
                     }

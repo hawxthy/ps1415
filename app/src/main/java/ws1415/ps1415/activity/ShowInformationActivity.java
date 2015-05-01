@@ -21,11 +21,12 @@ import java.util.Date;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.ShowCursorAdapter;
-import ws1415.ps1415.task.GetEventTask;
+import ws1415.common.task.GetEventTask;
 import ws1415.ps1415.task.ToggleMemberEventAttendanceTask;
 import ws1415.ps1415.util.EventUtils;
 import ws1415.ps1415.util.FieldType;
@@ -77,7 +78,12 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
 
         if ((intent = getIntent()) != null) {
             keyId = intent.getLongExtra(EXTRA_KEY_ID, 0);
-            new GetEventTask(this).execute(keyId);
+            new GetEventTask(new ExtendedTaskDelegateAdapter<Void, Event>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, Event event) {
+                    setEventInformation(event);
+                }
+            }).execute(keyId);
         }
 
         final Button attendButton = (Button) findViewById(R.id.show_info_attend_button);

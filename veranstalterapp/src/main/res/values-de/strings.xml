@@ -102,6 +102,7 @@
     <!-- Strings zu EditEventActivity -->
     <string name="title_activity_edit_event">Veranstaltung bearbeiten</string>
     <string name="eventedited">Veranstaltung wurde bearbeitet</string>
+    <string name="eventediting_failed">Veranstaltung konnte nicht bearbeitet werden</string>
     <string name="edit_event_info_apply_button">Speichern</string>
     <string name="title_activity_choose_image">ChooseImageActivity</string>
     <string name="announce_info_edit_button">Editiere Event Eigenschaften</string>

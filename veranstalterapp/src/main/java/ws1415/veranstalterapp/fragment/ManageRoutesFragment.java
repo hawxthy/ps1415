@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.ServerWaypoint;
@@ -21,12 +22,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.veranstalterapp.dialog.AddRouteDraftDialog;
 import ws1415.veranstalterapp.adapter.MapsCursorAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.activity.ShowRouteActivity;
-import ws1415.veranstalterapp.task.DeleteRouteTask;
-import ws1415.veranstalterapp.task.QueryRouteTask;
+import ws1415.common.task.DeleteRouteTask;
+import ws1415.common.task.QueryRouteTask;
 
 /**
  * Dieses Fragment wird dazu genutzt um die Routen zu verwalten.
@@ -56,7 +59,12 @@ public class ManageRoutesFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        new QueryRouteTask().execute(this);
+        new QueryRouteTask(new ExtendedTaskDelegateAdapter<Void, List<Route>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<Route> routes) {
+                setRoutesToListView((ArrayList<Route>) routes);
+            }
+        }).execute();
     }
 
     /**
@@ -164,8 +172,17 @@ public class ManageRoutesFragment extends Fragment {
      *
      * @param route die zu löschende Route
      */
-    public void deleteRoute(Route route) {
-        new DeleteRouteTask(this).execute(route);
+    public void deleteRoute(final Route route) {
+        new DeleteRouteTask(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                if(aBoolean != null && aBoolean == true) {
+                    deleteRouteFromList(route);
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.route_delete_failed), Toast.LENGTH_LONG).show();
+                }
+            }
+        }).execute(route);
     }
 
     /**

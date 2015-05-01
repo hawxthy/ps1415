@@ -1,7 +1,6 @@
 package ws1415.SkatenightBackend;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -21,6 +20,9 @@ import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
+import ws1415.SkatenightBackend.model.Event;
+import ws1415.SkatenightBackend.model.FieldType;
+import ws1415.SkatenightBackend.model.Member;
 
 /**
  * Wird periodisch von einem Cron-Job aufgerufen und such nach beginnenden Events, über die die

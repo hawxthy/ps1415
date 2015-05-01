@@ -37,11 +37,12 @@ import java.util.List;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.ps1415.task.GetEventTask;
-import ws1415.ps1415.task.QueryMemberTask;
+import ws1415.common.task.GetEventTask;
+import ws1415.common.task.QueryMemberTask;
 import ws1415.ps1415.task.QueryVisibleMembersTask;
 
 
@@ -216,7 +217,14 @@ public class ShowRouteActivity extends Activity {
         // Ruft die aktuellen Memberinformationen ab
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String email = prefs.getString("accountName", null);
-        new QueryMemberTask(this).execute(email);
+        new QueryMemberTask(new ExtendedTaskDelegateAdapter<Void, Member>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Member member) {
+                // Hier wurde in einer früheren Version der eigene Benutzer-Marker auf die
+                // Karte gezeichnet. Zurzeit geschieht dies nicht, da die Anzeige der eigenen
+                // Position anders umgesetzt wird.
+            }
+        }).execute(email);
     }
 
     Runnable mStatusChecker = new Runnable(){

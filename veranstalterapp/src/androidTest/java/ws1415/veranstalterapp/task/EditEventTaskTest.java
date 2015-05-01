@@ -2,7 +2,6 @@ package ws1415.veranstalterapp.task;
 
 import android.util.Log;
 
-import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
@@ -14,8 +13,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import ws1415.common.task.EditEventTask;
 import ws1415.veranstalterapp.ServiceProvider;
-import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.FieldType;
 
 /**

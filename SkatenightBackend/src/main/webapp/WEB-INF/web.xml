@@ -5,7 +5,7 @@
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>ws1415.SkatenightBackend.SkatenightServerEndpoint</param-value>
+            <param-value>ws1415.SkatenightBackend.EventEndpoint,ws1415.SkatenightBackend.UserEndpoint,ws1415.SkatenightBackend.HostEndpoint,ws1415.SkatenightBackend.GroupEndpoint,ws1415.SkatenightBackend.RouteEndpoint</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

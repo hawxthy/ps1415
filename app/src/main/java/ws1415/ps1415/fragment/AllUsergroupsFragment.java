@@ -16,10 +16,13 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.util.List;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
+import ws1415.common.net.ServiceProvider;
+import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.adapter.UsergroupAdapter;
-import ws1415.ps1415.task.QueryUserGroupsTask;
+import ws1415.common.task.QueryUserGroupsTask;
 import ws1415.ps1415.util.groupUtils;
 
 /**
@@ -43,7 +46,7 @@ public class AllUsergroupsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new QueryUserGroupsTask().execute(this);
+        refresh();
     }
 
     /**
@@ -98,7 +101,7 @@ public class AllUsergroupsFragment extends Fragment {
                 String email = ServiceProvider.getEmail();
                 UserGroup group = mAdapter.getItem(i);
                 if (groupUtils.isCreator(email, group)) {
-                    c_dialog = groupUtils.createDialogDelete(AllUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
+                    c_dialog = groupUtils.createDialogDelete((UsergroupActivity) AllUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
                     c_dialog.show();
                 } else {
                     c_dialog = groupUtils.createDialogDeleteFailed(AllUsergroupsFragment.this.getActivity(), mAdapter.getItem(i));
@@ -116,7 +119,12 @@ public class AllUsergroupsFragment extends Fragment {
      */
     public void refresh() {
         if(mProgressBarRefresh != null) mProgressBarRefresh.setVisibility(View.VISIBLE);
-        new QueryUserGroupsTask().execute(this);
+        new QueryUserGroupsTask(new ExtendedTaskDelegateAdapter<Void, List<UserGroup>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserGroup> userGroups) {
+                setUserGroupsToListView(userGroups);
+            }
+        }).execute();
     }
 
     /**

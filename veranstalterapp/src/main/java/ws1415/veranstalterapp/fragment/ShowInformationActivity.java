@@ -8,9 +8,11 @@ import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.Event;
 
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.veranstalterapp.adapter.ShowCursorAdapter;
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.task.GetEventTask;
+import ws1415.common.task.GetEventTask;
 import ws1415.veranstalterapp.util.EventUtils;
 
 /**
@@ -36,7 +38,12 @@ public class ShowInformationActivity extends Activity {
         setContentView(R.layout.activity_show_information);
 
         long id = getIntent().getLongExtra("event", 0);
-        new GetEventTask(this).execute(id);
+        new GetEventTask(new ExtendedTaskDelegateAdapter<Void, Event>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Event event) {
+                setEventInformation(event);
+            }
+        }).execute(id);
     }
 
     /**

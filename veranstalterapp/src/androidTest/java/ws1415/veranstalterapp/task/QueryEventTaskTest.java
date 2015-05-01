@@ -1,8 +1,5 @@
 package ws1415.veranstalterapp.task;
 
-import android.test.AndroidTestCase;
-
-import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
@@ -14,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import ws1415.common.task.QueryEventTask;
 import ws1415.common.util.EventUtil;
 import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.fragment.ShowEventsFragment;

@@ -19,7 +19,7 @@ import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.dialog.AddHostDialog;
 import ws1415.veranstalterapp.activity.PermissionManagementActivity;
-import ws1415.veranstalterapp.task.DeleteHostTask;
+import ws1415.common.task.DeleteHostTask;
 
 /**
  * Testet das Hinzufügen und Löschen eines neuen Veranstalters.

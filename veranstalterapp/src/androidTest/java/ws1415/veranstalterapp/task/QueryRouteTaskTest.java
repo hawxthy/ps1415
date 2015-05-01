@@ -1,7 +1,5 @@
 package ws1415.veranstalterapp.task;
 
-import android.test.AndroidTestCase;
-
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
@@ -11,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import ws1415.common.task.QueryRouteTask;
 import ws1415.veranstalterapp.fragment.ManageRoutesFragment;
 import ws1415.veranstalterapp.ServiceProvider;
 

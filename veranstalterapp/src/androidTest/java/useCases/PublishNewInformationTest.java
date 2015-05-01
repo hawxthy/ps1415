@@ -34,7 +34,7 @@ import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.adapter.EventsCursorAdapter;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
 import ws1415.veranstalterapp.fragment.ShowEventsFragment;
-import ws1415.veranstalterapp.task.AddRouteTask;
+import ws1415.common.task.AddRouteTask;
 import ws1415.veranstalterapp.util.EventUtils;
 import ws1415.veranstalterapp.util.FieldType;
 

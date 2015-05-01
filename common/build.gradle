@@ -4,6 +4,8 @@ android {
     compileSdkVersion 21
     buildToolsVersion "21.0.1"
 
+    defaultPublishConfig "jenkins"
+
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 21
@@ -14,6 +16,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        jenkins {
+            debuggable true
+            jniDebuggable false
+            renderscriptDebuggable false
+            minifyEnabled false
+            zipAlignEnabled true
         }
     }
 }
