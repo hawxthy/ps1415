@@ -100,7 +100,7 @@ public class EndUser {
     }
 
     public void removeUserGroup(UserGroup userGroup) {
-        if (userGroup != null) myUserGroups.remove(userGroup);
+        if (userGroup != null) myUserGroups.remove(userGroup.getName());
     }
 
     public void addEvent(Event event) {
