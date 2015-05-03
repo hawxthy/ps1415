@@ -2,8 +2,9 @@ package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.datanucleus.annotations.Unowned;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -18,12 +19,35 @@ public class UserGroup {
     @PrimaryKey
     @Persistent
     private String name;            // Eindeutiger Name der Gruppe
+
+    @Persistent
+    private boolean open;
+
+    @Persistent
+    private GroupType type;
+
     @Persistent(defaultFetchGroup = "true")
     @Unowned
     private Member creator;
+
+    // Eine Map die die E-Mail von einem Benutzer(vorne)
+    // mit dem Namen eines Rangs(hinten) verbindet.
     @Persistent(defaultFetchGroup = "true")
     @Unowned
-    private Set<String> members = new HashSet<>();
+    private Map<String, String> memberRanks = new HashMap<>();
+
+    @Persistent(defaultFetchGroup = "true")
+    @Unowned
+    private List<Rank> ranking;
+
+    @Persistent(defaultFetchGroup = "true")
+    @Unowned
+    private List<BoardEntry> news;
+
+    @Persistent
+    @Unowned
+    private List<BoardEntry> blackBoard;
+
 
     public UserGroup() {
         // Konstruktor für GAE
@@ -36,6 +60,7 @@ public class UserGroup {
         this.creator = creator;
     }
 
+
     public String getName() {
         return name;
     }
@@ -44,11 +69,63 @@ public class UserGroup {
         this.name = name;
     }
 
+
     public Member getCreator() {
         return creator;
     }
 
-    public Set<String> getMembers() {
-        return members;
+
+    public Map<String, String> getMemberRanks() {
+
+        return memberRanks;
+    }
+
+    public void setMemberRanks(Map<String, String> memberRanks) {
+        this.memberRanks = memberRanks;
+    }
+
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
+
+
+    public GroupType getType() {
+        return type;
+    }
+
+    public void setType(GroupType type) {
+        this.type = type;
+    }
+
+
+    public List<BoardEntry> getBlackBoard() {
+        return blackBoard;
+    }
+
+    public void setBlackBoard(List<BoardEntry> blackBoard) {
+        this.blackBoard = blackBoard;
+    }
+
+
+    public List<BoardEntry> getNews() {
+        return news;
+    }
+
+    public void setNews(List<BoardEntry> news) {
+        this.news = news;
+    }
+
+
+    public List<Rank> getRanking() {
+        return ranking;
+    }
+
+    public void setRanking(List<Rank> ranking) {
+        this.ranking = ranking;
     }
 }

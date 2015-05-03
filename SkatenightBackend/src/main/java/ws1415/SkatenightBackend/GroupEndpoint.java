@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.PersistenceManager;
@@ -18,7 +19,10 @@ import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
+import ws1415.SkatenightBackend.model.BoardEntry;
+import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.Member;
+import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.UserGroup;
 
 /**
@@ -170,9 +174,9 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             }
 
             // Benutzer abrufen, die in der Gruppe sind
-            Member[] members = new Member[ug.getMembers().size()];
+            Member[] members = new Member[ug.getMemberRanks().size()];
             int index = 0;
-            for (String mail : ug.getMembers()) {
+            for (String mail: ug.getMemberRanks().values()) {
                 members[index++] = userEndpoint.getMember(mail);
             }
 
@@ -285,10 +289,47 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         ArrayList<Member> members = new ArrayList<>();
         UserGroup tmpGroup = getUserGroup(userGroup);
         UserEndpoint userEndpoint = new UserEndpoint();
-        for(String s : tmpGroup.getMembers()){
+        for(String s : tmpGroup.getMemberRanks().values()){
             members.add(userEndpoint.getMember(s));
         }
         return members;
+    }
+
+    public void setVisibility(@Named("groupName") String groupName, BooleanWrapper visibility){
+        //TODO Lösung für den PrefManager finden.
+    }
+
+    public void sendInvitation(UserGroup u, @Named("userName") String user, @Named("message") String message){
+        //TODO Implementieren.
+    }
+
+    public BooleanWrapper removeMember(UserGroup u, @Named("userName") String user){
+        //TODO Implementieren.
+        return new BooleanWrapper(true);
+    }
+
+    public void sendGlobalMessage(UserGroup u, @Named("message") String message){
+        //TODO Implementieren.
+    }
+
+    public BooleanWrapper sendMessage(UserGroup u, @Named("message") String message, @Named("userName") String user){
+        //TODO Implementieren.
+        return new BooleanWrapper(true);
+    }
+
+    public BooleanWrapper postBlackBoard(UserGroup u, @Named("message") String Message){
+        //TODO Implementieren.
+        return new BooleanWrapper(true);
+    }
+
+    public BooleanWrapper deleteBoardMessage(@Named("groupName") String groupName, BoardEntry be){
+        //TODO Implementieren.
+        return new BooleanWrapper(true);
+    }
+
+    public BooleanWrapper changePicture(@Named("gropuName") String gropuName, Picture p){
+        //TODO Implementieren.
+        return new BooleanWrapper(true);
     }
 
 }
