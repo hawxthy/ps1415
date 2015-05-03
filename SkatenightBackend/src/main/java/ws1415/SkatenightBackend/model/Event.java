@@ -45,6 +45,9 @@ public class Event {
     private List<String> images;
 
     @Persistent
+    private Gallery gallery;
+
+    @Persistent
     private EventMetaData metaData;
 
     public Key getKey() {
@@ -142,5 +145,13 @@ public class Event {
 
     public void setMetaData(EventMetaData metaData) {
         this.metaData = metaData;
+    }
+
+    public Gallery getGallery() {
+        return gallery;
+    }
+
+    public void setGallery(Gallery gallery) {
+        this.gallery = gallery;
     }
 }

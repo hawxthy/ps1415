@@ -4,6 +4,7 @@ import com.google.appengine.api.datastore.Key;
 
 import java.util.Date;
 
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
 /**
@@ -12,6 +13,7 @@ import javax.jdo.annotations.Persistent;
  * Events herunter zu laden.
  * @author Richard Schulze
  */
+@PersistenceCapable
 public class EventMetaData {
     @Persistent
     private String icon;
