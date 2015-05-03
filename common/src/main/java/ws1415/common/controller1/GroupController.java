@@ -1,14 +1,11 @@
-package ws1415.common.Controller;
+package ws1415.common.controller1;
 
 import android.graphics.Picture;
 
 import com.skatenight.skatenightAPI.model.BoardEntry;
 import com.skatenight.skatenightAPI.model.UserGroup;
 
-import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
-import ws1415.common.task.QueryHostsTask;
 
 /**
  * Created by Bernd Eissing on 02.05.2015.

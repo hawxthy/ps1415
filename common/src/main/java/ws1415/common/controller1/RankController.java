@@ -1,4 +1,4 @@
-package ws1415.common.Controller;
+package ws1415.common.controller1;
 
 import com.skatenight.skatenightAPI.model.Rank;
 import com.skatenight.skatenightAPI.model.UserGroup;
