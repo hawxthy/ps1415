@@ -1,4 +1,4 @@
-package ws1415.common.controller1;
+package ws1415.common.controller;
 
 import android.graphics.Picture;
 
