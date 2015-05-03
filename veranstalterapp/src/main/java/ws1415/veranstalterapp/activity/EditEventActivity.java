@@ -15,7 +15,6 @@ import com.skatenight.skatenightAPI.model.Route;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
-import ws1415.veranstalterapp.adapter.AnnounceCursorAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.dialog.ChooseRouteDialog;
 import ws1415.common.task.EditEventTask;
@@ -27,9 +26,9 @@ import ws1415.common.task.GetEventTask;
  *
  * @author Bernd Eissing, Martin Wrodarczyk.
  */
-public class EditEventActivity extends Activity implements AnnounceCursorAdapter.PictureChooserActivity {
+public class EditEventActivity extends Activity {
     // Adapter für die ListView von activity_edit_event_list_view
-    private AnnounceCursorAdapter listAdapter;
+    // private AnnounceCursorAdapter listAdapter;
 
     AlertDialog c_dialog;
 
@@ -82,38 +81,38 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
      */
     private void setButtonListener() {
         // Setze die Listener für Cancel und Apply Buttons
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!listAdapter.getEditMode()) {
-                    cancelInfo(true);
-                }
-                Toast.makeText(EditEventActivity.this, getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
-            }
-        });
-
-        applyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!listAdapter.getEditMode()) {
-                    applyInfo();
-                }
-                Toast.makeText(EditEventActivity.this, getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
-            }
-        });
-
-        editButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                if(editButton.getText().equals(getResources().getString(R.string.announce_info_start_edit_button))){
-                    listAdapter.startEditMode();
-                    editButton.setText(getResources().getString(R.string.announce_info_exit_edit_button));
-                }else if(editButton.getText().equals(getResources().getString(R.string.announce_info_exit_edit_button))){
-                    listAdapter.exitEditMode();
-                    editButton.setText(getResources().getString(R.string.announce_info_start_edit_button));
-                }
-            }
-        });
+//        cancelButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(!listAdapter.getEditMode()) {
+//                    cancelInfo(true);
+//                }
+//                Toast.makeText(EditEventActivity.this, getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
+//            }
+//        });
+//
+//        applyButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(!listAdapter.getEditMode()) {
+//                    applyInfo();
+//                }
+//                Toast.makeText(EditEventActivity.this, getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_LONG);
+//            }
+//        });
+//
+//        editButton.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View view){
+//                if(editButton.getText().equals(getResources().getString(R.string.announce_info_start_edit_button))){
+//                    listAdapter.startEditMode();
+//                    editButton.setText(getResources().getString(R.string.announce_info_exit_edit_button));
+//                }else if(editButton.getText().equals(getResources().getString(R.string.announce_info_exit_edit_button))){
+//                    listAdapter.exitEditMode();
+//                    editButton.setText(getResources().getString(R.string.announce_info_start_edit_button));
+//                }
+//            }
+//        });
     }
 
 
@@ -186,12 +185,12 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
         // listAdapter = new AnnounceCursorAdapter(this, e.getDynamicFields(), e);
 
         listView = (ListView) findViewById(R.id.activity_edit_event_list_view);
-        listView.setAdapter(listAdapter);
+        // listView.setAdapter(listAdapter);
     }
 
-    public AnnounceCursorAdapter getAdapter(){
-        return listAdapter;
-    }
+//    public AnnounceCursorAdapter getAdapter(){
+//        return listAdapter;
+//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -199,7 +198,7 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
         // Verarbietet das ausgewählte Bild
         // Hier wird der RequestCOde dazu verwendet die Positions des zu ändernden dynamischen Feldes
         // zu übergeben.
-        listAdapter.processImage(requestCode, data);
+        // listAdapter.processImage(requestCode, data);
     }
 
     public ListView getListView() {

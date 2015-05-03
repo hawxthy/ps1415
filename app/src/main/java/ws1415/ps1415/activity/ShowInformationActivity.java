@@ -25,7 +25,6 @@ import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.ps1415.adapter.ShowCursorAdapter;
 import ws1415.common.task.GetEventTask;
 import ws1415.ps1415.task.ToggleMemberEventAttendanceTask;
 
@@ -42,7 +41,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     public static final String EXTRA_KEY_ID = "show_information_extra_key_id";
 
     // Adapter für die ListView von activity_show_information_list_view
-    private ShowCursorAdapter listAdapter;
+    // private ShowCursorAdapter listAdapter;
 
     // Die ListView von der xml datei activity_show_information
     private ListView listView;
@@ -160,9 +159,9 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         return super.onOptionsItemSelected(item);
     }
 
-    public ShowCursorAdapter getShowCursorAdapter() {
-        return listAdapter;
-    }
+    // public ShowCursorAdapter getShowCursorAdapter() {
+    //     return listAdapter;
+    // }
 
     public Event getEvent() {
         return event;
@@ -182,7 +181,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
             // listAdapter = new ShowCursorAdapter(this, e.getDynamicFields(), e);
 
             listView = (ListView) findViewById(R.id.activity_show_information_list_view);
-            listView.setAdapter(listAdapter);
+            // listView.setAdapter(listAdapter);
 
             // Prüft, ob das aktuelle Datum nach dem Start-Datum des Events liegt.
             // Also ob es bereits gestartet ist. Somit wird der Server gestartet.

@@ -12,6 +12,7 @@ import java.util.List;
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.CreateUserTask;
 import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.task.GetFullUserTask;
 
@@ -29,7 +30,7 @@ public class UserController {
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void createUser(ExtendedTaskDelegateAdapter handler, String userMail) {
+    public static void createUser(ExtendedTaskDelegate handler, String userMail) {
         new CreateUserTask(handler).execute(userMail);
     }
 

@@ -10,7 +10,6 @@ import com.skatenight.skatenightAPI.model.Event;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
-import ws1415.veranstalterapp.adapter.ShowCursorAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.common.task.GetEventTask;
 
@@ -21,7 +20,7 @@ import ws1415.common.task.GetEventTask;
  */
 public class ShowInformationActivity extends Activity {
     // Adapter für die ListView von activity_show_information_list_view
-    private ShowCursorAdapter listAdapter;
+    // private ShowCursorAdapter listAdapter;
 
     // Die ListView von der xml datei activity_show_information
     private ListView listView;
@@ -57,7 +56,7 @@ public class ShowInformationActivity extends Activity {
             // listAdapter = new ShowCursorAdapter(this, e.getDynamicFields(), e);
 
             listView = (ListView) findViewById(R.id.activity_show_information_list_view);
-            listView.setAdapter(listAdapter);
+            // listView.setAdapter(listAdapter);
         }
     }
 }

@@ -13,7 +13,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.Event;
-import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
 
 import java.util.ArrayList;
@@ -21,16 +20,15 @@ import java.util.ArrayList;
 import ws1415.common.task.CreateEventTask;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.activity.HoldTabsActivity;
-import ws1415.veranstalterapp.adapter.AnnounceCursorAdapter;
 
 /**
  * Fragment zum Veröffentlichen von neuen Veranstaltungen.
  *
  * @author Bernd Eissing, Marting Wrodarczyk
  */
-public class AnnounceInformationFragment extends Fragment implements AnnounceCursorAdapter.PictureChooserActivity {
+public class AnnounceInformationFragment extends Fragment {
     //Adapter für die ListView listView
-    private AnnounceCursorAdapter listAdapter;
+    // private AnnounceCursorAdapter listAdapter;
 
     // Die ListView von der xml datei fragment_announce_information
     private ListView listView;
@@ -66,7 +64,7 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
 
         listView = (ListView) view.findViewById(R.id.fragment_announce_information_list_view);
         listView.setItemsCanFocus(true);
-        listView.setAdapter(listAdapter);
+        // listView.setAdapter(listAdapter);
 
         applyButton = (Button) view.findViewById(R.id.announce_info_apply_button);
         cancelButton = (Button) view.findViewById(R.id.announce_info_cancel_button);
@@ -83,40 +81,40 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
      */
     private void setButtonListener() {
         // Setze die Listener für Cancel und Apply Buttons
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!listAdapter.getEditMode()) {
-                    cancelInfo(true);
-                } else {
-                    Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        applyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!listAdapter.getEditMode()) {
-                    applyInfo();
-                } else {
-                    Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        editButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                if(editButton.getText().equals(getResources().getString(R.string.announce_info_start_edit_button))){
-                    listAdapter.startEditMode();
-                    editButton.setText(getResources().getString(R.string.announce_info_exit_edit_button));
-                }else if(editButton.getText().equals(getResources().getString(R.string.announce_info_exit_edit_button))){
-                    listAdapter.exitEditMode();
-                    editButton.setText(getResources().getString(R.string.announce_info_start_edit_button));
-                }
-            }
-        });
+//        cancelButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(!listAdapter.getEditMode()) {
+//                    cancelInfo(true);
+//                } else {
+//                    Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//
+//        applyButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (!listAdapter.getEditMode()) {
+//                    applyInfo();
+//                } else {
+//                    Toast.makeText(getActivity(), getResources().getString(R.string.announce_info_edit_mode_string), Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//
+//        editButton.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View view){
+//                if(editButton.getText().equals(getResources().getString(R.string.announce_info_start_edit_button))){
+//                    listAdapter.startEditMode();
+//                    editButton.setText(getResources().getString(R.string.announce_info_exit_edit_button));
+//                }else if(editButton.getText().equals(getResources().getString(R.string.announce_info_exit_edit_button))){
+//                    listAdapter.exitEditMode();
+//                    editButton.setText(getResources().getString(R.string.announce_info_start_edit_button));
+//                }
+//            }
+//        });
     }
 
     /**
@@ -147,8 +145,8 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
                     // TODO Verwendung von Dynamic Fields anpassen
 //                    EventUtils.getInstance(getActivity()).setStandardFields(event);
 //                    listAdapter = new AnnounceCursorAdapter(AnnounceInformationFragment.this, event.getDynamicFields(), event);
-                    listView.setAdapter(listAdapter);
-                    listAdapter.notifyDataSetChanged();
+                    //listView.setAdapter(listAdapter);
+                    //listAdapter.notifyDataSetChanged();
 
                     // Update die Informationen in ShowInformationFragment
                     HoldTabsActivity.updateInformation();
@@ -176,7 +174,7 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
             Toast.makeText(getActivity(), "Wurde noch nicht erstellt", Toast.LENGTH_LONG).show();
             // TODO Verwendung von Dynamic Fields anpassen
 //            EventUtils.getInstance(getActivity()).setStandardFields(event);
-            listAdapter.notifyDataSetChanged();
+            //listAdapter.notifyDataSetChanged();
         } else {
             Toast.makeText(getActivity(), "Nicht alle notwendigen Felder ausgefüllt", Toast.LENGTH_LONG).show();
         }
@@ -187,9 +185,9 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
      *
      * @return Adapter
      */
-    public AnnounceCursorAdapter getAdapter(){
-        return listAdapter;
-    }
+//    public AnnounceCursorAdapter getAdapter(){
+//        return listAdapter;
+//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -197,7 +195,7 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
         // Verarbietet das ausgewählte Bild
         // Hier wird der RequestCOde dazu verwendet die Positions des zu ändernden dynamischen Feldes
         // zu übergeben.
-        listAdapter.processImage(requestCode, data);
+        //listAdapter.processImage(requestCode, data);
     }
 
     public AlertDialog getLastDialog(){

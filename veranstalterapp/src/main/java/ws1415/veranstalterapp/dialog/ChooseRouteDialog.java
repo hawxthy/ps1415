@@ -46,10 +46,10 @@ public class ChooseRouteDialog extends Activity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ((AnnounceInformationFragment) HoldTabsActivity.getAdapter().getItem(1)).getAdapter().setRouteAndText(routeList.get(i));
-                if(activity != null){
-                    activity.getAdapter().setRouteAndText(routeList.get(i));
-                }
+//                ((AnnounceInformationFragment) HoldTabsActivity.getAdapter().getItem(1)).getAdapter().setRouteAndText(routeList.get(i));
+//                if(activity != null){
+//                    activity.getAdapter().setRouteAndText(routeList.get(i));
+//                }
                 finish();
             }
         });
