@@ -21,7 +21,6 @@ import ws1415.SkatenightBackend.gcm.MessageType;
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
 import ws1415.SkatenightBackend.model.Event;
-import ws1415.SkatenightBackend.model.FieldType;
 import ws1415.SkatenightBackend.model.Member;
 
 /**
@@ -61,7 +60,7 @@ public class EventStartServlet extends HttpServlet {
             q = pm.newQuery(Event.class);
             for (Event e : (List<Event>) q.execute()) {
                 if (!e.isNotificationSend()) {
-                    startingDate = FieldType.getFusedDate(e);
+                    startingDate = e.getMetaData().getDate();
                     if (startingDate.before(currentDate)) {
                         startingEvents.add(e);
                     }
@@ -105,7 +104,7 @@ public class EventStartServlet extends HttpServlet {
                             .build();
                     sender.send(m, new LinkedList<>(ids), 1);
 
-                    String event_title = FieldType.getUniqueField(FieldType.TITLE.getId(), e).getValue();
+                    String event_title = e.getMetaData().getTitle();
                     m = new Message.Builder()
                             .delayWhileIdle(false)
                             .timeToLive(3600)

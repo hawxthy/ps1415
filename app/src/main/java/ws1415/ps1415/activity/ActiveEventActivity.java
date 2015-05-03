@@ -33,7 +33,6 @@ import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.common.task.GetEventTask;
-import ws1415.ps1415.util.EventUtils;
 import ws1415.ps1415.util.LocalAnalysisData;
 import ws1415.ps1415.util.LocalStorageUtil;
 
@@ -245,7 +244,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         if (e == null) {
             return true;
         }
-        else if (EventUtils.getInstance(this).getUniqueField(3, e) == null) {
+        else if (e.getMetaData().getDate() == null) {
             return true;
         }
         else if (e.getRoute().getRouteData() == null) {
@@ -259,7 +258,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     public void taskDidFinish(ExtendedTask task, Event event) {
         setProgressBarIndeterminateVisibility(false);
         if (!isEventNull(event)) {
-            startDate = EventUtils.getInstance(this).getFusedDate(event);
+            startDate = new Date(event.getMetaData().getDate().getValue());
 
             encodedWaypoints = event.getRoute().getRouteData().getValue();
 

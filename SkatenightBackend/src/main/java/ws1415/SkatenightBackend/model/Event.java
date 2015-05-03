@@ -1,6 +1,7 @@
 package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.datanucleus.annotations.Unowned;
 
 import java.util.ArrayList;
@@ -12,8 +13,8 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
- * Datenmodell für eine Veranstaltung.
- * Created by Richard Schulze, Bernd Eissing, Martin Wrodarczyk on 21.10.2014.
+ * Repräsentiert die vollständigen Daten eines Events inklusive der Metadaten.
+ * @author Richard Schulze
  */
 @PersistenceCapable
 public class Event {
@@ -23,9 +24,6 @@ public class Event {
     @Persistent(defaultFetchGroup = "true")
     @Unowned
     private Route route;
-    // Dynamische ArrayListe von dynamischen Komponenten
-    @Persistent(serialized = "true", defaultFetchGroup = "true")
-    private List<Field> dynamicFields = new ArrayList<Field>();
     @Persistent
     private int routeFieldFirst;
     @Persistent
@@ -34,6 +32,20 @@ public class Event {
     private ArrayList<String> memberList;
     @Persistent
     private boolean notificationSend = false;
+
+    @Persistent
+    private String headerImage;
+    @Persistent
+    private Text description;
+    @Persistent
+    private String meetingPlace;
+    @Persistent
+    private int fee;
+    @Persistent
+    private List<String> images;
+
+    @Persistent
+    private EventMetaData metaData;
 
     public Key getKey() {
         return key;
@@ -49,14 +61,6 @@ public class Event {
 
     public Route getRoute() {
         return  route;
-    }
-
-    public List<Field> getDynamicFields(){
-        return dynamicFields;
-    }
-
-    public void setDynamicFields(ArrayList<Field> list){
-        this.dynamicFields = list;
     }
 
     public int getRouteFieldFirst() {
@@ -90,5 +94,53 @@ public class Event {
 
     public void setNotificationSend(boolean notificationSend) {
         this.notificationSend = notificationSend;
+    }
+
+    public String getHeaderImage() {
+        return headerImage;
+    }
+
+    public void setHeaderImage(String headerImage) {
+        this.headerImage = headerImage;
+    }
+
+    public Text getDescription() {
+        return description;
+    }
+
+    public void setDescription(Text description) {
+        this.description = description;
+    }
+
+    public String getMeetingPlace() {
+        return meetingPlace;
+    }
+
+    public void setMeetingPlace(String meetingPlace) {
+        this.meetingPlace = meetingPlace;
+    }
+
+    public int getFee() {
+        return fee;
+    }
+
+    public void setFee(int fee) {
+        this.fee = fee;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public EventMetaData getMetaData() {
+        return metaData;
+    }
+
+    public void setMetaData(EventMetaData metaData) {
+        this.metaData = metaData;
     }
 }

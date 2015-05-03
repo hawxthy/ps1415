@@ -13,7 +13,6 @@ import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.veranstalterapp.adapter.ShowCursorAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.common.task.GetEventTask;
-import ws1415.veranstalterapp.util.EventUtils;
 
 /**
  * Activity zum Anzeigen der Metainformationen der erstellten Veranstaltung.
@@ -53,8 +52,9 @@ public class ShowInformationActivity extends Activity {
      */
     public void setEventInformation(Event e) {
         if (e != null) {
-            setTitle(EventUtils.getInstance(this).getUniqueField(8, e).getValue());
-            listAdapter = new ShowCursorAdapter(this, e.getDynamicFields(), e);
+            setTitle(e.getMetaData().getTitle());
+            // TODO Verwendung von Dynamic Fields anpassen
+            // listAdapter = new ShowCursorAdapter(this, e.getDynamicFields(), e);
 
             listView = (ListView) findViewById(R.id.activity_show_information_list_view);
             listView.setAdapter(listAdapter);

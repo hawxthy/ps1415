@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.AddRouteTask;
-import ws1415.veranstalterapp.ServiceProvider;
 
 /**
  * Created by Richard Schulze on 10.11.2014.
@@ -46,21 +46,21 @@ public class AddRouteTaskTest extends AuthTaskTestCase {
         super.setUp();
 
         // Bestehende Events löschen
-        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+        List<Event> events = ServiceProvider.getService().eventEndpoint().getAllEvents()
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
                         .execute();
             }
         }
 
         // Bestehende Routen löschen
-        List<Route> routes = ServiceProvider.getService().skatenightServerEndpoint().getRoutes()
+        List<Route> routes = ServiceProvider.getService().routeEndpoint().getRoutes()
                 .execute().getItems();
         if (routes != null) {
             for (Route r : routes) {
-                ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey()
+                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getKey()
                         .getId()).execute();
             }
         }
@@ -70,9 +70,9 @@ public class AddRouteTaskTest extends AuthTaskTestCase {
      * Testet, ob die Route vollständig und korrekt auf dem Server gespeichert wird.
      */
     public void testTask() throws IOException, ExecutionException, InterruptedException {
-        new AddRouteTask().execute(testRoute1).get();
+        new AddRouteTask(null).execute(testRoute1).get();
         // Route wieder abrufen und mit lokaler Route vergleichen
-        List<Route> routes = ServiceProvider.getService().skatenightServerEndpoint().getRoutes()
+        List<Route> routes = ServiceProvider.getService().routeEndpoint().getRoutes()
                 .execute().getItems();
         assertNotNull("no routes on server", routes);
         assertEquals("wrong route count", 1, routes.size());

@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.QueryRouteTask;
 import ws1415.veranstalterapp.fragment.ManageRoutesFragment;
-import ws1415.veranstalterapp.ServiceProvider;
 
 /**
  * Created by Richard Schulze on 10.11.2014.
@@ -80,41 +80,36 @@ public class QueryRouteTaskTest extends AuthTaskTestCase {
         super.setUp();
 
         // Bestehende Events löschen
-        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+        List<Event> events = ServiceProvider.getService().eventEndpoint().getAllEvents()
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
                         .execute();
             }
         }
 
         // Bestehende Routen löschen
-        List<Route> routes = ServiceProvider.getService().skatenightServerEndpoint().getRoutes()
+        List<Route> routes = ServiceProvider.getService().routeEndpoint().getRoutes()
                 .execute().getItems();
         if (routes != null) {
             for (Route r : routes) {
-                ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey().getId())
+                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getKey().getId())
                         .execute();
             }
         }
         // Testrouten auf den Server schreiben
-        ServiceProvider.getService().skatenightServerEndpoint().addRoute(testRoute1).execute();
-        ServiceProvider.getService().skatenightServerEndpoint().addRoute(testRoute2).execute();
-        ServiceProvider.getService().skatenightServerEndpoint().addRoute(testRoute3).execute();
+        ServiceProvider.getService().routeEndpoint().addRoute(testRoute1).execute();
+        ServiceProvider.getService().routeEndpoint().addRoute(testRoute2).execute();
+        ServiceProvider.getService().routeEndpoint().addRoute(testRoute3).execute();
     }
 
     /**
      * Testet, ob die Routen vollständig und korrekt abgerufen werden.
      */
     public void testTask() throws ExecutionException, InterruptedException, IOException {
-        QueryRouteTask task = new QueryRouteTask();
-        List<Route> routes = task.execute(new ManageRoutesFragment() {
-            public void setRoutesToListView(ArrayList<Route> results) {
-                // Methode mit leerem Rumpf überschreiben,
-                // da der Callback für den Test nicht relevant ist
-            }
-        }).get();
+        QueryRouteTask task = new QueryRouteTask(null);
+        List<Route> routes = task.execute().get();
         // Abgerufene Routen den Testrouten zuordnen
         Route route1 = null, route2 = null, route3 = null;
         for (Route r : routes) {
@@ -149,11 +144,11 @@ public class QueryRouteTaskTest extends AuthTaskTestCase {
                 route3.getRouteData().getValue());
 
         // Bestehende Routen löschen
-        List<Route> routes2 = ServiceProvider.getService().skatenightServerEndpoint().getRoutes()
+        List<Route> routes2 = ServiceProvider.getService().routeEndpoint().getRoutes()
                 .execute().getItems();
         if (routes != null) {
             for (Route r : routes2) {
-                ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey()
+                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getKey()
                         .getId()).execute();
             }
         }

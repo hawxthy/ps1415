@@ -2,20 +2,18 @@ package ws1415.veranstalterapp.task;
 
 import android.util.Log;
 
+import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
-import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.EditEventTask;
-import ws1415.veranstalterapp.ServiceProvider;
-import ws1415.veranstalterapp.util.FieldType;
 
 /**
  * Created by Bernd Eissing on 21.11.2014.
@@ -68,51 +66,12 @@ public class EditEventTaskTest extends AuthTaskTestCase {
 
         // Erstelle das zu testende Event
         event1 = new Event();
-        event1.setDynamicFields(new ArrayList<Field>());
-
-        Field tmpField = new Field();
-        tmpField.setType(FieldType.TITLE.getId());
-        tmpField.setTitle("Title");
-        tmpField.setValue("Testevent");
-        event1.getDynamicFields().add(0, tmpField);
-
-        Field tmpField2 = new Field();
-        tmpField2.setType(FieldType.FEE.getId());
-        tmpField2.setTitle("Fee");
-        tmpField2.setValue("7");
-        event1.getDynamicFields().add(1, tmpField2);
-
-        Field tmpField3 = new Field();
-        tmpField3.setType(FieldType.DATE.getId());
-        tmpField3.setTitle("Date");
-        tmpField3.setValue(Long.toString(time));
-        event1.getDynamicFields().add(2, tmpField3);
-
-        Field tmpField4 = new Field();
-        tmpField4.setType(FieldType.TIME.getId());
-        tmpField4.setTitle("Time");
-
-        tmpField4.setValue(Long.toString(time));
-        event1.getDynamicFields().add(3, tmpField4);
-
-        Field tmpField5 = new Field();
-        tmpField5.setType(FieldType.LOCATION.getId());
-        tmpField5.setTitle("Location");
-        tmpField5.setValue("Münster");
-        event1.getDynamicFields().add(4, tmpField5);
-
-        Field tmpField6 = new Field();
-        tmpField6.setType(FieldType.ROUTE.getId());
-        tmpField6.setTitle("Map");
-        tmpField6.setValue(route1.getName());
-        event1.getDynamicFields().add(5, tmpField6);
+        event1.getMetaData().setTitle("Testevent");
+        event1.setFee(700);
+        event1.getMetaData().setDate(new DateTime(time));
+        event1.setMeetingPlace("Münster");
         event1.setRoute(route1);
-
-        Field tmpField7 = new Field();
-        tmpField7.setType(FieldType.DESCRIPTION.getId());
-        tmpField7.setTitle("Description");
-        tmpField7.setValue("Das ist ein Testevent");
-        event1.getDynamicFields().add(6, tmpField7);
+        event1.setDescription(new Text().setValue("Das ist ein Testevent"));
     }
 
     /**
@@ -124,21 +83,21 @@ public class EditEventTaskTest extends AuthTaskTestCase {
         super.setUp();
 
         // Alle Events löschen
-        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+        List<Event> events = ServiceProvider.getService().eventEndpoint().getAllEvents()
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
                         .execute();
             }
         }
 
         // Das oben erstellte Event auf dem Server speichern
-        ServiceProvider.getService().skatenightServerEndpoint().createEvent(event1).execute();
-        event1 = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems().get(0);
+        ServiceProvider.getService().eventEndpoint().createEvent(event1).execute();
+        event1 = ServiceProvider.getService().eventEndpoint().getAllEvents().execute().getItems().get(0);
         // Ggfs. warten, bis die Datenbank auf dem Server aktualisiert wurde
         while (event1 == null) {
-            event1 = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems().get(0);
+            event1 = ServiceProvider.getService().eventEndpoint().getAllEvents().execute().getItems().get(0);
             Thread.sleep(500);
         }
     }
@@ -151,75 +110,39 @@ public class EditEventTaskTest extends AuthTaskTestCase {
      */
     public void testTask() throws IOException, ExecutionException, InterruptedException {
         // Ändere alle Daten vom event
-        for (int i = 0; i < event1.getDynamicFields().size(); i++) {
-            if (event1.getDynamicFields().get(i).getType() == FieldType.TITLE.getId()) {
-                event1.getDynamicFields().get(i).setValue("EditEvent");
-            } else if (event1.getDynamicFields().get(i).getType() == FieldType.FEE.getId()) {
-                event1.getDynamicFields().get(i).setValue("2");
-            } else if (event1.getDynamicFields().get(i).getType() == FieldType.LOCATION.getId()) {
-                event1.getDynamicFields().get(i).setValue("MS");
-            } else if (event1.getDynamicFields().get(i).getType() == FieldType.DESCRIPTION.getId()) {
-                event1.getDynamicFields().get(i).setValue("Das ist das veränderte Testevent");
-            } else if (event1.getDynamicFields().get(i).getType() == FieldType.ROUTE.getId()) {
-                event1.getDynamicFields().get(i).setValue(route2.getName());
-                event1.setRoute(route2);
-            }
-        }
+        event1.getMetaData().setTitle("EditEvent");
+        event1.setFee(200);
+        event1.setMeetingPlace("MS");
+        event1.setDescription(new Text().setValue("Das ist das veränderte Testevent"));
+        event1.setRoute(route2);
 
-        Log.d("TESTS", "" + new EditEventTask().execute(event1).get());
+        Log.d("TESTS", "" + new EditEventTask(null).execute(event1).get());
 
         // Überprüfen
         Log.d("TESTS", event1.getKey().toPrettyString());
         // Event testEvent = ServiceProvider.getService().skatenightServerEndpoint().getEvent(event.getKey().getId()).execute();
-        Event testEvent = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems().get(0);
+        Event testEvent = ServiceProvider.getService().eventEndpoint().getAllEvents().execute().getItems().get(0);
 
-        for (int i = 0; i < event1.getDynamicFields().size(); i++) {
-            if (event1.getDynamicFields().get(i).getType() == FieldType.TITLE.getId()) {
-                for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
-                    if (testEvent.getDynamicFields().get(j).getType() == FieldType.TITLE.getId()) {
-                        assertEquals("Der Title stimmt nicht überein", event1.getDynamicFields().get(i).getValue(), testEvent.getDynamicFields().get(j).getValue());
-                    }
-                }
-            } else if (event1.getDynamicFields().get(i).getType() == FieldType.FEE.getId()) {
-                for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
-                    if (testEvent.getDynamicFields().get(j).getType() == FieldType.FEE.getId()) {
-                        assertEquals("Die Fee stimmt nicht überein", event1.getDynamicFields().get(i).getValue(), testEvent.getDynamicFields().get(j).getValue());
-                    }
-                }
-            } else if (event1.getDynamicFields().get(i).getType() == FieldType.LOCATION.getId()) {
-                for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
-                    if (testEvent.getDynamicFields().get(j).getType() == FieldType.LOCATION.getId()) {
-                        assertEquals("Die Location stimmt nicht überein", event1.getDynamicFields().get(i).getValue(), testEvent.getDynamicFields().get(j).getValue());
-                    }
-                }
-            } else if (event1.getDynamicFields().get(i).getType() == FieldType.DESCRIPTION.getId()) {
-                for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
-                    if (testEvent.getDynamicFields().get(j).getType() == FieldType.DESCRIPTION.getId()) {
-                        assertEquals("Die Beschreibung stimmt nicht überein", event1.getDynamicFields().get(i).getValue(), testEvent.getDynamicFields().get(j).getValue());
-                    }
-                }
-            } else if (event1.getDynamicFields().get(i).getType() == FieldType.ROUTE.getId()) {
-                for (int j = 0; j < testEvent.getDynamicFields().size(); j++) {
-                    if (testEvent.getDynamicFields().get(j).getType() == FieldType.ROUTE.getId()) {
-                        assertEquals("Der Routenname stimmt nicht überein", event1.getDynamicFields().get(i), testEvent.getDynamicFields().get(j));
-                    }
-                }
-            }
-        }
+        assertEquals("Der Title stimmt nicht überein", event1.getMetaData().getTitle(), testEvent.getMetaData().getTitle());
+        assertEquals("Die Fee stimmt nicht überein", event1.getFee(), testEvent.getFee());
+        assertEquals("Die Location stimmt nicht überein", event1.getMeetingPlace(), testEvent.getMeetingPlace());
+        assertEquals("Die Beschreibung stimmt nicht überein", event1.getDescription().getValue(), testEvent.getDescription().getValue());
+        assertEquals("Der Routenname stimmt nicht überein", event1.getRoute().getName(), testEvent.getRoute().getName());
+
         // Bestehende Events löschen
-        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+        List<Event> events = ServiceProvider.getService().eventEndpoint().getAllEvents()
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
                         .execute();
             }
         }
 
         // Bestehende Routen löschen
-        for (Route r : ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute()
+        for (Route r : ServiceProvider.getService().routeEndpoint().getRoutes().execute()
                 .getItems()) {
-            ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey().getId())
+            ServiceProvider.getService().routeEndpoint().deleteRoute(r.getKey().getId())
                     .execute();
         }
     }

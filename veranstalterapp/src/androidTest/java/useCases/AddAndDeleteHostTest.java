@@ -14,9 +14,9 @@ import android.widget.ListView;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Host;
 
+import ws1415.common.net.ServiceProvider;
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.dialog.AddHostDialog;
 import ws1415.veranstalterapp.activity.PermissionManagementActivity;
 import ws1415.common.task.DeleteHostTask;
@@ -143,7 +143,7 @@ public class AddAndDeleteHostTest extends ActivityInstrumentationTestCase2<Permi
         Thread.sleep(3000);
 
         final AlertDialog dialog = mActivity.getLastDialog();
-        new DeleteHostTask(mActivity).execute(mActivity.getHostList().get(pos).getEmail());
+        new DeleteHostTask(null).execute(mActivity.getHostList().get(pos).getEmail());
         dialog.cancel();
         Thread.sleep(3000);
         found = false;

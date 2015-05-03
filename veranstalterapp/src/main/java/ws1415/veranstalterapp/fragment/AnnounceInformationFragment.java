@@ -19,12 +19,9 @@ import com.skatenight.skatenightAPI.model.Route;
 import java.util.ArrayList;
 
 import ws1415.common.task.CreateEventTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.adapter.AnnounceCursorAdapter;
-import ws1415.veranstalterapp.util.EventUtils;
-import ws1415.veranstalterapp.util.FieldType;
 
 /**
  * Fragment zum Veröffentlichen von neuen Veranstaltungen.
@@ -62,9 +59,10 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
 
         // Erstelle ein neues Event und füge die Standardattribute in die ArrayList ein.
         event = new Event();
-        event.setDynamicFields(new ArrayList<Field>());
-        EventUtils.getInstance(getActivity()).setStandardFields(event);
-        listAdapter = new AnnounceCursorAdapter(this, event.getDynamicFields(), event);
+        // TODO Verwendung von Dynamic Fields anpassen
+//        event.setDynamicFields(new ArrayList<Field>());
+//        EventUtils.getInstance(getActivity()).setStandardFields(event);
+//        listAdapter = new AnnounceCursorAdapter(this, event.getDynamicFields(), event);
 
         listView = (ListView) view.findViewById(R.id.fragment_announce_information_list_view);
         listView.setItemsCanFocus(true);
@@ -132,11 +130,9 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
         builder.setMessage(R.string.areyousure);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // Setze die Attribute vom Event
-                EventUtils.getInstance(getActivity()).setEventInfo(event, listView);
 
                 // Initialisiere Pflichtfelder
-                String eventTitle = EventUtils.getUniqueField(FieldType.TITLE.getId(), event).getValue();
+                String eventTitle = event.getMetaData().getTitle();
                 Route eventRoute = event.getRoute();
 
                 if (!eventTitle.equals("") && eventRoute != null){
@@ -148,8 +144,9 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
 
                     // Setze die Attribute von Event auf den Standard
                     event = new Event();
-                    EventUtils.getInstance(getActivity()).setStandardFields(event);
-                    listAdapter = new AnnounceCursorAdapter(AnnounceInformationFragment.this, event.getDynamicFields(), event);
+                    // TODO Verwendung von Dynamic Fields anpassen
+//                    EventUtils.getInstance(getActivity()).setStandardFields(event);
+//                    listAdapter = new AnnounceCursorAdapter(AnnounceInformationFragment.this, event.getDynamicFields(), event);
                     listView.setAdapter(listAdapter);
                     listAdapter.notifyDataSetChanged();
 
@@ -177,7 +174,8 @@ public class AnnounceInformationFragment extends Fragment implements AnnounceCur
     public void cancelInfo(boolean allSet) {
         if (allSet) {
             Toast.makeText(getActivity(), "Wurde noch nicht erstellt", Toast.LENGTH_LONG).show();
-            EventUtils.getInstance(getActivity()).setStandardFields(event);
+            // TODO Verwendung von Dynamic Fields anpassen
+//            EventUtils.getInstance(getActivity()).setStandardFields(event);
             listAdapter.notifyDataSetChanged();
         } else {
             Toast.makeText(getActivity(), "Nicht alle notwendigen Felder ausgefüllt", Toast.LENGTH_LONG).show();

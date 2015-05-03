@@ -11,11 +11,10 @@ import com.skatenight.skatenightAPI.model.Event;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.util.EventUtils;
-import ws1415.veranstalterapp.util.FieldType;
 
 /**
  * Klasse zum Füllen der ListView in ShowEventsFragment.
@@ -112,10 +111,11 @@ public class EventsCursorAdapter extends BaseAdapter{
         }else{
             holder = (Holder)convertView.getTag();
         }
-        String eventLocationText = EventUtils.getInstance(mContext).getUniqueField(FieldType.LOCATION.getId(), getItem(position)).getValue();
-        String eventFeeText = EventUtils.getInstance(mContext).getUniqueField(FieldType.FEE.getId(), getItem(position)).getValue();
-        holder.eventName.setText(EventUtils.getInstance(mContext).getUniqueField(FieldType.TITLE.getId(), getItem(position)).getValue());
-        holder.eventDate.setText(eventDateFormat.format(EventUtils.getInstance(mContext).getFusedDate(getItem(position))));
+        Event event = getItem(position);
+        String eventLocationText = event.getMeetingPlace();
+        String eventFeeText = event.getFee() + " €";
+        holder.eventName.setText(event.getMetaData().getTitle());
+        holder.eventDate.setText(eventDateFormat.format(new Date(event.getMetaData().getDate().getValue())));
 
 
         if(eventLocationText != null) holder.eventLocation.setText(eventLocationText);

@@ -1,5 +1,6 @@
 package ws1415.veranstalterapp.task;
 
+import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
@@ -11,12 +12,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import ws1415.common.task.QueryEventTask;
-import ws1415.common.util.EventUtil;
-import ws1415.veranstalterapp.ServiceProvider;
+import ws1415.common.net.ServiceProvider;
+import ws1415.common.task.QueryEventsTask;
 import ws1415.veranstalterapp.fragment.ShowEventsFragment;
-import ws1415.veranstalterapp.util.EventUtils;
-import ws1415.veranstalterapp.util.FieldType;
 
 
 /**
@@ -68,100 +66,20 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
                 "j@t@FLXh@Vp@BF??b@vANh@d@fBh@pB@HDXBRBTB^Dj@?BBVCZ"));
 
         event1 = new Event();
-        event1.setDynamicFields(new ArrayList<Field>());
-
-        Field tmpField = new Field();
-        tmpField.setType(FieldType.TITLE.getId());
-        tmpField.setTitle("Title");
-        tmpField.setValue("Skatenight 1");
-        event1.getDynamicFields().add(0, tmpField);
-
-        Field tmpField2 = new Field();
-        tmpField2.setType(FieldType.FEE.getId());
-        tmpField2.setTitle("Fee");
-        tmpField2.setValue("2");
-        event1.getDynamicFields().add(1, tmpField2);
-
-        Field tmpField3 = new Field();
-        tmpField3.setType(FieldType.DATE.getId());
-        tmpField3.setTitle("Date");
-        tmpField3.setValue(Long.toString(time));
-        event1.getDynamicFields().add(2, tmpField3);
-
-        Field tmpField4 = new Field();
-        tmpField4.setType(FieldType.TIME.getId());
-        tmpField4.setTitle("Time");
-
-        tmpField4.setValue(Long.toString(time));
-        event1.getDynamicFields().add(3, tmpField4);
-
-        Field tmpField5 = new Field();
-        tmpField5.setType(FieldType.LOCATION.getId());
-        tmpField5.setTitle("Location");
-        tmpField5.setValue("MS");
-        event1.getDynamicFields().add(4, tmpField5);
-
-        Field tmpField6 = new Field();
-        tmpField6.setType(FieldType.ROUTE.getId());
-        tmpField6.setTitle("Map");
-        tmpField6.setValue(route1.getName());
-        event1.getDynamicFields().add(5, tmpField6);
+        event1.getMetaData().setTitle("Skatenight 1");
+        event1.setFee(200);
+        event1.getMetaData().setDate(new DateTime(time));
+        event1.setMeetingPlace("MS");
         event1.setRoute(route1);
-
-        Field tmpField7 = new Field();
-        tmpField7.setType(FieldType.DESCRIPTION.getId());
-        tmpField7.setTitle("Description");
-        tmpField7.setValue("Die erste Skatenightt");
-        event1.getDynamicFields().add(6, tmpField7);
-
+        event1.setDescription(new Text().setValue("Die erste Skatenightt"));
 
         event2 = new Event();
-        event2.setDynamicFields(new ArrayList<Field>());
-
-        tmpField = new Field();
-        tmpField.setType(FieldType.TITLE.getId());
-        tmpField.setTitle("Title");
-        tmpField.setValue("Skatenight 2");
-        event2.getDynamicFields().add(0, tmpField);
-
-        tmpField2 = new Field();
-        tmpField2.setType(FieldType.FEE.getId());
-        tmpField2.setTitle("Fee");
-        tmpField2.setValue("5");
-        event2.getDynamicFields().add(1, tmpField2);
-
-        tmpField3 = new Field();
-        tmpField3.setType(FieldType.DATE.getId());
-        tmpField3.setTitle("Date");
-        tmpField3.setValue(Long.toString(time));
-        event2.getDynamicFields().add(2, tmpField3);
-
-        tmpField4 = new Field();
-        tmpField4.setType(FieldType.TIME.getId());
-        tmpField4.setTitle("Time");
-
-        tmpField4.setValue(Long.toString(time));
-        event2.getDynamicFields().add(3, tmpField4);
-
-        tmpField5 = new Field();
-        tmpField5.setType(FieldType.LOCATION.getId());
-        tmpField5.setTitle("Location");
-        tmpField5.setValue("Schlossplatz");
-        event2.getDynamicFields().add(4, tmpField5);
-
-        tmpField6 = new Field();
-        tmpField6.setType(FieldType.ROUTE.getId());
-        tmpField6.setTitle("Map");
-        tmpField6.setValue(route2.getName());
-        event2.getDynamicFields().add(5, tmpField6);
+        event2.getMetaData().setTitle("Skatenight 2");
+        event2.setFee(500);
+        event2.getMetaData().setDate(new DateTime(time));
+        event2.setMeetingPlace("Schlossplatz");
         event2.setRoute(route1);
-
-        tmpField7 = new Field();
-        tmpField7.setType(FieldType.DESCRIPTION.getId());
-        tmpField7.setTitle("Description");
-        tmpField7.setValue("Daie zweite Skatenight");
-        event2.getDynamicFields().add(6, tmpField7);
-
+        event2.setDescription(new Text().setValue("Die zweite Skatenight"));
 
         testEvents = new ArrayList<Event>();
         testEvents.add(event1);
@@ -177,30 +95,30 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
         super.setUp();
 
         // Bestehende Events löschen
-        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+        List<Event> events = ServiceProvider.getService().eventEndpoint().getAllEvents()
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
                         .execute();
             }
         }
 
         // Bestehende Routen löschen
-        List<Route> routes = ServiceProvider.getService().skatenightServerEndpoint().getRoutes()
+        List<Route> routes = ServiceProvider.getService().routeEndpoint().getRoutes()
                 .execute().getItems();
         if (routes != null) {
             for (Route r : routes) {
-                ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey()
+                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getKey()
                         .getId()).execute();
             }
         }
 
         // Test-Events auf den Server übertragen
-        ServiceProvider.getService().skatenightServerEndpoint().addRoute(event1.getRoute()).execute();
-        ServiceProvider.getService().skatenightServerEndpoint().addRoute(event2.getRoute()).execute();
-        ServiceProvider.getService().skatenightServerEndpoint().createEvent(event1).execute();
-        ServiceProvider.getService().skatenightServerEndpoint().createEvent(event2).execute();
+        ServiceProvider.getService().routeEndpoint().addRoute(event1.getRoute()).execute();
+        ServiceProvider.getService().routeEndpoint().addRoute(event2.getRoute()).execute();
+        ServiceProvider.getService().eventEndpoint().createEvent(event1).execute();
+        ServiceProvider.getService().eventEndpoint().createEvent(event2).execute();
     }
 
 
@@ -211,20 +129,14 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
      * @throws InterruptedException
      */
     public void testTask() throws ExecutionException, InterruptedException, IOException {
-        QueryEventTask task = new QueryEventTask();
-        List<Event> eventList = task.execute(new ShowEventsFragment() {
-            @Override
-            public void setEventsToListView(List<Event> results) {
-                // Methode mit leerem Rumpf überschreiben,
-                // da der Callback für den Test nicht relevant ist
-            }
-        }).get();
+        QueryEventsTask task = new QueryEventsTask(null);
+        List<Event> eventList = task.execute().get();
 
         assertNotNull("events are null", eventList);
         int testIndex = -1;
         for (int i = 0; i < eventList.size(); i++) {
-            String event1Title = EventUtils.getUniqueField(FieldType.TITLE.getId(), event1).getValue();
-            String selEventTitle = EventUtils.getUniqueField(FieldType.TITLE.getId(), eventList.get(i)).getValue();
+            String event1Title = event1.getMetaData().getTitle();
+            String selEventTitle = eventList.get(i).getMetaData().getTitle();
 
             // Passendes Event zum Vergleich über den Titel auswählen
             if (event1Title.equals(selEventTitle)) {
@@ -235,17 +147,17 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
                 testIndex = 1;
             }
 
-            String selectedEventTitle = EventUtils.getUniqueField(FieldType.TITLE.getId(), testEvents.get(testIndex)).getValue();
-            long selectedEventDate = Long.parseLong(EventUtils.getUniqueField(FieldType.DATE.getId(), testEvents.get(testIndex)).getValue());
-            String selectedEventFee = EventUtils.getUniqueField(FieldType.FEE.getId(), testEvents.get(testIndex)).getValue();
-            String selectedEventLocation = EventUtils.getUniqueField(FieldType.LOCATION.getId(), testEvents.get(testIndex)).getValue();
-            String selectedEventDescription = EventUtils.getUniqueField(FieldType.DESCRIPTION.getId(), testEvents.get(testIndex)).getValue();
+            String selectedEventTitle = testEvents.get(testIndex).getMetaData().getTitle();
+            long selectedEventDate = testEvents.get(testIndex).getMetaData().getDate().getValue();
+            int selectedEventFee = testEvents.get(testIndex).getFee();
+            String selectedEventLocation = testEvents.get(testIndex).getMeetingPlace();
+            String selectedEventDescription = testEvents.get(testIndex).getDescription().getValue();
 
-            String serverEventTitle = EventUtils.getUniqueField(FieldType.TITLE.getId(), eventList.get(i)).getValue();
-            long serverEventDate = Long.parseLong(EventUtils.getUniqueField(FieldType.DATE.getId(), eventList.get(i)).getValue());
-            String serverEventFee = EventUtils.getUniqueField(FieldType.FEE.getId(), eventList.get(i)).getValue();
-            String serverEventLocation = EventUtils.getUniqueField(FieldType.LOCATION.getId(), eventList.get(i)).getValue();
-            String serverEventDescription = EventUtils.getUniqueField(FieldType.DESCRIPTION.getId(), eventList.get(i)).getValue();
+            String serverEventTitle = eventList.get(i).getMetaData().getTitle();
+            long serverEventDate = eventList.get(i).getMetaData().getDate().getValue();
+            int serverEventFee = eventList.get(i).getFee();
+            String serverEventLocation = eventList.get(i).getMeetingPlace();
+            String serverEventDescription = eventList.get(i).getDescription().getValue();
 
             assertEquals(i + ".event: wrong title", serverEventTitle, selectedEventTitle);
             // Datum kann Millisekunden abweichen, diese Abweichung zulassen
@@ -262,21 +174,21 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
         }
 
         // Bestehende Events löschen
-        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+        List<Event> events = ServiceProvider.getService().eventEndpoint().getAllEvents()
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
                         .execute();
             }
         }
 
         // Bestehende Routen löschen
-        List<Route> routes = ServiceProvider.getService().skatenightServerEndpoint().getRoutes()
+        List<Route> routes = ServiceProvider.getService().routeEndpoint().getRoutes()
                 .execute().getItems();
         if (routes != null) {
             for (Route r : routes) {
-                ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey()
+                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getKey()
                         .getId()).execute();
             }
         }

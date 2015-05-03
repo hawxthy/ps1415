@@ -22,7 +22,6 @@ import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.Event;
-import ws1415.SkatenightBackend.model.FieldType;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Route;
 
@@ -76,11 +75,11 @@ public class EventEndpoint extends SkatenightServerEndpoint {
                 pm.makePersistent(e);
 
                 // Benachrichtigung an User schicken
-                long secondsTillStart = (FieldType.getFusedDate(e).getTime() - System.currentTimeMillis()) / 1000;
+                long secondsTillStart = (e.getMetaData().getDate().getTime() - System.currentTimeMillis()) / 1000;
 
                 // Benachrichtigung nur schicken, wenn Event in der Zukunft liegt
                 if (secondsTillStart > 0) {
-                    String eventTitle = FieldType.getUniqueField(FieldType.TITLE.getId(), e).getValue();
+                    String eventTitle = e.getMetaData().getTitle();
                     Sender sender = new Sender(Constants.GCM_API_KEY);
                     Message.Builder mb = new Message.Builder()
                             // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
@@ -95,7 +94,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
                         mb.addData("date_changed", Boolean.toString(dateChanged));
                         if (dateChanged) {
                             mb.addData("event_id", Long.toString(e.getKey().getId()));
-                            mb.addData("new_date", Long.toString(FieldType.getFusedDate(e).getTime()));
+                            mb.addData("new_date", Long.toString(e.getMetaData().getDate().getTime()));
                         }
                     } else {
                         mb.addData("title", "Ein neues Event wurde erstellt.");
@@ -302,8 +301,8 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      */
     public BooleanWrapper editEvent(Event event, User user) throws OAuthRequestException, IOException {
         long keyId = event.getKey().getId();
-        Date oldDate = FieldType.getFusedDate(getEvent(keyId));
-        Date newDate = FieldType.getFusedDate(event);
+        Date oldDate = getEvent(keyId).getMetaData().getDate();
+        Date newDate = event.getMetaData().getDate();
         boolean dateChanged = oldDate.equals(newDate);
         BooleanWrapper b = deleteEvent(keyId, user);
         if(b.value) {

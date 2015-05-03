@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import ws1415.veranstalterapp.util.FieldType;
 import ws1415.veranstalterapp.util.ImageUtil;
 
 /**
@@ -135,115 +134,116 @@ public class ShowCursorAdapter extends BaseAdapter{
         View view = null;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        if(getItem(position).getType() == FieldType.TITLE.getId() ||
-           getItem(position).getType() == FieldType.LOCATION.getId() ||
-           getItem(position).getType() == FieldType.DESCRIPTION.getId() ||
-           getItem(position).getType() == FieldType.SIMPLETEXT.getId()){
-            HolderTextField holder = new HolderTextField();
-            view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
-            view.setEnabled(false);
-            view.setOnClickListener(null);
-            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
-            holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
-            String contentValue = fieldList.get(position).getValue();
-            holder.title.setText(fieldList.get(position).getTitle());
-            if(contentValue != null) holder.content.setText(contentValue.toString());
-            else holder.content.setText("n/a");
-
-        }else if(getItem(position).getType() == FieldType.PICTURE.getId()){
-            HolderImageField holder = new HolderImageField();
-            view = inflater.inflate(R.layout.list_view_item_show_information_image_field, viewGroup, false);
-            view.setEnabled(false);
-            view.setOnClickListener(null);
-            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_image_field_textView_title);
-            holder.image = (ImageView) view.findViewById(R.id.list_view_item_show_information_image_field_imageView);
-            holder.title.setText(fieldList.get(position).getTitle());
-            Bitmap bm = bitmapCache.get(getItem(position));
-            if (bm == null) {
-                Text encodedBytes = getItem(position).getData();
-                if (encodedBytes != null) {
-                    byte[] bytes = Base64.decodeBase64(encodedBytes.getValue());
-                    // Zunächst nur Auflösung des Bilds abrufen und passende SampleSize berechnen
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inJustDecodeBounds = true;
-                    BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                    options.inSampleSize = ImageUtil.calculateInSampleSize(options, 720);
-                    // Skalierte Version des Bilds abrufen
-                    options.inJustDecodeBounds = false;
-                    bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                    bitmapCache.put(getItem(position), bm);
-                }
-            }
-            // Bild anzeigen
-            holder.image.setImageBitmap(bm);
-        }else if(getItem(position).getType() == FieldType.ROUTE.getId()){
-            HolderButtonField holder = new HolderButtonField();
-            view = inflater.inflate(R.layout.list_view_item_show_information_button_field, viewGroup, false);
-            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_button_field_textView_title);
-            holder.button = (Button) view.findViewById(R.id.list_view_item_show_information_button_field_button);
-            holder.title.setText(fieldList.get(position).getTitle());
-            holder.button.setText(event.getRoute().getName());
-            holder.button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(context, ShowRouteActivity.class);
-                    intent.putExtra(ShowRouteActivity.EXTRA_TITLE, event.getRoute().getName());
-                    intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, event.getRoute().getRouteData().getValue());
-                    ArrayList<ServerWaypoint> tmp = (ArrayList) event.getRoute().getWaypoints();
-                    intent.putExtra(ShowRouteActivity.EXTRA_WAYPOINTS, (Serializable) tmp);
-                    context.startActivity(intent);
-                }
-            });
-
-        }else if(getItem(position).getType() == FieldType.FEE.getId()){
-            HolderTextField holder = new HolderTextField();
-            view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
-            view.setEnabled(false);
-            view.setOnClickListener(null);
-            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
-            holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
-            String contentValue = fieldList.get(position).getValue();
-            holder.title.setText(fieldList.get(position).getTitle());
-            if(contentValue != null) holder.content.setText(contentValue.toString() + " €");
-            else holder.content.setText("n/a");
-
-        }else if(getItem(position).getType() == FieldType.TIME.getId()){
-            HolderTextField holder = new HolderTextField();
-            view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
-            view.setEnabled(false);
-            view.setOnClickListener(null);;
-            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
-            holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
-            holder.title.setText(fieldList.get(position).getTitle());
-            // muss noch richtig gemacht werden
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-            holder.content.setText(dateFormat.format(new Date(Long.parseLong(fieldList.get(position).getValue()))));
-
-        }else if(getItem(position).getType() == FieldType.LINK.getId()){
-            HolderTextField holder = new HolderTextField();
-            view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
-            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
-            holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
-            String contentValue = fieldList.get(position).getValue();
-            holder.title.setText((String)fieldList.get(position).getTitle());
-            if(contentValue != null) {
-                holder.content.setText(contentValue);
-                holder.content.setTextColor(Color.BLUE);
-            } else holder.content.setText("n/a");
-            final String link = contentValue;
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(link != null) {
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse("http://" + link));
-                        context.startActivity(i);
-                    }
-                }
-            });
-        }else if(getItem(position).getType() == FieldType.DATE.getId()){
-            view = new View(context);
-        }
+        // TODO Verwendung von Dynamic Fields anpassen
+//        if(getItem(position).getType() == FieldType.TITLE.getId() ||
+//           getItem(position).getType() == FieldType.LOCATION.getId() ||
+//           getItem(position).getType() == FieldType.DESCRIPTION.getId() ||
+//           getItem(position).getType() == FieldType.SIMPLETEXT.getId()){
+//            HolderTextField holder = new HolderTextField();
+//            view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
+//            view.setEnabled(false);
+//            view.setOnClickListener(null);
+//            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
+//            holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
+//            String contentValue = fieldList.get(position).getValue();
+//            holder.title.setText(fieldList.get(position).getTitle());
+//            if(contentValue != null) holder.content.setText(contentValue.toString());
+//            else holder.content.setText("n/a");
+//
+//        }else if(getItem(position).getType() == FieldType.PICTURE.getId()){
+//            HolderImageField holder = new HolderImageField();
+//            view = inflater.inflate(R.layout.list_view_item_show_information_image_field, viewGroup, false);
+//            view.setEnabled(false);
+//            view.setOnClickListener(null);
+//            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_image_field_textView_title);
+//            holder.image = (ImageView) view.findViewById(R.id.list_view_item_show_information_image_field_imageView);
+//            holder.title.setText(fieldList.get(position).getTitle());
+//            Bitmap bm = bitmapCache.get(getItem(position));
+//            if (bm == null) {
+//                Text encodedBytes = getItem(position).getData();
+//                if (encodedBytes != null) {
+//                    byte[] bytes = Base64.decodeBase64(encodedBytes.getValue());
+//                    // Zunächst nur Auflösung des Bilds abrufen und passende SampleSize berechnen
+//                    BitmapFactory.Options options = new BitmapFactory.Options();
+//                    options.inJustDecodeBounds = true;
+//                    BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+//                    options.inSampleSize = ImageUtil.calculateInSampleSize(options, 720);
+//                    // Skalierte Version des Bilds abrufen
+//                    options.inJustDecodeBounds = false;
+//                    bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+//                    bitmapCache.put(getItem(position), bm);
+//                }
+//            }
+//            // Bild anzeigen
+//            holder.image.setImageBitmap(bm);
+//        }else if(getItem(position).getType() == FieldType.ROUTE.getId()){
+//            HolderButtonField holder = new HolderButtonField();
+//            view = inflater.inflate(R.layout.list_view_item_show_information_button_field, viewGroup, false);
+//            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_button_field_textView_title);
+//            holder.button = (Button) view.findViewById(R.id.list_view_item_show_information_button_field_button);
+//            holder.title.setText(fieldList.get(position).getTitle());
+//            holder.button.setText(event.getRoute().getName());
+//            holder.button.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    Intent intent = new Intent(context, ShowRouteActivity.class);
+//                    intent.putExtra(ShowRouteActivity.EXTRA_TITLE, event.getRoute().getName());
+//                    intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, event.getRoute().getRouteData().getValue());
+//                    ArrayList<ServerWaypoint> tmp = (ArrayList) event.getRoute().getWaypoints();
+//                    intent.putExtra(ShowRouteActivity.EXTRA_WAYPOINTS, (Serializable) tmp);
+//                    context.startActivity(intent);
+//                }
+//            });
+//
+//        }else if(getItem(position).getType() == FieldType.FEE.getId()){
+//            HolderTextField holder = new HolderTextField();
+//            view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
+//            view.setEnabled(false);
+//            view.setOnClickListener(null);
+//            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
+//            holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
+//            String contentValue = fieldList.get(position).getValue();
+//            holder.title.setText(fieldList.get(position).getTitle());
+//            if(contentValue != null) holder.content.setText(contentValue.toString() + " €");
+//            else holder.content.setText("n/a");
+//
+//        }else if(getItem(position).getType() == FieldType.TIME.getId()){
+//            HolderTextField holder = new HolderTextField();
+//            view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
+//            view.setEnabled(false);
+//            view.setOnClickListener(null);;
+//            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
+//            holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
+//            holder.title.setText(fieldList.get(position).getTitle());
+//            // muss noch richtig gemacht werden
+//            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+//            holder.content.setText(dateFormat.format(new Date(Long.parseLong(fieldList.get(position).getValue()))));
+//
+//        }else if(getItem(position).getType() == FieldType.LINK.getId()){
+//            HolderTextField holder = new HolderTextField();
+//            view = inflater.inflate(R.layout.list_view_item_show_information_text_field, viewGroup, false);
+//            holder.title = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_title);
+//            holder.content = (TextView) view.findViewById(R.id.list_view_item_show_information_text_field_textView_content);
+//            String contentValue = fieldList.get(position).getValue();
+//            holder.title.setText((String)fieldList.get(position).getTitle());
+//            if(contentValue != null) {
+//                holder.content.setText(contentValue);
+//                holder.content.setTextColor(Color.BLUE);
+//            } else holder.content.setText("n/a");
+//            final String link = contentValue;
+//            view.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    if(link != null) {
+//                        Intent i = new Intent(Intent.ACTION_VIEW);
+//                        i.setData(Uri.parse("http://" + link));
+//                        context.startActivity(i);
+//                    }
+//                }
+//            });
+//        }else if(getItem(position).getType() == FieldType.DATE.getId()){
+//            view = new View(context);
+//        }
         return view;
     }
 }

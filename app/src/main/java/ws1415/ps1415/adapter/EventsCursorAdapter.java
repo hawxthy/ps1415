@@ -15,8 +15,6 @@ import java.util.Date;
 import java.util.List;
 
 import ws1415.ps1415.R;
-import ws1415.ps1415.util.EventUtils;
-import ws1415.ps1415.util.FieldType;
 
 /**
  * Klasse zum Füllen der ListView in ShowEventsActivity.
@@ -113,16 +111,14 @@ public class EventsCursorAdapter extends BaseAdapter{
         }else{
             holder = (Holder)convertView.getTag();
         }
-        String eventLocationValue = EventUtils.getInstance(mContext).getUniqueField(FieldType.LOCATION.getId(), getItem(position)).getValue();
-        String eventFeeValue = EventUtils.getInstance(mContext).getUniqueField(FieldType.FEE.getId(), getItem(position)).getValue();
-        holder.eventName.setText(EventUtils.getInstance(mContext).getUniqueField(FieldType.TITLE.getId(), getItem(position)).getValue());
-        holder.eventDate.setText(eventDateFormat.format(EventUtils.getInstance(mContext).getFusedDate(getItem(position))));
+        Event event = getItem(position);
+        String eventLocationValue = event.getMeetingPlace();
+        String eventFeeValue = Integer.toString(event.getFee()) + " €";
+        holder.eventName.setText(event.getMetaData().getTitle());
+        holder.eventDate.setText(eventDateFormat.format(new Date(event.getMetaData().getDate().getValue())));
 
         if(eventLocationValue != null) holder.eventLocation.setText(eventLocationValue);
         else holder.eventLocation.setText("n/a");
-
-        if(eventFeeValue != null) holder.eventFee.setText(eventFeeValue + " €");
-        else holder.eventFee.setText("n/a");
 
         return convertView;
     }

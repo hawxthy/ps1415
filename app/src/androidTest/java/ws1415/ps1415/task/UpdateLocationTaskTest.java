@@ -32,9 +32,9 @@ public class UpdateLocationTaskTest extends AndroidTestCase {
      * wurden.
      */
     public void testTask() throws ExecutionException, InterruptedException, IOException {
-        UpdateLocationTask task = new UpdateLocationTask(testMail, testLatitude, testLongitude, (long) 0);
+        UpdateLocationTask task = new UpdateLocationTask(null, testMail, testLatitude, testLongitude, (long) 0);
         task.execute().get();
-        Member m = ServiceProvider.getService().skatenightServerEndpoint().getMember(testMail)
+        Member m = ServiceProvider.getService().userEndpoint().getMember(testMail)
                 .execute();
         assertNotNull("member is null", m);
         assertEquals("wrong member latitude", testLatitude, m.getLatitude());

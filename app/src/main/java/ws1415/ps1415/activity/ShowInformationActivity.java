@@ -28,8 +28,6 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.ShowCursorAdapter;
 import ws1415.common.task.GetEventTask;
 import ws1415.ps1415.task.ToggleMemberEventAttendanceTask;
-import ws1415.ps1415.util.EventUtils;
-import ws1415.ps1415.util.FieldType;
 
 /**
  * Activity zum Begutachten der Metainformationen der erstellten Veranstaltung.
@@ -179,15 +177,16 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         Button attendButton = (Button) findViewById(R.id.show_info_attend_button);
         if (e != null) {
             event = e;
-            setTitle(EventUtils.getInstance(this).getUniqueField(FieldType.TITLE.getId(), e).getValue());
-            listAdapter = new ShowCursorAdapter(this, e.getDynamicFields(), e);
+            setTitle(e.getMetaData().getTitle());
+            // TODO Verwendung von Dynamic Fields entfernen
+            // listAdapter = new ShowCursorAdapter(this, e.getDynamicFields(), e);
 
             listView = (ListView) findViewById(R.id.activity_show_information_list_view);
             listView.setAdapter(listAdapter);
 
             // Prüft, ob das aktuelle Datum nach dem Start-Datum des Events liegt.
             // Also ob es bereits gestartet ist. Somit wird der Server gestartet.
-            startDate = EventUtils.getInstance(this.getBaseContext()).getFusedDate(e);
+            startDate = new Date(e.getMetaData().getDate().getValue());
             Date today = new Date();
             if (today.after(startDate)) {
                 active = true;
@@ -240,7 +239,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                 new GetEventTask(new ExtendedTaskDelegate<Void, Event>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Event e) {
-                        Date startDate = EventUtils.getInstance(ShowInformationActivity.this).getFusedDate(e);
+                        Date startDate = new Date(e.getMetaData().getDate().getValue());
                         LocationTransmitterService.ScheduleService(ShowInformationActivity.this, keyId, startDate);
                     }
 

@@ -26,17 +26,15 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 
+import ws1415.common.net.ServiceProvider;
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.adapter.EventsCursorAdapter;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
 import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 import ws1415.common.task.AddRouteTask;
-import ws1415.veranstalterapp.util.EventUtils;
-import ws1415.veranstalterapp.util.FieldType;
 
 
 /**
@@ -371,10 +369,10 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         testRoute1.setRouteData(new Text().setValue("{sb|Hyamm@Ma@So@EKIWuFyPa@wAESYaAYmA]gB??LWLa@J]Fe@Fg@Bk@NcB@SBO@QDa@@K?K@I?KFoABi@FiALmDFcADiAJmC@Y???_@y@QC?OCOCI?ODYBUDa@Jc@Nc@RKFMJQPOTa@d@_BvB_@d@UXSPSLSJOFG@SDKB_@Dw@FQGs@DqBNK@QBO@OAWC_AMMC]Gg@IQCOA[CWAa@?m@@e@@mBJI@SBO@c@FSD_@HC@g@L_@L[LOHC@_@PKFWNMHOLIJGFGJEFGJEJA?CFENKd@Qp@CHIXK\\[v@Yr@OXaAtA[f@_@f@qCfEUZ??_@RYZWZGJMJKFIBIBUDsCCo@?y@?}@AI?U?aBDaBFcELoADiABi@B??GsEKmEEiDAi@SiMGsDGuBEoBCoEGmE?iCAsB@y@??SCIAc@C]@]FUBMDMFC@KFIFKHEDGHORWd@KPGLQ\\_@p@ABQPIFUNy@n@UPuB|A??IOGGk@SSG{C_A]I_@C_@EICQEi@Qe@M_@IKCGAG?S@Q@SBQBE?s@J}ARI@"));
 
         // Testroute auf dem Server speichern
-        new AddRouteTask().execute(testRoute1).get();
+        new AddRouteTask(null).execute(testRoute1).get();
         List<Route> list = null;
         try {
-            list = ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute().getItems();
+            list = ServiceProvider.getService().routeEndpoint().getRoutes().execute().getItems();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -409,7 +407,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         // Suche das neu angelegte Event
         List<Event> list2 = null;
         try {
-            list2 = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents().execute().getItems();
+            list2 = ServiceProvider.getService().eventEndpoint().getAllEvents().execute().getItems();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -417,7 +415,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         boolean found = false;
         if (list2 != null) {
             for (Event e : list2) {
-                if (EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue().equals(TEST_TITLE)) {
+                if (e.getMetaData().getTitle().equals(TEST_TITLE)) {
                     found = true;
                     break;
                 }
@@ -445,7 +443,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         found = false;
         for(Event e : eventList){
             pos++;
-            if(TEST_TITLE.equals(EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue())){
+            if(TEST_TITLE.equals(e.getMetaData().getTitle())){
                 found = true;
                 break;
             }
@@ -537,7 +535,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         found = false;
         for(Event e : eventList){
             pos++;
-            if(TEST_TITLE_EDIT.equals(EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), e).getValue())){
+            if(TEST_TITLE_EDIT.equals(e.getMetaData().getTitle())){
                 found = true;
                 break;
             }
@@ -546,10 +544,10 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         assertTrue("Couldn't find the event!", found);
 
         // Prüfen, ob die Daten verändert wurden
-        assertEquals(TEST_TITLE_EDIT, EventUtils.getInstance(mActivity).getUniqueField(FieldType.TITLE.getId(), eventList.get(pos)).getValue());
-        assertEquals(TEST_FEE_EDIT, EventUtils.getInstance(mActivity).getUniqueField(FieldType.FEE.getId(), eventList.get(pos)).getValue());
-        assertEquals(TEST_LOCATION_EDIT, EventUtils.getInstance(mActivity).getUniqueField(FieldType.LOCATION.getId(), eventList.get(pos)).getValue());
-        assertEquals(TEST_DESCRIPTION_EDIT, EventUtils.getInstance(mActivity).getUniqueField(FieldType.DESCRIPTION.getId(), eventList.get(pos)).getValue());
+        assertEquals(TEST_TITLE_EDIT, eventList.get(pos).getMetaData().getTitle());
+        assertEquals(TEST_FEE_EDIT, eventList.get(pos).getFee());
+        assertEquals(TEST_LOCATION_EDIT, eventList.get(pos).getMeetingPlace());
+        assertEquals(TEST_DESCRIPTION_EDIT, eventList.get(pos).getDescription().getValue());
 
         swipe(Direction.Left);
 

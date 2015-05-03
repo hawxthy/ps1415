@@ -23,7 +23,6 @@ import ws1415.veranstalterapp.adapter.EventsCursorAdapter;
 import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.R;
 import ws1415.common.task.DeleteEventTask;
-import ws1415.veranstalterapp.util.EventUtils;
 
 /**
  * Dieses Fragment wird dazu genutzt, eine Liste von Veranstaltungen anzuzeigen.
@@ -133,7 +132,7 @@ public class ShowEventsFragment extends Fragment {
      */
     private void createSelectionsMenu(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(EventUtils.getInstance(getActivity()).getUniqueField(8, eventList.get(position)).getValue())
+        builder.setTitle(eventList.get(position).getMetaData().getTitle())
                 .setItems(R.array.selections_menu, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int index) {
                         if (index == 0) {

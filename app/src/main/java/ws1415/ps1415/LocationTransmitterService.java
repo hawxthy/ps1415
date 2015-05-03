@@ -35,8 +35,6 @@ import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.util.LocationUtils;
 import ws1415.common.task.GetEventTask;
 import ws1415.common.task.UpdateLocationTask;
-import ws1415.ps1415.util.EventUtils;
-import ws1415.ps1415.util.FieldType;
 import ws1415.ps1415.util.LocalAnalysisData;
 import ws1415.ps1415.util.LocalStorageUtil;
 
@@ -447,7 +445,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
                         prefs.edit().putBoolean(keyId + "-started", true).commit();
 
-                        Date startDate = EventUtils.getInstance(context).getFusedDate(e);
+                        Date startDate = new Date(e.getMetaData().getDate().getValue());
 
                         List<LatLng> waypoints;
                         try {
@@ -463,8 +461,8 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                         serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
                         serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
                         serviceIntent.putExtra(LocationTransmitterService.EXTRA_DISTANCE, e.getRoute().getLength());
-                        serviceIntent.putExtra(LocationTransmitterService.EXTRA_NAME, EventUtils.getInstance(context).getUniqueField(FieldType.TITLE.getId(), e).getValue());
-                        serviceIntent.putExtra(LocationTransmitterService.EXTRA_LOCATION, EventUtils.getInstance(context).getUniqueField(FieldType.LOCATION.getId(), e).getValue());
+                        serviceIntent.putExtra(LocationTransmitterService.EXTRA_NAME, e.getMetaData().getTitle());
+                        serviceIntent.putExtra(LocationTransmitterService.EXTRA_LOCATION, e.getMeetingPlace());
 
                         context.startService(serviceIntent);
                     }

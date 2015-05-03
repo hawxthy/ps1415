@@ -46,8 +46,6 @@ import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.dialog.ChooseRouteDialog;
 import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
-import ws1415.veranstalterapp.util.EventUtils;
-import ws1415.veranstalterapp.util.FieldType;
 import ws1415.veranstalterapp.util.ImageUtil;
 
 /**
@@ -99,7 +97,7 @@ public class AnnounceCursorAdapter extends BaseAdapter {
         this.fieldList = fieldList;
         this.event = event;
         this.parent = parent;
-        setDate(EventUtils.getInstance(context).getFusedDate(event));
+        setDate(new Date(event.getMetaData().getDate().getValue()));
         setRoute(event.getRoute());
     }
 
@@ -188,129 +186,130 @@ public class AnnounceCursorAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup viewGroup) {
         View view = null;
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        if (position % 2 == 1 || edit_mode == false) {
-            if (edit_mode) position = position / 2;
-
-            final Field field = getItem(position);
-
-            final int focusPos = position;
-
-            // Textwatcher um die temporären Änderungen von den EditTexts zu speichern
-            TextWatcher watcher = new TextWatcher() {
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-                    fieldList.get(focusPos).setValue(charSequence.toString());
-                }
-
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                }
-            };
-
-            if (field.getType() == FieldType.TITLE.getId() ||
-                    field.getType() == FieldType.LOCATION.getId() ||
-                    field.getType() == FieldType.DESCRIPTION.getId()) {
-                HolderUniqueTextField holder = new HolderUniqueTextField();
-                view = inflater.inflate(R.layout.list_view_item_announce_information_unique_text, viewGroup, false);
-                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_uniquetext_textView);
-                holder.content = (EditText) view.findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
-
-                setTitleAndContentInView(holder.title, holder.content, position, watcher);
-            } else if (field.getType() == FieldType.FEE.getId()) {
-                HolderUniqueTextField holder = new HolderUniqueTextField();
-                view = inflater.inflate(R.layout.list_view_item_announce_information_fee, viewGroup, false);
-                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_fee_textView);
-                holder.content = (EditText) view.findViewById(R.id.list_view_item_announce_information_fee_editText);
-
-                setTitleAndContentInView(holder.title, holder.content, position, watcher);
-            } else if (field.getType() == FieldType.DATE.getId()) {
-                HolderButtonField holder = new HolderButtonField();
-                view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
-                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
-                holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
-
-                setDateInView(holder.title, holder.button, position);
-            } else if (field.getType() == FieldType.TIME.getId()) {
-                HolderButtonField holder = new HolderButtonField();
-                view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
-                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
-                holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
-
-                setTimeInView(holder.title, holder.button, position);
-            } else if (field.getType() == FieldType.ROUTE.getId()) {
-                HolderButtonField holder = new HolderButtonField();
-                view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
-                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
-                holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
-                holder.title.setText(field.getTitle());
-                setRouteInView(holder.title, holder.button, position);
-            } else if (field.getType() == FieldType.SIMPLETEXT.getId() ||
-                    field.getType() == FieldType.LINK.getId()) {
-                HolderSimpleTextField holder = new HolderSimpleTextField();
-                view = inflater.inflate(R.layout.list_view_item_announce_information_simpletext, viewGroup, false);
-                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_simpletext_textView);
-                holder.content = (EditText) view.findViewById(R.id.list_view_item_announce_information_simpletext_editText);
-                holder.deleteButton = (Button) view.findViewById(R.id.list_view_item_announce_information_simpletext_deleteButton);
-
-                setSimpleTextInView(holder.title, holder.content, holder.deleteButton, position, watcher);
-            } else if (field.getType() == FieldType.PICTURE.getId()) {
-                final HolderPictureField holder = new HolderPictureField();
-                view = inflater.inflate(R.layout.list_view_item_announce_information_picture, viewGroup, false);
-                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_picture_textView);
-                holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_picture_button);
-                holder.deleteButton = (Button) view.findViewById(R.id.list_view_item_announce_information_picture_deleteButton);
-                holder.image = (ImageView) view.findViewById(R.id.list_view_item_announce_information_picture_picture);
-                setPictureInView(holder.title, holder.deleteButton, position);
-
-                Bitmap bm = bitmapCache.get(field);
-                if (bm == null) {
-                    Text encodedBytes = field.getData();
-                    if (encodedBytes != null) {
-                        byte[] bytes = Base64.decodeBase64(encodedBytes.getValue());
-                        // Zunächst nur Auflösung des Bilds abrufen und passende SampleSize berechnen
-                        BitmapFactory.Options options = new BitmapFactory.Options();
-                        options.inJustDecodeBounds = true;
-                        BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                        options.inSampleSize = ImageUtil.calculateInSampleSize(options, 720);
-                        // Skalierte Version des Bilds abrufen
-                        options.inJustDecodeBounds = false;
-                        bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                        bitmapCache.put(field, bm);
-                    }
-                }
-                // Bild anzeigen
-                holder.image.setImageBitmap(bm);
-
-                final int finalPosition = position;
-                holder.button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_PICK,
-                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        intent.setType("image/*");
-                        parent.startActivityForResult(Intent.createChooser(intent, context.getString(R.string.choose_image)), finalPosition);
-                        bitmapCache.remove(field);
-                    }
-                });
-            }
-        } else {
-            HolderAddField holder = new HolderAddField();
-            final int pos = position;
-            view = inflater.inflate(R.layout.list_view_item_announce_information_plus_item, viewGroup, false);
-            holder.addFieldButton = (Button) view.findViewById(R.id.list_view_item_announce_information_plus_item_button);
-            holder.addFieldButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    createFieldChooser(pos);
-                }
-            });
-        }
+        // TODO Verwendung von Dynamic Fields anpassen
+//        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//
+//        if (position % 2 == 1 || edit_mode == false) {
+//            if (edit_mode) position = position / 2;
+//
+//            final Field field = getItem(position);
+//
+//            final int focusPos = position;
+//
+//            // Textwatcher um die temporären Änderungen von den EditTexts zu speichern
+//            TextWatcher watcher = new TextWatcher() {
+//                @Override
+//                public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+//                    fieldList.get(focusPos).setValue(charSequence.toString());
+//                }
+//
+//                @Override
+//                public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+//                }
+//
+//                @Override
+//                public void afterTextChanged(Editable editable) {
+//                }
+//            };
+//
+//            if (field.getType() == FieldType.TITLE.getId() ||
+//                    field.getType() == FieldType.LOCATION.getId() ||
+//                    field.getType() == FieldType.DESCRIPTION.getId()) {
+//                HolderUniqueTextField holder = new HolderUniqueTextField();
+//                view = inflater.inflate(R.layout.list_view_item_announce_information_unique_text, viewGroup, false);
+//                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_uniquetext_textView);
+//                holder.content = (EditText) view.findViewById(R.id.list_view_item_announce_information_uniquetext_editText);
+//
+//                setTitleAndContentInView(holder.title, holder.content, position, watcher);
+//            } else if (field.getType() == FieldType.FEE.getId()) {
+//                HolderUniqueTextField holder = new HolderUniqueTextField();
+//                view = inflater.inflate(R.layout.list_view_item_announce_information_fee, viewGroup, false);
+//                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_fee_textView);
+//                holder.content = (EditText) view.findViewById(R.id.list_view_item_announce_information_fee_editText);
+//
+//                setTitleAndContentInView(holder.title, holder.content, position, watcher);
+//            } else if (field.getType() == FieldType.DATE.getId()) {
+//                HolderButtonField holder = new HolderButtonField();
+//                view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
+//                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
+//                holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
+//
+//                setDateInView(holder.title, holder.button, position);
+//            } else if (field.getType() == FieldType.TIME.getId()) {
+//                HolderButtonField holder = new HolderButtonField();
+//                view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
+//                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
+//                holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
+//
+//                setTimeInView(holder.title, holder.button, position);
+//            } else if (field.getType() == FieldType.ROUTE.getId()) {
+//                HolderButtonField holder = new HolderButtonField();
+//                view = inflater.inflate(R.layout.list_view_item_announce_information_button, viewGroup, false);
+//                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_button_textView);
+//                holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_button_button);
+//                holder.title.setText(field.getTitle());
+//                setRouteInView(holder.title, holder.button, position);
+//            } else if (field.getType() == FieldType.SIMPLETEXT.getId() ||
+//                    field.getType() == FieldType.LINK.getId()) {
+//                HolderSimpleTextField holder = new HolderSimpleTextField();
+//                view = inflater.inflate(R.layout.list_view_item_announce_information_simpletext, viewGroup, false);
+//                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_simpletext_textView);
+//                holder.content = (EditText) view.findViewById(R.id.list_view_item_announce_information_simpletext_editText);
+//                holder.deleteButton = (Button) view.findViewById(R.id.list_view_item_announce_information_simpletext_deleteButton);
+//
+//                setSimpleTextInView(holder.title, holder.content, holder.deleteButton, position, watcher);
+//            } else if (field.getType() == FieldType.PICTURE.getId()) {
+//                final HolderPictureField holder = new HolderPictureField();
+//                view = inflater.inflate(R.layout.list_view_item_announce_information_picture, viewGroup, false);
+//                holder.title = (TextView) view.findViewById(R.id.list_view_item_announce_information_picture_textView);
+//                holder.button = (Button) view.findViewById(R.id.list_view_item_announce_information_picture_button);
+//                holder.deleteButton = (Button) view.findViewById(R.id.list_view_item_announce_information_picture_deleteButton);
+//                holder.image = (ImageView) view.findViewById(R.id.list_view_item_announce_information_picture_picture);
+//                setPictureInView(holder.title, holder.deleteButton, position);
+//
+//                Bitmap bm = bitmapCache.get(field);
+//                if (bm == null) {
+//                    Text encodedBytes = field.getData();
+//                    if (encodedBytes != null) {
+//                        byte[] bytes = Base64.decodeBase64(encodedBytes.getValue());
+//                        // Zunächst nur Auflösung des Bilds abrufen und passende SampleSize berechnen
+//                        BitmapFactory.Options options = new BitmapFactory.Options();
+//                        options.inJustDecodeBounds = true;
+//                        BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+//                        options.inSampleSize = ImageUtil.calculateInSampleSize(options, 720);
+//                        // Skalierte Version des Bilds abrufen
+//                        options.inJustDecodeBounds = false;
+//                        bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+//                        bitmapCache.put(field, bm);
+//                    }
+//                }
+//                // Bild anzeigen
+//                holder.image.setImageBitmap(bm);
+//
+//                final int finalPosition = position;
+//                holder.button.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Intent intent = new Intent(Intent.ACTION_PICK,
+//                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                        intent.setType("image/*");
+//                        parent.startActivityForResult(Intent.createChooser(intent, context.getString(R.string.choose_image)), finalPosition);
+//                        bitmapCache.remove(field);
+//                    }
+//                });
+//            }
+//        } else {
+//            HolderAddField holder = new HolderAddField();
+//            final int pos = position;
+//            view = inflater.inflate(R.layout.list_view_item_announce_information_plus_item, viewGroup, false);
+//            holder.addFieldButton = (Button) view.findViewById(R.id.list_view_item_announce_information_plus_item_button);
+//            holder.addFieldButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    createFieldChooser(pos);
+//                }
+//            });
+//        }
         return view;
     }
 
@@ -351,7 +350,6 @@ public class AnnounceCursorAdapter extends BaseAdapter {
         deleteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                EventUtils.getInstance(context).deleteDynamicField(event, pos);
                 notifyDataSetChanged();
             }
         });
@@ -364,7 +362,6 @@ public class AnnounceCursorAdapter extends BaseAdapter {
         deleteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                EventUtils.getInstance(context).deleteDynamicField(event, pos);
                 notifyDataSetChanged();
             }
         });
@@ -409,19 +406,20 @@ public class AnnounceCursorAdapter extends BaseAdapter {
 
         alert.setView(input);
 
-        alert.setPositiveButton(R.string.apply, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String value = input.getText().toString() + ":";
-
-                if (which == 0)
-                    EventUtils.getInstance(context).addDynamicField(value, FieldType.SIMPLETEXT, event, position / 2);
-                else if (which == 1)
-                    EventUtils.getInstance(context).addDynamicField(value, FieldType.PICTURE, event, position / 2);
-                else if (which == 2)
-                    EventUtils.getInstance(context).addDynamicField(value, FieldType.LINK, event, position / 2);
-                notifyDataSetChanged();
-            }
-        });
+        // TODO Verwendung von Dynamic Fields anpassen
+//        alert.setPositiveButton(R.string.apply, new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialog, int whichButton) {
+//                String value = input.getText().toString() + ":";
+//
+//                if (which == 0)
+//                    EventUtils.getInstance(context).addDynamicField(value, FieldType.SIMPLETEXT, event, position / 2);
+//                else if (which == 1)
+//                    EventUtils.getInstance(context).addDynamicField(value, FieldType.PICTURE, event, position / 2);
+//                else if (which == 2)
+//                    EventUtils.getInstance(context).addDynamicField(value, FieldType.LINK, event, position / 2);
+//                notifyDataSetChanged();
+//            }
+//        });
 
         alert.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {

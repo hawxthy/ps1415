@@ -38,7 +38,6 @@ import ws1415.ps1415.R;
 import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.adapter.EventsCursorAdapter;
 import ws1415.common.task.QueryEventsTask;
-import ws1415.ps1415.util.EventUtils;
 
 public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDelegate<Void, List<Event>> {
     /**
@@ -104,7 +103,7 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
 
                 Intent intent;
 
-                Date startDate = EventUtils.getInstance(ShowEventsActivity.this).getFusedDate(e);
+                Date startDate = new Date(e.getMetaData().getDate().getValue());
                 if (new Date().after(startDate) &&
                         e.getMemberList() != null &&
                         e.getMemberList().contains(prefs.getString("accountName", null))) {

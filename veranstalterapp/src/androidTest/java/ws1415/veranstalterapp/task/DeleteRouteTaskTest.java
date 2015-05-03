@@ -6,9 +6,10 @@ import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.DeleteRouteTask;
-import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.fragment.ManageRoutesFragment;
 
 
@@ -79,27 +80,27 @@ public class DeleteRouteTaskTest extends AuthTaskTestCase {
         super.setUp();
 
         // Bestehende Events löschen
-        List<Event> events = ServiceProvider.getService().skatenightServerEndpoint().getAllEvents()
+        List<Event> events = ServiceProvider.getService().eventEndpoint().getAllEvents()
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().skatenightServerEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
                         .execute();
             }
         }
 
         // Bestehende Routen löschen
-        for (Route r : ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute()
+        for (Route r : ServiceProvider.getService().routeEndpoint().getRoutes().execute()
                 .getItems()) {
-            ServiceProvider.getService().skatenightServerEndpoint().deleteRoute(r.getKey().getId())
+            ServiceProvider.getService().routeEndpoint().deleteRoute(r.getKey().getId())
                     .execute();
         }
         // Testrouten auf den Server schreiben
-        ServiceProvider.getService().skatenightServerEndpoint().addRoute(testRoute1).execute();
-        ServiceProvider.getService().skatenightServerEndpoint().addRoute(testRoute2).execute();
-        ServiceProvider.getService().skatenightServerEndpoint().addRoute(testRoute3).execute();
+        ServiceProvider.getService().routeEndpoint().addRoute(testRoute1).execute();
+        ServiceProvider.getService().routeEndpoint().addRoute(testRoute2).execute();
+        ServiceProvider.getService().routeEndpoint().addRoute(testRoute3).execute();
         // Routen wieder abrufen, damit die Keys in den Test-Objekten gesetzt sind
-        for (Route r : ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute()
+        for (Route r : ServiceProvider.getService().routeEndpoint().getRoutes().execute()
                 .getItems()) {
             if (testRoute1.getName().equals(r.getName())) {
                 testRoute1 = r;
@@ -114,16 +115,10 @@ public class DeleteRouteTaskTest extends AuthTaskTestCase {
     /**
      * Das Löschen von Routen testen.
      */
-    public void testTask() throws IOException {
-        new DeleteRouteTask(new ManageRoutesFragment() {
-            @Override
-            public void deleteRouteFromList(Route r) {
-                // Methode mit leerem Rumpf überschreiben,
-                // da der Callback für den Test nicht relevant ist
-            }
-        }).execute(testRoute2);
+    public void testTask() throws IOException, ExecutionException, InterruptedException {
+        new DeleteRouteTask(null).execute(testRoute2).get();
         // Testen, ob die Route wirklich gelöscht wurde
-        for (Route r : ServiceProvider.getService().skatenightServerEndpoint().getRoutes().execute()
+        for (Route r : ServiceProvider.getService().routeEndpoint().getRoutes().execute()
                 .getItems()) {
             assertNotSame("route2 not deleted", testRoute2.getName(), r.getName());
         }

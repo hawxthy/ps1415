@@ -29,7 +29,7 @@ public class QueryMemberTaskTest extends AndroidTestCase {
         super.setUp();
 
         // Member-Objekt auf dem Server erstellen lassen
-        ServiceProvider.getService().skatenightServerEndpoint().updateMemberLocation(testMail,
+        ServiceProvider.getService().routeEndpoint().updateMemberLocation(testMail,
                 testLatitude, testLongitude, (long) 1).execute();
     }
 

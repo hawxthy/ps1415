@@ -1,17 +1,15 @@
 package useCases;
 
-import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.SmallTest;
 import android.widget.Button;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
 import java.io.IOException;
 
+import ws1415.common.net.ServiceProvider;
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.ServiceProvider;
 import ws1415.veranstalterapp.activity.LoginActivity;
 
 /**
@@ -63,7 +61,7 @@ public class AuthenticationOrganizerTest extends ActivityInstrumentationTestCase
         assertEquals(tmp != null, true);
 
         // Testet, ob der ausgewählte Account ein Veranstalter ist.
-        assertEquals(new Boolean(true), ServiceProvider.getService().skatenightServerEndpoint().isHost(credential.getSelectedAccountName()).execute().getValue());
+        assertEquals(new Boolean(true), ServiceProvider.getService().hostEndpoint().isHost(credential.getSelectedAccountName()).execute().getValue());
     }
 }
 

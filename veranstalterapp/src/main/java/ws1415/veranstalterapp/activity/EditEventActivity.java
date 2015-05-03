@@ -20,8 +20,6 @@ import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.dialog.ChooseRouteDialog;
 import ws1415.common.task.EditEventTask;
 import ws1415.common.task.GetEventTask;
-import ws1415.veranstalterapp.util.EventUtils;
-import ws1415.veranstalterapp.util.FieldType;
 
 /**
  * Die Activity zum Ändern der Attribute eines Events und zum eventuellen Hinzufügen weiterer
@@ -131,14 +129,8 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
         builder.setMessage(R.string.areyousure);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                int titleId = EventUtils.getInstance(EditEventActivity.this).getUniqueFieldId(FieldType.TITLE, event);
-
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (titleId != -1) { //&& !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
-
-                    // Setze die Attribute vom Event
-                    EventUtils.getInstance(EditEventActivity.this).setEventInfo(event, listView);
-
+                if (event.getMetaData().getTitle() != null && !event.getMetaData().getTitle().isEmpty()) { //&& !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
                     // Erstelle Event auf dem Server
                     new EditEventTask(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
                         @Override
@@ -190,7 +182,8 @@ public class EditEventActivity extends Activity implements AnnounceCursorAdapter
      */
     public void setEventDataToView(Event e){
         event = e;
-        listAdapter = new AnnounceCursorAdapter(this, e.getDynamicFields(), e);
+        // TODO Verwendung von Dynamic Fields anpassen
+        // listAdapter = new AnnounceCursorAdapter(this, e.getDynamicFields(), e);
 
         listView = (ListView) findViewById(R.id.activity_edit_event_list_view);
         listView.setAdapter(listAdapter);

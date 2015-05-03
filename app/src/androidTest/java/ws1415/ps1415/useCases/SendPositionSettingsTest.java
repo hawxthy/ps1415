@@ -240,12 +240,12 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         Thread.sleep(2500); // Zeit zum initialisieren
 
         // Setzen der Position auf den Server
-        new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute();
+        new UpdateLocationTask(null, TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute();
 
         Thread.sleep(5000); // Zeit zum initialisieren
 
         // Teilnehmer, der seine Position an den Server senden wird
-        Member m = ServiceProvider.getService().skatenightServerEndpoint().getMember(TEST_EMAIL).execute();
+        Member m = ServiceProvider.getService().userEndpoint().getMember(TEST_EMAIL).execute();
         assertEquals(TEST_POSITION.latitude, m.getLatitude());
         assertEquals(TEST_POSITION.longitude, m.getLongitude());
 
@@ -310,11 +310,11 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         assertTrue(active);
 
         // Setzen der Position auf den Server
-        new UpdateLocationTask(TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute();
+        new UpdateLocationTask(null, TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute();
         Thread.sleep(5000); // Zeit zum initialisieren
 
         // Teilnehmer, der seine Position an den Server senden wird
-        Member m = ServiceProvider.getService().skatenightServerEndpoint().getMember(TEST_EMAIL).execute();
+        Member m = ServiceProvider.getService().userEndpoint().getMember(TEST_EMAIL).execute();
         assertEquals(TEST_POSITION.latitude, m.getLatitude());
         assertEquals(TEST_POSITION.longitude, m.getLongitude());
 
