@@ -11,6 +11,7 @@ import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Diese Klasse wird dazu genutzt die Funktionalitäten des UserControllers zu testen.
@@ -24,12 +25,7 @@ public class UserControllerUnitTest {
 
     @Test
     public void testCreateUser() throws Exception {
-        UserController.createUser(new ExtendedTaskDelegateAdapter<Void, EndUser>(){
-            @Override
-            public void taskDidFinish(ExtendedTask task, EndUser user) {
-                assertEquals(TEST_MAIL, user.getEmail());
-            }
-        }, TEST_MAIL);
+        UserController.createUser(null, TEST_MAIL);
     }
 
     @Test

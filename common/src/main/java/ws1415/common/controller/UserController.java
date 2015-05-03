@@ -40,7 +40,7 @@ public class UserController {
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void getFullUser(ExtendedTaskDelegateAdapter handler, String userMail) {
+    public static void getFullUser(ExtendedTaskDelegate handler, String userMail) {
         new GetFullUserTask(handler).execute(userMail);
     }
 
@@ -50,7 +50,7 @@ public class UserController {
      * @param handler
      * @param newInfo Neue allgemeine Informationen zu dem Benutzer
      */
-    public static void updateUserInfo(ExtendedTaskDelegateAdapter handler, UserInfo newInfo) {
+    public static void updateUserInfo(ExtendedTaskDelegate handler, UserInfo newInfo) {
         new ExtendedTask<UserInfo, Void, UserInfo>(handler) {
             @Override
             protected UserInfo doInBackground(UserInfo... params) {
@@ -72,7 +72,7 @@ public class UserController {
      * @param handler
      * @param newPicture Neues Profilbild eines Benutzers
      */
-    public static void updateUserPicture(ExtendedTaskDelegateAdapter handler, UserPicture newPicture) {
+    public static void updateUserPicture(ExtendedTaskDelegate handler, UserPicture newPicture) {
         new ExtendedTask<UserPicture, Void, UserPicture>(handler) {
             @Override
             protected UserPicture doInBackground(UserPicture... params) {
@@ -98,7 +98,7 @@ public class UserController {
      *                    andernfalls
      */
     @SuppressWarnings("unchecked")
-    public static void listUserInfo(ExtendedTaskDelegateAdapter handler, List<String> userMails, final boolean withPicture) {
+    public static void listUserInfo(ExtendedTaskDelegate handler, List<String> userMails, final boolean withPicture) {
         new ExtendedTask<List<String>, Void, List<UserInfo>>(handler) {
             @Override
             protected List<UserInfo> doInBackground(List<String>... params) {
@@ -121,7 +121,7 @@ public class UserController {
      * @param userMail E-Mail Adresse des Benutzers
      */
     @SuppressWarnings("unchecked")
-    public static void listUserGroups(ExtendedTaskDelegateAdapter handler, String userMail) {
+    public static void listUserGroups(ExtendedTaskDelegate handler, String userMail) {
         new ExtendedTask<String, Void, List<UserGroup>>(handler) {
             @Override
             protected List<UserGroup> doInBackground(String... params) {
@@ -144,7 +144,7 @@ public class UserController {
      * @param userMail E-Mail Adresse des Benutzers
      */
     @SuppressWarnings("unchecked")
-    public static void listEvents(ExtendedTaskDelegateAdapter handler, String userMail) {
+    public static void listEvents(ExtendedTaskDelegate handler, String userMail) {
         new ExtendedTask<String, Void, List<Event>>(handler) {
             @Override
             protected List<Event> doInBackground(String... params) {
@@ -165,7 +165,7 @@ public class UserController {
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void getUserLocation(ExtendedTaskDelegateAdapter handler, String userMail){
+    public static void getUserLocation(ExtendedTaskDelegate handler, String userMail){
         new ExtendedTask<String, Void, UserLocation>(handler) {
             @Override
             protected UserLocation doInBackground(String... params) {
