@@ -1,7 +1,9 @@
-package ws1415.SkatenightBackend.model;
+package ws1415.common.model;
 
 /**
- * Created by Martin on 01.05.2015.
+ * Enum-Klasse für das Geschlecht für die Benutzer.
+ *
+ * @author Martin Wrodarczyk
  */
 public enum Gender {
     MALE(1),

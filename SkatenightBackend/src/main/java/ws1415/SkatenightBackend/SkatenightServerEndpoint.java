@@ -31,6 +31,7 @@ public abstract class SkatenightServerEndpoint {
 
     /**
      * Ruft über den angegebenen PersistenceManager den RegistrationManager aus der Datenbank ab.
+     *
      * @param pm Der zu verwendende PersistenceManager.
      * @return Gibt den RegistrationManager zurück, der in der Datenbank gespeichert ist.
      */

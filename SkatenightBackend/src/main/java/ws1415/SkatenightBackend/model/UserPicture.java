@@ -1,7 +1,5 @@
 package ws1415.SkatenightBackend.model;
 
-import com.google.appengine.api.datastore.Blob;
-
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -17,7 +15,7 @@ public class UserPicture {
     @Persistent
     private String email;
     @Persistent
-    private Blob picture;
+    private byte[] picture;
 
     public UserPicture(String email){
         this.email = email;
@@ -31,11 +29,11 @@ public class UserPicture {
         this.email = email;
     }
 
-    public Blob getPicture() {
+    public byte[] getPicture() {
         return picture;
     }
 
-    public void setPicture(Blob picture) {
+    public void setPicture(byte[] picture) {
         this.picture = picture;
     }
 }

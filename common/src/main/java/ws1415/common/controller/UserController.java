@@ -3,6 +3,7 @@ package ws1415.common.controller;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserInfo;
+import com.skatenight.skatenightAPI.model.UserInfoPicture;
 import com.skatenight.skatenightAPI.model.UserLocation;
 import com.skatenight.skatenightAPI.model.UserPicture;
 
@@ -13,7 +14,6 @@ import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.CreateUserTask;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.task.GetFullUserTask;
 
 /**
@@ -89,21 +89,68 @@ public class UserController {
     }
 
     /**
+     * Aktualisiert die Standortinformationen eines Benutzers.
+     *
+     * @param handler
+     * @param userMail       E-Mail Adresse des Benutzers
+     * @param latitude       Neue Latitude
+     * @param longitude      Neue Longitude
+     * @param currentEventId Neue Event Id
+     */
+    public static void updateUserLocation(ExtendedTaskDelegate handler, final String userMail,
+                                          final double latitude, final double longitude, final long currentEventId) {
+        new ExtendedTask<Void, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().updateUserLocation(currentEventId,
+                            latitude, longitude, userMail).execute();
+                } catch(IOException e) {
+                    e.printStackTrace();
+                    publishError("Standortinformationen konnten nicht geändert werden");
+                    return null;
+                }
+            }
+        }.execute();
+    }
+
+    /**
      * Listet die allgemeinen Informationen der Benutzer auf, dessen E-Mail Adressen übergeben
      * wurden.
      *
      * @param handler
      * @param userMails Liste der E-Mail Adressen der Benutzer
-     * @param withPicture true, falls Profilbilder auch runtergeladen werden sollen, false
-     *                    andernfalls
      */
     @SuppressWarnings("unchecked")
-    public static void listUserInfo(ExtendedTaskDelegate handler, List<String> userMails, final boolean withPicture) {
+    public static void listUserInfo(ExtendedTaskDelegate handler, List<String> userMails) {
         new ExtendedTask<List<String>, Void, List<UserInfo>>(handler) {
             @Override
             protected List<UserInfo> doInBackground(List<String>... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().listUserInfo(params[0], withPicture).execute().getItems();
+                    return ServiceProvider.getService().userEndpoint().listUserInfo(params[0]).execute().getItems();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Liste von Benutzern konnte nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute(userMails);
+    }
+
+    /**
+     * Listet die allgemeinen Informationen der Benutzer auf, dessen E-Mail Adressen übergeben
+     * wurden.
+     *
+     * @param handler
+     * @param userMails Liste der E-Mail Adressen der Benutzer
+     */
+    @SuppressWarnings("unchecked")
+    public static void listUserInfoWithPicture(ExtendedTaskDelegate handler, List<String> userMails) {
+        new ExtendedTask<List<String>, Void, List<UserInfoPicture>>(handler) {
+            @Override
+            protected List<UserInfoPicture> doInBackground(List<String>... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().listUserInfoWithPicture(params[0]).execute().getItems();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Liste von Benutzern konnte nicht abgerufen werden");
@@ -156,7 +203,7 @@ public class UserController {
                     return null;
                 }
             }
-        };
+        }.execute(userMail);
     }
 
     /**
@@ -165,6 +212,7 @@ public class UserController {
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
      */
+    @SuppressWarnings("unchecked")
     public static void getUserLocation(ExtendedTaskDelegate handler, String userMail){
         new ExtendedTask<String, Void, UserLocation>(handler) {
             @Override
@@ -177,8 +225,29 @@ public class UserController {
                     return null;
                 }
             }
-        };
+        }.execute(userMail);
     }
 
-
+    /**
+     *
+     * Löscht einen Benutzer auf dem Server, falls dieser vorhanden ist. Wird zur Zeit nur für
+     * die Tests verwendet.
+     *
+     * @param userMail E-Mail Adresse des Benutzers
+     */
+    @SuppressWarnings("unchecked")
+    public static void deleteUser(ExtendedTaskDelegate handler, String userMail){
+        new ExtendedTask<String, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(String... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().deleteUser(params[0]).execute();
+                } catch(IOException e) {
+                    e.printStackTrace();
+                    publishError("Benutzer konnte nicht gelöscht werden");
+                    return null;
+                }
+            }
+        }.execute(userMail);
+    }
 }

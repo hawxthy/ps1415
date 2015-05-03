@@ -24,12 +24,12 @@ public class EndUser {
     private String email;
     @Persistent(defaultFetchGroup = "true")
     @Unowned
-    private UserInfo userInfo;
+    private UserInfoPicture userInfoPicture;
     @Persistent(defaultFetchGroup = "true")
     @Unowned
     private UserLocation userLocation;
     @Persistent
-    private Map<Key, Role> myRoles;
+    private Map<Key, Integer> myRoles;
     @Persistent
     private List<String> myUserGroups;
     @Persistent
@@ -38,11 +38,11 @@ public class EndUser {
     public EndUser() {
     }
 
-    public EndUser(String email, UserInfo userInfo, UserLocation userLocation) {
+    public EndUser(String email, UserInfoPicture userInfoPicture, UserLocation userLocation) {
         this.email = email;
-        this.userInfo = userInfo;
+        this.userInfoPicture = userInfoPicture;
         this.userLocation = userLocation;
-        myRoles = new HashMap<Key, Role>();
+        myRoles = new HashMap<>();
         myUserGroups = new ArrayList<>();
         myEvents = new ArrayList<>();
     }
@@ -63,12 +63,12 @@ public class EndUser {
         this.userLocation = userLocation;
     }
 
-    public UserInfo getUserInfo() {
-        return userInfo;
+    public UserInfoPicture getUserInfoPicture() {
+        return userInfoPicture;
     }
 
-    public void setUserInfo(UserInfo userInfo) {
-        this.userInfo = userInfo;
+    public void setUserInfoPicture(UserInfoPicture userInfoPicture) {
+        this.userInfoPicture = userInfoPicture;
     }
 
     public List<String> getMyUserGroups() {
@@ -87,11 +87,11 @@ public class EndUser {
         this.myEvents = myEvents;
     }
 
-    public Map<Key, Role> getMyRoles() {
+    public Map<Key, Integer> getMyRoles() {
         return myRoles;
     }
 
-    public void setMyRoles(Map<Key, Role> myRoles) {
+    public void setMyRoles(Map<Key, Integer> myRoles) {
         this.myRoles = myRoles;
     }
 
@@ -109,5 +109,17 @@ public class EndUser {
 
     public void removeEvent(Event event) {
         if (event != null) myEvents.remove(event.getKey());
+    }
+
+    public Integer getRole(Key key){
+        return myRoles.get(key);
+    }
+
+    public void setRole(Key key, Integer role){
+        myRoles.put(key, role);
+    }
+
+    public void removeRole(Key key){
+        myRoles.remove(key);
     }
 }
