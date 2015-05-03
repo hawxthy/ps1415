@@ -112,7 +112,7 @@ public class UsergroupAdapter extends BaseAdapter {
 
         holder.groupName.setText(getItem(position).getName());
         holder.groupCreator.setText(getItem(position).getCreator().getName());
-        holder.groupCount.setText(Integer.toString(getItem(position).getMembers().size()));
+        holder.groupCount.setText(Integer.toString(getItem(position).getMemberRanks().size()));
 
         return convertView;
     }

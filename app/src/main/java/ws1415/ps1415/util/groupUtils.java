@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentActivity;
 import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.util.List;
+import java.util.Map;
+
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
@@ -33,9 +35,9 @@ public class groupUtils {
      * @return
      */
     public static boolean isUserInGroup(String email, UserGroup group){
-        List<String> members = group.getMembers();
-        for(int i=0; i<members.size(); i++){
-            if(members.get(i).equals(email)) return true;
+        for(Map.Entry<String, Object> e : group.getMemberRanks().entrySet()){
+            String value = (String)e.getValue();
+            if(value.equals(email)) return true;
         }
         return false;
     }
