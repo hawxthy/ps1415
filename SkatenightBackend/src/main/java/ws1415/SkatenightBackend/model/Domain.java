@@ -23,13 +23,14 @@ public class Domain {
     @Persistent
     private List<Integer> possibleRoles;
     @Persistent
-    private List<String> adminMails;
+    private Integer adminRole;
 
     public Domain(){
     }
 
-    public Domain(List<Integer> possibleRoles){
+    public Domain(List<Integer> possibleRoles, Integer adminRole){
         this.possibleRoles = possibleRoles;
+        this.adminRole = adminRole;
     }
 
     public Key getKey() {
@@ -48,19 +49,11 @@ public class Domain {
         this.possibleRoles = possibleRoles;
     }
 
-    public List<String> getAdminMails() {
-        return adminMails;
+    public Integer getAdminRole() {
+        return adminRole;
     }
 
-    public void setAdminMails(List<String> adminMails) {
-        this.adminMails = adminMails;
-    }
-
-    public void addAdmin(String adminMail){
-        adminMails.add(adminMail);
-    }
-
-    public void removeAdmin(String adminMail){
-        if(adminMails.contains(adminMail)) adminMails.remove(adminMail);
+    public void setAdminRole(Integer adminRole) {
+        this.adminRole = adminRole;
     }
 }

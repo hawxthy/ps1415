@@ -112,8 +112,8 @@ public class UserControllerUnitTest {
 
         Thread.sleep(3000);
 
-        UserController.deleteUser(null, TEST_MAIL);
-        UserController.deleteUser(null, TEST_MAIL_2);
+        //UserController.deleteUser(null, TEST_MAIL);
+        //UserController.deleteUser(null, TEST_MAIL_2);
     }
 
     /**

@@ -17,9 +17,11 @@ import javax.jdo.Query;
 
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
+import ws1415.SkatenightBackend.model.Domain;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.Member;
+import ws1415.SkatenightBackend.model.Role;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserInfo;
 import ws1415.SkatenightBackend.model.UserInfoPicture;
@@ -123,6 +125,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             UserInfo userInfo = new UserInfo(email);
             UserInfoPicture userInfoPicture = new UserInfoPicture(email, userInfo, userPicture);
             EndUser user = new EndUser(email, userInfoPicture, userLocation);
+
+            Domain globalDomain = new RoleEndpoint().getGlobalDomain();
+            user.setRole(globalDomain.getKey(), Role.USER.getId());
 
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
             try {

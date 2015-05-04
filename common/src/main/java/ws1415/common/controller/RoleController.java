@@ -101,4 +101,41 @@ public class RoleController {
             }
         }.execute();
     }
+
+    /**
+     * Gibt die globale Rolle eines Benutzers aus.
+     *
+     * @param handler
+     * @param userMail E-Mail Adresse eines Benutzers
+     */
+    public static void getGlobalRole(ExtendedTaskDelegate handler, final String userMail){
+        new ExtendedTask<Void, Void, Role>(handler) {
+            @Override
+            protected Role doInBackground(Void... params) {
+                try {
+                    Integer roleId = ServiceProvider.getService().roleEndpoint().getGlobalRole(userMail).execute().getValue();
+                    return Role.getValue(roleId);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Globale Rolle des Benutzers konnte nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute();
+    }
+
+    public static void setGlobalRole(ExtendedTaskDelegate handler, final String userMail, final Role role){
+        new ExtendedTask<Void, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().roleEndpoint().changeGlobalRole(userMail, role.getId()).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Globale Rolle des Benutzers konnte nicht gesetzt werden");
+                    return null;
+                }
+            }
+        }.execute();
+    }
 }
