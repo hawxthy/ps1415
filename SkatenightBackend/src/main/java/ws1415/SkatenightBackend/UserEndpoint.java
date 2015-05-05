@@ -291,9 +291,11 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-
+        else if(!new UserEndpoint().existsUser(user.getEmail()).value){
+            throw new JDOObjectNotFoundException("Kein gültiger Benutzer");
+        }
         UserInfo userInfo;
-        //if (user.getEmail().equals(newUserInfo.getEmail())) {
+        if (user.getEmail().equals(newUserInfo.getEmail())) {
         try {
             userInfo = pm.getObjectById(UserInfo.class, newUserInfo.getEmail());
             userInfo.setFirstName(newUserInfo.getFirstName());
@@ -306,9 +308,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         } finally {
             pm.close();
         }
-        //} else {
-        //    throw new UnauthorizedException("Keine Rechte um diesen Benutzer zu editieren");
-        //}
+        } else {
+            throw new UnauthorizedException("Keine Rechte um diesen Benutzer zu editieren");
+        }
         return userInfo;
     }
 
