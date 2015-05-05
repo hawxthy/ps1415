@@ -19,7 +19,7 @@ import static org.junit.Assert.fail;
  * @author Martin Wrodarczyk
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(manifest=Config.NONE)
+@Config(manifest=Config.NONE, emulateSdk = 18)
 public class UserControllerUnitTest {
     public static final String TEST_MAIL = "test@gmail.com";
 

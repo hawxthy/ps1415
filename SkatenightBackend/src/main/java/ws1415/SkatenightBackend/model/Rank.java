@@ -1,6 +1,11 @@
 package ws1415.SkatenightBackend.model;
 
+import com.google.appengine.datanucleus.annotations.Unowned;
+
 import java.util.List;
+
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
 
 /**
  * Diese Klasse wird von der Usergroup Klasse benötigt um Ränge darzustellen. Es wird
@@ -9,9 +14,16 @@ import java.util.List;
  *
  * Created by Bernd Eissing on 02.05.2015.
  */
+@PersistenceCapable
 public class Rank {
+    @Persistent
     private String name;
+
+    @Persistent
     private String description;
+
+    @Persistent(defaultFetchGroup = "true")
+    @Unowned
     private List<Right> rights;
 
     public Rank(String name, String description, List<Right> rights){

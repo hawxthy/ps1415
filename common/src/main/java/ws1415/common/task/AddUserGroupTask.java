@@ -28,12 +28,7 @@ public class AddUserGroupTask extends ExtendedTask<String, Void, Void> {
      */
     @Override
     protected Void doInBackground(String... params) {
-        try{
-            ServiceProvider.getService().groupEndpoint().createUserGroup(params[0]).execute();
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-        return null;
+
     }
 
 }
