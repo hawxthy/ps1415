@@ -10,6 +10,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import ws1415.SkatenightBackend.gcm.Message;
+import ws1415.SkatenightBackend.gcm.MessageType;
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
 
@@ -21,19 +22,24 @@ import ws1415.SkatenightBackend.gcm.Sender;
  */
 public class MessageEndpoint extends SkatenightServerEndpoint {
 
+
     /**
      * Sendet über GCM eine Nachricht an den Benutzer mit der angegebenen Email.
      *
-     * @param receiver E-Mail Adresse des Empfängers
-     * @param message Nachricht an den Empfänger
+     * @param user      User zur Authentifizierung
+     * @param receiver  Empfänger der Nachricht
+     * @param messageId Lokale Nachrichten Id des Senders zur Bestätigung
+     * @param content   Inhalt der Nachricht
+     * @param sendDate  Sendedatum der Nachricht
      * @throws IOException
+     * @throws OAuthRequestException
      */
-    public void sendMessage(User user, @Named("receiver") String receiver,
-                            @Named("message") String message, @Named("sendDate") Long sendDate) throws IOException, OAuthRequestException {
+    public void sendMessage(User user, @Named("receiver") String receiver, @Named("messageId") Long messageId,
+                            @Named("content") String content, @Named("sendDate") Long sendDate) throws IOException, OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        if(!new UserEndpoint().existsUser(user.getEmail()).value){
+        if (!new UserEndpoint().existsUser(user.getEmail()).value) {
             throw new JDOObjectNotFoundException("Kein gültiger Benutzer");
         }
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
@@ -46,18 +52,61 @@ public class MessageEndpoint extends SkatenightServerEndpoint {
         Message m = new Message.Builder()
                 .delayWhileIdle(false)
                 .timeToLive(2419200)
+                .addData("type", MessageType.USER_NEW_MESSAGE.name())
+                .addData("messageId", Long.toString(messageId))
                 .addData("sender", user.getEmail())
-                .addData("message", message)
                 .addData("sendDate", Long.toString(sendDate))
+                .addData("content", content)
+                .addData("title", "Skatenight-App")
                 .build();
         try {
-            // Versucht, Nachricht ungefähr 18 Stunden lang zu senden
-            GCMSender.send(m, id, 26);
-        }
-        catch (IOException e) {
+            GCMSender.send(m, id, 3);
+        } catch (IOException e) {
             throw new IOException("Nachricht konnte nicht gesendet werden");
         }
         if (pm != null) pm.close();
+    }
 
+
+    /**
+     * Sendet über GCM eine Bestätigung des Erhaltes einer Nachricht.
+     *
+     * @param user User zur Authentifizierung
+     * @param receiver Empfänger der Bestätigung
+     * @param messageId Lokale Nachrichten Id des ursprünglichen Senders
+     * @param sendDate Sendedatum der ursprünglichen Nachricht
+     *
+     * @throws OAuthRequestException
+     * @throws IOException
+     */
+    public void sendConfirmation(User user, @Named("receiver") String receiver,
+                                 @Named("messageId") Long messageId, @Named("sendDate") Long sendDate) throws OAuthRequestException, IOException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (!new UserEndpoint().existsUser(user.getEmail()).value) {
+            throw new JDOObjectNotFoundException("Kein gültiger Benutzer");
+        }
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        RegistrationManager registrationManager = getRegistrationManager(pm);
+
+        String id = registrationManager.getUserIdByMail(receiver);
+
+        Sender GCMSender = new Sender(Constants.GCM_API_KEY);
+
+        Message m = new Message.Builder()
+                .delayWhileIdle(false)
+                .timeToLive(2419200)
+                .addData("type", MessageType.USER_CONFIRMATION_MESSAGE.name())
+                .addData("messageId", Long.toString(messageId))
+                .addData("sender", user.getEmail())
+                .addData("sendDate", Long.toString(sendDate))
+                .build();
+        try {
+            GCMSender.send(m, id, 3);
+        } catch (IOException e) {
+            throw new IOException("Nachricht konnte nicht gesendet werden");
+        }
+        if (pm != null) pm.close();
     }
 }

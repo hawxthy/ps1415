@@ -98,6 +98,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             if (m == null) {
                 createMember(user.getEmail());
             }
+            if(!existsUser(user.getEmail()).value){
+                createUser(user.getEmail());
+            }
 
             RegistrationManager registrationManager;
             // Den GCM-Manager abrufen, falls er existiert, sonst einen neuen Manager anlegen.

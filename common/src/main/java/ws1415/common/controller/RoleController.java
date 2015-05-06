@@ -17,6 +17,11 @@ import ws1415.common.task.ExtendedTaskDelegate;
  * @author Martin Wrodarczyk
  */
 public class RoleController {
+    /**
+     * Keine Instanziierung ermöglichen.
+     */
+    private RoleController() {
+    }
 
     /**
      * Setzt die Rolle für einen Benutzer, falls eine Rolle für die Umgebung vorhanden ist, so wird
@@ -24,8 +29,8 @@ public class RoleController {
      *
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
-     * @param domain Umgebung
-     * @param role Rolle des Benutzers
+     * @param domain   Umgebung
+     * @param role     Rolle des Benutzers
      */
     public static void setUserRole(ExtendedTaskDelegate handler, final String userMail,
                                    final Domain domain, final Role role) {
@@ -54,7 +59,7 @@ public class RoleController {
      *
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
-     * @param domain Umgebung
+     * @param domain   Umgebung
      */
     public static void getUserRole(ExtendedTaskDelegate handler, final String userMail,
                                    final Domain domain) {
@@ -81,7 +86,7 @@ public class RoleController {
      *
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
-     * @param domain Umgebung
+     * @param domain   Umgebung
      */
     public static void deleteUserRole(ExtendedTaskDelegate handler, final String userMail,
                                       final Domain domain) {
@@ -108,7 +113,7 @@ public class RoleController {
      * @param handler
      * @param userMail E-Mail Adresse eines Benutzers
      */
-    public static void getGlobalRole(ExtendedTaskDelegate handler, final String userMail){
+    public static void getGlobalRole(ExtendedTaskDelegate handler, final String userMail) {
         new ExtendedTask<Void, Void, Role>(handler) {
             @Override
             protected Role doInBackground(Void... params) {
@@ -124,7 +129,7 @@ public class RoleController {
         }.execute();
     }
 
-    public static void setGlobalRole(ExtendedTaskDelegate handler, final String userMail, final Role role){
+    public static void setGlobalRole(ExtendedTaskDelegate handler, final String userMail, final Role role) {
         new ExtendedTask<Void, Void, Void>(handler) {
             @Override
             protected Void doInBackground(Void... params) {

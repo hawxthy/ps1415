@@ -22,6 +22,11 @@ import ws1415.common.task.GetFullUserTask;
  * @author Martin Wrodarczyk
  */
 public class UserController {
+    /**
+     * Keine Instanziierung ermöglichen.
+     */
+    private UserController(){
+    }
 
     /**
      * Erstellt einen Benutzer auf dem Server, falls noch keiner zu der angegebenen E-Mail Adresse
@@ -105,7 +110,7 @@ public class UserController {
                 try {
                     return ServiceProvider.getService().userEndpoint().updateUserLocation(currentEventId,
                             latitude, longitude, userMail).execute();
-                } catch(IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Standortinformationen konnten nicht geändert werden");
                     return null;
@@ -213,13 +218,13 @@ public class UserController {
      * @param userMail E-Mail Adresse des Benutzers
      */
     @SuppressWarnings("unchecked")
-    public static void getUserLocation(ExtendedTaskDelegate handler, String userMail){
+    public static void getUserLocation(ExtendedTaskDelegate handler, String userMail) {
         new ExtendedTask<String, Void, UserLocation>(handler) {
             @Override
             protected UserLocation doInBackground(String... params) {
                 try {
                     return ServiceProvider.getService().userEndpoint().getUserLocation(params[0]).execute();
-                } catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Standort des Benutzers konnte nicht abgerufen werden");
                     return null;
@@ -229,20 +234,19 @@ public class UserController {
     }
 
     /**
-     *
      * Löscht einen Benutzer auf dem Server, falls dieser vorhanden ist. Wird zur Zeit nur für
      * die Tests verwendet.
      *
      * @param userMail E-Mail Adresse des Benutzers
      */
     @SuppressWarnings("unchecked")
-    public static void deleteUser(ExtendedTaskDelegate handler, String userMail){
+    public static void deleteUser(ExtendedTaskDelegate handler, String userMail) {
         new ExtendedTask<String, Void, Void>(handler) {
             @Override
             protected Void doInBackground(String... params) {
                 try {
                     return ServiceProvider.getService().userEndpoint().deleteUser(params[0]).execute();
-                } catch(IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Benutzer konnte nicht gelöscht werden");
                     return null;

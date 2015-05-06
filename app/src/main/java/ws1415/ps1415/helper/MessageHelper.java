@@ -12,7 +12,7 @@ import java.util.List;
 
 import ws1415.ps1415.model.Conversation;
 import ws1415.ps1415.model.Message;
-import ws1415.ps1415.model.MessageType;
+import ws1415.ps1415.model.LocalMessageType;
 
 /**
  * Der MessageHelper verwaltet die Datenbank der Nachrichten und Konversationen.
@@ -136,7 +136,7 @@ public class MessageHelper extends SQLiteOpenHelper {
      *
      * @param conversation Zu speichernde Conversation
      */
-    public boolean createConversation(Conversation conversation) {
+    public boolean insertConversation(Conversation conversation) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -211,7 +211,7 @@ public class MessageHelper extends SQLiteOpenHelper {
                     cursor.getInt(cursor.getColumnIndex(KEY_ID_MESSAGE)),
                     getDate(cursor.getLong(cursor.getColumnIndex(KEY_SEND_DATE))),
                     cursor.getString(cursor.getColumnIndex(KEY_CONTENT)),
-                    MessageType.getValue(cursor.getInt(cursor.getColumnIndex(KEY_TYPE))));
+                    LocalMessageType.getValue(cursor.getInt(cursor.getColumnIndex(KEY_TYPE))));
         }
 
         // Konversation abrufen
@@ -283,11 +283,11 @@ public class MessageHelper extends SQLiteOpenHelper {
     /**
      * Erstellt eine Nachricht zu der gehörigen Conversation.
      *
-     * @param conversationMail
-     * @param message
+     * @param conversationMail E-Mail Adresse zu der Konversation
+     * @param message          Nachricht
      * @return
      */
-    public boolean createMessage(String conversationMail, Message message) {
+    public long insertMessage(String conversationMail, Message message) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -301,10 +301,37 @@ public class MessageHelper extends SQLiteOpenHelper {
         values.clear();
         values.put(FOREIGN_KEY_LAST_MESSAGE, rowId);
 
-        db.update(TABLE_CONVERSATION, values, KEY_ID_CONVERSATION + " = ?",
+        db.update(TABLE_CONVERSATION, values, KEY_ID_CONVERSATION + "=?",
                 new String[]{conversationMail});
 
-        return !(rowId == -1);
+        return rowId;
+    }
+
+    /**
+     * Prüft, ob das Sendedatum der Nachricht mit der gespeicherten Nachricht übereinstimmt.
+     * Stimmt es überein, wird die Nachricht auf "erhalten" gesetzt.
+     *
+     * @param conversationMail E-Mail der Konversationsperson
+     * @param messageId Id der Nachricht
+     * @param sendDate Sendedatum
+     * @return true, falls update erfolgreich, false andernfalls
+     */
+    public boolean updateMessageReceived(String conversationMail, long messageId, long sendDate) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT " + KEY_SEND_DATE + " FROM " + TABLE_MESSAGE
+                        + " WHERE " + KEY_ID_MESSAGE + "=?" + " AND " + KEY_SEND_DATE + "=?",
+                new String[]{String.valueOf(messageId), String.valueOf(sendDate)});
+
+        if (!cursor.moveToFirst()) return false;
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_TYPE, LocalMessageType.OUTGOING_RECEIVED.getId());
+
+        int updatedRow = db.update(TABLE_MESSAGE, values, KEY_ID_MESSAGE + "=?",
+                new String[]{String.valueOf(messageId)});
+
+        return updatedRow == messageId;
     }
 
     /**
@@ -331,7 +358,7 @@ public class MessageHelper extends SQLiteOpenHelper {
                     cursor.getInt(cursor.getColumnIndex(KEY_ID_MESSAGE)),
                     getDate(cursor.getLong(cursor.getColumnIndex(KEY_SEND_DATE))),
                     cursor.getString(cursor.getColumnIndex(KEY_CONTENT)),
-                    MessageType.getValue(cursor.getInt(cursor.getColumnIndex(KEY_TYPE))));
+                    LocalMessageType.getValue(cursor.getInt(cursor.getColumnIndex(KEY_TYPE))));
             messages.add(message);
             cursor.moveToNext();
         }
