@@ -4,9 +4,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.datanucleus.annotations.Unowned;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -22,14 +20,10 @@ public class EndUser {
     @PrimaryKey
     @Persistent
     private String email;
-    @Persistent(defaultFetchGroup = "true")
     @Unowned
     private UserInfoPicture userInfoPicture;
-    @Persistent(defaultFetchGroup = "true")
     @Unowned
     private UserLocation userLocation;
-    @Persistent
-    private Map<Key, Integer> myRoles;
     @Persistent
     private List<String> myUserGroups;
     @Persistent
@@ -42,7 +36,6 @@ public class EndUser {
         this.email = email;
         this.userInfoPicture = userInfoPicture;
         this.userLocation = userLocation;
-        myRoles = new HashMap<>();
         myUserGroups = new ArrayList<>();
         myEvents = new ArrayList<>();
     }
@@ -87,14 +80,6 @@ public class EndUser {
         this.myEvents = myEvents;
     }
 
-    public Map<Key, Integer> getMyRoles() {
-        return myRoles;
-    }
-
-    public void setMyRoles(Map<Key, Integer> myRoles) {
-        this.myRoles = myRoles;
-    }
-
     public void addUserGroup(UserGroup userGroup) {
         if (userGroup != null) myUserGroups.add(userGroup.getName());
     }
@@ -109,17 +94,5 @@ public class EndUser {
 
     public void removeEvent(Event event) {
         if (event != null) myEvents.remove(event.getKey());
-    }
-
-    public Integer getRole(Key key){
-        return myRoles.get(key);
-    }
-
-    public void setRole(Key key, Integer role){
-        myRoles.put(key, role);
-    }
-
-    public void removeRole(Key key){
-        myRoles.remove(key);
     }
 }

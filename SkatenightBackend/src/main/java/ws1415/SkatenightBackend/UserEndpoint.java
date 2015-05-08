@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.jdo.JDOException;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -20,6 +21,7 @@ import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.Domain;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
+import ws1415.SkatenightBackend.model.GlobalDomain;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Role;
 import ws1415.SkatenightBackend.model.UserGroup;
@@ -98,7 +100,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             if (m == null) {
                 createMember(user.getEmail());
             }
-            if(!existsUser(user.getEmail()).value){
+            if (!existsUser(user.getEmail()).value) {
                 createUser(user.getEmail());
             }
 
@@ -122,23 +124,25 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param email E-Mail Adresse des zu erstellenden Benutzers
      */
     public void createUser(@Named("email") String email) {
-        if (!existsUser(email).value) {
-            UserLocation userLocation = new UserLocation(email);
-            UserPicture userPicture = new UserPicture(email);
-            UserInfo userInfo = new UserInfo(email);
-            UserInfoPicture userInfoPicture = new UserInfoPicture(email, userInfo, userPicture);
-            EndUser user = new EndUser(email, userInfoPicture, userLocation);
-
-            Domain globalDomain = new RoleEndpoint().getGlobalDomain();
-            user.setRole(globalDomain.getKey(), Role.USER.getId());
-
-            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-            try {
-                pm.makePersistent(user);
-            } finally {
-                pm.close();
-            }
+        if (existsUser(email).value) {
+            throw new JDOException("Benutzer existiert bereits");
         }
+        UserLocation userLocation = new UserLocation(email);
+        UserPicture userPicture = new UserPicture(email);
+        UserInfo userInfo = new UserInfo(email);
+        UserInfoPicture userInfoPicture = new UserInfoPicture(email, userInfo, userPicture);
+        EndUser user = new EndUser(email, userInfoPicture, userLocation);
+
+        Domain globalDomain = new RoleEndpoint().getGlobalDomain();
+        globalDomain.setRole(email, Role.USER.getId());
+
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        pm.makePersistent(globalDomain);
+        pm.close();
+
+        pm = getPersistenceManagerFactory().getPersistenceManager();
+        pm.makePersistent(user);
+        pm.close();
     }
 
     /**
@@ -150,7 +154,15 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @return true, falls Benutzer existiert, sonst false
      */
     public BooleanWrapper existsUser(@Named("email") String email) {
-        EndUser user = getFullUser(email);
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        EndUser user;
+        try {
+            user = pm.getObjectById(EndUser.class, email);
+        } catch (Exception e) {
+            user = null;
+        } finally {
+            pm.close();
+        }
         if (user == null) {
             return new BooleanWrapper(false);
         }
@@ -165,47 +177,41 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      */
     @ApiMethod(path = "get_full_user")
     public EndUser getFullUser(@Named("email") String email) {
-        EndUser endUser;
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            try {
-                endUser = pm.getObjectById(EndUser.class, email);
-                // Stellt sicher das Objekte der Assoziation auch runtergeladen werden
-                endUser.getUserInfoPicture();
-                endUser.getUserInfoPicture().getUserPicture();
-                endUser.getUserInfoPicture().getUserInfo();
-                endUser.getUserLocation();
-            } catch (Exception e) {
-                // User mit der Email wurde nicht gefunden
-                return null;
-            }
+            EndUser endUser = pm.getObjectById(EndUser.class, email);
+            // Stellt sicher das Objekte der Assoziation auch runtergeladen werden
+            endUser.getUserInfoPicture();
+            endUser.getUserInfoPicture().getUserPicture();
+            endUser.getUserInfoPicture().getUserInfo();
+            endUser.getUserLocation();
+            endUser.getMyEvents();
+            endUser.getMyUserGroups();
+            return endUser;
+        } catch (Exception e) {
+            // User mit der Email wurde nicht gefunden
+            return null;
         } finally {
             pm.close();
         }
-        return endUser;
     }
 
     /**
      * Gibt die Standordinformationen eines Benutzers mit der angegebenen E-Mail Adresse aus.
      *
      * @param email E-Mail Adresse des Benutzers
-     * @return Standortinformationen zum Benutzer
+     * @return Standortinformationen zum Benutzer, falls nicht gefunden: null
      */
     @ApiMethod(path = "get_user_location")
     public UserLocation getUserLocation(@Named("email") String email) {
-        UserLocation userLocation;
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            try {
-                userLocation = pm.getObjectById(UserLocation.class, email);
-            } catch (Exception e) {
-                // UserLocation mit der Email wurde nicht gefunden
-                return null;
-            }
+            return pm.getObjectById(UserLocation.class, email);
+        } catch (Exception e) {
+            return null;
         } finally {
             pm.close();
         }
-        return userLocation;
     }
 
     /**
@@ -213,69 +219,58 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * aus.
      *
      * @param email E-Mail Adresse des Benutzers
-     * @return Allgemeine Informationen zum Benutzer
+     * @return Allgemeine Informationen zum Benutzer, falls nicht gefunden: null
      */
     @ApiMethod(path = "get_user_info")
     public UserInfo getUserInfo(@Named("email") String email) {
-        UserInfo userInfo;
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            try {
-                userInfo = pm.getObjectById(UserInfo.class, email);
-            } catch (Exception e) {
-                return null;
-            }
+            return pm.getObjectById(UserInfo.class, email);
+        } catch (Exception e) {
+            return null;
         } finally {
             pm.close();
         }
-        return userInfo;
     }
 
     /**
      * Gibt die allgemeinen Informationen und das Profilbild zu einem Benutzer mit der angegebenen
      * E-Mail Adresse aus.
      *
-     * @param email
-     * @return Informationen und Profilbild vom Benutzer
+     * @param email E-Mail Adresse des Benutzers
+     * @return Informationen und Profilbild vom Benutzer, falls nicht gefunden: null
      */
     @ApiMethod(path = "get_user_info_with_picture")
     public UserInfoPicture getUserInfoWithPicture(@Named("email") String email) {
-        UserInfoPicture userInfoPicture;
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            try {
-                userInfoPicture = pm.getObjectById(UserInfoPicture.class, email);
-                userInfoPicture.getUserInfo();
-                userInfoPicture.getUserPicture();
-            } catch (Exception e) {
-                return null;
-            }
+            UserInfoPicture userInfoPicture = pm.getObjectById(UserInfoPicture.class, email);
+            userInfoPicture.getUserInfo();
+            userInfoPicture.getUserPicture();
+            return userInfoPicture;
+        } catch (Exception e) {
+            return null;
         } finally {
             pm.close();
         }
-        return userInfoPicture;
     }
 
     /**
      * Gibt das Profilbild des Benuters mit der angegebenen E-Mail Adresse aus.
      *
      * @param email E-Mail Adresse des Benutzers
-     * @return Profilbild des Benutzers
+     * @return Profilbild des Benutzers, falls nicht gefunden: null
      */
     @ApiMethod(path = "get_user_picture")
     public UserPicture getUserPicture(@Named("email") String email) {
-        UserPicture userPicture;
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            try {
-                userPicture = pm.getObjectById(UserPicture.class, email);
-            } catch (Exception e) {
-                return null;
-            }
+            return pm.getObjectById(UserPicture.class, email);
+        } catch (Exception e) {
+            return null;
         } finally {
             pm.close();
         }
-        return userPicture;
     }
 
     /**
@@ -290,17 +285,16 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     // TODO: Authentifizierung korrigieren(?)
     @ApiMethod(path = "update_user_info")
     public UserInfo updateUserInfo(User user, UserInfo newUserInfo) throws UnauthorizedException, OAuthRequestException {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
+        } else if (!existsUser(user.getEmail()).value) {
+            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
+        } else if (!user.getEmail().equals(newUserInfo.getEmail())) {
+            throw new UnauthorizedException("Keine Rechte um diesen Benutzer zu editieren");
         }
-        else if(!new UserEndpoint().existsUser(user.getEmail()).value){
-            throw new JDOObjectNotFoundException("Kein gültiger Benutzer");
-        }
-        UserInfo userInfo;
-        if (user.getEmail().equals(newUserInfo.getEmail())) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            userInfo = pm.getObjectById(UserInfo.class, newUserInfo.getEmail());
+            UserInfo userInfo = pm.getObjectById(UserInfo.class, newUserInfo.getEmail());
             userInfo.setFirstName(newUserInfo.getFirstName());
             userInfo.setLastName(newUserInfo.getLastName());
             userInfo.setCity(newUserInfo.getCity());
@@ -308,13 +302,10 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             userInfo.setDescription(newUserInfo.getDescription());
             userInfo.setGender(newUserInfo.getGender());
             userInfo.setPostalCode(newUserInfo.getPostalCode());
+            return userInfo;
         } finally {
             pm.close();
         }
-        } else {
-            throw new UnauthorizedException("Keine Rechte um diesen Benutzer zu editieren");
-        }
-        return userInfo;
     }
 
     /**
@@ -331,20 +322,19 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             UnauthorizedException, OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
-        }
-        UserPicture userPicture;
-        if (user.getEmail().equals(newUserPicture.getEmail())) {
-            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-            try {
-                userPicture = pm.getObjectById(UserPicture.class, newUserPicture.getEmail());
-                userPicture.setPicture(newUserPicture.getPicture());
-            } finally {
-                pm.close();
-            }
-        } else {
+        } else if (!existsUser(user.getEmail()).value) {
+            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
+        } else if (!user.getEmail().equals(newUserPicture.getEmail())) {
             throw new UnauthorizedException("Keine Rechte um diesen Benutzer zu editieren");
         }
-        return userPicture;
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            UserPicture userPicture = pm.getObjectById(UserPicture.class, newUserPicture.getEmail());
+            userPicture.setPicture(newUserPicture.getPicture());
+            return userPicture;
+        } finally {
+            pm.close();
+        }
     }
 
     /**
@@ -366,20 +356,21 @@ public class UserEndpoint extends SkatenightServerEndpoint {
                                    @Named("currentEventId") long currentEventId) throws Exception {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
-        }
-        if (user.getEmail().equals(userMail)) {
-            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-            try {
-                UserLocation userLocation = pm.getObjectById(UserLocation.class, userMail);
-                userLocation.setUpdatedAt(new Date());
-                userLocation.setLatitude(latitude);
-                userLocation.setLongitude(longitude);
-                userLocation.setCurrentEventId(currentEventId);
-            } finally {
-                pm.close();
-            }
-        } else {
+        } else if (!existsUser(user.getEmail()).value) {
+            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
+        } else if (!user.getEmail().equals(userMail)) {
             throw new UnauthorizedException("Keine Rechte um diesen Benutzer zu editieren");
+        }
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            UserLocation userLocation = pm.getObjectById(UserLocation.class, userMail);
+            userLocation.setUpdatedAt(new Date());
+            userLocation.setLatitude(latitude);
+            userLocation.setLongitude(longitude);
+            userLocation.setCurrentEventId(currentEventId);
+            pm.makePersistent(userLocation);
+        } finally {
+            pm.close();
         }
     }
 
@@ -392,16 +383,11 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      */
     @ApiMethod(path = "list_user_infos")
     public List<UserInfo> listUserInfo(@Named("userMails") List<String> userMails) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         List<UserInfo> result = new ArrayList<>();
-        try {
-            UserInfo userInfo;
-            for (String userMail : userMails) {
-                userInfo = getUserInfo(userMail);
-                if (userInfo != null) result.add(userInfo);
-            }
-        } finally {
-            pm.close();
+        UserInfo userInfo;
+        for (String userMail : userMails) {
+            userInfo = getUserInfo(userMail);
+            if (userInfo != null) result.add(userInfo);
         }
         return result;
     }
@@ -415,16 +401,11 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      */
     @ApiMethod(path = "list_user_info_with_picture")
     public List<UserInfoPicture> listUserInfoWithPicture(@Named("userMails") List<String> userMails) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         List<UserInfoPicture> result = new ArrayList<>();
-        try {
-            UserInfoPicture userInfoPicture;
-            for (String userMail : userMails) {
-                userInfoPicture = getUserInfoWithPicture(userMail);
-                if (userInfoPicture != null) result.add(userInfoPicture);
-            }
-        } finally {
-            pm.close();
+        UserInfoPicture userInfoPicture;
+        for (String userMail : userMails) {
+            userInfoPicture = getUserInfoWithPicture(userMail);
+            if (userInfoPicture != null) result.add(userInfoPicture);
         }
         return result;
     }
@@ -437,16 +418,11 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      */
     @ApiMethod(path = "list_user_picture")
     public List<UserPicture> listUserPicture(@Named("userMails") List<String> userMails) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         List<UserPicture> result = new ArrayList<>();
-        try {
-            UserPicture userPicture;
-            for (String userMail : userMails) {
-                userPicture = getUserPicture(userMail);
-                if (userPicture != null) result.add(userPicture);
-            }
-        } finally {
-            pm.close();
+        UserPicture userPicture;
+        for (String userMail : userMails) {
+            userPicture = getUserPicture(userMail);
+            if (userPicture != null) result.add(userPicture);
         }
         return result;
     }
@@ -461,24 +437,22 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      */
     @ApiMethod(path = "list_user_groups")
     public List<UserGroup> listUserGroups(@Named("userMail") String userMail) throws Exception {
-        if (existsUser(userMail).value) {
-            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-            List<UserGroup> result = new ArrayList<>();
-            try {
-                List<String> userGroupIds = getFullUser(userMail).getMyUserGroups();
-                UserGroup userGroup;
-                for (String userGroupId : userGroupIds) {
-                    userGroup = new GroupEndpoint().getUserGroup(userGroupId);
-                    if (userGroup != null) result.add(userGroup);
-                }
-            } finally {
-                pm.close();
-            }
-            return result;
-        } else {
-            throw new Exception("Benutzer existiert nicht");
+        if (!existsUser(userMail).value) {
+            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
         }
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        List<String> userGroupIds = pm.getObjectById(EndUser.class, userMail).getMyUserGroups();
+        pm.close();
+
+        UserGroup userGroup;
+        List<UserGroup> result = new ArrayList<>();
+        for (String userGroupId : userGroupIds) {
+            userGroup = new GroupEndpoint().getUserGroup(userGroupId);
+            if (userGroup != null) result.add(userGroup);
+        }
+        return result;
     }
+
 
     /**
      * Gibt eine Liste von allen Veranstaltungen aus, an denen der Benutzer teilgenommen hat bzw.
@@ -490,67 +464,71 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      */
     @ApiMethod(path = "list_events")
     public List<Event> listEvents(@Named("userMail") String userMail) throws Exception {
-        if (existsUser(userMail).value) {
-            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-            List<Event> result = new ArrayList<>();
-            try {
-                List<Key> eventIds = getFullUser(userMail).getMyEvents();
-                Event event;
-                for (Key key : eventIds) {
-                    event = new EventEndpoint().getEvent(key.getId());
-                    if (event != null) result.add(event);
-                }
-            } finally {
-                pm.close();
-            }
-            return result;
-        } else {
-            throw new Exception("Benutzer existiert nicht");
+        if (!existsUser(userMail).value) {
+            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
         }
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        List<Key> eventIds = pm.getObjectById(EndUser.class, userMail).getMyEvents();
+
+        Event event;
+        List<Event> result = new ArrayList<>();
+        for (Key key : eventIds) {
+            event = new EventEndpoint().getEvent(key.getId());
+            if (event != null) result.add(event);
+        }
+        return result;
     }
 
     /**
      * Löscht einen Benutzer auf dem Server, falls dieser vorhanden ist. Wird zur Zeit nur für
      * die Tests verwendet.
      *
-     * @param email E-Mail Adresse des Benutzers
+     * @param userMail E-Mail Adresse des Benutzers
      */
-    public void deleteUser(@Named("email") String email) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        if (existsUser(email).value) {
-            EndUser endUser;
-            try {
-                endUser = pm.getObjectById(EndUser.class, email);
-                pm.deletePersistent(endUser.getUserInfoPicture().getUserPicture());
-                pm.deletePersistent(endUser.getUserInfoPicture().getUserInfo());
-                pm.deletePersistent(endUser.getUserInfoPicture());
-                pm.deletePersistent(endUser.getUserLocation());
-                pm.deletePersistent(endUser);
-
-                // Lösche aus Teilnehmerlisten
-                //List<Key> eventIds = endUser.getMyEvents();
-                //Event event;
-                //for (Key eventId : eventIds) {
-                //   event = new EventEndpoint().getEvent(eventId.getId());
-                // event.removeMember(email)
-                // pm.makePersistent(event);
-                //}
-
-                //List<String> groupIds = endUser.getMyUserGroups();
-                //UserGroup userGroup;
-                //for (String groupId : groupIds) {
-                //   userGroup = new GroupEndpoint().getUserGroup(groupId);
-                // userGroup.removeMember(email);
-                // pm.makePersistent(userGroup);
-                //}
-
-            } catch (Exception e) {
-                throw new JDOObjectNotFoundException("User wurde nicht gefunden");
-            } finally {
-                pm.close();
-            }
-        } else {
-            throw new JDOObjectNotFoundException("User wurde nicht gefunden");
+    public void deleteUser(@Named("userMail") String userMail) {
+        if (!existsUser(userMail).value) {
+            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
         }
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+        try {
+            pm.deletePersistent(endUser.getUserInfoPicture().getUserPicture());
+            pm.deletePersistent(endUser.getUserInfoPicture().getUserInfo());
+            pm.deletePersistent(endUser.getUserInfoPicture());
+            pm.deletePersistent(endUser.getUserLocation());
+            pm.deletePersistent(endUser);
+        } finally {
+            pm.close();
+        }
+
+        pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            GlobalDomain globalDomain = new RoleEndpoint().getGlobalDomain();
+            globalDomain.removeRole(userMail);
+            pm.makePersistent(globalDomain);
+        } finally {
+            pm.close();
+        }
+
+        // Lösche aus Teilnehmerlisten
+        //List<Key> eventIds = endUser.getMyEvents();
+        //Event event;
+        //for (Key eventId : eventIds) {
+        //   event = new EventEndpoint().getEvent(eventId.getId());
+        // event.removeMember(userMail)
+        // pm.makePersistent(event);
+        //}
+
+        //List<String> groupIds = endUser.getMyUserGroups();
+        //UserGroup userGroup;
+        //for (String groupId : groupIds) {
+        //   userGroup = new GroupEndpoint().getUserGroup(groupId);
+        // userGroup.removeMember(userMail);
+        // pm.makePersistent(userGroup);
+        //}
+
+
+
+        // Aus Domänen löschen
     }
 }

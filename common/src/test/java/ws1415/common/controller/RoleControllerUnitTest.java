@@ -31,7 +31,7 @@ public class RoleControllerUnitTest {
     public void testGetGlobalRole() throws InterruptedException {
         UserController.createUser(null, TEST_MAIL);
 
-        Thread.sleep(3000);
+        Thread.sleep(4000);
 
         RoleController.getGlobalRole(new ExtendedTaskDelegateAdapter<Void, Role>() {
             @Override
@@ -44,4 +44,5 @@ public class RoleControllerUnitTest {
 
         UserController.deleteUser(null, TEST_MAIL);
     }
+
 }

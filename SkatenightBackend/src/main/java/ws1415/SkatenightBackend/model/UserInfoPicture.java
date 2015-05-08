@@ -16,10 +16,8 @@ public class UserInfoPicture {
     @PrimaryKey
     @Persistent
     private String email;
-    @Persistent(defaultFetchGroup = "true")
     @Unowned
     private UserInfo userInfo;
-    @Persistent(defaultFetchGroup = "true")
     @Unowned
     private UserPicture userPicture;
 

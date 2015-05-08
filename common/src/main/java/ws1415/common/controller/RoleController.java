@@ -1,7 +1,11 @@
 package ws1415.common.controller;
 
 import com.skatenight.skatenightAPI.model.Domain;
+import com.skatenight.skatenightAPI.model.JsonMap;
 import com.skatenight.skatenightAPI.model.RoleWrapper;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -24,38 +28,7 @@ public class RoleController {
     }
 
     /**
-     * Setzt die Rolle für einen Benutzer, falls eine Rolle für die Umgebung vorhanden ist, so wird
-     * diese überschrieben.
-     *
-     * @param handler
-     * @param userMail E-Mail Adresse des Benutzers
-     * @param domain   Umgebung
-     * @param role     Rolle des Benutzers
-     */
-    public static void setUserRole(ExtendedTaskDelegate handler, final String userMail,
-                                   final Domain domain, final Role role) {
-        if (domain == null || domain.getKey() == null) {
-            throw new IllegalArgumentException("Domain nicht gültig");
-        }
-        if (!domain.getPossibleRoles().contains(role.getId())) {
-            throw new IllegalArgumentException("Rolle ist für die Umgebung nicht gültig");
-        }
-        new ExtendedTask<Void, Void, Void>(handler) {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    return ServiceProvider.getService().roleEndpoint().setUserRole(userMail, role.getId(), domain).execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    publishError("Rolle für den Benutzer konnte nicht gesetzt werden");
-                    return null;
-                }
-            }
-        }.execute();
-    }
-
-    /**
-     * Gibt die Rolle eines Benutzers zurück.
+     * Gibt die Rolle eines Benutzers vom Server zurück.
      *
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
@@ -82,6 +55,34 @@ public class RoleController {
     }
 
     /**
+     * Setzt die Rolle für einen Benutzer, falls eine Rolle für die Umgebung vorhanden ist, so wird
+     * diese überschrieben.
+     *
+     * @param handler
+     * @param userMail E-Mail Adresse des Benutzers
+     * @param domain   Umgebung
+     * @param role     Rolle des Benutzers
+     */
+    public static void assignUserRole(ExtendedTaskDelegate handler, final String userMail,
+                                      final Domain domain, final Role role) {
+        if (domain == null || domain.getKey() == null) {
+            throw new IllegalArgumentException("Domain nicht gültig");
+        }
+        new ExtendedTask<Void, Void, Domain>(handler) {
+            @Override
+            protected Domain doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().roleEndpoint().assignUserRole(userMail, role.getId(), domain).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Rolle für den Benutzer konnte nicht gesetzt werden");
+                    return null;
+                }
+            }
+        }.execute();
+    }
+
+    /**
      * Löscht die Rolle des Benutzers.
      *
      * @param handler
@@ -93,9 +94,9 @@ public class RoleController {
         if (domain == null) {
             throw new IllegalArgumentException("Domain nicht gültig");
         }
-        new ExtendedTask<Void, Void, Void>(handler) {
+        new ExtendedTask<Void, Void, Domain>(handler) {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Domain doInBackground(Void... params) {
                 try {
                     return ServiceProvider.getService().roleEndpoint().deleteUserRole(userMail, domain).execute();
                 } catch (IOException e) {
@@ -107,11 +108,12 @@ public class RoleController {
         }.execute();
     }
 
+
     /**
      * Gibt die globale Rolle eines Benutzers aus.
      *
      * @param handler
-     * @param userMail E-Mail Adresse eines Benutzers
+     * @param userMail E-Mail Adresse des Benutzers
      */
     public static void getGlobalRole(ExtendedTaskDelegate handler, final String userMail) {
         new ExtendedTask<Void, Void, Role>(handler) {
@@ -129,12 +131,19 @@ public class RoleController {
         }.execute();
     }
 
-    public static void setGlobalRole(ExtendedTaskDelegate handler, final String userMail, final Role role) {
+    /**
+     * Weist einem Benutzer eine globale Rolle zu.
+     *
+     * @param handler
+     * @param userMail E-Mail Adresse des Benutzers
+     * @param role Neue Rolle
+     */
+    public static void assignGlobalRole(ExtendedTaskDelegate handler, final String userMail, final Role role) {
         new ExtendedTask<Void, Void, Void>(handler) {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().roleEndpoint().changeGlobalRole(userMail, role.getId()).execute();
+                    return ServiceProvider.getService().roleEndpoint().assignGlobalRole(userMail, role.getId()).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Globale Rolle des Benutzers konnte nicht gesetzt werden");
@@ -143,4 +152,23 @@ public class RoleController {
             }
         }.execute();
     }
+
+
+    /**
+     * Gibt die Rolle für den Benutzer für das lokale Objekt der Umgebung zurück.
+     * TODO: Testen
+     *
+     * @param domain Umgebung
+     * @param userMail E-Mail Adresse des Benutzers
+     */
+    public static void getUserRole(Domain domain, String userMail) throws JSONException {
+        JsonMap userRoles = domain.getUserRoles();
+        JSONObject userRolesObject = new JSONObject(userRoles);
+        try {
+            userRolesObject.getInt(userMail);
+        } catch (JSONException e) {
+            throw new JSONException("Rolle vom Benutzer konnte nicht abgerufen werden: " + userMail);
+        }
+    }
+
 }

@@ -144,6 +144,7 @@ public class UserControllerUnitTest {
      *
      * @throws InterruptedException
      */
+    @Test
     public void testGetUserLocation() throws InterruptedException {
         UserController.createUser(null, TEST_MAIL);
 
@@ -156,7 +157,36 @@ public class UserControllerUnitTest {
                 assertEquals(TEST_MAIL, userLocation.getEmail());
             }
         }, TEST_MAIL);
+
+        Thread.sleep(3000);
+
+        UserController.deleteUser(null, TEST_MAIL);
     }
+
+    /**
+     * Prüft, ob die Standortinformationen eines Benutzers richtig abgerufen werden.
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void testGetUserInfo() throws InterruptedException {
+        UserController.createUser(null, TEST_MAIL);
+
+        Thread.sleep(4000);
+
+        UserController.getUserLocation(new ExtendedTaskDelegateAdapter<Void, UserLocation>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserLocation userLocation) {
+                assertNotNull(userLocation);
+                assertEquals(TEST_MAIL, userLocation.getEmail());
+            }
+        }, TEST_MAIL);
+
+        Thread.sleep(3000);
+
+        UserController.deleteUser(null, TEST_MAIL);
+    }
+
 
     // TODO: Wenn Groupcontroller fertig
     public void testListUserGroups() throws InterruptedException {
