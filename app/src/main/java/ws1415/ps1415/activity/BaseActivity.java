@@ -7,7 +7,6 @@ import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -68,6 +67,7 @@ public class BaseActivity extends Activity {
         // Die Nav Drawer Items hinzufügen
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
 
         navMenuIcons.recycle();
 
@@ -114,6 +114,11 @@ public class BaseActivity extends Activity {
                     Intent user_group_intent = new Intent(BaseActivity.this, UsergroupActivity.class);
                     user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(user_group_intent);
+                    break;
+                case 2:
+                    Intent cloud_storage_test_intent = new Intent(BaseActivity.this, ImageStorageTestActivity.class);
+                    cloud_storage_test_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(cloud_storage_test_intent);
                     break;
             }
             mDrawerLayout.closeDrawer(mDrawerList);

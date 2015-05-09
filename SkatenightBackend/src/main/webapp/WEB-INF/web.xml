@@ -42,4 +42,15 @@
         <servlet-class>ws1415.SkatenightBackend.ObjectifyStartupServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+
+
+    <!-- Blobstore Upload Handler -->
+    <servlet>
+        <servlet-name>BlobstoreUploadHandler</servlet-name>
+        <servlet-class>ws1415.SkatenightBackend.BlobstoreUploadHandler</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BlobstoreUploadHandler</servlet-name>
+        <url-pattern>/images/upload</url-pattern>
+    </servlet-mapping>
 </web-app>

@@ -11,6 +11,7 @@ import com.skatenight.skatenightAPI.SkatenightAPI;
  * Created by Richard on 21.10.2014.
  */
 public abstract class ServiceProvider {
+    private static boolean testing = false;
 
     private static SkatenightAPI service;
     private static String email;
@@ -22,11 +23,7 @@ public abstract class ServiceProvider {
      */
     public static SkatenightAPI getService() {
         if (service == null) {
-            SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
-                    AndroidHttp.newCompatibleTransport(),
-                    new AndroidJsonFactory(), null);
-            builder.setRootUrl(Constants.API_URL);
-            service = builder.build();
+            login(null);
         }
         return service;
     }
@@ -37,16 +34,36 @@ public abstract class ServiceProvider {
      * @param credential Die zu verwendenen Credentials
      */
     public static void login(GoogleAccountCredential credential) {
+        testing = false;
+
         SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
                 AndroidHttp.newCompatibleTransport(),
                 new AndroidJsonFactory(), credential);
-        System.out.println("API_URL: " + Constants.API_URL);
         builder.setRootUrl(Constants.API_URL);
         service = builder.build();
-        email = credential.getSelectedAccountName();
+        if (credential != null) {
+            email = credential.getSelectedAccountName();
+        } else {
+            email = null;
+        }
     }
 
     public static String getEmail(){
         return email;
+    }
+
+    /**
+     * Baut eine Verbindung zum lokalen Testserver auf, der für Tests genutzt werden sollte.
+     */
+    public static void setupLocalTestserverConnection() {
+        if (!testing) {
+            testing = true;
+
+            SkatenightAPI.Builder builder = new SkatenightAPI.Builder(
+                    AndroidHttp.newCompatibleTransport(),
+                    new AndroidJsonFactory(), null);
+            builder.setRootUrl("http://localhost:8080/_ah/api");
+            service = builder.build();
+        }
     }
 }

@@ -58,6 +58,13 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+
+    // Aufgrund eines Bugs von Gradle müssen die folgenden Dateien beim Packen der App ignoriert werden
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
 }
 
 dependencies {
@@ -66,4 +73,7 @@ dependencies {
     compile 'com.google.android.gms:play-services:6.1.+'
     compile project(':common')
     compile files('libs/gson-2.2.2.jar')
+
+//    compile 'com.google.apis:google-api-services-storage:v1-rev34-1.20.0'
+//    compile 'com.google.appengine.tools:appengine-gcs-client:0.4.4'
 }

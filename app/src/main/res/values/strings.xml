@@ -14,11 +14,13 @@
     <string-array name="nav_drawer_items">
         <item>Events</item>
         <item>User Groups</item>
+        <item>Image Storage Test</item>
     </string-array>
 
     <array name="nav_drawer_icons">
         <item>@drawable/ic_event</item>
         <item>@drawable/ic_group</item>
+        <item>@drawable/common_ic_googleplayservices</item>
     </array>
 
     <!-- Content Description -->
@@ -102,4 +104,7 @@
 
     <!-- Strings zu LocationTransmitterService -->
     <string name="location_transmitter_button_stop">Stop</string>
+
+    <!-- Strings zu ImageStorageTestActivity  -->
+    <string name="title_activity_blobstore_test">ImageStorageTestActivity</string>
 </resources>

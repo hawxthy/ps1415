@@ -14,11 +14,13 @@
     <string-array name="nav_drawer_items">
         <item >Veranstaltungen</item>
         <item >Nutzergruppen</item>
+        <item>Image Storage Test</item>
     </string-array>
 
     <array name="nav_drawer_icons">
         <item>@drawable/ic_event</item>
         <item>@drawable/ic_group</item>
+        <item>@drawable/common_ic_googleplayservices</item>
     </array>
 
     <!-- Content Description -->
