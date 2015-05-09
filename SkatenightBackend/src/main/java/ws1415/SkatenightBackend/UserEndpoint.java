@@ -420,10 +420,10 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
             List<Event> result = new ArrayList<>();
             try {
-                List<Key> eventIds = getFullUser(userMail).getMyEvents();
+                List<Long> eventIds = getFullUser(userMail).getMyEvents();
                 Event event;
-                for(Key key : eventIds){
-                    event = new EventEndpoint().getEvent(key.getId());
+                for(Long key : eventIds){
+                    event = new EventEndpoint().getEvent(0l, key);
                     if(event != null) result.add(event);
                 }
             } finally {

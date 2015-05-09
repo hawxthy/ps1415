@@ -81,8 +81,8 @@ public class EventStartServlet extends HttpServlet {
                         if (!results.isEmpty()) {
                             _logger.info("DEBUG");
                             member = results.get(0);
-                            if (member.getCurrentEventId() ==  null ||member.getCurrentEventId() != e.getKey().getId()) {
-                                member.setCurrentEventId(e.getKey().getId());
+                            if (member.getCurrentEventId() ==  null ||member.getCurrentEventId() != e.getId()) {
+                                member.setCurrentEventId(e.getId());
                                 member.setCurrentWaypoint(0);
                             }
                             pm.makePersistent(member);
@@ -100,7 +100,7 @@ public class EventStartServlet extends HttpServlet {
                             .delayWhileIdle(false)
                             .timeToLive(3600)
                             .addData("type", MessageType.EVENT_START_MESSAGE.name())
-                            .addData("eventId", Long.toString(e.getKey().getId()))
+                            .addData("eventId", Long.toString(e.getId()))
                             .build();
                     sender.send(m, new LinkedList<>(ids), 1);
 

@@ -5,7 +5,7 @@
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>ws1415.SkatenightBackend.EventEndpoint,ws1415.SkatenightBackend.UserEndpoint,ws1415.SkatenightBackend.HostEndpoint,ws1415.SkatenightBackend.GroupEndpoint,ws1415.SkatenightBackend.RouteEndpoint</param-value>
+            <param-value>ws1415.SkatenightBackend.EventEndpoint,ws1415.SkatenightBackend.UserEndpoint,ws1415.SkatenightBackend.HostEndpoint,ws1415.SkatenightBackend.GroupEndpoint,ws1415.SkatenightBackend.RouteEndpoint,ws1415.SkatenightBackend.GalleryEndpoint</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>
@@ -25,4 +25,21 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+
+
+    <!-- Objectify -->
+    <filter>
+        <filter-name>ObjectifyFilter</filter-name>
+        <filter-class>com.googlecode.objectify.ObjectifyFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ObjectifyFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <servlet>
+        <servlet-name>ObjectifyStartupServlet</servlet-name>
+        <servlet-class>ws1415.SkatenightBackend.ObjectifyStartupServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 </web-app>

@@ -108,16 +108,16 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
                         e.getMemberList() != null &&
                         e.getMemberList().contains(prefs.getString("accountName", null))) {
 
-                    if (!prefs.getBoolean(e.getKey().getId()+"-started", false)) {
-                        LocationTransmitterService.ScheduleService(ShowEventsActivity.this, e.getKey().getId(), startDate);
+                    if (!prefs.getBoolean(e.getId()+"-started", false)) {
+                        LocationTransmitterService.ScheduleService(ShowEventsActivity.this, e.getId(), startDate);
                     }
 
                     intent = new Intent(ShowEventsActivity.this, ActiveEventActivity.class);
-                    intent.putExtra(ActiveEventActivity.EXTRA_KEY_ID, e.getKey().getId());
+                    intent.putExtra(ActiveEventActivity.EXTRA_KEY_ID, e.getId());
                 }
                 else {
                     intent = new Intent(ShowEventsActivity.this, ShowInformationActivity.class);
-                    intent.putExtra(ShowInformationActivity.EXTRA_KEY_ID, e.getKey().getId());
+                    intent.putExtra(ShowInformationActivity.EXTRA_KEY_ID, e.getId());
                 }
                 startActivity(intent);
             }

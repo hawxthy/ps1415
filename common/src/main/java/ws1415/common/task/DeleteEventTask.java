@@ -30,11 +30,11 @@ public class DeleteEventTask extends ExtendedTask<Event, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Event... params) {
         try {
-            return ServiceProvider.getService().eventEndpoint().deleteEvent(
-                    params[0].getKey().getId()).execute().getValue();
+            ServiceProvider.getService().eventEndpoint().deleteEvent(params[0].getId()).execute();
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
+        return true;
     }
 }

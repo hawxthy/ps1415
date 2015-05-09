@@ -28,7 +28,7 @@ public class GetEventTask extends ExtendedTask<Long, Void, Event> {
     protected Event doInBackground(Long... params) {
         Long keyId = params[0];
         try {
-            return ServiceProvider.getService().eventEndpoint().getEvent(keyId).execute();
+            return ServiceProvider.getService().eventEndpoint().getEvent(0l, keyId).execute();
         } catch (IOException e) {
             e.printStackTrace();
             publishError(e.getMessage());

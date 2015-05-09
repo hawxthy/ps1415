@@ -295,41 +295,41 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         return members;
     }
 
-    public void setVisibility(@Named("groupName") String groupName, BooleanWrapper visibility){
-        //TODO Lösung für den PrefManager finden.
-    }
-
-    public void sendInvitation(UserGroup u, @Named("userName") String user, @Named("message") String message){
-        //TODO Implementieren.
-    }
-
-    public BooleanWrapper removeMember(UserGroup u, @Named("userName") String user){
-        //TODO Implementieren.
-        return new BooleanWrapper(true);
-    }
-
-    public void sendGlobalMessage(UserGroup u, @Named("message") String message){
-        //TODO Implementieren.
-    }
-
-    public BooleanWrapper sendMessage(UserGroup u, @Named("message") String message, @Named("userName") String user){
-        //TODO Implementieren.
-        return new BooleanWrapper(true);
-    }
-
-    public BooleanWrapper postBlackBoard(UserGroup u, @Named("message") String Message){
-        //TODO Implementieren.
-        return new BooleanWrapper(true);
-    }
-
-    public BooleanWrapper deleteBoardMessage(@Named("groupName") String groupName, BoardEntry be){
-        //TODO Implementieren.
-        return new BooleanWrapper(true);
-    }
-
-    public BooleanWrapper changePicture(@Named("gropuName") String gropuName, Picture p){
-        //TODO Implementieren.
-        return new BooleanWrapper(true);
-    }
+//    public void setVisibility(@Named("groupName") String groupName, BooleanWrapper visibility){
+//        //TODO Lösung für den PrefManager finden.
+//    }
+//
+//    public void sendInvitation(UserGroup u, @Named("userName") String user, @Named("message") String message){
+//        //TODO Implementieren.
+//    }
+//
+//    public BooleanWrapper removeMember(UserGroup u, @Named("userName") String user){
+//        //TODO Implementieren.
+//        return new BooleanWrapper(true);
+//    }
+//
+//    public void sendGlobalMessage(UserGroup u, @Named("message") String message){
+//        //TODO Implementieren.
+//    }
+//
+//    public BooleanWrapper sendMessage(UserGroup u, @Named("message") String message, @Named("userName") String user){
+//        //TODO Implementieren.
+//        return new BooleanWrapper(true);
+//    }
+//
+//    public BooleanWrapper postBlackBoard(UserGroup u, @Named("message") String Message){
+//        //TODO Implementieren.
+//        return new BooleanWrapper(true);
+//    }
+//
+//    public BooleanWrapper deleteBoardMessage(@Named("groupName") String groupName, BoardEntry be){
+//        //TODO Implementieren.
+//        return new BooleanWrapper(true);
+//    }
+//
+//    public BooleanWrapper changePicture(@Named("gropuName") String gropuName, Picture p){
+//        //TODO Implementieren.
+//        return new BooleanWrapper(true);
+//    }
 
 }

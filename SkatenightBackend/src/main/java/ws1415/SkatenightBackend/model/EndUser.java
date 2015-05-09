@@ -33,7 +33,7 @@ public class EndUser {
     @Persistent
     private List<String> myUserGroups;
     @Persistent
-    private List<Key> myEvents;
+    private List<Long> myEvents;
 
     public EndUser() {
     }
@@ -79,11 +79,11 @@ public class EndUser {
         this.myUserGroups = myUserGroups;
     }
 
-    public List<Key> getMyEvents() {
+    public List<Long> getMyEvents() {
         return myEvents;
     }
 
-    public void setMyEvents(List<Key> myEvents) {
+    public void setMyEvents(List<Long> myEvents) {
         this.myEvents = myEvents;
     }
 
@@ -104,10 +104,10 @@ public class EndUser {
     }
 
     public void addEvent(Event event) {
-        if (event != null) myEvents.add(event.getKey());
+        if (event != null) myEvents.add(event.getId());
     }
 
     public void removeEvent(Event event) {
-        if (event != null) myEvents.remove(event.getKey());
+        if (event != null) myEvents.remove(event.getId());
     }
 }

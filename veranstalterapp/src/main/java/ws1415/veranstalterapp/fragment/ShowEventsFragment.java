@@ -87,7 +87,7 @@ public class ShowEventsFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity(), ShowInformationActivity.class);
-                intent.putExtra("event", eventList.get(i).getKey().getId());
+                intent.putExtra("event", eventList.get(i).getId());
                 startActivity(intent);
             }
         });
@@ -167,7 +167,7 @@ public class ShowEventsFragment extends Fragment {
 
     public void editEvent(Event event){
         Intent intent = new Intent(getActivity(), EditEventActivity.class);
-        intent.putExtra("event", event.getKey().getId());
+        intent.putExtra("event", event.getId());
         startActivity(intent);
     }
 

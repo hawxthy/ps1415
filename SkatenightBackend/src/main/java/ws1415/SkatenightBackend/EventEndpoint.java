@@ -1,9 +1,10 @@
 package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.Named;
-import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.Key;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,23 +23,152 @@ import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.Event;
+import ws1415.SkatenightBackend.model.EventMetaData;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Route;
 
+import static com.googlecode.objectify.ObjectifyService.ofy;
+
 /**
- * Created by Richard on 01.05.2015.
+ * Stellt Methoden zur Verarbeitung von Events auf dem Backend bereit.
+ * @author Richard Schulze
  */
 public class EventEndpoint extends SkatenightServerEndpoint {
 
     /**
-     * Aktualisiert das auf dem Server gespeicherte Event-Objekt.
-     *
-     * @param user Der User, der das Event-Objekt aktualisieren möchte.
-     * @param e    Das neue Event-Objekt.
+     * Gibt eine Liste aller auf dem Server gespeicherter Metadaten von Events zurück.
+     * @return Eine Liste aller auf dem Server gespeicherter EventMetaData-Objekte.
      */
-    public void createEvent(User user, Event e) throws OAuthRequestException, IOException {
-        createEvent(user, e, false, false);
+    public List<EventMetaData> getEventsMetaData() {
+        return ofy().load().type(EventMetaData.class).list();
     }
+
+    /**
+     * Ruft ein Event aus der Datenbank ab.
+     * @param metaDataId Die Id der Metadaten des Events das abgerufen werden soll.
+     * @param eventId    Die Id des abzurufenden Events.
+     * @return Das Event-Objekt inklusive Metadaten und Gallery-Objekt. Die Bilder der Galerie
+     * werden nicht mit abgerufen.
+     */
+    public Event getEvent(@Named("metaDataId") Long metaDataId, @Named("eventId") Long eventId) {
+        if (metaDataId == null) {
+            return null;
+        }
+        return ofy().load().type(Event.class)
+                .parent(Key.create(EventMetaData.class, metaDataId))
+                .id(eventId)
+                .safe();
+    }
+
+    /**
+     * Erstellt ein neues Event mit den angegebenen Daten auf dem Server und gibt das persistierte
+     * Event-Objekt zurück. Kann nur von Benutzern aufgerufen werden, die in der globalen Domäne die
+     * Rolle Veranstalter haben.
+     *
+     * @param user            Der aufrufende Benutzer.
+     * @param icon            TODO
+     * @param title           Der Titel des anzulegenden Events.
+     * @param date            Das Datum des Events.
+     * @param headerImage     TODO
+     * @param description     Der Beschreibungstext des Events.
+     * @param meetingPlace    Der Treffpunkt für das Event.
+     * @param fee             Die Gebühr für das Event.
+     * @param images          TODO
+     * @return Das persistierte Event-Objekt.
+     */
+    // TODO Route hinzufügen
+    public Event createEvent(User user, @Named("icon") String icon, @Named("title") String title,
+                             @Named("date") Date date, @Named("headerImage") String headerImage,
+                             Text description, @Named("meetingPlace") String meetingPlace,
+                             @Named("fee") int fee, @Named("images") List<String> images) {
+        // TODO User prüfen
+        // TODO Event prüfen
+
+        EventMetaData metaData = new EventMetaData();
+        metaData.setIcon(icon);
+        metaData.setTitle(title);
+        metaData.setDate(date);
+        ofy().save().entity(metaData).now();
+
+        Event event = new Event();
+        event.setHeaderImage(headerImage);
+        event.setDescription(description);
+        event.setMeetingPlace(meetingPlace);
+        event.setFee(fee);
+        event.setImages(images);
+        event.setMetaData(metaData);
+        ofy().save().entity(event).now();
+
+        metaData.setEventId(event.getId());
+        ofy().save().entity(metaData).now();
+
+        return event;
+    }
+
+    /**
+     * Löscht das gesamte Event inklusive Metadaten und Gallerie. Der aufrufende Benutzer muss die
+     * Rolle Veranstalter in der globalen Domäne haben.
+     * @param user Der aufrufende Benutzer.
+     * @param id   Die ID der Metadaten des zu löschenden Events.
+     */
+    public void deleteEvent(User user, @Named("id") Long id) {
+        if (id != null) {
+            // TODO User prüfen
+
+            // Die Eventmetadaten und alle untergeordneten Objekte löschen
+            Key metaDataKey = Key.create(EventMetaData.class, id);
+            ofy().delete().keys(ofy().load().ancestor(metaDataKey).keys().list());
+            ofy().delete().key(metaDataKey).now();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ---------------------------------------------------------------------------------------------
+    // |                                  Alte Endpoint-Methoden                                   |
+    // ---------------------------------------------------------------------------------------------
 
     /**
      * Aktualisiert das auf dem Server gespeicherte Event-Objekt. Diese Methode ist private, damit
@@ -71,7 +201,6 @@ public class EventEndpoint extends SkatenightServerEndpoint {
                     e.setRoute(results.get(0));
                 }
                 // Weil sonst Nullpointer beim Editieren kommmt
-                e.setKey(null);
                 pm.makePersistent(e);
 
                 // Benachrichtigung an User schicken
@@ -93,7 +222,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
                         mb.addData("title", "Ein Event wurde angepasst.");
                         mb.addData("date_changed", Boolean.toString(dateChanged));
                         if (dateChanged) {
-                            mb.addData("event_id", Long.toString(e.getKey().getId()));
+                            mb.addData("event_id", Long.toString(e.getId()));
                             mb.addData("new_date", Long.toString(e.getMetaData().getDate().getTime()));
                         }
                     } else {
@@ -137,7 +266,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param email die E-Mail des Teilnehmers
      */
     public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
-        Event event = getEvent(keyId);
+        Event event = getEvent(0l, keyId);
         ArrayList<String> memberKeys = event.getMemberList();
         if (!memberKeys.contains(email)) {
             memberKeys.add(email);
@@ -185,7 +314,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param email Die E-Mail des Members
      */
     public void removeMemberFromEvent(@Named("id") long keyId, @Named("email") String email) {
-        Event event = getEvent(keyId);
+        Event event = getEvent(0l, keyId);
 
         ArrayList<String> memberKeys = event.getMemberList();
         if (memberKeys.contains(email)) {
@@ -203,63 +332,13 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @return List von Teilnehmern
      */
     public List<Member> getMembersFromEvent(@Named("id") long keyId) {
-        Event event = getEvent(keyId);
+        Event event = getEvent(0l, keyId);
 
         List<Member> members = new ArrayList<Member>(event.getMemberList().size());
         for (String key: event.getMemberList()) {
             members.add(new UserEndpoint().getMember(key));
         }
         return members;
-    }
-
-    /**
-     * Durchsucht alle auf dem Server gespeicherten Events nach dem übergebenen Event und gibt dieses,
-     * falls vorhanden zurück.
-     *
-     * @param keyId Id von dem Event
-     * @return Das Event, null falls keins gefunden wurde
-     */
-    public Event getEvent(@Named("id") long keyId) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            pm.getFetchPlan().setMaxFetchDepth(3);
-            try {
-                return (Event) pm.getObjectById(Event.class, keyId);
-            } catch (Exception ex) {
-                // Wenn Event nicht gefunden wurde, dann null zurückgeben
-                return null;
-            }
-        } finally {
-            pm.close();
-        }
-    }
-
-    /**
-     * Löscht  das übergebene Event vom Server, falls dieses existiert
-     *
-     * @param keyId die Id von dem Event
-     * @param user  der User, der die Operation aufruft
-     * @throws OAuthRequestException
-     */
-    public BooleanWrapper deleteEvent(@Named("id") long keyId, User user) throws OAuthRequestException {
-        if (user == null) {
-            throw new OAuthRequestException("no user submitted");
-        }
-        if (!new HostEndpoint().isHost(user.getEmail()).value) {
-            throw new OAuthRequestException("user is not a host");
-        }
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            Event event = getEvent(keyId);
-            if (event != null) {
-                pm.makePersistent(event);
-                pm.deletePersistent(event);
-                return new BooleanWrapper(true);
-            }
-        } finally {
-            pm.close();
-        }
-        return new BooleanWrapper(false);
     }
 
     /**
@@ -271,10 +350,9 @@ public class EventEndpoint extends SkatenightServerEndpoint {
     private void updateEvent(Event event) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
 
-        Key key = event.getRoute().getKey();
         Route route;
         try {
-            route = pm.getObjectById(Route.class, key);
+            route = pm.getObjectById(Route.class, event.getRoute().getKey());
         } catch(Exception ex) {
             route = null;
         }
@@ -300,16 +378,13 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @throws IOException
      */
     public BooleanWrapper editEvent(Event event, User user) throws OAuthRequestException, IOException {
-        long keyId = event.getKey().getId();
-        Date oldDate = getEvent(keyId).getMetaData().getDate();
+        long keyId = event.getId();
+        Date oldDate = getEvent(0l, keyId).getMetaData().getDate();
         Date newDate = event.getMetaData().getDate();
         boolean dateChanged = oldDate.equals(newDate);
-        BooleanWrapper b = deleteEvent(keyId, user);
-        if(b.value) {
-            createEvent(user, event, true, dateChanged);
-        }
-
-        return new BooleanWrapper(b.value);
+        deleteEvent(user, event.getId());
+        createEvent(user, event, true, dateChanged);
+        return new BooleanWrapper(true);
     }
 
     /**
@@ -330,7 +405,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             // Events nocheinmal abrufen, da die Route nicht vollständig über ein QUery abgerufen werden kann
             List<Event> events = new ArrayList<>();
             for (Event e : result) {
-                events.add(getEvent(e.getKey().getId()));
+                events.add(getEvent(0l, e.getId()));
             }
             return events;
         } else {

@@ -30,11 +30,12 @@ public class CreateEventTask extends ExtendedTask<Event, Void, Void> {
      * @param params Das in der Activity erstelle Event
      */
     protected Void doInBackground(Event... params){
-        try{
-            ServiceProvider.getService().eventEndpoint().createEvent(params[0]).execute();
-        }catch(IOException e) {
-            e.printStackTrace();
-        }
+        // TODO Fixen
+//        try{
+//            ServiceProvider.getService().eventEndpoint().createEvent(params[0]).execute();
+//        }catch(IOException e) {
+//            e.printStackTrace();
+//        }
         return null;
     }
 }

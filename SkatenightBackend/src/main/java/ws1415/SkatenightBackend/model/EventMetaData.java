@@ -1,11 +1,9 @@
 package ws1415.SkatenightBackend.model;
 
-import com.google.appengine.api.datastore.Key;
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
 
 import java.util.Date;
-
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
 
 /**
  * Speichert Metadaten zu einem Event, die im Umfang begrenzt und daher geeignet sind, wenn
@@ -13,16 +11,22 @@ import javax.jdo.annotations.Persistent;
  * Events herunter zu laden.
  * @author Richard Schulze
  */
-@PersistenceCapable
+@Entity
 public class EventMetaData {
-    @Persistent
+    @Id
+    private Long id;
     private String icon;
-    @Persistent
     private String title;
-    @Persistent
     private Date date;
-    @Persistent
-    private Key eventKey;
+    private Long eventId;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getIcon() {
         return icon;
@@ -48,11 +52,11 @@ public class EventMetaData {
         this.date = date;
     }
 
-    public Key getEventKey() {
-        return eventKey;
+    public Long getEventId() {
+        return eventId;
     }
 
-    public void setEventKey(Key eventKey) {
-        this.eventKey = eventKey;
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 }

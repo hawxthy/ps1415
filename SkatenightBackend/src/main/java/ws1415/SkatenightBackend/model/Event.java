@@ -1,69 +1,55 @@
 package ws1415.SkatenightBackend.model;
 
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
-import com.google.appengine.datanucleus.annotations.Unowned;
+import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Load;
+import com.googlecode.objectify.annotation.Parent;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
 
 /**
  * Repräsentiert die vollständigen Daten eines Events inklusive der Metadaten.
  * @author Richard Schulze
  */
-@PersistenceCapable
+@Entity
 public class Event {
-    @PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-    private Key key;
-    @Persistent(defaultFetchGroup = "true")
-    @Unowned
-    private Route route;
-    @Persistent
+    @Id
+    private Long id;
+    private Ref<Route> route;
     private int routeFieldFirst;
-    @Persistent
     private int routeFieldLast;
-    @Persistent(serialized = "true", defaultFetchGroup = "true")
     private ArrayList<String> memberList;
-    @Persistent
     private boolean notificationSend = false;
-
-    @Persistent
     private String headerImage;
-    @Persistent
     private Text description;
-    @Persistent
     private String meetingPlace;
-    @Persistent
     private int fee;
-    @Persistent
     private List<String> images;
+    @Parent
+    @Load
+    private Ref<EventMetaData> metaData;
 
-    @Persistent
-    private Gallery gallery;
-
-    @Persistent
-    private EventMetaData metaData;
-
-    public Key getKey() {
-        return key;
+    public Long getId() {
+        return id;
     }
 
-    public void setKey(Key key) {
-        this.key = key;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setRoute(Route route){
-        this.route = route;
+        this.route = Ref.create(route);
     }
 
     public Route getRoute() {
-        return  route;
+        if (route != null) {
+            return route.get();
+        } else {
+            return null;
+        }
     }
 
     public int getRouteFieldFirst() {
@@ -87,7 +73,7 @@ public class Event {
     }
 
     public ArrayList<String> getMemberList() {
-        if (this.memberList == null) return new ArrayList();
+        if (this.memberList == null) return new ArrayList<>();
         else return this.memberList;
     }
 
@@ -140,18 +126,14 @@ public class Event {
     }
 
     public EventMetaData getMetaData() {
-        return metaData;
+        if (metaData != null) {
+            return metaData.get();
+        } else {
+            return null;
+        }
     }
 
     public void setMetaData(EventMetaData metaData) {
-        this.metaData = metaData;
-    }
-
-    public Gallery getGallery() {
-        return gallery;
-    }
-
-    public void setGallery(Gallery gallery) {
-        this.gallery = gallery;
+        this.metaData = Ref.create(metaData);
     }
 }
