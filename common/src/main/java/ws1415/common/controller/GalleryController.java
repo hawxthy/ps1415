@@ -42,11 +42,11 @@ public abstract class GalleryController {
 
                 // Upload-URL abrufen
                 String uploadUrl = null;
-                try {
-                    uploadUrl = ServiceProvider.getService().galleryEndpoint().getUploadUrl().execute().getUrl();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    uploadUrl = ServiceProvider.getService().galleryEndpoint().getUploadUrl().execute().getUrl();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
 
                 // POST-Anfrage für den Upload erstellen
                 try {

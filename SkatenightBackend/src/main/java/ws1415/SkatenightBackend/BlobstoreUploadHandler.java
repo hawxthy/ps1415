@@ -35,11 +35,14 @@ public class BlobstoreUploadHandler extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, List<BlobKey>> uploads = blobstoreService.getUploads(req);
-        log.info("[DEBUG]: " + uploads.toString());
-        for (List<BlobKey> keys : uploads.values()) {
-            for (BlobKey key : keys) {
-                blobstoreService.delete(key);
-            }
+        BlobKey blobKey = uploads.get("file").get(0);
+
+        try {
+
+        } catch(Exception ex) {
+            // Im Falle eines Fehlers den gespeicherten Blob löschen
+            blobstoreService.delete(blobKey);
+            throw ex;
         }
     }
 

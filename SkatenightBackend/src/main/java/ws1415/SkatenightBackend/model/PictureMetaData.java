@@ -1,5 +1,8 @@
 package ws1415.SkatenightBackend.model;
 
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
+
 import java.util.Date;
 
 import javax.jdo.annotations.PersistenceCapable;
@@ -9,19 +12,24 @@ import javax.jdo.annotations.Persistent;
  * Speichert die Metadaten zu einem Bild.
  * @author Richard Schulze
  */
-@PersistenceCapable
+@Entity
 public class PictureMetaData {
-    @Persistent
+    @Id
+    private Long id;
     private String title;
-    @Persistent
     private Date date;
-    @Persistent
     private String thumbnail;
-
-    @Persistent
     private Gallery gallery;
-    @Persistent
-    private Member uploader;
+    private String uploader;
+    private Long pictureId;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;
@@ -55,11 +63,19 @@ public class PictureMetaData {
         this.gallery = gallery;
     }
 
-    public Member getUploader() {
+    public String getUploader() {
         return uploader;
     }
 
-    public void setUploader(Member uploader) {
+    public void setUploader(String uploader) {
         this.uploader = uploader;
+    }
+
+    public Long getPictureId() {
+        return pictureId;
+    }
+
+    public void setPictureId(Long pictureId) {
+        this.pictureId = pictureId;
     }
 }
