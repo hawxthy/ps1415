@@ -5,12 +5,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
@@ -37,12 +35,10 @@ import java.util.List;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.common.task.GetEventTask;
 import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.common.task.GetEventTask;
-import ws1415.common.task.QueryMemberTask;
 import ws1415.ps1415.task.QueryVisibleMembersTask;
 
 
@@ -213,18 +209,6 @@ public class ShowRouteActivity extends Activity {
         }
 
         highlightRoute(fieldFirst, fieldLast);
-
-        // Ruft die aktuellen Memberinformationen ab
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String email = prefs.getString("accountName", null);
-        new QueryMemberTask(new ExtendedTaskDelegateAdapter<Void, Member>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Member member) {
-                // Hier wurde in einer früheren Version der eigene Benutzer-Marker auf die
-                // Karte gezeichnet. Zurzeit geschieht dies nicht, da die Anzeige der eigenen
-                // Position anders umgesetzt wird.
-            }
-        }).execute(email);
     }
 
     Runnable mStatusChecker = new Runnable(){

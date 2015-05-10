@@ -26,5 +26,13 @@ public enum MessageType {
     /**
      * Wird an alle Mitglieder einer Gruppe gesendet, wenn eine Gruppe erstellt wird.
      */
-    GROUP_CREATED_NOTIFICATION_MESSAGE;
+    GROUP_CREATED_NOTIFICATION_MESSAGE,
+    /**
+     * Wird an einen Benutzer gesendet, wenn dieser eine neue private Nachricht erhält.
+     */
+    USER_NEW_MESSAGE,
+    /**
+     * Wird an einen Benutzer gesendet, um den Erhalt einer Nachricht zu bestätigen.
+     */
+    USER_CONFIRMATION_MESSAGE;
 }

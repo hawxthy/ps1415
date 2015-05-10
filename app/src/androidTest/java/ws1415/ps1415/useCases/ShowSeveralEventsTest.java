@@ -134,7 +134,7 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
         // Liste, die die TextView enthält
         ListView listView = (ListView) showInformationActivity.findViewById(R.id.activity_show_information_list_view);
         assertNotNull("listView is null!", listView);
-        listView.setAdapter(showInformationActivity.getShowCursorAdapter());
+        //listView.setAdapter(showInformationActivity.getShowCursorAdapter());
 
         Thread.sleep(5000); // Zeit zum Initialisieren
         assertNotNull("listViewAdapter is null!", listView.getAdapter());

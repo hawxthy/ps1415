@@ -77,6 +77,8 @@ public class GcmIntentService extends IntentService {
                         Intent refreshGroupsIntent = new Intent(UsergroupActivity.REFRESH_GROUPS_ACTION);
                         LocalBroadcastManager.getInstance(this).sendBroadcast(refreshGroupsIntent);
                         break;
+                    case USER_NEW_MESSAGE:
+                        sendNotification(extras);
                 }
             }
         }

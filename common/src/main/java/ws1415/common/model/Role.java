@@ -1,4 +1,4 @@
-package ws1415.SkatenightBackend.model;
+package ws1415.common.model;
 
 /**
  * Diese Enum-Klasse verwaltet die Rollen, die ein Benutzer innerhalb verschiedener
@@ -9,10 +9,10 @@ package ws1415.SkatenightBackend.model;
 public enum Role {
     USER(1),
     ADMIN(2),
-    HOST(3),
-    GUARD(4),
-    MEDIC(5),
-    PARTICIPANT(6);
+    HOST(10),
+    GUARD(11),
+    MEDIC(12),
+    PARTICIPANT(13);
 
     private int id;
 
@@ -30,13 +30,13 @@ public enum Role {
                 return "Benutzer";
             case 2:
                 return "Administrator";
-            case 3:
+            case 10:
                 return "Veranstalter";
-            case 4:
+            case 11:
                 return "Ordner";
-            case 5:
+            case 12:
                 return "Sanitäter";
-            case 6:
+            case 13:
                 return "Teilnehmer";
             default:
                 return null;

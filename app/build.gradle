@@ -1,9 +1,10 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.robolectric'
 
 android {
     // Festlegen, welcher Build Type für die Tests genutzt werden soll. Definiert, welche Signing-
     // Configuration für das Testpaket genutzt wird.
-    testBuildType "debug"
+    testBuildType "release"
 
     signingConfigs {
         release {
@@ -74,6 +75,7 @@ dependencies {
     compile project(':common')
     compile files('libs/gson-2.2.2.jar')
 
-//    compile 'com.google.apis:google-api-services-storage:v1-rev34-1.20.0'
-//    compile 'com.google.appengine.tools:appengine-gcs-client:0.4.4'
+    compile 'com.android.support:support-v4:21.0.3' // required by Robolectric 2.4
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.robolectric:robolectric:2.4'
 }

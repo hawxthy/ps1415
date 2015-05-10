@@ -1,13 +1,13 @@
 package ws1415.SkatenightBackend.model;
 
-import com.google.appengine.datanucleus.annotations.Unowned;
-
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
  * Die UserInfo-Klasse speichert die allgemeinen Informationen zu einem Benutzer.
+ *
+ * @author Martin Wrodarczyk
  */
 @PersistenceCapable
 public class UserInfo {
@@ -19,7 +19,7 @@ public class UserInfo {
     @Persistent
     private String lastName;
     @Persistent
-    private Gender gender;
+    private String gender;
     @Persistent
     private String dateOfBirth;
     @Persistent
@@ -28,23 +28,19 @@ public class UserInfo {
     private String postalCode;
     @Persistent
     private String description;
-    @Persistent(defaultFetchGroup = "true")
-    @Unowned
-    private UserPicture picture;
 
     public UserInfo() {
     }
 
-    public UserInfo(String email, UserPicture picture) {
+    public UserInfo(String email) {
         this.email = email;
-        firstName = "Martin";
+        firstName = "";
         lastName = "";
-        gender = Gender.NA;
+        gender = Gender.NA.getRepresentation();
         dateOfBirth = "";
         city = "";
         postalCode = "";
         description = "";
-        this.picture = picture;
     }
 
     public String getEmail() {
@@ -71,11 +67,11 @@ public class UserInfo {
         this.lastName = lastName;
     }
 
-    public Gender getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
@@ -109,13 +105,5 @@ public class UserInfo {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public UserPicture getPicture() {
-        return picture;
-    }
-
-    public void setPicture(UserPicture picture) {
-        this.picture = picture;
     }
 }

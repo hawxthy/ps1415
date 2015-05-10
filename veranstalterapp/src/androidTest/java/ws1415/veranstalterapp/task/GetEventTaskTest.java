@@ -3,16 +3,16 @@ package ws1415.veranstalterapp.task;
 
 import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
-import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import ws1415.common.net.ServiceProvider;
+
+//import com.skatenight.skatenightAPI.model.Field;
 
 
 /**

@@ -30,11 +30,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.common.controller.UserController;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.util.LocationUtils;
 import ws1415.common.task.GetEventTask;
-import ws1415.common.task.UpdateLocationTask;
 import ws1415.ps1415.util.LocalAnalysisData;
 import ws1415.ps1415.util.LocalStorageUtil;
 
@@ -235,7 +235,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
         // Sendet die Nutzerdaten an den Server, wenn dies in den Einstellungen vorgesehen ist
         if (email != null && sendLocation && System.currentTimeMillis() - updateTime >= UPDATE_INTERVAL) {
-            new UpdateLocationTask(null, email, location.getLatitude(), location.getLongitude(), eventId).execute();
+            UserController.updateUserLocation(null, email, location.getLatitude(), location.getLongitude(), eventId);
             updateTime = System.currentTimeMillis();
         }
 
