@@ -1,12 +1,15 @@
 package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.api.datastore.Text;
+import com.google.appengine.api.datastore.Key;
 
 import java.util.List;
 import java.util.Map;
 
+import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 /**
  * Speichert die kompletten Bilddaten inklusive Metadaten, Kommentaren und Bewertungen.
@@ -14,6 +17,10 @@ import javax.jdo.annotations.Persistent;
  */
 @PersistenceCapable
 public class Picture {
+    @PrimaryKey
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    private Key key;
+
     @Persistent
     private Text description;
     @Persistent

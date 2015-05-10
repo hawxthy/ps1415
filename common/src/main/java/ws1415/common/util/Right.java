@@ -1,4 +1,4 @@
-package ws1415.SkatenightBackend.model;
+package ws1415.common.util;
 
 /**
  * Aufzählungstyp für die Rechte, die in einer Gruppe vergeben werden können. Hier

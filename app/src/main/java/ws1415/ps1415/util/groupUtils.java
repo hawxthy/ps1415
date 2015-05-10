@@ -10,13 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 
+import ws1415.common.controller.GroupController;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.UsergroupActivity;
-import ws1415.common.task.DeleteUserGroupTask;
-import ws1415.common.task.JoinUserGroupTask;
-import ws1415.common.task.LeaveUserGroupTask;
 import ws1415.ps1415.fragment.AllUsergroupsFragment;
 import ws1415.ps1415.fragment.MyUsergroupsFragment;
 
@@ -70,12 +68,12 @@ public class groupUtils {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                new JoinUserGroupTask(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                GroupController.getInstance().joinUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Void aVoid) {
                         ((UsergroupActivity) activity).refresh();
                     }
-                }).execute(userGroup.getName());
+                }, userGroup.getName());
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -101,12 +99,12 @@ public class groupUtils {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                new LeaveUserGroupTask(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                GroupController.getInstance().leaveUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Void aVoid) {
                         ((UsergroupActivity) activity).refresh();
                     }
-                }).execute(userGroup.getName());
+                }, userGroup.getName());
                 PrefManager.setGroupVisibility(activity, userGroup.getName(), false);
             }
         });
@@ -153,19 +151,17 @@ public class groupUtils {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                new DeleteUserGroupTask(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+                GroupController.getInstance().deleteUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
                     @Override
-                    public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
-                        if (aBoolean != null && aBoolean == true) {
+                    public void taskDidFinish(ExtendedTask task, Void aVoid) {
                             AllUsergroupsFragment allUsergroupsFragment =
-                                    (AllUsergroupsFragment)activity.getAdapter().getItem(0);
+                                    (AllUsergroupsFragment) activity.getAdapter().getItem(0);
                             allUsergroupsFragment.deleteUserGroupFromList(userGroup);
                             MyUsergroupsFragment myUsergroupsFragment =
-                                    (MyUsergroupsFragment)activity.getAdapter().getItem(1);
+                                    (MyUsergroupsFragment) activity.getAdapter().getItem(1);
                             myUsergroupsFragment.deleteUserGroupFromList(userGroup);
-                        }
                     }
-                }).execute(userGroup);
+                }, userGroup.getName());
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

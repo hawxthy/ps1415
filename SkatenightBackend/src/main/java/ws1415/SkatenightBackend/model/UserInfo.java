@@ -28,7 +28,7 @@ public class UserInfo {
     private String postalCode;
     @Persistent
     private String description;
-    @Persistent(defaultFetchGroup = "true")
+    @Persistent
     @Unowned
     private UserPicture picture;
 

@@ -31,6 +31,7 @@ public class EndUser {
     @Persistent
     private Map<Key, Role> myRoles;
     @Persistent
+    @Unowned
     private List<String> myUserGroups;
     @Persistent
     private List<Key> myEvents;

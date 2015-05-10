@@ -3,9 +3,12 @@ package ws1415.SkatenightBackend.model;
 import com.google.appengine.datanucleus.annotations.Unowned;
 
 import java.util.List;
+import com.google.appengine.api.datastore.Key;
 
+import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 /**
  * Diese Klasse wird von der Usergroup Klasse benötigt um Ränge darzustellen. Es wird
@@ -16,13 +19,16 @@ import javax.jdo.annotations.Persistent;
  */
 @PersistenceCapable
 public class Rank {
+    @PrimaryKey
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    private Key key;
     @Persistent
     private String name;
 
     @Persistent
     private String description;
 
-    @Persistent(defaultFetchGroup = "true")
+    @Persistent
     @Unowned
     private List<Right> rights;
 
@@ -54,5 +60,13 @@ public class Rank {
 
     public void setRights(List<Right> rights) {
         this.rights = rights;
+    }
+
+    public Key getKey() {
+        return key;
+    }
+
+    public void setKey(Key key) {
+        this.key = key;
     }
 }

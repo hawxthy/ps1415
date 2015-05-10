@@ -2,6 +2,7 @@ package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.oauth.OAuthRequestException;
+import com.google.appengine.api.users.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +24,8 @@ import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.UserGroup;
+import ws1415.SkatenightBackend.model.Rank;
+import ws1415.SkatenightBackend.model.Right;
 
 /**
  * Created by Richard on 01.05.2015.
@@ -74,7 +77,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * Gibt eine Liste aller Benutzergruppen des angegebenen Benutzers zurück.
      * @return Eine Liste aller Benutzergruppen.
      */
-    public List<UserGroup> fetchMyUserGroups(EndUser user) throws OAuthRequestException {
+    public List<UserGroup> fetchMyUserGroups(User user) throws OAuthRequestException {
         EndUser endUser;
         if (user == null || (endUser = new UserEndpoint().getFullUser(user.getEmail())) == null) {
             // Falls kein Benutzer angegeben, dann leere Liste zurückgeben.
@@ -113,7 +116,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param user Der Benutzer, der die Gruppe anlegen möchte.
      * @param name Der Name der neuen Gruppe.
      */
-    public void createUserGroup(EndUser user, @Named("name") String name) throws OAuthRequestException {
+    public void createUserGroup(User user, @Named("name") String name) throws OAuthRequestException {
         if (user == null) {
             throw new NullPointerException("no user submitted");
         }
@@ -132,7 +135,9 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         try {
             UserGroup ug = new UserGroup(endUser);
             ug.setName(name);
+            ug.getMemberRanks().put(endUser.getEmail(), Right.DELETEGROUP.name());
             endUser.addUserGroup(ug);
+            endUser.getMyUserGroups();
             pm.makePersistent(endUser);
             pm.makePersistent(ug);
             RegistrationManager rm = getRegistrationManager(pm);
@@ -156,7 +161,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param user Der Benutzer, der den Löschvorgang durchführen möchte.
      * @param name Der Name, der zu löschenden Gruppe.
      */
-    public void deleteUserGroup(EndUser user, @Named("name") String name) throws OAuthRequestException {
+    public void deleteUserGroup(User user, @Named("name") String name) throws OAuthRequestException {
         if (user == null) {
             throw new NullPointerException("no user submitted");
         }
@@ -177,7 +182,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             // Benutzer abrufen, die in der Gruppe sind
             EndUser[] members = new EndUser[ug.getMemberRanks().size()];
             int index = 0;
-            for (String mail: ug.getMemberRanks().values()) {
+            for (String mail: ug.getMemberRanks().keySet()) {
                 members[index++] = userEndpoint.getFullUser(mail);
             }
 
@@ -220,7 +225,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param user Der aufrufende Benutzer.
      * @param groupName Der Name der beizutretenden Gruppe
      */
-    public void joinUserGroup(EndUser user, @Named("groupName") String groupName) throws OAuthRequestException {
+    public void joinUserGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException {
         if (user == null) {
             throw new NullPointerException("no user submitted");
         }
@@ -251,7 +256,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param user Der aufrufende Benutzer.
      * @param groupName Der Name der zu verlassenden Gruppe.
      */
-    public void leaveUserGroup(EndUser user, @Named("groupName") String groupName) {
+    public void leaveUserGroup(User user, @Named("groupName") String groupName) {
         if (user == null) {
             throw new NullPointerException("no user submitted");
         }

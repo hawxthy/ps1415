@@ -1,34 +1,29 @@
 package ws1415.common.controller;
 
-import com.skatenight.skatenightAPI.SkatenightAPI;
+import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.Picture;
 import com.skatenight.skatenightAPI.model.BoardEntry;
 import com.skatenight.skatenightAPI.model.BooleanWrapper;
 import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.io.IOException;
+import java.security.acl.Group;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import ws1415.common.net.ServiceProvider;
-import ws1415.common.task.AddUserGroupTask;
-import ws1415.common.task.DeleteUserGroupTask;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.task.JoinUserGroupTask;
-import ws1415.common.task.LeaveUserGroupTask;
-import ws1415.common.task.QueryMyUserGroupsTask;
 import ws1415.common.task.QueryUserGroupsTask;
 
 /**
  * Created by Bernd Eissing on 02.05.2015.
  */
 public class GroupController {
-    private GroupController instance;
+    private static GroupController instance;
 
     private GroupController(){}
 
-    public GroupController getInstance(){
+    public static GroupController getInstance(){
         if(instance == null){
             instance = new GroupController();
         }
@@ -42,53 +37,97 @@ public class GroupController {
      * @param handler Der Task, der mit dem Server kommuniziert
      */
     public void getAllUserGroups(ExtendedTaskDelegate handler){
-        new QueryUserGroupsTask(handler).execute();
+        new ExtendedTask<Void, Void, List<UserGroup>>(handler){
+            @Override
+            protected List<UserGroup> doInBackground(Void... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().getAllUserGroups().execute().getItems();
+                }catch(IOException e){
+                    publishError("Die Nutzergruppen konnten nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute();
     }
 
     /**
-     * Methode, welche mit dem GroupEndpoint via den QueryMyUserGroupsTask
-     * kommuniziert um alle UserGroups zum angemeldeten EndUser zu laden
+     * Methode, welche mit dem GroupEndpoint kommuniziert um
+     * alle UserGroups zum angemeldeten EndUser zu laden.
      *
      * @param handler Der Task, der mit dem Server kommuniziert
      */
     public void getMyUserGroups(ExtendedTaskDelegate handler){
-        new QueryMyUserGroupsTask(handler).execute();
+        new ExtendedTask<Void, Void, List<UserGroup>>(handler){
+            @Override
+            protected List<UserGroup> doInBackground(Void... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().fetchMyUserGroups().execute().getItems();
+                }catch(IOException e){
+                    publishError("Die Nutzergruppen konnten nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute();
     }
 
     /**
-     * Methode, welche mit dem GroupEndpoint via den QueryMyUserGroupsTask
-     * kommuniziert um eine neue UserGroup zu erstellen
+     * Methode, welche mit dem GroupEndpoint kommuniziert um eine neue
+     * UserGroup mit dem übergebenen EndUser als Ersteller zu speichern.
      *
      * @param handler Der Task, der mit dem Server kommuniziert
+     * @param groupName Der Name der zu erstellenden UserGroup
      */
-    public void createUserGroup(ExtendedTaskDelegate handler){
-        new ExtendedTask<EndUser>()
-        try{
-            ServiceProvider.getService().groupEndpoint().createUserGroup(params[0]).execute();
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-        return null;
+    public void createUserGroup(ExtendedTaskDelegate handler, String groupName){
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().createUserGroup(params[0]).execute();
+                }catch(IOException e){
+                    publishError("Die Nutzergruppe konnte nicht erstellt werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
     }
 
     /**
-     * Methode, welche mit dem GroupEndpoint via den DeleteUserGroupTask
-     * kommuniziert um eine UserGroup zu löschen
+     * Methode, welche mit dem GroupEndpoint kommuniziert um eine UserGroup zu löschen.
      *
      * @param handler Der Task, der mit dem Server kommuniziert
      */
-    public void deleteUserGroup(ExtendedTaskDelegate handler){
-        new DeleteUserGroupTask(handler).execute();
+    public void deleteUserGroup(ExtendedTaskDelegate handler, String groupName){
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().deleteUserGroup(params[0]).execute();
+                }catch(IOException e){
+                    publishError("Die Nutzergruppe konnte nicht gelöscht werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
     }
 
     /**
-     * Methode, welche mit dem GroupEndpoint via den JoinUserGroupTask
-     * kommuniziert um einen EndUser einer UserGroup zuzuordnen
+     * Methode, welche mit dem GroupEndpoint kommuniziert um
+     * einen EndUser einer UserGroup zuzuordnen.
      *
      * @param handler Der Task, der mit dem Server kommuniziert
      */
-    public void joinUserGroup(ExtendedTaskDelegate handler){
-        new JoinUserGroupTask(handler).execute();
+    public void joinUserGroup(ExtendedTaskDelegate handler, String groupName){
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().joinUserGroup(params[0]).execute();
+                }catch(IOException e){
+                    publishError("Der Nutzergruppe konnte beigetreten werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
     }
 
     /**
@@ -97,8 +136,20 @@ public class GroupController {
      *
      * @param handler Der Task, der mit dem Server kommuniziert
      */
-    public void leaveUserGroup(ExtendedTaskDelegate handler){
-        new LeaveUserGroupTask(handler).execute();
+    public void leaveUserGroup(ExtendedTaskDelegate handler, String groupName){
+        //TODO Eventuell statt den EndUser direkt nur die E-Mail übergeben
+        final String groupNameFinal = groupName;
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().leaveUserGroup(params[0]).execute();
+                }catch(IOException e){
+                    publishError("Es war nicht möglich die Nutzergruppe zu verlassen");
+                    return null;
+                }
+            }
+        }.execute(groupName);
     }
 
     public void setVisibility(UserGroup u, boolean visibility){
