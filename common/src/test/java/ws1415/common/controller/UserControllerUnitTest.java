@@ -60,6 +60,8 @@ public class UserControllerUnitTest {
         Thread.sleep(2000);
 
         UserController.deleteUser(null, TEST_MAIL);
+
+        Thread.sleep(2000);
     }
 
     /**
@@ -96,6 +98,8 @@ public class UserControllerUnitTest {
 
         UserController.deleteUser(null, TEST_MAIL);
         UserController.deleteUser(null, TEST_MAIL_2);
+
+        Thread.sleep(2000);
     }
 
     /**
@@ -137,6 +141,8 @@ public class UserControllerUnitTest {
 
         UserController.deleteUser(null, TEST_MAIL);
         UserController.deleteUser(null, TEST_MAIL_2);
+
+        Thread.sleep(2000);
     }
 
     /**
@@ -161,6 +167,8 @@ public class UserControllerUnitTest {
         Thread.sleep(3000);
 
         UserController.deleteUser(null, TEST_MAIL);
+
+        Thread.sleep(2000);
     }
 
     /**
@@ -185,6 +193,37 @@ public class UserControllerUnitTest {
         Thread.sleep(3000);
 
         UserController.deleteUser(null, TEST_MAIL);
+
+        Thread.sleep(2000);
+    }
+
+    /**
+     * Prüft, ob die Suche das richtige Ergebnis liefert.
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void testSearchUsers() throws InterruptedException {
+        UserController.createUser(null, TEST_MAIL);
+        UserController.createUser(null, TEST_MAIL_2);
+
+        Thread.sleep(4000);
+
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserInfo>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserInfo> result) {
+                assertNotNull(result);
+                assertTrue(result.size() == 1);
+                assertEquals(result.get(0).getEmail(), TEST_MAIL);
+            }
+        }, TEST_MAIL);
+
+        Thread.sleep(3000);
+
+        UserController.deleteUser(null, TEST_MAIL);
+        UserController.deleteUser(null, TEST_MAIL_2);
+
+        Thread.sleep(2000);
     }
 
 

@@ -5,7 +5,6 @@ import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
@@ -18,6 +17,7 @@ import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.RoutePoint;
 import ws1415.SkatenightBackend.model.UserGroup;
+import ws1415.SkatenightBackend.model.UserLocation;
 
 /**
  * Created by Richard on 01.05.2015.
@@ -26,44 +26,7 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
     private static final Logger logger = Logger.getLogger(RouteEndpoint.class.getName());
 
     public static final int FIELD_UPDATE_INTERVAL = 30000;
-    private long lastFieldUpdateTime = 0;
-
-    /**
-     * Aktualisiert die für die angegebene Mail-Adresse gespeicherte Position auf dem Server. Falls
-     * kein Member-Objekt für die Mail-Adresse existiert, so wird ein neues Objekt angelegt.
-     * @param mail Die Mail-Adresse des zu aktualisierenden Member-Objekts.
-     * @param latitude
-     * @param longitude
-     */
-    public void updateMemberLocation(@Named("mail") String mail,
-                                     @Named("latitude") double latitude,
-                                     @Named("longitude") double longitude,
-                                     @Named("currentEventId") long currentEventId) {
-        if (mail != null) {
-            Member m = new UserEndpoint().getMember(mail);
-            m.setLatitude(latitude);
-            m.setLongitude(longitude);
-            m.setUpdatedAt(new Date());
-            if (m.getCurrentEventId() == null || m.getCurrentEventId() != currentEventId) {
-                m.setCurrentEventId(currentEventId);
-                m.setCurrentWaypoint(0);
-            }
-
-            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-            try {
-                calculateCurrentWaypoint(pm, m);
-                pm.makePersistent(m);
-
-                // Überprüfen ob mehr als 5 Minuten seit dem letzten Update vergangen sind.
-                if (System.currentTimeMillis()-lastFieldUpdateTime >= FIELD_UPDATE_INTERVAL) {
-                    calculateField(pm, m.getCurrentEventId());
-                    lastFieldUpdateTime = System.currentTimeMillis();
-                }
-            } finally {
-                pm.close();
-            }
-        }
-    }
+    public long lastFieldUpdateTime = 0;
 
     /**
      * Hilfsmethode, die für den normalen Betireb nicht benötigt wird. Stellt eine Schnittstelle für
@@ -71,6 +34,9 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
      * dabei pro Akutalisierung ein Serveraufruf notwendig ist.
      * Die Mails, Latituden und Logituden werden als Strings mit = als Trennzeichen kodiert, da ein
      * Aufruf mit Arrays nicht funktioniert hat.
+     *
+     * TODO: Auf neue EndUser anpassen
+     *
      * @param mailParam Die Mail-Adressen der zu Aktualisierenden Member-Objekte als String, durch = getrennt.
      * @param latitudeParam Die neuen Latituden als String, durch = getrennt
      * @param longitudeParam Die neuen Longituden, durch = getrennt
@@ -141,13 +107,13 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
             }
 
             for (int i = 0; i < count; i++) {
-                updateMemberLocation(mail[i], latitude[i], longitude[i], currentEventId);
+                //updateMemberLocation(mail[i], latitude[i], longitude[i], currentEventId);
             }
         }
     }
 
-    private void calculateCurrentWaypoint(PersistenceManager pm, Member member) {
-        Long eventId = member.getCurrentEventId();
+    protected void calculateCurrentWaypoint(PersistenceManager pm, UserLocation userLocation) {
+        Long eventId = userLocation.getCurrentEventId();
         if (eventId != null) {
             Event event;
             try {
@@ -157,24 +123,24 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
                 event = null;
             }
             if (event != null) {
-                Integer currentWaypoint = member.getCurrentWaypoint();
+                Integer currentWaypoint = userLocation.getCurrentWaypoint();
                 if (currentWaypoint == null) {
-                    member.setCurrentWaypoint(0);
+                    userLocation.setCurrentWaypoint(0);
                     currentWaypoint = 0;
                 }
                 List<RoutePoint> points = event.getRoute().getRoutePoints();
                 if (currentWaypoint < points.size()-1) {
                     RoutePoint current = points.get(currentWaypoint);
                     RoutePoint next = points.get(currentWaypoint+1);
-                    float distanceCurrent = distance(current.getLatitude(), current.getLongitude(), member.getLatitude(), member.getLongitude());
-                    float distanceNext = distance(next.getLatitude(), next.getLongitude(), member.getLatitude(), member.getLongitude());
+                    float distanceCurrent = distance(current.getLatitude(), current.getLongitude(), userLocation.getLatitude(), userLocation.getLongitude());
+                    float distanceNext = distance(next.getLatitude(), next.getLongitude(), userLocation.getLatitude(), userLocation.getLongitude());
                     boolean findNextWaypoint = false;
                     if (distanceCurrent > Constants.MAX_NEXT_WAYPOINT_DISTANCE) {
                         findNextWaypoint = true;
                     }
                     if (distanceNext < distanceCurrent) {
                         if (distanceNext < Constants.MAX_NEXT_WAYPOINT_DISTANCE) {
-                            member.setCurrentWaypoint(currentWaypoint+1);
+                            userLocation.setCurrentWaypoint(currentWaypoint+1);
                             findNextWaypoint = false;
                         }
                         else {
@@ -186,11 +152,11 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
                         float minDistance = Float.POSITIVE_INFINITY;
                         for (int i = currentWaypoint; i < points.size(); i++) {
                             float distance = distance(
-                                    member.getLatitude(), member.getLongitude(),
+                                    userLocation.getLatitude(), userLocation.getLongitude(),
                                     points.get(i).getLatitude(), points.get(i).getLongitude());
 
                             if (distance < 50.0f && distance < minDistance) {
-                                member.setCurrentWaypoint(i);
+                                userLocation.setCurrentWaypoint(i);
                                 minDistance = distance;
                             }
                         }
@@ -205,7 +171,7 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
      * Wobei das Feld um den Wegpunkte herum gebaut wird, welcher die meisten Member enthält
      * @param id event Id
      */
-    private void calculateField(PersistenceManager pm, long id) {
+    protected void calculateField(PersistenceManager pm, long id) {
         Event event;
         try {
             event = pm.getObjectById(Event.class, id);
@@ -214,15 +180,16 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
             return;
         }
         List<RoutePoint> points = event.getRoute().getRoutePoints();
-        List<Member> members = new EventEndpoint().getMembersFromEvent(event.getKey().getId());
+        List<UserLocation> userLocations = new EventEndpoint().getMemberLocationsFromEvent(event.getKey().getId());
 
         logger.info("points.size(): " + points.size());
         // array erstellen welches an der stelle n die Anzahl der Member enthält welche am RoutePoint n sind.
         int memberCountPerRoutePoint[] = new int[points.size()];
-        for (Member member : members) {
-            if (member.getCurrentEventId() != null && member.getCurrentEventId() == event.getKey().getId() && member.getCurrentWaypoint() != null && member.getCurrentWaypoint() < memberCountPerRoutePoint.length) {
-                logger.info(member.getEmail() + " current waypoint: " + member.getCurrentWaypoint());
-                memberCountPerRoutePoint[member.getCurrentWaypoint()] = memberCountPerRoutePoint[member.getCurrentWaypoint()] + 1;
+        for (UserLocation userLocation : userLocations) {
+            if (userLocation.getCurrentEventId() != null && userLocation.getCurrentEventId() == event.getKey().getId() &&
+                    userLocation.getCurrentWaypoint() != null && userLocation.getCurrentWaypoint() < memberCountPerRoutePoint.length) {
+                logger.info(userLocation.getEmail() + " current waypoint: " + userLocation.getCurrentWaypoint());
+                memberCountPerRoutePoint[userLocation.getCurrentWaypoint()] = memberCountPerRoutePoint[userLocation.getCurrentWaypoint()] + 1;
             }
         }
 

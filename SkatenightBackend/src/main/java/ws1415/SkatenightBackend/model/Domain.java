@@ -3,6 +3,7 @@ package ws1415.SkatenightBackend.model;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.repackaged.com.google.api.client.util.ArrayMap;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,14 +76,16 @@ public class Domain {
     }
 
     public void setRole(String userMail, Integer role) {
+        if(userRoles == null) userRoles = new HashMap<>();
         userRoles.put(userMail, role);
     }
 
-    public void removeRole(String userMail) {
+    public void removeRole(String userMail){
         userRoles.remove(userMail);
     }
 
     public boolean existsUser(String userMail){
+        if(userRoles == null) return false;
         return userRoles.containsKey(userMail);
     }
 }

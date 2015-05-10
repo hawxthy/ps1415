@@ -16,6 +16,7 @@ import ws1415.SkatenightBackend.model.Domain;
 import ws1415.SkatenightBackend.model.GlobalDomain;
 import ws1415.SkatenightBackend.model.Role;
 import ws1415.SkatenightBackend.model.RoleWrapper;
+import ws1415.SkatenightBackend.model.UserInfo;
 
 /**
  * Der RoleEndpoint stellt Hilfsmethoden bereit, die genutzt werden um die Rollen der Benutzer
@@ -36,6 +37,8 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             Domain domain = pm.getObjectById(Domain.class, dom.getKey());
+            dom.getPossibleRoles();
+            dom.getUserRoles();
             if (!dom.existsUser(userMail)) {
                 throw new JDOObjectNotFoundException("Benutzer wurde nicht gefunden");
             } else {
@@ -62,6 +65,8 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             dom = pm.getObjectById(Domain.class, dom.getKey());
+            dom.getPossibleRoles();
+            dom.getUserRoles();
             if (!(dom.getRole(user.getEmail()).equals(dom.getAdminRole()))) {
                 throw new OAuthRequestException("Rechte um Rollen zu ändern fehlen");
             } else if (!dom.existsUser(userMail)) {
@@ -92,6 +97,8 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             dom = pm.getObjectById(Domain.class, dom.getKey());
+            dom.getPossibleRoles();
+            dom.getUserRoles();
             if (!(dom.getRole(user.getEmail()).equals(dom.getAdminRole()))) {
                 throw new OAuthRequestException("Rechte um Rolle zu löschen fehlen");
             } else if (!dom.existsUser(userMail)) {
@@ -114,9 +121,9 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
      */
     public GlobalDomain getGlobalDomain() {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        Query q = pm.newQuery(GlobalDomain.class);
-        List<GlobalDomain> listGlobalDomain = (List<GlobalDomain>) q.execute();
         try {
+            Query q = pm.newQuery(GlobalDomain.class);
+            List<GlobalDomain> listGlobalDomain = (List<GlobalDomain>) q.execute();
             if (listGlobalDomain.size() != 0) {
                 listGlobalDomain.get(0).getUserRoles();
                 listGlobalDomain.get(0).getPossibleRoles();
@@ -127,11 +134,17 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
                 possibleRoles.add(Role.USER.getId());
                 Integer adminRole = Role.ADMIN.getId();
                 GlobalDomain globalDomain = new GlobalDomain(possibleRoles, adminRole);
-                return pm.makePersistent(globalDomain);
+                pm = getPersistenceManagerFactory().getPersistenceManager();
+                try {
+                    return pm.makePersistent(globalDomain);
+                } finally {
+                    pm.close();
+                }
             }
         } finally {
             pm.close();
         }
+
     }
 
     /**
@@ -174,5 +187,20 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
                 pm.close();
             }
         }
+    }
+
+    /**
+     * Gibt eine Liste mit Informationen zu den Administratoren aus.
+     *
+     * @return Liste von Administratoren
+     */
+    public List<UserInfo> listGlobalAdmins(){
+        GlobalDomain globalDomain = getGlobalDomain();
+        List<String> admins = globalDomain.listAdmins();
+        ArrayList<UserInfo> adminUsers = new ArrayList<>();
+        for(String adminMail : admins){
+            adminUsers.add(new UserEndpoint().getUserInfo(adminMail));
+        }
+        return adminUsers;
     }
 }

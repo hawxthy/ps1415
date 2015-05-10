@@ -28,7 +28,6 @@ import ws1415.ps1415.activity.SettingsActivity;
 import ws1415.ps1415.activity.ShowEventsActivity;
 
 import ws1415.ps1415.activity.ShowInformationActivity;
-import ws1415.common.task.UpdateLocationTask;
 
 /**
  * Testet den Use Case "Handhabung der aktuellen Position".
@@ -240,7 +239,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         Thread.sleep(2500); // Zeit zum initialisieren
 
         // Setzen der Position auf den Server
-        new UpdateLocationTask(null, TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute();
+        //new UpdateLocationTask(null, TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute();
 
         Thread.sleep(5000); // Zeit zum initialisieren
 
@@ -310,7 +309,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         assertTrue(active);
 
         // Setzen der Position auf den Server
-        new UpdateLocationTask(null, TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute();
+        //new UpdateLocationTask(null, TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute();
         Thread.sleep(5000); // Zeit zum initialisieren
 
         // Teilnehmer, der seine Position an den Server senden wird
@@ -334,7 +333,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         // Liste, die die TextView enthält
         ListView listView = (ListView) showInformationActivity.findViewById(R.id.activity_show_information_list_view);
         assertNotNull("listView is null!", listView);
-        listView.setAdapter(showInformationActivity.getShowCursorAdapter());
+        //listView.setAdapter(showInformationActivity.getShowCursorAdapter());
 
         Thread.sleep(3000); // Zeit zum Initialisieren
         assertNotNull("listViewAdapter is null!", listView.getAdapter());

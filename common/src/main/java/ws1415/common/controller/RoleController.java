@@ -3,11 +3,13 @@ package ws1415.common.controller;
 import com.skatenight.skatenightAPI.model.Domain;
 import com.skatenight.skatenightAPI.model.JsonMap;
 import com.skatenight.skatenightAPI.model.RoleWrapper;
+import com.skatenight.skatenightAPI.model.UserInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
 
 import ws1415.common.model.Role;
 import ws1415.common.net.ServiceProvider;
@@ -52,6 +54,23 @@ public class RoleController {
                 }
             }
         }.execute();
+    }
+
+    /**
+     * Gibt die Rolle für den Benutzer für das lokale Objekt der Umgebung zurück.
+     * TODO: Testen
+     *
+     * @param domain Umgebung
+     * @param userMail E-Mail Adresse des Benutzers
+     */
+    public static void getUserRole(Domain domain, String userMail) throws JSONException {
+        JsonMap userRoles = domain.getUserRoles();
+        JSONObject userRolesObject = new JSONObject(userRoles);
+        try {
+            userRolesObject.getInt(userMail);
+        } catch (JSONException e) {
+            throw new JSONException("Rolle vom Benutzer konnte nicht abgerufen werden: " + userMail);
+        }
     }
 
     /**
@@ -153,22 +172,25 @@ public class RoleController {
         }.execute();
     }
 
-
     /**
-     * Gibt die Rolle für den Benutzer für das lokale Objekt der Umgebung zurück.
-     * TODO: Testen
+     * Gibt eine Liste von globalen Administratoren aus.
      *
-     * @param domain Umgebung
-     * @param userMail E-Mail Adresse des Benutzers
+     * @param handler
      */
-    public static void getUserRole(Domain domain, String userMail) throws JSONException {
-        JsonMap userRoles = domain.getUserRoles();
-        JSONObject userRolesObject = new JSONObject(userRoles);
-        try {
-            userRolesObject.getInt(userMail);
-        } catch (JSONException e) {
-            throw new JSONException("Rolle vom Benutzer konnte nicht abgerufen werden: " + userMail);
-        }
+    public static void listGlobalAdmins(ExtendedTaskDelegate handler){
+        new ExtendedTask<Void, Void, List<UserInfo>>(handler) {
+            @Override
+            protected List<UserInfo> doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().roleEndpoint().listGlobalAdmins().execute().getItems();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Liste von Administratoren konnte nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute();
     }
+
 
 }

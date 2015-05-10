@@ -24,6 +24,8 @@ import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Route;
+import ws1415.SkatenightBackend.model.EndUser;
+import ws1415.SkatenightBackend.model.UserLocation;
 
 /**
  * Created by Richard on 01.05.2015.
@@ -113,24 +115,6 @@ public class EventEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Gibt die Events des Teilnehmers mit der übergebenen E-Mail zurück.
-     *
-     * @param email die E-Mail des Teilnehmers
-     * @return Liste von Events, an denen der Teilnehmer teilnimmt
-     */
-    public List<Event> getCurrentEventsForMember(@Named("email") String email) {
-        //  Nur Events ausgeben die auch JETZT stattfinden.
-        List<Event> out = new ArrayList<Event>();
-        List<Event> eventList = getAllEvents();
-        for (Event e : eventList) {
-            if (e.getMemberList().contains(email)) {
-                out.add(e);
-            }
-        }
-        return out;
-    }
-
-    /**
      * Fügt einen Member zu einem Event hinzu.
      *
      * @param keyId Die ID des Events
@@ -202,14 +186,30 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param keyId die Id von dem Event
      * @return List von Teilnehmern
      */
-    public List<Member> getMembersFromEvent(@Named("id") long keyId) {
+    public List<EndUser> getMembersFromEvent(@Named("id") long keyId) {
         Event event = getEvent(keyId);
 
-        List<Member> members = new ArrayList<Member>(event.getMemberList().size());
-        for (String key: event.getMemberList()) {
-            members.add(new UserEndpoint().getMember(key));
+        List<EndUser> endUsers = new ArrayList<>(event.getMemberList().size());
+        for (String email: event.getMemberList()) {
+            endUsers.add(new UserEndpoint().getFullUser(email));
         }
-        return members;
+        return endUsers;
+    }
+
+    /**
+     * Gibt eine Liste von Standortinformationen zu allen Membern, welche an dem übergenen Event teilnehmen.
+     *
+     * @param keyId
+     * @return
+     */
+    public List<UserLocation> getMemberLocationsFromEvent(@Named("id") long keyId) {
+        Event event = getEvent(keyId);
+
+        List<UserLocation> userLocations = new ArrayList<>();
+        for (String email: event.getMemberList()) {
+            userLocations.add(new UserEndpoint().getUserLocation(email));
+        }
+        return userLocations;
     }
 
     /**

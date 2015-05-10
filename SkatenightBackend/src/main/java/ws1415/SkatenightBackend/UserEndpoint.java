@@ -8,6 +8,7 @@ import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +37,7 @@ import ws1415.SkatenightBackend.model.UserPicture;
  * @author Martin Wrodarczyk
  */
 public class UserEndpoint extends SkatenightServerEndpoint {
+    public long lastFieldUpdateTime = 0;
 
     /**
      * Erstellt ein Member-Objekt für die angegebene
@@ -137,12 +139,18 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         globalDomain.setRole(email, Role.USER.getId());
 
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        pm.makePersistent(globalDomain);
-        pm.close();
+        try {
+            pm.makePersistent(globalDomain);
+        } finally {
+            pm.close();
+        }
 
         pm = getPersistenceManagerFactory().getPersistenceManager();
-        pm.makePersistent(user);
-        pm.close();
+        try {
+            pm.makePersistent(user);
+        } finally {
+            pm.close();
+        }
     }
 
     /**
@@ -215,25 +223,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Gibt die allgemeinen Informationen zu einem Benutzer mit der angegebenen E-Mail Adresse
-     * aus.
-     *
-     * @param email E-Mail Adresse des Benutzers
-     * @return Allgemeine Informationen zum Benutzer, falls nicht gefunden: null
-     */
-    @ApiMethod(path = "get_user_info")
-    public UserInfo getUserInfo(@Named("email") String email) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            return pm.getObjectById(UserInfo.class, email);
-        } catch (Exception e) {
-            return null;
-        } finally {
-            pm.close();
-        }
-    }
-
-    /**
      * Gibt die allgemeinen Informationen und das Profilbild zu einem Benutzer mit der angegebenen
      * E-Mail Adresse aus.
      *
@@ -248,6 +237,25 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             userInfoPicture.getUserInfo();
             userInfoPicture.getUserPicture();
             return userInfoPicture;
+        } catch (Exception e) {
+            return null;
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Gibt die allgemeinen Informationen zu einem Benutzer mit der angegebenen E-Mail Adresse
+     * aus.
+     *
+     * @param email E-Mail Adresse des Benutzers
+     * @return Allgemeine Informationen zum Benutzer, falls nicht gefunden: null
+     */
+    @ApiMethod(path = "get_user_info")
+    public UserInfo getUserInfo(@Named("email") String email) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            return pm.getObjectById(UserInfo.class, email);
         } catch (Exception e) {
             return null;
         } finally {
@@ -357,7 +365,8 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         } else if (!existsUser(user.getEmail()).value) {
-            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
+            createUser(userMail);
+            //throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
         } else if (!user.getEmail().equals(userMail)) {
             throw new UnauthorizedException("Keine Rechte um diesen Benutzer zu editieren");
         }
@@ -367,29 +376,22 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             userLocation.setUpdatedAt(new Date());
             userLocation.setLatitude(latitude);
             userLocation.setLongitude(longitude);
-            userLocation.setCurrentEventId(currentEventId);
+
+            if (userLocation.getCurrentEventId() == null || userLocation.getCurrentEventId() != currentEventId) {
+                userLocation.setCurrentEventId(currentEventId);
+                userLocation.setCurrentWaypoint(0);
+            }
+
+            RouteEndpoint routeEndpoint = new RouteEndpoint();
+            routeEndpoint.calculateCurrentWaypoint(pm, userLocation);
+            if (System.currentTimeMillis()-lastFieldUpdateTime >= routeEndpoint.FIELD_UPDATE_INTERVAL) {
+                routeEndpoint.calculateField(pm, userLocation.getCurrentEventId());
+                lastFieldUpdateTime = System.currentTimeMillis();
+            }
             pm.makePersistent(userLocation);
         } finally {
             pm.close();
         }
-    }
-
-    /**
-     * Listet die allgemeinen Informationen der Benutzer auf, dessen E-Mail Adressen übergeben
-     * wurden.
-     *
-     * @param userMails Liste der E-Mail Adressen der Benutzer
-     * @return Liste von allgemeinen Informationen
-     */
-    @ApiMethod(path = "list_user_infos")
-    public List<UserInfo> listUserInfo(@Named("userMails") List<String> userMails) {
-        List<UserInfo> result = new ArrayList<>();
-        UserInfo userInfo;
-        for (String userMail : userMails) {
-            userInfo = getUserInfo(userMail);
-            if (userInfo != null) result.add(userInfo);
-        }
-        return result;
     }
 
     /**
@@ -411,18 +413,19 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Listet die Profilbilder der Benutzer, dessen E-Mail Adressen übergeben wurden.
+     * Listet die allgemeinen Informationen der Benutzer auf, dessen E-Mail Adressen übergeben
+     * wurden.
      *
      * @param userMails Liste der E-Mail Adressen der Benutzer
-     * @return Liste von Profilbildern
+     * @return Liste von allgemeinen Informationen
      */
-    @ApiMethod(path = "list_user_picture")
-    public List<UserPicture> listUserPicture(@Named("userMails") List<String> userMails) {
-        List<UserPicture> result = new ArrayList<>();
-        UserPicture userPicture;
+    @ApiMethod(path = "list_user_infos")
+    public List<UserInfo> listUserInfo(@Named("userMails") List<String> userMails) {
+        List<UserInfo> result = new ArrayList<>();
+        UserInfo userInfo;
         for (String userMail : userMails) {
-            userPicture = getUserPicture(userMail);
-            if (userPicture != null) result.add(userPicture);
+            userInfo = getUserInfo(userMail);
+            if (userInfo != null) result.add(userInfo);
         }
         return result;
     }
@@ -477,6 +480,26 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             if (event != null) result.add(event);
         }
         return result;
+    }
+
+    /**
+     * Durchsucht die Benutzer nach der Eingabe und gibt die allgemeinen Nutzerinformationen
+     * zu den Ergebnissen in einer Liste aus.
+     *
+     * @param input Eingabe
+     * @return Liste von allgemeinen Informationen zu Benutzern
+     */
+    public List<UserInfo> searchUsers(@Named("input") String input){
+        List<UserInfo> result;
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            Query q = pm.newQuery(UserInfo.class);
+            q.setFilter("email == :inputEmail");
+            result = (List<UserInfo>) q.execute(Arrays.asList(input));
+            return result;
+        } finally {
+            pm.close();
+        }
     }
 
     /**

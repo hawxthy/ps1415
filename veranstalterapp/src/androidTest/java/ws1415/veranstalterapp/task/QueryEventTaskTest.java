@@ -2,7 +2,6 @@ package ws1415.veranstalterapp.task;
 
 import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
-import com.skatenight.skatenightAPI.model.Field;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
@@ -14,7 +13,8 @@ import java.util.concurrent.ExecutionException;
 
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.QueryEventsTask;
-import ws1415.veranstalterapp.fragment.ShowEventsFragment;
+
+//import com.skatenight.skatenightAPI.model.Field;
 
 
 /**

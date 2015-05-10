@@ -234,6 +234,28 @@ public class UserController {
     }
 
     /**
+     * Durchsucht die Benutzer nach der Eingabe und gibt die allgemeinen Nutzerinformationen
+     * zu den Ergebnissen in einer Liste aus.
+     *
+     * @param handler
+     * @param input Eingabe
+     */
+    public static void searchUsers(ExtendedTaskDelegate handler, String input) {
+        new ExtendedTask<String, Void, List<UserInfo>>(handler) {
+            @Override
+            protected List<UserInfo> doInBackground(String... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().searchUsers(params[0]).execute().getItems();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Suche nach Benutzern konnte nicht durchgeführt werden");
+                    return null;
+                }
+            }
+        }.execute(input);
+    }
+
+    /**
      * Löscht einen Benutzer auf dem Server, falls dieser vorhanden ist. Wird zur Zeit nur für
      * die Tests verwendet.
      *

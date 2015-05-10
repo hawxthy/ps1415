@@ -16,15 +16,15 @@ import android.widget.ListView;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
-import com.skatenight.skatenightAPI.model.Member;
+import com.skatenight.skatenightAPI.model.UserLocation;
 
+import ws1415.common.controller.UserController;
+import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.activity.SettingsActivity;
 import ws1415.ps1415.activity.ShowEventsActivity;
-import ws1415.common.task.UpdateLocationTask;
 
 /**
  * Testet den User Case "Übertragung der aktuellen Position an den Server".
@@ -141,13 +141,13 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
         Thread.sleep(2500); // Zeit zum initialisieren
 
         // Setzen der Position auf den Server
-        new UpdateLocationTask(null, TEST_EMAIL, TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId()).execute();
+        UserController.updateUserLocation(null, TEST_EMAIL,  TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId());
         Thread.sleep(2000); // Zeit zum initialisieren
 
         // Teilnehmer, der seine Position an den Server senden wird
-        Member m = ServiceProvider.getService().userEndpoint().getMember(TEST_EMAIL).execute();
-        assertEquals(TEST_POSITION.latitude, m.getLatitude());
-        assertEquals(TEST_POSITION.longitude, m.getLongitude());
+        UserLocation userLocation = ServiceProvider.getService().userEndpoint().getUserLocation(TEST_EMAIL).execute();
+        assertEquals(TEST_POSITION.latitude, userLocation.getLatitude());
+        assertEquals(TEST_POSITION.longitude, userLocation.getLongitude());
 
         // Prüfen, ob das Senden aktiviert ist
         boolean active = sharedPreferences.getBoolean("prefSendLocation", true);
@@ -161,8 +161,8 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
         Thread.sleep(10000); // Zeit zum Senden
 
         // Prüfen, ob die neuen Positionen auf dem Server übernommen worden sind
-        assertNotSame("Position not updated!", TEST_POSITION.latitude, m.getLatitude());
-        assertNotSame("Position not updated!", TEST_POSITION.longitude, m.getLongitude());
+        assertNotSame("Position not updated!", TEST_POSITION.latitude, userLocation.getLatitude());
+        assertNotSame("Position not updated!", TEST_POSITION.longitude, userLocation.getLongitude());
 
         // Übertragenden Service stoppen
         mActivity.stopService(service);
