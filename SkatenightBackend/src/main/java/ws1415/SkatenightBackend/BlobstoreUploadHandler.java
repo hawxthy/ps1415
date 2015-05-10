@@ -16,6 +16,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ws1415.SkatenightBackend.model.Gallery;
+import ws1415.SkatenightBackend.model.Picture;
+
+import static com.googlecode.objectify.ObjectifyService.ofy;
+
 /**
  * Nimmt POST-Anfragen für einen Upload in den Blobstore entgegen.
  * @author Richard Schulze
@@ -38,7 +43,11 @@ public class BlobstoreUploadHandler extends HttpServlet {
         BlobKey blobKey = uploads.get("file").get(0);
 
         try {
+            Picture picture = new GalleryEndpoint().getPicture(Long.parseLong(req.getParameter("pictureId")));
+            picture.setImageBlobKey(blobKey);
+            ofy().save().entity(picture).now();
 
+            // TODO Thumbnail generieren
         } catch(Exception ex) {
             // Im Falle eines Fehlers den gespeicherten Blob löschen
             blobstoreService.delete(blobKey);

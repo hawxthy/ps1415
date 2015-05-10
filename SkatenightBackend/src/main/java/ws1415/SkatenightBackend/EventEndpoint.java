@@ -24,6 +24,7 @@ import ws1415.SkatenightBackend.gcm.Sender;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.EventMetaData;
+import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Route;
 
@@ -84,6 +85,9 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         // TODO User prüfen
         // TODO Event prüfen
 
+        Gallery gallery = new Gallery();
+        ofy().save().entity(gallery).now();
+
         EventMetaData metaData = new EventMetaData();
         metaData.setIcon(icon);
         metaData.setTitle(title);
@@ -97,6 +101,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         event.setFee(fee);
         event.setImages(images);
         event.setMetaData(metaData);
+        event.setGallery(gallery);
         ofy().save().entity(event).now();
 
         metaData.setEventId(event.getId());
@@ -114,6 +119,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
     public void deleteEvent(User user, @Named("id") Long id) {
         if (id != null) {
             // TODO User prüfen
+            // TODO Gallery und alle zugehörigen Blobs löschen
 
             // Die Eventmetadaten und alle untergeordneten Objekte löschen
             Key metaDataKey = Key.create(EventMetaData.class, id);

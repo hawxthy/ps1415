@@ -4,6 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.skatenight.skatenightAPI.model.Gallery;
+import com.skatenight.skatenightAPI.model.Picture;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -32,30 +35,33 @@ public abstract class GalleryController {
     /**
      * Lädt das angegebene Bild in den Google Blobstore hoch.
      * @param handler    Der Handler, der beim Abschluss des Vorgangs aufgerufen werden soll.
-     * @param imagePath  Der Pfad des hochzuladenden Bildes.
+     * @param image      Das hochzuladende Bild.
      */
-    public static void uploadImage(ExtendedTaskDelegate<Void, Void> handler, final String imagePath) {
+    public static void uploadImage(ExtendedTaskDelegate<Void, Void> handler, final File image,
+                                   final String title, final String description, final Gallery gallery) {
         new ExtendedTask<Void, Void, Void>(handler) {
             @Override
             protected Void doInBackground(Void... params) {
-                File f = new File(imagePath);
+                // TODO Bei Fehlern das Picture-Objekt löschen
 
-                // Upload-URL abrufen
-                String uploadUrl = null;
-//                try {
-//                    uploadUrl = ServiceProvider.getService().galleryEndpoint().getUploadUrl().execute().getUrl();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+                // Picture-Objekt auf dem Server erstellen lassen
+                Picture picture = null;
+                try {
+                    picture = ServiceProvider.getService().galleryEndpoint().createPicture(
+                            title, description, gallery).execute();
+                } catch (IOException e) {
+                    new RuntimeException(e);
+                }
 
                 // POST-Anfrage für den Upload erstellen
                 try {
                     HttpClient client = new DefaultHttpClient();
-                    HttpPost post = new HttpPost(uploadUrl);
+                    HttpPost post = new HttpPost(picture.getUploadUrl());
 
                     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                     builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-                    builder.addBinaryBody("file", f);
+                    builder.addBinaryBody("file", image);
+                    builder.addTextBody("pictureId", picture.getId().toString());
 
                     HttpEntity entity = builder.build();
                     post.setEntity(entity);
@@ -65,7 +71,7 @@ public abstract class GalleryController {
 
                     Log.d("result", EntityUtils.toString(httpEntity));
                 } catch(IOException ex) {
-                    ex.printStackTrace();
+                    new RuntimeException(ex);
                 }
 
                 return null;

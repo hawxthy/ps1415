@@ -2,9 +2,12 @@ package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Text;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
+import com.googlecode.objectify.annotation.Load;
+import com.googlecode.objectify.annotation.Parent;
 
 import java.util.List;
 import java.util.Map;
@@ -24,8 +27,10 @@ public class Picture {
     private Map<String, Integer> ratings;
     private Double avgRating;
     private BlobKey imageBlobKey;
-    private PictureMetaData metaData;
-    private List<PictureComment> pictureComments;
+    @Parent
+    @Load
+    private Ref<PictureMetaData> metaData;
+    // private List<PictureComment> pictureComments;
 
     /**
      * Speichert die Upload-URL für den Upload in den Blobstore. Dient nur der Übertragung an die App
@@ -76,20 +81,24 @@ public class Picture {
     }
 
     public PictureMetaData getMetaData() {
-        return metaData;
+        if (metaData != null) {
+            return metaData.get();
+        } else {
+            return null;
+        }
     }
 
     public void setMetaData(PictureMetaData metaData) {
-        this.metaData = metaData;
+        this.metaData = Ref.create(metaData);
     }
 
-    public List<PictureComment> getPictureComments() {
-        return pictureComments;
-    }
-
-    public void setPictureComments(List<PictureComment> pictureComments) {
-        this.pictureComments = pictureComments;
-    }
+//    public List<PictureComment> getPictureComments() {
+//        return pictureComments;
+//    }
+//
+//    public void setPictureComments(List<PictureComment> pictureComments) {
+//        this.pictureComments = pictureComments;
+//    }
 
     public String getUploadUrl() {
         return uploadUrl;

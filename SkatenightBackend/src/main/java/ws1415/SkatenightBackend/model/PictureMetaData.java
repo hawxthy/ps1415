@@ -1,7 +1,10 @@
 package ws1415.SkatenightBackend.model;
 
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Load;
+import com.googlecode.objectify.annotation.Parent;
 
 import java.util.Date;
 
@@ -19,7 +22,9 @@ public class PictureMetaData {
     private String title;
     private Date date;
     private String thumbnail;
-    private Gallery gallery;
+    @Parent
+    @Load
+    private Ref<Gallery> gallery;
     private String uploader;
     private Long pictureId;
 
@@ -56,11 +61,15 @@ public class PictureMetaData {
     }
 
     public Gallery getGallery() {
-        return gallery;
+        if (gallery != null) {
+            return gallery.get();
+        } else {
+            return null;
+        }
     }
 
     public void setGallery(Gallery gallery) {
-        this.gallery = gallery;
+        this.gallery = Ref.create(gallery);
     }
 
     public String getUploader() {

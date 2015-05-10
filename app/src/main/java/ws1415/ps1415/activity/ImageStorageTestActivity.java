@@ -13,9 +13,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.skatenight.skatenightAPI.model.Gallery;
+
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 
 import ws1415.common.controller.GalleryController;
+import ws1415.common.net.ServiceProvider;
+import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 
@@ -85,10 +91,24 @@ public class ImageStorageTestActivity extends BaseActivity {
                     Cursor cursor = cl.loadInBackground();
                     int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
                     cursor.moveToFirst();
-                    String tempPath = cursor.getString(column_index);
+                    final String tempPath = cursor.getString(column_index);
                     cursor.close();
 
-                    GalleryController.uploadImage(null, tempPath);
+                    new ExtendedTask<Void, Void, Gallery>(new ExtendedTaskDelegateAdapter<Void, Gallery>() {
+                        @Override
+                        public void taskDidFinish(ExtendedTask task, Gallery gallery) {
+                            GalleryController.uploadImage(null, new File(tempPath), "Bildtitel", "Dateipfad: " + tempPath, gallery);
+                        }
+                    }) {
+                        @Override
+                        protected Gallery doInBackground(Void... params) {
+                            try {
+                                return ServiceProvider.getService().galleryEndpoint().getGlobalGallery().execute();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }.execute();
                 }
                 break;
         }

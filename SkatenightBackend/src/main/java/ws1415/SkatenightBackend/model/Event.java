@@ -31,6 +31,7 @@ public class Event {
     @Parent
     @Load
     private Ref<EventMetaData> metaData;
+    private Ref<Gallery> gallery;
 
     public Long getId() {
         return id;
@@ -135,5 +136,17 @@ public class Event {
 
     public void setMetaData(EventMetaData metaData) {
         this.metaData = Ref.create(metaData);
+    }
+
+    public Gallery getGallery() {
+        if (gallery != null) {
+            return gallery.get();
+        } else {
+            return null;
+        }
+    }
+
+    public void setGallery(Gallery gallery) {
+        this.gallery = Ref.create(gallery);
     }
 }
