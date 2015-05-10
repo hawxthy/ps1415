@@ -28,6 +28,14 @@ public enum MessageType {
      */
     GROUP_CREATED_NOTIFICATION_MESSAGE,
     /**
+     * Wird an den Enduser gesendet, der zu einer Gruppe eingeladen wurde.
+     */
+    INVITATION_TO_GROUP_MESSAGE,
+    /**
+     * Wird an alle Mitglieder der Gruppe gesendet.
+     */
+    GLOBAL_GROUP_MESSAGE,
+    /**
      * Wird an einen Benutzer gesendet, wenn dieser eine neue private Nachricht erhält.
      */
     USER_NEW_MESSAGE,

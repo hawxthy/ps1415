@@ -21,20 +21,26 @@ public class UserGroup {
     private String name;            // Eindeutiger Name der Gruppe
 
     @Persistent
+    @Unowned
     private boolean open;
 
     @Persistent
+    @Unowned
     private GroupType type;
 
     @Persistent(defaultFetchGroup = "true")
     @Unowned
-    private Member creator;
+    private EndUser creator;
+
+    @Persistent
+    @Unowned
+    private Picture picture;
 
     // Eine Map die die E-Mail von einem Benutzer(vorne)
     // mit dem Namen eines Rangs(hinten) verbindet.
     @Persistent(defaultFetchGroup = "true")
     @Unowned
-    private Map<String, String> memberRanks = new HashMap<>();
+    private Map<String, String> memberRanks = new HashMap<String, String>();
 
     @Persistent(defaultFetchGroup = "true")
     @Unowned
@@ -53,11 +59,12 @@ public class UserGroup {
         // Konstruktor für GAE
     }
 
-    public UserGroup(Member creator) {
+    public UserGroup(EndUser creator) {
         if (creator == null) {
             throw new IllegalArgumentException("creator can not be null");
         }
         this.creator = creator;
+        memberRanks = new HashMap<String, String>();
     }
 
 
@@ -70,7 +77,7 @@ public class UserGroup {
     }
 
 
-    public Member getCreator() {
+    public EndUser getCreator() {
         return creator;
     }
 
@@ -127,5 +134,14 @@ public class UserGroup {
 
     public void setRanking(List<Rank> ranking) {
         this.ranking = ranking;
+    }
+
+
+    public Picture getPicture() {
+        return picture;
+    }
+
+    public void setPicture(Picture picture) {
+        this.picture = picture;
     }
 }

@@ -16,13 +16,13 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import ws1415.common.controller.GroupController;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.adapter.UsergroupAdapter;
-import ws1415.common.task.QueryMyUserGroupsTask;
 import ws1415.ps1415.util.PrefManager;
 import ws1415.ps1415.util.groupUtils;
 
@@ -157,12 +157,12 @@ public class MyUsergroupsFragment extends Fragment{
      */
     public void refresh(){
         if(mProgressBarRefresh != null) mProgressBarRefresh.setVisibility(View.VISIBLE);
-        new QueryMyUserGroupsTask(new ExtendedTaskDelegateAdapter<Void, List<UserGroup>>() {
+        GroupController.getInstance().getMyUserGroups(new ExtendedTaskDelegateAdapter<Void, List<UserGroup>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<UserGroup> userGroups) {
                 setUserGroupsToListView(userGroups);
             }
-        }).execute();
+        });
     }
 
     /**

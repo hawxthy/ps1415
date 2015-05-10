@@ -111,7 +111,8 @@ public class UsergroupAdapter extends BaseAdapter {
         }
 
         holder.groupName.setText(getItem(position).getName());
-        holder.groupCreator.setText(getItem(position).getCreator().getName());
+        //TODO Den Namen des EndUsers holen und nicht die E-Mail
+        holder.groupCreator.setText(getItem(position).getCreator().getEmail());
         holder.groupCount.setText(Integer.toString(getItem(position).getMemberRanks().size()));
 
         return convertView;

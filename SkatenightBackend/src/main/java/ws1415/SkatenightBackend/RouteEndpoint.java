@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 
 import ws1415.SkatenightBackend.model.BooleanWrapper;
+import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Route;
@@ -66,14 +67,14 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
             Event event = new EventEndpoint().getEvent(0l, currentEventId);
             int count = Math.min(mail.length, Math.min(latitude.length, longitude.length));
 
-            Member admin = new UserEndpoint().getMember("richard-schulze@online.de");
+            EndUser admin = new UserEndpoint().getFullUser("richard-schulze@online.de");
 
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
             UserGroup group = new GroupEndpoint().getUserGroup(pm, "Simulationsgruppe");
             if (group == null) {
                 UserGroup ug = new UserGroup(admin);
                 ug.setName("Simulationsgruppe");
-                admin.addGroup(ug);
+                admin.addUserGroup(ug);
                 pm.makePersistent(admin);
                 pm.makePersistent(ug);
             }

@@ -1,18 +1,25 @@
 package ws1415.SkatenightBackend.model;
 
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.datanucleus.annotations.Unowned;
 
 import java.util.List;
 
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
  * Created by Bernd Eissing on 02.05.2015.
  */
+@PersistenceCapable
 public class GroupMeta {
-    @Persistent
     @PrimaryKey
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+    private Key key;
+
+    @Persistent
     private String name;
 
     @Persistent
@@ -21,12 +28,7 @@ public class GroupMeta {
     @Persistent(defaultFetchGroup = "true")
     @Unowned
     private List<String> members;
-
-    public GroupMeta(String name, String creator, List<String> members){
-        this.name = name;
-        this.creator = creator;
-        this.members = members;
-    }
+    
 
     public String getName() {
         return name;

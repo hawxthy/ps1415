@@ -10,10 +10,10 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.util.List;
 
+import ws1415.common.controller.GroupController;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
-import ws1415.common.task.AddUserGroupTask;
 import ws1415.common.task.QueryUserGroupsTask;
 
 /**
@@ -62,12 +62,12 @@ public class AddUserGroupActivity extends Activity {
                         }
                     }
                     finish();
-                    new AddUserGroupTask(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                    GroupController.getInstance().createUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
                         @Override
                         public void taskDidFinish(ExtendedTask task, Void aVoid) {
                             UsergroupActivity.getUserGroupActivity().refresh();
                         }
-                    }).execute(groupName);
+                    }, groupName);
                 }
             }).execute();
         } else {
