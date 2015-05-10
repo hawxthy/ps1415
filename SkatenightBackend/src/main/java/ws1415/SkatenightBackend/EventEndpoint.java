@@ -338,7 +338,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @return
      */
     public List<UserLocation> getMemberLocationsFromEvent(@Named("id") long keyId) {
-        Event event = getEvent(keyId);
+        Event event = getEvent(0l, keyId);
 
         List<UserLocation> userLocations = new ArrayList<>();
         for (String email: event.getMemberList()) {

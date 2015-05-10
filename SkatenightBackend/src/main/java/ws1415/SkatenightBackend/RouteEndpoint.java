@@ -63,7 +63,7 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
         }
 
         if (mail != null && latitude != null && longitude != null) {
-            Event event = new EventEndpoint().getEvent(currentEventId);
+            Event event = new EventEndpoint().getEvent(0l, currentEventId);
             int count = Math.min(mail.length, Math.min(latitude.length, longitude.length));
 
             Member admin = new UserEndpoint().getMember("richard-schulze@online.de");
@@ -180,13 +180,13 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
             return;
         }
         List<RoutePoint> points = event.getRoute().getRoutePoints();
-        List<UserLocation> userLocations = new EventEndpoint().getMemberLocationsFromEvent(event.getKey().getId());
+        List<UserLocation> userLocations = new EventEndpoint().getMemberLocationsFromEvent(event.getId());
 
         logger.info("points.size(): " + points.size());
         // array erstellen welches an der stelle n die Anzahl der Member enthält welche am RoutePoint n sind.
         int memberCountPerRoutePoint[] = new int[points.size()];
         for (UserLocation userLocation : userLocations) {
-            if (userLocation.getCurrentEventId() != null && userLocation.getCurrentEventId() == event.getKey().getId() &&
+            if (userLocation.getCurrentEventId() != null && userLocation.getCurrentEventId() == event.getId() &&
                     userLocation.getCurrentWaypoint() != null && userLocation.getCurrentWaypoint() < memberCountPerRoutePoint.length) {
                 logger.info(userLocation.getEmail() + " current waypoint: " + userLocation.getCurrentWaypoint());
                 memberCountPerRoutePoint[userLocation.getCurrentWaypoint()] = memberCountPerRoutePoint[userLocation.getCurrentWaypoint()] + 1;

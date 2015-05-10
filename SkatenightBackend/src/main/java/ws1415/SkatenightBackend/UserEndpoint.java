@@ -471,12 +471,12 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
         }
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        List<Key> eventIds = pm.getObjectById(EndUser.class, userMail).getMyEvents();
+        List<Long> eventIds = pm.getObjectById(EndUser.class, userMail).getMyEvents();
 
         Event event;
         List<Event> result = new ArrayList<>();
-        for (Key key : eventIds) {
-            event = new EventEndpoint().getEvent(key.getId());
+        for (long key : eventIds) {
+            event = new EventEndpoint().getEvent(0l, key);
             if (event != null) result.add(event);
         }
         return result;
