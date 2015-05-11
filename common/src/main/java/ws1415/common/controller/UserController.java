@@ -143,6 +143,28 @@ public class UserController {
     }
 
     /**
+     * Listet die Profilbilder der Benutzer auf, dessen E-Mail Adressen übergeben wurden.
+     *
+     * @param handler
+     * @param userMails Liste der E-Mail Adressen der Benutzer
+     */
+    @SuppressWarnings("unchecked")
+    public static void listUserPictures(ExtendedTaskDelegate handler, List<String> userMails) {
+        new ExtendedTask<List<String>, Void, List<UserPicture>>(handler) {
+            @Override
+            protected List<UserPicture> doInBackground(List<String>... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().listUserPicture(params[0]).execute().getItems();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Liste von Benutzern konnte nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute(userMails);
+    }
+
+    /**
      * Listet die allgemeinen Informationen der Benutzer auf, dessen E-Mail Adressen übergeben
      * wurden.
      *
@@ -253,6 +275,48 @@ public class UserController {
                 }
             }
         }.execute(input);
+    }
+
+    /**
+     * Fügt einen Benutzer der eigenen Freundeliste hinzu.
+     *
+     * @param handler
+     * @param userMail E-Mail Adresse des Benutzers, der hinzugefügt werden soll
+     */
+    public static void addFriend(ExtendedTaskDelegate handler, String userMail){
+        new ExtendedTask<String, Void, Boolean>(handler) {
+            @Override
+            protected Boolean doInBackground(String... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().addFriend(params[0]).execute().getValue();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Benutzer konnte nicht der Freundesliste hinzugefügt werden");
+                    return null;
+                }
+            }
+        }.execute(userMail);
+    }
+
+    /**
+     * Entfernt einen Benutzer aus der eigenen Freundeliste.
+     *
+     * @param handler
+     * @param userMail E-Mail Adresse des Benutzers, der entfernt werden soll
+     */
+    public static void removeFriend(ExtendedTaskDelegate handler, String userMail){
+        new ExtendedTask<String, Void, Boolean>(handler) {
+            @Override
+            protected Boolean doInBackground(String... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().removeFriend(params[0]).execute().getValue();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Benutzer konnte nicht aus der Freundesliste entfernt werden");
+                    return null;
+                }
+            }
+        }.execute(userMail);
     }
 
     /**

@@ -5,6 +5,8 @@ import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserInfoPicture;
 import com.skatenight.skatenightAPI.model.UserLocation;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -12,6 +14,8 @@ import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
@@ -28,8 +32,63 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE, emulateSdk = 18)
 public class UserControllerUnitTest {
+    public static boolean initialized = false;
     public static final String TEST_MAIL = "test@gmail.com";
     public static final String TEST_MAIL_2 = "test2@gmail.com";
+
+    @Before
+    public void testSetUp() throws Exception {
+        // Lösche beim Start der Tests alle Benutzer vom Server
+        if (!initialized) {
+            deleteAllUsers();
+            initialized = true;
+        }
+
+        // Zwei EndUser zum Testen erstellen
+        final CountDownLatch createSignal = new CountDownLatch(1);
+        UserController.createUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void voids) {
+                createSignal.countDown();
+            }
+        }, TEST_MAIL_2);
+        UserController.createUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void voids) {
+                createSignal.countDown();
+            }
+        }, TEST_MAIL);
+        assertTrue(createSignal.await(30, TimeUnit.SECONDS));
+    }
+
+    @After
+    public void testTearDown() throws Exception {
+        deleteAllUsers();
+    }
+
+    private void deleteAllUsers() throws InterruptedException {
+        final CountDownLatch signal = new CountDownLatch(1);
+        final List<UserInfo> userInfosFinal = new ArrayList<>();
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserInfo>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserInfo> userInfos) {
+                if (userInfos != null) userInfosFinal.addAll(userInfos);
+                signal.countDown();
+            }
+        }, "all");
+        assertTrue(signal.await(45, TimeUnit.SECONDS));
+
+        final CountDownLatch deleteAllSignal = new CountDownLatch(userInfosFinal.size());
+        for (UserInfo userInfo : userInfosFinal) {
+            UserController.deleteUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, Void avoid) {
+                    deleteAllSignal.countDown();
+                }
+            }, userInfo.getEmail());
+        }
+        assertTrue(deleteAllSignal.await(45, TimeUnit.SECONDS));
+    }
 
     /**
      * Erstellt einen Benutzer und prüft ob der Benutzer auf dem Server gespeichert ist.
@@ -37,15 +96,8 @@ public class UserControllerUnitTest {
      * @throws Exception
      */
     @Test
-    public void testCreateAndGetUser() throws Exception {
-        UserController.createUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Void voids) {
-            }
-        }, TEST_MAIL);
-
-        Thread.sleep(4000);
-
+    public void testGetUser() throws InterruptedException {
+        final CountDownLatch getSignal = new CountDownLatch(1);
         UserController.getFullUser(new ExtendedTaskDelegateAdapter<Void, EndUser>() {
             @Override
             public void taskDidFinish(ExtendedTask task, EndUser user) {
@@ -54,14 +106,10 @@ public class UserControllerUnitTest {
                 assertEquals(TEST_MAIL, user.getUserInfoPicture().getUserPicture().getEmail());
                 assertEquals(TEST_MAIL, user.getUserInfoPicture().getUserInfo().getEmail());
                 assertEquals(TEST_MAIL, user.getUserLocation().getEmail());
+                getSignal.countDown();
             }
         }, TEST_MAIL);
-
-        Thread.sleep(2000);
-
-        UserController.deleteUser(null, TEST_MAIL);
-
-        Thread.sleep(2000);
+        assertTrue(getSignal.await(20, TimeUnit.SECONDS));
     }
 
     /**
@@ -70,17 +118,12 @@ public class UserControllerUnitTest {
      * @throws Exception
      */
     @Test
-    public void testListUserInfo() throws Exception {
-        UserController.createUser(null, TEST_MAIL);
-        UserController.createUser(null, TEST_MAIL_2);
-
-        Thread.sleep(4000);
-
+    public void testListUserInfo() throws InterruptedException {
         final List<String> userMails = new ArrayList<>();
         userMails.add(TEST_MAIL);
         userMails.add(TEST_MAIL_2);
 
-
+        final CountDownLatch listSignal = new CountDownLatch(1);
         UserController.listUserInfo(new ExtendedTaskDelegateAdapter<Void, List<UserInfo>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<UserInfo> userInfos) {
@@ -91,15 +134,10 @@ public class UserControllerUnitTest {
 
                 assertTrue(userMailsServer.containsAll(userMails)
                         && userMails.containsAll(userMailsServer));
+                listSignal.countDown();
             }
         }, userMails);
-
-        Thread.sleep(3000);
-
-        UserController.deleteUser(null, TEST_MAIL);
-        UserController.deleteUser(null, TEST_MAIL_2);
-
-        Thread.sleep(2000);
+        assertTrue(listSignal.await(20, TimeUnit.SECONDS));
     }
 
     /**
@@ -110,23 +148,15 @@ public class UserControllerUnitTest {
      */
     @Test
     public void testListUserInfoWithPicture() throws InterruptedException {
-        UserController.createUser(null, TEST_MAIL);
-        UserController.createUser(null, TEST_MAIL_2);
-
-        Thread.sleep(4000);
-
         final List<String> userMails = new ArrayList<>();
         userMails.add(TEST_MAIL);
         userMails.add(TEST_MAIL_2);
 
+        final CountDownLatch listSignal = new CountDownLatch(1);
         UserController.listUserInfoWithPicture(new ExtendedTaskDelegateAdapter<Void, List<UserInfoPicture>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<UserInfoPicture> userInfoPictures) {
                 assertEquals(userMails.size(), userInfoPictures.size());
-                assertNotNull(userInfoPictures.get(0).getUserPicture());
-                assertNotNull(userInfoPictures.get(0).getUserInfo());
-                assertNotNull(userInfoPictures.get(1).getUserPicture());
-                assertNotNull(userInfoPictures.get(1).getUserInfo());
 
                 List<String> userMailsSever = new ArrayList<>();
                 userMailsSever.add(userInfoPictures.get(0).getEmail());
@@ -134,15 +164,10 @@ public class UserControllerUnitTest {
 
                 assertTrue(userMailsSever.containsAll(userMails)
                         && userMails.containsAll(userMailsSever));
+                listSignal.countDown();
             }
         }, userMails);
-
-        Thread.sleep(3000);
-
-        UserController.deleteUser(null, TEST_MAIL);
-        UserController.deleteUser(null, TEST_MAIL_2);
-
-        Thread.sleep(2000);
+        assertTrue(listSignal.await(20, TimeUnit.SECONDS));
     }
 
     /**
@@ -152,23 +177,16 @@ public class UserControllerUnitTest {
      */
     @Test
     public void testGetUserLocation() throws InterruptedException {
-        UserController.createUser(null, TEST_MAIL);
-
-        Thread.sleep(4000);
-
+        final CountDownLatch getSignal = new CountDownLatch(1);
         UserController.getUserLocation(new ExtendedTaskDelegateAdapter<Void, UserLocation>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserLocation userLocation) {
                 assertNotNull(userLocation);
                 assertEquals(TEST_MAIL, userLocation.getEmail());
+                getSignal.countDown();
             }
         }, TEST_MAIL);
-
-        Thread.sleep(3000);
-
-        UserController.deleteUser(null, TEST_MAIL);
-
-        Thread.sleep(2000);
+        assertTrue(getSignal.await(20, TimeUnit.SECONDS));
     }
 
     /**
@@ -178,23 +196,16 @@ public class UserControllerUnitTest {
      */
     @Test
     public void testGetUserInfo() throws InterruptedException {
-        UserController.createUser(null, TEST_MAIL);
-
-        Thread.sleep(4000);
-
+        final CountDownLatch getSignal = new CountDownLatch(1);
         UserController.getUserLocation(new ExtendedTaskDelegateAdapter<Void, UserLocation>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserLocation userLocation) {
                 assertNotNull(userLocation);
                 assertEquals(TEST_MAIL, userLocation.getEmail());
+                getSignal.countDown();
             }
         }, TEST_MAIL);
-
-        Thread.sleep(3000);
-
-        UserController.deleteUser(null, TEST_MAIL);
-
-        Thread.sleep(2000);
+        assertTrue(getSignal.await(20, TimeUnit.SECONDS));
     }
 
     /**
@@ -204,38 +215,17 @@ public class UserControllerUnitTest {
      */
     @Test
     public void testSearchUsers() throws InterruptedException {
-        UserController.createUser(null, TEST_MAIL);
-        UserController.createUser(null, TEST_MAIL_2);
-
-        Thread.sleep(4000);
-
+        final CountDownLatch searchSignal = new CountDownLatch(1);
         UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserInfo>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<UserInfo> result) {
                 assertNotNull(result);
                 assertTrue(result.size() == 1);
                 assertEquals(result.get(0).getEmail(), TEST_MAIL);
+                searchSignal.countDown();
             }
         }, TEST_MAIL);
-
-        Thread.sleep(3000);
-
-        UserController.deleteUser(null, TEST_MAIL);
-        UserController.deleteUser(null, TEST_MAIL_2);
-
-        Thread.sleep(2000);
+        assertTrue(searchSignal.await(20, TimeUnit.SECONDS));
     }
-
-
-    // TODO: Wenn Groupcontroller fertig
-    public void testListUserGroups() throws InterruptedException {
-
-    }
-
-    //TODO: Wenn Eventcontroller fertig
-    public void testListEvents() throws InterruptedException {
-
-    }
-
 
 }

@@ -3,7 +3,6 @@ package ws1415.SkatenightBackend;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.api.server.spi.response.UnauthorizedException;
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -12,19 +11,15 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.jdo.JDOException;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
-import ws1415.SkatenightBackend.model.Domain;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
-import ws1415.SkatenightBackend.model.GlobalDomain;
 import ws1415.SkatenightBackend.model.Member;
-import ws1415.SkatenightBackend.model.Role;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserInfo;
 import ws1415.SkatenightBackend.model.UserInfoPicture;
@@ -97,25 +92,25 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param regid
      */
     public void registerForGCM(User user, @Named("regid") String regid) throws OAuthRequestException {
-        if (user != null) {
-            Member m = getMember(user.getEmail());
-            if (m == null) {
-                createMember(user.getEmail());
-            }
-            if (!existsUser(user.getEmail()).value) {
-                createUser(user.getEmail());
-            }
-
-            RegistrationManager registrationManager;
-            // Den GCM-Manager abrufen, falls er existiert, sonst einen neuen Manager anlegen.
-            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-            try {
-                registrationManager = getRegistrationManager(pm);
-                registrationManager.addRegistrationId(user.getEmail(), regid);
-                pm.makePersistent(registrationManager);
-            } finally {
-                pm.close();
-            }
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        Member m = getMember(user.getEmail());
+        if (m == null) {
+            createMember(user.getEmail());
+        }
+        //if (!existsUser(user.getEmail()).value) {
+        //    createUser(user.getEmail());
+        //}
+        RegistrationManager registrationManager;
+        // Den GCM-Manager abrufen, falls er existiert, sonst einen neuen Manager anlegen.
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            registrationManager = getRegistrationManager(pm);
+            registrationManager.addRegistrationId(user.getEmail(), regid);
+            pm.makePersistent(registrationManager);
+        } finally {
+            pm.close();
         }
     }
 
@@ -126,30 +121,19 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param email E-Mail Adresse des zu erstellenden Benutzers
      */
     public void createUser(@Named("email") String email) {
-        if (existsUser(email).value) {
-            throw new JDOException("Benutzer existiert bereits");
-        }
-        UserLocation userLocation = new UserLocation(email);
-        UserPicture userPicture = new UserPicture(email);
-        UserInfo userInfo = new UserInfo(email);
-        UserInfoPicture userInfoPicture = new UserInfoPicture(email, userInfo, userPicture);
-        EndUser user = new EndUser(email, userInfoPicture, userLocation);
+        if (!existsUser(email).value) {
+            UserLocation userLocation = new UserLocation(email);
+            UserPicture userPicture = new UserPicture(email);
+            UserInfo userInfo = new UserInfo(email);
+            UserInfoPicture userInfoPicture = new UserInfoPicture(email, userInfo, userPicture);
+            EndUser user = new EndUser(email, userInfoPicture, userLocation);
 
-        Domain globalDomain = new RoleEndpoint().getGlobalDomain();
-        globalDomain.setRole(email, Role.USER.getId());
-
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            pm.makePersistent(globalDomain);
-        } finally {
-            pm.close();
-        }
-
-        pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            pm.makePersistent(user);
-        } finally {
-            pm.close();
+            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+            try {
+                pm.makePersistent(user);
+            } finally {
+                pm.close();
+            }
         }
     }
 
@@ -193,8 +177,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             endUser.getUserInfoPicture().getUserPicture();
             endUser.getUserInfoPicture().getUserInfo();
             endUser.getUserLocation();
-            endUser.getMyEvents();
-            endUser.getMyUserGroups();
             return endUser;
         } catch (Exception e) {
             // User mit der Email wurde nicht gefunden
@@ -365,8 +347,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         } else if (!existsUser(user.getEmail()).value) {
-            createUser(userMail);
-            //throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
+            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
         } else if (!user.getEmail().equals(userMail)) {
             throw new UnauthorizedException("Keine Rechte um diesen Benutzer zu editieren");
         }
@@ -384,7 +365,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
 
             RouteEndpoint routeEndpoint = new RouteEndpoint();
             routeEndpoint.calculateCurrentWaypoint(pm, userLocation);
-            if (System.currentTimeMillis()-lastFieldUpdateTime >= routeEndpoint.FIELD_UPDATE_INTERVAL) {
+            if (System.currentTimeMillis() - lastFieldUpdateTime >= routeEndpoint.FIELD_UPDATE_INTERVAL) {
                 routeEndpoint.calculateField(pm, userLocation.getCurrentEventId());
                 lastFieldUpdateTime = System.currentTimeMillis();
             }
@@ -429,6 +410,23 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         }
         return result;
     }
+
+    /**
+     * Listet die Profilbilder der Benutzer auf, dessen E-Mail Adressen übergeben wurden.
+     *
+     * @param userMails Liste der E-Mail Adressen der Benutzer
+     * @return Liste von Profilbildern
+     */
+    public List<UserPicture> listUserPicture(@Named("userMails") List<String> userMails){
+        List<UserPicture> result = new ArrayList<>();
+        UserPicture userPicture;
+        for (String userMail : userMails) {
+            userPicture = getUserPicture(userMail);
+            if(userPicture != null) result.add(userPicture);
+        }
+        return result;
+    }
+
 
     /**
      * Gibt eine Liste von allen Nutzergruppen aus, bei denen der Benutzer als Mitglied eingetragen
@@ -489,14 +487,73 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param input Eingabe
      * @return Liste von allgemeinen Informationen zu Benutzern
      */
-    public List<UserInfo> searchUsers(@Named("input") String input){
+    public List<UserInfo> searchUsers(@Named("input") String input) {
         List<UserInfo> result;
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             Query q = pm.newQuery(UserInfo.class);
-            q.setFilter("email == :inputEmail");
-            result = (List<UserInfo>) q.execute(Arrays.asList(input));
+            if(!input.equals("all")) {
+                q.setFilter("email == :inputEmail");
+                result = (List<UserInfo>) q.execute(Arrays.asList(input));
+            } else {
+                result = (List<UserInfo>) q.execute();
+            }
             return result;
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Fügt einen Benutzer der Freundeliste hinzu.
+     *
+     * @param user User-Objekt für die Authentifikation
+     * @param userMail E-Mail Adresse des Benutzers
+     * @return true, falls Benutzer hinzugefügt wurde, false falls dieser nicht existiert
+     * @throws OAuthRequestException
+     */
+    public BooleanWrapper addFriend(User user, @Named("userMail") String userMail) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        } else if (!existsUser(user.getEmail()).value) {
+            throw new JDOObjectNotFoundException("Eigener Benutzer konnte nicht gefunden werden");
+        } else if (!existsUser(userMail).value){
+            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
+        } else if (user.getEmail().equals(userMail)){
+            throw new IllegalArgumentException("userMail darf nicht eigene E-Mail Adresse sein");
+        }
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, user.getEmail());
+            List<String> myFriends = endUser.getMyFriends();
+            for (String mail : myFriends){
+                if (mail.equals(userMail)) return new BooleanWrapper(false);
+            }
+            myFriends.add(userMail);
+            return new BooleanWrapper(true);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Löscht einen Benutzer aus der Freundeliste.
+     *
+     * @param user User-Objekt für die Authentifikation
+     * @param userMail E-Mail Adresse des Benutzers
+     * @return true, falls Benutzer entfernt wurde, false falls dieser nicht exisiert
+     * @throws OAuthRequestException
+     */
+    public BooleanWrapper removeFriend(User user, @Named("userMail") String userMail) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        } else if (!existsUser(user.getEmail()).value) {
+            throw new JDOObjectNotFoundException("Eigener Benutzer konnte nicht gefunden werden");
+        }
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, user.getEmail());
+            return new BooleanWrapper(endUser.getMyFriends().remove(userMail));
         } finally {
             pm.close();
         }
@@ -524,15 +581,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             pm.close();
         }
 
-        pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            GlobalDomain globalDomain = new RoleEndpoint().getGlobalDomain();
-            globalDomain.removeRole(userMail);
-            pm.makePersistent(globalDomain);
-        } finally {
-            pm.close();
-        }
-
         // Lösche aus Teilnehmerlisten
         //List<Key> eventIds = endUser.getMyEvents();
         //Event event;
@@ -549,7 +597,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         // userGroup.removeMember(userMail);
         // pm.makePersistent(userGroup);
         //}
-
 
 
         // Aus Domänen löschen

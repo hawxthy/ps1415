@@ -23,7 +23,7 @@ public class RoleControllerUnitTest {
 
     @Test
     // TODO: Veranstaltung braucht Domain, damit über einen Key die Rolle zurückgegeben kann
-    public void testSetAndGetUserRole() throws InterruptedException {
+    public void testSetAndGetUserRole() {
 
     }
 

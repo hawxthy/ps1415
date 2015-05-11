@@ -29,15 +29,17 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.common.controller.UserController;
 import ws1415.common.gcm.GCMUtil;
+import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.common.task.QueryEventsTask;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.adapter.EventsCursorAdapter;
-import ws1415.common.task.QueryEventsTask;
+import ws1415.ps1415.util.PrefManager;
 
 public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDelegate<Void, List<Event>> {
     /**
@@ -138,6 +140,7 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
         } else {
             ServiceProvider.login(credential);
             initGCM();
+            checkUserExistance();
         }
 
         // Listener für REFRESH_EVENTS_ACTION-Intents erstellen
@@ -147,12 +150,21 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
             }
         }, new IntentFilter(REFRESH_EVENTS_ACTION));
 
-        new QueryEventsTask(this).execute();
+        //new QueryEventsTask(this).execute();
     }
 
     private void refresh(){
         setProgressBarIndeterminateVisibility(true);
         new QueryEventsTask(ShowEventsActivity.this).execute();
+    }
+
+    private void checkUserExistance() {
+        // Check ob EndUser existiert
+        if(!PrefManager.getSelectedUserMail(context).equals(ServiceProvider.getEmail())){
+            UserController.createUser(null, ServiceProvider.getEmail());
+            Log.i(TAG, "User: " + ServiceProvider.getEmail() + " created.");
+            PrefManager.setSelectedUserMail(context, ServiceProvider.getEmail());
+        }
     }
 
     private void initGCM() {
@@ -246,6 +258,10 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
 
                         ServiceProvider.login(credential);
                         initGCM();
+
+                        UserController.createUser(null, ServiceProvider.getEmail());
+                        Log.i(TAG, "User: " + ServiceProvider.getEmail() + " created.");
+                        PrefManager.setSelectedUserMail(context, ServiceProvider.getEmail());
                     }
                 }
                 break;

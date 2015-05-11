@@ -1,6 +1,5 @@
 package ws1415.SkatenightBackend.model;
 
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.datanucleus.annotations.Unowned;
 
 import java.util.ArrayList;
@@ -28,6 +27,8 @@ public class EndUser {
     private List<String> myUserGroups;
     @Persistent
     private List<Long> myEvents;
+    @Persistent
+    private List<String> myFriends;
 
     public EndUser() {
     }
@@ -38,6 +39,7 @@ public class EndUser {
         this.userLocation = userLocation;
         myUserGroups = new ArrayList<>();
         myEvents = new ArrayList<>();
+        myFriends = new ArrayList<>();
     }
 
     public String getEmail() {
@@ -78,6 +80,14 @@ public class EndUser {
 
     public void setMyEvents(List<Long> myEvents) {
         this.myEvents = myEvents;
+    }
+
+    public List<String> getMyFriends() {
+        return myFriends;
+    }
+
+    public void setMyFriends(List<String> myFriends) {
+        this.myFriends = myFriends;
     }
 
     public void addUserGroup(UserGroup userGroup) {

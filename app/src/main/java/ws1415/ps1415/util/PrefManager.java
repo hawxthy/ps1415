@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
  * @author Martin Wrodarczyk
  */
 public class PrefManager {
+    private static final String SELECTED_USER_MAIL = "selectedUserMail";
     private PrefManager(){}
 
     private static SharedPreferences getSharedPreferences(Context context) {
@@ -42,6 +43,24 @@ public class PrefManager {
         SharedPreferences sp = getSharedPreferences(context);
         if (sp != null) {
             sp.edit().remove(groupName).commit();
+        }
+    }
+
+    public static void setSelectedUserMail(Context context, String userMail){
+        SharedPreferences sp = getSharedPreferences(context);
+        if (sp != null) {
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString(SELECTED_USER_MAIL, userMail);
+            editor.commit();
+        }
+    }
+
+    public static String getSelectedUserMail(Context context){
+        SharedPreferences sp = getSharedPreferences(context);
+        if (sp != null) {
+            return sp.getString(SELECTED_USER_MAIL, "");
+        } else {
+            return "";
         }
     }
 }
