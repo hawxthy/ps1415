@@ -10,6 +10,7 @@ import com.skatenight.skatenightAPI.model.UserPicture;
 import java.io.IOException;
 import java.util.List;
 
+import ws1415.common.model.Visibility;
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.CreateUserTask;
 import ws1415.common.task.ExtendedTask;
@@ -54,21 +55,23 @@ public class UserController {
      *
      * @param handler
      * @param newInfo Neue allgemeine Informationen zu dem Benutzer
+     * @param optOutSearch
+     * @param groupVisibility
+     * TODO: Abfrage parameter
      */
-    public static void updateUserInfo(ExtendedTaskDelegate handler, UserInfo newInfo) {
-        new ExtendedTask<UserInfo, Void, UserInfo>(handler) {
+    public static void updateUserProfile(ExtendedTaskDelegate handler, final UserInfo newInfo, final Boolean optOutSearch, final Visibility groupVisibility) {
+        new ExtendedTask<Void, Void, UserInfo>(handler) {
             @Override
-            protected UserInfo doInBackground(UserInfo... params) {
-                UserInfo userInfo = params[0];
+            protected UserInfo doInBackground(Void... voids) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().updateUserInfo(userInfo).execute();
+                    return ServiceProvider.getService().userEndpoint().updateUserProfile(groupVisibility.getId(), optOutSearch, newInfo).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Benutzerdaten konnten nicht geändert werden");
                     return null;
                 }
             }
-        }.execute(newInfo);
+        }.execute();
     }
 
     /**
@@ -283,19 +286,19 @@ public class UserController {
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers, der hinzugefügt werden soll
      */
-    public static void addFriend(ExtendedTaskDelegate handler, String userMail){
+    public static void addFriend(ExtendedTaskDelegate handler, final String userMail, final String friendMail){
         new ExtendedTask<String, Void, Boolean>(handler) {
             @Override
             protected Boolean doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().addFriend(params[0]).execute().getValue();
+                    return ServiceProvider.getService().userEndpoint().addFriend(userMail, friendMail).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Benutzer konnte nicht der Freundesliste hinzugefügt werden");
                     return null;
                 }
             }
-        }.execute(userMail);
+        }.execute();
     }
 
     /**
@@ -304,19 +307,19 @@ public class UserController {
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers, der entfernt werden soll
      */
-    public static void removeFriend(ExtendedTaskDelegate handler, String userMail){
+    public static void removeFriend(ExtendedTaskDelegate handler, final String userMail, final String friendMail){
         new ExtendedTask<String, Void, Boolean>(handler) {
             @Override
             protected Boolean doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().removeFriend(params[0]).execute().getValue();
+                    return ServiceProvider.getService().userEndpoint().removeFriend(userMail, friendMail).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Benutzer konnte nicht aus der Freundesliste entfernt werden");
                     return null;
                 }
             }
-        }.execute(userMail);
+        }.execute();
     }
 
     /**

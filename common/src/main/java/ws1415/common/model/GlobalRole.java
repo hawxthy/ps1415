@@ -1,4 +1,4 @@
-package ws1415.SkatenightBackend.model;
+package ws1415.common.model;
 
 /**
  * Diese Enum-Klasse verwaltet die Rollen, die ein Benutzer innerhalb verschiedener
@@ -6,21 +6,17 @@ package ws1415.SkatenightBackend.model;
  *
  * @author Martin Wrodarczyk
  */
-public enum Role {
+public enum GlobalRole {
     USER(1),
-    ADMIN(2),
-    HOST(3),
-    GUARD(4),
-    MEDIC(5),
-    PARTICIPANT(6);
+    ADMIN(2);
 
-    private int id;
+    private Integer id;
 
-    private Role(int id){
+    private GlobalRole(Integer id){
         this.id = id;
     }
 
-    public int getId(){
+    public Integer getId(){
         return id;
     }
 
@@ -30,23 +26,15 @@ public enum Role {
                 return "Benutzer";
             case 2:
                 return "Administrator";
-            case 3:
-                return "Veranstalter";
-            case 4:
-                return "Ordner";
-            case 5:
-                return "Sanitäter";
-            case 6:
-                return "Teilnehmer";
             default:
                 return null;
         }
     }
 
-    public static Role getValue(int i)
+    public static GlobalRole getValue(Integer i)
     {
-        for (Role r : Role.values()) {
-            if (r.getId() == i)
+        for (GlobalRole r : GlobalRole.values()) {
+            if (r.getId().equals(i))
                 return r;
         }
         throw new IllegalArgumentException("Keine gültige Id für die Rolle");

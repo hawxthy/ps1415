@@ -19,13 +19,21 @@ public class UserInfo {
     @Persistent
     private String lastName;
     @Persistent
+    private Integer lastNameVisibility;
+    @Persistent
     private String gender;
     @Persistent
     private String dateOfBirth;
     @Persistent
+    private Integer dateOfBirthVisibility;
+    @Persistent
     private String city;
     @Persistent
+    private Integer cityVisibility;
+    @Persistent
     private String postalCode;
+    @Persistent
+    private Integer postalCodeVisibility;
     @Persistent
     private String description;
 
@@ -36,10 +44,14 @@ public class UserInfo {
         this.email = email;
         firstName = "";
         lastName = "";
+        lastNameVisibility = Visibility.PUBLIC.getId();
         gender = Gender.NA.getRepresentation();
         dateOfBirth = "";
+        dateOfBirthVisibility = Visibility.PUBLIC.getId();
         city = "";
+        cityVisibility = Visibility.PUBLIC.getId();
         postalCode = "";
+        postalCodeVisibility = Visibility.PUBLIC.getId();
         description = "";
     }
 
@@ -67,6 +79,14 @@ public class UserInfo {
         this.lastName = lastName;
     }
 
+    public Integer getLastNameVisibility() {
+        return lastNameVisibility;
+    }
+
+    public void setLastNameVisibility(Integer lastNameVisibility) {
+        this.lastNameVisibility = lastNameVisibility;
+    }
+
     public String getGender() {
         return gender;
     }
@@ -83,6 +103,14 @@ public class UserInfo {
         this.dateOfBirth = dateOfBirth;
     }
 
+    public Integer getDateOfBirthVisibility() {
+        return dateOfBirthVisibility;
+    }
+
+    public void setDateOfBirthVisibility(Integer dateOfBirthVisibility) {
+        this.dateOfBirthVisibility = dateOfBirthVisibility;
+    }
+
     public String getCity() {
         return city;
     }
@@ -91,12 +119,28 @@ public class UserInfo {
         this.city = city;
     }
 
+    public Integer getCityVisibility() {
+        return cityVisibility;
+    }
+
+    public void setCityVisibility(Integer cityVisibility) {
+        this.cityVisibility = cityVisibility;
+    }
+
     public String getPostalCode() {
         return postalCode;
     }
 
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
+    }
+
+    public Integer getPostalCodeVisibility() {
+        return postalCodeVisibility;
+    }
+
+    public void setPostalCodeVisibility(Integer postalCodeVisibility) {
+        this.postalCodeVisibility = postalCodeVisibility;
     }
 
     public String getDescription() {

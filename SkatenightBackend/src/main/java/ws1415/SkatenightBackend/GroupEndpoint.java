@@ -23,9 +23,8 @@ import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Picture;
-import ws1415.SkatenightBackend.model.UserGroup;
-import ws1415.SkatenightBackend.model.Rank;
 import ws1415.SkatenightBackend.model.Right;
+import ws1415.SkatenightBackend.model.UserGroup;
 
 /**
  * Created by Richard on 01.05.2015.
@@ -391,7 +390,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param group die UserGroup deren Mitglieder eine Nachricht erhalten sollen
      * @param message die Nachricht die gesendet werden soll
      */
-    public void sendGlobalMessage(UserGroup group, @Named("message") String message){
+    public void sendGlobalMessage(UserGroup group, @Named("global_message") String message){
         //TODO Diese Methode kann so noch nicht funktionieren.
         if(group == null){
             throw new NullPointerException("no group submitted");

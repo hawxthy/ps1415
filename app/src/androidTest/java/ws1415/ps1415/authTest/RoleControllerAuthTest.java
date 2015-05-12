@@ -7,12 +7,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
-import ws1415.common.controller.RoleController;
-import ws1415.common.controller.UserController;
-import ws1415.common.model.Role;
 import ws1415.common.net.ServiceProvider;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.activity.ShowInformationActivity;
 
@@ -52,23 +47,6 @@ public class RoleControllerAuthTest extends ActivityInstrumentationTestCase2<Sho
      */
     @SmallTest
     public void testChangeGlobalRole() throws InterruptedException {
-        UserController.createUser(null, MY_MAIL);
 
-        Thread.sleep(3000);
-
-        RoleController.assignGlobalRole(null, MY_MAIL, Role.ADMIN);
-
-        Thread.sleep(2000);
-
-        RoleController.getGlobalRole(new ExtendedTaskDelegateAdapter<Void, Role>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Role role) {
-                assertEquals(Role.ADMIN.getId(), role.getId());
-            }
-        }, MY_MAIL);
-
-        Thread.sleep(2000);
-
-        UserController.deleteUser(null, MY_MAIL);
     }
 }

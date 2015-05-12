@@ -19,6 +19,12 @@ public class EndUser {
     @PrimaryKey
     @Persistent
     private String email;
+    @Persistent
+    private Integer globalRole;
+    @Persistent
+    private Boolean optOutSearch;
+    @Persistent
+    private Integer groupVisibility;
     @Unowned
     private UserInfoPicture userInfoPicture;
     @Unowned
@@ -37,6 +43,9 @@ public class EndUser {
         this.email = email;
         this.userInfoPicture = userInfoPicture;
         this.userLocation = userLocation;
+        globalRole = GlobalRole.USER.getId();
+        optOutSearch = false;
+        groupVisibility = Visibility.PUBLIC.getId();
         myUserGroups = new ArrayList<>();
         myEvents = new ArrayList<>();
         myFriends = new ArrayList<>();
@@ -48,6 +57,30 @@ public class EndUser {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Integer getGlobalRole() {
+        return globalRole;
+    }
+
+    public void setGlobalRole(Integer globalRole) {
+        this.globalRole = globalRole;
+    }
+
+    public Boolean isOptOutSearch() {
+        return optOutSearch;
+    }
+
+    public void setOptOutSearch(Boolean optOutSearch) {
+        this.optOutSearch = optOutSearch;
+    }
+
+    public Integer getGroupVisibility() {
+        return groupVisibility;
+    }
+
+    public void setGroupVisibility(Integer groupVisibility) {
+        this.groupVisibility = groupVisibility;
     }
 
     public UserLocation getUserLocation() {
