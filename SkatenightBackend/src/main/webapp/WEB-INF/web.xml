@@ -53,4 +53,9 @@
         <servlet-name>BlobstoreUploadHandler</servlet-name>
         <url-pattern>/images/upload</url-pattern>
     </servlet-mapping>
+
+    <!-- Listener für Server-Start -->
+    <listener>
+        <listener-class>ws1415.SkatenightBackend.ServerStartListener</listener-class>
+    </listener>
 </web-app>
