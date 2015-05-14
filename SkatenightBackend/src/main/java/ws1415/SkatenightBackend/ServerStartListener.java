@@ -11,7 +11,7 @@ import ws1415.SkatenightBackend.model.GlobalRole;
 public class ServerStartListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        new UserEndpoint().createUser(Constants.FIRST_ADMIN);
+        new UserEndpoint().createUser(Constants.FIRST_ADMIN, "", "");
         PersistenceManager pm = JDOHelper.getPersistenceManagerFactory(
                 "transactions-optional").getPersistenceManager();
         try {
