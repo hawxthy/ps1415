@@ -14,7 +14,7 @@ import javax.jdo.annotations.PrimaryKey;
  *
  * @author Martin Wrodarczyk
  */
-@PersistenceCapable
+@PersistenceCapable(detachable="true")
 public class EndUser {
     @PrimaryKey
     @Persistent
@@ -23,31 +23,22 @@ public class EndUser {
     private Integer globalRole;
     @Persistent
     private Boolean optOutSearch;
-    @Persistent
-    private Integer groupVisibility;
     @Unowned
-    private UserInfoPicture userInfoPicture;
+    private UserProfile userProfile;
     @Unowned
     private UserLocation userLocation;
-    @Persistent
-    private List<String> myUserGroups;
-    @Persistent
-    private List<Long> myEvents;
     @Persistent
     private List<String> myFriends;
 
     public EndUser() {
     }
 
-    public EndUser(String email, UserInfoPicture userInfoPicture, UserLocation userLocation) {
+    public EndUser(String email, UserProfile userProfile, UserLocation userLocation) {
         this.email = email;
-        this.userInfoPicture = userInfoPicture;
+        this.userProfile = userProfile;
         this.userLocation = userLocation;
         globalRole = GlobalRole.USER.getId();
         optOutSearch = false;
-        groupVisibility = Visibility.PUBLIC.getId();
-        myUserGroups = new ArrayList<>();
-        myEvents = new ArrayList<>();
         myFriends = new ArrayList<>();
     }
 
@@ -75,14 +66,6 @@ public class EndUser {
         this.optOutSearch = optOutSearch;
     }
 
-    public Integer getGroupVisibility() {
-        return groupVisibility;
-    }
-
-    public void setGroupVisibility(Integer groupVisibility) {
-        this.groupVisibility = groupVisibility;
-    }
-
     public UserLocation getUserLocation() {
         return userLocation;
     }
@@ -91,28 +74,12 @@ public class EndUser {
         this.userLocation = userLocation;
     }
 
-    public UserInfoPicture getUserInfoPicture() {
-        return userInfoPicture;
+    public UserProfile getUserProfile() {
+        return userProfile;
     }
 
-    public void setUserInfoPicture(UserInfoPicture userInfoPicture) {
-        this.userInfoPicture = userInfoPicture;
-    }
-
-    public List<String> getMyUserGroups() {
-        return myUserGroups;
-    }
-
-    public void setMyUserGroups(List<String> myUserGroups) {
-        this.myUserGroups = myUserGroups;
-    }
-
-    public List<Long> getMyEvents() {
-        return myEvents;
-    }
-
-    public void setMyEvents(List<Long> myEvents) {
-        this.myEvents = myEvents;
+    public void setUserProfile(UserProfile userProfile) {
+        this.userProfile = userProfile;
     }
 
     public List<String> getMyFriends() {
@@ -121,21 +88,5 @@ public class EndUser {
 
     public void setMyFriends(List<String> myFriends) {
         this.myFriends = myFriends;
-    }
-
-    public void addUserGroup(UserGroup userGroup) {
-        if (userGroup != null) myUserGroups.add(userGroup.getName());
-    }
-
-    public void removeUserGroup(UserGroup userGroup) {
-        if (userGroup != null) myUserGroups.remove(userGroup.getName());
-    }
-
-    public void addEvent(Event event) {
-        if (event != null) myEvents.add(event.getId());
-    }
-
-    public void removeEvent(Event event) {
-        if (event != null) myEvents.remove(event.getId());
     }
 }

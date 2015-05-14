@@ -161,7 +161,7 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
     private void checkUserExistance() {
         // Check ob EndUser existiert
         if(!PrefManager.getSelectedUserMail(context).equals(ServiceProvider.getEmail())){
-            UserController.createUser(null, ServiceProvider.getEmail());
+            UserController.createUser(null, ServiceProvider.getEmail(), "", "");
             Log.i(TAG, "User: " + ServiceProvider.getEmail() + " created.");
             PrefManager.setSelectedUserMail(context, ServiceProvider.getEmail());
         }
@@ -259,7 +259,7 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
                         ServiceProvider.login(credential);
                         initGCM();
 
-                        UserController.createUser(null, ServiceProvider.getEmail());
+                        UserController.createUser(null, ServiceProvider.getEmail(), "", "");
                         Log.i(TAG, "User: " + ServiceProvider.getEmail() + " created.");
                         PrefManager.setSelectedUserMail(context, ServiceProvider.getEmail());
                     }

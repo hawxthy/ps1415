@@ -24,8 +24,11 @@ import ws1415.ps1415.Constants;
 import ws1415.ps1415.activity.ImageStorageTestActivity;
 
 /**
- * Muss von einem Admin, oder dem Admin der auf dem Server als "First Admin" eingetragen ist,
- * ausgeführt werden.
+ * Dient dazu Funktionalitäten zu testen, die mit Adminrollen zu tun haben.
+ *
+ * Ausführer der Tests muss eingetragener Admin auf dem Server sein. Dies ist umsetzbar in dem man
+ * als "FIRST_ADMIN" seine E-Mail Adresse einträgt, sodass anschließend bei Serverstart ein
+ * mit der angegebenen E-Mail als Administrator angelegt wird.
  */
 public class AdminRoleAuthTest extends ActivityInstrumentationTestCase2<ImageStorageTestActivity> {
     public static String MY_MAIL = "";
@@ -45,8 +48,12 @@ public class AdminRoleAuthTest extends ActivityInstrumentationTestCase2<ImageSto
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getActivity(), "server:client_id:" + Constants.WEB_CLIENT_ID);
         if (credential.getSelectedAccountName() == null) {
-            credential.setSelectedAccountName(prefs.getString("accountName", null));
-            MY_MAIL = credential.getSelectedAccountName();
+            String selectedMail = prefs.getString("accountName", null);
+            if (selectedMail == null || !ServiceProvider.getService().roleEndpoint().isAdmin(selectedMail).execute().getValue()) {
+                throw new Exception("Benutzer muss Administrator sein");
+            }
+            MY_MAIL = selectedMail;
+            credential.setSelectedAccountName(selectedMail);
             ServiceProvider.login(credential);
         } else {
             throw new Exception("Benutzer muss vorher ausgewählt werden");
@@ -58,7 +65,7 @@ public class AdminRoleAuthTest extends ActivityInstrumentationTestCase2<ImageSto
             public void taskDidFinish(ExtendedTask task, Void voids) {
                 createSignal.countDown();
             }
-        }, TEST_MAIL);
+        }, TEST_MAIL, "", "");
         assertTrue(createSignal.await(30, TimeUnit.SECONDS));
     }
 

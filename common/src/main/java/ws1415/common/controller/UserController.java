@@ -1,21 +1,24 @@
 package ws1415.common.controller;
 
+import android.graphics.Bitmap;
+
+import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Text;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserInfo;
-import com.skatenight.skatenightAPI.model.UserInfoPicture;
 import com.skatenight.skatenightAPI.model.UserLocation;
 import com.skatenight.skatenightAPI.model.UserPicture;
+import com.skatenight.skatenightAPI.model.UserProfile;
 
 import java.io.IOException;
 import java.util.List;
 
 import ws1415.common.model.Visibility;
 import ws1415.common.net.ServiceProvider;
-import ws1415.common.task.CreateUserTask;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.task.GetFullUserTask;
+import ws1415.common.util.ImageUtil;
 
 /**
  * Der UserController steuert den Datenfluss zwischen den Benutzerdaten und View-Komponenten.
@@ -36,8 +39,22 @@ public class UserController {
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void createUser(ExtendedTaskDelegate handler, String userMail) {
-        new CreateUserTask(handler).execute(userMail);
+    public static void createUser(ExtendedTaskDelegate handler, String userMail, final String firstName, final String lastName) {
+        new ExtendedTask<String, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(String... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().createUser(params[0])
+                            .set("firstName", firstName)
+                            .set("lastName", lastName)
+                            .execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("endUser: " + params[0] + " could not be created");
+                    return null;
+                }
+            }
+        }.execute(userMail);
     }
 
     /**
@@ -47,7 +64,83 @@ public class UserController {
      * @param userMail E-Mail Adresse des Benutzers
      */
     public static void getFullUser(ExtendedTaskDelegate handler, String userMail) {
-        new GetFullUserTask(handler).execute(userMail);
+        new ExtendedTask<String, Void, EndUser>(handler) {
+            @Override
+            protected EndUser doInBackground(String... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().getFullUser(params[0]).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("endUser: " + params[0] + " could not be retrieved");
+                    return null;
+                }
+            }
+        }.execute(userMail);
+    }
+
+    /**
+     * Gibt das Benutzerprofil aus.
+     *
+     * @param handler
+     * @param userMail E-Mail Adresse des Benutzers
+     */
+    public static void getUserProfile(ExtendedTaskDelegate handler, final String userMail){
+        new ExtendedTask<Void, Void, UserProfile>(handler) {
+            @Override
+            protected UserProfile doInBackground(Void... voids) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().getUserProfile(userMail).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("profile of user:" + userMail + " could not be retrieved");
+                    return null;
+                }
+            }
+        }.execute();
+    }
+
+
+    /**
+     * Gibt das Profilbild eines Benutzers aus.
+     *
+     * @param handler
+     * @param userMail E-Mail Adresse des Benutzers
+     */
+    public static void getUserPicture(ExtendedTaskDelegate handler, final String userMail){
+        new ExtendedTask<Void, Void, UserPicture>(handler){
+            @Override
+            protected UserPicture doInBackground(Void... voids){
+                try {
+                    return ServiceProvider.getService().userEndpoint().getUserPicture(userMail).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("profile picture of user:" + userMail + " could not be retrieved");
+                    return null;
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Gibt die Standordinformationen eines Benutzers mit der angegebenen E-Mail Adresse aus.
+     *
+     * @param handler
+     * @param userMail E-Mail Adresse des Benutzers
+     */
+    @SuppressWarnings("unchecked")
+    public static void getUserLocation(ExtendedTaskDelegate handler, String userMail) {
+        new ExtendedTask<String, Void, UserLocation>(handler) {
+            @Override
+            protected UserLocation doInBackground(String... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().getUserLocation(params[0]).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Standort des Benutzers konnte nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute(userMail);
     }
 
     /**
@@ -74,26 +167,28 @@ public class UserController {
         }.execute();
     }
 
+
     /**
      * Aktualisiert das Profilbild eines Benutzers.
      *
      * @param handler
-     * @param newPicture Neues Profilbild eines Benutzers
+     * @param userMail E-Mail Adresse des Benutzers
+     * @param picture Bitmap des neuen Profilbildes
      */
-    public static void updateUserPicture(ExtendedTaskDelegate handler, UserPicture newPicture) {
-        new ExtendedTask<UserPicture, Void, UserPicture>(handler) {
+    public static void updateUserPicture(ExtendedTaskDelegate handler, final String userMail, final Bitmap picture) {
+        final Text encodedImage = ImageUtil.EncodeBitmapToText(picture);
+        new ExtendedTask<Void, Void, UserPicture>(handler) {
             @Override
-            protected UserPicture doInBackground(UserPicture... params) {
-                UserPicture userPicture = params[0];
+            protected UserPicture doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().updateUserPicture(userPicture).execute();
+                    return ServiceProvider.getService().userEndpoint().updateUserPicture(userMail, encodedImage).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Profilbild konnte nicht geändert werden");
                     return null;
                 }
             }
-        }.execute(newPicture);
+        }.execute();
     }
 
     /**
@@ -120,6 +215,29 @@ public class UserController {
                 }
             }
         }.execute();
+    }
+
+    /**
+     * Listet die allgemeinen Informationen mit Profilbildern der Benutzer auf, dessen E-Mail Adressen übergeben
+     * wurden.
+     *
+     * @param handler
+     * @param userMails Liste der E-Mail Adressen der Benutzer
+     */
+    @SuppressWarnings("unchecked")
+    public static void listUserProfile(ExtendedTaskDelegate handler, List<String> userMails) {
+        new ExtendedTask<List<String>, Void, List<UserProfile>>(handler) {
+            @Override
+            protected List<UserProfile> doInBackground(List<String>... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().listUserProfile(params[0]).execute().getItems();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Liste von Benutzern konnte nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute(userMails);
     }
 
     /**
@@ -152,35 +270,12 @@ public class UserController {
      * @param userMails Liste der E-Mail Adressen der Benutzer
      */
     @SuppressWarnings("unchecked")
-    public static void listUserPictures(ExtendedTaskDelegate handler, List<String> userMails) {
+    public static void listUserPicture(ExtendedTaskDelegate handler, List<String> userMails) {
         new ExtendedTask<List<String>, Void, List<UserPicture>>(handler) {
             @Override
             protected List<UserPicture> doInBackground(List<String>... params) {
                 try {
                     return ServiceProvider.getService().userEndpoint().listUserPicture(params[0]).execute().getItems();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    publishError("Liste von Benutzern konnte nicht abgerufen werden");
-                    return null;
-                }
-            }
-        }.execute(userMails);
-    }
-
-    /**
-     * Listet die allgemeinen Informationen der Benutzer auf, dessen E-Mail Adressen übergeben
-     * wurden.
-     *
-     * @param handler
-     * @param userMails Liste der E-Mail Adressen der Benutzer
-     */
-    @SuppressWarnings("unchecked")
-    public static void listUserInfoWithPicture(ExtendedTaskDelegate handler, List<String> userMails) {
-        new ExtendedTask<List<String>, Void, List<UserInfoPicture>>(handler) {
-            @Override
-            protected List<UserInfoPicture> doInBackground(List<String>... params) {
-                try {
-                    return ServiceProvider.getService().userEndpoint().listUserInfoWithPicture(params[0]).execute().getItems();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Liste von Benutzern konnte nicht abgerufen werden");
@@ -237,21 +332,20 @@ public class UserController {
     }
 
     /**
-     * Gibt die Standordinformationen eines Benutzers mit der angegebenen E-Mail Adresse aus.
+     * Erstellt eine Liste mit allgemeinen Informationen zu den Freunden eines Benutzers.
      *
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
      */
-    @SuppressWarnings("unchecked")
-    public static void getUserLocation(ExtendedTaskDelegate handler, String userMail) {
-        new ExtendedTask<String, Void, UserLocation>(handler) {
+    public static void listFriends(ExtendedTaskDelegate handler, String userMail) {
+        new ExtendedTask<String, Void, List<UserInfo>>(handler) {
             @Override
-            protected UserLocation doInBackground(String... params) {
+            protected List<UserInfo> doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().getUserLocation(params[0]).execute();
-                } catch (IOException e) {
+                    return ServiceProvider.getService().userEndpoint().listFriends(params[0]).execute().getItems();
+                } catch (IOException e){
                     e.printStackTrace();
-                    publishError("Standort des Benutzers konnte nicht abgerufen werden");
+                    publishError("list of friends of: " + params[0] + " could not be retrieved");
                     return null;
                 }
             }
@@ -270,7 +364,9 @@ public class UserController {
             @Override
             protected List<UserInfo> doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().searchUsers(params[0]).execute().getItems();
+                    return ServiceProvider.getService().userEndpoint().searchUsers()
+                            .set("input", params[0])
+                            .execute().getItems();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Suche nach Benutzern konnte nicht durchgeführt werden");

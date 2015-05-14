@@ -2,7 +2,9 @@ package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
+import com.google.api.server.spi.config.Nullable;
 import com.google.api.server.spi.response.UnauthorizedException;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -19,13 +21,13 @@ import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
-import ws1415.SkatenightBackend.model.GlobalRole;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserInfo;
-import ws1415.SkatenightBackend.model.UserInfoPicture;
 import ws1415.SkatenightBackend.model.UserLocation;
 import ws1415.SkatenightBackend.model.UserPicture;
+import ws1415.SkatenightBackend.model.UserProfile;
+import ws1415.SkatenightBackend.model.Visibility;
 
 /**
  * Der UserEndpoint stellt Hilfsmethoden bereit, die genutzt werden um die Benutzer zu verwalten.
@@ -93,9 +95,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param regid
      */
     public void registerForGCM(User user, @Named("regid") String regid) throws OAuthRequestException {
-        if (user == null) {
-            throw new OAuthRequestException("no user submitted");
-        }
+        EndpointUtil.throwIfNoUser(user);
         Member m = getMember(user.getEmail());
         if (m == null) {
             createMember(user.getEmail());
@@ -121,14 +121,16 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      *
      * @param email E-Mail Adresse des zu erstellenden Benutzers
      */
-    public void createUser(@Named("email") String email) {
+    public void createUser(@Named("email") String email, @Nullable @Named("firstName") String firstName,
+                           @Nullable @Named("lastName") String lastName) {
         if (!existsUser(email).value) {
             UserLocation userLocation = new UserLocation(email);
             UserPicture userPicture = new UserPicture(email);
             UserInfo userInfo = new UserInfo(email);
-            UserInfoPicture userInfoPicture = new UserInfoPicture(email, userInfo, userPicture);
-            EndUser user = new EndUser(email, userInfoPicture, userLocation);
-            user.setGlobalRole(GlobalRole.USER.getId());
+            userInfo.setFirstName(firstName);
+            userInfo.setLastName(new UserInfo.InfoPair(lastName, Visibility.PUBLIC.getId()));
+            UserProfile userProfile = new UserProfile(email, userInfo, userPicture);
+            EndUser user = new EndUser(email, userProfile, userLocation);
 
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
             try {
@@ -168,16 +170,17 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      *
      * @param email E-Mail Adresse des zu auszugebenen Benutzers
      * @return Benutzer mit der angegebenen E-Mail Adresse, falls nicht gefunden: null
+     * TODO: Wirklich nötig?
      */
-    @ApiMethod(path = "get_full_user")
+    @ApiMethod(path = "enduser")
     public EndUser getFullUser(@Named("email") String email) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, email);
             // Stellt sicher das Objekte der Assoziation auch runtergeladen werden
-            endUser.getUserInfoPicture();
-            endUser.getUserInfoPicture().getUserPicture();
-            endUser.getUserInfoPicture().getUserInfo();
+            endUser.getUserProfile();
+            endUser.getUserProfile().getUserPicture();
+            endUser.getUserProfile().getUserInfo();
             endUser.getUserLocation();
             return endUser;
         } catch (Exception e) {
@@ -194,7 +197,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param email E-Mail Adresse des Benutzers
      * @return Standortinformationen zum Benutzer, falls nicht gefunden: null
      */
-    @ApiMethod(path = "get_user_location")
+    @ApiMethod(path = "user_location")
     public UserLocation getUserLocation(@Named("email") String email) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
@@ -213,16 +216,22 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param email E-Mail Adresse des Benutzers
      * @return Informationen und Profilbild vom Benutzer, falls nicht gefunden: null
      */
-    @ApiMethod(path = "get_user_info_with_picture")
-    public UserInfoPicture getUserInfoWithPicture(@Named("email") String email) {
+    @ApiMethod(path = "user_profile")
+    public UserProfile getUserProfile(User user, @Named("email") String email) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            UserInfoPicture userInfoPicture = pm.getObjectById(UserInfoPicture.class, email);
-            userInfoPicture.getUserInfo();
-            userInfoPicture.getUserPicture();
-            return userInfoPicture;
-        } catch (Exception e) {
-            return null;
+            EndUser endUser = pm.getObjectById(EndUser.class, email);
+            List<String> friends = endUser.getMyFriends();
+            endUser.getUserProfile().getUserPicture();
+            endUser.getUserProfile().getUserInfo();
+
+            UserProfile detachedUserProfile = pm.detachCopy(endUser.getUserProfile());
+            UserInfo detachedUserInfo = detachedUserProfile.getUserInfo();
+
+            setUpVisibility(detachedUserInfo, user, email, friends);
+
+            detachedUserProfile.setUserInfo(detachedUserInfo);
+            return detachedUserProfile;
         } finally {
             pm.close();
         }
@@ -235,11 +244,19 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param email E-Mail Adresse des Benutzers
      * @return Allgemeine Informationen zum Benutzer, falls nicht gefunden: null
      */
-    @ApiMethod(path = "get_user_info")
-    public UserInfo getUserInfo(@Named("email") String email) {
+    @ApiMethod(path = "user_info")
+    public UserInfo getUserInfo(User user, @Named("email") String email) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            return pm.getObjectById(UserInfo.class, email);
+            EndUser endUser = pm.getObjectById(EndUser.class, email);
+            List<String> friends = endUser.getMyFriends();
+            endUser.getUserProfile().getUserInfo();
+
+            UserInfo detachedUserInfo = pm.detachCopy(endUser.getUserProfile().getUserInfo());
+
+            setUpVisibility(detachedUserInfo, user, email, friends);
+
+            return detachedUserInfo;
         } catch (Exception e) {
             return null;
         } finally {
@@ -248,12 +265,63 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
+     * Setzt die Informationen der UserInfo auf null, die für den User nicht sichtbar sein sollen.
+     *
+     * @param userInfo Informationen die aufgerufen werden
+     * @param user User, der Informationen abrufen will
+     * @param mailToCheck E-Mail Adresse des Benutzers mit den Informationen
+     * @param friends E-Mail Adressen der Freunde des Benutzers mit den Informationen
+     * @return Informationen mit Sichtbarkeitsanpassungen
+     */
+    private UserInfo setUpVisibility(UserInfo userInfo, User user, String mailToCheck, List<String> friends){
+        if (!isVisible(user, mailToCheck, userInfo.getLastName().getVisibility(), friends).value) {
+            userInfo.getLastName().setValue(null);
+        }
+        if (!isVisible(user, mailToCheck, userInfo.getCity().getVisibility(), friends).value) {
+            userInfo.getCity().setValue(null);
+        }
+        if (!isVisible(user, mailToCheck, userInfo.getDateOfBirth().getVisibility(), friends).value) {
+            userInfo.getDateOfBirth().setValue(null);
+        }
+        if (!isVisible(user, mailToCheck, userInfo.getDescription().getVisibility(), friends).value) {
+            userInfo.getDescription().setValue(null);
+        }
+        if (!isVisible(user, mailToCheck, userInfo.getPostalCode().getVisibility(), friends).value) {
+            userInfo.getPostalCode().setValue(null);
+        }
+        return userInfo;
+    }
+
+    /**
+     * Hilfsmethode, um die Sichtbarkeit abzufragen.
+     *
+     * @param user Benutzer, der Informationen abrufen will
+     * @param mailToCheck Benutzer, deren Informationen abgerufen werden
+     * @param visibility Sichtbarkeit der Information
+     * @param friends E-Mail Adressen der Freunde des Benutzers, dessen Informationen abgerufen werden
+     * @return true, falls Information sichtbar, false andernfalls
+     */
+    private BooleanWrapper isVisible(User user, String mailToCheck, Integer visibility, List<String> friends) {
+        if (visibility.equals(Visibility.PUBLIC.getId())) return new BooleanWrapper(true);
+        if (visibility.equals(Visibility.ONLY_ME.getId()))
+            return new BooleanWrapper(user.getEmail().equals(mailToCheck));
+        if (visibility.equals(Visibility.ONLY_FRIENDS.getId())) {
+            if (friends == null) return new BooleanWrapper(false);
+            for (String friend : friends) {
+                if (friend.equals(user.getEmail())) return new BooleanWrapper(true);
+            }
+            return new BooleanWrapper(false);
+        }
+        return new BooleanWrapper(false);
+    }
+
+    /**
      * Gibt das Profilbild des Benuters mit der angegebenen E-Mail Adresse aus.
      *
      * @param email E-Mail Adresse des Benutzers
      * @return Profilbild des Benutzers, falls nicht gefunden: null
      */
-    @ApiMethod(path = "get_user_picture")
+    @ApiMethod(path = "user_picture")
     public UserPicture getUserPicture(@Named("email") String email) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
@@ -270,39 +338,29 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      *
      * @param user        User-Objekt für die Authentifikation
      * @param newUserInfo Neue allgemeine Informationen zu dem Benutzer
-     * @throws UnauthorizedException Wird geworfen, falls Benutzer nicht authorisiert ist die Daten
-     *                               zu ändern
+     * @throws UnauthorizedException Wird geworfen, falls Benutzer nicht authorisiert ist, die Aktion auszuführen
      * @throws OAuthRequestException Wird geworfen, falls kein User-Objekt übergeben wird
      */
     // TODO: Authentifizierung korrigieren(?)
-    @ApiMethod(path = "update_user_profile")
+    @ApiMethod(path = "user_profile")
     public UserInfo updateUserProfile(User user, UserInfo newUserInfo, @Named("optOutSearch") Boolean optOutSearch, @Named("groupVisibility") int groupVisibility)
             throws UnauthorizedException, OAuthRequestException {
-        if (user == null) {
-            throw new OAuthRequestException("no user submitted");
-        } else if (!existsUser(user.getEmail()).value) {
-            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
-        } else if (!user.getEmail().equals(newUserInfo.getEmail()) && !new RoleEndpoint().isAdmin(user.getEmail()).value) {
-            throw new UnauthorizedException("rights missing to perform the action");
-        }
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfEndUserNotExists(user.getEmail());
+        EndpointUtil.throwIfNoRights(user.getEmail(), newUserInfo.getEmail());
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, newUserInfo.getEmail());
-            endUser.setGroupVisibility(groupVisibility);
             endUser.setOptOutSearch(optOutSearch);
-            UserInfo userInfo = endUser.getUserInfoPicture().getUserInfo();
-            //UserInfo userInfo = pm.getObjectById(UserInfo.class, newUserInfo.getEmail());
+            endUser.getUserProfile().setGroupVisibility(groupVisibility);
+            UserInfo userInfo = endUser.getUserProfile().getUserInfo();
             userInfo.setFirstName(newUserInfo.getFirstName());
             userInfo.setLastName(newUserInfo.getLastName());
-            userInfo.setLastNameVisibility(newUserInfo.getLastNameVisibility());
             userInfo.setCity(newUserInfo.getCity());
-            userInfo.setCityVisibility(newUserInfo.getCityVisibility());
             userInfo.setDateOfBirth(newUserInfo.getDateOfBirth());
-            userInfo.setDateOfBirthVisibility(newUserInfo.getDateOfBirthVisibility());
             userInfo.setDescription(newUserInfo.getDescription());
             userInfo.setGender(newUserInfo.getGender());
             userInfo.setPostalCode(newUserInfo.getPostalCode());
-            userInfo.setPostalCodeVisibility(newUserInfo.getPostalCodeVisibility());
             return userInfo;
         } finally {
             pm.close();
@@ -312,26 +370,22 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     /**
      * Aktualisiert das Profilbild eines Benutzers.
      *
-     * @param user           User-Objekt für die Authentifikation
-     * @param newUserPicture Neues Profilbild eines Benutzers
+     * @param user     User-Objekt für die Authentifikation
+     * @param userMail E-Mail Adresse des Benutzers
      * @throws UnauthorizedException Wird geworfen, falls Benutzer nicht authorisiert ist die Daten
      *                               zu ändern
      * @throws OAuthRequestException Wird geworfen, falls kein User-Objekt übergeben wird
      */
-    @ApiMethod(path = "update_user_picture")
-    public UserPicture updateUserPicture(User user, UserPicture newUserPicture) throws
+    @ApiMethod(path = "user_picture")
+    public UserPicture updateUserPicture(User user, @Named("userMail") String userMail, Text encodedImage) throws
             UnauthorizedException, OAuthRequestException {
-        if (user == null) {
-            throw new OAuthRequestException("no user submitted");
-        } else if (!existsUser(user.getEmail()).value) {
-            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
-        } else if (!user.getEmail().equals(newUserPicture.getEmail()) && !new RoleEndpoint().isAdmin(user.getEmail()).value) {
-            throw new UnauthorizedException("rights missing to perform the action");
-        }
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfEndUserNotExists(user.getEmail());
+        EndpointUtil.throwIfNoRights(user.getEmail(), userMail);
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            UserPicture userPicture = pm.getObjectById(UserPicture.class, newUserPicture.getEmail());
-            userPicture.setPicture(newUserPicture.getPicture());
+            UserPicture userPicture = pm.getObjectById(UserPicture.class, userMail);
+            userPicture.setPicture(encodedImage);
             return userPicture;
         } finally {
             pm.close();
@@ -350,18 +404,14 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      *                               ändern
      * @throws OAuthRequestException Wird geworfen, falls kein User-Objekt übergeben wird
      */
-    @ApiMethod(path = "update_user_location")
+    @ApiMethod(path = "user_location")
     public void updateUserLocation(User user, @Named("userMail") String userMail,
                                    @Named("latitude") double latitude,
                                    @Named("longitude") double longitude,
                                    @Named("currentEventId") long currentEventId) throws Exception {
-        if (user == null) {
-            throw new OAuthRequestException("no user submitted");
-        } else if (!existsUser(user.getEmail()).value) {
-            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
-        } else if (!user.getEmail().equals(userMail) && !new RoleEndpoint().isAdmin(user.getEmail()).value) {
-            throw new UnauthorizedException("rights missing to perform the action");
-        }
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfEndUserNotExists(user.getEmail());
+        EndpointUtil.throwIfNoRights(user.getEmail(), userMail);
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             UserLocation userLocation = pm.getObjectById(UserLocation.class, userMail);
@@ -393,13 +443,13 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param userMails
      * @return Liste von allgemeinen Informationen mit Profilbildern
      */
-    @ApiMethod(path = "list_user_info_with_picture")
-    public List<UserInfoPicture> listUserInfoWithPicture(@Named("userMails") List<String> userMails) {
-        List<UserInfoPicture> result = new ArrayList<>();
-        UserInfoPicture userInfoPicture;
+    @ApiMethod(path = "user_profile_list")
+    public List<UserProfile> listUserProfile(User user, @Named("userMails") List<String> userMails) {
+        List<UserProfile> result = new ArrayList<>();
+        UserProfile userProfile;
         for (String userMail : userMails) {
-            userInfoPicture = getUserInfoWithPicture(userMail);
-            if (userInfoPicture != null) result.add(userInfoPicture);
+            userProfile = getUserProfile(user, userMail);
+            if (userProfile != null) result.add(userProfile);
         }
         return result;
     }
@@ -411,12 +461,12 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param userMails Liste der E-Mail Adressen der Benutzer
      * @return Liste von allgemeinen Informationen
      */
-    @ApiMethod(path = "list_user_infos")
-    public List<UserInfo> listUserInfo(@Named("userMails") List<String> userMails) {
+    @ApiMethod(path = "user_info_list")
+    public List<UserInfo> listUserInfo(User user, @Named("userMails") List<String> userMails) {
         List<UserInfo> result = new ArrayList<>();
         UserInfo userInfo;
         for (String userMail : userMails) {
-            userInfo = getUserInfo(userMail);
+            userInfo = getUserInfo(user, userMail);
             if (userInfo != null) result.add(userInfo);
         }
         return result;
@@ -428,6 +478,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param userMails Liste der E-Mail Adressen der Benutzer
      * @return Liste von Profilbildern
      */
+    @ApiMethod(path = "user_picture_list")
     public List<UserPicture> listUserPicture(@Named("userMails") List<String> userMails) {
         List<UserPicture> result = new ArrayList<>();
         UserPicture userPicture;
@@ -438,7 +489,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         return result;
     }
 
-
     /**
      * Gibt eine Liste von allen Nutzergruppen aus, bei denen der Benutzer als Mitglied eingetragen
      * ist.
@@ -447,7 +497,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @return Liste von beigetretenen oder erstellten Nutzergruppen
      * @throws Exception Wird geworfen, falls Benutzer mit der angegebenen E-Mail nicht existiert
      */
-    @ApiMethod(path = "list_user_groups")
+    @ApiMethod(path = "user_groups_list")
     public List<UserGroup> listUserGroups(@Named("userMail") String userMail) throws Exception {
         if (!existsUser(userMail).value) {
             throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
@@ -455,7 +505,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         List<String> userGroupIds;
         try {
-            userGroupIds = pm.getObjectById(EndUser.class, userMail).getMyUserGroups();
+            userGroupIds = pm.getObjectById(UserProfile.class, userMail).getMyUserGroups();
         } finally {
             pm.close();
         }
@@ -478,15 +528,13 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @return Liste von Veranstaltungen des Benutzers
      * @throws Exception Wird geworfen, falls Benutzer mit der angegebenen E-Mail nicht existiert
      */
-    @ApiMethod(path = "list_events")
+    @ApiMethod(path = "events_list")
     public List<Event> listEvents(@Named("userMail") String userMail) throws Exception {
-        if (!existsUser(userMail).value) {
-            throw new JDOObjectNotFoundException("Benutzer konnte nicht gefunden werden");
-        }
+        EndpointUtil.throwIfEndUserNotExists(userMail);
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         List<Long> eventIds;
         try {
-            eventIds = pm.getObjectById(EndUser.class, userMail).getMyEvents();
+            eventIds = pm.getObjectById(UserProfile.class, userMail).getMyEvents();
         } finally {
             pm.close();
         }
@@ -501,13 +549,37 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
+     * Erstellt eine Liste mit allgemeinen Informationen zu den Freunden eines Benutzers.
+     *
+     * @param user     User-Objekt für die Authentifikation
+     * @param userMail E-Mail Adresse des Benutzers
+     * @return Liste von Informationen zu Freunden
+     * @throws OAuthRequestException
+     * @throws UnauthorizedException
+     */
+    @ApiMethod(path = "friends_list")
+    public List<UserInfo> listFriends(User user, @Named("userMail") String userMail) throws OAuthRequestException, UnauthorizedException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfEndUserNotExists(userMail);
+        EndpointUtil.throwIfNoRights(user.getEmail(), userMail);
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        List<String> friendMails;
+        try {
+            friendMails = pm.getObjectById(EndUser.class, userMail).getMyFriends();
+        } finally {
+            pm.close();
+        }
+        return listUserInfo(user, friendMails);
+    }
+
+    /**
      * Durchsucht die Benutzer nach der Eingabe und gibt die allgemeinen Nutzerinformationen
      * zu den Ergebnissen in einer Liste aus.
      *
      * @param input Eingabe
      * @return Liste von allgemeinen Informationen zu Benutzern
      */
-    public List<UserInfo> searchUsers(@Named("input") String input) {
+    public List<UserInfo> searchUsers(@Nullable @Named("input") String input) {
         List<UserInfo> result;
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
@@ -533,13 +605,11 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @throws OAuthRequestException
      */
     public BooleanWrapper addFriend(User user, @Named("userMail") String userMail, @Named("friendMail") String friendMail) throws OAuthRequestException, UnauthorizedException {
-        if (user == null) {
-            throw new OAuthRequestException("no user submitted");
-        } else if (!user.getEmail().equals(userMail) && !new RoleEndpoint().isAdmin(user.getEmail()).value) {
-            throw new UnauthorizedException("rights missing to perform the action");
-        } else if (!existsUser(user.getEmail()).value) {
-            throw new JDOObjectNotFoundException("own user could not be retrieved");
-        } else if (user.getEmail().equals(friendMail)) {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfNoRights(user.getEmail(), userMail);
+        EndpointUtil.throwIfEndUserNotExists(userMail);
+        EndpointUtil.throwIfEndUserNotExists(friendMail);
+        if (user.getEmail().equals(friendMail)) {
             throw new IllegalArgumentException("friendMail may not be your own mail");
         }
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
@@ -566,13 +636,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      */
     public BooleanWrapper removeFriend(User user, @Named("userMail") String userMail, @Named("friendMail") String friendMail)
             throws OAuthRequestException, UnauthorizedException {
-        if (user == null) {
-            throw new OAuthRequestException("no user submitted");
-        } else if (!user.getEmail().equals(userMail) && !new RoleEndpoint().isAdmin(user.getEmail()).value) {
-            throw new UnauthorizedException("rights missing to perform the action");
-        } else if (!existsUser(user.getEmail()).value) {
-            throw new JDOObjectNotFoundException("own user could not be retrieved");
-        }
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfNoRights(user.getEmail(), userMail);
+        EndpointUtil.throwIfEndUserNotExists(userMail);
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
@@ -596,9 +662,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             try {
-                pm.deletePersistent(endUser.getUserInfoPicture().getUserPicture());
-                pm.deletePersistent(endUser.getUserInfoPicture().getUserInfo());
-                pm.deletePersistent(endUser.getUserInfoPicture());
+                pm.deletePersistent(endUser.getUserProfile().getUserPicture());
+                pm.deletePersistent(endUser.getUserProfile().getUserInfo());
+                pm.deletePersistent(endUser.getUserProfile());
                 pm.deletePersistent(endUser.getUserLocation());
                 pm.deletePersistent(endUser);
             } finally {

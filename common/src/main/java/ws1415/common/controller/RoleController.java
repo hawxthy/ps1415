@@ -35,7 +35,7 @@ public class RoleController {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().roleEndpoint().assignGlobalRole(userMail, role.getId()).execute();
+                    return ServiceProvider.getService().roleEndpoint().assignGlobalRole(role.getId(), userMail).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Globale Rolle des Benutzers konnte nicht gesetzt werden");

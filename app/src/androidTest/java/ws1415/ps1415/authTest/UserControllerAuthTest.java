@@ -1,17 +1,22 @@
 package ws1415.ps1415.authTest;
 
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.preference.PreferenceManager;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.SmallTest;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.EndUser;
+import com.skatenight.skatenightAPI.model.InfoPair;
 import com.skatenight.skatenightAPI.model.UserInfo;
-import com.skatenight.skatenightAPI.model.UserInfoPicture;
 import com.skatenight.skatenightAPI.model.UserLocation;
+import com.skatenight.skatenightAPI.model.UserPicture;
+import com.skatenight.skatenightAPI.model.UserProfile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -23,12 +28,18 @@ import ws1415.common.model.Visibility;
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.Constants;
+import ws1415.ps1415.R;
 import ws1415.ps1415.activity.ImageStorageTestActivity;
 
 /**
  * Diese Klasse wird dazu genutzt die Funktionalitäten des UserControllers zu testen, die
- * Authorisierung benötigen. Eigener Benutzer wird dabei neu erstellt und anschließend gelöscht.
+ * Authorisierung benötigen.
+ *
+ * Ausführer der Tests muss eingetragener Admin auf dem Server sein. Dies ist umsetzbar in dem man
+ * als "FIRST_ADMIN" seine E-Mail Adresse einträgt, sodass anschließend bei Serverstart ein
+ * mit der angegebenen E-Mail als Administrator angelegt wird.
  *
  * @author Martin Wrodarczyk
  */
@@ -39,20 +50,40 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
     public static final double TEST_LONGITUDE = 7.626135;
     public static final double TEST_LATITUDE = 51.960665;
     public static final Long TEST_CURRENT_EVENT_ID = 5L;
-
     public static final String TEST_FIRST_NAME = "Martin";
+    public static final Gender TEST_GENDER = Gender.MALE;
+
     public static final String TEST_LAST_NAME = "Müller";
     public static final Visibility TEST_LAST_NAME_VISIBILITY = Visibility.ONLY_FRIENDS;
-    public static final String TEST_CITY = "Münster";
-    public static final Visibility TEST_CITY_VISIBILITY = Visibility.ONLY_FRIENDS;
-    public static final String TEST_DATE_OF_BIRTH = "1990-01-01";
-    public static final Visibility TEST_DATE_OF_BIRTH_VISIBILITY = Visibility.ONLY_FRIENDS;
-    public static final String TEST_DESCRIPTION = "Neue Beschreibung";
-    public static final Gender TEST_GENDER = Gender.MALE;
-    public static final String TEST_POSTAL_CODE = "48159";
-    public static final Visibility TEST_POSTAL_CODE_VISIBILITY = Visibility.ONLY_FRIENDS;
+    public static final InfoPair TEST_LAST_NAME_PAIR = new InfoPair().
+            setValue(TEST_LAST_NAME).
+            setVisibility(TEST_LAST_NAME_VISIBILITY.getId());
 
-    public static final Visibility TEST_GROUP_VISIBILITY = Visibility.ONLY_FRIENDS;
+    public static final String TEST_CITY = "Münster";
+    public static final Visibility TEST_CITY_VISIBILITY = Visibility.ONLY_ME;
+    public static final InfoPair TEST_CITY_PAIR = new InfoPair().
+            setValue(TEST_CITY).
+            setVisibility(TEST_CITY_VISIBILITY.getId());
+
+    public static final String TEST_DATE_OF_BIRTH = "1990-01-01";
+    public static final Visibility TEST_DATE_OF_BIRTH_VISIBILITY = Visibility.PUBLIC;
+    public static final InfoPair TEST_DATE_OF_BIRTH_PAIR = new InfoPair().
+            setValue(TEST_DATE_OF_BIRTH).
+            setVisibility(TEST_DATE_OF_BIRTH_VISIBILITY.getId());
+
+    public static final String TEST_DESCRIPTION = "Neue Beschreibung";
+    public static final Visibility TEST_DESCRIPTION_VISIBILITY = Visibility.PUBLIC;
+    public static final InfoPair TEST_DESCRIPTION_PAIR = new InfoPair().
+            setValue(TEST_DESCRIPTION).
+            setVisibility(TEST_DESCRIPTION_VISIBILITY.getId());
+
+    public static final String TEST_POSTAL_CODE = "48159";
+    public static final Visibility TEST_POSTAL_CODE_VISIBILITY = Visibility.PUBLIC;
+    public static final InfoPair TEST_POSTAL_CODE_PAIR = new InfoPair().
+            setValue(TEST_POSTAL_CODE).
+            setVisibility(TEST_POSTAL_CODE_VISIBILITY.getId());
+
+    public static final Visibility TEST_GROUP_VISIBILITY = Visibility.PUBLIC;
     public static final Boolean TEST_OPT_OUT_SEARCH = true;
 
     public UserControllerAuthTest() {
@@ -84,13 +115,13 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
             public void taskDidFinish(ExtendedTask task, Void voids) {
                 createSignal.countDown();
             }
-        }, TEST_MAIL);
+        }, TEST_MAIL, "", "");
         UserController.createUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void voids) {
                 createSignal.countDown();
             }
-        }, TEST_MAIL_2);
+        }, TEST_MAIL_2, "Test", "Test2");
         assertTrue(createSignal.await(30, TimeUnit.SECONDS));
     }
 
@@ -126,9 +157,9 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
             @Override
             public void taskDidFinish(ExtendedTask task, EndUser user) {
                 assertEquals(TEST_MAIL, user.getEmail());
-                assertEquals(TEST_MAIL, user.getUserInfoPicture().getEmail());
-                assertEquals(TEST_MAIL, user.getUserInfoPicture().getUserPicture().getEmail());
-                assertEquals(TEST_MAIL, user.getUserInfoPicture().getUserInfo().getEmail());
+                assertEquals(TEST_MAIL, user.getUserProfile().getEmail());
+                assertEquals(TEST_MAIL, user.getUserProfile().getUserPicture().getEmail());
+                assertEquals(TEST_MAIL, user.getUserProfile().getUserInfo().getEmail());
                 assertEquals(TEST_MAIL, user.getUserLocation().getEmail());
                 getSignal.countDown();
             }
@@ -215,12 +246,12 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         userMails.add(TEST_MAIL_2);
 
         final CountDownLatch listSignal = new CountDownLatch(1);
-        UserController.listUserInfoWithPicture(new ExtendedTaskDelegateAdapter<Void, List<UserInfoPicture>>() {
+        UserController.listUserProfile(new ExtendedTaskDelegateAdapter<Void, List<UserProfile>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserInfoPicture> userInfoPictures) {
+            public void taskDidFinish(ExtendedTask task, List<UserProfile> userProfiles) {
                 List<String> userMailsServer = new ArrayList<>();
-                for (UserInfoPicture userInfoPicture : userInfoPictures) {
-                    userMailsServer.add(userInfoPicture.getEmail());
+                for (UserProfile userProfile : userProfiles) {
+                    userMailsServer.add(userProfile.getEmail());
                 }
 
                 assertTrue(userMailsServer.containsAll(userMails) &&
@@ -279,7 +310,8 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
     }
 
     /**
-     * Prüft, ob die allgemeinen Informationen eines Benutzers richtig geändert werden.
+     * Prüft, ob die allgemeinen Informationen eines Benutzers richtig geändert werden und
+     * ob Sichtbarkeitseinstellungen richtig umgesetzt wurden.
      *
      * @throws InterruptedException
      */
@@ -288,16 +320,12 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         UserInfo newUserInfo = new UserInfo();
         newUserInfo.setEmail(TEST_MAIL);
         newUserInfo.setFirstName(TEST_FIRST_NAME);
-        newUserInfo.setLastName(TEST_LAST_NAME);
-        newUserInfo.setLastNameVisibility(TEST_LAST_NAME_VISIBILITY.getId());
-        newUserInfo.setCity(TEST_CITY);
-        newUserInfo.setCityVisibility(TEST_CITY_VISIBILITY.getId());
-        newUserInfo.setDateOfBirth(TEST_DATE_OF_BIRTH);
-        newUserInfo.setDateOfBirthVisibility(TEST_DATE_OF_BIRTH_VISIBILITY.getId());
-        newUserInfo.setDescription(TEST_DESCRIPTION);
         newUserInfo.setGender(TEST_GENDER.getRepresentation());
-        newUserInfo.setPostalCode(TEST_POSTAL_CODE);
-        newUserInfo.setPostalCodeVisibility(TEST_POSTAL_CODE_VISIBILITY.getId());
+        newUserInfo.setLastName(TEST_LAST_NAME_PAIR);
+        newUserInfo.setCity(TEST_CITY_PAIR);
+        newUserInfo.setDateOfBirth(TEST_DATE_OF_BIRTH_PAIR);
+        newUserInfo.setDescription(TEST_DESCRIPTION_PAIR);
+        newUserInfo.setPostalCode(TEST_POSTAL_CODE_PAIR);
 
         final CountDownLatch updateSignal = new CountDownLatch(1);
         UserController.updateUserProfile(new ExtendedTaskDelegateAdapter<Void, UserInfo>() {
@@ -309,36 +337,70 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         assertTrue(updateSignal.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch getSignal = new CountDownLatch(1);
-        UserController.getFullUser(new ExtendedTaskDelegateAdapter<Void, EndUser>() {
+        UserController.getUserProfile(new ExtendedTaskDelegateAdapter<Void, UserProfile>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, EndUser endUser) {
-                UserInfo userInfo = endUser.getUserInfoPicture().getUserInfo();
+            public void taskDidFinish(ExtendedTask task, UserProfile userProfile) {
+                UserInfo userInfo = userProfile.getUserInfo();
                 assertNotNull(userInfo);
                 assertEquals(TEST_MAIL, userInfo.getEmail());
                 assertEquals(TEST_FIRST_NAME, userInfo.getFirstName());
-                assertEquals(TEST_LAST_NAME, userInfo.getLastName());
-                assertEquals(TEST_LAST_NAME_VISIBILITY.getId(), userInfo.getLastNameVisibility());
-                assertEquals(TEST_CITY, userInfo.getCity());
-                assertEquals(TEST_CITY_VISIBILITY.getId(), userInfo.getCityVisibility());
-                assertEquals(TEST_DATE_OF_BIRTH, userInfo.getDateOfBirth());
-                assertEquals(TEST_DATE_OF_BIRTH_VISIBILITY.getId(), userInfo.getCityVisibility());
-                assertEquals(TEST_DESCRIPTION, userInfo.getDescription());
                 assertEquals(TEST_GENDER.getRepresentation(), userInfo.getGender());
-                assertEquals(TEST_POSTAL_CODE, userInfo.getPostalCode());
-                assertEquals(TEST_POSTAL_CODE_VISIBILITY.getId(), userInfo.getPostalCodeVisibility());
+                //assertEquals(TEST_LAST_NAME, userInfo.getLastName().getValue());
+                assertNull(userInfo.getLastName().getValue());
+                assertEquals(TEST_LAST_NAME_VISIBILITY.getId(), userInfo.getLastName().getVisibility());
+                //assertEquals(TEST_CITY, userInfo.getCity().getValue());
+                assertNull(userInfo.getCity().getValue());
+                assertEquals(TEST_CITY_VISIBILITY.getId(), userInfo.getCity().getVisibility());
+                assertEquals(TEST_DATE_OF_BIRTH, userInfo.getDateOfBirth().getValue());
+                assertEquals(TEST_DATE_OF_BIRTH_VISIBILITY.getId(), userInfo.getDateOfBirth().getVisibility());
+                assertEquals(TEST_DESCRIPTION, userInfo.getDescription().getValue());
+                assertEquals(TEST_DESCRIPTION_VISIBILITY.getId(), userInfo.getDescription().getVisibility());
+                assertEquals(TEST_POSTAL_CODE, userInfo.getPostalCode().getValue());
+                assertEquals(TEST_POSTAL_CODE_VISIBILITY.getId(), userInfo.getPostalCode().getVisibility());
 
-                assertEquals(TEST_GROUP_VISIBILITY.getId(), endUser.getGroupVisibility());
-                assertEquals(TEST_OPT_OUT_SEARCH, endUser.getOptOutSearch());
+                assertEquals(TEST_GROUP_VISIBILITY.getId(), userProfile.getGroupVisibility());
                 getSignal.countDown();
             }
         }, TEST_MAIL);
         assertTrue(getSignal.await(30, TimeUnit.SECONDS));
+
+        final CountDownLatch getFullSignal = new CountDownLatch(1);
+        UserController.getFullUser(new ExtendedTaskDelegateAdapter<Void, EndUser>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, EndUser endUser) {
+                assertEquals(TEST_OPT_OUT_SEARCH, endUser.getOptOutSearch());
+                getFullSignal.countDown();
+            }
+        }, TEST_MAIL);
+        assertTrue(getFullSignal.await(30, TimeUnit.SECONDS));
     }
 
     // TODO: Profilbild ändern
     @SmallTest
-    public void testUpdateUserPicture() {
+    public void testUpdateUserPicture() throws InterruptedException {
+        final Bitmap testImage = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.test);
+        final byte[] testImageByte = ImageUtil.BitmapToByteArray(testImage);
 
+        final CountDownLatch updateSignal = new CountDownLatch(1);
+        UserController.updateUserPicture(new ExtendedTaskDelegateAdapter<Void, UserPicture>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserPicture userPicture) {
+                updateSignal.countDown();
+            }
+        }, TEST_MAIL, testImage);
+        assertTrue(updateSignal.await(120, TimeUnit.SECONDS));
+
+        final CountDownLatch getSignal = new CountDownLatch(1);
+        UserController.getUserPicture(new ExtendedTaskDelegateAdapter<Void, UserPicture>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserPicture userPicture) {
+                Bitmap retrievedImage = ImageUtil.DecodeTextToBitmap(userPicture.getPicture());
+                byte[] retrievedImageByte = ImageUtil.BitmapToByteArray(retrievedImage);
+                assertTrue(Arrays.equals(testImageByte, retrievedImageByte));
+                getSignal.countDown();
+            }
+        }, TEST_MAIL);
+        assertTrue(getSignal.await(120, TimeUnit.SECONDS));
     }
 
     @SmallTest
@@ -385,6 +447,30 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         }, TEST_MAIL);
 
         assertTrue(getUserRemovedSignal.await(30, TimeUnit.SECONDS));
+    }
+
+    @SmallTest
+    public void testListFriends() throws InterruptedException {
+        final CountDownLatch addFriendSignal = new CountDownLatch(1);
+        UserController.addFriend(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Boolean result) {
+                assertTrue(result);
+                addFriendSignal.countDown();
+            }
+        }, TEST_MAIL, TEST_MAIL_2);
+        assertTrue(addFriendSignal.await(30, TimeUnit.SECONDS));
+
+        final CountDownLatch listFriendsSignal = new CountDownLatch(1);
+        UserController.listFriends(new ExtendedTaskDelegateAdapter<Void, List<UserInfo>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserInfo> friendInfos) {
+                assertTrue(friendInfos.size() == 1);
+                assertEquals(TEST_MAIL_2, friendInfos.get(0).getEmail());
+                listFriendsSignal.countDown();
+            }
+        }, TEST_MAIL);
+        assertTrue(listFriendsSignal.await(30, TimeUnit.SECONDS));
     }
 
     // TODO: Wenn Eventcontroller fertig

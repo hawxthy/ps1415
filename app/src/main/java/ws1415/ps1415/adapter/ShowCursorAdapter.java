@@ -2,35 +2,6 @@ package ws1415.ps1415.adapter;
 
 // TODO Anpassen
 
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.net.Uri;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
-import com.skatenight.skatenightAPI.model.Event;
-import com.skatenight.skatenightAPI.model.Text;
-
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import ws1415.ps1415.R;
-import ws1415.ps1415.activity.ShowRouteActivity;
-import ws1415.ps1415.util.ImageUtil;
-
 /**
  * Adapter zum füllen der ListView in der ShowInformationActivity.
  *

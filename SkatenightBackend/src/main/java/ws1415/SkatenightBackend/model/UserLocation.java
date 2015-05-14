@@ -11,7 +11,7 @@ import javax.jdo.annotations.PrimaryKey;
  *
  * @author Martin Wrodarczyk
  */
-@PersistenceCapable
+@PersistenceCapable(detachable="true")
 public class UserLocation {
     @PrimaryKey
     @Persistent

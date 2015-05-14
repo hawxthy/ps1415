@@ -1,5 +1,6 @@
 package ws1415.SkatenightBackend;
 
+import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.api.oauth.OAuthRequestException;
@@ -28,6 +29,7 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
      * @param email E-Mail Adresse des Benutzers
      * @return true, falls Benutzer ein Administrator ist, false andernfalls
      */
+    @ApiMethod(path = "global_admin")
     public BooleanWrapper isAdmin(@Named("email") String email){
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try{
@@ -47,6 +49,7 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
      *
      * @return Liste von Administratoren
      */
+    @ApiMethod(path = "global_admin")
     public List<EndUser> listGlobalAdmins(){
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         List<EndUser> adminUsers;
@@ -70,6 +73,7 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
      * @param role     Id neuer Rolle
      * @throws OAuthRequestException
      */
+    @ApiMethod(path = "global_role")
     public void assignGlobalRole(User user, @Named("userMail") String userMail, @Named("role") int role) throws OAuthRequestException, UnauthorizedException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
