@@ -132,7 +132,7 @@ public class ShowEventsFragment extends Fragment {
      */
     private void createSelectionsMenu(final int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(eventList.get(position).getMetaData().getTitle())
+        builder.setTitle(eventList.get(position).getTitle())
                 .setItems(R.array.selections_menu, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int index) {
                         if (index == 0) {

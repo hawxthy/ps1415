@@ -60,7 +60,7 @@ public class EventStartServlet extends HttpServlet {
             q = pm.newQuery(Event.class);
             for (Event e : (List<Event>) q.execute()) {
                 if (!e.isNotificationSend()) {
-                    startingDate = e.getMetaData().getDate();
+                    startingDate = e.getDate();
                     if (startingDate.before(currentDate)) {
                         startingEvents.add(e);
                     }
@@ -104,7 +104,7 @@ public class EventStartServlet extends HttpServlet {
                             .build();
                     sender.send(m, new LinkedList<>(ids), 1);
 
-                    String event_title = e.getMetaData().getTitle();
+                    String event_title = e.getTitle();
                     m = new Message.Builder()
                             .delayWhileIdle(false)
                             .timeToLive(3600)

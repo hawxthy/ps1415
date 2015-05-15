@@ -103,7 +103,7 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
 
                 Intent intent;
 
-                Date startDate = new Date(e.getMetaData().getDate().getValue());
+                Date startDate = new Date(e.getDate().getValue());
                 if (new Date().after(startDate) &&
                         e.getMemberList() != null &&
                         e.getMemberList().contains(prefs.getString("accountName", null))) {

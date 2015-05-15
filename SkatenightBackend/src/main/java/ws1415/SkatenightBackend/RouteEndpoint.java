@@ -64,7 +64,7 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
         }
 
         if (mail != null && latitude != null && longitude != null) {
-            Event event = new EventEndpoint().getEvent(0l, currentEventId);
+            Event event = new EventEndpoint().getEvent(currentEventId);
             int count = Math.min(mail.length, Math.min(latitude.length, longitude.length));
 
             EndUser admin = new UserEndpoint().getFullUser("richard-schulze@online.de");

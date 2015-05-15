@@ -1,24 +1,29 @@
-package ws1415.SkatenightBackend.model;
+package ws1415.SkatenightBackend.transport;
 
+import com.google.appengine.api.blobstore.BlobKey;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 
 import java.util.Date;
 
+import ws1415.SkatenightBackend.model.Event;
+
 /**
- * Speichert Metadaten zu einem Event, die im Umfang begrenzt und daher geeignet sind, wenn
- * beispielsweise nur eine Liste von Events verarbeitet werden soll, ohne alle Informationen des
- * Events herunter zu laden.
+ * TODO Kommentieren
  * @author Richard Schulze
  */
-@Entity
 public class EventMetaData {
-    @Id
     private Long id;
-    private String icon;
+    private BlobKey icon;
     private String title;
     private Date date;
-    private Long eventId;
+
+    public EventMetaData(Event event) {
+        this.id = event.getId();
+        this.icon = event.getIcon();
+        this.title = event.getTitle();
+        this.date = event.getDate();
+    }
 
     public Long getId() {
         return id;
@@ -28,11 +33,11 @@ public class EventMetaData {
         this.id = id;
     }
 
-    public String getIcon() {
+    public BlobKey getIcon() {
         return icon;
     }
 
-    public void setIcon(String icon) {
+    public void setIcon(BlobKey icon) {
         this.icon = icon;
     }
 
@@ -50,13 +55,5 @@ public class EventMetaData {
 
     public void setDate(Date date) {
         this.date = date;
-    }
-
-    public Long getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(Long eventId) {
-        this.eventId = eventId;
     }
 }

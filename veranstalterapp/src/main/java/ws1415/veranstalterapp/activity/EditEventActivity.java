@@ -129,7 +129,7 @@ public class EditEventActivity extends Activity {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
-                if (event.getMetaData().getTitle() != null && !event.getMetaData().getTitle().isEmpty()) { //&& !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
+                if (event.getTitle() != null && !event.getTitle().isEmpty()) { //&& !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
                     // Erstelle Event auf dem Server
                     new EditEventTask(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
                         @Override

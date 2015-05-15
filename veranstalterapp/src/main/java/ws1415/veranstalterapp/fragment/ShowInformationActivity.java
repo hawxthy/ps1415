@@ -51,7 +51,7 @@ public class ShowInformationActivity extends Activity {
      */
     public void setEventInformation(Event e) {
         if (e != null) {
-            setTitle(e.getMetaData().getTitle());
+            setTitle(e.getTitle());
             // TODO Verwendung von Dynamic Fields anpassen
             // listAdapter = new ShowCursorAdapter(this, e.getDynamicFields(), e);
 

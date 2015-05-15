@@ -130,7 +130,7 @@ public class AnnounceInformationFragment extends Fragment {
             public void onClick(DialogInterface dialog, int id) {
 
                 // Initialisiere Pflichtfelder
-                String eventTitle = event.getMetaData().getTitle();
+                String eventTitle = event.getTitle();
                 Route eventRoute = event.getRoute();
 
                 if (!eventTitle.equals("") && eventRoute != null){

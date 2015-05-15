@@ -176,7 +176,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
         Button attendButton = (Button) findViewById(R.id.show_info_attend_button);
         if (e != null) {
             event = e;
-            setTitle(e.getMetaData().getTitle());
+            setTitle(e.getTitle());
             // TODO Verwendung von Dynamic Fields entfernen
             // listAdapter = new ShowCursorAdapter(this, e.getDynamicFields(), e);
 
@@ -185,7 +185,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
 
             // Prüft, ob das aktuelle Datum nach dem Start-Datum des Events liegt.
             // Also ob es bereits gestartet ist. Somit wird der Server gestartet.
-            startDate = new Date(e.getMetaData().getDate().getValue());
+            startDate = new Date(e.getDate().getValue());
             Date today = new Date();
             if (today.after(startDate)) {
                 active = true;
@@ -238,7 +238,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                 new GetEventTask(new ExtendedTaskDelegate<Void, Event>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Event e) {
-                        Date startDate = new Date(e.getMetaData().getDate().getValue());
+                        Date startDate = new Date(e.getDate().getValue());
                         LocationTransmitterService.ScheduleService(ShowInformationActivity.this, keyId, startDate);
                     }
 

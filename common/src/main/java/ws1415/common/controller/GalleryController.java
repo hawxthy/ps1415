@@ -1,7 +1,5 @@
 package ws1415.common.controller;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.skatenight.skatenightAPI.model.Gallery;
@@ -16,15 +14,12 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
-import ws1415.common.net.Constants;
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
 
 /**
  * Ruft Methoden des GalleryEndpoints auf und führt Datei-Uploads durch.
@@ -42,15 +37,13 @@ public abstract class GalleryController {
         new ExtendedTask<Void, Void, Void>(handler) {
             @Override
             protected Void doInBackground(Void... params) {
-                // TODO Bei Fehlern das Picture-Objekt löschen
-
                 // Picture-Objekt auf dem Server erstellen lassen
                 Picture picture = null;
                 try {
                     picture = ServiceProvider.getService().galleryEndpoint().createPicture(
                             title, description, gallery).execute();
                 } catch (IOException e) {
-                    new RuntimeException(e);
+                    throw new RuntimeException(e);
                 }
 
                 // POST-Anfrage für den Upload erstellen
@@ -71,7 +64,9 @@ public abstract class GalleryController {
 
                     Log.d("result", EntityUtils.toString(httpEntity));
                 } catch(IOException ex) {
-                    new RuntimeException(ex);
+                    // TODO ServiceProvider.getService().galleryEndpoint().deletePicture();
+
+                    throw new RuntimeException(ex);
                 }
 
                 return null;

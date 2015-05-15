@@ -244,7 +244,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         if (e == null) {
             return true;
         }
-        else if (e.getMetaData().getDate() == null) {
+        else if (e.getDate() == null) {
             return true;
         }
         else if (e.getRoute().getRouteData() == null) {
@@ -258,7 +258,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     public void taskDidFinish(ExtendedTask task, Event event) {
         setProgressBarIndeterminateVisibility(false);
         if (!isEventNull(event)) {
-            startDate = new Date(event.getMetaData().getDate().getValue());
+            startDate = new Date(event.getDate().getValue());
 
             encodedWaypoints = event.getRoute().getRouteData().getValue();
 

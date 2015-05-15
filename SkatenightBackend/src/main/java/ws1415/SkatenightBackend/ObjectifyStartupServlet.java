@@ -11,7 +11,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import ws1415.SkatenightBackend.model.Event;
-import ws1415.SkatenightBackend.model.EventMetaData;
 import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.PictureMetaData;
@@ -24,7 +23,6 @@ public class ObjectifyStartupServlet implements Servlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         ObjectifyService.register(Event.class);
-        ObjectifyService.register(EventMetaData.class);
         ObjectifyService.register(Gallery.class);
         ObjectifyService.register(Picture.class);
         ObjectifyService.register(PictureMetaData.class);
