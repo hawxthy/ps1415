@@ -70,9 +70,9 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
             EndUser admin = new UserEndpoint().getFullUser("richard-schulze@online.de");
 
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-            UserGroup group = new GroupEndpoint().getUserGroup(pm, "Simulationsgruppe");
+            UserGroup group = new GroupEndpoint().getUserGroup("Simulationsgruppe");
             if (group == null) {
-                UserGroup ug = new UserGroup(admin);
+                UserGroup ug = new UserGroup(admin.getEmail());
                 ug.setName("Simulationsgruppe");
                 admin.addUserGroup(ug);
                 pm.makePersistent(admin);
