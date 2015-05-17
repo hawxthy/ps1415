@@ -2,8 +2,12 @@ package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.datanucleus.annotations.Unowned;
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -13,22 +17,14 @@ import javax.jdo.annotations.PrimaryKey;
 /**
  * Created by Bernd Eissing on 02.05.2015.
  */
-@PersistenceCapable
-public class GroupMeta {
-    @PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-    private Key key;
-
-    @Persistent
+@Entity
+public class GroupMetaData {
+    @Id
     private String name;
-
-    @Persistent
     private String creator;
+    private HashSet<String> members;
 
-    @Persistent(defaultFetchGroup = "true")
-    @Unowned
-    private List<String> members;
-    
+    // Do not create a Constructor Objectify needs and empty one
 
     public String getName() {
         return name;
@@ -46,11 +42,11 @@ public class GroupMeta {
         this.creator = creator;
     }
 
-    public List<String> getMembers() {
+    public HashSet<String> getMembers() {
         return members;
     }
 
-    public void setMembers(List<String> members) {
+    public void setMembers(HashSet<String> members) {
         this.members = members;
     }
 }

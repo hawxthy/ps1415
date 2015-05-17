@@ -97,15 +97,12 @@ public class Member {
     public void addGroup(UserGroup g) {
         if (g != null) {
             groups.add(g.getName());
-            Rank rank = g.getRanking().get(g.getRanking().size()-1);
-            g.getMemberRanks().put(email, rank.getName());
         }
     }
 
     public void removeGroup(UserGroup g) {
         if (g != null) {
             groups.remove(g.getName());
-            g.getMemberRanks().remove(email);
         }
     }
 

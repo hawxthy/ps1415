@@ -31,6 +31,48 @@ public class GroupController {
     }
 
     /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um eine neue
+     * UserGroup mit dem übergebenen EndUser als Ersteller zu speichern.
+     *
+     * @param handler Der Task, der mit dem Server kommuniziert
+     * @param groupName Der Name der zu erstellenden UserGroup
+     */
+    public void createUserGroup(ExtendedTaskDelegate handler, String groupName){
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().createUserGroup(params[0]).execute();
+                }catch(IOException e){
+                    publishError("Die Nutzergruppe konnte nicht erstellt werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommunizert um eine UserGroup
+     * mit dem angegebenen Namen abruft.
+     *
+     * @param handler Der Task, der mit dem Server kommunizert
+     * @param groupName Der Name der UserGroup
+     */
+    public void getUserGroup(ExtendedTaskDelegate handler, String groupName){
+        new ExtendedTask<String, Void, UserGroup>(handler){
+            @Override
+            protected UserGroup doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().getUserGroup(params[0]).execute();
+                }catch(IOException e){
+                    publishError("Die Nutzergruppe konnte nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
      * Methode, welche mit dem GroupEndpoint via den QueryUserGroupsTask
      * kommuniziert um alle UserGroups zu laden
      *
@@ -68,27 +110,6 @@ public class GroupController {
                 }
             }
         }.execute();
-    }
-
-    /**
-     * Methode, welche mit dem GroupEndpoint kommuniziert um eine neue
-     * UserGroup mit dem übergebenen EndUser als Ersteller zu speichern.
-     *
-     * @param handler Der Task, der mit dem Server kommuniziert
-     * @param groupName Der Name der zu erstellenden UserGroup
-     */
-    public void createUserGroup(ExtendedTaskDelegate handler, String groupName){
-        new ExtendedTask<String, Void, Void>(handler){
-            @Override
-            protected Void doInBackground(String... params){
-                try{
-                    return ServiceProvider.getService().groupEndpoint().createUserGroup(params[0]).execute();
-                }catch(IOException e){
-                    publishError("Die Nutzergruppe konnte nicht erstellt werden");
-                    return null;
-                }
-            }
-        }.execute(groupName);
     }
 
     /**
@@ -192,11 +213,11 @@ public class GroupController {
      *          true = Löschen war erfolgreich
      *          false = Löschen war nicht erfolgreich
      */
-    public boolean removeMember(ExtendedTaskDelegate handler, UserGroup group, String user){
+    public void removeMember(ExtendedTaskDelegate handler, UserGroup group, String user){
         final String userFinal = user;
-        new ExtendedTask<UserGroup, Void, BooleanWrapper>(handler){
+        new ExtendedTask<UserGroup, Void, Void>(handler){
             @Override
-            protected BooleanWrapper doInBackground(UserGroup... params){
+            protected Void doInBackground(UserGroup... params){
                 try{
                     return ServiceProvider.getService().groupEndpoint().removeMember(userFinal, params[0]).execute();
                 }catch (IOException e){
@@ -205,7 +226,52 @@ public class GroupController {
                 }
             }
         }.execute(group);
-        return true;
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndoint kommuniziert um eine Nachricht an das
+     * BlackBoard der übergebenen UserGroup zu schicken.
+     *
+     * @param handler Der Task, der mit dem Server kommuniziert
+     * @param groupName Die UserGroup, dessen BlackBoard eine neue Nachricht erhalten soll
+     * @param boardMessage Die Nachricht
+     */
+    public void postBlackBoard(ExtendedTaskDelegate handler, String groupName, final String boardMessage, final String writer){
+        //TODO muss noch um Bilder erweitert werden
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().postBlackBoard(params[0], boardMessage, writer).execute();
+                }catch (IOException e){
+                    publishError("Member konnte nicht entfernt werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziet um eine Nachricht vom BlackBoard
+     * der übergebenen UserGroup zu löschen.
+     *
+     * @param handler Der Task, der mit dem Server kommuniziert
+     * @param group Die UserGroup, deren BlackBoard Nachricht gelöscht werden soll
+     * @param be Der BoardEntry der gelöscht werden soll
+     */
+    public void deleteBoardMessage(ExtendedTaskDelegate handler, String group, BoardEntry be){
+        final String groupFinal = group;
+        new ExtendedTask<BoardEntry, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(BoardEntry... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().deleteBoardMessage(groupFinal, params[0]).execute();
+                }catch (IOException e){
+                    publishError("Member konnte nicht entfernt werden");
+                    return null;
+                }
+            }
+        }.execute(be);
     }
 
     /**
@@ -254,62 +320,6 @@ public class GroupController {
                 }
             }
         }.execute(group);
-        return true;
-    }
-
-    /**
-     * Methode, welche mit dem GroupEndoint kommuniziert um eine Nachricht an das
-     * BlackBoard der übergebenen UserGroup zu schicken.
-     *
-     * @param handler Der Task, der mit dem Server kommuniziert
-     * @param group Die UserGroup, dessen BlackBoard eine neue Nachricht erhalten soll
-     * @param message Die Nachricht
-     * @return Meldung über Erfolg der Postens
-     *          true = Die Nachricht wurde erfolgreich gepostet
-     *          false = Die Nachricht wurde nicht gepostet, Fehler
-     */
-    public boolean postBlackBoard(ExtendedTaskDelegate handler, UserGroup group, String message, String writer){
-        //TODO muss noch um Bilder erweitert werden
-        final String messageFinal = message;
-        final String writerFinal = writer;
-        new ExtendedTask<UserGroup, Void, BooleanWrapper>(handler){
-            @Override
-            protected BooleanWrapper doInBackground(UserGroup... params){
-                try{
-                    return ServiceProvider.getService().groupEndpoint().postBlackBoard(messageFinal, writerFinal, params[0]).execute();
-                }catch (IOException e){
-                    publishError("Member konnte nicht entfernt werden");
-                    return null;
-                }
-            }
-        }.execute(group);
-        return true;
-    }
-
-    /**
-     * Methode, welche mit dem GroupEndpoint kommuniziet um eine Nachricht vom BlackBoard
-     * der übergebenen UserGroup zu löschen.
-     *
-     * @param handler Der Task, der mit dem Server kommuniziert
-     * @param group Die UserGroup, deren BlackBoard Nachricht gelöscht werden soll
-     * @param be Der BoardEntry der gelöscht werden soll
-     * @return Nachricht über das Ergebnis des Löschens
-     *          true = die Nachricht wurde erfolgreich gelöscht.
-     *          false = die Nachricht wurde nicht gelöscht, Fehler
-     */
-    public boolean deleteBoardMessage(ExtendedTaskDelegate handler, String group, BoardEntry be){
-        final String groupFinal = group;
-        new ExtendedTask<BoardEntry, Void, BooleanWrapper>(handler){
-            @Override
-            protected BooleanWrapper doInBackground(BoardEntry... params){
-                try{
-                    return ServiceProvider.getService().groupEndpoint().deleteBoardMessage(groupFinal, params[0]).execute();
-                }catch (IOException e){
-                    publishError("Member konnte nicht entfernt werden");
-                    return null;
-                }
-            }
-        }.execute(be);
         return true;
     }
 

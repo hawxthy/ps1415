@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.support.v4.app.FragmentActivity;
 
+import com.skatenight.skatenightAPI.model.GroupMemberRights;
 import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.util.List;
@@ -33,8 +34,8 @@ public class groupUtils {
      * @return
      */
     public static boolean isUserInGroup(String email, UserGroup group){
-        for(Map.Entry<String, Object> e : group.getMemberRanks().entrySet()){
-            String value = (String)e.getValue();
+        for(String member : group.getMembers()){
+            String value = member;
             if(value.equals(email)) return true;
         }
         return false;
@@ -48,7 +49,7 @@ public class groupUtils {
      * @return
      */
     public static boolean isCreator(String email, UserGroup group) {
-        String creator = group.getCreator().getEmail();
+        String creator = group.getCreator();
         if (creator.equals(email)) return true;
         return false;
     }
