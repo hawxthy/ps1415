@@ -110,12 +110,14 @@ public class GroupControllerAuthTest extends AuthenticatedAndroidTestCase {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
                 putUserGroup(group);
+                found = false;
                 for (GroupMemberRights member : group.getMemberRanks()) {
-                    if (member.getRights().contains(Right.DELETEGROUP.name())) {
+                    if (member.getRights().contains(Right.FULLRIGHTS.name())) {
                         found = true;
-                        signal.countDown();
                     }
                 }
+                assertTrue(found);
+                signal.countDown();
             }
         }, TEST_GROUP_NAME);
         try {
@@ -146,7 +148,14 @@ public class GroupControllerAuthTest extends AuthenticatedAndroidTestCase {
         GroupController.getInstance().getUserGroup(new ExtendedTaskDelegateAdapter<Void, UserGroup>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
-                putUserGroup(group);
+                found = false;
+                for (BoardEntry be : group.getBlackBoard()) {
+                    assertFalse("Message_3 sollte nicht enthalten sein", be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE_3));
+                    if (be.getMessage().toString().equals(TEST_BLACK_BOARD_MESSAGE)) {
+                        found = true;
+                    }
+                }
+                assertTrue("Die erste Blackboard Message ist nicht enthalten", found);
                 signal.countDown();
             }
         }, TEST_GROUP_NAME);
@@ -155,14 +164,6 @@ public class GroupControllerAuthTest extends AuthenticatedAndroidTestCase {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        found = false;
-        for (BoardEntry be : userGroup.getBlackBoard()) {
-            assertFalse("Message_3 sollte nicht enthalten sein", be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE_3));
-            if (be.getMessage().toString().equals(TEST_BLACK_BOARD_MESSAGE)) {
-                found = true;
-            }
-        }
-        assertTrue("Die erste Blackboard Message ist nicht enthalten", found);
 
         GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
@@ -179,7 +180,13 @@ public class GroupControllerAuthTest extends AuthenticatedAndroidTestCase {
         GroupController.getInstance().getUserGroup(new ExtendedTaskDelegateAdapter<Void, UserGroup>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
-                putUserGroup(group);
+                found = false;
+                for (BoardEntry be : group.getBlackBoard()) {
+                    if (be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE_2)) {
+                        found = true;
+                    }
+                }
+                assertTrue("Die zweite Blackboard Message sollte enthalten sein", found);
                 signal.countDown();
             }
         }, TEST_GROUP_NAME);
@@ -188,14 +195,6 @@ public class GroupControllerAuthTest extends AuthenticatedAndroidTestCase {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        found = false;
-        for (BoardEntry be : userGroup.getBlackBoard()) {
-            if (be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE_2)) {
-                found = true;
-            }
-        }
-        assertTrue("Die zweite Blackboard Message sollte enthalten sein", found);
     }
 
     @SmallTest
@@ -255,7 +254,13 @@ public class GroupControllerAuthTest extends AuthenticatedAndroidTestCase {
         GroupController.getInstance().getUserGroup(new ExtendedTaskDelegateAdapter<Void, UserGroup>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
-                putUserGroup(group);
+                found = false;
+                for (BoardEntry be : group.getBlackBoard()) {
+                    if (be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE)) {
+                        found = true;
+                    }
+                }
+                assertFalse("Die Blackboard Message 1 sollte nicht mehr enthalten sein", found);
                 signal.countDown();
             }
         }, TEST_GROUP_NAME);
@@ -264,13 +269,6 @@ public class GroupControllerAuthTest extends AuthenticatedAndroidTestCase {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        found = false;
-        for(BoardEntry be : userGroup.getBlackBoard()){
-            if(be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE)){
-                found = true;
-            }
-        }
-        assertFalse("Die Blackboard Message 1 sollte nicht mehr enthalten sein", found);
     }
 
     public void putUserGroup(UserGroup group){

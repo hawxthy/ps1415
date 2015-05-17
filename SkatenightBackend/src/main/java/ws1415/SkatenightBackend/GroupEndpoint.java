@@ -3,6 +3,7 @@ package ws1415.SkatenightBackend;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.cmd.Query;
 
 import java.io.IOException;
@@ -110,7 +111,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         if (groupName == null || groupName.isEmpty()) {
             throw new IllegalArgumentException("can't get the usergroup, no group name submitted");
         }
-        return ofy().load().type(UserGroup.class).id(groupName).now();
+        return ofy().load().type(UserGroup.class).parent(Key.create(GroupMetaData.class, groupName)).id(groupName).now();
     }
 
     /**
@@ -143,8 +144,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             for (String member : ug.getMembers()) {
                 members[index++] = userEndpoint.getUserProfile(user, member);
             }
-            ofy().delete().type(GroupMetaData.class).id(name);
-            ofy().delete().type(UserGroup.class).id(name);
+            ofy().delete().entity(ug).now();
+            ofy().delete().type(UserGroup.class).id(name).now();
             if(ug.getBlackBoard() != null){
                 ofy().delete().entities(ug.getBlackBoard()).now();
             }
