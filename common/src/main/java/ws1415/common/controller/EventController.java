@@ -89,14 +89,42 @@ public abstract class EventController {
         }.execute();
     }
 
-
+    /**
+     * Lässt den eingeloggten Benutzer dem Event mit der angegebenen ID beitreten.
+     * @param handler    Der Handler, der über den Status des Task informiert wird.
+     * @param eventId    Die ID des Events, dem beigetreten wird.
+     */
     public static void joinEvent(ExtendedTaskDelegate<Void, Void> handler, final long eventId) {
-        // TODO
+        new ExtendedTask<Void, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().eventEndpoint().joinEvent(eventId).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        }.execute();
     }
 
-
+    /**
+     * Lässt den eingeloggten Benutzer das Event mit der angegebenen ID verlassen.
+     * @param handler    Der Handler, der über den Status des Task informiert wird.
+     * @param eventId    Die ID des Events, dem beigetreten wird.
+     */
     public static void leaveEvent(ExtendedTaskDelegate<Void, Void> handler, final long eventId) {
-        // TODO
+        new ExtendedTask<Void, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().eventEndpoint().leaveEvent(eventId).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        }.execute();
     }
 
 }

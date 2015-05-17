@@ -71,7 +71,7 @@ public class EventStartServlet extends HttpServlet {
                 // Registration-IDs abrufen
                 Member member;
                 Set<String> ids = new HashSet<>();
-                for (String s : e.getMemberList()) {
+                for (String s : e.getMemberList().keySet()) {
                     ids.add(registrationManager.getUserIdByMail(s));
                     try {
                         q = pm.newQuery(Member.class);

@@ -141,7 +141,7 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
         Thread.sleep(2500); // Zeit zum initialisieren
 
         // Setzen der Position auf den Server
-        UserController.updateUserLocation(null, TEST_EMAIL,  TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getKey().getId());
+        UserController.updateUserLocation(null, TEST_EMAIL,  TEST_POSITION.latitude, TEST_POSITION.longitude, mEvent.getId());
         Thread.sleep(2000); // Zeit zum initialisieren
 
         // Teilnehmer, der seine Position an den Server senden wird

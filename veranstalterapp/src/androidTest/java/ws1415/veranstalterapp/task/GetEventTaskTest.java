@@ -52,9 +52,9 @@ public class GetEventTaskTest extends AuthTaskTestCase {
 
         // Erstelle das zu testende Event
         event1 = new Event();
-        event1.getMetaData().setTitle("Testevent");
+        event1.setTitle("Testevent");
         event1.setFee(700);
-        event1.getMetaData().setDate(new DateTime(time));
+        event1.setDate(new DateTime(time));
         event1.setMeetingPlace("Münster");
         event1.setRoute(route1);
         event1.setDescription(new Text().setValue("Das ist ein Testevent"));
@@ -76,7 +76,7 @@ public class GetEventTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getId())
                         .execute();
             }
         }
@@ -96,9 +96,9 @@ public class GetEventTaskTest extends AuthTaskTestCase {
 
     public void testTask() throws IOException{
         // Event mit getEvent vom Server abrufen und mit event vergleichen
-        Event testEvent = ServiceProvider.getService().eventEndpoint().getEvent(event1.getKey().getId()).execute();
+        Event testEvent = ServiceProvider.getService().eventEndpoint().getEvent(event1.getId()).execute();
 
-        assertEquals("Der Title stimmt nicht überein", event1.getMetaData().getTitle(), testEvent.getMetaData().getTitle());
+        assertEquals("Der Title stimmt nicht überein", event1.getTitle(), testEvent.getTitle());
         assertEquals("Die Fee stimmt nicht überein", event1.getFee(), testEvent.getFee());
         assertEquals("Die Location stimmt nicht überein", event1.getMeetingPlace(), testEvent.getMeetingPlace());
         assertEquals("Die Beschreibung stimmt nicht überein", event1.getDescription().getValue(), testEvent.getDescription().getValue());
@@ -109,7 +109,7 @@ public class GetEventTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getId())
                         .execute();
             }
         }

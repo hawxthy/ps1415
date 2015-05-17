@@ -9,7 +9,7 @@ import java.util.Date;
 import ws1415.SkatenightBackend.model.Event;
 
 /**
- * TODO Kommentieren
+ * Transportklasse, die ausschließlich die Metadaten(ID, Icon, Titel und Datum) eines Events überträgt.
  * @author Richard Schulze
  */
 public class EventMetaData {

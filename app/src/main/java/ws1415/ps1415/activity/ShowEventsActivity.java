@@ -106,7 +106,7 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
                 Date startDate = new Date(e.getDate().getValue());
                 if (new Date().after(startDate) &&
                         e.getMemberList() != null &&
-                        e.getMemberList().contains(prefs.getString("accountName", null))) {
+                        e.getMemberList().containsKey(prefs.getString("accountName", null))) {
 
                     if (!prefs.getBoolean(e.getId()+"-started", false)) {
                         LocationTransmitterService.ScheduleService(ShowEventsActivity.this, e.getId(), startDate);

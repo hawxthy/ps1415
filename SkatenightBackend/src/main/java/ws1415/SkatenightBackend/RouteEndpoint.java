@@ -14,6 +14,7 @@ import javax.jdo.PersistenceManager;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
+import ws1415.SkatenightBackend.model.EventRole;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.RoutePoint;
@@ -92,8 +93,8 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
                         member.setName(mail[i]);
                     }
                     // Member zum Event hinzufügen, falls noch nicht geschehen
-                    if (!event.getMemberList().contains(member.getEmail())) {
-                        event.getMemberList().add(member.getEmail());
+                    if (!event.getMemberList().containsKey(member.getEmail())) {
+                        event.getMemberList().put(member.getEmail(), EventRole.PARTICIPANT);
                     }
                     // Member in die Testgruppe aufnehmen, falls noch nicht geschehen
                     if (!member.getGroups().contains(group.getName())) {

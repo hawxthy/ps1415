@@ -66,9 +66,9 @@ public class EditEventTaskTest extends AuthTaskTestCase {
 
         // Erstelle das zu testende Event
         event1 = new Event();
-        event1.getMetaData().setTitle("Testevent");
+        event1.setTitle("Testevent");
         event1.setFee(700);
-        event1.getMetaData().setDate(new DateTime(time));
+        event1.setDate(new DateTime(time));
         event1.setMeetingPlace("Münster");
         event1.setRoute(route1);
         event1.setDescription(new Text().setValue("Das ist ein Testevent"));
@@ -87,7 +87,7 @@ public class EditEventTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getId())
                         .execute();
             }
         }
@@ -110,7 +110,7 @@ public class EditEventTaskTest extends AuthTaskTestCase {
      */
     public void testTask() throws IOException, ExecutionException, InterruptedException {
         // Ändere alle Daten vom event
-        event1.getMetaData().setTitle("EditEvent");
+        event1.setTitle("EditEvent");
         event1.setFee(200);
         event1.setMeetingPlace("MS");
         event1.setDescription(new Text().setValue("Das ist das veränderte Testevent"));
@@ -119,11 +119,11 @@ public class EditEventTaskTest extends AuthTaskTestCase {
         Log.d("TESTS", "" + new EditEventTask(null).execute(event1).get());
 
         // Überprüfen
-        Log.d("TESTS", event1.getKey().toPrettyString());
+        Log.d("TESTS", event1.toPrettyString());
         // Event testEvent = ServiceProvider.getService().skatenightServerEndpoint().getEvent(event.getKey().getId()).execute();
         Event testEvent = ServiceProvider.getService().eventEndpoint().getAllEvents().execute().getItems().get(0);
 
-        assertEquals("Der Title stimmt nicht überein", event1.getMetaData().getTitle(), testEvent.getMetaData().getTitle());
+        assertEquals("Der Title stimmt nicht überein", event1.getTitle(), testEvent.getTitle());
         assertEquals("Die Fee stimmt nicht überein", event1.getFee(), testEvent.getFee());
         assertEquals("Die Location stimmt nicht überein", event1.getMeetingPlace(), testEvent.getMeetingPlace());
         assertEquals("Die Beschreibung stimmt nicht überein", event1.getDescription().getValue(), testEvent.getDescription().getValue());
@@ -134,7 +134,7 @@ public class EditEventTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getId())
                         .execute();
             }
         }

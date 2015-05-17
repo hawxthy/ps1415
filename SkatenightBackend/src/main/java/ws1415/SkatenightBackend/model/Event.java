@@ -7,11 +7,12 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Load;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import ws1415.SkatenightBackend.transport.EventMetaData;
+import ws1415.SkatenightBackend.transport.EventParticipationData;
 
 /**
  * Repräsentiert die vollständigen Daten eines Events inklusive der Metadaten.
@@ -33,10 +34,10 @@ public class Event {
     private int fee;
 
     @Load(unless = {EventMetaData.class})
-    private ArrayList<String> memberList;
-    @Load(unless = {EventMetaData.class})
+    private Map<String, EventRole> memberList;
+    @Load(unless = {EventMetaData.class, EventParticipationData.class})
     private List<BlobKey> images;
-    @Load(unless = {EventMetaData.class})
+    @Load(unless = {EventMetaData.class, EventParticipationData.class})
     private Ref<Route> route;
 
     public Long getId() {
@@ -127,11 +128,11 @@ public class Event {
         this.fee = fee;
     }
 
-    public ArrayList<String> getMemberList() {
+    public Map<String, EventRole> getMemberList() {
         return memberList;
     }
 
-    public void setMemberList(ArrayList<String> memberList) {
+    public void setMemberList(Map<String, EventRole> memberList) {
         this.memberList = memberList;
     }
 

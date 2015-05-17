@@ -5,40 +5,27 @@ import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventMetaData;
 import com.skatenight.skatenightAPI.model.Text;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
-
 import java.io.IOException;
-import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
+import ws1415.AuthenticatedAndroidTestCase;
+import ws1415.common.model.EventRole;
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Testet die Methoden des EventController.
  * @author Richard Schulze
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(manifest=Config.NONE, emulateSdk = 18)
-public class EventControllerTest {
+public class EventControllerTest extends AuthenticatedAndroidTestCase {
     private Event testevent1;
 
-    @Before
-    public void setup() throws IOException {
+    public void setUp() throws Exception {
+        super.setUp();
+
         // TODO Testevent um Bilder und Route erweitern
         testevent1 = new Event();
         testevent1.setTitle("Testevent #1");
@@ -53,8 +40,9 @@ public class EventControllerTest {
         testevent1 = ServiceProvider.getService().eventEndpoint().createEvent(testevent1).execute();
     }
 
-    @Test
-    public void testListEventsMetaData() {
+    public void testListEventsMetaData() throws InterruptedException {
+        final CountDownLatch signal = new CountDownLatch(1);
+
         EventController.listEventsMetaData(new ExtendedTaskDelegateAdapter<Void, List<EventMetaData>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<EventMetaData> events) {
@@ -69,20 +57,24 @@ public class EventControllerTest {
                         assertEquals("Das Datum der abgerufenen Metadaten stimmt nicht mit dem Datum des Testevents überein",
                                 testevent1.getDate(), metaData.getDate());
 
+                        signal.countDown();
                         return;
                     }
                 }
                 fail("Die Eventmetadaten enthalten das Testevent nicht");
             }
+
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 fail(message);
             }
         });
+        signal.await(10, TimeUnit.SECONDS);
     }
 
-    @Test
     public void testGetEvent() throws InterruptedException {
+        final CountDownLatch signal = new CountDownLatch(1);
+
         EventController.getEvent(new ExtendedTaskDelegateAdapter<Void, Event>() {
             public void taskDidFinish(ExtendedTask task, Event event) {
                 assertNotNull(event);
@@ -99,8 +91,8 @@ public class EventControllerTest {
                 assertEquals("fee", testevent1.getFee(), event.getFee());
 
                 if (testevent1.getMemberList() != null) {
-                    assertTrue(testevent1.getMemberList().containsAll(event.getMemberList()));
-                    assertTrue(event.getMemberList().containsAll(testevent1.getMemberList()));
+                    assertTrue(testevent1.getMemberList().keySet().containsAll(event.getMemberList().keySet()));
+                    assertTrue(event.getMemberList().keySet().containsAll(testevent1.getMemberList().keySet()));
                 } else {
                     assertNull(event.getMemberList());
                 }
@@ -112,19 +104,24 @@ public class EventControllerTest {
                 }
 
                 assertEquals("route", testevent1.getRoute(), event.getRoute());
+
+                signal.countDown();
             }
+
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 fail(message);
             }
         }, testevent1.getId());
+        signal.await(10, TimeUnit.SECONDS);
     }
 
-    @Test
-    public void testCreateEvent() {
+    public void testCreateEvent() throws InterruptedException {
+        final CountDownLatch signal = new CountDownLatch(1);
+
         final Event neuesEvent = new Event();
         neuesEvent.setTitle("Neues Event");
-        neuesEvent.setDate(new DateTime(1431419000000l));
+        neuesEvent.setDate(new DateTime(1431442800000l));
         neuesEvent.setRouteFieldFirst(19);
         neuesEvent.setRouteFieldLast(23);
         neuesEvent.setDescription(new Text().setValue("Hier steht die Beschreibung des neuen Events"));
@@ -138,21 +135,16 @@ public class EventControllerTest {
                 assertNotNull("id", event.getId());
                 assertEquals("title", neuesEvent.getTitle(), event.getTitle());
                 assertEquals("icon", neuesEvent.getIcon(), event.getIcon());
-                assertEquals("date", neuesEvent.getDate(), event.getDate());
+                assertEquals("date", neuesEvent.getDate().getValue(), event.getDate().getValue());
                 assertEquals("routeFieldFirst", neuesEvent.getRouteFieldFirst(), event.getRouteFieldFirst());
                 assertEquals("routeFieldLast", neuesEvent.getRouteFieldLast(), event.getRouteFieldLast());
-                assertEquals("notificationSend", neuesEvent.getNotificationSend(), event.getNotificationSend());
                 assertEquals("headerImage", neuesEvent.getHeaderImage(), event.getHeaderImage());
                 assertEquals("description", neuesEvent.getDescription(), event.getDescription());
                 assertEquals("meetingPlace", neuesEvent.getMeetingPlace(), event.getMeetingPlace());
                 assertEquals("fee", neuesEvent.getFee(), event.getFee());
 
-                if (neuesEvent.getMemberList() != null) {
-                    assertTrue(neuesEvent.getMemberList().containsAll(event.getMemberList()));
-                    assertTrue(event.getMemberList().containsAll(neuesEvent.getMemberList()));
-                } else {
-                    assertNull(event.getMemberList());
-                }
+                assertTrue("host not contained in member list", event.getMemberList().containsKey(ServiceProvider.getEmail()));
+                assertEquals("host has wrong event role in created event", event.getMemberList().get(ServiceProvider.getEmail()), EventRole.HOST.name());
                 if (neuesEvent.getImages() != null) {
                     assertTrue(neuesEvent.getImages().containsAll(event.getImages()));
                     assertTrue(event.getImages().containsAll(neuesEvent.getImages()));
@@ -161,16 +153,93 @@ public class EventControllerTest {
                 }
 
                 assertEquals("route", neuesEvent.getRoute(), event.getRoute());
+
+                signal.countDown();
             }
+
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 fail(message);
             }
         }, neuesEvent);
+        signal.await(10, TimeUnit.SECONDS);
     }
 
-    @After
-    public void teardown() throws IOException {
+    public void testJoinEvent() throws InterruptedException {
+        assertTrue("Test kann nicht durchgeführt werden, da mindestens 2 Accounts auf dem Testgerät benötigt werden",
+                getAccountCount() >= 2);
+
+        final CountDownLatch signal = new CountDownLatch(1);
+        // Account wechseln, damit ein zweiter Benutzer dem Event beitritt
+        changeAccount(1);
+        EventController.joinEvent(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                // Event neu abrufen, damit die Teilnehmerdaten aktualisiert sind
+                Event event = null;
+                try {
+                    event = ServiceProvider.getService().eventEndpoint().getEvent(testevent1.getId()).execute();
+                } catch (IOException e) {
+                    fail("Event konnte nicht erneut vom Server abgerufen werden");
+                    throw new RuntimeException(e);
+                }
+
+                assertTrue("Teilnehmer ist dem Event nicht beigetreten", event.getMemberList().containsKey(getSelectedAccountMail()));
+
+                signal.countDown();
+            }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                fail(message);
+            }
+        }, testevent1.getId());
+        signal.await(10, TimeUnit.SECONDS);
+    }
+
+    public void testLeaveEvent() throws InterruptedException, IOException {
+        assertTrue("Test kann nicht durchgeführt werden, da mindestens 2 Accounts auf dem Testgerät benötigt werden",
+                getAccountCount() >= 2);
+
+        final CountDownLatch signal = new CountDownLatch(1);
+        // Account wechseln, damit ein zweiter Benutzer dem Event beitritt
+        changeAccount(1);
+        // Dem Event zunächst beitreten. Damit dies synchron geschieht, wird direkt die Endpoint-Methode
+        // über den ServiceProvider aufgerufen
+        ServiceProvider.getService().eventEndpoint().joinEvent(testevent1.getId()).execute();
+        // Event neu abrufen, damit die Teilnehmerdaten aktualisiert sind und sicherstellen, dass der
+        // Benutzer angemeldet ist
+        Event event = ServiceProvider.getService().eventEndpoint().getEvent(testevent1.getId()).execute();
+        assertTrue("Teilnehmer ist dem Event nicht beigetreten", event.getMemberList().containsKey(getSelectedAccountMail()));
+
+        EventController.leaveEvent(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                // Event neu abrufen, damit die Teilnehmerdaten aktualisiert sind
+                Event event = null;
+                try {
+                    event = ServiceProvider.getService().eventEndpoint().getEvent(testevent1.getId()).execute();
+                } catch (IOException e) {
+                    fail("Event konnte nicht erneut vom Server abgerufen werden");
+                    throw new RuntimeException(e);
+                }
+
+                assertFalse("Teilnehmer hat das Event nicht verlassen", event.getMemberList().containsKey(getSelectedAccountMail()));
+
+                signal.countDown();
+            }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                fail(message);
+            }
+        }, testevent1.getId());
+        signal.await(10, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
         ServiceProvider.getService().eventEndpoint().deleteEvent(testevent1.getId()).execute();
         testevent1 = null;
     }

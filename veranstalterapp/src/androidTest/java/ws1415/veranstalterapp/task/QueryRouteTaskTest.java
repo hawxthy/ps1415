@@ -84,7 +84,7 @@ public class QueryRouteTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getId())
                         .execute();
             }
         }
