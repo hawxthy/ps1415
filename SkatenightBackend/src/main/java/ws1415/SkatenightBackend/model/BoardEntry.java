@@ -2,7 +2,10 @@ package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.datanucleus.annotations.Unowned;
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -12,36 +15,33 @@ import javax.jdo.annotations.PrimaryKey;
 /**
  * Created by Bernd Eissing on 02.05.2015.
  */
+@Entity
 public class BoardEntry {
-    @PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-    private Key key;
-
-    @Persistent
+    @Id
+    private Long id;
     private Picture picture;
-
-    @Persistent
     private String message;
-
-    @Persistent
     private String writer;
+    private ArrayList<String> comments;
 
-    @Persistent(defaultFetchGroup = "true")
-    @Unowned
-    private List<String> comments;
+    public BoardEntry(){
+        // Konstruktor für GAE
+        comments = new ArrayList<>();
+    }
 
     public BoardEntry(Picture picture, String message, String writer){
         this.picture = picture;
         this.message = message;
         this.writer = writer;
+        comments = new ArrayList<>();
     }
 
-    public Key getKey() {
-        return key;
+    public Long getId() {
+        return id;
     }
 
-    public void setKey(Key key) {
-        this.key = key;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Picture getPicture() {
@@ -68,11 +68,24 @@ public class BoardEntry {
         this.writer = writer;
     }
 
-    public List<String> getComments() {
+    public ArrayList<String> getComments() {
         return comments;
     }
 
-    public void setComments(List<String> comments) {
+    public void setComments(ArrayList<String> comments) {
         this.comments = comments;
+    }
+
+    public void addComment(String comment){
+        // TODO auf Reihenfolge achten, wenn das nicht schon gemacht wird
+        if(comment != null && !comment.isEmpty()){
+            getComments().add(comment);
+        }
+    }
+
+    public void removeComment(String comment){
+        if(comment != null && !comment.isEmpty()){
+            getComments().remove(comment);
+        }
     }
 }

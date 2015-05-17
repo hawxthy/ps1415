@@ -22,7 +22,7 @@ public class GroupMetaData {
     @Id
     private String name;
     private String creator;
-    private Set<String> members = new HashSet<String>();
+    private HashSet<String> members;
 
     // Do not create a Constructor Objectify needs and empty one
 
@@ -42,11 +42,11 @@ public class GroupMetaData {
         this.creator = creator;
     }
 
-    public Set<String> getMembers() {
+    public HashSet<String> getMembers() {
         return members;
     }
 
-    public void setMembers(Set<String> members) {
+    public void setMembers(HashSet<String> members) {
         this.members = members;
     }
 }

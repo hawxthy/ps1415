@@ -20,10 +20,12 @@ import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
+import ws1415.SkatenightBackend.model.GroupMetaData;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
+import ws1415.SkatenightBackend.model.BoardEntry;
 
 import static ws1415.SkatenightBackend.OfyService.ofy;
 
@@ -65,14 +67,14 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         ug.setName(groupName);
         ofy().save().entity(ug).now();
 
-//        // Die Metadaten für die UserGroup erstellen
-//        GroupMetaData metaData = new GroupMetaData();
-//        metaData.setCreator(ug.getCreator());
-//        metaData.setName(ug.getName());
-//        metaData.setMembers(new HashSet<String>());
-//        metaData.getMembers().add(ug.getCreator());
-//
-//        ofy().save().entity(metaData).now();
+        // Die Metadaten für die UserGroup erstellen
+        GroupMetaData metaData = new GroupMetaData();
+        metaData.setCreator(ug.getCreator());
+        metaData.setName(ug.getName());
+        metaData.setMembers(new HashSet<String>());
+        metaData.getMembers().add(ug.getCreator());
+
+        ofy().save().entity(metaData).now();
 
         // Die Daten beim EndUser setzen und diesen dann abspeichern
         // und gleichzeitig eine Notification senden
@@ -139,7 +141,11 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             for (String member : ug.getMembers()) {
                 members[index++] = userEndpoint.getFullUser(member);
             }
-            ofy().delete().type(UserGroup.class).id(ug.getName()).now();
+            ofy().delete().type(GroupMetaData.class).id(name);
+            ofy().delete().type(UserGroup.class).id(name);
+            if(ug.getBlackBoard() != null){
+                ofy().delete().entities(ug.getBlackBoard()).now();
+            }
 
             // Die UserGroup aus den Benutzern entfernen und eine Notification
             // an die EndUser senden.
@@ -224,9 +230,6 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         }
     }
 
-
-//======================================================================================
-
     /**
      * Fügt den aufrufenden Benutzer zu der angegebenen Gruppe hinzu.
      *
@@ -253,7 +256,10 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             }
             endUser.addUserGroup(ug);
             pm.makePersistent(endUser);
-            pm.makePersistent(ug);
+            ArrayList<String> rights = new ArrayList<>();
+            rights.add(Right.NEWMEMBERRIGHTS.name());
+            ug.addGroupMember(endUser.getEmail(), rights);
+            ofy().save().entity(ug).now();
         } finally {
             pm.close();
         }
@@ -287,10 +293,9 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
                 throw new IllegalArgumentException("you can not leave your own group");
             }
             endUser.removeUserGroup(ug);
-            //TODO wird nicht richtig getan im moment
-            ug.getMembers().remove(endUser.getEmail());
+            ug.removeGroupMember(endUser.getEmail());
             pm.makePersistent(endUser);
-            pm.makePersistent(ug);
+            ofy().save().entity(ug).now();
         } finally {
             pm.close();
         }
@@ -311,6 +316,108 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         }
         return members;
     }
+
+    /**
+     * Löscht den EndUser aus der übergebenen UserGroup.
+     *
+     * @param group die UserGroup aus der gelöscht werden soll
+     * @param user  der EndUser, der gelöscht werden soll
+     * @return BooleanWrapper, eigene Klasse um boolean Werte zurück zu geben
+     */
+    public void removeMember(UserGroup group, @Named("userName") String user) {
+        if (group == null) {
+            throw new NullPointerException("no group submitted");
+        }
+        if (user == null || user.isEmpty()) {
+            throw new IllegalArgumentException("no user to remove submitted");
+        }
+        EndUser endUser = new UserEndpoint().getFullUser(user);
+        if (endUser == null) {
+            throw new IllegalArgumentException("user is not registered");
+        }
+
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            UserGroup userGroup = getUserGroup(group.getName());
+            if (userGroup == null) {
+                throw new IllegalArgumentException("a usergroup with this name doesn't exits");
+            }
+            endUser.removeUserGroup(userGroup);
+            pm.makePersistent(endUser);
+            userGroup.removeGroupMember(endUser.getEmail());
+            ofy().save().entity(userGroup).now();
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Methode zum posten von BlackBoard Nachrichten in einer UserGroup. Momentan wird die Nachricht und
+     * der Schreiber in das BoardEntry eingetragen und die Liste in der UserGroup aktualisiert.
+     *
+     * @param groupName   UserGroup, dessen BlackBoard eine neue Nachricht erhalten soll
+     * @param message Die Nachricht
+     * @param writer  Der Ersteller der Nachricht
+     */
+    public void postBlackBoard(User user, @Named("groupName") String groupName, @Named("boardMessage") String message, @Named("writer") String writer) throws  OAuthRequestException{
+        if(user == null){
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (groupName == null || groupName.isEmpty()) {
+            throw new NullPointerException("no groupName submitted");
+        }
+        if (message == null || message.isEmpty()) {
+            throw new IllegalArgumentException("no message submitted");
+        }
+        UserGroup userGroup = getUserGroup(groupName);
+        if (userGroup == null) {
+            throw new IllegalArgumentException("this group doesn't exist");
+        }
+
+        BoardEntry be = new BoardEntry(null, message, writer);
+        ofy().save().entity(be).now();
+        if(userGroup.getBlackBoard() == null){
+            ArrayList<BoardEntry> blackBoard = new ArrayList<>();
+            blackBoard.add(be);
+            userGroup.setBlackBoard(blackBoard);
+        }else{
+            userGroup.addBlackBoardMessage(be);
+        }
+        ofy().save().entity(userGroup).now();
+    }
+
+    /**
+     * Methode um BlackBoard Nachrichten zu löschen. Dabei wird der BoardEntry übergeben und in
+     * der Liste von BoardEntries dieser gesucht und dann gelöscht.
+     *
+     * @param boardEntry der zu löschende BoardEntry
+     * @param groupName  die UserGroup in der ein BoardEntry vom BlackBoard gelöscht werden soll
+     */
+    public void deleteBoardMessage(BoardEntry boardEntry, @Named("groupName") String groupName) {
+        if (boardEntry == null) {
+            throw new NullPointerException("no entry to delete submitted");
+        }
+        if (groupName == null || groupName.isEmpty()) {
+            throw new IllegalArgumentException("no group name submitted");
+        }
+        UserGroup userGroup = getUserGroup(groupName);
+        if (userGroup == null) {
+            throw new IllegalArgumentException("this group doesn't exist");
+        }
+        if(userGroup.getBlackBoard() != null){
+            for(BoardEntry be : userGroup.getBlackBoard()){
+                if(be.getId() == boardEntry.getId()){
+                    ArrayList<BoardEntry> blackBoard = userGroup.getBlackBoard();
+                    blackBoard.remove(be);
+                    userGroup.setBlackBoard(blackBoard);
+                    ofy().delete().entity(be).now();
+                    ofy().save().entity(userGroup).now();
+                }
+            }
+        }
+    }
+
+//======================================================================================
 
     public void setVisibility(@Named("groupName") String groupName, BooleanWrapper visibility) {
         //TODO Lösung für den PrefManager finden.
@@ -357,42 +464,6 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             pm.close();
         }
 
-    }
-
-    /**
-     * Löscht den EndUser aus der übergebenen UserGroup.
-     *
-     * @param group die UserGroup aus der gelöscht werden soll
-     * @param user  der EndUser, der gelöscht werden soll
-     * @return BooleanWrapper, eigene Klasse um boolean Werte zurück zu geben
-     */
-    public BooleanWrapper removeMember(UserGroup group, @Named("userName") String user) {
-        if (group == null) {
-            throw new NullPointerException("no group submitted");
-        }
-        if (user == null || user.isEmpty()) {
-            throw new IllegalArgumentException("no user to remove submitted");
-        }
-        EndUser endUser = new UserEndpoint().getFullUser(user);
-        if (endUser == null) {
-            throw new IllegalArgumentException("user is not registered");
-        }
-
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            UserGroup userGroup = getUserGroup(group.getName());
-            if (userGroup == null) {
-                throw new IllegalArgumentException("this group doesn't exist");
-            }
-            endUser.removeUserGroup(userGroup);
-            pm.makePersistent(endUser);
-            //TODOO wird nicht richtig getan im moment
-            userGroup.getMembers().remove(endUser.getEmail());
-        } finally {
-            pm.close();
-        }
-
-        return new BooleanWrapper(true);
     }
 
     /**
@@ -445,80 +516,6 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         new MessageEndoint().sendMessage(user, message);
         return new BooleanWrapper(true);
     }
-
-//    /**
-//     * Methode zum posten von BlackBoard Nachrichten in einer UserGroup. Momentan wird die Nachricht und
-//     * der Schreiber in das BoardEntry eingetragen und die Liste in der UserGroup aktualisiert.
-//     *
-//     * @param group   UserGroup, dessen BlackBoard eine neue Nachricht erhalten soll
-//     * @param message Die Nachricht
-//     * @param writer  Der Ersteller der Nachricht
-//     * @return BooleanWrapper, eigene Klasse um boolean Werte zurück zu geben
-//     * true = die Nachricht wurde erfolgreich ans BlackBoard geschickt
-//     * false = die Nachricht wurde nicht and BlackBoard geschickt
-//     */
-//    public BooleanWrapper postBlackBoard(UserGroup group, @Named("boardMessage") String message, @Named("writer") String writer) {
-//        if (group == null) {
-//            throw new NullPointerException("no group submitted");
-//        }
-//        if (message == null || message.isEmpty()) {
-//            throw new IllegalArgumentException("no message submitted");
-//        }
-//
-//        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-//        try {
-//            UserGroup userGroup = getUserGroup(group.getName());
-//            if (userGroup == null) {
-//                throw new IllegalArgumentException("this group doesn't exist");
-//            }
-//            List<BoardEntry> blackBoard = userGroup.getBlackBoard();
-//            blackBoard.add(new BoardEntry(null, message, writer));
-//            userGroup.setBlackBoard(blackBoard);
-//            pm.makePersistent(userGroup);
-//        } finally {
-//            pm.close();
-//        }
-//        return new BooleanWrapper(true);
-//    }
-
-//    /**
-//     * Methode um BlackBoard Nachrichten zu löschen. Dabei wird der BoardEntry übergeben und in
-//     * der Liste von BoardEntries dieser gesucht und dann gelöscht.
-//     *
-//     * @param boardEntry der zu löschende BoardEntry
-//     * @param groupName  die UserGroup in der ein BoardEntry vom BlackBoard gelöscht werden soll
-//     * @return Das Ergebnis des Löschens
-//     * true = falls der BoardEntry gelöscht wurde
-//     * false = falls der BoardEntry nicht in der Liste der BoardEntries der UserGroup gefunden wurde
-//     */
-//    public BooleanWrapper deleteBoardMessage(BoardEntry boardEntry, @Named("groupName") String groupName) {
-//        if (boardEntry == null) {
-//            throw new NullPointerException("no entry to delete submitted");
-//        }
-//        if (groupName == null || groupName.isEmpty()) {
-//            throw new IllegalArgumentException("no group name submitted");
-//        }
-//
-//
-//        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-//        try {
-//            UserGroup userGroup = getUserGroup(groupName);
-//            if (userGroup == null) {
-//                throw new IllegalArgumentException("this group doesn't exist");
-//            }
-//            List<BoardEntry> tmpList = userGroup.getBlackBoard();
-//            for (int i = 0; i < tmpList.size(); i++) {
-//                if (tmpList.get(i).getKey() == boardEntry.getKey()) {
-//                    userGroup.getBlackBoard().remove(i);
-//                    pm.makePersistent(userGroup);
-//                    return new BooleanWrapper(true);
-//                }
-//            }
-//        } finally {
-//            pm.close();
-//        }
-//        return new BooleanWrapper(true);
-//    }
 
     /**
      * Methode zum ändern des Bildes einer Nutzergruppe

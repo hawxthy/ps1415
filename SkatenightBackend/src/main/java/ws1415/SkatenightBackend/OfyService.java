@@ -4,6 +4,7 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 
+import ws1415.SkatenightBackend.model.BoardEntry;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.GroupMetaData;
 
@@ -18,6 +19,7 @@ public class OfyService {
     static {
         ObjectifyService.register(UserGroup.class);
         ObjectifyService.register(GroupMetaData.class);
+        ObjectifyService.register(BoardEntry.class);
     }
 
     public static Objectify ofy(){
