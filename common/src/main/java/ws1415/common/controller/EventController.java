@@ -35,21 +35,94 @@ public abstract class EventController {
     }
 
     /**
-     * Gibt das Event inklusive Metadaten und Gallery-Objekt zurück. Die Bilder der Gallerie werden
-     * dabei nicht mit abgerufen.
-     * @param handler       Der Handler, der das abgerufene Event übergeben bekommt.
-     * @param metaDataId    Die ID der Metadaten des abzurufenden Events.
-     * @param eventId       Die ID des abzurufenden Events.
+     * Ruft das Event mit der angebenen ID ab.
+     * @param handler   Der Handler, der das abgerufene Event übergeben bekommt.
+     * @param eventId   Die ID des abzurufenden Events.
      */
-    public static void getEvent(ExtendedTaskDelegate<Void, Event> handler, final long metaDataId, final long eventId) {
+    public static void getEvent(ExtendedTaskDelegate<Void, Event> handler, final long eventId) {
         new ExtendedTask<Void, Void, Event>(handler) {
             @Override
             protected Event doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().eventEndpoint().getEvent(metaDataId, eventId).execute();
+                    return ServiceProvider.getService().eventEndpoint().getEvent(eventId).execute();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+            }
+        }.execute();
+    }
+
+    /**
+     * Erstellt das angegebene Event auf dem Server.
+     * @param handler    Der Handler, der das erstellte Event übergeben bekommt.
+     * @param event      Das zu erstellende Event.
+     */
+    public static void createEvent(ExtendedTaskDelegate<Void, Event> handler, final Event event) {
+        new ExtendedTask<Void, Void, Event>(handler) {
+            @Override
+            protected Event doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().eventEndpoint().createEvent(event).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Löscht das Event mit der angegebenen ID.
+     * @param handler    Der Handler, der über den Status des Task informiert wird.
+     * @param eventId    Die ID des zu löschenden Events.
+     */
+    public static void deleteEvent(ExtendedTaskDelegate<Void, Void> handler, final long eventId) {
+        new ExtendedTask<Void, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().eventEndpoint().deleteEvent(eventId).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * Lässt den eingeloggten Benutzer dem Event mit der angegebenen ID beitreten.
+     * @param handler    Der Handler, der über den Status des Task informiert wird.
+     * @param eventId    Die ID des Events, dem beigetreten wird.
+     */
+    public static void joinEvent(ExtendedTaskDelegate<Void, Void> handler, final long eventId) {
+        new ExtendedTask<Void, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().eventEndpoint().joinEvent(eventId).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * Lässt den eingeloggten Benutzer das Event mit der angegebenen ID verlassen.
+     * @param handler    Der Handler, der über den Status des Task informiert wird.
+     * @param eventId    Die ID des Events, dem beigetreten wird.
+     */
+    public static void leaveEvent(ExtendedTaskDelegate<Void, Void> handler, final long eventId) {
+        new ExtendedTask<Void, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().eventEndpoint().leaveEvent(eventId).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
             }
         }.execute();
     }

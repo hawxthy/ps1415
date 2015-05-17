@@ -66,17 +66,17 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
                 "j@t@FLXh@Vp@BF??b@vANh@d@fBh@pB@HDXBRBTB^Dj@?BBVCZ"));
 
         event1 = new Event();
-        event1.getMetaData().setTitle("Skatenight 1");
+        event1.setTitle("Skatenight 1");
         event1.setFee(200);
-        event1.getMetaData().setDate(new DateTime(time));
+        event1.setDate(new DateTime(time));
         event1.setMeetingPlace("MS");
         event1.setRoute(route1);
         event1.setDescription(new Text().setValue("Die erste Skatenightt"));
 
         event2 = new Event();
-        event2.getMetaData().setTitle("Skatenight 2");
+        event2.setTitle("Skatenight 2");
         event2.setFee(500);
-        event2.getMetaData().setDate(new DateTime(time));
+        event2.setDate(new DateTime(time));
         event2.setMeetingPlace("Schlossplatz");
         event2.setRoute(route1);
         event2.setDescription(new Text().setValue("Die zweite Skatenight"));
@@ -99,7 +99,7 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getId())
                         .execute();
             }
         }
@@ -135,8 +135,8 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
         assertNotNull("events are null", eventList);
         int testIndex = -1;
         for (int i = 0; i < eventList.size(); i++) {
-            String event1Title = event1.getMetaData().getTitle();
-            String selEventTitle = eventList.get(i).getMetaData().getTitle();
+            String event1Title = event1.getTitle();
+            String selEventTitle = eventList.get(i).getTitle();
 
             // Passendes Event zum Vergleich über den Titel auswählen
             if (event1Title.equals(selEventTitle)) {
@@ -147,14 +147,14 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
                 testIndex = 1;
             }
 
-            String selectedEventTitle = testEvents.get(testIndex).getMetaData().getTitle();
-            long selectedEventDate = testEvents.get(testIndex).getMetaData().getDate().getValue();
+            String selectedEventTitle = testEvents.get(testIndex).getTitle();
+            long selectedEventDate = testEvents.get(testIndex).getDate().getValue();
             int selectedEventFee = testEvents.get(testIndex).getFee();
             String selectedEventLocation = testEvents.get(testIndex).getMeetingPlace();
             String selectedEventDescription = testEvents.get(testIndex).getDescription().getValue();
 
-            String serverEventTitle = eventList.get(i).getMetaData().getTitle();
-            long serverEventDate = eventList.get(i).getMetaData().getDate().getValue();
+            String serverEventTitle = eventList.get(i).getTitle();
+            long serverEventDate = eventList.get(i).getDate().getValue();
             int serverEventFee = eventList.get(i).getFee();
             String serverEventLocation = eventList.get(i).getMeetingPlace();
             String serverEventDescription = eventList.get(i).getDescription().getValue();
@@ -178,7 +178,7 @@ public class QueryEventTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getId())
                         .execute();
             }
         }

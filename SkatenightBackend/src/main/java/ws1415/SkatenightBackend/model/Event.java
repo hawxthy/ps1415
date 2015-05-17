@@ -1,14 +1,18 @@
 package ws1415.SkatenightBackend.model;
 
+import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Text;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Load;
-import com.googlecode.objectify.annotation.Parent;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import ws1415.SkatenightBackend.transport.EventMetaData;
+import ws1415.SkatenightBackend.transport.EventParticipationData;
 
 /**
  * Repräsentiert die vollständigen Daten eines Events inklusive der Metadaten.
@@ -18,20 +22,23 @@ import java.util.List;
 public class Event {
     @Id
     private Long id;
-    private Ref<Route> route;
+    private BlobKey icon;
+    private String title;
+    private Date date;
     private int routeFieldFirst;
     private int routeFieldLast;
-    private ArrayList<String> memberList;
     private boolean notificationSend = false;
-    private String headerImage;
+    private BlobKey headerImage;
     private Text description;
     private String meetingPlace;
     private int fee;
-    private List<String> images;
-    @Parent
-    @Load
-    private Ref<EventMetaData> metaData;
-    private Ref<Gallery> gallery;
+
+    @Load(unless = {EventMetaData.class})
+    private Map<String, EventRole> memberList;
+    @Load(unless = {EventMetaData.class, EventParticipationData.class})
+    private List<BlobKey> images;
+    @Load(unless = {EventMetaData.class, EventParticipationData.class})
+    private Ref<Route> route;
 
     public Long getId() {
         return id;
@@ -41,16 +48,28 @@ public class Event {
         this.id = id;
     }
 
-    public void setRoute(Route route){
-        this.route = Ref.create(route);
+    public BlobKey getIcon() {
+        return icon;
     }
 
-    public Route getRoute() {
-        if (route != null) {
-            return route.get();
-        } else {
-            return null;
-        }
+    public void setIcon(BlobKey icon) {
+        this.icon = icon;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public int getRouteFieldFirst() {
@@ -69,15 +88,6 @@ public class Event {
         this.routeFieldLast = routeFieldLast;
     }
 
-    public void setMemberList(ArrayList<String> memberList) {
-        this.memberList = memberList;
-    }
-
-    public ArrayList<String> getMemberList() {
-        if (this.memberList == null) return new ArrayList<>();
-        else return this.memberList;
-    }
-
     public boolean isNotificationSend() {
         return notificationSend;
     }
@@ -86,11 +96,11 @@ public class Event {
         this.notificationSend = notificationSend;
     }
 
-    public String getHeaderImage() {
+    public BlobKey getHeaderImage() {
         return headerImage;
     }
 
-    public void setHeaderImage(String headerImage) {
+    public void setHeaderImage(BlobKey headerImage) {
         this.headerImage = headerImage;
     }
 
@@ -118,35 +128,31 @@ public class Event {
         this.fee = fee;
     }
 
-    public List<String> getImages() {
+    public Map<String, EventRole> getMemberList() {
+        return memberList;
+    }
+
+    public void setMemberList(Map<String, EventRole> memberList) {
+        this.memberList = memberList;
+    }
+
+    public List<BlobKey> getImages() {
         return images;
     }
 
-    public void setImages(List<String> images) {
+    public void setImages(List<BlobKey> images) {
         this.images = images;
     }
 
-    public EventMetaData getMetaData() {
-        if (metaData != null) {
-            return metaData.get();
+    public void setRoute(Route route){
+        this.route = Ref.create(route);
+    }
+
+    public Route getRoute() {
+        if (route != null) {
+            return route.get();
         } else {
             return null;
         }
-    }
-
-    public void setMetaData(EventMetaData metaData) {
-        this.metaData = Ref.create(metaData);
-    }
-
-    public Gallery getGallery() {
-        if (gallery != null) {
-            return gallery.get();
-        } else {
-            return null;
-        }
-    }
-
-    public void setGallery(Gallery gallery) {
-        this.gallery = Ref.create(gallery);
     }
 }

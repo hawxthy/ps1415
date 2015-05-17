@@ -346,7 +346,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
                 routePickerButton2.setText(TEST_ROUTE);
 
                 // Hohes Datum für das Event setzen, damit es auf jeden Fall in der Zukunft beginnt
-                ((AnnounceInformationFragment) mActivity.getAdapter().getItem(1)).getAdapter().setYear(2016);
+                // ((AnnounceInformationFragment) mActivity.getAdapter().getItem(1)).getAdapter().setYear(2016);
             }
         });
         Thread.sleep(5000); // Zeit zum initialisieren
@@ -389,7 +389,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ((AnnounceInformationFragment) mActivity.getAdapter().getItem(1)).getAdapter().setRouteAndText(testRoute2);
+                //((AnnounceInformationFragment) mActivity.getAdapter().getItem(1)).getAdapter().setRouteAndText(testRoute2);
                 applyButton.performClick();
             }
         });
@@ -415,7 +415,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         boolean found = false;
         if (list2 != null) {
             for (Event e : list2) {
-                if (e.getMetaData().getTitle().equals(TEST_TITLE)) {
+                if (e.getTitle().equals(TEST_TITLE)) {
                     found = true;
                     break;
                 }
@@ -443,7 +443,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         found = false;
         for(Event e : eventList){
             pos++;
-            if(TEST_TITLE.equals(e.getMetaData().getTitle())){
+            if(TEST_TITLE.equals(e.getTitle())){
                 found = true;
                 break;
             }
@@ -535,7 +535,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         found = false;
         for(Event e : eventList){
             pos++;
-            if(TEST_TITLE_EDIT.equals(e.getMetaData().getTitle())){
+            if(TEST_TITLE_EDIT.equals(e.getTitle())){
                 found = true;
                 break;
             }
@@ -544,7 +544,7 @@ public class PublishNewInformationTest extends ActivityInstrumentationTestCase2<
         assertTrue("Couldn't find the event!", found);
 
         // Prüfen, ob die Daten verändert wurden
-        assertEquals(TEST_TITLE_EDIT, eventList.get(pos).getMetaData().getTitle());
+        assertEquals(TEST_TITLE_EDIT, eventList.get(pos).getTitle());
         assertEquals(TEST_FEE_EDIT, eventList.get(pos).getFee());
         assertEquals(TEST_LOCATION_EDIT, eventList.get(pos).getMeetingPlace());
         assertEquals(TEST_DESCRIPTION_EDIT, eventList.get(pos).getDescription().getValue());

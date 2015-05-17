@@ -23,7 +23,7 @@ public class QueryCurrentMemberEventTask extends ExtendedTask<Void, Void, Event>
         try {
             Member m = ServiceProvider.getService().userEndpoint().getMember(email).execute();
             // TODO: Fehler, wenn Teilnehmer zu keinem Event angemeldet ist
-            Event e = ServiceProvider.getService().eventEndpoint().getEvent(0l, m.getCurrentEventId()).execute();
+            Event e = ServiceProvider.getService().eventEndpoint().getEvent(m.getCurrentEventId()).execute();
             return e;
         }
         catch (Exception e) {

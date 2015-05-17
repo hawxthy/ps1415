@@ -5,7 +5,7 @@ android {
     compileSdkVersion 21
     buildToolsVersion "21.0.1"
 
-    defaultPublishConfig "jenkins"
+    defaultPublishConfig "release"
 
     defaultConfig {
         minSdkVersion 15
@@ -25,6 +25,12 @@ android {
             minifyEnabled false
             zipAlignEnabled true
         }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
     }
 }
 

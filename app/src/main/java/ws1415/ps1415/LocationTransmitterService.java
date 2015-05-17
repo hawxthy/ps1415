@@ -445,7 +445,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
                         prefs.edit().putBoolean(keyId + "-started", true).commit();
 
-                        Date startDate = new Date(e.getMetaData().getDate().getValue());
+                        Date startDate = new Date(e.getDate().getValue());
 
                         List<LatLng> waypoints;
                         try {
@@ -461,7 +461,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                         serviceIntent.putParcelableArrayListExtra(LocationTransmitterService.EXTRA_WAYPOINTS, new ArrayList(waypoints));
                         serviceIntent.putExtra(LocationTransmitterService.EXTRA_START_DATE, startDate.getTime());
                         serviceIntent.putExtra(LocationTransmitterService.EXTRA_DISTANCE, e.getRoute().getLength());
-                        serviceIntent.putExtra(LocationTransmitterService.EXTRA_NAME, e.getMetaData().getTitle());
+                        serviceIntent.putExtra(LocationTransmitterService.EXTRA_NAME, e.getTitle());
                         serviceIntent.putExtra(LocationTransmitterService.EXTRA_LOCATION, e.getMeetingPlace());
 
                         context.startService(serviceIntent);

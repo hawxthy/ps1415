@@ -40,9 +40,9 @@ public class CreateEventTaskTest extends AuthTaskTestCase {
         event = new Event();
         long time = new Date().getTime();
 
-        event.getMetaData().setTitle("Skatenight 1");
+        event.setTitle("Skatenight 1");
         event.setFee(200);
-        event.getMetaData().setDate(new DateTime(time));
+        event.setDate(new DateTime(time));
         event.setMeetingPlace("MS");
         event.setRoute(route);
         event.setDescription(new Text().setValue("Die erste Skatenight"));
@@ -61,7 +61,7 @@ public class CreateEventTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (events != null) {
             for (Event e : events) {
-                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getId())
                         .execute();
             }
         }
@@ -90,14 +90,14 @@ public class CreateEventTaskTest extends AuthTaskTestCase {
 
         Event serverEvent = eventList.get(0);
 
-        String addedEventTitle = event.getMetaData().getTitle();
-        long addedEventDate = event.getMetaData().getDate().getValue();
+        String addedEventTitle = event.getTitle();
+        long addedEventDate = event.getDate().getValue();
         int addedEventFee = event.getFee();
         String addedEventLocation = event.getMeetingPlace();
         String addedEventDescription = event.getDescription().getValue();
 
-        String serverEventTitle = serverEvent.getMetaData().getTitle();
-        long serverEventDate = serverEvent.getMetaData().getDate().getValue();
+        String serverEventTitle = serverEvent.getTitle();
+        long serverEventDate = serverEvent.getDate().getValue();
         int serverEventFee = serverEvent.getFee();
         String serverEventLocation = serverEvent.getMeetingPlace();
         String serverEventDescription = serverEvent.getDescription().getValue();
@@ -115,7 +115,7 @@ public class CreateEventTaskTest extends AuthTaskTestCase {
                 event.getRoute().getRouteData().getValue());
 
         // Route und Event löschen
-        ServiceProvider.getService().eventEndpoint().deleteEvent(serverEvent.getKey().getId()).execute();
+        ServiceProvider.getService().eventEndpoint().deleteEvent(serverEvent.getId()).execute();
         ServiceProvider.getService().routeEndpoint().deleteRoute(serverEvent.getRoute().getKey()
                 .getId()).execute();
     }

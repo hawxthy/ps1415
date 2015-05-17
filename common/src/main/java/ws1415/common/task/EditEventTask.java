@@ -34,7 +34,8 @@ public class EditEventTask extends ExtendedTask<Event, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Event... params){
         try{
-            return ServiceProvider.getService().eventEndpoint().editEvent(params[0]).execute().getValue();
+            ServiceProvider.getService().eventEndpoint().editEvent(params[0]).execute();
+            return true;
         }catch (IOException e){
             e.printStackTrace();
         }

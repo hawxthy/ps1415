@@ -49,9 +49,9 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
 
         event1 = new Event();
 
-        event1.getMetaData().setTitle("TestEvent");
+        event1.setTitle("TestEvent");
         event1.setFee(200);
-        event1.getMetaData().setDate(new DateTime(time));
+        event1.setDate(new DateTime(time));
         event1.setMeetingPlace("MS");
         event1.setRoute(route1);
         event1.setDescription(new Text().setValue("Martin"));
@@ -73,7 +73,7 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (eventList != null) {
             for (Event e : eventList) {
-                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getKey().getId())
+                ServiceProvider.getService().eventEndpoint().deleteEvent(e.getId())
                         .execute();
             }
         }
@@ -84,7 +84,7 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
 
         for( Event e : ServiceProvider.getService().eventEndpoint().getAllEvents()
                 .execute().getItems()){
-            if(event1.getMetaData().getTitle().equals(e.getMetaData().getTitle())){
+            if(event1.getTitle().equals(e.getTitle())){
                 event1 = e;
             }
         }
@@ -99,7 +99,7 @@ public class DeleteEventTaskTest extends AuthTaskTestCase {
         new DeleteEventTask(null).execute(event1).get();
         for(Event e : ServiceProvider.getService().eventEndpoint().getAllEvents()
                 .execute().getItems()){
-            assertNotSame("event1 not existent", event1.getKey().getId(), e.getKey().getId());
+            assertNotSame("event1 not existent", event1.getId(), e.getId());
         }
     }
 }

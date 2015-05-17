@@ -114,8 +114,8 @@ public class EventsCursorAdapter extends BaseAdapter{
         Event event = getItem(position);
         String eventLocationValue = event.getMeetingPlace();
         String eventFeeValue = Integer.toString(event.getFee()) + " €";
-        holder.eventName.setText(event.getMetaData().getTitle());
-        holder.eventDate.setText(eventDateFormat.format(new Date(event.getMetaData().getDate().getValue())));
+        holder.eventName.setText(event.getTitle());
+        holder.eventDate.setText(eventDateFormat.format(new Date(event.getDate().getValue())));
 
         if(eventLocationValue != null) holder.eventLocation.setText(eventLocationValue);
         else holder.eventLocation.setText("n/a");

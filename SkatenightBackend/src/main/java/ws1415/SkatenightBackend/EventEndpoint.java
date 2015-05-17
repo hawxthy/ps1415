@@ -1,14 +1,12 @@
 package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.Named;
-import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
-import com.googlecode.objectify.Key;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,14 +19,15 @@ import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
-import ws1415.SkatenightBackend.model.BooleanWrapper;
-import ws1415.SkatenightBackend.model.Event;
-import ws1415.SkatenightBackend.model.EventMetaData;
-import ws1415.SkatenightBackend.model.Gallery;
-import ws1415.SkatenightBackend.model.Member;
-import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.EndUser;
+import ws1415.SkatenightBackend.model.Event;
+import ws1415.SkatenightBackend.model.EventRole;
+import ws1415.SkatenightBackend.model.Member;
+import ws1415.SkatenightBackend.model.Privilege;
+import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.UserLocation;
+import ws1415.SkatenightBackend.transport.EventMetaData;
+import ws1415.SkatenightBackend.transport.EventParticipationData;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -39,28 +38,63 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public class EventEndpoint extends SkatenightServerEndpoint {
 
     /**
+     * Weist dem Benutzer mit der angegebenen Email
+     * @param user       Der aufrufende Benutzer.
+     * @param eventId    Die ID des Events, in dem die Rolle zugewiesen werden soll.
+     * @param endUser    Der Benutzer, dem die Rolle zugewiesen werden soll.
+     * @param role       Die zuzuweisende Rolle.
+     */
+    public void assignRole(User user, @Named("eventId") long eventId, @Named("endUser") String endUser, @Named("role") EventRole role) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
+        if (hasPrivilege(event, user.getEmail(), Privilege.ASSIGN_ROLE)) {
+            event.getMemberList().put(endUser, role);
+            ofy().save().entity(event).now();
+        } else {
+            throw new OAuthRequestException("insufficient privileges");
+        }
+    }
+
+    /**
+     * Prüft ob der angegebene Benutzer in dem übergebenen Event das entsprechende Privileg besitzt.
+     * @param event     Das Event, für das das Privileg geprüft werden soll.
+     * @param endUser   Die Mail-Adresse des zu prüfenden Benutzers.
+     * @param privilege Das zu prüfende Privileg.
+     * @return true, wenn der Benutzer das Privileg im angegebenen Event besitzt, sonst false.
+     */
+    private boolean hasPrivilege(Event event, String endUser, Privilege privilege) {
+        // TODO Methode ggf. mit User-Objekt sichern
+        if (event == null || endUser == null || privilege == null
+                || !event.getMemberList().containsKey(endUser)) {
+            return false;
+        }
+        return event.getMemberList().get(endUser).hasPrivilege(privilege);
+    }
+
+    /**
      * Gibt eine Liste aller auf dem Server gespeicherter Metadaten von Events zurück.
      * @return Eine Liste aller auf dem Server gespeicherter EventMetaData-Objekte.
      */
     public List<EventMetaData> getEventsMetaData() {
-        return ofy().load().type(EventMetaData.class).list();
+        List<EventMetaData> result = new LinkedList<>();
+        for (Event e : ofy().load().group(EventMetaData.class).type(Event.class).list()) {
+            result.add(new EventMetaData(e));
+        }
+        return result;
     }
 
     /**
      * Ruft ein Event aus der Datenbank ab.
-     * @param metaDataId Die Id der Metadaten des Events das abgerufen werden soll.
      * @param eventId    Die Id des abzurufenden Events.
-     * @return Das Event-Objekt inklusive Metadaten und Gallery-Objekt. Die Bilder der Galerie
-     * werden nicht mit abgerufen.
+     * @return Das Event-Objekt inklusive aller Daten.
      */
-    public Event getEvent(@Named("metaDataId") Long metaDataId, @Named("eventId") Long eventId) {
-        if (metaDataId == null) {
+    public Event getEvent(@Named("eventId") Long eventId) {
+        if (eventId == null) {
             return null;
         }
-        return ofy().load().type(Event.class)
-                .parent(Key.create(EventMetaData.class, metaDataId))
-                .id(eventId)
-                .safe();
+        return ofy().load().type(Event.class).id(eventId).safe();
     }
 
     /**
@@ -68,65 +102,93 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * Event-Objekt zurück. Kann nur von Benutzern aufgerufen werden, die in der globalen Domäne die
      * Rolle Veranstalter haben.
      *
-     * @param user            Der aufrufende Benutzer.
-     * @param icon            TODO
-     * @param title           Der Titel des anzulegenden Events.
-     * @param date            Das Datum des Events.
-     * @param headerImage     TODO
-     * @param description     Der Beschreibungstext des Events.
-     * @param meetingPlace    Der Treffpunkt für das Event.
-     * @param fee             Die Gebühr für das Event.
-     * @param images          TODO
+     * @param user     Der aufrufende Benutzer.
+     * @param event    Das zu erstellende Event.
      * @return Das persistierte Event-Objekt.
      */
     // TODO Route hinzufügen
-    public Event createEvent(User user, @Named("icon") String icon, @Named("title") String title,
-                             @Named("date") Date date, @Named("headerImage") String headerImage,
-                             Text description, @Named("meetingPlace") String meetingPlace,
-                             @Named("fee") int fee, @Named("images") List<String> images) {
-        // TODO User prüfen
+    public Event createEvent(User user, Event event) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        // TODO Globale Rolle des aufrufenden Benutzers prüfen
+        //if (new RoleEndpoint().getGlobalRole(user.getEmail()).value != Role.HOST.getId()) {
+        //    throw new OAuthRequestException("user is not a host");
+        //}
         // TODO Event prüfen
 
-        Gallery gallery = new Gallery();
-        ofy().save().entity(gallery).now();
+        // Den aufrufenden Benutzer als Host eintragen
+        if (event.getMemberList() == null) {
+            event.setMemberList(new HashMap<String, EventRole>());
+        }
+        event.getMemberList().put(user.getEmail(), EventRole.HOST);
 
-        EventMetaData metaData = new EventMetaData();
-        metaData.setIcon(icon);
-        metaData.setTitle(title);
-        metaData.setDate(date);
-        ofy().save().entity(metaData).now();
-
-        Event event = new Event();
-        event.setHeaderImage(headerImage);
-        event.setDescription(description);
-        event.setMeetingPlace(meetingPlace);
-        event.setFee(fee);
-        event.setImages(images);
-        event.setMetaData(metaData);
-        event.setGallery(gallery);
         ofy().save().entity(event).now();
-
-        metaData.setEventId(event.getId());
-        ofy().save().entity(metaData).now();
 
         return event;
     }
 
+
+    public void editEvent(User user, Event event) {
+        // TODO
+    }
+
     /**
-     * Löscht das gesamte Event inklusive Metadaten und Gallerie. Der aufrufende Benutzer muss die
-     * Rolle Veranstalter in der globalen Domäne haben.
+     * Löscht das angegebene Event. Der aufrufende Benutzer muss die Rolle Veranstalter in der
+     * globalen Domäne haben.
      * @param user Der aufrufende Benutzer.
-     * @param id   Die ID der Metadaten des zu löschenden Events.
+     * @param id   Die ID des zu löschenden Events.
      */
-    public void deleteEvent(User user, @Named("id") Long id) {
+    public void deleteEvent(User user, @Named("id") Long id) throws OAuthRequestException {
         if (id != null) {
+            if (user == null) {
+                throw new OAuthRequestException("no user submitted");
+            }
             // TODO User prüfen
             // TODO Gallery und alle zugehörigen Blobs löschen
 
-            // Die Eventmetadaten und alle untergeordneten Objekte löschen
-            Key metaDataKey = Key.create(EventMetaData.class, id);
-            ofy().delete().keys(ofy().load().ancestor(metaDataKey).keys().list());
-            ofy().delete().key(metaDataKey).now();
+            ofy().delete().type(Event.class).id(id);
+        }
+    }
+
+    /**
+     * Fügt den aufrufenden Teilnehmer zum angegebenen Event hinzu.
+     * @param user       Der aufrufende Benutzer, der dem Event hinzugefügt werden soll
+     * @param eventId    Die ID des Events, dem beigetreten wird.
+     */
+    public void joinEvent(User user, @Named("eventId") Long eventId) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (eventId != null) {
+            Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
+            if (!event.getMemberList().containsKey(user.getEmail())) {
+                event.getMemberList().put(user.getEmail(), EventRole.PARTICIPANT);
+                new UserEndpoint().getFullUser(user.getEmail()).addEvent(event);
+                // TODO Muss geändertes EndUser-Objekt gespeichert werden?
+            }
+        }
+    }
+
+    /**
+     * Entfernt den aufrufenden Benutzer aus dem Event mit der angegebenen ID.
+     * @param user       Der zu entfernende User.
+     * @param eventId    Die ID des Events, das verlassen wird.
+     * @throws IllegalStateException falls der letzte Host versucht aus dem Event auszutreten.
+     */
+    public void leaveEvent(User user, @Named("eventId") Long eventId) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (eventId != null) {
+            Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
+            event.getMemberList().remove(user.getEmail());
+            if (!event.getMemberList().containsValue(EventRole.HOST)) {
+                throw new IllegalStateException("the last host of an event can not leave");
+            }
+            new UserEndpoint().getFullUser(user.getEmail()).removeEvent(event);
+            // TODO Muss geändertes EndUser-Objekt gespeichert werden?
+            ofy().save().entity(event).now();
         }
     }
 
@@ -212,11 +274,11 @@ public class EventEndpoint extends SkatenightServerEndpoint {
                 pm.makePersistent(e);
 
                 // Benachrichtigung an User schicken
-                long secondsTillStart = (e.getMetaData().getDate().getTime() - System.currentTimeMillis()) / 1000;
+                long secondsTillStart = (e.getDate().getTime() - System.currentTimeMillis()) / 1000;
 
                 // Benachrichtigung nur schicken, wenn Event in der Zukunft liegt
                 if (secondsTillStart > 0) {
-                    String eventTitle = e.getMetaData().getTitle();
+                    String eventTitle = e.getTitle();
                     Sender sender = new Sender(Constants.GCM_API_KEY);
                     Message.Builder mb = new Message.Builder()
                             // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
@@ -231,7 +293,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
                         mb.addData("date_changed", Boolean.toString(dateChanged));
                         if (dateChanged) {
                             mb.addData("event_id", Long.toString(e.getId()));
-                            mb.addData("new_date", Long.toString(e.getMetaData().getDate().getTime()));
+                            mb.addData("new_date", Long.toString(e.getDate().getTime()));
                         }
                     } else {
                         mb.addData("title", "Ein neues Event wurde erstellt.");
@@ -256,11 +318,10 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param email die E-Mail des Teilnehmers
      */
     public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
-        Event event = getEvent(0l, keyId);
-        ArrayList<String> memberKeys = event.getMemberList();
+        Event event = getEvent(keyId);
+        Set<String> memberKeys = event.getMemberList().keySet();
         if (!memberKeys.contains(email)) {
-            memberKeys.add(email);
-            event.setMemberList(memberKeys);
+            event.getMemberList().put(email, EventRole.PARTICIPANT);
 
             updateEvent(event);
 
@@ -304,13 +365,11 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param email Die E-Mail des Members
      */
     public void removeMemberFromEvent(@Named("id") long keyId, @Named("email") String email) {
-        Event event = getEvent(0l, keyId);
+        Event event = getEvent(keyId);
 
-        ArrayList<String> memberKeys = event.getMemberList();
+        Set<String> memberKeys = event.getMemberList().keySet();
         if (memberKeys.contains(email)) {
-            memberKeys.remove(email);
-            event.setMemberList(memberKeys);
-
+            event.getMemberList().remove(email);
             updateEvent(event);
         }
     }
@@ -322,10 +381,10 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @return List von Teilnehmern
      */
     public List<EndUser> getMembersFromEvent(@Named("id") long keyId) {
-        Event event = getEvent(0l, keyId);
+        Event event = getEvent(keyId);
 
         List<EndUser> endUsers = new ArrayList<>(event.getMemberList().size());
-        for (String email: event.getMemberList()) {
+        for (String email: event.getMemberList().keySet()) {
             endUsers.add(new UserEndpoint().getFullUser(email));
         }
         return endUsers;
@@ -338,10 +397,10 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @return
      */
     public List<UserLocation> getMemberLocationsFromEvent(@Named("id") long keyId) {
-        Event event = getEvent(0l, keyId);
+        Event event = getEvent(keyId);
 
         List<UserLocation> userLocations = new ArrayList<>();
-        for (String email: event.getMemberList()) {
+        for (String email: event.getMemberList().keySet()) {
             userLocations.add(new UserEndpoint().getUserLocation(email));
         }
         return userLocations;
@@ -375,25 +434,6 @@ public class EventEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Bearbeitet das Event mit der Id des übergebenen Events mit den Daten des übergebenen Events.
-     *
-     * @param event das zu bearbeitende Event mit den neuen Daten
-     * @param user User, der die Methode aufruft
-     * @return true, wenn Aktion erfolgreich, false sonst
-     * @throws OAuthRequestException
-     * @throws IOException
-     */
-    public BooleanWrapper editEvent(Event event, User user) throws OAuthRequestException, IOException {
-        long keyId = event.getId();
-        Date oldDate = getEvent(0l, keyId).getMetaData().getDate();
-        Date newDate = event.getMetaData().getDate();
-        boolean dateChanged = oldDate.equals(newDate);
-        deleteEvent(user, event.getId());
-        createEvent(user, event, true, dateChanged);
-        return new BooleanWrapper(true);
-    }
-
-    /**
      * Gibt eine ArrayList von allen auf dem Server gespeicherten Events zurück.
      *
      * @return Liste mit allen Events
@@ -411,7 +451,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             // Events nocheinmal abrufen, da die Route nicht vollständig über ein QUery abgerufen werden kann
             List<Event> events = new ArrayList<>();
             for (Event e : result) {
-                events.add(getEvent(0l, e.getId()));
+                events.add(getEvent(e.getId()));
             }
             return events;
         } else {
