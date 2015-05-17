@@ -135,6 +135,14 @@ public class UserGroup {
         this.picture = picture;
     }
 
+    public GroupMetaData getMetaData() {
+        return metaData.get();
+    }
+
+    public void setMetaData(GroupMetaData metaData) {
+        this.metaData = Ref.create(metaData);
+    }
+
     /**
      * Eine embedded Klasse zum speichern von Rechten zu jedem Mitglied der
      * Nutzergrppe. Die Klasse hat zwei Felder, eins mit dem Namen des Mitglieds

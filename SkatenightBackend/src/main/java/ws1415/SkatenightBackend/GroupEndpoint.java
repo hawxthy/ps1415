@@ -65,7 +65,6 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         UserGroup ug = new UserGroup(endUser.getEmail());
         ug.addGroupMember(endUser.getEmail(), rights);
         ug.setName(groupName);
-        ofy().save().entity(ug).now();
 
         // Die Metadaten für die UserGroup erstellen
         GroupMetaData metaData = new GroupMetaData();
@@ -74,6 +73,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         metaData.setMembers(new HashSet<String>());
         metaData.getMembers().add(ug.getCreator());
 
+        ug.setMetaData(metaData);
+        ofy().save().entity(ug).now();
         ofy().save().entity(metaData).now();
 
         // Die Daten beim EndUser setzen und diesen dann abspeichern
