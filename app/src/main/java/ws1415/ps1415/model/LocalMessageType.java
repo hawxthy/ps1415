@@ -1,7 +1,7 @@
 package ws1415.ps1415.model;
 
 /**
- * Das MessageType-Enum dient zum einfachen Unterscheiden von Nachrichten.
+ * Das LocalMessageType-Enum dient zum einfachen Unterscheiden von Nachrichten.
  */
 public enum LocalMessageType {
     OUTGOING_NOT_RECEIVED(1),

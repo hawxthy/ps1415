@@ -1,4 +1,4 @@
-package ws1415.ps1415.helper;
+package ws1415.ps1415.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,34 +15,34 @@ import ws1415.ps1415.model.Message;
 import ws1415.ps1415.model.LocalMessageType;
 
 /**
- * Der MessageHelper verwaltet die Datenbank der Nachrichten und Konversationen.
+ * Der MessageDatabase verwaltet die Datenbank der Nachrichten und Konversationen.
  *
  * @author Martin Wrodarczyk
  */
-public class MessageHelper extends SQLiteOpenHelper {
+public class MessageDbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "messageManager";
 
     // Singelton Instanz
-    private static MessageHelper instance;
+    private static MessageDbHelper instance;
 
     // Tabellen
-    private static final String TABLE_CONVERSATION = "conversations";
-    private static final String TABLE_MESSAGE = "messages";
+    public static final String TABLE_CONVERSATION = "conversations";
+    public static final String TABLE_MESSAGE = "messages";
 
     // Conversation Spalten
-    private static final String KEY_ID_CONVERSATION = "email";
-    private static final String KEY_FIRST_NAME = "firstName";
-    private static final String KEY_LAST_NAME = "lastName";
-    private static final String KEY_COUNT_NEW_MESSAGES = "countNewMessages";
-    private static final String FOREIGN_KEY_LAST_MESSAGE = "lastMessage";
+    public static final String KEY_ID_CONVERSATION = "email";
+    public static final String KEY_FIRST_NAME = "firstName";
+    public static final String KEY_LAST_NAME = "lastName";
+    public static final String KEY_COUNT_NEW_MESSAGES = "countNewMessages";
+    public static final String FOREIGN_KEY_LAST_MESSAGE = "lastMessage";
 
     // Message Spalten
-    private static final String KEY_ID_MESSAGE = "id";
-    private static final String KEY_SEND_DATE = "sendDate";
-    private static final String KEY_CONTENT = "content";
-    private static final String KEY_TYPE = "type";
-    private static final String FOREIGN_KEY_CONVERSATION = "conversation_id";
+    public static final String KEY_ID_MESSAGE = "id";
+    public static final String KEY_SEND_DATE = "sendDate";
+    public static final String KEY_CONTENT = "content";
+    public static final String KEY_TYPE = "type";
+    public static final String FOREIGN_KEY_CONVERSATION = "conversation_id";
 
     // Tabellen Create Statements
     private static final String CREATE_TABLE_CONVERSATION = "CREATE TABLE "
@@ -58,26 +58,27 @@ public class MessageHelper extends SQLiteOpenHelper {
             + KEY_TYPE + " INTEGER" + ")";
 
     private static final String ALTER_TABLE_MESSAGE_FOREIGN_KEY = "ALTER TABLE "
-            + TABLE_MESSAGE + " ADD COLUMN " + FOREIGN_KEY_CONVERSATION + " INTEGER "
+            + TABLE_MESSAGE + " ADD COLUMN " + FOREIGN_KEY_CONVERSATION + " TEXT "
             + "REFERENCES " + TABLE_CONVERSATION + "(" + KEY_ID_CONVERSATION + ")"
             + " ON DELETE CASCADE";
 
-    private static final String JOIN_CONVERSATION_MESSAGE_ID = "SELECT * FROM "
+    public static final String JOIN_CONVERSATION_MESSAGE_ID = "SELECT * FROM "
             + TABLE_CONVERSATION + " LEFT JOIN " + TABLE_MESSAGE + " ON " + TABLE_CONVERSATION
             + "." + FOREIGN_KEY_LAST_MESSAGE + " = " + TABLE_MESSAGE + "." + KEY_ID_MESSAGE
             + " WHERE " + TABLE_CONVERSATION + "." + KEY_ID_CONVERSATION + " = ?";
 
-    private static final String JOIN_CONVERSATION_MESSAGE = "SELECT * FROM "
+    public static final String JOIN_CONVERSATION_MESSAGE = "SELECT * FROM "
             + TABLE_CONVERSATION + " LEFT JOIN " + TABLE_MESSAGE + " ON " + TABLE_CONVERSATION
             + "." + FOREIGN_KEY_LAST_MESSAGE + " = " + TABLE_MESSAGE + "." + KEY_ID_MESSAGE;
 
-    private MessageHelper(Context context) {
+    private MessageDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        context.deleteDatabase(DATABASE_NAME);
     }
 
-    public static synchronized MessageHelper getInstance(Context context) {
+    public static synchronized MessageDbHelper getInstance(Context context) {
         if (instance == null) {
-            instance = new MessageHelper(context.getApplicationContext());
+            instance = new MessageDbHelper(context.getApplicationContext());
         }
         return instance;
     }

@@ -1,5 +1,7 @@
-package ws1415.ps1415.helper;
+package ws1415.ps1415.database;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -11,9 +13,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.ps1415.controller.MessageDbController;
 import ws1415.ps1415.model.Conversation;
-import ws1415.ps1415.model.Message;
 import ws1415.ps1415.model.LocalMessageType;
+import ws1415.ps1415.model.Message;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,7 +30,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE, emulateSdk = 18)
-public class MessageHelperTest {
+public class MessageDbControllerTest {
     public static final String TEST_MAIL = "test@gmail.com";
     public static final String TEST_FIRST_NAME = "Martin";
     public static final String TEST_LAST_NAME = "Müller";
@@ -48,20 +51,37 @@ public class MessageHelperTest {
     public static final Date TEST_MESSAGE_DATE_SEND_2 = new Date(1430847009086L);
     public static final LocalMessageType TEST_MESSAGE_TYPE_2 = LocalMessageType.OUTGOING_NOT_RECEIVED;
 
-    private MessageHelper db;
+    private MessageDbController dbController;
+    private static final Conversation TEST_CONVERSATION = new Conversation(TEST_MAIL, TEST_FIRST_NAME, TEST_LAST_NAME);
+    private static final Conversation TEST_CONVERSATION_2 = new Conversation(TEST_MAIL_2, TEST_FIRST_NAME_2, TEST_LAST_NAME_2);
+    private static final List<Conversation> TEST_LIST_CONVERSATIONS = Arrays.asList(TEST_CONVERSATION, TEST_CONVERSATION_2);
+
+    @Before
+    public void setUp(){
+        dbController = MessageDbController.getInstance(Robolectric.application);
+
+        boolean succeed = dbController.insertConversation(TEST_CONVERSATION);
+        assertTrue(succeed);
+
+        succeed = dbController.insertConversation(TEST_CONVERSATION_2);
+        assertTrue(succeed);
+    }
+
+    @After
+    public void tearDown(){
+        boolean succeed = dbController.deleteConversation(TEST_CONVERSATION.getEmail());
+        assertTrue(succeed);
+
+        succeed = dbController.deleteConversation(TEST_CONVERSATION_2.getEmail());
+        assertTrue(succeed);
+    }
 
     /**
      * Prüft das Erstellen und Abrufen einer Konversation.
      */
     @Test
     public void testCreateAndGetConversation() {
-        db = MessageHelper.getInstance(Robolectric.application);
-
-        Conversation conversation = new Conversation(TEST_MAIL, TEST_FIRST_NAME, TEST_LAST_NAME);
-        boolean succeed = db.insertConversation(conversation);
-        assertTrue(succeed);
-
-        conversation = db.getConversation(TEST_MAIL);
+        Conversation conversation = dbController.getConversation(TEST_MAIL);
 
         assertNotNull(conversation);
         assertEquals(TEST_MAIL, conversation.getEmail());
@@ -76,22 +96,20 @@ public class MessageHelperTest {
      */
     @Test
     public void testDeleteConversation() {
-        db = MessageHelper.getInstance(Robolectric.application);
-
-        Conversation conversation = new Conversation(TEST_MAIL, TEST_FIRST_NAME, TEST_LAST_NAME);
-        db.insertConversation(conversation);
-
         Message message = new Message(TEST_MESSAGE_DATE_SEND_1, TEST_MESSAGE_CONTENT_1, TEST_MESSAGE_TYPE_1);
-        db.insertMessage(TEST_MAIL, message);
+        dbController.insertMessage(TEST_MAIL, message);
 
-        boolean succeed = db.deleteConversation(TEST_MAIL);
+        boolean succeed = dbController.deleteConversation(TEST_MAIL);
         assertTrue(succeed);
 
-        conversation = db.getConversation(TEST_MAIL);
+        Conversation conversation = dbController.getConversation(TEST_MAIL);
         assertNull(conversation);
 
-        List<Message> dbMessages = db.getAllMessages(TEST_MAIL);
+        List<Message> dbMessages = dbController.getAllMessages(TEST_MAIL);
         assertTrue(dbMessages.size() == 0);
+
+        succeed = dbController.insertConversation(TEST_CONVERSATION);
+        assertTrue(succeed);
     }
 
     /**
@@ -101,23 +119,22 @@ public class MessageHelperTest {
      */
     @Test
     public void testUpdateConversation() {
-        db = MessageHelper.getInstance(Robolectric.application);
-
-        Conversation conversation = new Conversation(TEST_MAIL, TEST_FIRST_NAME, TEST_LAST_NAME);
-        db.insertConversation(conversation);
-
-        boolean succeed = db.updateConversation(TEST_MAIL, TEST_NEW_FIRST_NAME, TEST_NEW_LAST_NAME);
+        boolean succeed = dbController.updateConversation(TEST_MAIL, TEST_NEW_FIRST_NAME, TEST_NEW_LAST_NAME);
         assertTrue(succeed);
 
-        conversation = db.getConversation(TEST_MAIL);
+        Conversation conversation = dbController.getConversation(TEST_MAIL);
         assertEquals(TEST_NEW_FIRST_NAME, conversation.getFirstName());
         assertEquals(TEST_NEW_LAST_NAME, conversation.getLastName());
 
-        succeed = db.updateConversation(TEST_MAIL, TEST_NEW_COUNT_NEW_MESSAGES);
-        assertTrue(succeed);
+        int oldCountNewMessages = conversation.getCountNewMessages();
 
-        conversation = db.getConversation(TEST_MAIL);
-        assertEquals(TEST_NEW_COUNT_NEW_MESSAGES, conversation.getCountNewMessages());
+        conversation = dbController.getConversation(TEST_MAIL);
+        assertEquals(oldCountNewMessages, conversation.getCountNewMessages());
+
+        dbController.resetNewMessages(TEST_MAIL);
+
+        conversation = dbController.getConversation(TEST_MAIL);
+        assertEquals(conversation.getCountNewMessages(), 0);
     }
 
     /**
@@ -125,23 +142,13 @@ public class MessageHelperTest {
      */
     @Test
     public void testListConversations() {
-        db = MessageHelper.getInstance(Robolectric.application);
-
-        List<Conversation> testConversations = new ArrayList<>();
-        Conversation conversation = new Conversation(TEST_MAIL, TEST_FIRST_NAME, TEST_LAST_NAME);
-        db.insertConversation(conversation);
-        testConversations.add(conversation);
-
-        Conversation conversation2 = new Conversation(TEST_MAIL_2, TEST_FIRST_NAME_2, TEST_LAST_NAME_2);
-        db.insertConversation(conversation2);
-        testConversations.add(conversation2);
-
-        List<Conversation> conversationsDb = db.getAllConversations();
+        List<Conversation> conversationsDb = dbController.getAllConversations();
 
         // Prüfe Größe
-        assertEquals(conversationsDb.size(), testConversations.size());
+        assertEquals(conversationsDb.size(), TEST_LIST_CONVERSATIONS.size());
 
-        List<String> testConversationEmails = Arrays.asList(TEST_MAIL, TEST_MAIL_2);
+        List<String> testConversationEmails = Arrays.asList(TEST_CONVERSATION.getEmail(),
+                TEST_CONVERSATION_2.getEmail());
         List<String> dbConversationEmails = new ArrayList<>();
 
         for(Conversation c : conversationsDb){
@@ -151,9 +158,6 @@ public class MessageHelperTest {
         // Prüfe Emails
         assertTrue(testConversationEmails.containsAll(dbConversationEmails)
                 && dbConversationEmails.containsAll(testConversationEmails));
-
-        db.deleteConversation(TEST_MAIL);
-        db.deleteConversation(TEST_MAIL_2);
     }
 
     /**
@@ -162,23 +166,17 @@ public class MessageHelperTest {
      */
     @Test
     public void testListMessages() {
-        db = MessageHelper.getInstance(Robolectric.application);
-
-        Conversation conversation = new Conversation(TEST_MAIL, TEST_FIRST_NAME, TEST_LAST_NAME);
-        assertTrue(db.insertConversation(conversation));
-
         List<Message> testMessages = new ArrayList<>();
 
         Message message1 = new Message(TEST_MESSAGE_DATE_SEND_1, TEST_MESSAGE_CONTENT_1, TEST_MESSAGE_TYPE_1);
-        assertTrue(db.insertMessage(TEST_MAIL, message1) >= 0);
+        assertTrue(dbController.insertMessage(TEST_MAIL, message1) >= 0);
         testMessages.add(message1);
 
         Message message2 = new Message(TEST_MESSAGE_DATE_SEND_2, TEST_MESSAGE_CONTENT_2, TEST_MESSAGE_TYPE_2);
-        assertTrue(db.insertMessage(TEST_MAIL, message2) >= 0);
-
+        assertTrue(dbController.insertMessage(TEST_MAIL, message2) >= 0);
         testMessages.add(message2);
 
-        List<Message> messagesDb = db.getAllMessages(TEST_MAIL);
+        List<Message> messagesDb = dbController.getAllMessages(TEST_MAIL);
 
         // Prüfe Größe
         assertEquals(testMessages.size(), messagesDb.size());
@@ -201,26 +199,19 @@ public class MessageHelperTest {
      */
     @Test
     public void testLastMessage(){
-        db = MessageHelper.getInstance(Robolectric.application);
-
-        Conversation conversation = new Conversation(TEST_MAIL, TEST_FIRST_NAME, TEST_LAST_NAME);
-        db.insertConversation(conversation);
-
         Message message = new Message(TEST_MESSAGE_DATE_SEND_1, TEST_MESSAGE_CONTENT_1, TEST_MESSAGE_TYPE_1);
-        db.insertMessage(TEST_MAIL, message);
+        dbController.insertMessage(TEST_MAIL, message);
 
-        Conversation dbConversation = db.getConversation(TEST_MAIL);
+        Conversation dbConversation = dbController.getConversation(TEST_MAIL);
 
         assertEquals(TEST_MESSAGE_CONTENT_1, dbConversation.getLastMessage().getContent());
 
         message = new Message(TEST_MESSAGE_DATE_SEND_2, TEST_MESSAGE_CONTENT_2, TEST_MESSAGE_TYPE_2);
-        db.insertMessage(TEST_MAIL, message);
+        dbController.insertMessage(TEST_MAIL, message);
 
-        dbConversation = db.getConversation(TEST_MAIL);
+        dbConversation = dbController.getConversation(TEST_MAIL);
 
         assertEquals(TEST_MESSAGE_CONTENT_2, dbConversation.getLastMessage().getContent());
-
-        db.deleteConversation(TEST_MAIL);
     }
 
     /**
@@ -228,16 +219,11 @@ public class MessageHelperTest {
      */
     @Test
     public void testUpdateReceivedMessage(){
-        db = MessageHelper.getInstance(Robolectric.application);
-
-        Conversation conversation = new Conversation(TEST_MAIL, TEST_FIRST_NAME, TEST_LAST_NAME);
-        db.insertConversation(conversation);
-
         Message message = new Message(TEST_MESSAGE_DATE_SEND_1, TEST_MESSAGE_CONTENT_1, TEST_MESSAGE_TYPE_1);
-        long id = db.insertMessage(TEST_MAIL, message);
-        assertTrue(db.updateMessageReceived(TEST_MAIL, id, TEST_MESSAGE_DATE_SEND_1.getTime()));
+        long id = dbController.insertMessage(TEST_MAIL, message);
+        assertTrue(dbController.updateMessageReceived(TEST_MAIL, id, TEST_MESSAGE_DATE_SEND_1.getTime()));
 
-        Message dbMessage = db.getAllMessages(TEST_MAIL).get(0);
+        Message dbMessage = dbController.getAllMessages(TEST_MAIL).get(0);
         assertEquals(LocalMessageType.OUTGOING_RECEIVED, dbMessage.getType());
     }
 

@@ -40,6 +40,11 @@ public class AdminRoleAuthTest extends ActivityInstrumentationTestCase2<ImageSto
         super(ImageStorageTestActivity.class);
     }
 
+    /**
+     * Loggt den Benutzer ein und erstellt einen Benutzer zum Testen.
+     *
+     * @throws Exception
+     */
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -69,6 +74,11 @@ public class AdminRoleAuthTest extends ActivityInstrumentationTestCase2<ImageSto
         assertTrue(createSignal.await(30, TimeUnit.SECONDS));
     }
 
+    /**
+     * Löscht den erstellten Benutzer aus der setUp-Methode.
+     *
+     * @throws Exception
+     */
     @Override
     public void tearDown() throws Exception {
         final CountDownLatch deleteSignal = new CountDownLatch(1);
@@ -82,6 +92,11 @@ public class AdminRoleAuthTest extends ActivityInstrumentationTestCase2<ImageSto
         super.tearDown();
     }
 
+    /**
+     * Prüft, ob einem Benutzer die Rolle richtig zugewiesen wird.
+     *
+     * @throws InterruptedException
+     */
     @SmallTest
     public void testAssignGlobalRole() throws InterruptedException {
         final CountDownLatch assignSignal = new CountDownLatch(1);
@@ -107,6 +122,11 @@ public class AdminRoleAuthTest extends ActivityInstrumentationTestCase2<ImageSto
         assertTrue(getSignal.await(30, TimeUnit.SECONDS));
     }
 
+    /**
+     * Prüft, ob globale Administratoren richtig abgerufen werden.
+     *
+     * @throws InterruptedException
+     */
     @SmallTest
     public void testListGlobalAdmins() throws InterruptedException {
         final CountDownLatch assignSignal = new CountDownLatch(1);
@@ -135,6 +155,4 @@ public class AdminRoleAuthTest extends ActivityInstrumentationTestCase2<ImageSto
         });
         assertTrue(listSignal.await(30, TimeUnit.SECONDS));
     }
-
-
 }

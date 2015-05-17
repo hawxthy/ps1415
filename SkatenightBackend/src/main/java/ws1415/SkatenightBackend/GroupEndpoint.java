@@ -88,7 +88,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         try {
             List<UserGroup> result = new LinkedList<>();
             List<String> missingGroups = new LinkedList<>();
-            for (String g : endUser.getMyUserGroups()) {
+            for (String g : endUser.getUserProfile().getMyUserGroups()) {
                 ug = getUserGroup(pm, g);
                 if (ug != null) {
                     result.add(ug);
@@ -100,7 +100,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             // nicht mehr da sein sollten, diese löschen
             if (missingGroups.size() > 0) {
                 for (String g : missingGroups) {
-                    endUser.getMyUserGroups().remove(g);
+                    endUser.getUserProfile().getMyUserGroups().remove(g);
                 }
                 pm.makePersistent(endUser);
             }
@@ -135,8 +135,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             UserGroup ug = new UserGroup(endUser);
             ug.setName(name);
             ug.getMemberRanks().put(endUser.getEmail(), Right.DELETEGROUP.name());
-            endUser.addUserGroup(ug);
-            endUser.getMyUserGroups();
+            endUser.getUserProfile().addUserGroup(ug);
+            endUser.getUserProfile().getMyUserGroups();
             pm.makePersistent(endUser);
             pm.makePersistent(ug);
             RegistrationManager rm = getRegistrationManager(pm);
@@ -190,7 +190,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
                 Set<String> regids = new HashSet<>();
                 RegistrationManager rm = getRegistrationManager(pm);
                 for (EndUser e : members) {
-                    e.removeUserGroup(ug);
+                    e.getUserProfile().removeUserGroup(ug);
                     pm.makePersistent(e);
                     regids.add(rm.getUserIdByMail(e.getEmail()));
                 }
@@ -242,7 +242,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             if (ug == null) {
                 throw new IllegalArgumentException("a group with the submitted group name does not exist");
             }
-            endUser.addUserGroup(ug);
+            endUser.getUserProfile().addUserGroup(ug);
             pm.makePersistent(endUser);
             pm.makePersistent(ug);
         } finally {
@@ -276,7 +276,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             if (user.getEmail().equals(ug.getCreator().getEmail())) {
                 throw new IllegalArgumentException("you can not leave your own group");
             }
-            endUser.removeUserGroup(ug);
+            endUser.getUserProfile().removeUserGroup(ug);
             ug.getMemberRanks().remove(endUser.getEmail());
             pm.makePersistent(endUser);
             pm.makePersistent(ug);
@@ -373,7 +373,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             if(userGroup == null){
                 throw new IllegalArgumentException("this group doesn't exist");
             }
-            endUser.removeUserGroup(userGroup);
+            endUser.getUserProfile().removeUserGroup(userGroup);
             pm.makePersistent(endUser);
             userGroup.getMemberRanks().remove(endUser.getEmail());
         }finally {

@@ -29,7 +29,7 @@ public class UserController {
     /**
      * Keine Instanziierung ermöglichen.
      */
-    private UserController(){
+    private UserController() {
     }
 
     /**
@@ -51,6 +51,27 @@ public class UserController {
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("endUser: " + params[0] + " could not be created");
+                    return null;
+                }
+            }
+        }.execute(userMail);
+    }
+
+    /**
+     * Prüft ob ein Benutzer mit der E-Mail Adresse existiert.
+     *
+     * @param handler
+     * @param userMail E-Mail Adresse
+     */
+    public static void existsUser(ExtendedTaskDelegate handler, String userMail) {
+        new ExtendedTask<String, Void, Boolean>(handler) {
+            @Override
+            protected Boolean doInBackground(String... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().existsUser(params[0]).execute().getValue();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("existance of the end user could not be retrieved");
                     return null;
                 }
             }
@@ -84,7 +105,7 @@ public class UserController {
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void getUserProfile(ExtendedTaskDelegate handler, final String userMail){
+    public static void getUserProfile(ExtendedTaskDelegate handler, final String userMail) {
         new ExtendedTask<Void, Void, UserProfile>(handler) {
             @Override
             protected UserProfile doInBackground(Void... voids) {
@@ -106,10 +127,10 @@ public class UserController {
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void getUserPicture(ExtendedTaskDelegate handler, final String userMail){
-        new ExtendedTask<Void, Void, UserPicture>(handler){
+    public static void getUserPicture(ExtendedTaskDelegate handler, final String userMail) {
+        new ExtendedTask<Void, Void, UserPicture>(handler) {
             @Override
-            protected UserPicture doInBackground(Void... voids){
+            protected UserPicture doInBackground(Void... voids) {
                 try {
                     return ServiceProvider.getService().userEndpoint().getUserPicture(userMail).execute();
                 } catch (IOException e) {
@@ -147,10 +168,9 @@ public class UserController {
      * Aktualisiert die allgemeinen Informationen zu einem Benutzer.
      *
      * @param handler
-     * @param newInfo Neue allgemeine Informationen zu dem Benutzer
+     * @param newInfo         Neue allgemeine Informationen zu dem Benutzer
      * @param optOutSearch
-     * @param groupVisibility
-     * TODO: Abfrage parameter
+     * @param groupVisibility TODO: Abfrage parameter
      */
     public static void updateUserProfile(ExtendedTaskDelegate handler, final UserInfo newInfo, final Boolean optOutSearch, final Visibility groupVisibility) {
         new ExtendedTask<Void, Void, UserInfo>(handler) {
@@ -173,7 +193,7 @@ public class UserController {
      *
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
-     * @param picture Bitmap des neuen Profilbildes
+     * @param picture  Bitmap des neuen Profilbildes
      */
     public static void updateUserPicture(ExtendedTaskDelegate handler, final String userMail, final Bitmap picture) {
         final Text encodedImage = ImageUtil.EncodeBitmapToText(picture);
@@ -343,7 +363,7 @@ public class UserController {
             protected List<UserInfo> doInBackground(String... params) {
                 try {
                     return ServiceProvider.getService().userEndpoint().listFriends(params[0]).execute().getItems();
-                } catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                     publishError("list of friends of: " + params[0] + " could not be retrieved");
                     return null;
@@ -357,7 +377,7 @@ public class UserController {
      * zu den Ergebnissen in einer Liste aus.
      *
      * @param handler
-     * @param input Eingabe
+     * @param input   Eingabe
      */
     public static void searchUsers(ExtendedTaskDelegate handler, String input) {
         new ExtendedTask<String, Void, List<UserInfo>>(handler) {
@@ -382,7 +402,7 @@ public class UserController {
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers, der hinzugefügt werden soll
      */
-    public static void addFriend(ExtendedTaskDelegate handler, final String userMail, final String friendMail){
+    public static void addFriend(ExtendedTaskDelegate handler, final String userMail, final String friendMail) {
         new ExtendedTask<String, Void, Boolean>(handler) {
             @Override
             protected Boolean doInBackground(String... params) {
@@ -403,7 +423,7 @@ public class UserController {
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers, der entfernt werden soll
      */
-    public static void removeFriend(ExtendedTaskDelegate handler, final String userMail, final String friendMail){
+    public static void removeFriend(ExtendedTaskDelegate handler, final String userMail, final String friendMail) {
         new ExtendedTask<String, Void, Boolean>(handler) {
             @Override
             protected Boolean doInBackground(String... params) {

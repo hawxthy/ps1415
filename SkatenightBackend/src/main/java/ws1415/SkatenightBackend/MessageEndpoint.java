@@ -22,7 +22,6 @@ import ws1415.SkatenightBackend.gcm.Sender;
  */
 public class MessageEndpoint extends SkatenightServerEndpoint {
 
-
     /**
      * Sendet über GCM eine Nachricht an den Benutzer mit der angegebenen Email.
      *

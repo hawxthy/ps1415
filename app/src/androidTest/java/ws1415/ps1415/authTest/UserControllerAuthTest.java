@@ -37,13 +37,14 @@ import ws1415.ps1415.activity.ImageStorageTestActivity;
  * Diese Klasse wird dazu genutzt die Funktionalitäten des UserControllers zu testen, die
  * Authorisierung benötigen.
  *
- * Ausführer der Tests muss eingetragener Admin auf dem Server sein. Dies ist umsetzbar in dem man
- * als "FIRST_ADMIN" seine E-Mail Adresse einträgt, sodass anschließend bei Serverstart ein
+ * Ausführer der Tests muss ein eingetragener Admin auf dem Server sein. Dies ist umsetzbar in dem
+ * man als "FIRST_ADMIN" seine E-Mail Adresse einträgt, sodass anschließend bei Serverstart ein
  * mit der angegebenen E-Mail als Administrator angelegt wird.
  *
  * @author Martin Wrodarczyk
  */
 public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<ImageStorageTestActivity> {
+    // Testdaten
     public static final String TEST_MAIL = "test@gmail.com";
     public static final String TEST_MAIL_2 = "test2@gmail.com";
 
@@ -90,6 +91,11 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         super(ImageStorageTestActivity.class);
     }
 
+    /**
+     * Loggt den Benutzer ein und erstellt zwei Benutzer zum Testen.
+     *
+     * @throws Exception
+     */
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -121,13 +127,17 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
             public void taskDidFinish(ExtendedTask task, Void voids) {
                 createSignal.countDown();
             }
-        }, TEST_MAIL_2, "Test", "Test2");
+        }, TEST_MAIL_2, "", "");
         assertTrue(createSignal.await(30, TimeUnit.SECONDS));
     }
 
+    /**
+     * Löscht die beiden Benutzer die in setUp erstellt worden sind.
+     *
+     * @throws Exception
+     */
     @Override
     public void tearDown() throws Exception {
-        // Benutzer wieder löschen
         final CountDownLatch deleteSignal = new CountDownLatch(2);
         UserController.deleteUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
@@ -146,7 +156,23 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
     }
 
     /**
-     * Erstellt einen Benutzer und prüft ob der Benutzer auf dem Server gespeichert ist.
+     * Prüft, ob die Existenz eines Benutzers richtig abgefragt wird.
+     *
+     * @throws InterruptedException
+     */
+    public void testExistsUser() throws InterruptedException {
+        final CountDownLatch existsSignal = new CountDownLatch(1);
+        UserController.existsUser(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Boolean result) {
+                assertTrue(result);
+                existsSignal.countDown();
+            }
+        }, TEST_MAIL);
+        assertTrue(existsSignal.await(30, TimeUnit.SECONDS));
+    }
+    /**
+     * Prüft ob ein Benutzer richtig auf dem Server gespeichert wird.
      *
      * @throws Exception
      */
@@ -187,7 +213,7 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
     }
 
     /**
-     * Prüft, ob die Standortinformationen eines Benutzers richtig abgerufen werden.
+     * Prüft, ob die allgemeinen Informationen eines Benutzers richtig abgerufen werden.
      *
      * @throws InterruptedException
      */
@@ -206,7 +232,7 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
     }
 
     /**
-     * Prüft ob die allgemeinen Informationen von Benutzern richtig abgerufen werden.
+     * Prüft ob die allgemeinen Informationen von mehreren Benutzern richtig abgerufen werden.
      *
      * @throws Exception
      */
@@ -234,13 +260,12 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
     }
 
     /**
-     * Prüft ob die allgemeinen Informationen von Benutzern zusammen mit den Profilbildern richtig
-     * abgerufen werden.
+     * Prüft ob Benutzerprofile von mehreren Benutzern richtig abgerufen werden.
      *
      * @throws Exception
      */
     @SmallTest
-    public void testListUserInfoWithPicture() throws InterruptedException {
+    public void testListUserProfile() throws InterruptedException {
         final List<String> userMails = new ArrayList<>();
         userMails.add(TEST_MAIL);
         userMails.add(TEST_MAIL_2);
@@ -282,6 +307,11 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         assertTrue(searchSignal.await(20, TimeUnit.SECONDS));
     }
 
+    /**
+     * Prüft, ob Standortinformationen eines Benutzers richtig aktualisiert werden.
+     *
+     * @throws InterruptedException
+     */
     @SmallTest
     public void testUpdateUserLocation() throws InterruptedException {
         final CountDownLatch updateSignal = new CountDownLatch(1);
@@ -345,10 +375,8 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
                 assertEquals(TEST_MAIL, userInfo.getEmail());
                 assertEquals(TEST_FIRST_NAME, userInfo.getFirstName());
                 assertEquals(TEST_GENDER.getRepresentation(), userInfo.getGender());
-                //assertEquals(TEST_LAST_NAME, userInfo.getLastName().getValue());
                 assertNull(userInfo.getLastName().getValue());
                 assertEquals(TEST_LAST_NAME_VISIBILITY.getId(), userInfo.getLastName().getVisibility());
-                //assertEquals(TEST_CITY, userInfo.getCity().getValue());
                 assertNull(userInfo.getCity().getValue());
                 assertEquals(TEST_CITY_VISIBILITY.getId(), userInfo.getCity().getVisibility());
                 assertEquals(TEST_DATE_OF_BIRTH, userInfo.getDateOfBirth().getValue());
@@ -375,7 +403,12 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         assertTrue(getFullSignal.await(30, TimeUnit.SECONDS));
     }
 
-    // TODO: Profilbild ändern
+
+    /**
+     * Prüft, ob das Profilbild eines Benutzers richtig geändert wird.
+     *
+     * @throws InterruptedException
+     */
     @SmallTest
     public void testUpdateUserPicture() throws InterruptedException {
         final Bitmap testImage = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.test);
@@ -403,6 +436,11 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         assertTrue(getSignal.await(120, TimeUnit.SECONDS));
     }
 
+    /**
+     * Prüft, ob ein Freund richtig hinzugefügt und auch wieder entfernt wird.
+     *
+     * @throws InterruptedException
+     */
     @SmallTest
     public void testAddAndRemoveFriend() throws InterruptedException {
         final CountDownLatch addFriendSignal = new CountDownLatch(1);
@@ -449,6 +487,11 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         assertTrue(getUserRemovedSignal.await(30, TimeUnit.SECONDS));
     }
 
+    /**
+     * Prüft, ob die Liste der Freunde richtig abgerufen werden.
+     *
+     * @throws InterruptedException
+     */
     @SmallTest
     public void testListFriends() throws InterruptedException {
         final CountDownLatch addFriendSignal = new CountDownLatch(1);
