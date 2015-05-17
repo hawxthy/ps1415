@@ -207,25 +207,24 @@ public class GroupController {
      * den übergenen EndUser aus der übergebenen UseGroup löscht.
      *
      * @param handler Task, der den Server anspricht
-     * @param group Die UserGroup dessen EndUser gelöscht werden soll
+     * @param groupName Die UserGroup dessen EndUser gelöscht werden soll
      * @param user Die E-Mail des EndUsers, der gelöscht werden soll
      * @return Meldung über Erfolg des Löschens
      *          true = Löschen war erfolgreich
      *          false = Löschen war nicht erfolgreich
      */
-    public void removeMember(ExtendedTaskDelegate handler, UserGroup group, String user){
-        final String userFinal = user;
-        new ExtendedTask<UserGroup, Void, Void>(handler){
+    public void removeMember(ExtendedTaskDelegate handler, String groupName, final String user){
+        new ExtendedTask<String, Void, Void>(handler){
             @Override
-            protected Void doInBackground(UserGroup... params){
+            protected Void doInBackground(String... params){
                 try{
-                    return ServiceProvider.getService().groupEndpoint().removeMember(userFinal, params[0]).execute();
+                    return ServiceProvider.getService().groupEndpoint().removeMember(params[0], user).execute();
                 }catch (IOException e){
                     publishError("Member konnte nicht entfernt werden");
                     return null;
                 }
             }
-        }.execute(group);
+        }.execute(groupName);
     }
 
     /**

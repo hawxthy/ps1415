@@ -49,4 +49,10 @@ public class Constants {
      * Der Public API-Key, der in der Developer Console für GCM angelegt wurde.
      */
     public static final String GCM_API_KEY = "AIzaSyCpwhxda1Lb5E61_fybZq2iSJgViZu3QNM";
+
+    /**
+     * Definiert den Benutzer, der als Administrator beim Start der Servers erstellt werden soll,
+     * falls dieser nicht bereits existiert.
+     */
+    public static final String FIRST_ADMIN = "martin.wrod@googlemail.com";
 }
