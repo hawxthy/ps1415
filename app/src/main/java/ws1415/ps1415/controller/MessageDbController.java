@@ -54,20 +54,19 @@ public class MessageDbController {
         values.put(MessageDbHelper.KEY_COUNT_NEW_MESSAGES, 0);
 
         long rowId = db.insert(MessageDbHelper.TABLE_CONVERSATION, null, values);
-        Log.d("ROWID", String.valueOf(rowId));
         return !(rowId == -1);
     }
 
     /**
      * Ruft die Konversation mit der Person mit der angegebenen E-Mail ab.
      *
-     * @param email E-Mail Adresse der Person
+     * @param userMail E-Mail Adresse der Person
      * @return Konversation mit der Person
      */
-    public Conversation getConversation(String email) {
+    public Conversation getConversation(String userMail) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery(MessageDbHelper.JOIN_CONVERSATION_MESSAGE_ID, new String[]{email});
+        Cursor cursor = db.rawQuery(MessageDbHelper.JOIN_CONVERSATION_MESSAGE_ID, new String[]{userMail});
 
         if (!cursor.moveToFirst()) return null;
         Conversation conversation = getConversation(cursor);
@@ -134,27 +133,26 @@ public class MessageDbController {
     /**
      * Löscht eine Conversation, wobei dazugehörige Nachrichten kaskadierend gelöscht werden.
      *
-     * @param email E-Mail Adresse der dazugehörigen Person
+     * @param userMail E-Mail Adresse der dazugehörigen Person
      */
-    public boolean deleteConversation(String email) {
+    public boolean deleteConversation(String userMail) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         int deletedRows = db.delete(MessageDbHelper.TABLE_CONVERSATION, MessageDbHelper.KEY_ID_CONVERSATION + "=?",
-                new String[]{email});
+                new String[]{userMail});
 
         return deletedRows == 1;
-
     }
 
     /**
      * Aktualisiert den Vor- und Nachnamen der Person, zu der die Konversation gehört.
      *
-     * @param email     E-Mail Adresse der Person
+     * @param userMail     E-Mail Adresse der Person
      * @param firstName Neuer Vorname
      * @param lastName  Neuer Nachname
      * @return true, falls Aktualisierung erfolgreich, false andernfalls
      */
-    public boolean updateConversation(String email, String firstName, String lastName) {
+    public boolean updateConversation(String userMail, String firstName, String lastName) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -162,7 +160,7 @@ public class MessageDbController {
         values.put(MessageDbHelper.KEY_LAST_NAME, lastName);
 
         int updatedRows = db.update(MessageDbHelper.TABLE_CONVERSATION, values, MessageDbHelper.KEY_ID_CONVERSATION + " = ?",
-                new String[]{email});
+                new String[]{userMail});
 
         return updatedRows == 1;
     }
@@ -170,17 +168,17 @@ public class MessageDbController {
     /**
      * Setzt die Anzahl der neuen Nachrichten auf 0.
      *
-     * @param email            E-Mail Adresse der Person
+     * @param userMail            E-Mail Adresse der Person
      * @return true, falls Aktualisierung erfolgreich, false andernfalls
      */
-    public boolean resetNewMessages(String email) {
+    public boolean resetNewMessages(String userMail) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(MessageDbHelper.KEY_COUNT_NEW_MESSAGES, 0);
 
         int updatedRows = db.update(MessageDbHelper.TABLE_CONVERSATION, values, MessageDbHelper.KEY_ID_CONVERSATION + " = ?",
-                new String[]{email});
+                new String[]{userMail});
 
         return updatedRows == 1;
     }
@@ -240,12 +238,11 @@ public class MessageDbController {
      * Prüft, ob das Sendedatum der Nachricht mit der gespeicherten Nachricht übereinstimmt.
      * Stimmt es überein, wird die Nachricht auf "erhalten" gesetzt.
      *
-     * @param conversationMail E-Mail der Konversationsperson
      * @param messageId Id der Nachricht
      * @param sendDate Sendedatum
      * @return true, falls update erfolgreich, false andernfalls
      */
-    public boolean updateMessageReceived(String conversationMail, long messageId, long sendDate) {
+    public boolean updateMessageReceived(long messageId, long sendDate) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         Cursor cursor = db.rawQuery("SELECT " + MessageDbHelper.KEY_SEND_DATE + " FROM " + MessageDbHelper.TABLE_MESSAGE
@@ -270,14 +267,14 @@ public class MessageDbController {
     /**
      * Gibt eine Liste aller Nachrichten einer Conversation aus.
      *
-     * @param conversationMail E-Mail Adresse der Person der Konversation
+     * @param userMail E-Mail Adresse der Person der Konversation
      * @return Liste aller Nachrichten in einer Konversation
      */
-    public List<Message> getAllMessages(String conversationMail) {
+    public List<Message> getAllMessages(String userMail) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + MessageDbHelper.TABLE_MESSAGE + " WHERE "
-                + MessageDbHelper.FOREIGN_KEY_CONVERSATION + "=?", new String[]{conversationMail});
+                + MessageDbHelper.FOREIGN_KEY_CONVERSATION + "=?", new String[]{userMail});
 
         if (!cursor.moveToFirst()) {
             cursor.close();

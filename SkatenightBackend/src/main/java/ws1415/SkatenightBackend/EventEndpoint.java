@@ -164,7 +164,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
             if (!event.getMemberList().containsKey(user.getEmail())) {
                 event.getMemberList().put(user.getEmail(), EventRole.PARTICIPANT);
-                new UserEndpoint().getUserProfile(user, user.getEmail()).addEvent(event);
+                //new UserEndpoint().getUserProfile(user, user.getEmail()).addEvent(event);
                 // TODO Muss geändertes EndUser-Objekt gespeichert werden?
             }
         }
@@ -186,7 +186,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             if (!event.getMemberList().containsValue(EventRole.HOST)) {
                 throw new IllegalStateException("the last host of an event can not leave");
             }
-            new UserEndpoint().getUserProfile(user, user.getEmail()).removeEvent(event);
+            // new UserEndpoint().getUserProfile(user, user.getEmail()).removeEvent(event);
             // TODO Muss geändertes EndUser-Objekt gespeichert werden?
             ofy().save().entity(event).now();
         }

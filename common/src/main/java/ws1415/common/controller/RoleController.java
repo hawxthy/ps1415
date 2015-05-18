@@ -1,6 +1,6 @@
 package ws1415.common.controller;
 
-import com.skatenight.skatenightAPI.model.EndUser;
+import com.skatenight.skatenightAPI.model.UserProfile;
 
 import java.io.IOException;
 import java.util.List;
@@ -51,9 +51,9 @@ public class RoleController {
      * @param handler
      */
     public static void listGlobalAdmins(ExtendedTaskDelegate handler){
-        new ExtendedTask<Void, Void, List<EndUser>>(handler) {
+        new ExtendedTask<Void, Void, List<UserProfile>>(handler) {
             @Override
-            protected List<EndUser> doInBackground(Void... params) {
+            protected List<UserProfile> doInBackground(Void... params) {
                 try {
                     return ServiceProvider.getService().roleEndpoint().listGlobalAdmins().execute().getItems();
                 } catch (IOException e) {

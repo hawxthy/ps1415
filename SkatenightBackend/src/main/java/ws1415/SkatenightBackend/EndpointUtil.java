@@ -42,4 +42,17 @@ public class EndpointUtil {
             throw new UnauthorizedException("rights missing to perform the action");
         }
     }
+
+    /**
+     * Exception wird geworfen, falls Benutzer mit dem eingeloggten Benutzer nicht übereinstimmt
+     *
+     * @param mailLoggedIn eingeloggter Benutzer
+     * @param mailUserToChange Benutzer der abgerufen/geändert wird
+     * @throws UnauthorizedException
+     */
+    public static void throwIfUserNotSame(String mailLoggedIn, String mailUserToChange) throws UnauthorizedException {
+        if (!mailLoggedIn.equals(mailUserToChange)) {
+            throw new UnauthorizedException("rights missing to perform the action");
+        }
+    }
 }

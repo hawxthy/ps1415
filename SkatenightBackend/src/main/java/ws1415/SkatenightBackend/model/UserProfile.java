@@ -1,38 +1,26 @@
 package ws1415.SkatenightBackend.model;
 
-import com.google.appengine.datanucleus.annotations.Unowned;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
-
 /**
- * Die UserInfo-Klasse speichert die allgemeinen Informationen und das Profilbild zu einem Benutzer.
+ * Die UserProfile-Klasse ist für die Übertragung der Nutzerprofildaten an die Anwendung
+ * implementiert.
  *
  * @author Martin Wrodarczyk
  */
-@PersistenceCapable(detachable="true")
 public class UserProfile {
-    @PrimaryKey
-    @Persistent
     private String email;
-    @Persistent
-    private Integer groupVisibility;
-    @Unowned
     private UserInfo userInfo;
-    @Unowned
     private UserPicture userPicture;
-    @Persistent
-    private List<String> myUserGroups;
-    @Persistent
-    private List<Long> myEvents;
+    private List<UserGroup> myUserGroups;
+    private List<Event> myEvents;
+
+    public UserProfile(){
+    }
 
     public UserProfile(String email, UserInfo userInfo, UserPicture userPicture) {
         this.email = email;
-        groupVisibility = Visibility.PUBLIC.getId();
         this.userInfo = userInfo;
         this.userPicture = userPicture;
         myUserGroups = new ArrayList<>();
@@ -45,14 +33,6 @@ public class UserProfile {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public Integer getGroupVisibility() {
-        return groupVisibility;
-    }
-
-    public void setGroupVisibility(Integer groupVisibility) {
-        this.groupVisibility = groupVisibility;
     }
 
     public UserInfo getUserInfo() {
@@ -71,35 +51,19 @@ public class UserProfile {
         this.userPicture = userPicture;
     }
 
-    public List<String> getMyUserGroups() {
+    public List<UserGroup> getMyUserGroups() {
         return myUserGroups;
     }
 
-    public void setMyUserGroups(List<String> myUserGroups) {
+    public void setMyUserGroups(List<UserGroup> myUserGroups) {
         this.myUserGroups = myUserGroups;
     }
 
-    public List<Long> getMyEvents() {
+    public List<Event> getMyEvents() {
         return myEvents;
     }
 
-    public void setMyEvents(List<Long> myEvents) {
+    public void setMyEvents(List<Event> myEvents) {
         this.myEvents = myEvents;
-    }
-
-    public void addUserGroup(UserGroup userGroup) {
-        if (userGroup != null) getMyUserGroups().add(userGroup.getName());
-    }
-
-    public void removeUserGroup(UserGroup userGroup) {
-        if (userGroup != null) getMyUserGroups().remove(userGroup.getName());
-    }
-
-    public void addEvent(Event event) {
-        if (event != null) getMyEvents().add(event.getId());
-    }
-
-    public void removeEvent(Event event) {
-        if (event != null) getMyEvents().remove(event.getId());
     }
 }

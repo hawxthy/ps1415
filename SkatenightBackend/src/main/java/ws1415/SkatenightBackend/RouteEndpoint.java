@@ -75,7 +75,7 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
             if (group == null) {
                 UserGroup ug = new UserGroup(admin.getEmail());
                 ug.setName("Simulationsgruppe");
-                admin.getUserProfile().addUserGroup(ug);
+                admin.addUserGroup(ug);
                 pm.makePersistent(admin);
                 pm.makePersistent(ug);
             }

@@ -82,7 +82,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         // und gleichzeitig eine Notification senden
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            userProfile.addUserGroup(ug);
+            //userProfile.addUserGroup(ug);
             pm.makePersistent(userProfile);
             RegistrationManager rm = getRegistrationManager(pm);
             Message m = new Message.Builder()
@@ -156,7 +156,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
                 Set<String> regids = new HashSet<>();
                 RegistrationManager rm = getRegistrationManager(pm);
                 for (UserProfile e : members) {
-                    e.removeUserGroup(ug);
+                    //e.removeUserGroup(ug);
                     pm.makePersistent(e);
                     regids.add(rm.getUserIdByMail(e.getEmail()));
                 }
@@ -199,8 +199,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @return Eine Liste aller Benutzergruppen.
      */
     public List<UserGroup> fetchMyUserGroups(User user) throws OAuthRequestException {
-        UserProfile userProfile;
-        if (user == null || (userProfile = new UserEndpoint().getUserProfile(user, user.getEmail())) == null) {
+        EndUser endUser;
+        if (user == null || (endUser = new UserEndpoint().getFullUser(user.getEmail())) == null) {
             // Falls kein Benutzer angegeben, dann leere Liste zurückgeben.
             return new ArrayList<>();
         }
@@ -210,7 +210,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         UserGroup ug;
         List<UserGroup> result = new LinkedList<>();
         List<String> missingGroups = new LinkedList<>();
-        for (String g : userProfile.getMyUserGroups()) {
+        for (String g : endUser.getMyUserGroups()) {
             ug = getUserGroup(g);
             if (ug != null) {
                 result.add(ug);
@@ -222,9 +222,9 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         try {
             if (missingGroups.size() > 0) {
                 for (String g : missingGroups) {
-                    userProfile.getMyUserGroups().remove(g);
+                    endUser.getMyUserGroups().remove(g);
                 }
-                pm.makePersistent(userProfile);
+                pm.makePersistent(endUser);
             }
             return result;
         } finally {
@@ -245,8 +245,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         if (groupName == null || groupName.isEmpty()) {
             throw new IllegalArgumentException("no group name submitted");
         }
-        UserProfile userProfile = new UserEndpoint().getUserProfile(user, user.getEmail());
-        if (userProfile == null) {
+        EndUser endUser = new UserEndpoint().getFullUser(user.getEmail());
+        if (endUser == null) {
             throw new IllegalArgumentException("user is not registered");
         }
 
@@ -256,11 +256,11 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             if (ug == null) {
                 throw new IllegalArgumentException("a group with the submitted group name does not exist");
             }
-            userProfile.addUserGroup(ug);
-            pm.makePersistent(userProfile);
+            endUser.addUserGroup(ug);
+            pm.makePersistent(endUser);
             ArrayList<String> rights = new ArrayList<>();
             rights.add(Right.NEWMEMBERRIGHTS.name());
-            ug.addGroupMember(userProfile.getEmail(), rights);
+            ug.addGroupMember(endUser.getEmail(), rights);
             ofy().save().entity(ug).now();
         } finally {
             pm.close();
@@ -280,8 +280,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         if (groupName == null || groupName.isEmpty()) {
             throw new IllegalArgumentException("no group name submitted");
         }
-        UserProfile userProfile = new UserEndpoint().getUserProfile(user, user.getEmail());
-        if (userProfile == null) {
+        EndUser endUser = new UserEndpoint().getFullUser(user.getEmail());
+        if (endUser == null) {
             throw new IllegalArgumentException("user is not registered");
         }
 
@@ -294,9 +294,9 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             if (user.getEmail().equals(ug.getCreator())) {
                 throw new IllegalArgumentException("you can not leave your own group");
             }
-            userProfile.removeUserGroup(ug);
-            ug.removeGroupMember(userProfile.getEmail());
-            pm.makePersistent(userProfile);
+            endUser.removeUserGroup(ug);
+            ug.removeGroupMember(endUser.getEmail());
+            pm.makePersistent(endUser);
             ofy().save().entity(ug).now();
         } finally {
             pm.close();
@@ -334,8 +334,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         if (userName == null || userName.isEmpty()) {
             throw new IllegalArgumentException("no user to remove submitted");
         }
-        UserProfile userProfile = new UserEndpoint().getUserProfile(user, userName);
-        if (userProfile == null) {
+        EndUser endUser = new UserEndpoint().getFullUser(user.getEmail());
+        if (endUser == null) {
             throw new IllegalArgumentException("user is not registered");
         }
 
@@ -345,9 +345,9 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             if (userGroup == null) {
                 throw new IllegalArgumentException("a usergroup with this name doesn't exits");
             }
-            userProfile.removeUserGroup(userGroup);
-            pm.makePersistent(userProfile);
-            userGroup.removeGroupMember(userProfile.getEmail());
+            endUser.removeUserGroup(userGroup);
+            pm.makePersistent(endUser);
+            userGroup.removeGroupMember(endUser.getEmail());
             ofy().save().entity(userGroup).now();
         } finally {
             pm.close();

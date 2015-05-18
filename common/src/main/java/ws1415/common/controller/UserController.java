@@ -3,9 +3,7 @@ package ws1415.common.controller;
 import android.graphics.Bitmap;
 
 import com.skatenight.skatenightAPI.model.EndUser;
-import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Text;
-import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserLocation;
 import com.skatenight.skatenightAPI.model.UserPicture;
@@ -40,14 +38,14 @@ public class UserController {
      * @param userMail E-Mail Adresse des Benutzers
      */
     public static void createUser(ExtendedTaskDelegate handler, String userMail, final String firstName, final String lastName) {
-        new ExtendedTask<String, Void, Void>(handler) {
+        new ExtendedTask<String, Void, Boolean>(handler) {
             @Override
-            protected Void doInBackground(String... params) {
+            protected Boolean doInBackground(String... params) {
                 try {
                     return ServiceProvider.getService().userEndpoint().createUser(params[0])
                             .set("firstName", firstName)
                             .set("lastName", lastName)
-                            .execute();
+                            .execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("endUser: " + params[0] + " could not be created");
@@ -170,14 +168,15 @@ public class UserController {
      * @param handler
      * @param newInfo         Neue allgemeine Informationen zu dem Benutzer
      * @param optOutSearch
-     * @param groupVisibility TODO: Abfrage parameter
+     * @param showPrivateGroups
+     * TODO: Abfrage parameter
      */
-    public static void updateUserProfile(ExtendedTaskDelegate handler, final UserInfo newInfo, final Boolean optOutSearch, final Visibility groupVisibility) {
+    public static void updateUserProfile(ExtendedTaskDelegate handler, final UserInfo newInfo, final Boolean optOutSearch, final Visibility showPrivateGroups) {
         new ExtendedTask<Void, Void, UserInfo>(handler) {
             @Override
             protected UserInfo doInBackground(Void... voids) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().updateUserProfile(groupVisibility.getId(), optOutSearch, newInfo).execute();
+                    return ServiceProvider.getService().userEndpoint().updateUserProfile(optOutSearch, showPrivateGroups.getId(), newInfo).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Benutzerdaten konnten nicht geändert werden");
@@ -306,61 +305,15 @@ public class UserController {
     }
 
     /**
-     * Gibt eine Liste von allen Nutzergruppen aus, bei denen der Benutzer als Mitglied eingetragen
-     * ist.
-     *
-     * @param handler
-     * @param userMail E-Mail Adresse des Benutzers
-     */
-    @SuppressWarnings("unchecked")
-    public static void listUserGroups(ExtendedTaskDelegate handler, String userMail) {
-        new ExtendedTask<String, Void, List<UserGroup>>(handler) {
-            @Override
-            protected List<UserGroup> doInBackground(String... params) {
-                try {
-                    return ServiceProvider.getService().userEndpoint().listUserGroups(params[0]).execute().getItems();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    publishError("Liste von Nutzergruppen konnte nicht abgerufen werden");
-                    return null;
-                }
-            }
-        }.execute(userMail);
-    }
-
-    /**
-     * Gibt eine Liste von allen Veranstaltungen aus, an denen der Benutzer teilgenommen hat bzw.
-     * teilnimmt.
-     *
-     * @param handler
-     * @param userMail E-Mail Adresse des Benutzers
-     */
-    @SuppressWarnings("unchecked")
-    public static void listEvents(ExtendedTaskDelegate handler, String userMail) {
-        new ExtendedTask<String, Void, List<Event>>(handler) {
-            @Override
-            protected List<Event> doInBackground(String... params) {
-                try {
-                    return ServiceProvider.getService().userEndpoint().listEvents(params[0]).execute().getItems();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    publishError("Liste von Veranstaltungen konnte nicht abgerufen werden");
-                    return null;
-                }
-            }
-        }.execute(userMail);
-    }
-
-    /**
      * Erstellt eine Liste mit allgemeinen Informationen zu den Freunden eines Benutzers.
      *
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
      */
     public static void listFriends(ExtendedTaskDelegate handler, String userMail) {
-        new ExtendedTask<String, Void, List<UserInfo>>(handler) {
+        new ExtendedTask<String, Void, List<UserProfile>>(handler) {
             @Override
-            protected List<UserInfo> doInBackground(String... params) {
+            protected List<UserProfile> doInBackground(String... params) {
                 try {
                     return ServiceProvider.getService().userEndpoint().listFriends(params[0]).execute().getItems();
                 } catch (IOException e) {
@@ -380,9 +333,9 @@ public class UserController {
      * @param input   Eingabe
      */
     public static void searchUsers(ExtendedTaskDelegate handler, String input) {
-        new ExtendedTask<String, Void, List<UserInfo>>(handler) {
+        new ExtendedTask<String, Void, List<UserProfile>>(handler) {
             @Override
-            protected List<UserInfo> doInBackground(String... params) {
+            protected List<UserProfile> doInBackground(String... params) {
                 try {
                     return ServiceProvider.getService().userEndpoint().searchUsers()
                             .set("input", params[0])

@@ -1,5 +1,6 @@
 package ws1415;
 
+import android.accounts.Account;
 import android.test.AndroidTestCase;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -11,6 +12,7 @@ import ws1415.ps1415.Constants;
  * Erweitert den normalen AndroidTestCase um Authenifizierung. Es wird dabei automatisch der erste
  * Benutzer, der auf dem angeschlossenen Handy gefunden wird, eingeloggt, falls noch kein anderer
  * Benutzer eingeloggt ist.
+ *
  * @author Richard Schulze
  */
 public class AuthenticatedAndroidTestCase extends AndroidTestCase {
@@ -35,6 +37,25 @@ public class AuthenticatedAndroidTestCase extends AndroidTestCase {
         if (credential.getSelectedAccountName() == null || selectedAccount != index) {
             credential.setSelectedAccountName(credential.getAllAccounts()[index].name);
             selectedAccount = index;
+        }
+        ServiceProvider.login(credential);
+    }
+
+    /**
+     * Wechselt auf den Account des Testgeräts mit dem angegebenen Index.
+     * @param email    E-Mail Adresse des Accounts, der ausgewählt wird.
+     */
+    public void changeAccount(String email) {
+        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getContext(), "server:client_id:" + Constants.WEB_CLIENT_ID);
+        if (credential.getSelectedAccountName() == null) {
+            int i = 0;
+            for(Account account : credential.getAllAccounts()){
+                if(account.name.equals(email)){
+                    credential.setSelectedAccountName(account.name);
+                    selectedAccount = i;
+                }
+                i++;
+            }
         }
         ServiceProvider.login(credential);
     }

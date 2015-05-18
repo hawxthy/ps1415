@@ -1,12 +1,9 @@
 package ws1415.ps1415.authTest;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.EndUser;
+import com.skatenight.skatenightAPI.model.UserProfile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,31 +11,28 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import ws1415.AuthenticatedAndroidTestCase;
 import ws1415.common.controller.RoleController;
 import ws1415.common.controller.UserController;
 import ws1415.common.model.GlobalRole;
-import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.Constants;
-import ws1415.ps1415.activity.ImageStorageTestActivity;
 
 /**
  * Dient dazu Funktionalitäten zu testen, die mit Adminrollen zu tun haben.
  *
- * Ausführer der Tests muss eingetragener Admin auf dem Server sein. Dies ist umsetzbar in dem man
- * als "FIRST_ADMIN" seine E-Mail Adresse einträgt, sodass anschließend bei Serverstart ein
- * mit der angegebenen E-Mail als Administrator angelegt wird.
+ * Ausführer der Tests muss eingetragener Admin auf dem Server sein. Dies ist beispielsweise
+ * umsetzbar in dem man als "FIRST_ADMIN" seine E-Mail Adresse einträgt, sodass anschließend bei
+ * Serverstart ein mit der angegebenen E-Mail als Administrator angelegt wird.
+ *
+ * ADMIN_MAIL muss mit dem zu testenden Administrator ersetzt werden.
+ * TEST_MAIL muss mit einer weiteren eingetragenen E-Mail Adresse ersetzt werden.
  */
-public class AdminRoleAuthTest extends ActivityInstrumentationTestCase2<ImageStorageTestActivity> {
-    public static String MY_MAIL = "";
-    public static final String TEST_MAIL = "test@gmail.com";
+public class AdminRoleAuthTest extends AuthenticatedAndroidTestCase {
+    public static String ADMIN_MAIL = "martin.wrod@googlemail.com";
+    public static String TEST_MAIL = "skatenight.dev@gmail.com";
 
     public static final GlobalRole TEST_ROLE = GlobalRole.ADMIN;
-
-    public AdminRoleAuthTest() {
-        super(ImageStorageTestActivity.class);
-    }
 
     /**
      * Loggt den Benutzer ein und erstellt einen Benutzer zum Testen.
@@ -49,29 +43,16 @@ public class AdminRoleAuthTest extends ActivityInstrumentationTestCase2<ImageSto
     public void setUp() throws Exception {
         super.setUp();
 
-        // Nutzer einloggen
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getActivity(), "server:client_id:" + Constants.WEB_CLIENT_ID);
-        if (credential.getSelectedAccountName() == null) {
-            String selectedMail = prefs.getString("accountName", null);
-            if (selectedMail == null || !ServiceProvider.getService().roleEndpoint().isAdmin(selectedMail).execute().getValue()) {
-                throw new Exception("Benutzer muss Administrator sein");
-            }
-            MY_MAIL = selectedMail;
-            credential.setSelectedAccountName(selectedMail);
-            ServiceProvider.login(credential);
-        } else {
-            throw new Exception("Benutzer muss vorher ausgewählt werden");
-        }
-
         final CountDownLatch createSignal = new CountDownLatch(1);
-        UserController.createUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        UserController.createUser(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void voids) {
+            public void taskDidFinish(ExtendedTask task, Boolean result) {
                 createSignal.countDown();
             }
         }, TEST_MAIL, "", "");
         assertTrue(createSignal.await(30, TimeUnit.SECONDS));
+
+        changeAccount(ADMIN_MAIL);
     }
 
     /**
@@ -81,6 +62,7 @@ public class AdminRoleAuthTest extends ActivityInstrumentationTestCase2<ImageSto
      */
     @Override
     public void tearDown() throws Exception {
+        changeAccount(TEST_MAIL);
         final CountDownLatch deleteSignal = new CountDownLatch(1);
         UserController.deleteUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
@@ -138,13 +120,13 @@ public class AdminRoleAuthTest extends ActivityInstrumentationTestCase2<ImageSto
         }, TEST_MAIL, TEST_ROLE);
         assertTrue(assignSignal.await(30, TimeUnit.SECONDS));
 
-        final List<String> adminMails = Arrays.asList(TEST_MAIL, MY_MAIL);
+        final List<String> adminMails = Arrays.asList(TEST_MAIL, ADMIN_MAIL);
         final CountDownLatch listSignal = new CountDownLatch(1);
-        RoleController.listGlobalAdmins(new ExtendedTaskDelegateAdapter<Void, List<EndUser>>() {
+        RoleController.listGlobalAdmins(new ExtendedTaskDelegateAdapter<Void, List<UserProfile>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<EndUser> admins){
+            public void taskDidFinish(ExtendedTask task, List<UserProfile> admins){
                 List<String> adminMailsRetrieved = new ArrayList<String>();
-                for(EndUser admin : admins){
+                for(UserProfile admin : admins){
                     adminMailsRetrieved.add(admin.getEmail());
                 }
                 assertEquals(adminMails.size(), adminMailsRetrieved.size());

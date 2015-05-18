@@ -80,7 +80,7 @@ public class MessageDbControllerTest {
      * Prüft das Erstellen und Abrufen einer Konversation.
      */
     @Test
-    public void testCreateAndGetConversation() {
+    public void testGetConversation() {
         Conversation conversation = dbController.getConversation(TEST_MAIL);
 
         assertNotNull(conversation);
@@ -91,12 +91,13 @@ public class MessageDbControllerTest {
     }
 
     /**
-     * Prüft das Löschen einer Konversation. Dabei werden Nachrichten erstellt, die nach dem Löschen
-     * der Konversation gelöscht sein sollten.
+     * Prüft das Löschen einer Konversation. Dabei werden Nachrichten erstellt, die nach
+     * dem Löschen der Konversation gelöscht sein sollten.
      */
     @Test
     public void testDeleteConversation() {
-        Message message = new Message(TEST_MESSAGE_DATE_SEND_1, TEST_MESSAGE_CONTENT_1, TEST_MESSAGE_TYPE_1);
+        Message message = new Message(TEST_MESSAGE_DATE_SEND_1, TEST_MESSAGE_CONTENT_1,
+                TEST_MESSAGE_TYPE_1);
         dbController.insertMessage(TEST_MAIL, message);
 
         boolean succeed = dbController.deleteConversation(TEST_MAIL);
@@ -221,7 +222,7 @@ public class MessageDbControllerTest {
     public void testUpdateReceivedMessage(){
         Message message = new Message(TEST_MESSAGE_DATE_SEND_1, TEST_MESSAGE_CONTENT_1, TEST_MESSAGE_TYPE_1);
         long id = dbController.insertMessage(TEST_MAIL, message);
-        assertTrue(dbController.updateMessageReceived(TEST_MAIL, id, TEST_MESSAGE_DATE_SEND_1.getTime()));
+        assertTrue(dbController.updateMessageReceived(id, TEST_MESSAGE_DATE_SEND_1.getTime()));
 
         Message dbMessage = dbController.getAllMessages(TEST_MAIL).get(0);
         assertEquals(LocalMessageType.OUTGOING_RECEIVED, dbMessage.getType());

@@ -1,13 +1,9 @@
 package ws1415.ps1415.authTest;
 
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.preference.PreferenceManager;
-import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.InfoPair;
 import com.skatenight.skatenightAPI.model.UserInfo;
@@ -22,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import ws1415.AuthenticatedAndroidTestCase;
 import ws1415.common.controller.UserController;
 import ws1415.common.model.Gender;
 import ws1415.common.model.Visibility;
@@ -29,24 +26,23 @@ import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.util.ImageUtil;
-import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
-import ws1415.ps1415.activity.ImageStorageTestActivity;
 
 /**
  * Diese Klasse wird dazu genutzt die Funktionalitäten des UserControllers zu testen, die
  * Authorisierung benötigen.
  *
- * Ausführer der Tests muss ein eingetragener Admin auf dem Server sein. Dies ist umsetzbar in dem
- * man als "FIRST_ADMIN" seine E-Mail Adresse einträgt, sodass anschließend bei Serverstart ein
- * mit der angegebenen E-Mail als Administrator angelegt wird.
+ * Für diese Tests müssen zwei E-Mail Adressen auf dem Gerät eingetragen sein. Anzumerken ist,
+ * dass zu den beiden E-Mail Adressen zu Beginn gelöscht werden und nach Ablauf aller Tests
+ * auch gelöscht bleiben.
  *
  * @author Martin Wrodarczyk
  */
-public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<ImageStorageTestActivity> {
+public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
+    public static boolean initialized = false;
     // Testdaten
-    public static final String TEST_MAIL = "test@gmail.com";
-    public static final String TEST_MAIL_2 = "test2@gmail.com";
+    public static String TEST_MAIL = "";
+    public static String TEST_MAIL_2 = "";
 
     public static final double TEST_LONGITUDE = 7.626135;
     public static final double TEST_LATITUDE = 51.960665;
@@ -87,10 +83,6 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
     public static final Visibility TEST_GROUP_VISIBILITY = Visibility.PUBLIC;
     public static final Boolean TEST_OPT_OUT_SEARCH = true;
 
-    public UserControllerAuthTest() {
-        super(ImageStorageTestActivity.class);
-    }
-
     /**
      * Loggt den Benutzer ein und erstellt zwei Benutzer zum Testen.
      *
@@ -100,35 +92,43 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
     public void setUp() throws Exception {
         super.setUp();
 
-        // Nutzer einloggen
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getActivity(), "server:client_id:" + Constants.WEB_CLIENT_ID);
-        if (credential.getSelectedAccountName() == null) {
-            String selectedMail = prefs.getString("accountName", null);
-            if (selectedMail == null || !ServiceProvider.getService().roleEndpoint().isAdmin(selectedMail).execute().getValue()) {
-                throw new Exception("Benutzer muss Administrator sein");
+        changeAccount(0);
+        TEST_MAIL = ServiceProvider.getEmail();
+
+        changeAccount(1);
+        TEST_MAIL_2 = ServiceProvider.getEmail();
+
+        // Wechsel initial zu dem ersten Benutzer
+        changeAccount(0);
+
+        if(!initialized){
+            boolean exists = ServiceProvider.getService().userEndpoint().existsUser(TEST_MAIL).execute().getValue();
+            if(exists){
+                deleteUser(0, TEST_MAIL);
             }
-            credential.setSelectedAccountName(selectedMail);
-            ServiceProvider.login(credential);
-        } else {
-            throw new Exception("Benutzer muss vorher ausgewählt werden");
+            exists = ServiceProvider.getService().userEndpoint().existsUser(TEST_MAIL_2).execute().getValue();
+            if(exists){
+                deleteUser(1, TEST_MAIL_2);
+            }
         }
 
-        // Zwei EndUser zum Testen erstellen
-        final CountDownLatch createSignal = new CountDownLatch(2);
-        UserController.createUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        final CountDownLatch createSignal1 = new CountDownLatch(1);
+        UserController.createUser(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void voids) {
-                createSignal.countDown();
+            public void taskDidFinish(ExtendedTask task, Boolean result) {
+                createSignal1.countDown();
             }
         }, TEST_MAIL, "", "");
-        UserController.createUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        assertTrue(createSignal1.await(30, TimeUnit.SECONDS));
+
+        final CountDownLatch createSignal2 = new CountDownLatch(1);
+        UserController.createUser(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void voids) {
-                createSignal.countDown();
+            public void taskDidFinish(ExtendedTask task, Boolean result) {
+                createSignal2.countDown();
             }
         }, TEST_MAIL_2, "", "");
-        assertTrue(createSignal.await(30, TimeUnit.SECONDS));
+        assertTrue(createSignal2.await(30, TimeUnit.SECONDS));
     }
 
     /**
@@ -138,21 +138,21 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
      */
     @Override
     public void tearDown() throws Exception {
-        final CountDownLatch deleteSignal = new CountDownLatch(2);
-        UserController.deleteUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Void avoid) {
-                deleteSignal.countDown();
-            }
-        }, TEST_MAIL);
-        UserController.deleteUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Void avoid) {
-                deleteSignal.countDown();
-            }
-        }, TEST_MAIL_2);
-        assertTrue(deleteSignal.await(30, TimeUnit.SECONDS));
+        deleteUser(0, TEST_MAIL);
+        deleteUser(1, TEST_MAIL_2);
         super.tearDown();
+    }
+
+    private void deleteUser(int index, String email) throws InterruptedException {
+        changeAccount(index);
+        final CountDownLatch deleteSignal1 = new CountDownLatch(1);
+        UserController.deleteUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void avoid) {
+                deleteSignal1.countDown();
+            }
+        }, email);
+        assertTrue(deleteSignal1.await(30, TimeUnit.SECONDS));
     }
 
     /**
@@ -171,6 +171,7 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         }, TEST_MAIL);
         assertTrue(existsSignal.await(30, TimeUnit.SECONDS));
     }
+
     /**
      * Prüft ob ein Benutzer richtig auf dem Server gespeichert wird.
      *
@@ -183,9 +184,8 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
             @Override
             public void taskDidFinish(ExtendedTask task, EndUser user) {
                 assertEquals(TEST_MAIL, user.getEmail());
-                assertEquals(TEST_MAIL, user.getUserProfile().getEmail());
-                assertEquals(TEST_MAIL, user.getUserProfile().getUserPicture().getEmail());
-                assertEquals(TEST_MAIL, user.getUserProfile().getUserInfo().getEmail());
+                assertEquals(TEST_MAIL, user.getUserPicture().getEmail());
+                assertEquals(TEST_MAIL, user.getUserInfo().getEmail());
                 assertEquals(TEST_MAIL, user.getUserLocation().getEmail());
                 getSignal.countDown();
             }
@@ -213,22 +213,24 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
     }
 
     /**
-     * Prüft, ob die allgemeinen Informationen eines Benutzers richtig abgerufen werden.
+     * Prüft, ob das Profil eines Benutzers richtig abgerufen wird.
      *
      * @throws InterruptedException
      */
     @SmallTest
-    public void testGetUserInfo() throws InterruptedException {
+    public void testGetUserProfile() throws InterruptedException {
         final CountDownLatch getSignal = new CountDownLatch(1);
-        UserController.getUserLocation(new ExtendedTaskDelegateAdapter<Void, UserLocation>() {
+        UserController.getUserProfile(new ExtendedTaskDelegateAdapter<Void, UserProfile>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, UserLocation userLocation) {
-                assertNotNull(userLocation);
-                assertEquals(TEST_MAIL, userLocation.getEmail());
+            public void taskDidFinish(ExtendedTask task, UserProfile userProfile) {
+                assertNotNull(userProfile);
+                assertEquals(TEST_MAIL, userProfile.getEmail());
+                assertEquals(TEST_MAIL, userProfile.getUserInfo().getEmail());
+                assertEquals(TEST_MAIL, userProfile.getUserPicture().getEmail());
                 getSignal.countDown();
             }
         }, TEST_MAIL);
-        assertTrue(getSignal.await(20, TimeUnit.SECONDS));
+        assertTrue(getSignal.await(30, TimeUnit.SECONDS));
     }
 
     /**
@@ -295,9 +297,9 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
     @SmallTest
     public void testSearchUsers() throws InterruptedException {
         final CountDownLatch searchSignal = new CountDownLatch(1);
-        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserInfo>>() {
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserProfile>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserInfo> result) {
+            public void taskDidFinish(ExtendedTask task, List<UserProfile> result) {
                 assertNotNull(result);
                 assertTrue(result.size() == 1);
                 assertEquals(result.get(0).getEmail(), TEST_MAIL);
@@ -343,6 +345,7 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
      * Prüft, ob die allgemeinen Informationen eines Benutzers richtig geändert werden und
      * ob Sichtbarkeitseinstellungen richtig umgesetzt wurden.
      *
+     * TODO: Groupvisibility
      * @throws InterruptedException
      */
     @SmallTest
@@ -357,6 +360,18 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         newUserInfo.setDescription(TEST_DESCRIPTION_PAIR);
         newUserInfo.setPostalCode(TEST_POSTAL_CODE_PAIR);
 
+        final CountDownLatch searchSignal1 = new CountDownLatch(1);
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserProfile>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserProfile> result) {
+                assertNotNull(result);
+                assertTrue(result.size() == 1);
+                assertEquals(result.get(0).getEmail(), TEST_MAIL);
+                searchSignal1.countDown();
+            }
+        }, TEST_MAIL);
+        assertTrue(searchSignal1.await(30, TimeUnit.SECONDS));
+
         final CountDownLatch updateSignal = new CountDownLatch(1);
         UserController.updateUserProfile(new ExtendedTaskDelegateAdapter<Void, UserInfo>() {
             @Override
@@ -366,6 +381,7 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         }, newUserInfo, TEST_OPT_OUT_SEARCH, TEST_GROUP_VISIBILITY);
         assertTrue(updateSignal.await(30, TimeUnit.SECONDS));
 
+        changeAccount(1);
         final CountDownLatch getSignal = new CountDownLatch(1);
         UserController.getUserProfile(new ExtendedTaskDelegateAdapter<Void, UserProfile>() {
             @Override
@@ -385,22 +401,20 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
                 assertEquals(TEST_DESCRIPTION_VISIBILITY.getId(), userInfo.getDescription().getVisibility());
                 assertEquals(TEST_POSTAL_CODE, userInfo.getPostalCode().getValue());
                 assertEquals(TEST_POSTAL_CODE_VISIBILITY.getId(), userInfo.getPostalCode().getVisibility());
-
-                assertEquals(TEST_GROUP_VISIBILITY.getId(), userProfile.getGroupVisibility());
                 getSignal.countDown();
             }
         }, TEST_MAIL);
         assertTrue(getSignal.await(30, TimeUnit.SECONDS));
 
-        final CountDownLatch getFullSignal = new CountDownLatch(1);
-        UserController.getFullUser(new ExtendedTaskDelegateAdapter<Void, EndUser>() {
+        final CountDownLatch searchSignal2 = new CountDownLatch(1);
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserProfile>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, EndUser endUser) {
-                assertEquals(TEST_OPT_OUT_SEARCH, endUser.getOptOutSearch());
-                getFullSignal.countDown();
+            public void taskDidFinish(ExtendedTask task, List<UserProfile> result) {
+                assertNull(result);
+                searchSignal2.countDown();
             }
         }, TEST_MAIL);
-        assertTrue(getFullSignal.await(30, TimeUnit.SECONDS));
+        assertTrue(searchSignal2.await(30, TimeUnit.SECONDS));
     }
 
 
@@ -411,7 +425,7 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
      */
     @SmallTest
     public void testUpdateUserPicture() throws InterruptedException {
-        final Bitmap testImage = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.test);
+        final Bitmap testImage = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.test);
         final byte[] testImageByte = ImageUtil.BitmapToByteArray(testImage);
 
         final CountDownLatch updateSignal = new CountDownLatch(1);
@@ -443,6 +457,7 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
      */
     @SmallTest
     public void testAddAndRemoveFriend() throws InterruptedException {
+        String s = TEST_MAIL;
         final CountDownLatch addFriendSignal = new CountDownLatch(1);
         UserController.addFriend(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
@@ -505,9 +520,9 @@ public class UserControllerAuthTest extends ActivityInstrumentationTestCase2<Ima
         assertTrue(addFriendSignal.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch listFriendsSignal = new CountDownLatch(1);
-        UserController.listFriends(new ExtendedTaskDelegateAdapter<Void, List<UserInfo>>() {
+        UserController.listFriends(new ExtendedTaskDelegateAdapter<Void, List<UserProfile>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserInfo> friendInfos) {
+            public void taskDidFinish(ExtendedTask task, List<UserProfile> friendInfos) {
                 assertTrue(friendInfos.size() == 1);
                 assertEquals(TEST_MAIL_2, friendInfos.get(0).getEmail());
                 listFriendsSignal.countDown();
