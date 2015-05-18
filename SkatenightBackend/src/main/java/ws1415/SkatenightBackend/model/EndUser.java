@@ -29,6 +29,8 @@ public class EndUser {
     private UserLocation userLocation;
     @Persistent
     private List<String> myFriends;
+    @Persistent
+    private List<String> myUserGroups;
 
     public EndUser() {
     }
@@ -88,5 +90,21 @@ public class EndUser {
 
     public void setMyFriends(List<String> myFriends) {
         this.myFriends = myFriends;
+    }
+
+    public List<String> getMyUserGroups() {
+        return myUserGroups;
+    }
+
+    public void setMyUserGroups(List<String> myUserGroups) {
+        this.myUserGroups = myUserGroups;
+    }
+
+    public void addUserGroup(UserGroup userGroup) {
+        if (userGroup != null) getMyUserGroups().add(userGroup.getName());
+    }
+
+    public void removeUserGroup(UserGroup userGroup) {
+        if (userGroup != null) getMyUserGroups().remove(userGroup.getName());
     }
 }

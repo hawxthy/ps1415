@@ -256,21 +256,21 @@ public class GroupController {
      *
      * @param handler Der Task, der mit dem Server kommuniziert
      * @param group Die UserGroup, deren BlackBoard Nachricht gelöscht werden soll
-     * @param be Der BoardEntry der gelöscht werden soll
+     * @param boardEntryId Der BoardEntry der gelöscht werden soll
      */
-    public void deleteBoardMessage(ExtendedTaskDelegate handler, String group, BoardEntry be){
+    public void deleteBoardMessage(ExtendedTaskDelegate handler, String group, Long boardEntryId){
         final String groupFinal = group;
-        new ExtendedTask<BoardEntry, Void, Void>(handler){
+        new ExtendedTask<Long, Void, Void>(handler){
             @Override
-            protected Void doInBackground(BoardEntry... params){
+            protected Void doInBackground(Long... params){
                 try{
-                    return ServiceProvider.getService().groupEndpoint().deleteBoardMessage(groupFinal, params[0]).execute();
+                    return ServiceProvider.getService().groupEndpoint().deleteBoardMessage(params[0], groupFinal).execute();
                 }catch (IOException e){
                     publishError("Member konnte nicht entfernt werden");
                     return null;
                 }
             }
-        }.execute(be);
+        }.execute(boardEntryId);
     }
 
     /**

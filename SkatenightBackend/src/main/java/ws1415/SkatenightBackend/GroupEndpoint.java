@@ -8,11 +8,13 @@ import com.googlecode.objectify.cmd.Query;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import ws1415.SkatenightBackend.gcm.Message;
@@ -22,12 +24,13 @@ import ws1415.SkatenightBackend.gcm.Sender;
 import ws1415.SkatenightBackend.model.BoardEntry;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
-import ws1415.SkatenightBackend.model.GroupMetaData;
+import ws1415.SkatenightBackend.transport.UserGroupMetaData;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserProfile;
+import ws1415.SkatenightBackend.transport.UserGroupPicture;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -38,149 +41,69 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public class GroupEndpoint extends SkatenightServerEndpoint {
 
     /**
-     * Erstellt eine Gruppe mit dem angegebenen Namen
+     * Erstellt eine Gruppe mit dem angegebenen Namen und der angegebenen
+     * Öffentlichkeit.
      *
-     * @param user      Der Benutzer, der die Gruppe anlegen möchte.
+     * @param user      Der Benutzer, der die Gruppe anlegen möchte
+     * @param isOpen    Die Öffentlichkeitseinstellung der Gruppe
      * @param groupName Der Name der neuen Gruppe.
      */
-    public void createUserGroup(User user, @Named("name") String groupName) throws OAuthRequestException {
-        if (user == null) {
-            throw new NullPointerException("no user submitted");
-        }
-        if (groupName == null || groupName.isEmpty()) {
-            throw new IllegalArgumentException("no group name submitted");
-        }
-        UserProfile userProfile = new UserEndpoint().getUserProfile(user, user.getEmail());
-        if (userProfile == null) {
-            throw new IllegalArgumentException("user is not registered");
-        }
-        if (getUserGroup(groupName) != null) {
-            throw new IllegalArgumentException("group with submitted name already exists");
-        }
+    public void createUserGroup(User user, @Named("groupName") String groupName, @Named("groupIsOpen") boolean isOpen) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupAlreadyExists(groupName);
+        EndUser endUser = throwIfNoEndUserFound(user.getEmail());
 
-
-        ArrayList<String> rights = new ArrayList<String>();
-        rights.add(Right.FULLRIGHTS.name());
-
-
-        // Die Daten der UserGroup setzen und diese dann abspeichern
-        UserGroup ug = new UserGroup(userProfile.getEmail());
-        ug.addGroupMember(userProfile.getEmail(), rights);
-        ug.setName(groupName);
-
-        // Die Metadaten für die UserGroup erstellen
-        GroupMetaData metaData = new GroupMetaData();
-        metaData.setCreator(ug.getCreator());
-        metaData.setName(ug.getName());
-        metaData.setMembers(new HashSet<String>());
-        metaData.getMembers().add(ug.getCreator());
-
-        ug.setMetaData(metaData);
+        UserGroup ug = new UserGroup(endUser.getEmail());
+        ug.setMemberRights(new HashMap<String, ArrayList<String>>());
+        ug.addGroupMember(endUser.getEmail(), createFullRightsList());
+        ug.setMemberCount(1);
+        ug.setOpen(isOpen);
         ofy().save().entity(ug).now();
-        ofy().save().entity(metaData).now();
-
-        // Die Daten beim EndUser setzen und diesen dann abspeichern
-        // und gleichzeitig eine Notification senden
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            userProfile.addUserGroup(ug);
-            pm.makePersistent(userProfile);
-            RegistrationManager rm = getRegistrationManager(pm);
-            Message m = new Message.Builder()
-                    .collapseKey("createUserGroup")
-                    .timeToLive(6000)
-                    .delayWhileIdle(false)
-                    .addData("type", MessageType.GROUP_CREATED_NOTIFICATION_MESSAGE.name())
-                    .build();
-            Sender s = new Sender(Constants.GCM_API_KEY);
-            s.send(m, rm.getRegisteredUser(), 1);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            pm.close();
-        }
+        saveEndUserAndSendNotification(endUser);
     }
 
     /**
-     * Ruft die Gruppe mit dem angegebenen Namen ab.
+     * Ruft die Gruppen Metadaten zu dem angegebenen Namen ab.
      *
-     * @param groupName Der Name der abzurufenden Gruppe.
-     * @return Die UserGroup-Entity.
+     * @param groupName Der Name der Nutzergruppe, deren Metadaten agerufen werden sollen
+     * @return UserGroupMetaData oder null falls keine Nutzergruppe gefunden wurde
+     */
+    public UserGroupMetaData getUserGroupMetaData(@Named("groupName") String groupName) {
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        UserGroup group = ofy().load().group(UserGroupMetaData.class).type(UserGroup.class).id(groupName).now();
+        if(group != null){
+            return new UserGroupMetaData(group.getName(), group.getCreator(), group.isOpen(), group.getMemberCount());
+        }
+        return null;
+    }
+
+    /**
+     * Ruft die Nutzergruppe zu dem angegebenen Namen ab.
+     *
+     * @param groupName Der Name der Nutzergruppe
+     * @return Die Nutzergruppe, oder null falls keine gefunden wurde
      */
     public UserGroup getUserGroup(@Named("groupName") String groupName) {
-        if (groupName == null || groupName.isEmpty()) {
-            throw new IllegalArgumentException("can't get the usergroup, no group name submitted");
-        }
-        return ofy().load().type(UserGroup.class).parent(Key.create(GroupMetaData.class, groupName)).id(groupName).now();
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        return ofy().load().type(UserGroup.class).id(groupName).now();
     }
 
     /**
      * Löscht die Gruppe, falls der aufrufende Benutzer der Ersteller der Gruppe ist.
      *
      * @param user Der Benutzer, der den Löschvorgang durchführen möchte.
-     * @param name Der Name, der zu löschenden Gruppe.
+     * @param groupName Der Name, der zu löschenden Gruppe.
      */
-    public void deleteUserGroup(User user, @Named("name") String name) throws OAuthRequestException {
-        if (user == null) {
-            throw new NullPointerException("no user submitted");
-        }
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("no group name submitted");
-        }
-        UserEndpoint userEndpoint = new UserEndpoint();
-        UserProfile userProfile = userEndpoint.getUserProfile(user, user.getEmail());
-        if (userProfile == null) {
-            throw new IllegalArgumentException("user is not registered");
-        }
-        UserGroup ug = getUserGroup(name);
-        if (ug != null) {
-            if (!ug.getCreator().equals(user.getEmail())) {
-                throw new IllegalArgumentException("user is not creator of group");
-            }
-
-            // Benutzer abrufen, die in der Gruppe sind und Löschen der Nutzergruppe
-            UserProfile[] members = new UserProfile[ug.getMembers().size()];
-            int index = 0;
-            for (String member : ug.getMembers()) {
-                members[index++] = userEndpoint.getUserProfile(user, member);
-            }
-            ofy().delete().entity(ug).now();
-            ofy().delete().type(UserGroup.class).id(name).now();
-            if(ug.getBlackBoard() != null){
-                ofy().delete().entities(ug.getBlackBoard()).now();
-            }
-
+    public void deleteUserGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        UserGroup ug = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        if(hasRights(ug, user.getEmail(), Right.FULLRIGHTS.name())){
             // Die UserGroup aus den Benutzern entfernen und eine Notification
             // an die EndUser senden.
-            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-            try {
-                Set<String> regids = new HashSet<>();
-                RegistrationManager rm = getRegistrationManager(pm);
-                for (UserProfile e : members) {
-                    e.removeUserGroup(ug);
-                    pm.makePersistent(e);
-                    regids.add(rm.getUserIdByMail(e.getEmail()));
-                }
+            removeGroupFromEndUsersAndSendNotification(ug);
 
-                // Notification senden
-                Sender sender = new Sender(Constants.GCM_API_KEY);
-                Message.Builder mb = new Message.Builder()
-                        // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
-                        .delayWhileIdle(false)
-                        .collapseKey("group_" + ug.getName() + "_deleted")
-                                // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
-                        .addData("type", MessageType.GROUP_DELETED_NOTIFICATION_MESSAGE.name())
-                        .addData("content", ug.getName())
-                        .addData("title", "Eine Gruppe wurde geloescht");
-                Message m = mb.build();
-                try {
-                    sender.send(m, new LinkedList<>(regids), 1);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            } finally {
-                pm.close();
-            }
+            ofy().delete().entity(ug).now();
         }
     }
 
@@ -200,37 +123,14 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @return Eine Liste aller Benutzergruppen.
      */
     public List<UserGroup> fetchMyUserGroups(User user) throws OAuthRequestException {
-        UserProfile userProfile;
-        if (user == null || (userProfile = new UserEndpoint().getUserProfile(user, user.getEmail())) == null) {
+        EndUser endUser;
+        if (user == null || (endUser = throwIfNoEndUserFound(user.getEmail())) == null) {
             // Falls kein Benutzer angegeben, dann leere Liste zurückgeben.
             return new ArrayList<>();
         }
-
         // Falls im EndUser noch UserGroups existieren die
         // nicht mehr da sein sollten, diese löschen
-        UserGroup ug;
-        List<UserGroup> result = new LinkedList<>();
-        List<String> missingGroups = new LinkedList<>();
-        for (String g : userProfile.getMyUserGroups()) {
-            ug = getUserGroup(g);
-            if (ug != null) {
-                result.add(ug);
-            } else {
-                missingGroups.add(g);
-            }
-        }
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            if (missingGroups.size() > 0) {
-                for (String g : missingGroups) {
-                    userProfile.getMyUserGroups().remove(g);
-                }
-                pm.makePersistent(userProfile);
-            }
-            return result;
-        } finally {
-            pm.close();
-        }
+        return removeMissingUserGroups(endUser);
     }
 
     /**
@@ -240,30 +140,20 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param groupName Der Name der beizutretenden Gruppe
      */
     public void joinUserGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException {
-        if (user == null) {
-            throw new NullPointerException("no user submitted");
-        }
-        if (groupName == null || groupName.isEmpty()) {
-            throw new IllegalArgumentException("no group name submitted");
-        }
-        UserProfile userProfile = new UserEndpoint().getUserProfile(user, user.getEmail());
-        if (userProfile == null) {
-            throw new IllegalArgumentException("user is not registered");
-        }
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        EndUser endUser = throwIfNoEndUserFound(user.getEmail());
 
+        group.addGroupMember(endUser.getEmail(), createNewMemberRightsList());
+        ofy().save().entity(group).now();
+
+        // Dem EndUser die Nutzergruppe hinzufügen
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            UserGroup ug = getUserGroup(groupName);
-            if (ug == null) {
-                throw new IllegalArgumentException("a group with the submitted group name does not exist");
-            }
-            userProfile.addUserGroup(ug);
-            pm.makePersistent(userProfile);
-            ArrayList<String> rights = new ArrayList<>();
-            rights.add(Right.NEWMEMBERRIGHTS.name());
-            ug.addGroupMember(userProfile.getEmail(), rights);
-            ofy().save().entity(ug).now();
-        } finally {
+            endUser.addUserGroup(group);
+            pm.makePersistent(endUser);
+        }finally {
             pm.close();
         }
     }
@@ -274,84 +164,34 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param user      Der aufrufende Benutzer.
      * @param groupName Der Name der zu verlassenden Gruppe.
      */
-    public void leaveUserGroup(User user, @Named("groupName") String groupName) {
-        if (user == null) {
-            throw new NullPointerException("no user submitted");
-        }
-        if (groupName == null || groupName.isEmpty()) {
-            throw new IllegalArgumentException("no group name submitted");
-        }
-        UserProfile userProfile = new UserEndpoint().getUserProfile(user, user.getEmail());
-        if (userProfile == null) {
-            throw new IllegalArgumentException("user is not registered");
-        }
+    public void leaveUserGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
 
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            UserGroup ug = getUserGroup(groupName);
-            if (ug == null) {
-                throw new IllegalArgumentException("a group with the submitted group name does not exist");
-            }
-            if (user.getEmail().equals(ug.getCreator())) {
-                throw new IllegalArgumentException("you can not leave your own group");
-            }
-            userProfile.removeUserGroup(ug);
-            ug.removeGroupMember(userProfile.getEmail());
-            pm.makePersistent(userProfile);
-            ofy().save().entity(ug).now();
-        } finally {
-            pm.close();
-        }
+        group.removeGroupMember(user.getEmail());
+        ofy().save().entity(group).now();
+
+        removeGroupFromEndUser(group, user.getEmail());
     }
 
     /**
-     * Gibt eine Liste der Mitglieder der übergebenen Gruppe zurück.
-     *
-     * @param userGroup
-     * @return
-     */
-    public ArrayList<Member> fetchGroupMembers(@Named("userGroup") String userGroup) {
-        ArrayList<Member> members = new ArrayList<>();
-        UserGroup tmpGroup = getUserGroup(userGroup);
-        UserEndpoint userEndpoint = new UserEndpoint();
-        for (String member : tmpGroup.getMembers()) {
-            members.add(userEndpoint.getMember(member));
-        }
-        return members;
-    }
-
-    /**
-     * Löscht den EndUser aus der übergebenen UserGroup.
+     * Löscht den EndUser aus der übergebenen Nutzergruppe.
      *
      * @param groupName die UserGroup aus der gelöscht werden soll
      * @param user  der EndUser, der gelöscht werden soll
      * @return BooleanWrapper, eigene Klasse um boolean Werte zurück zu geben
      */
-    public void removeMember(User user, @Named("groupName") String groupName, @Named("userName") String userName) {
-        // TODO User prüfen
-        if (groupName == null) {
-            throw new NullPointerException("no group submitted");
-        }
-        if (userName == null || userName.isEmpty()) {
-            throw new IllegalArgumentException("no user to remove submitted");
-        }
-        UserProfile userProfile = new UserEndpoint().getUserProfile(user, userName);
-        if (userProfile == null) {
-            throw new IllegalArgumentException("user is not registered");
-        }
+    public void removeMember(User user, @Named("groupName") String groupName, @Named("userName") String userName) throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        if(hasRights(group, user.getEmail(), Right.DELETEMEMBER.name()) && group.getMemberRights().keySet().contains(userName)){
 
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            UserGroup userGroup = getUserGroup(groupName);
-            if (userGroup == null) {
-                throw new IllegalArgumentException("a usergroup with this name doesn't exits");
-            }
-            userProfile.removeUserGroup(userGroup);
-            pm.makePersistent(userProfile);
-            userGroup.removeGroupMember(userProfile.getEmail());
-            ofy().save().entity(userGroup).now();
-        } finally {
-            pm.close();
+            group.removeGroupMember(userName);
+            ofy().save().entity(group).now();
+
+            removeGroupFromEndUser(group, user.getEmail());
         }
     }
 
@@ -363,7 +203,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param message Die Nachricht
      * @param writer  Der Ersteller der Nachricht
      */
-    public void postBlackBoard(User user, @Named("groupName") String groupName, @Named("boardMessage") String message, @Named("writer") String writer) throws  OAuthRequestException{
+    public void postBlackBoard(User user, @Named("groupName") String groupName, @Named("boardMessage") String message, @Named("messageWriter") String writer) throws  OAuthRequestException{
         if(user == null){
             throw new OAuthRequestException("no user submitted");
         }
@@ -394,11 +234,14 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * Methode um BlackBoard Nachrichten zu löschen. Dabei wird der BoardEntry übergeben und in
      * der Liste von BoardEntries dieser gesucht und dann gelöscht.
      *
-     * @param boardEntry der zu löschende BoardEntry
+     * @param boardEntryId der zu löschende BoardEntry
      * @param groupName  die UserGroup in der ein BoardEntry vom BlackBoard gelöscht werden soll
      */
-    public void deleteBoardMessage(BoardEntry boardEntry, @Named("groupName") String groupName) {
-        if (boardEntry == null) {
+    public void deleteBoardMessage(User user, @Named("goardEntryId") Long boardEntryId, @Named("groupName") String groupName) throws  OAuthRequestException{
+        if(user == null){
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (boardEntryId == null || boardEntryId == 0) {
             throw new NullPointerException("no entry to delete submitted");
         }
         if (groupName == null || groupName.isEmpty()) {
@@ -410,7 +253,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         }
         if(userGroup.getBlackBoard() != null){
             for(BoardEntry be : userGroup.getBlackBoard()){
-                if(be.getId() == boardEntry.getId()){
+                if(be.getId().longValue() == boardEntryId.longValue()){
                     ArrayList<BoardEntry> blackBoard = userGroup.getBlackBoard();
                     blackBoard.remove(be);
                     userGroup.setBlackBoard(blackBoard);
@@ -530,7 +373,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * true = das Bild wurde erfolgreich geändert
      * false = fas Bild wurde nicht geändert
      */
-    public BooleanWrapper changePicture(Picture p, @Named("groupName") String groupName) {
+    public BooleanWrapper changePicture(UserGroupPicture p, @Named("groupName") String groupName) {
         if (p == null) {
             throw new NullPointerException("no picture submitted");
         }
@@ -547,6 +390,196 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             userGroup.setPicture(p);
             pm.makePersistent(userGroup);
             return new BooleanWrapper(true);
+        } finally {
+            pm.close();
+        }
+    }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    /**
+     * Hilfsmethoden damit Code nicht doppelt vorkommt.
+     */
+
+    /**
+     * Exception wird geworfen, falls kein EndUser für die gegebene E-Mail existiert.
+     *
+     * @param email E-Mail Adresse des zu prüfenden EndUsers
+     */
+    private EndUser throwIfNoEndUserFound(@Named("userMail") String email){
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        EndUser user;
+        try {
+            user = pm.getObjectById(EndUser.class, email);
+        } catch (Exception e) {
+            user = null;
+        } finally {
+            pm.close();
+        }
+        if (user == null) {
+            throw new JDOObjectNotFoundException("EndUser with submitted E-Mail doesn't exsit");
+        }
+        return user;
+    }
+
+    /**
+     * Hilfsmethode zum speichern von EndUser objekten.
+     *
+     * @param endUser
+     */
+    private void saveEndUser(EndUser endUser){
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try{
+            pm.makePersistent(endUser);
+        }finally{
+            pm.close();
+        }
+    }
+
+    /**
+     * Hilfsmethode um zu testen, ob ein EndUser die nötigen Rechte hat eine
+     * Aktion durchzuführen.
+     *
+     * @param group Nutzergruppe in der die Rechte überprüft werden sollen
+     * @param email Die E-Mail des EndUsers
+     * @param requiredRight Das Recht, das benötigt wird
+     * @return true, falls der EndUser die nötigen Rechte hat
+     *          false, falls nicht
+     */
+    private boolean hasRights(UserGroup group, @Named("email") String email, @Named("requiredRight") String requiredRight){
+        ArrayList<String> rights = (ArrayList<String>)group.getMemberRights().get(email);
+        if(rights != null && (rights.contains(requiredRight) || rights.contains(Right.FULLRIGHTS.name()))){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Hilfsmethode, welche das EndUser- Objekt speichert und eine Notification
+     * and das Smartphone sendet.
+     *
+     * @param endUser
+     */
+    private void saveEndUserAndSendNotification(EndUser endUser){
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            pm.makePersistent(endUser);
+            RegistrationManager rm = getRegistrationManager(pm);
+            Message m = new Message.Builder()
+                    .collapseKey("createUserGroup")
+                    .timeToLive(6000)
+                    .delayWhileIdle(false)
+                    .addData("type", MessageType.GROUP_CREATED_NOTIFICATION_MESSAGE.name())
+                    .build();
+            Sender s = new Sender(Constants.GCM_API_KEY);
+            s.send(m, rm.getRegisteredUser(), 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pm.close();
+        }
+    }
+
+    private void removeGroupFromEndUsersAndSendNotification(UserGroup group) {
+        // Benutzer abrufen, die in der Gruppe sind und Löschen der Nutzergruppe
+        EndUser[] members = new EndUser[group.getMemberCount()];
+        int index = 0;
+        for (String member : group.getMemberRights().keySet()) {
+            members[index++] = throwIfNoEndUserFound(member);
+        }
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            Set<String> regids = new HashSet<>();
+            RegistrationManager rm = getRegistrationManager(pm);
+            for (EndUser enduser : members) {
+                enduser.removeUserGroup(group);
+                pm.makePersistent(enduser);
+                regids.add(rm.getUserIdByMail(enduser.getEmail()));
+            }
+
+            // Notification senden
+            Sender sender = new Sender(Constants.GCM_API_KEY);
+            Message.Builder mb = new Message.Builder()
+                    // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
+                    .delayWhileIdle(false)
+                    .collapseKey("group_" + group.getName() + "_deleted")
+                            // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
+                    .addData("type", MessageType.GROUP_DELETED_NOTIFICATION_MESSAGE.name())
+                    .addData("content", group.getName())
+                    .addData("title", "Eine Gruppe wurde geloescht");
+            Message m = mb.build();
+            try {
+                sender.send(m, new LinkedList<>(regids), 1);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            pm.close();
+        }
+    }
+
+    private void removeGroupFromEndUser(UserGroup group, @Named("userMail") String userMail) {
+        EndUser user = throwIfNoEndUserFound(userMail);
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            user.removeUserGroup(group);
+            pm.makePersistent(user);
+        }finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Hilfsmethode welche eine Liste mit dem Recht FULLRIGHTS erstellt.
+     *
+     * @return
+     */
+    private ArrayList<String> createFullRightsList(){
+        ArrayList<String> tmpList = new ArrayList<>();
+        tmpList.add(Right.FULLRIGHTS.name());
+        return tmpList;
+    }
+
+    /**
+     * Hilfsmethode, welche eine Liste mit dem Recht NEWMEMBERRIGHTS erstellt.
+     *
+     * @return
+     */
+    private ArrayList<String> createNewMemberRightsList(){
+        ArrayList<String> tmpList = new ArrayList<>();
+        tmpList.add(Right.NEWMEMBERRIGHTS.name());
+        return tmpList;
+    }
+
+    /**
+     * Hilfsmethode zum löschen aller Nutzergruppen in einem EndUser welche
+     * nicht mehr existieren. Als Ergebnis werden alle Nutzergruppen zurück
+     * gegeben in denen der EndUser Mitglied ist und die noch auf dem Server
+     * existieren.
+     *
+     * @param endUser Der EndUser, dessen Nutzergruppen überprüft werden sollen
+     * @return Liste mit allen Nutzergruppen in denen der EndUser Mitglied ist.
+     */
+    private List<UserGroup> removeMissingUserGroups(EndUser endUser){
+        UserGroup ug;
+        List<UserGroup> result = new LinkedList<>();
+        List<String> missingGroups = new LinkedList<>();
+        for (String g : endUser.getMyUserGroups()) {
+            ug = getUserGroup(g);
+            if (ug != null) {
+                result.add(ug);
+            } else {
+                missingGroups.add(g);
+            }
+        }
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            if (missingGroups.size() > 0) {
+                for (String g : missingGroups) {
+                    endUser.getMyUserGroups().remove(g);
+                }
+                pm.makePersistent(endUser);
+            }
+            return result;
         } finally {
             pm.close();
         }

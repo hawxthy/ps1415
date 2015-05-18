@@ -13,7 +13,7 @@ import javax.servlet.ServletResponse;
 import ws1415.SkatenightBackend.model.BoardEntry;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.Gallery;
-import ws1415.SkatenightBackend.model.GroupMetaData;
+import ws1415.SkatenightBackend.transport.UserGroupMetaData;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.PictureMetaData;
 import ws1415.SkatenightBackend.model.UserGroup;
@@ -30,7 +30,7 @@ public class ObjectifyStartupServlet implements Servlet {
         ObjectifyService.register(Picture.class);
         ObjectifyService.register(PictureMetaData.class);
         ObjectifyService.register(UserGroup.class);
-        ObjectifyService.register(GroupMetaData.class);
+        ObjectifyService.register(UserGroupMetaData.class);
         ObjectifyService.register(BoardEntry.class);
     }
 
