@@ -8,8 +8,9 @@ import com.googlecode.objectify.NotFoundException;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import ws1415.SkatenightBackend.model.EndUser;
+import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
+import ws1415.SkatenightBackend.model.UserGroup.BoardEntry;
 
 /**
  * Created by Martin on 13.05.2015.
@@ -100,6 +101,87 @@ public class EndpointUtil {
     public static void throwIfNotCreatorOfUserGroup(UserGroup group, String email){
         if (!group.getCreator().equals(email)) {
             throw new IllegalArgumentException("user is not creator of group");
+        }
+    }
+
+    /**
+     * Exception wird geworfen, falls die übergebene Message leer oder null ist.
+     *
+     * @param message
+     */
+    public static void throwIfNotBoardMessageSubmitted(String message){
+        if(message == null || message.isEmpty()){
+            throw new IllegalArgumentException("no message for BoardEntry submitted");
+        }
+    }
+
+    /**
+     * Exception wird geworfen, falls die übergebene BoardEntry id leer oder null ist.
+     *
+     * @param boardEntryId
+     */
+    public static void throwIfNoBoardEntryIdISubmitted(Long boardEntryId){
+        if (boardEntryId == null || boardEntryId == 0) {
+            throw new NullPointerException("no entry to delete submitted");
+        }
+    }
+
+    /**
+     * Exception wird geworfen, falls kein BoardEntry submitted wurde.
+     *
+     * @param be
+     */
+    public static void throwIfNoBoardEntrySubmitted(BoardEntry be){
+        if(be == null){
+            throw new IllegalArgumentException("no BoardEntry submitted");
+        }
+    }
+
+    /**
+     * Exception um zu informieren, dass der Aufrufer keine Rechte hat.
+     *
+     * @throws IllegalAccessException
+     */
+    public static void throwIfNoRights(){
+        throw new IllegalArgumentException("the user doesn't have the needed rights to delete this user group");
+    }
+
+    /**
+     * Exception wird geworfen, falls eine Mitglied einer Nutzergruppe versicht
+     * diese erneut zu betreten.
+     *
+     * @param group Die Nutzergruppe
+     * @param email Der EndUser
+     */
+    public static void throwIfUserAlreadyInGroup(UserGroup group, String email){
+        if(group.getMemberRights().keySet().contains(email)){
+            throw new IllegalArgumentException("the user is already a member of they group");
+        }
+    }
+
+    /**
+     * Exception wird geworfen, fall der Leader eine Nutzergruppe versucht diese
+     * zu verlassen.
+     *
+     * @param group Die Nutzergruppe
+     * @param email Der EndUser
+     */
+    public static void throwIfLeaderTriesToLeaveGroup(UserGroup group, String email){
+        if(group.getMemberRights().values().contains(Right.FULLRIGHTS.name())){
+            throw new IllegalArgumentException("the leader of a group can't leave the group");
+        }
+    }
+
+    /**
+     * Exception wird geworfen, falls der EndUser nicht in der Nutzergruppe als
+     * Mitglieg eigetragen ist.
+     *
+     * @param group Die Nutzergruppe
+     * @param email Der EndUser
+     */
+    public static void throwIfUserNotInGroup(UserGroup group, String email){
+        if(!group.getMemberRights().keySet().contains(email)){
+            throw new IllegalArgumentException("the submitted user is not part of this group "+group.getName());
         }
     }
 }

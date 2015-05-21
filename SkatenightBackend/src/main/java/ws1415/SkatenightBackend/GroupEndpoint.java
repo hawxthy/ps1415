@@ -21,15 +21,14 @@ import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
-import ws1415.SkatenightBackend.model.BoardEntry;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
+import ws1415.SkatenightBackend.model.UserGroup.BoardEntry;
+import ws1415.SkatenightBackend.transport.UserGroupBlackBoardTransport;
 import ws1415.SkatenightBackend.transport.UserGroupMetaData;
-import ws1415.SkatenightBackend.model.Member;
-import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
-import ws1415.SkatenightBackend.model.UserProfile;
+import ws1415.SkatenightBackend.transport.UserGroupNewsBoardTransport;
 import ws1415.SkatenightBackend.transport.UserGroupPicture;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -54,12 +53,52 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         EndUser endUser = throwIfNoEndUserFound(user.getEmail());
 
         UserGroup ug = new UserGroup(endUser.getEmail());
+        ug.setName(groupName);
         ug.setMemberRights(new HashMap<String, ArrayList<String>>());
         ug.addGroupMember(endUser.getEmail(), createFullRightsList());
         ug.setMemberCount(1);
         ug.setOpen(isOpen);
         ofy().save().entity(ug).now();
+        endUser.addUserGroup(ug);
         saveEndUserAndSendNotification(endUser);
+    }
+
+    /**
+     * Ruft das BlackBoard zu dem übergebenen Nutzergruppennamen ab und verschickt
+     * dies mit einer Tansportklasse UserGroupBlackBoardTransport.
+     *
+     * @param user      Der Benutzer, der das BlackBoard abrufen möchte
+     * @param groupName Der Name der Nutzergruppe
+     * @return Die Tansportklasse, die die BoardEntries enthält
+     * @throws OAuthRequestException
+     */
+    public UserGroupBlackBoardTransport getUserGroupBlackBoard(User user, @Named("groupName") String groupName) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        UserGroup group = ofy().load().group(UserGroupBlackBoardTransport.class).type(UserGroup.class).id(groupName).now();
+        if (group != null) {
+            return new UserGroupBlackBoardTransport(group.getName(), group.getBlackBoard());
+        }
+        return null;
+    }
+
+    /**
+     * Ruft das BlackBoard zu dem übergebenen Nutzergruppennamen ab und verschickt
+     * dies mit einer Tansportklasse UserGroupBlackBoardTransport.
+     *
+     * @param user      Der Benutzer, der das BlackBoard abrufen möchte
+     * @param groupName Der Name der Nutzergruppe
+     * @return Die Tansportklasse, die die BoardEntries enthält
+     * @throws OAuthRequestException
+     */
+    public UserGroupNewsBoardTransport getUserGroupNewsBoard(User user, @Named("groupName") String groupName) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        UserGroup group = ofy().load().group(UserGroupNewsBoardTransport.class).type(UserGroup.class).id(groupName).now();
+        if (group != null) {
+            return new UserGroupNewsBoardTransport(group.getName(), group.getBlackBoard());
+        }
+        return null;
     }
 
     /**
@@ -71,7 +110,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
     public UserGroupMetaData getUserGroupMetaData(@Named("groupName") String groupName) {
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = ofy().load().group(UserGroupMetaData.class).type(UserGroup.class).id(groupName).now();
-        if(group != null){
+        if (group != null) {
             return new UserGroupMetaData(group.getName(), group.getCreator(), group.isOpen(), group.getMemberCount());
         }
         return null;
@@ -91,19 +130,20 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
     /**
      * Löscht die Gruppe, falls der aufrufende Benutzer der Ersteller der Gruppe ist.
      *
-     * @param user Der Benutzer, der den Löschvorgang durchführen möchte.
+     * @param user      Der Benutzer, der den Löschvorgang durchführen möchte.
      * @param groupName Der Name, der zu löschenden Gruppe.
      */
     public void deleteUserGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup ug = EndpointUtil.throwIfNoUserGroupExists(groupName);
-        if(hasRights(ug, user.getEmail(), Right.FULLRIGHTS.name())){
+        if (hasRights(ug, user.getEmail(), Right.FULLRIGHTS.name())) {
             // Die UserGroup aus den Benutzern entfernen und eine Notification
             // an die EndUser senden.
             removeGroupFromEndUsersAndSendNotification(ug);
-
             ofy().delete().entity(ug).now();
+        }else{
+            EndpointUtil.throwIfNoRights();
         }
     }
 
@@ -143,6 +183,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        EndpointUtil.throwIfUserAlreadyInGroup(group, user.getEmail());
         EndUser endUser = throwIfNoEndUserFound(user.getEmail());
 
         group.addGroupMember(endUser.getEmail(), createNewMemberRightsList());
@@ -153,7 +194,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         try {
             endUser.addUserGroup(group);
             pm.makePersistent(endUser);
-        }finally {
+        } finally {
             pm.close();
         }
     }
@@ -164,10 +205,11 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param user      Der aufrufende Benutzer.
      * @param groupName Der Name der zu verlassenden Gruppe.
      */
-    public void leaveUserGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException{
+    public void leaveUserGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        EndpointUtil.throwIfLeaderTriesToLeaveGroup(group, user.getEmail());
 
         group.removeGroupMember(user.getEmail());
         ofy().save().entity(group).now();
@@ -179,19 +221,21 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * Löscht den EndUser aus der übergebenen Nutzergruppe.
      *
      * @param groupName die UserGroup aus der gelöscht werden soll
-     * @param user  der EndUser, der gelöscht werden soll
+     * @param user      der EndUser, der gelöscht werden soll
      * @return BooleanWrapper, eigene Klasse um boolean Werte zurück zu geben
      */
-    public void removeMember(User user, @Named("groupName") String groupName, @Named("userName") String userName) throws OAuthRequestException{
+    public void removeMember(User user, @Named("groupName") String groupName, @Named("userName") String userName) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
-        if(hasRights(group, user.getEmail(), Right.DELETEMEMBER.name()) && group.getMemberRights().keySet().contains(userName)){
+        if (hasRights(group, user.getEmail(), Right.DELETEMEMBER.name()) && group.getMemberRights().keySet().contains(userName)) {
 
             group.removeGroupMember(userName);
             ofy().save().entity(group).now();
 
-            removeGroupFromEndUser(group, user.getEmail());
+            removeGroupFromEndUser(group, userName);
+        }else{
+            EndpointUtil.throwIfNoRights();
         }
     }
 
@@ -199,35 +243,21 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * Methode zum posten von BlackBoard Nachrichten in einer UserGroup. Momentan wird die Nachricht und
      * der Schreiber in das BoardEntry eingetragen und die Liste in der UserGroup aktualisiert.
      *
-     * @param groupName   UserGroup, dessen BlackBoard eine neue Nachricht erhalten soll
-     * @param message Die Nachricht
-     * @param writer  Der Ersteller der Nachricht
+     * @param groupName UserGroup, dessen BlackBoard eine neue Nachricht erhalten soll
+     * @param message   Die Nachricht
      */
-    public void postBlackBoard(User user, @Named("groupName") String groupName, @Named("boardMessage") String message, @Named("messageWriter") String writer) throws  OAuthRequestException{
-        if(user == null){
-            throw new OAuthRequestException("no user submitted");
-        }
-        if (groupName == null || groupName.isEmpty()) {
-            throw new NullPointerException("no groupName submitted");
-        }
-        if (message == null || message.isEmpty()) {
-            throw new IllegalArgumentException("no message submitted");
-        }
-        UserGroup userGroup = getUserGroup(groupName);
-        if (userGroup == null) {
-            throw new IllegalArgumentException("this group doesn't exist");
-        }
-
-        BoardEntry be = new BoardEntry(null, message, writer);
-        ofy().save().entity(be).now();
-        if(userGroup.getBlackBoard() == null){
-            ArrayList<BoardEntry> blackBoard = new ArrayList<>();
-            blackBoard.add(be);
-            userGroup.setBlackBoard(blackBoard);
+    public void postBlackBoard(User user, @Named("groupName") String groupName, @Named("boardMessage") String message) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        EndpointUtil.throwIfNotBoardMessageSubmitted(message);
+        UserGroup group = ofy().load().group(UserGroupBlackBoardTransport.class).type(UserGroup.class).id(groupName).safe();
+        if(hasRights(group, user.getEmail(), Right.POSTBLACKBOARD.name())){
+            BoardEntry be = new BoardEntry(message, user.getEmail(), ofy().factory().allocateId(UserGroup.class).getId());
+            group.addBlackBoardMessage(be);
+            ofy().save().entity(group).now();
         }else{
-            userGroup.addBlackBoardMessage(be);
+            EndpointUtil.throwIfNoRights();
         }
-        ofy().save().entity(userGroup).now();
     }
 
     /**
@@ -235,35 +265,63 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * der Liste von BoardEntries dieser gesucht und dann gelöscht.
      *
      * @param boardEntryId der zu löschende BoardEntry
-     * @param groupName  die UserGroup in der ein BoardEntry vom BlackBoard gelöscht werden soll
+     * @param groupName    die UserGroup in der ein BoardEntry vom BlackBoard gelöscht werden soll
      */
-    public void deleteBoardMessage(User user, @Named("goardEntryId") Long boardEntryId, @Named("groupName") String groupName) throws  OAuthRequestException{
-        if(user == null){
-            throw new OAuthRequestException("no user submitted");
-        }
-        if (boardEntryId == null || boardEntryId == 0) {
-            throw new NullPointerException("no entry to delete submitted");
-        }
-        if (groupName == null || groupName.isEmpty()) {
-            throw new IllegalArgumentException("no group name submitted");
-        }
-        UserGroup userGroup = getUserGroup(groupName);
-        if (userGroup == null) {
-            throw new IllegalArgumentException("this group doesn't exist");
-        }
-        if(userGroup.getBlackBoard() != null){
-            for(BoardEntry be : userGroup.getBlackBoard()){
-                if(be.getId().longValue() == boardEntryId.longValue()){
-                    ArrayList<BoardEntry> blackBoard = userGroup.getBlackBoard();
-                    blackBoard.remove(be);
-                    userGroup.setBlackBoard(blackBoard);
-                    ofy().delete().entity(be).now();
-                    ofy().save().entity(userGroup).now();
-                }
-            }
+    public void deleteBlackBoardMessage(User user, @Named("boardEntryId") long boardEntryId, @Named("groupName") String groupName) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        EndpointUtil.throwIfNoBoardEntryIdISubmitted(boardEntryId);
+        UserGroup group = ofy().load().group(UserGroupBlackBoardTransport.class).type(UserGroup.class).id(groupName).now();
+        if(hasRights(group, user.getEmail(), Right.POSTBLACKBOARD.name())) {
+            group.removeBlackBoardMessage(boardEntryId);
+            ofy().save().entity(group).now();
+        }else{
+            EndpointUtil.throwIfNoRights();
         }
     }
 
+    /**
+     * Methode zum posten von NewsBoard Nachrichten in einer UserGroup. Momentan wird die Nachricht und
+     * der Schreiber in das BoardEntry eingetragen und die Liste in der UserGroup aktualisiert.
+     *
+     * @param groupName UserGroup, dessen BlackBoard eine neue Nachricht erhalten soll
+     * @param message   Die Nachricht
+     */
+    public void postNewsBoard(User user, @Named("groupName") String groupName, @Named("boardMessage") String message) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        EndpointUtil.throwIfNotBoardMessageSubmitted(message);
+        UserGroup group = ofy().load().group(UserGroupBlackBoardTransport.class).type(UserGroup.class).id(groupName).safe();
+
+        if(hasRights(group, user.getEmail(), Right.FULLRIGHTS.name())){
+            BoardEntry be = new BoardEntry(message, groupName, ofy().factory().allocateId(UserGroup.class).getId());
+            group.addNewsBoardMessage(be);
+            ofy().save().entity(group).now();
+        }else{
+            EndpointUtil.throwIfNoRights();
+        }
+    }
+
+    /**
+     * Methode um BlackBoard Nachrichten zu löschen. Dabei wird der BoardEntry übergeben und in
+     * der Liste von BoardEntries dieser gesucht und dann gelöscht.
+     *
+     * @param boardEntryId der zu löschende BoardEntry
+     * @param groupName    die UserGroup in der ein BoardEntry vom BlackBoard gelöscht werden soll
+     */
+    public void deleteNewsBoardMessage(User user, @Named("boardEntryId") long boardEntryId, @Named("groupName") String groupName) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        EndpointUtil.throwIfNoBoardEntryIdISubmitted(boardEntryId);
+        UserGroup group = ofy().load().group(UserGroupBlackBoardTransport.class).type(UserGroup.class).id(groupName).now();
+
+        if(hasRights(group, user.getEmail(), Right.FULLRIGHTS.name())){
+            group.removeNewsBoardMessage(boardEntryId);
+            ofy().save().entity(group).now();
+        }else{
+            EndpointUtil.throwIfNoRights();
+        }
+    }
 //======================================================================================
 
     public void setVisibility(@Named("groupName") String groupName, BooleanWrapper visibility) {
@@ -274,27 +332,19 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * Diese Methode sendet eine Einladung(Notification) zu der übergebene UserGroup and den
      * übergebenen EndUser mit der Möglichkeit diese anzunehmen oder abzulehnen.
      *
-     * @param group   die UserGroup in die der EndUser eingeladen werden soll.
-     * @param user    der EndUser, der die Einladung(Notification) erhalten soll
+     * @param groupName   die UserGroup in die der EndUser eingeladen werden soll.
+     * @param userToInvite    der EndUser, der die Einladung(Notification) erhalten soll
      * @param message ein Text beigefügt zu der Einladung.
      */
-    public void sendInvitation(UserGroup group, @Named("userName") String user, @Named("invitationMessage") String message) {
-        //TODO Diese Methode kann so noch nicht funktionieren.
-        if (group == null) {
-            throw new NullPointerException("no group submitted");
-        }
-        if (user == null || user.isEmpty()) {
-            throw new IllegalArgumentException("no user to send message to");
-        }
-        EndUser endUser = new UserEndpoint().getFullUser(user);
-        if (endUser == null) {
-            throw new IllegalArgumentException("user is not registered");
-        }
-        if (getUserGroup(group.getName()) == null) {
-            throw new IllegalArgumentException("group doesn't exist");
-        }
-        // send a message to the endUser asking if he want's to join the group
+    public void sendInvitation(User user, @Named("groupName") String groupName, @Named("userToInvite") String userToInvite, @Named("invitationMessage") String message) throws  OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        EndpointUtil.throwIfEndUserNotExists(userToInvite);
+        EndpointUtil.throwIfNotBoardMessageSubmitted(message);
+        EndpointUtil.throwIfNoUserGroupExists(groupName);
+        // send a message to the endUser asking if he wants to join the group
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+
         try {
             RegistrationManager rm = getRegistrationManager(pm);
             Message m = new Message.Builder()
@@ -302,6 +352,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
                     .timeToLive(6000)
                     .delayWhileIdle(false)
                     .addData("type", MessageType.INVITATION_TO_GROUP_MESSAGE.name())
+                    .addData("content", message)
+                    .addData("title", "Sie haben eine Einladung erhalten von "+user.getEmail()+ " in die Nutzergruppe "+groupName)
                     .build();
             Sender s = new Sender(Constants.GCM_API_KEY);
             s.send(m, rm.getRegisteredUser(), 1);
@@ -360,7 +412,6 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      */
     public BooleanWrapper sendMessage(@Named("normalMessage") String message, @Named("userName") String user) {
         //TODO auf Martin warten
-        new MessageEndoint().sendMessage(user, message);
         return new BooleanWrapper(true);
     }
 
@@ -405,7 +456,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      *
      * @param email E-Mail Adresse des zu prüfenden EndUsers
      */
-    private EndUser throwIfNoEndUserFound(@Named("userMail") String email){
+    private EndUser throwIfNoEndUserFound(@Named("userMail") String email) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         EndUser user;
         try {
@@ -426,11 +477,11 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      *
      * @param endUser
      */
-    private void saveEndUser(EndUser endUser){
+    private void saveEndUser(EndUser endUser) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try{
+        try {
             pm.makePersistent(endUser);
-        }finally{
+        } finally {
             pm.close();
         }
     }
@@ -439,15 +490,15 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * Hilfsmethode um zu testen, ob ein EndUser die nötigen Rechte hat eine
      * Aktion durchzuführen.
      *
-     * @param group Nutzergruppe in der die Rechte überprüft werden sollen
-     * @param email Die E-Mail des EndUsers
+     * @param group         Nutzergruppe in der die Rechte überprüft werden sollen
+     * @param email         Die E-Mail des EndUsers
      * @param requiredRight Das Recht, das benötigt wird
      * @return true, falls der EndUser die nötigen Rechte hat
-     *          false, falls nicht
+     * false, falls nicht
      */
-    private boolean hasRights(UserGroup group, @Named("email") String email, @Named("requiredRight") String requiredRight){
-        ArrayList<String> rights = (ArrayList<String>)group.getMemberRights().get(email);
-        if(rights != null && (rights.contains(requiredRight) || rights.contains(Right.FULLRIGHTS.name()))){
+    private boolean hasRights(UserGroup group, @Named("email") String email, @Named("requiredRight") String requiredRight) {
+        ArrayList<String> rights = (ArrayList<String>) group.getMemberRights().get(email);
+        if (rights != null && (rights.contains(requiredRight) || rights.contains(Right.FULLRIGHTS.name()))) {
             return true;
         }
         return false;
@@ -459,7 +510,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      *
      * @param endUser
      */
-    private void saveEndUserAndSendNotification(EndUser endUser){
+    private void saveEndUserAndSendNotification(EndUser endUser) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             pm.makePersistent(endUser);
@@ -523,7 +574,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         try {
             user.removeUserGroup(group);
             pm.makePersistent(user);
-        }finally {
+        } finally {
             pm.close();
         }
     }
@@ -533,7 +584,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      *
      * @return
      */
-    private ArrayList<String> createFullRightsList(){
+    private ArrayList<String> createFullRightsList() {
         ArrayList<String> tmpList = new ArrayList<>();
         tmpList.add(Right.FULLRIGHTS.name());
         return tmpList;
@@ -544,7 +595,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      *
      * @return
      */
-    private ArrayList<String> createNewMemberRightsList(){
+    private ArrayList<String> createNewMemberRightsList() {
         ArrayList<String> tmpList = new ArrayList<>();
         tmpList.add(Right.NEWMEMBERRIGHTS.name());
         return tmpList;
@@ -559,7 +610,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param endUser Der EndUser, dessen Nutzergruppen überprüft werden sollen
      * @return Liste mit allen Nutzergruppen in denen der EndUser Mitglied ist.
      */
-    private List<UserGroup> removeMissingUserGroups(EndUser endUser){
+    private List<UserGroup> removeMissingUserGroups(EndUser endUser) {
         UserGroup ug;
         List<UserGroup> result = new LinkedList<>();
         List<String> missingGroups = new LinkedList<>();

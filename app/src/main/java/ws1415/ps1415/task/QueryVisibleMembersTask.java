@@ -44,22 +44,23 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
     protected HashMap<Member, String> doInBackground(Void... params) {
         List<UserGroup> tmpGroups = null;
         List<Member> groupMembers = new ArrayList<Member>();
-        HashMap<Member, String> farbenMap = new HashMap<Member, String> ();
-        try{
-            tmpGroups = (ArrayList)ServiceProvider.getService().groupEndpoint().fetchMyUserGroups().execute().getItems();
-        }catch( IOException e){
+        HashMap<Member, String> farbenMap = new HashMap<Member, String>();
+        try {
+            tmpGroups = (ArrayList) ServiceProvider.getService().groupEndpoint().fetchMyUserGroups().execute().getItems();
+        } catch (IOException e) {
             e.printStackTrace();
         }
         if (tmpGroups != null) {
-            for(UserGroup userGroup: tmpGroups){
-                if(PrefManager.getGroupVisibility(context, userGroup.getName())){
+            for (UserGroup userGroup : tmpGroups) {
+                if (PrefManager.getGroupVisibility(context, userGroup.getName())) {
                     try {
-                        groupMembers = ServiceProvider.getService().groupEndpoint().fetchGroupMembers(userGroup.getName()).execute().getItems();
-                    }catch(IOException e){
-                        e.printStackTrace();
-                    }
-                    for(Member m : groupMembers){
-                        farbenMap.put(m, userGroup.getName());
+                        //TODO auf EndUser umstellen
+                        //groupMembers = ServiceProvider.getService().groupEndpoint().fetchGroupMembers(userGroup.getName()).execute().getItems();
+                        for (Member m : groupMembers) {
+                            farbenMap.put(m, userGroup.getName());
+                        }
+                    } finally {
+                        // damit man übersetzen kann
                     }
                 }
             }

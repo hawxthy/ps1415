@@ -21,13 +21,14 @@ import static junit.framework.Assert.assertTrue;
 public class GroupControllerBlackBoardTest extends AuthenticatedAndroidTestCase {
     private String MY_MAIL = "";
     final private String TEST_GROUP_NAME = "Testgruppe1";
+    final private boolean TEST_BOOLEAN_IS_OPEN = true;
     final private String TEST_BLACK_BOARD_MESSAGE = "Das ist eine Blackboard Message";
     final private String TEST_BLACK_BOARD_MESSAGE_2 = "Das ist die zweite Blackboard Message";
     final private String TEST_BLACK_BOARD_MESSAGE_3 = "Das ist die dritte Blackboard Message";
 
     // Variablen zum füllen von wichtigen Attributen, wie BoardEntries
     private boolean found;
-    private Long boardEntryId;
+    private long boardEntryId;
 
 
     @Override
@@ -44,7 +45,7 @@ public class GroupControllerBlackBoardTest extends AuthenticatedAndroidTestCase 
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME);
+        }, TEST_GROUP_NAME, TEST_BOOLEAN_IS_OPEN);
         try {
             assertTrue("setUp for createUserGroup failed", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -57,7 +58,7 @@ public class GroupControllerBlackBoardTest extends AuthenticatedAndroidTestCase 
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal2.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE, MY_MAIL);
+        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE);
         try {
             assertTrue("testRemoveBlackBoardMessage failed to post the first message", signal2.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
