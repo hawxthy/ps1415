@@ -60,8 +60,7 @@ public class AddRouteTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (routes != null) {
             for (Route r : routes) {
-                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getKey()
-                        .getId()).execute();
+                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getId()).execute();
             }
         }
     }

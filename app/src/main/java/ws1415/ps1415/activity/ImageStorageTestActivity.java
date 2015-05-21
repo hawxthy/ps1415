@@ -17,6 +17,8 @@ import com.skatenight.skatenightAPI.model.Gallery;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import ws1415.common.controller.GalleryController;
@@ -94,21 +96,11 @@ public class ImageStorageTestActivity extends BaseActivity {
                     final String tempPath = cursor.getString(column_index);
                     cursor.close();
 
-                    new ExtendedTask<Void, Void, Gallery>(new ExtendedTaskDelegateAdapter<Void, Gallery>() {
-                        @Override
-                        public void taskDidFinish(ExtendedTask task, Gallery gallery) {
-                            GalleryController.uploadImage(null, new File(tempPath), "Bildtitel", "Dateipfad: " + tempPath, gallery);
-                        }
-                    }) {
-                        @Override
-                        protected Gallery doInBackground(Void... params) {
-                            try {
-                                return ServiceProvider.getService().galleryEndpoint().getGlobalGallery().execute();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    }.execute();
+                    try {
+                        GalleryController.uploadImage(null, new FileInputStream(new File(tempPath)), "Bildtitel", "Dateipfad: " + tempPath);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
         }

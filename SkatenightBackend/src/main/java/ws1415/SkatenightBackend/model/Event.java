@@ -5,6 +5,7 @@ import com.google.appengine.api.datastore.Text;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 
 import java.util.Date;
@@ -38,6 +39,7 @@ public class Event {
     @Load(unless = {EventMetaData.class, EventParticipationData.class})
     private List<BlobKey> images;
     @Load(unless = {EventMetaData.class, EventParticipationData.class})
+    @Index
     private Ref<Route> route;
 
     public Long getId() {

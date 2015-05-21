@@ -3,6 +3,9 @@ package ws1415.SkatenightBackend;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.images.Image;
+import com.google.appengine.api.images.ImagesServiceFactory;
+import com.google.appengine.api.images.Transform;
 import com.google.appengine.api.urlfetch.HTTPRequest;
 import com.google.appengine.api.urlfetch.HTTPResponse;
 
@@ -26,14 +29,16 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * @author Richard Schulze
  */
 public class BlobstoreUploadHandler extends HttpServlet {
-    private static final Logger log = Logger.getLogger(BlobstoreUploadHandler.class.getName());
-
     private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
     /**
-     * TODO Kommentieren
-     * @param req
-     * @param resp
+     * Wird aufgerufen, wenn der Upload in den Blobstore fertiggestellt wurde.
+     * Im Request wird die ID des Picture-Objekts erwartet, für das der Upload durchgeführt wurde.
+     * Die ID wird als Parameter {@code pictureId} ausgelesen. Die Antwort, die von diesem Servlet
+     * generiert wird, enthält den BlobKey des Bildes, der außerdem im Picture-Objekt im Datastore
+     * gespeichert wird.
+     * @param req     Die HTTP-Anfrage, die die ID des Picture-Objekts enthält.
+     * @param resp    Die HTTP-Antwort, die den BlobKey enthält.
      * @throws ServletException
      * @throws IOException
      */
@@ -47,7 +52,11 @@ public class BlobstoreUploadHandler extends HttpServlet {
             picture.setImageBlobKey(blobKey);
             ofy().save().entity(picture).now();
 
-            // TODO Thumbnail generieren
+            // BlobKey zurück an den Client senden
+            resp.setCharacterEncoding("UTF-8");
+            resp.getWriter().print(blobKey.getKeyString());
+            resp.getWriter().flush();
+            resp.getWriter().close();
         } catch(Exception ex) {
             // Im Falle eines Fehlers den gespeicherten Blob löschen
             blobstoreService.delete(blobKey);

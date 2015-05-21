@@ -54,5 +54,5 @@ public class Constants {
      * Definiert den Benutzer, der als Administrator beim Start der Servers erstellt werden soll,
      * falls dieser nicht bereits existiert.
      */
-    public static final String FIRST_ADMIN = "martin.wrod@googlemail.com";
+    public static final String FIRST_ADMIN = "richard-schulze@online.de";
 }
