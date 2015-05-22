@@ -33,9 +33,9 @@ public enum Gender {
         }
     }
 
-    public static Gender getValue(String s) {
+    public static Gender getValue(Integer id) {
         for (Gender g : Gender.values()) {
-            if (g.getRepresentation().equals(s))
+            if (g.getId() == id)
                 return g;
         }
         throw new IllegalArgumentException("Ungültige Id");

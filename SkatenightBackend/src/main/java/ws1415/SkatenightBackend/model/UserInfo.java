@@ -20,7 +20,7 @@ public class UserInfo {
     @Persistent
     private String firstName;
     @Persistent
-    private String gender;
+    private Integer gender;
 
     @Persistent(defaultFetchGroup = "true")
     @Embedded(members = {
@@ -89,7 +89,7 @@ public class UserInfo {
     public UserInfo(String email) {
         this.email = email;
         firstName = "";
-        gender = Gender.NA.getRepresentation();
+        gender = Gender.NA.getId();
         lastName = new InfoPair("", Visibility.PUBLIC.getId());
         dateOfBirth = new InfoPair("", Visibility.PUBLIC.getId());
         city = new InfoPair("", Visibility.PUBLIC.getId());
@@ -113,11 +113,11 @@ public class UserInfo {
         this.firstName = firstName;
     }
 
-    public String getGender() {
+    public Integer getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Integer gender) {
         this.gender = gender;
     }
 

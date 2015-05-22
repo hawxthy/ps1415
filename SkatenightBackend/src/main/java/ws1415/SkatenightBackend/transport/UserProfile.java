@@ -1,7 +1,11 @@
-package ws1415.SkatenightBackend.model;
+package ws1415.SkatenightBackend.transport;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ws1415.SkatenightBackend.model.UserGroup;
+import ws1415.SkatenightBackend.model.UserInfo;
+import ws1415.SkatenightBackend.model.UserPicture;
 
 /**
  * Die UserProfile-Klasse ist für die Übertragung der Nutzerprofildaten an die Anwendung
@@ -14,7 +18,7 @@ public class UserProfile {
     private UserInfo userInfo;
     private UserPicture userPicture;
     private List<UserGroup> myUserGroups;
-    private List<Event> myEvents;
+    private List<EventMetaData> myEvents;
 
     public UserProfile(){
     }
@@ -59,11 +63,11 @@ public class UserProfile {
         this.myUserGroups = myUserGroups;
     }
 
-    public List<Event> getMyEvents() {
+    public List<EventMetaData> getMyEvents() {
         return myEvents;
     }
 
-    public void setMyEvents(List<Event> myEvents) {
+    public void setMyEvents(List<EventMetaData> myEvents) {
         this.myEvents = myEvents;
     }
 }

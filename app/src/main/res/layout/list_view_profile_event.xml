@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="20dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="20dp">
+
+    <ImageView
+        android:id="@+id/list_item_profile_event_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:id="@+id/list_item_profile_event_primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/list_item_profile_event_icon"
+        android:paddingLeft="16dp"
+        android:text="Primary Text"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/list_item_profile_event_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/list_item_profile_event_primary"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@id/list_item_profile_event_icon"
+        android:paddingLeft="16dp"
+        android:text="Secondary Text"
+        android:fontFamily="sans-serif-light"
+        android:textSize="14sp" />
+
+</RelativeLayout>

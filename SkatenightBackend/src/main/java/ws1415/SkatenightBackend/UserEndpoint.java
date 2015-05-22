@@ -10,7 +10,9 @@ import com.google.appengine.api.users.User;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -25,8 +27,9 @@ import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserInfo;
 import ws1415.SkatenightBackend.model.UserLocation;
 import ws1415.SkatenightBackend.model.UserPicture;
-import ws1415.SkatenightBackend.model.UserProfile;
 import ws1415.SkatenightBackend.model.Visibility;
+import ws1415.SkatenightBackend.transport.UserListData;
+import ws1415.SkatenightBackend.transport.UserProfile;
 
 /**
  * Der UserEndpoint stellt Hilfsmethoden bereit, die genutzt werden um die Benutzer zu verwalten.
@@ -118,17 +121,18 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * Erstellt einen Benutzer auf dem Server, falls noch keiner zu der angegebenen E-Mail Adresse
      * existiert.
      *
-     * @param userMail E-Mail Adresse des zu erstellenden Benutzers
+     * @param userMail  E-Mail Adresse des zu erstellenden Benutzers
      * @param firstName Vorname des zu erstellenden Benutzers
-     * @param lastName Nachname des zu erstellenden Benutzers
+     * @param lastName  Nachname des zu erstellenden Benutzers
      * @return true, wenn Benutzer erstellt wurde, false andernfalls
      */
     public BooleanWrapper createUser(@Named("userMail") String userMail, @Nullable @Named("firstName") String firstName,
-                           @Nullable @Named("lastName") String lastName) {
+                                     @Nullable @Named("lastName") String lastName, Text picture) {
         if (!existsUser(userMail).value) {
             UserLocation userLocation = new UserLocation(userMail);
             UserPicture userPicture = new UserPicture(userMail);
             UserInfo userInfo = new UserInfo(userMail);
+            if (picture.getValue() != null) userPicture.setPicture(picture);
             userInfo.setFirstName(firstName);
             userInfo.setLastName(new UserInfo.InfoPair(lastName, Visibility.PUBLIC.getId()));
             EndUser user = new EndUser(userMail, userLocation, userInfo, userPicture);
@@ -253,7 +257,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param endUser Benutzer dessen Gruppen abgerufen werden
      * @return Liste von beigetretenen oder erstellten Nutzergruppen
      */
-    private List<UserGroup> listUserGroups(EndUser endUser){
+    private List<UserGroup> listUserGroups(EndUser endUser) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         List<String> userGroupIds = endUser.getMyUserGroups();
         UserGroup userGroup;
@@ -273,7 +277,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param endUser Benutzer dessen Veranstaltungen abgerufen werden
      * @return Liste von Veranstaltungen des Benutzers
      */
-    private List<Event> listEvents(EndUser endUser){
+    private List<Event> listEvents(EndUser endUser) {
         List<Long> eventIds = endUser.getMyEvents();
         Event event;
         List<Event> result = new ArrayList<>();
@@ -293,18 +297,18 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @return Allgemeine Informationen zum Benutzer, falls nicht gefunden: null
      */
     @ApiMethod(path = "user_info")
-    public UserInfo getUserInfo(User user, @Named("userMail") String userMail) {
+    public UserListData getUserInfo(User user, @Named("userMail") String userMail, @Named("withPicture") boolean withPicture) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             List<String> friends = endUser.getMyFriends();
-            endUser.getUserInfo();
 
             UserInfo detachedUserInfo = pm.detachCopy(endUser.getUserInfo());
-
             setUpVisibility(detachedUserInfo, user, userMail, friends);
 
-            return detachedUserInfo;
+            UserListData result = new UserListData(endUser.getEmail(), detachedUserInfo);
+            if (withPicture) result.setUserPicture(endUser.getUserPicture());
+            return result;
         } catch (Exception e) {
             return null;
         } finally {
@@ -315,13 +319,13 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     /**
      * Setzt die Informationen der UserInfo auf null, die für den User nicht sichtbar sein sollen.
      *
-     * @param userInfo Informationen die aufgerufen werden
-     * @param user User, der Informationen abrufen will
+     * @param userInfo    Informationen die aufgerufen werden
+     * @param user        User, der Informationen abrufen will
      * @param mailToCheck E-Mail Adresse des Benutzers mit den Informationen
-     * @param friends E-Mail Adressen der Freunde des Benutzers mit den Informationen
+     * @param friends     E-Mail Adressen der Freunde des Benutzers mit den Informationen
      * @return Informationen mit Sichtbarkeitsanpassungen
      */
-    private UserInfo setUpVisibility(UserInfo userInfo, User user, String mailToCheck, List<String> friends){
+    private UserInfo setUpVisibility(UserInfo userInfo, User user, String mailToCheck, List<String> friends) {
         if (!isVisible(user, mailToCheck, userInfo.getLastName().getVisibility(), friends).value) {
             userInfo.getLastName().setValue(null);
         }
@@ -343,10 +347,10 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     /**
      * Hilfsmethode, um die Sichtbarkeit abzufragen.
      *
-     * @param user Benutzer, der Informationen abrufen will
+     * @param user        Benutzer, der Informationen abrufen will
      * @param mailToCheck Benutzer, deren Informationen abgerufen werden
-     * @param visibility Sichtbarkeit der Information
-     * @param friends E-Mail Adressen der Freunde des Benutzers, dessen Informationen abgerufen werden
+     * @param visibility  Sichtbarkeit der Information
+     * @param friends     E-Mail Adressen der Freunde des Benutzers, dessen Informationen abgerufen werden
      * @return true, falls Information sichtbar, false andernfalls
      */
     private BooleanWrapper isVisible(User user, String mailToCheck, Integer visibility, List<String> friends) {
@@ -376,6 +380,120 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             return pm.getObjectById(UserPicture.class, userMail);
         } catch (Exception e) {
             return null;
+        } finally {
+            pm.close();
+        }
+    }
+
+
+    /**
+     * Listet die allgemeinen Informationen der Benutzer auf, dessen E-Mail Adressen übergeben
+     * wurden.
+     *
+     * @param userMails Liste der E-Mail Adressen der Benutzer
+     * @return Liste von allgemeinen Informationen
+     */
+    @ApiMethod(path = "user_info_list")
+    public List<UserListData> listUserInfo(User user, @Named("userMails") List<String> userMails,
+                                           @Named("withPicture") boolean withPicture) {
+        List<UserListData> result = new ArrayList<>();
+        UserListData userInfo;
+        for (String userMail : userMails) {
+            userInfo = getUserInfo(user, userMail, withPicture);
+            if (userInfo != null) result.add(userInfo);
+        }
+        return result;
+    }
+
+    /**
+     * Listet die Profilbilder der Benutzer auf, dessen E-Mail Adressen übergeben wurden.
+     *
+     * @param userMails Liste der E-Mail Adressen der Benutzer
+     * @return Liste von Profilbildern
+     */
+    @ApiMethod(path = "user_picture_list")
+    public List<UserPicture> listUserPicture(@Named("userMails") List<String> userMails) {
+        List<UserPicture> result = new ArrayList<>();
+        UserPicture userPicture;
+        for (String userMail : userMails) {
+            userPicture = getUserPicture(userMail);
+            if (userPicture != null) result.add(userPicture);
+        }
+        return result;
+    }
+
+
+    /**
+     * Erstellt eine Liste mit allgemeinen Informationen zu den Freunden eines Benutzers.
+     *
+     * @param user     User-Objekt für die Authentifikation
+     * @param userMail E-Mail Adresse des Benutzers
+     * @return Liste von Informationen zu Freunden
+     * @throws OAuthRequestException
+     * @throws UnauthorizedException
+     */
+    @ApiMethod(path = "friends_list")
+    public List<UserListData> listFriends(User user, @Named("userMail") String userMail) throws OAuthRequestException, UnauthorizedException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfEndUserNotExists(userMail);
+        EndpointUtil.throwIfUserNotSame(user.getEmail(), userMail);
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        List<String> friendMails;
+        try {
+            friendMails = pm.getObjectById(EndUser.class, userMail).getMyFriends();
+        } finally {
+            pm.close();
+        }
+        return listUserInfo(user, friendMails, true);
+    }
+
+    /**
+     * Durchsucht die Benutzer nach der Eingabe und gibt die allgemeinen Nutzerinformationen
+     * zu den Ergebnissen in einer Liste aus.
+     *
+     * @param input Eingabe
+     * @return Liste von allgemeinen Informationen zu Benutzern
+     */
+    public List<UserListData> searchUsers(User user, @Named("input") String input) throws OAuthRequestException {
+        List<String> cache;
+        Set<String> resultMails = new HashSet<>();
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            Query q = pm.newQuery(UserInfo.class);
+            q.setFilter("email.startsWith(inputParam)");
+            q.declareParameters("String inputParam");
+            q.setResult("this.email");
+            cache = (List<String>) q.execute(input);
+            resultMails.addAll(cache);
+
+            q = pm.newQuery(UserInfo.class);
+            q.setFilter("firstName.startsWith(inputParam)");
+            q.declareParameters("String inputParam");
+            q.setResult("this.email");
+            cache = (List<String>) q.execute(input);
+            resultMails.addAll(cache);
+
+            q = pm.newQuery(UserInfo.class);
+            q.setFilter("lastName.value.startsWith(inputParam)");
+            q.declareParameters("String inputParam");
+            q.setResult("this.email");
+            cache = (List<String>) q.execute(input);
+            resultMails.addAll(cache);
+
+            Set<String> cacheMails = new HashSet<>();
+            for(String userMail : resultMails){
+                EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+                if(!endUser.isOptOutSearch()){
+                    cacheMails.add(userMail);
+                }
+            }
+            resultMails = cacheMails;
+
+            List<UserListData> result = new ArrayList<>();
+            for (String userMail : resultMails) {
+                result.add(getUserInfo(user, userMail, false));
+            }
+            return result;
         } finally {
             pm.close();
         }
@@ -479,112 +597,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
                 lastFieldUpdateTime = System.currentTimeMillis();
             }
             pm.makePersistent(userLocation);
-        } finally {
-            pm.close();
-        }
-    }
-
-    /**
-     * Listet die allgemeinen Informationen zusammen mit den Profilbildern der Benutzer auf, dessen
-     * E-Mail Adressen übergeben wurden.
-     *
-     * @param userMails
-     * @return Liste von allgemeinen Informationen mit Profilbildern
-     */
-    @ApiMethod(path = "user_profile_list")
-    public List<UserProfile> listUserProfile(User user, @Named("userMails") List<String> userMails) throws OAuthRequestException {
-        List<UserProfile> result = new ArrayList<>();
-        UserProfile userProfile;
-        for (String userMail : userMails) {
-            userProfile = getUserProfile(user, userMail);
-            if (userProfile != null) result.add(userProfile);
-        }
-        return result;
-    }
-
-    /**
-     * Listet die allgemeinen Informationen der Benutzer auf, dessen E-Mail Adressen übergeben
-     * wurden.
-     *
-     * @param userMails Liste der E-Mail Adressen der Benutzer
-     * @return Liste von allgemeinen Informationen
-     */
-    @ApiMethod(path = "user_info_list")
-    public List<UserInfo> listUserInfo(User user, @Named("userMails") List<String> userMails) {
-        List<UserInfo> result = new ArrayList<>();
-        UserInfo userInfo;
-        for (String userMail : userMails) {
-            userInfo = getUserInfo(user, userMail);
-            if (userInfo != null) result.add(userInfo);
-        }
-        return result;
-    }
-
-    /**
-     * Listet die Profilbilder der Benutzer auf, dessen E-Mail Adressen übergeben wurden.
-     *
-     * @param userMails Liste der E-Mail Adressen der Benutzer
-     * @return Liste von Profilbildern
-     */
-    @ApiMethod(path = "user_picture_list")
-    public List<UserPicture> listUserPicture(@Named("userMails") List<String> userMails) {
-        List<UserPicture> result = new ArrayList<>();
-        UserPicture userPicture;
-        for (String userMail : userMails) {
-            userPicture = getUserPicture(userMail);
-            if (userPicture != null) result.add(userPicture);
-        }
-        return result;
-    }
-
-    /**
-     * Erstellt eine Liste mit allgemeinen Informationen zu den Freunden eines Benutzers.
-     *
-     * @param user     User-Objekt für die Authentifikation
-     * @param userMail E-Mail Adresse des Benutzers
-     * @return Liste von Informationen zu Freunden
-     * @throws OAuthRequestException
-     * @throws UnauthorizedException
-     */
-    @ApiMethod(path = "friends_list")
-    public List<UserProfile> listFriends(User user, @Named("userMail") String userMail) throws OAuthRequestException, UnauthorizedException {
-        EndpointUtil.throwIfNoUser(user);
-        EndpointUtil.throwIfEndUserNotExists(userMail);
-        EndpointUtil.throwIfUserNotSame(user.getEmail(), userMail);
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        List<String> friendMails;
-        try {
-            friendMails = pm.getObjectById(EndUser.class, userMail).getMyFriends();
-        } finally {
-            pm.close();
-        }
-        return listUserProfile(user, friendMails);
-    }
-
-    /**
-     * Durchsucht die Benutzer nach der Eingabe und gibt die allgemeinen Nutzerinformationen
-     * zu den Ergebnissen in einer Liste aus.
-     *
-     * @param input Eingabe
-     * @return Liste von allgemeinen Informationen zu Benutzern
-     */
-    public List<UserProfile> searchUsers(User user, @Nullable @Named("input") String input) throws OAuthRequestException {
-        List<EndUser> cache;
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            Query q = pm.newQuery(EndUser.class);
-            if (input != null) {
-                q.setFilter("email == inputParam && optOutSearch == false");
-                q.declareParameters("String inputParam");
-                cache = (List<EndUser>) q.execute(input);
-            } else {
-                cache = (List<EndUser>) q.execute();
-            }
-            List<UserProfile> result = new ArrayList<>();
-            for(EndUser endUser : cache){
-                result.add(getUserProfile(user, endUser.getEmail()));
-            }
-            return result;
         } finally {
             pm.close();
         }

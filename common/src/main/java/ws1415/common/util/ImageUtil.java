@@ -1,7 +1,18 @@
 package ws1415.common.util;
 
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.net.Uri;
+import android.widget.Toast;
 
 import com.google.api.client.util.Base64;
 import com.skatenight.skatenightAPI.model.Text;
@@ -43,7 +54,7 @@ public abstract class ImageUtil {
      */
     public static byte[] BitmapToByteArray(Bitmap bitmap) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
         return out.toByteArray();
     }
 
@@ -67,6 +78,71 @@ public abstract class ImageUtil {
     public static Bitmap DecodeTextToBitmap(Text text){
         byte[] byteArray = Base64.decodeBase64(text.getValue());
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+    }
+
+    /**
+     * Erstellt aus einer Bitmap eine abgerundete Bitmap.
+     *
+     * Credit: http://stackoverflow.com/questions/17040475/adding-a-round-frame-circle-on-rounded-bitmap
+     *
+     * @param bitmap Bitmap
+     * @return abgerundete Bitmap
+     */
+    public static Bitmap getRoundedBitmap(Bitmap bitmap) {
+        final int width = bitmap.getWidth();
+        final int height = bitmap.getHeight();
+        final int radius = Math.min(height / 2, width / 2);
+
+        final Bitmap output = Bitmap.createBitmap(bitmap.getWidth() + 8, bitmap.getHeight() + 8, Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(output);
+
+        final Paint paint = new Paint();
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setStyle(Paint.Style.FILL);
+
+        canvas.drawCircle((width / 2) + 4, (height / 2) + 4, radius, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+
+        canvas.drawBitmap(bitmap, 4, 4, paint);
+        paint.setXfermode(null);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(Color.WHITE);
+        paint.setStrokeWidth(3);
+        canvas.drawCircle((width / 2) + 4, (height / 2) + 4, radius, paint);
+
+        //bitmap.recycle();
+        return output;
+    }
+
+    /**
+     * Cropt das Bild auf 150x150.
+     *
+     * @param picUri Uri des Bildes
+     * @param context Context
+     * @param requestCode RequestCode
+     */
+    public static void performCrop(Uri picUri, Context context, int requestCode, Uri tempUri) {
+        try {
+            Intent cropIntent = new Intent("com.android.camera.action.CROP");
+            //indicate image type and Uri
+            cropIntent.setDataAndType(picUri, "image/*");
+            cropIntent.putExtra("crop", "true");
+            cropIntent.putExtra("aspectX", 1);
+            cropIntent.putExtra("aspectY", 1);
+            cropIntent.putExtra("outputX", 150);
+            cropIntent.putExtra("outputY", 150);
+            cropIntent.putExtra("output", tempUri);
+            cropIntent.putExtra("outputFormat", "PNG");
+            cropIntent.putExtra("return-data", true);
+            cropIntent.putExtra("scale", true);
+            ((Activity) context).startActivityForResult(cropIntent, requestCode);
+        } catch (ActivityNotFoundException anfe) {
+            String errorMessage = "Your device doesn't support the crop action!";
+            Toast toast = Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
 }

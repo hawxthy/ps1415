@@ -12,12 +12,14 @@
     <string name="drawer_close">Slider Menu geschlossen</string>
 
     <string-array name="nav_drawer_items">
-        <item >Veranstaltungen</item>
-        <item >Nutzergruppen</item>
+        <item>Mein Profil</item>
+        <item>Veranstaltungen</item>
+        <item>Nutzergruppen</item>
         <item>Image Storage Test</item>
     </string-array>
 
     <array name="nav_drawer_icons">
+        <item>@drawable/ic_action_person</item>
         <item>@drawable/ic_event</item>
         <item>@drawable/ic_group</item>
         <item>@drawable/common_ic_googleplayservices</item>
@@ -103,4 +105,32 @@
     <string name="group">"Gruppe: "</string>
     <!-- Strings zu LocationTransmitterService -->
     <string name="location_transmitter_button_stop">Stop</string>
+
+    <!--Strings zu RegisterActivity-->
+    <string name="first_name_hint">Vorname</string>
+    <string name="last_name_hint">Nachname</string>
+    <string name="register">Registrieren</string>
+    <string name="profile_picture">Profilbild</string>
+    <string-array name="image_selection">
+        <item>Aus Album auswählen</item>
+        <item>Bild aufnehmen</item>
+    </string-array>
+
+    <!-- Strings zu ProfileActivity -->
+    <string name="group_tab">Gruppen</string>
+    <string name="info_tab">Allgemeines</string>
+    <string name="events_tab">Events</string>
+
+    <string name="residence">Wohnort</string>
+    <string name="date_of_birth">Geburtsdatum</string>
+    <string name="gender">Geschlecht</string>
+    <string name="description">Beschreibung</string>
+
+    <string name="gender_female">Weiblich</string>
+    <string name="gender_male">Männlich</string>
+    <string name="na">N/A</string>
+
+    <string name="result_date_of_birth">%1$d.%2$d.%3$d (%4$d Jahre)</string>
+
+    <string name="at_time">um</string>
 </resources>

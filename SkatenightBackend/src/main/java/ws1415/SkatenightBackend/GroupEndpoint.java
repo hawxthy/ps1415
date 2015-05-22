@@ -26,7 +26,7 @@ import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
-import ws1415.SkatenightBackend.model.UserProfile;
+import ws1415.SkatenightBackend.transport.UserProfile;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 

@@ -1,7 +1,9 @@
 package ws1415.SkatenightBackend.model;
 
 /**
- * Created by Martin on 01.05.2015.
+ * Enum-Klasse für das Geschlecht für die Benutzer.
+ *
+ * @author Martin Wrodarczyk
  */
 public enum Gender {
     MALE(1),
@@ -31,9 +33,9 @@ public enum Gender {
         }
     }
 
-    public static Gender getValue(String s) {
+    public static Gender getValue(Integer id) {
         for (Gender g : Gender.values()) {
-            if (g.getRepresentation().equals(s))
+            if (g.getId() == id)
                 return g;
         }
         throw new IllegalArgumentException("Ungültige Id");

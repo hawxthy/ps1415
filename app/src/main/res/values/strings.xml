@@ -12,12 +12,14 @@
     <string name="drawer_close">Slider Menu Closed</string>
 
     <string-array name="nav_drawer_items">
+        <item>My Profile</item>
         <item>Events</item>
         <item>User Groups</item>
         <item>Image Storage Test</item>
     </string-array>
 
     <array name="nav_drawer_icons">
+        <item>@drawable/ic_action_person</item>
         <item>@drawable/ic_event</item>
         <item>@drawable/ic_group</item>
         <item>@drawable/common_ic_googleplayservices</item>
@@ -107,4 +109,35 @@
 
     <!-- Strings zu ImageStorageTestActivity  -->
     <string name="title_activity_blobstore_test">ImageStorageTestActivity</string>
+
+    <!--Strings zu RegisterActivity-->
+    <string name="first_name_hint">Vorname</string>
+    <string name="last_name_hint">Nachname</string>
+    <string name="register">Register</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="set_email">Setze E-Mail</string>
+    <string-array name="image_selection">
+        <item>Choose out of album</item>
+        <item>Take a picture</item>
+    </string-array>
+    <string name="title_activity_profile">ProfileActivity</string>
+
+    <!-- Strings zu ProfileActivity -->
+    <string name="group_tab">Groups</string>
+    <string name="info_tab">General</string>
+    <string name="events_tab">Events</string>
+
+    <string name="residence">Residence</string>
+    <string name="date_of_birth">Date Of Birth</string>
+    <string name="gender">Gender</string>
+    <string name="description">Description</string>
+
+    <string name="gender_female">Female</string>
+    <string name="gender_male">Male</string>
+    <string name="na">N/A</string>
+
+    <string name="result_date_of_birth">%1$d.%2$d.%3$d (%4$d years)</string>
+
+    <string name="at_time">at</string>
+
 </resources>

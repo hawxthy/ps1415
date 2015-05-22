@@ -7,6 +7,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.InfoPair;
 import com.skatenight.skatenightAPI.model.UserInfo;
+import com.skatenight.skatenightAPI.model.UserListData;
 import com.skatenight.skatenightAPI.model.UserLocation;
 import com.skatenight.skatenightAPI.model.UserPicture;
 import com.skatenight.skatenightAPI.model.UserProfile;
@@ -43,6 +44,10 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     // Testdaten
     public static String TEST_MAIL = "";
     public static String TEST_MAIL_2 = "";
+    public static String TEST_INITIAL_FIRST_NAME_1 = "Vorname1";
+    public static String TEST_INITIAL_FIRST_NAME_2 = "Vorname2";
+    public static String TEST_INITIAL_LAST_NAME_1 = "Nachname1";
+    public static String TEST_INITIAL_LAST_NAME_2 = "Nachname2";
 
     public static final double TEST_LONGITUDE = 7.626135;
     public static final double TEST_LATITUDE = 51.960665;
@@ -62,7 +67,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
             setValue(TEST_CITY).
             setVisibility(TEST_CITY_VISIBILITY.getId());
 
-    public static final String TEST_DATE_OF_BIRTH = "1990-01-01";
+    public static final String TEST_DATE_OF_BIRTH = "1990/01/01";
     public static final Visibility TEST_DATE_OF_BIRTH_VISIBILITY = Visibility.PUBLIC;
     public static final InfoPair TEST_DATE_OF_BIRTH_PAIR = new InfoPair().
             setValue(TEST_DATE_OF_BIRTH).
@@ -118,7 +123,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Boolean result) {
                 createSignal1.countDown();
             }
-        }, TEST_MAIL, "", "");
+        }, TEST_MAIL, TEST_INITIAL_FIRST_NAME_1, TEST_INITIAL_LAST_NAME_1, null);
         assertTrue(createSignal1.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch createSignal2 = new CountDownLatch(1);
@@ -127,7 +132,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Boolean result) {
                 createSignal2.countDown();
             }
-        }, TEST_MAIL_2, "", "");
+        }, TEST_MAIL_2, TEST_INITIAL_FIRST_NAME_2, TEST_INITIAL_LAST_NAME_2, null);
         assertTrue(createSignal2.await(30, TimeUnit.SECONDS));
     }
 
@@ -138,8 +143,8 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
      */
     @Override
     public void tearDown() throws Exception {
-        deleteUser(0, TEST_MAIL);
-        deleteUser(1, TEST_MAIL_2);
+//        deleteUser(0, TEST_MAIL);
+//        deleteUser(1, TEST_MAIL_2);
         super.tearDown();
     }
 
@@ -245,11 +250,11 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
         userMails.add(TEST_MAIL_2);
 
         final CountDownLatch listSignal = new CountDownLatch(1);
-        UserController.listUserInfo(new ExtendedTaskDelegateAdapter<Void, List<UserInfo>>() {
+        UserController.listUserInfo(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserInfo> userInfos) {
+            public void taskDidFinish(ExtendedTask task, List<UserListData> userListData) {
                 List<String> userMailsServer = new ArrayList<>();
-                for (UserInfo userInfo : userInfos) {
+                for (UserListData userInfo : userListData) {
                     userMailsServer.add(userInfo.getEmail());
                 }
 
@@ -257,35 +262,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
                         userMails.containsAll(userMailsServer));
                 listSignal.countDown();
             }
-        }, userMails);
-        assertTrue(listSignal.await(20, TimeUnit.SECONDS));
-    }
-
-    /**
-     * Prüft ob Benutzerprofile von mehreren Benutzern richtig abgerufen werden.
-     *
-     * @throws Exception
-     */
-    @SmallTest
-    public void testListUserProfile() throws InterruptedException {
-        final List<String> userMails = new ArrayList<>();
-        userMails.add(TEST_MAIL);
-        userMails.add(TEST_MAIL_2);
-
-        final CountDownLatch listSignal = new CountDownLatch(1);
-        UserController.listUserProfile(new ExtendedTaskDelegateAdapter<Void, List<UserProfile>>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, List<UserProfile> userProfiles) {
-                List<String> userMailsServer = new ArrayList<>();
-                for (UserProfile userProfile : userProfiles) {
-                    userMailsServer.add(userProfile.getEmail());
-                }
-
-                assertTrue(userMailsServer.containsAll(userMails) &&
-                        userMails.containsAll(userMailsServer));
-                listSignal.countDown();
-            }
-        }, userMails);
+        }, userMails, true);
         assertTrue(listSignal.await(20, TimeUnit.SECONDS));
     }
 
@@ -297,16 +274,40 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     @SmallTest
     public void testSearchUsers() throws InterruptedException {
         final CountDownLatch searchSignal = new CountDownLatch(1);
-        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserProfile>>() {
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserProfile> result) {
+            public void taskDidFinish(ExtendedTask task, List<UserListData> result) {
                 assertNotNull(result);
                 assertTrue(result.size() == 1);
                 assertEquals(result.get(0).getEmail(), TEST_MAIL);
                 searchSignal.countDown();
             }
         }, TEST_MAIL);
-        assertTrue(searchSignal.await(20, TimeUnit.SECONDS));
+        assertTrue(searchSignal.await(30, TimeUnit.SECONDS));
+
+        final CountDownLatch searchSignal2 = new CountDownLatch(1);
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserListData> result) {
+                assertNotNull(result);
+                assertTrue(result.size() == 1);
+                assertEquals(result.get(0).getEmail(), TEST_MAIL);
+                searchSignal2.countDown();
+            }
+        }, TEST_INITIAL_FIRST_NAME_1);
+        assertTrue(searchSignal2.await(30, TimeUnit.SECONDS));
+
+        final CountDownLatch searchSignal3 = new CountDownLatch(1);
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserListData> result) {
+                assertNotNull(result);
+                assertTrue(result.size() == 1);
+                assertEquals(result.get(0).getEmail(), TEST_MAIL);
+                searchSignal3.countDown();
+            }
+        }, TEST_INITIAL_LAST_NAME_1);
+        assertTrue(searchSignal3.await(30, TimeUnit.SECONDS));
     }
 
     /**
@@ -350,10 +351,11 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
      */
     @SmallTest
     public void testUpdateUserInfo() throws InterruptedException {
+        changeAccount(0);
         UserInfo newUserInfo = new UserInfo();
         newUserInfo.setEmail(TEST_MAIL);
         newUserInfo.setFirstName(TEST_FIRST_NAME);
-        newUserInfo.setGender(TEST_GENDER.getRepresentation());
+        newUserInfo.setGender(TEST_GENDER.getId());
         newUserInfo.setLastName(TEST_LAST_NAME_PAIR);
         newUserInfo.setCity(TEST_CITY_PAIR);
         newUserInfo.setDateOfBirth(TEST_DATE_OF_BIRTH_PAIR);
@@ -361,9 +363,9 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
         newUserInfo.setPostalCode(TEST_POSTAL_CODE_PAIR);
 
         final CountDownLatch searchSignal1 = new CountDownLatch(1);
-        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserProfile>>() {
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserProfile> result) {
+            public void taskDidFinish(ExtendedTask task, List<UserListData> result) {
                 assertNotNull(result);
                 assertTrue(result.size() == 1);
                 assertEquals(result.get(0).getEmail(), TEST_MAIL);
@@ -390,7 +392,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
                 assertNotNull(userInfo);
                 assertEquals(TEST_MAIL, userInfo.getEmail());
                 assertEquals(TEST_FIRST_NAME, userInfo.getFirstName());
-                assertEquals(TEST_GENDER.getRepresentation(), userInfo.getGender());
+                assertEquals(TEST_GENDER.getId(), userInfo.getGender().intValue());
                 assertNull(userInfo.getLastName().getValue());
                 assertEquals(TEST_LAST_NAME_VISIBILITY.getId(), userInfo.getLastName().getVisibility());
                 assertNull(userInfo.getCity().getValue());
@@ -407,9 +409,9 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
         assertTrue(getSignal.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch searchSignal2 = new CountDownLatch(1);
-        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserProfile>>() {
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserProfile> result) {
+            public void taskDidFinish(ExtendedTask task, List<UserListData> result) {
                 assertNull(result);
                 searchSignal2.countDown();
             }
@@ -425,7 +427,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
      */
     @SmallTest
     public void testUpdateUserPicture() throws InterruptedException {
-        final Bitmap testImage = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.test);
+        final Bitmap testImage = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.default_picture);
         final byte[] testImageByte = ImageUtil.BitmapToByteArray(testImage);
 
         final CountDownLatch updateSignal = new CountDownLatch(1);
@@ -458,6 +460,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     @SmallTest
     public void testAddAndRemoveFriend() throws InterruptedException {
         String s = TEST_MAIL;
+        changeAccount(0);
         final CountDownLatch addFriendSignal = new CountDownLatch(1);
         UserController.addFriend(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
@@ -509,6 +512,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
      */
     @SmallTest
     public void testListFriends() throws InterruptedException {
+        changeAccount(0);
         final CountDownLatch addFriendSignal = new CountDownLatch(1);
         UserController.addFriend(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
@@ -520,9 +524,9 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
         assertTrue(addFriendSignal.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch listFriendsSignal = new CountDownLatch(1);
-        UserController.listFriends(new ExtendedTaskDelegateAdapter<Void, List<UserProfile>>() {
+        UserController.listFriends(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserProfile> friendInfos) {
+            public void taskDidFinish(ExtendedTask task, List<UserListData> friendInfos) {
                 assertTrue(friendInfos.size() == 1);
                 assertEquals(TEST_MAIL_2, friendInfos.get(0).getEmail());
                 listFriendsSignal.countDown();

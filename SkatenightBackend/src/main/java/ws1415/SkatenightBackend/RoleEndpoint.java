@@ -15,7 +15,7 @@ import javax.jdo.Query;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.GlobalRole;
-import ws1415.SkatenightBackend.model.UserProfile;
+import ws1415.SkatenightBackend.transport.UserListData;
 
 /**
  * Der RoleEndpoint stellt Hilfsmethoden bereit, die genutzt werden um die Rollen der Benutzer
@@ -55,17 +55,17 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
      * @return Liste von Administratoren
      */
     @ApiMethod(path = "global_admin")
-    public List<UserProfile> listGlobalAdmins(User user) throws OAuthRequestException {
+    public List<UserListData> listGlobalAdmins(User user) throws OAuthRequestException {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         List<EndUser> adminUsers;
-        List<UserProfile> result = new ArrayList<>();
+        List<UserListData> result = new ArrayList<>();
         try {
             Query q = pm.newQuery(EndUser.class);
             q.setFilter("globalRole == p1");
 
             adminUsers = (List<EndUser>) pm.newQuery(q).execute(GlobalRole.ADMIN.getId());
             for(EndUser adminUser : adminUsers){
-                result.add(new UserEndpoint().getUserProfile(user, adminUser.getEmail()));
+                result.add(new UserEndpoint().getUserInfo(user, adminUser.getEmail(), true));
             }
             return result;
         } finally {

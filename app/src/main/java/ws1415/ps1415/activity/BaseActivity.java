@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.NavDrawerListAdapter;
 import ws1415.ps1415.model.NavDrawerItem;
@@ -68,6 +69,7 @@ public class BaseActivity extends Activity {
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(3, -1)));
 
         navMenuIcons.recycle();
 
@@ -106,16 +108,22 @@ public class BaseActivity extends Activity {
         private void selectItem(int position) {
             switch(position){
                 case 0:
+                    Intent profile_intent = new Intent(BaseActivity.this, ProfileActivity.class);
+                    profile_intent.putExtra("email", ServiceProvider.getEmail());
+                    profile_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(profile_intent);
+                    break;
+                case 1:
                     Intent show_events_intent = new Intent(BaseActivity.this, ShowEventsActivity.class);
                     show_events_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(show_events_intent);
                     break;
-                case 1:
+                case 2:
                     Intent user_group_intent = new Intent(BaseActivity.this, UsergroupActivity.class);
                     user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(user_group_intent);
                     break;
-                case 2:
+                case 3:
                     Intent cloud_storage_test_intent = new Intent(BaseActivity.this, ImageStorageTestActivity.class);
                     cloud_storage_test_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(cloud_storage_test_intent);

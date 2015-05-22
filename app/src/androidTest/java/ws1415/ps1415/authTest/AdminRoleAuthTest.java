@@ -3,7 +3,7 @@ package ws1415.ps1415.authTest;
 import android.test.suitebuilder.annotation.SmallTest;
 
 import com.skatenight.skatenightAPI.model.EndUser;
-import com.skatenight.skatenightAPI.model.UserProfile;
+import com.skatenight.skatenightAPI.model.UserListData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,7 +49,7 @@ public class AdminRoleAuthTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Boolean result) {
                 createSignal.countDown();
             }
-        }, TEST_MAIL, "", "");
+        }, TEST_MAIL, "", "", null);
         assertTrue(createSignal.await(30, TimeUnit.SECONDS));
 
         changeAccount(ADMIN_MAIL);
@@ -122,11 +122,11 @@ public class AdminRoleAuthTest extends AuthenticatedAndroidTestCase {
 
         final List<String> adminMails = Arrays.asList(TEST_MAIL, ADMIN_MAIL);
         final CountDownLatch listSignal = new CountDownLatch(1);
-        RoleController.listGlobalAdmins(new ExtendedTaskDelegateAdapter<Void, List<UserProfile>>() {
+        RoleController.listGlobalAdmins(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserProfile> admins){
+            public void taskDidFinish(ExtendedTask task, List<UserListData> admins){
                 List<String> adminMailsRetrieved = new ArrayList<String>();
-                for(UserProfile admin : admins){
+                for(UserListData admin : admins){
                     adminMailsRetrieved.add(admin.getEmail());
                 }
                 assertEquals(adminMails.size(), adminMailsRetrieved.size());

@@ -6,9 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -25,11 +22,9 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import ws1415.common.controller.UserController;
 import ws1415.common.gcm.GCMUtil;
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
@@ -39,6 +34,7 @@ import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.EventsCursorAdapter;
+import ws1415.ps1415.util.LocalGCMUtil;
 import ws1415.ps1415.util.PrefManager;
 
 public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDelegate<Void, List<Event>> {
@@ -75,6 +71,22 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        context = this;
+
+        // SharePreferences skatenight.app laden
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        credential = GoogleAccountCredential.usingAudience(this, "server:client_id:" + Constants.WEB_CLIENT_ID);
+
+        if(PrefManager.getSelectedUserMail(context).equals("")){
+            context.startActivity(new Intent(this, RegisterActivity.class));
+            finish();
+        } else {
+            credential.setSelectedAccountName(PrefManager.getSelectedUserMail(context));
+            String s = PrefManager.getSelectedUserMail(context);
+            ServiceProvider.login(credential);
+            initGCM();
+        }
+
         super.onCreate(savedInstanceState);
 
         // Einstellungen müssen als erstes beim App Start geladenw werden
@@ -125,24 +137,6 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
             }
         });
 
-        // SharePreferences skatenight.app laden
-        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        credential = GoogleAccountCredential.usingAudience(this, "server:client_id:" + Constants.WEB_CLIENT_ID);
-
-        // accountName aus SharedPreferences laden
-        if (prefs.contains("accountName")) {
-            credential.setSelectedAccountName(prefs.getString("accountName", null));
-        }
-
-        // Kein accountName gesetzt, also AccountPicker aufrufen
-        if (credential.getSelectedAccountName() == null) {
-            startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-        } else {
-            ServiceProvider.login(credential);
-            initGCM();
-            checkUserExistance();
-        }
-
         // Listener für REFRESH_EVENTS_ACTION-Intents erstellen
         LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
@@ -158,26 +152,17 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
         new QueryEventsTask(ShowEventsActivity.this).execute();
     }
 
-    private void checkUserExistance() {
-        // Check ob EndUser existiert
-        if(!PrefManager.getSelectedUserMail(context).equals(ServiceProvider.getEmail())){
-            UserController.createUser(null, ServiceProvider.getEmail(), "", "");
-            Log.i(TAG, "User: " + ServiceProvider.getEmail() + " created.");
-            PrefManager.setSelectedUserMail(context, ServiceProvider.getEmail());
-        }
-    }
-
     private void initGCM() {
         // GCM initialisieren
         context = this;
         if (GCMUtil.checkPlayServices(this)) {
             gcm = GoogleCloudMessaging.getInstance(this);
-            regid = getRegistrationId(context);
+            regid = LocalGCMUtil.getRegistrationId(context);
 
             if (regid.isEmpty()) {
-                registerInBackground();
+                LocalGCMUtil.registerInBackground(context, gcm);
             } else {
-                sendRegistrationIdToBackend();
+                LocalGCMUtil.sendRegistrationIdToBackend(regid);
             }
         } else {
             Log.i(TAG, "No valid Google Play Services APK found.");
@@ -259,7 +244,6 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
                         ServiceProvider.login(credential);
                         initGCM();
 
-                        UserController.createUser(null, ServiceProvider.getEmail(), "", "");
                         Log.i(TAG, "User: " + ServiceProvider.getEmail() + " created.");
                         PrefManager.setSelectedUserMail(context, ServiceProvider.getEmail());
                     }
@@ -267,137 +251,4 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
                 break;
         }
     }
-
-    // ---------- Methoden für GCM ----------
-    /**
-     * Gets the current registration ID for application on GCM service.
-     * <p>
-     * If result is empty, the app needs to register.
-     *
-     * @return registration ID, or empty string if there is no existing
-     *         registration ID.
-     */
-    private String getRegistrationId(Context context) {
-        final SharedPreferences prefs = getGCMPreferences(context);
-        String registrationId = prefs.getString(PROPERTY_REG_ID, "");
-        if (registrationId.isEmpty()) {
-            Log.i(TAG, "Registration not found.");
-            return "";
-        }
-        // Check if app was updated; if so, it must clear the registration ID
-        // since the existing regID is not guaranteed to work with the new
-        // app version.
-        int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-        int currentVersion = getAppVersion(context);
-        if (registeredVersion != currentVersion) {
-            Log.i(TAG, "App version changed.");
-            return "";
-        }
-        return registrationId;
-    }
-
-    /**
-     * @return Application's {@code SharedPreferences}.
-     */
-    private SharedPreferences getGCMPreferences(Context context) {
-        // This sample app persists the registration ID in shared preferences, but
-        // how you store the regID in your app is up to you.
-        return getSharedPreferences(ShowEventsActivity.class.getSimpleName(),
-                Context.MODE_PRIVATE);
-    }
-
-    /**
-     * @return Application's version code from the {@code PackageManager}.
-     */
-    private static int getAppVersion(Context context) {
-        try {
-            PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-            return packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            // should never happen
-            throw new RuntimeException("Could not get package name: " + e);
-        }
-    }
-
-    /**
-     * Registers the application with GCM servers asynchronously.
-     * <p>
-     * Stores the registration ID and app versionCode in the application's
-     * shared preferences.
-     */
-    private void registerInBackground() {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... params) {
-                String msg = "";
-                try {
-                    if (gcm == null) {
-                        gcm = GoogleCloudMessaging.getInstance(context);
-                    }
-                    regid = gcm.register(SENDER_ID);
-                    msg = "Device registered, registration ID=" + regid;
-
-                    // You should send the registration ID to your server over HTTP,
-                    // so it can use GCM/HTTP or CCS to send messages to your app.
-                    // The request to your server should be authenticated if your app
-                    // is using accounts.
-                    sendRegistrationIdToBackend();
-
-                    // For this demo: we don't need to send it because the device
-                    // will send upstream messages to a server that echo back the
-                    // message using the 'from' address in the message.
-
-                    // Persist the regID - no need to register again.
-                    storeRegistrationId(context, regid);
-                } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
-                    // If there is an error, don't just keep trying to register.
-                    // Require the user to click a button again, or perform
-                    // exponential back-off.
-                }
-                return msg;
-            }
-
-            @Override
-            protected void onPostExecute(String msg) {
-                Log.e(TAG, msg);
-            }
-        }.execute(null, null, null);
-    }
-
-    /**
-     * Sendet die Registration-ID für GCM an das Backend.
-     */
-    private void sendRegistrationIdToBackend() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    ServiceProvider.getService().userEndpoint().registerForGCM(regid).execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        }.execute(null, null, null);
-    }
-
-    /**
-     * Stores the registration ID and app versionCode in the application's
-     * {@code SharedPreferences}.
-     *
-     * @param context application's context.
-     * @param regId registration ID
-     */
-    private void storeRegistrationId(Context context, String regId) {
-        final SharedPreferences prefs = getGCMPreferences(context);
-        int appVersion = getAppVersion(context);
-        Log.i(TAG, "Saving regId on app version " + appVersion);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(PROPERTY_REG_ID, regId);
-        editor.putInt(PROPERTY_APP_VERSION, appVersion);
-        editor.commit();
-    }
-
 }
