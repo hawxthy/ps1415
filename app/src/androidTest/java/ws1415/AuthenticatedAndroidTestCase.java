@@ -14,6 +14,7 @@ import ws1415.ps1415.Constants;
  * @author Richard Schulze
  */
 public class AuthenticatedAndroidTestCase extends AndroidTestCase {
+    private GoogleAccountCredential credential;
     private int selectedAccount = -1;
 
     /**
@@ -23,6 +24,8 @@ public class AuthenticatedAndroidTestCase extends AndroidTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
+
+        credential = GoogleAccountCredential.usingAudience(getContext(), "server:client_id:" + Constants.WEB_CLIENT_ID);
         changeAccount(0);
     }
 
@@ -31,7 +34,6 @@ public class AuthenticatedAndroidTestCase extends AndroidTestCase {
      * @param index    Der Index des Accounts, der ausgewählt wird.
      */
     public void changeAccount(int index) {
-        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getContext(), "server:client_id:" + Constants.WEB_CLIENT_ID);
         if (credential.getSelectedAccountName() == null || selectedAccount != index) {
             credential.setSelectedAccountName(credential.getAllAccounts()[index].name);
             selectedAccount = index;
@@ -48,12 +50,12 @@ public class AuthenticatedAndroidTestCase extends AndroidTestCase {
     }
 
     /**
-     * Gibt die Mail-Adresse des zurzeit ausgewählten Accounts zurück.
-     * @return Die Mail-Adresse des zurzeit ausgewählten Accounts.
+     * Gibt die Mail-Adresse des Accounts mit dem angegebenen Index zurück.
+     * @param index Der Index des Accounts.
+     * @return Die Mail-Adresse des Accounts mit dem angegebenen Index.
      */
-    public String getSelectedAccountMail() {
-        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getContext(), "server:client_id:" + Constants.WEB_CLIENT_ID);
-        return credential.getSelectedAccountName();
+    public String getAccountMail(int index) {
+        return credential.getAllAccounts()[index].name;
     }
 
     /**
@@ -71,7 +73,6 @@ public class AuthenticatedAndroidTestCase extends AndroidTestCase {
      * @return Die Anzahl der Accounts auf dem Testgerät.
      */
     public int getAccountCount() {
-        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getContext(), "server:client_id:" + Constants.WEB_CLIENT_ID);
         return credential.getAllAccounts().length;
     }
 }

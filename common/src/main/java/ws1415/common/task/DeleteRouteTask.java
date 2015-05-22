@@ -34,7 +34,7 @@ public class DeleteRouteTask extends ExtendedTask<Route, Void, Boolean> {
     protected Boolean doInBackground(Route... params) {
         try {
              return ServiceProvider.getService().routeEndpoint().deleteRoute(
-                    params[0].getKey().getId()).execute().getValue();
+                    params[0].getId()).execute().getValue();
         }catch(IOException e){
             e.printStackTrace();
         }

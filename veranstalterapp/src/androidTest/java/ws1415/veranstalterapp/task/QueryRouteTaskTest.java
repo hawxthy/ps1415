@@ -94,7 +94,7 @@ public class QueryRouteTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (routes != null) {
             for (Route r : routes) {
-                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getKey().getId())
+                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getId())
                         .execute();
             }
         }
@@ -148,8 +148,7 @@ public class QueryRouteTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (routes != null) {
             for (Route r : routes2) {
-                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getKey()
-                        .getId()).execute();
+                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getId()).execute();
             }
         }
     }

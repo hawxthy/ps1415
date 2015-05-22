@@ -92,7 +92,7 @@ public class DeleteRouteTaskTest extends AuthTaskTestCase {
         // Bestehende Routen löschen
         for (Route r : ServiceProvider.getService().routeEndpoint().getRoutes().execute()
                 .getItems()) {
-            ServiceProvider.getService().routeEndpoint().deleteRoute(r.getKey().getId())
+            ServiceProvider.getService().routeEndpoint().deleteRoute(r.getId())
                     .execute();
         }
         // Testrouten auf den Server schreiben

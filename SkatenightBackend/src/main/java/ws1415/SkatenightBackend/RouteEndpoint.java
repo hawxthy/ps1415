@@ -3,6 +3,7 @@ package ws1415.SkatenightBackend;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.Key;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +22,11 @@ import ws1415.SkatenightBackend.model.RoutePoint;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserLocation;
 
+import static com.googlecode.objectify.ObjectifyService.ofy;
+
 /**
- * Created by Richard on 01.05.2015.
+ * TODO
+ * @author Richard Schulze
  */
 public class RouteEndpoint extends SkatenightServerEndpoint {
     private static final Logger logger = Logger.getLogger(RouteEndpoint.class.getName());
@@ -114,16 +118,10 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
         }
     }
 
-    protected void calculateCurrentWaypoint(PersistenceManager pm, UserLocation userLocation) {
+    protected void calculateCurrentWaypoint(UserLocation userLocation) {
         Long eventId = userLocation.getCurrentEventId();
         if (eventId != null) {
-            Event event;
-            try {
-                event = pm.getObjectById(Event.class, eventId);
-            } catch(Exception ex) {
-                // Falls event nicht gefunden wurde
-                event = null;
-            }
+            Event event = ofy().load().type(Event.class).id(eventId).safe();
             if (event != null) {
                 Integer currentWaypoint = userLocation.getCurrentWaypoint();
                 if (currentWaypoint == null) {
@@ -173,14 +171,8 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
      * Wobei das Feld um den Wegpunkte herum gebaut wird, welcher die meisten Member enthält
      * @param id event Id
      */
-    protected void calculateField(PersistenceManager pm, long id) {
-        Event event;
-        try {
-            event = pm.getObjectById(Event.class, id);
-        } catch(Exception ex) {
-            // Falls Event nicht gefunden wurde, dann Feldberechnung abbrechen
-            return;
-        }
+    protected void calculateField(long id) {
+        Event event = ofy().load().type(Event.class).id(id).safe();
         List<RoutePoint> points = event.getRoute().getRoutePoints();
         List<UserLocation> userLocations = new EventEndpoint().getMemberLocationsFromEvent(event.getId());
 
@@ -235,7 +227,7 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
         if (event.getRoute().getRoutePoints().size() == 0) {
             logger.info("RoutePoints wurden gelöscht!");
         }
-        pm.makePersistent(event);
+        ofy().save().entity(event).now();
     }
 
     /**
@@ -332,22 +324,17 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
      * @param user  Der User, der die Route hinzufügen möchte
      * @param route zu speichernde Route
      */
-    public void addRoute(User user, Route route) throws OAuthRequestException {
+    public Route addRoute(User user, Route route) throws OAuthRequestException {
+        // TODO Prüfen
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        if (!new HostEndpoint().isHost(user.getEmail()).value) {
-            throw new OAuthRequestException("user is not a host");
+        if (!new RoleEndpoint().isAdmin(user.getEmail()).value) {
+            throw new OAuthRequestException("user is not an admin");
         }
 
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        if (route != null) {
-            try {
-                pm.makePersistent(route);
-            } finally {
-                pm.close();
-            }
-        }
+        ofy().save().entity(route).now();
+        return route;
     }
 
     /**
@@ -356,18 +343,9 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
      * @return Liste der Routen.
      */
     public List<Route> getRoutes() {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        // TODO Prüfen
 
-        try {
-            List<Route> result = (List<Route>) pm.newQuery(Route.class).execute();
-            if (result.isEmpty()) {
-                return new ArrayList<Route>();
-            } else {
-                return result;
-            }
-        } finally {
-            pm.close();
-        }
+        return ofy().load().type(Route.class).list();
     }
 
     /**
@@ -378,32 +356,21 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
      * @return true, wenn die Route gelöscht wurde, sonst false
      */
     public BooleanWrapper deleteRoute(User user, @Named("id") long id) throws OAuthRequestException {
+        // TODO Prüfen, Rückegabewert entfernen
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        if (!new HostEndpoint().isHost(user.getEmail()).value) {
-            throw new OAuthRequestException("user is not a host");
+        if (!new RoleEndpoint().isAdmin(user.getEmail()).value) {
+            throw new OAuthRequestException("user is not an admin");
         }
 
-        List<Event> eventList = new EventEndpoint().getAllEvents();
-        for (int i = 0; i < eventList.size(); i++) {
-            if (eventList.get(i).getRoute().getKey().getId() == id) {
-                return new BooleanWrapper(false);
-            }
+        boolean hasDependedEvents = ofy().load().type(Event.class).filter("route", Key.create(Route.class, id)).limit(1).count() > 0;
+        if (hasDependedEvents) {
+            throw new IllegalArgumentException("route with dependet events can not be deleted");
         }
 
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            for (Route r : (List<Route>) pm.newQuery(Route.class).execute()) {
-                if (r.getKey().getId() == id) {
-                    pm.deletePersistent(r);
-                    return new BooleanWrapper(true);
-                }
-            }
-        } finally {
-            pm.close();
-        }
-        return new BooleanWrapper(false);
+        ofy().delete().key(Key.create(Route.class, id)).now();
+        return new BooleanWrapper(true);
     }
 
 }

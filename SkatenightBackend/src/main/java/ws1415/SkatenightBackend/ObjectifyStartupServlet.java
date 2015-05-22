@@ -15,7 +15,7 @@ import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.GroupMetaData;
 import ws1415.SkatenightBackend.model.Picture;
-import ws1415.SkatenightBackend.model.PictureMetaData;
+import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.UserGroup;
 
 /**
@@ -26,9 +26,9 @@ public class ObjectifyStartupServlet implements Servlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         ObjectifyService.register(Event.class);
+        ObjectifyService.register(Route.class);
         ObjectifyService.register(Gallery.class);
         ObjectifyService.register(Picture.class);
-        ObjectifyService.register(PictureMetaData.class);
         ObjectifyService.register(UserGroup.class);
         ObjectifyService.register(GroupMetaData.class);
         ObjectifyService.register(BoardEntry.class);

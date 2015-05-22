@@ -14,6 +14,7 @@ import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.management.relation.Role;
 
 import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
@@ -106,16 +107,26 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param event    Das zu erstellende Event.
      * @return Das persistierte Event-Objekt.
      */
-    // TODO Route hinzufügen
     public Event createEvent(User user, Event event) throws OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        // TODO Globale Rolle des aufrufenden Benutzers prüfen
-        //if (new RoleEndpoint().getGlobalRole(user.getEmail()).value != Role.HOST.getId()) {
-        //    throw new OAuthRequestException("user is not a host");
-        //}
-        // TODO Event prüfen
+        if (!new UserEndpoint().existsUser(user.getEmail()).value) {
+            throw new IllegalArgumentException("submitted user is not registered");
+        }
+        if (!new RoleEndpoint().isAdmin(user.getEmail()).value) {
+            throw new OAuthRequestException("user is not an admin");
+        }
+
+        // Event prüfen
+        if (event.getId() != null) {
+            throw new IllegalArgumentException("event was already created (id is not empty)");
+        }
+        if (event.getDate() == null || event.getFee() < 0 || event.getMeetingPlace() == null
+                || event.getMeetingPlace().isEmpty() || event.getTitle() == null
+                || event.getTitle().isEmpty() || event.getRoute() == null) {
+            throw new IllegalArgumentException("invalid event");
+        }
 
         // Den aufrufenden Benutzer als Host eintragen
         if (event.getMemberList() == null) {
@@ -128,9 +139,25 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         return event;
     }
 
-
-    public void editEvent(User user, Event event) {
-        // TODO
+    /**
+     * Editiert das auf dem Server gepsicherte Event mit den Daten des übergebenen Events.
+     * Der aufrufende Benutzer muss das Privileg EDIT_EVENT im Event haben.
+     * @param user     Der aufrufende Benutzer.
+     * @param event    Die neuen Daten des Events.
+     */
+    public Event editEvent(User user, Event event) throws OAuthRequestException {
+        if (event == null) {
+            throw new IllegalArgumentException("no event submitted");
+        }
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        Event oldEvent = ofy().load().type(Event.class).id(event.getId()).safe();
+        if (!hasPrivilege(oldEvent, user.getEmail(), Privilege.EDIT_EVENT)) {
+            throw new OAuthRequestException("insufficient privileges");
+        }
+        ofy().save().entity(event).now();
+        return event;
     }
 
     /**
@@ -144,10 +171,15 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             if (user == null) {
                 throw new OAuthRequestException("no user submitted");
             }
-            // TODO User prüfen
-            // TODO Gallery und alle zugehörigen Blobs löschen
+            Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(id).now();
+            if (event != null) {
+                if (!hasPrivilege(event, user.getEmail(), Privilege.DELETE_EVENT)) {
+                    throw new OAuthRequestException("insufficient privileges");
+                }
+                // TODO Gallery und alle zugehörigen Blobs löschen
 
-            ofy().delete().type(Event.class).id(id);
+                ofy().delete().entity(event).now();
+            }
         }
     }
 
@@ -164,7 +196,8 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
             if (!event.getMemberList().containsKey(user.getEmail())) {
                 event.getMemberList().put(user.getEmail(), EventRole.PARTICIPANT);
-                new UserEndpoint().getUserProfile(user, user.getEmail()).addEvent(event);
+                ofy().save().entity(event).now();
+                // new UserEndpoint().getUserProfile(user, user.getEmail()).addEvent(event);
                 // TODO Muss geändertes EndUser-Objekt gespeichert werden?
             }
         }
@@ -186,7 +219,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             if (!event.getMemberList().containsValue(EventRole.HOST)) {
                 throw new IllegalStateException("the last host of an event can not leave");
             }
-            new UserEndpoint().getUserProfile(user, user.getEmail()).removeEvent(event);
+            //new UserEndpoint().getUserProfile(user, user.getEmail()).removeEvent(event);
             // TODO Muss geändertes EndUser-Objekt gespeichert werden?
             ofy().save().entity(event).now();
         }
@@ -239,77 +272,6 @@ public class EventEndpoint extends SkatenightServerEndpoint {
     // ---------------------------------------------------------------------------------------------
     // |                                  Alte Endpoint-Methoden                                   |
     // ---------------------------------------------------------------------------------------------
-
-    /**
-     * Aktualisiert das auf dem Server gespeicherte Event-Objekt. Diese Methode ist private, damit
-     * aus den Apps der Parameter editing nicht manuell angegeben werden kann.
-     *
-     * @param user      Der User, der das Event-Objekt aktualisieren möchte.
-     * @param e         Das neue Event-Objekt.
-     * @param editing   true, wenn das Event editiert wurde, false, wenn es sich um ein neues Event
-     *                  handelt. Hat Auswirkungen auf die Notification, die an die Benutzer gesendet
-     *                  wird.
-     * @param dateChanged true, wenn das Event geändert wurde und sich die Startzeit geändert hat,
-     *                    sonst false.
-     */
-    private void createEvent(User user, Event e, boolean editing, boolean dateChanged) throws OAuthRequestException, IOException {
-        if (user == null) {
-            throw new OAuthRequestException("no user submitted");
-        }
-        if (!new HostEndpoint().isHost(user.getEmail()).value) {
-            throw new OAuthRequestException("user is not a host");
-        }
-
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            if (e != null) {
-                Query q = pm.newQuery(Route.class);
-                q.setFilter("name == nameParam");
-                q.declareParameters("String nameParam");
-                List<Route> results = (List<Route>) q.execute(e.getRoute().getName());
-                if (!results.isEmpty()) {
-                    e.setRoute(results.get(0));
-                }
-                // Weil sonst Nullpointer beim Editieren kommmt
-                pm.makePersistent(e);
-
-                // Benachrichtigung an User schicken
-                long secondsTillStart = (e.getDate().getTime() - System.currentTimeMillis()) / 1000;
-
-                // Benachrichtigung nur schicken, wenn Event in der Zukunft liegt
-                if (secondsTillStart > 0) {
-                    String eventTitle = e.getTitle();
-                    Sender sender = new Sender(Constants.GCM_API_KEY);
-                    Message.Builder mb = new Message.Builder()
-                            // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
-                            .delayWhileIdle(true)
-                            .collapseKey("event_created")
-                                    // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
-                            .timeToLive((int) secondsTillStart)
-                            .addData("type", MessageType.EVENT_NOTIFICATION_MESSAGE.name())
-                            .addData("content", eventTitle);
-                    if (editing) {
-                        mb.addData("title", "Ein Event wurde angepasst.");
-                        mb.addData("date_changed", Boolean.toString(dateChanged));
-                        if (dateChanged) {
-                            mb.addData("event_id", Long.toString(e.getId()));
-                            mb.addData("new_date", Long.toString(e.getDate().getTime()));
-                        }
-                    } else {
-                        mb.addData("title", "Ein neues Event wurde erstellt.");
-                    }
-                    Message m = mb.build();
-                    try {
-                        sender.send(m, getRegistrationManager(pm).getRegisteredUser(), 1);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        } finally {
-            pm.close();
-        }
-    }
 
     /**
      * Fügt einen Member zu einem Event hinzu.
@@ -417,7 +379,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
 
         Route route;
         try {
-            route = pm.getObjectById(Route.class, event.getRoute().getKey());
+            route = pm.getObjectById(Route.class, event.getRoute().getId());
         } catch(Exception ex) {
             route = null;
         }
