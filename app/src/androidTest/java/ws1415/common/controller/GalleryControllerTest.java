@@ -4,6 +4,7 @@ import com.skatenight.skatenightAPI.model.Picture;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -139,16 +140,17 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         int[] ratings = new int[] {2, 5};
 
         // Zwei Bewertungen von unterschiedlichen Accounts für das Bild erstellen
-        final CountDownLatch signal = new CountDownLatch(ratings.length);
         for (int i = 0; i < ratings.length; i++) {
+            changeAccount(i);
+            final CountDownLatch signal = new CountDownLatch(1);
             GalleryController.ratePicture(new ExtendedTaskDelegateAdapter<Void, Void>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, Void aVoid) {
                     signal.countDown();
                 }
             }, picture1.getId(), ratings[i]);
+            assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
         }
-        assertTrue("timeout reached", signal.await(20, TimeUnit.SECONDS));
 
         // Bild neu abrufen und die Bewertungen prüfen
         Picture picture = ServiceProvider.getService().galleryEndpoint().getPicture(picture1.getId()).execute();
@@ -157,7 +159,9 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
 
         assertEquals("wrong count of ratings", ratings.length, picture.getRatings().size());
         for (int i = 0; i < ratings.length; i++) {
-            assertEquals("wrong rating for account " + getAccountMail(i), ratings[i], picture.getRatings().get(getAccountMail(i)));
+            assertNotNull("no rating for " + getAccountMail(i), picture.getRatings().get(getAccountMail(i)));
+            assertEquals("wrong rating for account " + getAccountMail(i), ratings[i],
+                    ((BigDecimal) picture.getRatings().get(getAccountMail(i))).intValue());
         }
 
         // Erwartete durchschnittliche Bewertung berechnen
@@ -171,6 +175,9 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
 
     public void tearDown() throws Exception {
         super.tearDown();
+
+        // Sicherstellen, dass der Benutzer, der die Bilder hochgeladen hat, angemeldet ist
+        changeAccount(0);
 
         for (Picture p : picturesToDelete) {
             ServiceProvider.getService().galleryEndpoint().deletePicture(p.getId()).execute();

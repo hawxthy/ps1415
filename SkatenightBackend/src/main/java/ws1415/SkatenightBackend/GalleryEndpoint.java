@@ -58,6 +58,7 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
      */
     public Picture getPicture(@Named("id") long id) {
         // TODO Eventuell mit User-Parameter sichern
+        // TODO Nur die durchschnittliche und die eigene Bewertung an die App übertragen
         return ofy().load().type(Picture.class).id(id).safe();
     }
 
@@ -110,10 +111,16 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         }
         if (ratings.get(user) != null) {
             // Falls alte Bewertung existiert, dann zunächst von der durchschnittlichen Bewertung abziehen
-            picture.setAvgRating((picture.getAvgRating() - ratings.get(user) / ratings.size()) * ratings.size() / (ratings.size() - 1));
+            // Die Anzahl der Bewertungen wird als float zwischengespeichert, damit beim Teilen keine
+            // Rundungsfehler durch das automatische Casten entstehen
+            float count = (float) ratings.size();
+            picture.setAvgRating((picture.getAvgRating() - ratings.get(user) / count) * count / (count - 1));
         }
         ratings.put(user.getEmail(), rating);
-        picture.setAvgRating(picture.getAvgRating() * (ratings.size() - 1) / ratings.size() + rating / ratings.size());
+        // Die Anzahl der Bewertungen wird als float zwischengespeichert, damit beim Teilen keine
+        // Rundungsfehler durch das automatische Casten entstehen
+        float count = (float) ratings.size();
+        picture.setAvgRating(picture.getAvgRating() * (count - 1) / count + rating / count);
         ofy().save().entity(picture).now();
     }
 
