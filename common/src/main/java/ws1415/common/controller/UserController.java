@@ -285,12 +285,14 @@ public class UserController {
      * @param picture  Bitmap des neuen Profilbildes
      */
     public static void updateUserPicture(ExtendedTaskDelegate handler, final String userMail, final Bitmap picture) {
-        final Text encodedImage = ImageUtil.EncodeBitmapToText(picture);
-        new ExtendedTask<Void, Void, UserPicture>(handler) {
+        Text encodedImage = null;
+        if(picture != null) encodedImage = ImageUtil.EncodeBitmapToText(picture);
+        final Text encodedImageFinal = encodedImage;
+        new ExtendedTask<Void, Void, Void>(handler) {
             @Override
-            protected UserPicture doInBackground(Void... params) {
+            protected Void doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().updateUserPicture(userMail, encodedImage).execute();
+                    return ServiceProvider.getService().userEndpoint().updateUserPicture(userMail, encodedImageFinal).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Profilbild konnte nicht geändert werden");

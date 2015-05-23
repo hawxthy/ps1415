@@ -43,6 +43,7 @@ import ws1415.ps1415.adapter.ProfilePagerAdapter;
 import ws1415.ps1415.widget.SlidingTabLayout;
 
 public class ProfileActivity extends FragmentActivity{
+    public static final SimpleDateFormat DATE_OF_BIRTH_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
     // Für das TabLayout
     private ViewPager mViewPager;
     private SlidingTabLayout mTabs;
@@ -189,16 +190,16 @@ public class ProfileActivity extends FragmentActivity{
         generalData.add(new SimpleEntry<>(getString(R.string.residence), residence));
 
         String dateOfBirth = userInfo.getDateOfBirth().getValue();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         if(dateOfBirth != null) {
             try {
-                Date date = format.parse(dateOfBirth);
+                Date date = DATE_OF_BIRTH_FORMAT.parse(dateOfBirth);
                 Calendar dob = Calendar.getInstance();
                 dob.setTime(date);
                 int age = calculateAge(dob);
-                dateOfBirth = getString(R.string.result_date_of_birth,
-                        dob.get(Calendar.DAY_OF_YEAR),
-                        dob.get(Calendar.MONTH),
+                dateOfBirth = getResources().getQuantityString(R.plurals.result_date_of_birth,
+                        age,
+                        dob.get(Calendar.DAY_OF_MONTH),
+                        dob.get(Calendar.MONTH)+1,
                         dob.get(Calendar.YEAR),
                         age);
             } catch (ParseException e) {
@@ -224,7 +225,7 @@ public class ProfileActivity extends FragmentActivity{
     private int calculateAge(Calendar dob){
         Calendar today = Calendar.getInstance();
         int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
-        if (today.get(Calendar.DAY_OF_YEAR) <= dob.get(Calendar.DAY_OF_YEAR))
+        if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR))
             age--;
         return age;
     }
@@ -263,8 +264,13 @@ public class ProfileActivity extends FragmentActivity{
                 if(mUserProfile != null) {
                     Intent editIntent = new Intent(ProfileActivity.this, EditProfileActivity.class);
                     UserInfo userInfo = mUserProfile.getUserInfo();
+                    String userPicture = null;
+                    if(mUserProfile.getUserPicture().getPicture() != null) {
+                        userPicture = mUserProfile.getUserPicture().getPicture().getValue();
+                    }
                     // Da UserInfo nicht serialisierbar auf Client Seite und auch es auch nicht möglich es es mit Json zu senden
                     editIntent.putExtra("email", userInfo.getEmail());
+                    editIntent.putExtra("userPicture", userPicture);
                     editIntent.putExtra("firstName", userInfo.getFirstName());
                     editIntent.putExtra("gender", userInfo.getGender());
                     editIntent.putExtra("lastName", userInfo.getLastName().getValue());

@@ -136,7 +136,10 @@
     <string name="gender_male">Male</string>
     <string name="na">N/A</string>
 
-    <string name="result_date_of_birth">%1$d.%2$d.%3$d (%4$d years)</string>
+    <plurals name="result_date_of_birth">
+        <item quantity="one">%1$d.%2$d.%3$d (%4$d year)</item>
+        <item quantity="other">%1$d.%2$d.%3$d (%4$d years)</item>
+    </plurals>
 
     <string name="at_time">at</string>
 
@@ -185,4 +188,10 @@
     <string name="show_private_groups">Show private groups</string>
     <string name="date_of_birth_profile">date of birth</string>
     <string name="description_profile">description</string>
+
+    <string-array name="image_selection_edit">
+        <item>Choose out of album</item>
+        <item>Take a picture</item>
+        <item>Delete profile picture</item>
+    </string-array>
 </resources>

@@ -545,7 +545,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @throws OAuthRequestException Wird geworfen, falls kein User-Objekt übergeben wird
      */
     @ApiMethod(path = "user_picture")
-    public UserPicture updateUserPicture(User user, @Named("userMail") String userMail, Text encodedImage) throws
+    public void updateUserPicture(User user, @Named("userMail") String userMail, Text encodedImage) throws
             UnauthorizedException, OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfEndUserNotExists(user.getEmail());
@@ -553,8 +553,8 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             UserPicture userPicture = pm.getObjectById(UserPicture.class, userMail);
-            userPicture.setPicture(encodedImage);
-            return userPicture;
+            if(encodedImage.getValue() != null)userPicture.setPicture(encodedImage);
+            else userPicture.setPicture(null);
         } finally {
             pm.close();
         }
