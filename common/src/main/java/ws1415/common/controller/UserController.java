@@ -239,11 +239,11 @@ public class UserController {
      * @param input   Eingabe
      */
     public static void searchUsers(ExtendedTaskDelegate handler, final String input) {
-        new ExtendedTask<String, Void, List<UserListData>>(handler) {
+        new ExtendedTask<String, Void, List<String>>(handler) {
             @Override
-            protected List<UserListData> doInBackground(String... params) {
+            protected List<String> doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().searchUsers(input).execute().getItems();
+                    return ServiceProvider.getService().userEndpoint().searchUsers(input).execute().getStringList();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Suche nach Benutzern konnte nicht durchgeführt werden");

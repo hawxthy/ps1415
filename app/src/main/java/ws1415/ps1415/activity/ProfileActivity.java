@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +39,7 @@ import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.ProfilePagerAdapter;
+import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.widget.SlidingTabLayout;
 
 public class ProfileActivity extends FragmentActivity{
@@ -75,7 +75,7 @@ public class ProfileActivity extends FragmentActivity{
         mDescription = (TextView) findViewById(R.id.profile_description);
 
         Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_picture);
-        mPicture.setImageBitmap(ImageUtil.getRoundedBitmap(bm));
+        mPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
 
         if(email != null) {
             setProgressBarIndeterminateVisibility(Boolean.TRUE);
@@ -83,7 +83,7 @@ public class ProfileActivity extends FragmentActivity{
                 @Override
                 public void taskDidFinish(ExtendedTask task, UserProfile userProfile) {
                     setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                    setUpProfile(userProfile);
+                    if(mAdapter != null) setUpProfile(userProfile);
                 }
 
                 @Override
@@ -155,7 +155,7 @@ public class ProfileActivity extends FragmentActivity{
         // Profilbild setzen
         if(userProfile.getUserPicture().getPicture() != null) {
             Bitmap profilePicture = ImageUtil.DecodeTextToBitmap(userPicture.getPicture());
-            mPicture.setImageBitmap(ImageUtil.getRoundedBitmap(profilePicture));
+            mPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(profilePicture));
         }
 
         // Beschreibung setzen
@@ -195,7 +195,7 @@ public class ProfileActivity extends FragmentActivity{
                 Date date = DATE_OF_BIRTH_FORMAT.parse(dateOfBirth);
                 Calendar dob = Calendar.getInstance();
                 dob.setTime(date);
-                int age = calculateAge(dob);
+                int age = UniversalUtil.calculateAge(dob);
                 dateOfBirth = getResources().getQuantityString(R.plurals.result_date_of_birth,
                         age,
                         dob.get(Calendar.DAY_OF_MONTH),
@@ -220,14 +220,6 @@ public class ProfileActivity extends FragmentActivity{
         String description = userInfo.getDescription().getValue();
         if(description == null) description = getString(R.string.na);
         generalData.add(new SimpleEntry<>(getString(R.string.description), description));
-    }
-
-    private int calculateAge(Calendar dob){
-        Calendar today = Calendar.getInstance();
-        int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
-        if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR))
-            age--;
-        return age;
     }
 
     @Override
@@ -258,7 +250,8 @@ public class ProfileActivity extends FragmentActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+                //NavUtils.navigateUpFromSameTask(this);
+                finish();
                 return true;
             case R.id.action_edit_profile:
                 if(mUserProfile != null) {
@@ -268,7 +261,7 @@ public class ProfileActivity extends FragmentActivity{
                     if(mUserProfile.getUserPicture().getPicture() != null) {
                         userPicture = mUserProfile.getUserPicture().getPicture().getValue();
                     }
-                    // Da UserInfo nicht serialisierbar auf Client Seite und auch es auch nicht möglich es es mit Json zu senden
+                    // Da UserInfo nicht serialisierbar auf Client Seite und es auch nicht möglich ist es mit Json zu senden
                     editIntent.putExtra("email", userInfo.getEmail());
                     editIntent.putExtra("userPicture", userPicture);
                     editIntent.putExtra("firstName", userInfo.getFirstName());

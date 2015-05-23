@@ -7,6 +7,7 @@ package ws1415.ps1415.model;
  */
 public class Conversation {
     private String email;
+    private byte[] picture;
     private String firstName;
     private String lastName;
     private int countNewMessages;
@@ -20,8 +21,18 @@ public class Conversation {
         lastMessage = null;
     }
 
-    public Conversation(String email, String firstName, String lastName, int countNewMessages, Message lastMessage) {
+    public Conversation(String email, byte[] picture, String firstName, String lastName) {
         this.email = email;
+        this.picture = picture;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        countNewMessages = 0;
+        lastMessage = null;
+    }
+
+    public Conversation(String email, byte[] picture, String firstName, String lastName, int countNewMessages, Message lastMessage) {
+        this.email = email;
+        this.picture = picture;
         this.firstName = firstName;
         this.lastName = lastName;
         this.countNewMessages = countNewMessages;
@@ -34,6 +45,14 @@ public class Conversation {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public byte[] getPicture() {
+        return picture;
+    }
+
+    public void setPicture(byte[] picture) {
+        this.picture = picture;
     }
 
     public String getFirstName() {

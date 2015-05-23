@@ -11,6 +11,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.widget.Toast;
 
@@ -27,7 +29,8 @@ public abstract class ImageUtil {
     /**
      * Berechnet eine passende Sample-Size für Bilder mit der in options angegebenen Auflösung und
      * der Zielgröße reqWidht.
-     * @param options Die Größe und Auflösung des Bildes.
+     *
+     * @param options  Die Größe und Auflösung des Bildes.
      * @param reqWidth Die Zielbreite
      * @return Eine passende SampleSIze, die zum Dekodieren des Bildes genutzt werden kann
      */
@@ -47,14 +50,26 @@ public abstract class ImageUtil {
     }
 
     /**
-     * Wandelt eine Bitmap in ein byte-array um.
+     * Wandelt eine Bitmap in ein byte-array und komprimiert es dabei mit dem JPEG-Format.
+     *
+     * @param bitmap Bitmap
+     * @return Byte-Array der Bitmap
+     */
+    public static byte[] BitmapToByteArrayJPEG(Bitmap bitmap) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+        return out.toByteArray();
+    }
+
+    /**
+     * Wandelt eine Bitmap in ein byte-array verlustlos um.
      *
      * @param bitmap Bitmap
      * @return Byte-Array der Bitmap
      */
     public static byte[] BitmapToByteArray(Bitmap bitmap) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
         return out.toByteArray();
     }
 
@@ -64,31 +79,32 @@ public abstract class ImageUtil {
      * @param bitmap Bitmap
      * @return Bitmap als Text
      */
-    public static Text EncodeBitmapToText(Bitmap bitmap){
-        byte[] byteArray = ImageUtil.BitmapToByteArray(bitmap);
+    public static Text EncodeBitmapToText(Bitmap bitmap) {
+        byte[] byteArray = ImageUtil.BitmapToByteArrayJPEG(bitmap);
         String encodedImage = Base64.encodeBase64String(byteArray);
         return new Text().setValue(encodedImage);
     }
 
     /**
      * Dekodiert einen Text in eine Bitmap mit Hilfe von Base64.
+     *
      * @param text
      * @return
      */
-    public static Bitmap DecodeTextToBitmap(Text text){
+    public static Bitmap DecodeTextToBitmap(Text text) {
         byte[] byteArray = Base64.decodeBase64(text.getValue());
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
     }
 
     /**
      * Erstellt aus einer Bitmap eine abgerundete Bitmap.
-     *
+     * <p/>
      * Credit: http://stackoverflow.com/questions/17040475/adding-a-round-frame-circle-on-rounded-bitmap
      *
      * @param bitmap Bitmap
      * @return abgerundete Bitmap
      */
-    public static Bitmap getRoundedBitmap(Bitmap bitmap) {
+    public static Bitmap getRoundedBitmapFramed(Bitmap bitmap) {
         final int width = bitmap.getWidth();
         final int height = bitmap.getHeight();
         final int radius = Math.min(height / 2, width / 2);
@@ -112,15 +128,41 @@ public abstract class ImageUtil {
         paint.setStrokeWidth(3);
         canvas.drawCircle((width / 2) + 4, (height / 2) + 4, radius, paint);
 
-        //bitmap.recycle();
         return output;
     }
 
     /**
+     * Credit: http://evel.io/2013/07/21/rounded-avatars-in-android/
+     *
+     * @param bitmap Bitmap
+     * @return abgerundete Bitmap
+     */
+    public static Bitmap getRoundedBitmap(Bitmap bitmap) {
+        final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(output);
+
+        final int color = Color.RED;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawOval(rectF, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        return output;
+    }
+
+
+    /**
      * Cropt das Bild auf 150x150.
      *
-     * @param picUri Uri des Bildes
-     * @param context Context
+     * @param picUri      Uri des Bildes
+     * @param context     Context
      * @param requestCode RequestCode
      */
     public static void performCrop(Uri picUri, Context context, int requestCode, Uri tempUri) {

@@ -70,6 +70,7 @@ public class BaseActivity extends Activity {
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
 
         navMenuIcons.recycle();
 
@@ -126,6 +127,11 @@ public class BaseActivity extends Activity {
                     Intent cloud_storage_test_intent = new Intent(BaseActivity.this, ImageStorageTestActivity.class);
                     cloud_storage_test_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(cloud_storage_test_intent);
+                    break;
+                case 4:
+                    Intent search_intent = new Intent(BaseActivity.this, SearchActivity.class);
+                    search_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(search_intent);
                     break;
             }
             mDrawerLayout.closeDrawer(mDrawerList);

@@ -115,12 +115,12 @@ public class EditProfileActivity extends Activity {
         mCheckBoxOptOut.setChecked(mOptOutSearch);
         mSpinnerPrivateGroupsVisibility.setSelection(mShowPrivateGroups.getId());
         if(mImage != null) {
-            mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmap(mImage));
+            mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(mImage));
         }
         else {
             Bitmap bm = BitmapFactory.decodeResource(getResources(),
                     R.drawable.default_picture);
-            mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmap(bm));
+            mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
         }
 
         setUpDateOfBirth();
@@ -176,7 +176,7 @@ public class EditProfileActivity extends Activity {
                                 mImage = null;
                                 Bitmap bm = BitmapFactory.decodeResource(getResources(),
                                         R.drawable.default_picture);
-                                mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmap(bm));
+                                mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
                                 changedPicture = true;
                         }
                     }
@@ -202,7 +202,7 @@ public class EditProfileActivity extends Activity {
                 case REQUEST_PICTURE_CROP:
                     Bundle extras = data.getExtras();
                     mImage = extras.getParcelable("data");
-                    mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmap(mImage));
+                    mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(mImage));
                     changedPicture = true;
                     tempFile.delete();
                     break;

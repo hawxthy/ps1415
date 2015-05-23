@@ -28,6 +28,7 @@ import ws1415.SkatenightBackend.model.UserInfo;
 import ws1415.SkatenightBackend.model.UserLocation;
 import ws1415.SkatenightBackend.model.UserPicture;
 import ws1415.SkatenightBackend.model.Visibility;
+import ws1415.SkatenightBackend.transport.ListWrapper;
 import ws1415.SkatenightBackend.transport.UserListData;
 import ws1415.SkatenightBackend.transport.UserProfile;
 
@@ -457,7 +458,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param input Eingabe
      * @return Liste von allgemeinen Informationen zu Benutzern
      */
-    public List<UserListData> searchUsers(User user, @Named("input") String input) throws OAuthRequestException {
+    public ListWrapper searchUsers(User user, @Named("input") String input) throws OAuthRequestException {
         List<String> cache;
         Set<String> resultMails = new HashSet<>();
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
@@ -492,11 +493,12 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             }
             resultMails = cacheMails;
 
-            List<UserListData> result = new ArrayList<>();
-            for (String userMail : resultMails) {
-                result.add(getUserInfo(user, userMail, false));
-            }
-            return result;
+//            List<UserListData> result = new ArrayList<>();
+//            for (String userMail : resultMails) {
+//                result.add(getUserInfo(user, userMail, false));
+//            }
+//            return result;
+            return new ListWrapper(new ArrayList<>(resultMails));
         } finally {
             pm.close();
         }

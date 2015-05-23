@@ -16,6 +16,7 @@
         <item>Events</item>
         <item>User Groups</item>
         <item>Image Storage Test</item>
+        <item>Search</item>
     </string-array>
 
     <array name="nav_drawer_icons">
@@ -23,6 +24,7 @@
         <item>@drawable/ic_event</item>
         <item>@drawable/ic_group</item>
         <item>@drawable/common_ic_googleplayservices</item>
+        <item>@drawable/ic_action_search</item>
     </array>
 
     <!-- Content Description -->
@@ -160,7 +162,7 @@
     </string-array>
 
     <string-array name="gender_items_array">
-        <item>Nicht angegeben</item>
+        <item>Unspecified</item>
         <item>Male</item>
         <item>Female</item>
     </string-array>
@@ -194,4 +196,16 @@
         <item>Take a picture</item>
         <item>Delete profile picture</item>
     </string-array>
+
+    <!-- SearchActivity -->
+    <string name="title_activity_search">Search</string>
+    <string name="search_title">Search</string>
+    <string name="search_hint">e-mail, first name or last name</string>
+
+    <string name="from_city">from</string>
+    <string name="no_user_found">No matching user found</string>
+    <plurals name="years_old">
+        <item quantity="one">%1$d year old</item>
+        <item quantity="other">%1$d years old</item>
+    </plurals>
 </resources>

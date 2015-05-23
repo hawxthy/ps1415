@@ -40,7 +40,7 @@ public class ProfileGroupsFragment extends Fragment {
      * @param data Informationen
      */
     public void setUpData(List<GroupMetaData> data){
-        mAdapter = new ProfileGroupAdapter(data, this.getActivity());
+        if(this.getActivity() != null) mAdapter = new ProfileGroupAdapter(data, this.getActivity());
         if(mGroupListView != null) mGroupListView.setAdapter(mAdapter);
     }
 }

@@ -40,7 +40,7 @@ public class ProfileInfoFragment extends Fragment {
      * @param data Informationen
      */
     public void setUpData(List<Entry<String, String>> data){
-        mAdapter = new ProfileInfoAdapter(data, this.getActivity());
+        if(this.getActivity() != null) mAdapter = new ProfileInfoAdapter(data, this.getActivity());
         if(mInfoListView != null) mInfoListView.setAdapter(mAdapter);
     }
 }

@@ -6,6 +6,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.InfoPair;
+import com.skatenight.skatenightAPI.model.Text;
 import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserListData;
 import com.skatenight.skatenightAPI.model.UserLocation;
@@ -13,7 +14,6 @@ import com.skatenight.skatenightAPI.model.UserPicture;
 import com.skatenight.skatenightAPI.model.UserProfile;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -274,36 +274,36 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     @SmallTest
     public void testSearchUsers() throws InterruptedException {
         final CountDownLatch searchSignal = new CountDownLatch(1);
-        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserListData> result) {
+            public void taskDidFinish(ExtendedTask task, List<String> result) {
                 assertNotNull(result);
                 assertTrue(result.size() == 1);
-                assertEquals(result.get(0).getEmail(), TEST_MAIL);
+                assertEquals(result.get(0), TEST_MAIL);
                 searchSignal.countDown();
             }
         }, TEST_MAIL);
         assertTrue(searchSignal.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch searchSignal2 = new CountDownLatch(1);
-        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserListData> result) {
+            public void taskDidFinish(ExtendedTask task, List<String> result) {
                 assertNotNull(result);
                 assertTrue(result.size() == 1);
-                assertEquals(result.get(0).getEmail(), TEST_MAIL);
+                assertEquals(result.get(0), TEST_MAIL);
                 searchSignal2.countDown();
             }
         }, TEST_INITIAL_FIRST_NAME_1);
         assertTrue(searchSignal2.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch searchSignal3 = new CountDownLatch(1);
-        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserListData> result) {
+            public void taskDidFinish(ExtendedTask task, List<String> result) {
                 assertNotNull(result);
                 assertTrue(result.size() == 1);
-                assertEquals(result.get(0).getEmail(), TEST_MAIL);
+                assertEquals(result.get(0), TEST_MAIL);
                 searchSignal3.countDown();
             }
         }, TEST_INITIAL_LAST_NAME_1);
@@ -317,6 +317,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
      */
     @SmallTest
     public void testUpdateUserLocation() throws InterruptedException {
+        changeAccount(0);
         final CountDownLatch updateSignal = new CountDownLatch(1);
         UserController.updateUserLocation(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
@@ -363,12 +364,12 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
         newUserInfo.setPostalCode(TEST_POSTAL_CODE_PAIR);
 
         final CountDownLatch searchSignal1 = new CountDownLatch(1);
-        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserListData> result) {
+            public void taskDidFinish(ExtendedTask task, List<String> result) {
                 assertNotNull(result);
                 assertTrue(result.size() == 1);
-                assertEquals(result.get(0).getEmail(), TEST_MAIL);
+                assertEquals(result.get(0), TEST_MAIL);
                 searchSignal1.countDown();
             }
         }, TEST_MAIL);
@@ -409,9 +410,9 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
         assertTrue(getSignal.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch searchSignal2 = new CountDownLatch(1);
-        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
+        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserListData> result) {
+            public void taskDidFinish(ExtendedTask task, List<String> result) {
                 assertNull(result);
                 searchSignal2.countDown();
             }
@@ -427,8 +428,9 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
      */
     @SmallTest
     public void testUpdateUserPicture() throws InterruptedException {
+        changeAccount(0);
         final Bitmap testImage = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.default_picture);
-        final byte[] testImageByte = ImageUtil.BitmapToByteArray(testImage);
+        final Text testImageText = ImageUtil.EncodeBitmapToText(testImage);
 
         final CountDownLatch updateSignal = new CountDownLatch(1);
         UserController.updateUserPicture(new ExtendedTaskDelegateAdapter<Void, UserPicture>() {
@@ -443,9 +445,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
         UserController.getUserPicture(new ExtendedTaskDelegateAdapter<Void, UserPicture>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserPicture userPicture) {
-                Bitmap retrievedImage = ImageUtil.DecodeTextToBitmap(userPicture.getPicture());
-                byte[] retrievedImageByte = ImageUtil.BitmapToByteArray(retrievedImage);
-                assertTrue(Arrays.equals(testImageByte, retrievedImageByte));
+                assertTrue(testImageText.getValue().equals(userPicture.getPicture().getValue()));
                 getSignal.countDown();
             }
         }, TEST_MAIL);

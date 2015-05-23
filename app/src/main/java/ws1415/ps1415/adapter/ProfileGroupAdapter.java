@@ -59,6 +59,7 @@ public class ProfileGroupAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.list_view_profile_group, viewGroup, false);
             holder.primaryText = (TextView) convertView.findViewById(R.id.list_item_profile_group_primary);
             holder.secondaryText = (TextView) convertView.findViewById(R.id.list_item_profile_group_secondary);
+            convertView.setTag(holder);
         } else {
             holder = (Holder)convertView.getTag();
         }

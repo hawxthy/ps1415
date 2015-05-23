@@ -90,7 +90,7 @@ public class RegisterActivity extends Activity {
         // Default-Bild setzen
         Bitmap bm = BitmapFactory.decodeResource(getResources(),
                 R.drawable.default_picture);
-        mPictureView.setImageBitmap(ImageUtil.getRoundedBitmap(bm));
+        mPictureView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
 
         mRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -232,7 +232,7 @@ public class RegisterActivity extends Activity {
                 case REQUEST_PICTURE_CROP:
                     Bundle extras = data.getExtras();
                     selectedPicture = extras.getParcelable("data");
-                    mPictureView.setImageBitmap(ImageUtil.getRoundedBitmap(selectedPicture));
+                    mPictureView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(selectedPicture));
                     tempFile.delete();
                     break;
             }

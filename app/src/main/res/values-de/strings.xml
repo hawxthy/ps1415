@@ -16,6 +16,7 @@
         <item>Veranstaltungen</item>
         <item>Nutzergruppen</item>
         <item>Image Storage Test</item>
+        <item>Suche</item>
     </string-array>
 
     <array name="nav_drawer_icons">
@@ -23,6 +24,7 @@
         <item>@drawable/ic_event</item>
         <item>@drawable/ic_group</item>
         <item>@drawable/common_ic_googleplayservices</item>
+        <item>@drawable/ic_action_search</item>
     </array>
 
     <!-- Content Description -->
@@ -176,4 +178,16 @@
         <item>Bild aufnehmen</item>
         <item>Profilbild entfernen</item>
     </string-array>
+
+    <!-- SearchActivity -->
+    <string name="title_activity_search">Suche</string>
+    <string name="search_title">Suche</string>
+    <string name="search_hint">E-Mail, Vorname oder Nachname</string>
+
+    <string name="from_city">aus</string>
+    <string name="no_user_found">Keinen passenden Benutzer gefunden</string>
+    <plurals name="years_old">
+        <item quantity="one">%1$d Jahr alt</item>
+        <item quantity="other">%1$d Jahre alt</item>
+    </plurals>
 </resources>

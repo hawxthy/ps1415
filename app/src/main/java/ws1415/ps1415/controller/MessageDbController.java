@@ -49,6 +49,7 @@ public class MessageDbController {
 
         ContentValues values = new ContentValues();
         values.put(MessageDbHelper.KEY_ID_CONVERSATION, conversation.getEmail());
+        values.put(MessageDbHelper.KEY_PICTURE, conversation.getPicture());
         values.put(MessageDbHelper.KEY_FIRST_NAME, conversation.getFirstName());
         values.put(MessageDbHelper.KEY_LAST_NAME, conversation.getLastName());
         values.put(MessageDbHelper.KEY_COUNT_NEW_MESSAGES, 0);
@@ -124,6 +125,7 @@ public class MessageDbController {
         // Konversation abrufen
         return new Conversation(
                 cursor.getString(cursor.getColumnIndex(MessageDbHelper.KEY_ID_CONVERSATION)),
+                cursor.getBlob(cursor.getColumnIndex(MessageDbHelper.KEY_PICTURE)),
                 cursor.getString(cursor.getColumnIndex(MessageDbHelper.KEY_FIRST_NAME)),
                 cursor.getString(cursor.getColumnIndex(MessageDbHelper.KEY_LAST_NAME)),
                 cursor.getInt(cursor.getColumnIndex(MessageDbHelper.KEY_COUNT_NEW_MESSAGES)),
@@ -158,6 +160,25 @@ public class MessageDbController {
         ContentValues values = new ContentValues();
         values.put(MessageDbHelper.KEY_FIRST_NAME, firstName);
         values.put(MessageDbHelper.KEY_LAST_NAME, lastName);
+
+        int updatedRows = db.update(MessageDbHelper.TABLE_CONVERSATION, values, MessageDbHelper.KEY_ID_CONVERSATION + " = ?",
+                new String[]{userMail});
+
+        return updatedRows == 1;
+    }
+
+    /**
+     * Aktualisiert das Profilbild der Person, zu der die Konversation gehört.
+     *
+     * @param userMail E-Mail Adresse der Person
+     * @param picture Neues Profilbild
+     * @return true, falls Aktualisierung erfolgreich, false andernfalls
+     */
+    public boolean updateConversation(String userMail, byte[] picture){
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(MessageDbHelper.KEY_PICTURE, picture);
 
         int updatedRows = db.update(MessageDbHelper.TABLE_CONVERSATION, values, MessageDbHelper.KEY_ID_CONVERSATION + " = ?",
                 new String[]{userMail});
@@ -309,5 +330,12 @@ public class MessageDbController {
     public static Date getDate(Long time) {
         return new Date(time);
     }
+
+    // Für das Testen
+    public void deleteAllConversation(){
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(MessageDbHelper.TABLE_CONVERSATION, null, null);
+    }
+
 
 }

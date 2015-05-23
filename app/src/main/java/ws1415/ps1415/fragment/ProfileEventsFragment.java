@@ -40,7 +40,7 @@ public class ProfileEventsFragment extends Fragment {
      * @param data Informationen
      */
     public void setUpData(List<EventMetaData> data){
-        mAdapter = new ProfileEventAdapter(data, this.getActivity());
+        if(this.getActivity() != null) mAdapter = new ProfileEventAdapter(data, this.getActivity());
         if(mEventListView != null) mEventListView.setAdapter(mAdapter);
     }
 }

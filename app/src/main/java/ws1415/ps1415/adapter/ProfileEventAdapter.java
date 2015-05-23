@@ -14,7 +14,6 @@ import com.skatenight.skatenightAPI.model.EventMetaData;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import ws1415.common.util.ImageUtil;
@@ -26,7 +25,7 @@ import ws1415.ps1415.R;
  * @author Martin Wrodarczyk
  */
 public class ProfileEventAdapter extends BaseAdapter {
-    private List<EventMetaData> mData = new LinkedList<>();
+    private List<EventMetaData> mData;
     private LayoutInflater mInflater;
     private Context mContext;
 
@@ -67,8 +66,9 @@ public class ProfileEventAdapter extends BaseAdapter {
             holder.icon = (ImageView) convertView.findViewById(R.id.list_item_profile_event_icon);
             holder.primaryText = (TextView) convertView.findViewById(R.id.list_item_profile_event_primary);
             holder.secondaryText = (TextView) convertView.findViewById(R.id.list_item_profile_event_secondary);
+            convertView.setTag(holder);
         } else {
-            holder = (Holder)convertView.getTag();
+            holder = (Holder) convertView.getTag();
         }
 
         EventMetaData item = getItem(i);
@@ -79,7 +79,7 @@ public class ProfileEventAdapter extends BaseAdapter {
         String startDateFormatted = sdfFirst.format(startDate) + " " + at + " " + sdfSecond.format(startDate);
 
         Bitmap bm = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.default_picture);
-        holder.icon.setImageBitmap(ImageUtil.getRoundedBitmap(bm));
+        holder.icon.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
         holder.primaryText.setText(item.getTitle());
         holder.secondaryText.setText(startDateFormatted);
 
