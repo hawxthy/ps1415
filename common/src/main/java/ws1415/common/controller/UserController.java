@@ -260,7 +260,6 @@ public class UserController {
      * @param newInfo         Neue allgemeine Informationen zu dem Benutzer
      * @param optOutSearch
      * @param showPrivateGroups
-     * TODO: Abfrage parameter
      */
     public static void updateUserProfile(ExtendedTaskDelegate handler, final UserInfo newInfo, final Boolean optOutSearch, final Visibility showPrivateGroups) {
         new ExtendedTask<Void, Void, UserInfo>(handler) {

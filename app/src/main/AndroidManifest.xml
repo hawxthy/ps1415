@@ -117,7 +117,15 @@
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ws1415.ps1415.activity.ShowInformationActivity" />
+                android:value="ws1415.ps1415.activity.ShowEventsActivity" />
+        </activity>
+        <activity
+            android:name=".activity.EditProfileActivity"
+            android:label="@string/title_activity_edit_profile"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.activity.ProfileActivity" />
         </activity>
     </application>
 

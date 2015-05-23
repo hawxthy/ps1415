@@ -140,4 +140,49 @@
 
     <string name="at_time">at</string>
 
+    <string name="members">Members</string>
+
+    <!-- String zu EditProfileActivity -->
+    <string name="title_activity_edit_profile">Edit</string>
+    <string-array name="visibility_items_array">
+        <item>Public</item>
+        <item>Friends</item>
+        <item>Only Me</item>
+    </string-array>
+
+    <string-array name="visibility_items_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="gender_items_array">
+        <item>Nicht angegeben</item>
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+
+    <string-array name="gender_items_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="save">Save</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_message">Message</string>
+    <string name="action_add_friend">Add as friend</string>
+    <string name="profile_edit_save">"Save   "</string>
+
+    <string name="Name">name</string>
+    <string name="first_name">first name</string>
+    <string name="last_name">last name</string>
+    <string name="general_info">General Info</string>
+    <string name="city">city</string>
+    <string name="postal_code">postal code</string>
+    <string name="settings">Settings</string>
+    <string name="opt_out_of_search">Opt out of search</string>
+    <string name="show_private_groups">Show private groups</string>
+    <string name="date_of_birth_profile">date of birth</string>
+    <string name="description_profile">description</string>
 </resources>

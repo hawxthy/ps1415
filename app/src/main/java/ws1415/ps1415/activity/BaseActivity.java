@@ -110,7 +110,6 @@ public class BaseActivity extends Activity {
                 case 0:
                     Intent profile_intent = new Intent(BaseActivity.this, ProfileActivity.class);
                     profile_intent.putExtra("email", ServiceProvider.getEmail());
-                    profile_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(profile_intent);
                     break;
                 case 1:

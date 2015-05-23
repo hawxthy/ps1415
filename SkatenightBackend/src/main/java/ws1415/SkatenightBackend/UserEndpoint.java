@@ -244,6 +244,8 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             result.setUserInfo(detachedUserInfo);
             result.setUserPicture(endUser.getUserPicture());
             result.setEmail(endUser.getEmail());
+            result.setOptOutSearch(endUser.isOptOutSearch());
+            result.setShowPrivateGroups(endUser.getShowPrivateGroups());
             return result;
         } finally {
             pm.close();
@@ -357,7 +359,8 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         if (visibility.equals(Visibility.PUBLIC.getId())) return new BooleanWrapper(true);
         if (visibility.equals(Visibility.ONLY_ME.getId()))
             return new BooleanWrapper(user.getEmail().equals(mailToCheck));
-        if (visibility.equals(Visibility.ONLY_FRIENDS.getId())) {
+        if (visibility.equals(Visibility.FRIENDS.getId())) {
+            if(user.getEmail().equals(mailToCheck)) return new BooleanWrapper(true);
             if (friends == null) return new BooleanWrapper(false);
             for (String friend : friends) {
                 if (friend.equals(user.getEmail())) return new BooleanWrapper(true);
@@ -507,7 +510,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @throws UnauthorizedException Wird geworfen, falls Benutzer nicht authorisiert ist, die Aktion auszuführen
      * @throws OAuthRequestException Wird geworfen, falls kein User-Objekt übergeben wird
      */
-    // TODO: Authentifizierung korrigieren(?)
     @ApiMethod(path = "user_profile")
     public UserInfo updateUserProfile(User user, UserInfo newUserInfo, @Named("optOutSearch") Boolean optOutSearch, @Named("showPrivateGroups") Integer showPrivateGroups)
             throws UnauthorizedException, OAuthRequestException {

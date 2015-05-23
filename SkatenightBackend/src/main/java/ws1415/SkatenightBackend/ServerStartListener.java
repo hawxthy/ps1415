@@ -14,16 +14,17 @@ import ws1415.SkatenightBackend.model.GlobalRole;
 public class ServerStartListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        new UserEndpoint().createUser(Constants.FIRST_ADMIN, "", "", new Text(null));
-        PersistenceManager pm = JDOHelper.getPersistenceManagerFactory(
-                "transactions-optional").getPersistenceManager();
-        try {
-            EndUser user = pm.getObjectById(EndUser.class, Constants.FIRST_ADMIN);
-            user.setGlobalRole(GlobalRole.ADMIN.getId());
-        } finally {
-            pm.close();
+        for(String admin: Constants.INITIAL_ADMINS){
+            PersistenceManager pm = JDOHelper.getPersistenceManagerFactory(
+                    "transactions-optional").getPersistenceManager();
+            new UserEndpoint().createUser(admin, "", "", new Text(null));
+            try {
+                EndUser user = pm.getObjectById(EndUser.class, admin);
+                user.setGlobalRole(GlobalRole.ADMIN.getId());
+            } finally {
+                pm.close();
+            }
         }
-
     }
 
     @Override

@@ -128,9 +128,43 @@
 
     <string name="gender_female">Weiblich</string>
     <string name="gender_male">Männlich</string>
-    <string name="na">N/A</string>
+    <string name="na">Nicht angegeben</string>
 
     <string name="result_date_of_birth">%1$d.%2$d.%3$d (%4$d Jahre)</string>
 
     <string name="at_time">um</string>
+
+    <string name="members">Mitglieder</string>
+
+    <!-- String zu EditProfileActivity -->
+    <string name="title_activity_edit_profile">Bearbeiten</string>
+    <string-array name="visibility_items_array">
+        <item>Öffentlich</item>
+        <item>Freunde</item>
+        <item>Nur ich</item>
+    </string-array>
+
+    <string-array name="gender_items_array">
+        <item>Nicht angegeben</item>
+        <item>Männlich</item>
+        <item>Weiblich</item>
+    </string-array>
+
+    <string name="save">Speichern</string>
+    <string name="action_edit">Bearbeiten</string>
+    <string name="action_message">Nachricht schreiben</string>
+    <string name="action_add_friend">als Freund hinzufügen</string>
+    <string name="profile_edit_save">"Speichern   "</string>
+
+    <string name="Name">Name</string>
+    <string name="first_name">Vorname</string>
+    <string name="last_name">Nachname</string>
+    <string name="general_info">Allgemeine Informationen</string>
+    <string name="city">Stadt</string>
+    <string name="postal_code">Postleitzahl</string>
+    <string name="settings">Einstellungen</string>
+    <string name="opt_out_of_search">Aus der Suche austragen</string>
+    <string name="show_private_groups">Anzeige privater Gruppen</string>
+    <string name="date_of_birth_profile">Geburtsdatum</string>
+    <string name="description_profile">Beschreibung</string>
 </resources>

@@ -82,7 +82,6 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
             finish();
         } else {
             credential.setSelectedAccountName(PrefManager.getSelectedUserMail(context));
-            String s = PrefManager.getSelectedUserMail(context);
             ServiceProvider.login(credential);
             initGCM();
         }

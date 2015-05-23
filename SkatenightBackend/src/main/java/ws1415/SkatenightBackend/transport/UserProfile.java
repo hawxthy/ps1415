@@ -3,7 +3,7 @@ package ws1415.SkatenightBackend.transport;
 import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.SkatenightBackend.model.UserGroup;
+import ws1415.SkatenightBackend.model.GroupMetaData;
 import ws1415.SkatenightBackend.model.UserInfo;
 import ws1415.SkatenightBackend.model.UserPicture;
 
@@ -13,11 +13,13 @@ import ws1415.SkatenightBackend.model.UserPicture;
  *
  * @author Martin Wrodarczyk
  */
-public class UserProfile {
+public class UserProfile{
     private String email;
+    private boolean optOutSearch;
+    private Integer showPrivateGroups;
     private UserInfo userInfo;
     private UserPicture userPicture;
-    private List<UserGroup> myUserGroups;
+    private List<GroupMetaData> myUserGroups;
     private List<EventMetaData> myEvents;
 
     public UserProfile(){
@@ -39,6 +41,22 @@ public class UserProfile {
         this.email = email;
     }
 
+    public Integer getShowPrivateGroups() {
+        return showPrivateGroups;
+    }
+
+    public void setShowPrivateGroups(Integer showPrivateGroups) {
+        this.showPrivateGroups = showPrivateGroups;
+    }
+
+    public boolean isOptOutSearch() {
+        return optOutSearch;
+    }
+
+    public void setOptOutSearch(boolean optOutSearch) {
+        this.optOutSearch = optOutSearch;
+    }
+
     public UserInfo getUserInfo() {
         return userInfo;
     }
@@ -55,11 +73,11 @@ public class UserProfile {
         this.userPicture = userPicture;
     }
 
-    public List<UserGroup> getMyUserGroups() {
+    public List<GroupMetaData> getMyUserGroups() {
         return myUserGroups;
     }
 
-    public void setMyUserGroups(List<UserGroup> myUserGroups) {
+    public void setMyUserGroups(List<GroupMetaData> myUserGroups) {
         this.myUserGroups = myUserGroups;
     }
 

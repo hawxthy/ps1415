@@ -78,7 +78,7 @@ public class EndUser {
         this.optOutSearch = optOutSearch;
     }
 
-    public Integer isShowPrivateGroups() {
+    public Integer getShowPrivateGroups() {
         return showPrivateGroups;
     }
 

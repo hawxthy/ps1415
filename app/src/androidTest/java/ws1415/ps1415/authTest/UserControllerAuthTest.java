@@ -56,7 +56,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     public static final Gender TEST_GENDER = Gender.MALE;
 
     public static final String TEST_LAST_NAME = "Müller";
-    public static final Visibility TEST_LAST_NAME_VISIBILITY = Visibility.ONLY_FRIENDS;
+    public static final Visibility TEST_LAST_NAME_VISIBILITY = Visibility.FRIENDS;
     public static final InfoPair TEST_LAST_NAME_PAIR = new InfoPair().
             setValue(TEST_LAST_NAME).
             setVisibility(TEST_LAST_NAME_VISIBILITY.getId());

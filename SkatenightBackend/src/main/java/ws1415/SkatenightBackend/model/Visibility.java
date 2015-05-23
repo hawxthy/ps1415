@@ -5,9 +5,9 @@ package ws1415.SkatenightBackend.model;
  * Enum-Klasse um die Sichtbarkeit der allgemeinen Informationen eines Benutzers zu vereinfachen.
  */
 public enum Visibility {
-    PUBLIC(1),
-    ONLY_FRIENDS(2),
-    ONLY_ME(3);
+    PUBLIC(0),
+    FRIENDS(1),
+    ONLY_ME(2);
 
     private Integer id;
 
@@ -21,11 +21,11 @@ public enum Visibility {
 
     public String getRepresentation(){
         switch(id){
-            case 1:
+            case 0:
                 return "Öffentlich";
+            case 1:
+                return "Freunde";
             case 2:
-                return "Nur Freunde";
-            case 3:
                 return "Nur ich";
             default:
                 return null;

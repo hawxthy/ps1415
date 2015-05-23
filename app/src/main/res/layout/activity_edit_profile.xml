@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
+
+        <ImageView
+            android:id="@+id/activity_edit_profile_picture"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center" />
+
+        <TextView
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:paddingTop="10dp"
+            android:text="@string/Name" />
+
+
+        <EditText
+            android:id="@+id/activity_edit_profile_first_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/first_name"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp">
+
+            <EditText
+                android:id="@+id/activity_edit_profile_last_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/last_name" />
+
+            <Spinner
+                android:id="@+id/activity_edit_profile_last_name_visibility"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/visibility_items_array"
+                android:entryValues="@array/visibility_items_values"
+                android:paddingLeft="10dp" />
+        </LinearLayout>
+
+        <TextView
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="@string/general_info" />
+
+        <Spinner
+            android:id="@+id/activity_edit_profile_set_gender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/gender_items_array"
+            android:entryValues="@array/gender_items_values" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp">
+
+            <EditText
+                android:id="@+id/activity_edit_profile_dateofbirth"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/date_of_birth_profile" />
+
+            <Spinner
+                android:id="@+id/activity_edit_profile_dateofbirth_visibility"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/visibility_items_array"
+                android:entryValues="@array/visibility_items_values"
+                android:paddingLeft="10dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp">
+
+            <EditText
+                android:id="@+id/activity_edit_profile_city"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/city"
+                android:singleLine="true" />
+
+            <Spinner
+                android:id="@+id/activity_edit_profile_city_visibility"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/visibility_items_array"
+                android:entryValues="@array/visibility_items_values"
+                android:paddingLeft="10dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp">
+
+            <EditText
+                android:id="@+id/activity_edit_profile_plz"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/postal_code"
+                android:inputType="numberSigned"
+                android:singleLine="true" />
+
+            <Spinner
+                android:id="@+id/activity_edit_profile_plz_visibility"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/visibility_items_array"
+                android:entryValues="@array/visibility_items_values"
+                android:paddingLeft="10dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp">
+
+            <EditText
+                android:id="@+id/activity_edit_profile_description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/description_profile" />
+
+            <Spinner
+                android:id="@+id/activity_edit_profile_description_visibility"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/visibility_items_array"
+                android:entryValues="@array/visibility_items_values"
+                android:paddingLeft="10dp" />
+        </LinearLayout>
+
+        <TextView
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:paddingTop="10dp"
+            android:text="@string/settings" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/opt_out_of_search"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/activity_edit_profile_findable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:text="@string/show_private_groups"
+                android:textSize="16sp" />
+
+            <Spinner
+                android:id="@+id/activity_edit_profile_private_groups_visibility"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/visibility_items_array"
+                android:entryValues="@array/visibility_items_values"
+                android:paddingLeft="10dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</ScrollView>

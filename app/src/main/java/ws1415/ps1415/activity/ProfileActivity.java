@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.EventMetaData;
-import com.skatenight.skatenightAPI.model.UserGroup;
+import com.skatenight.skatenightAPI.model.GroupMetaData;
 import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserPicture;
 import com.skatenight.skatenightAPI.model.UserProfile;
@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +34,7 @@ import java.util.Map.Entry;
 
 import ws1415.common.controller.UserController;
 import ws1415.common.model.Gender;
+import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.util.ImageUtil;
@@ -53,6 +55,9 @@ public class ProfileActivity extends FragmentActivity{
     private TextView mName;
     private TextView mDescription;
 
+    private UserProfile mUserProfile;
+    private String email;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +66,7 @@ public class ProfileActivity extends FragmentActivity{
 
         // Intent
         Intent intent = getIntent();
-        String email = intent.getStringExtra("email");
+        email = intent.getStringExtra("email");
 
         // Header initialisieren
         mPicture = (ImageView) findViewById(R.id.profile_picture);
@@ -119,10 +124,11 @@ public class ProfileActivity extends FragmentActivity{
      * @param userProfile Profil
      */
     private void setUpProfile(UserProfile userProfile) {
+        mUserProfile = userProfile;
         UserInfo userInfo = userProfile.getUserInfo();
         UserPicture userPicture = userProfile.getUserPicture();
-        List<UserGroup> userGroups = userProfile.getMyUserGroups();
-        userGroups = (userGroups == null) ? new ArrayList<UserGroup>() : userGroups;
+        List<GroupMetaData> userGroups = userProfile.getMyUserGroups();
+        userGroups = (userGroups == null) ? new ArrayList<GroupMetaData>() : userGroups;
         List<EventMetaData> events = userProfile.getMyEvents();
         events = (events == null) ? new ArrayList<EventMetaData>() : events;
 
@@ -130,6 +136,13 @@ public class ProfileActivity extends FragmentActivity{
         test.setDate(new DateTime(new Date()));
         test.setTitle("Primary Title");
         events.add(test);
+        events.add(test);
+
+        GroupMetaData testGroup = new GroupMetaData();
+        testGroup.setMembers(Arrays.asList("test", "test2"));
+        testGroup.setName("Martin");
+        userGroups.add(testGroup);
+        userGroups.add(testGroup);
 
         // Namen setzen
         String firstName = userInfo.getFirstName();
@@ -160,6 +173,9 @@ public class ProfileActivity extends FragmentActivity{
 
         // Daten für Veranstaltungen dem Fragment übergeben
         mAdapter.getEventFragment().setUpData(events);
+
+        // Daten für Gruppen dem Fragment übergeben
+        mAdapter.getGroupFragment().setUpData(userGroups);
     }
 
     private void setUpGeneralData(List<Entry<String, String>> generalData, UserInfo userInfo){
@@ -214,6 +230,24 @@ public class ProfileActivity extends FragmentActivity{
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu){
+        MenuItem editItem = menu.findItem(R.id.action_edit_profile);
+        MenuItem messageItem = menu.findItem(R.id.action_message_profile);
+        MenuItem friendItem = menu.findItem(R.id.action_add_friend);
+
+        if(email != null && email.equals(ServiceProvider.getEmail())){
+            editItem.setEnabled(true).setVisible(true);
+            messageItem.setEnabled(false).setVisible(false);
+            friendItem.setEnabled(false).setVisible(false);
+        } else {
+            editItem.setEnabled(false).setVisible(false);
+            messageItem.setEnabled(true).setVisible(true);
+            friendItem.setEnabled(true).setVisible(true);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_profile, menu);
         return true;
@@ -225,7 +259,28 @@ public class ProfileActivity extends FragmentActivity{
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(this);
                 return true;
-            case R.id.action_settings:
+            case R.id.action_edit_profile:
+                if(mUserProfile != null) {
+                    Intent editIntent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+                    UserInfo userInfo = mUserProfile.getUserInfo();
+                    // Da UserInfo nicht serialisierbar auf Client Seite und auch es auch nicht möglich es es mit Json zu senden
+                    editIntent.putExtra("email", userInfo.getEmail());
+                    editIntent.putExtra("firstName", userInfo.getFirstName());
+                    editIntent.putExtra("gender", userInfo.getGender());
+                    editIntent.putExtra("lastName", userInfo.getLastName().getValue());
+                    editIntent.putExtra("lastNameVisibility", userInfo.getLastName().getVisibility());
+                    editIntent.putExtra("dateOfBirth", userInfo.getDateOfBirth().getValue());
+                    editIntent.putExtra("dateOfBirthVisibility", userInfo.getDateOfBirth().getVisibility());
+                    editIntent.putExtra("city", userInfo.getCity().getValue());
+                    editIntent.putExtra("cityVisibility", userInfo.getCity().getVisibility());
+                    editIntent.putExtra("plz", userInfo.getPostalCode().getValue());
+                    editIntent.putExtra("plzVisibility", userInfo.getPostalCode().getVisibility());
+                    editIntent.putExtra("description", userInfo.getDescription().getValue());
+                    editIntent.putExtra("descriptionVisibility", userInfo.getDescription().getVisibility());
+                    editIntent.putExtra("optOutSearch", mUserProfile.getOptOutSearch());
+                    editIntent.putExtra("showPrivateGroups", mUserProfile.getShowPrivateGroups());
+                    startActivity(editIntent);
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);

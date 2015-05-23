@@ -6,9 +6,9 @@ package ws1415.common.model;
  * @author Martin Wrodarczyk
  */
 public enum Gender {
+    NA(0),
     MALE(1),
-    FEMALE(2),
-    NA(3);
+    FEMALE(2);
 
     private int id;
 
@@ -22,12 +22,12 @@ public enum Gender {
 
     public String getRepresentation() {
         switch (id) {
+            case 0:
+                return "N/A";
             case 1:
                 return "Männlich";
             case 2:
                 return "Weiblich";
-            case 3:
-                return "N.a";
             default:
                 return "";
         }
