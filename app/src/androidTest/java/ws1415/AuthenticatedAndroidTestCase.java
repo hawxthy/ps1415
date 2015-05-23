@@ -59,16 +59,6 @@ public class AuthenticatedAndroidTestCase extends AndroidTestCase {
     }
 
     /**
-     * Gibt die Mail-Adresse des Accounts mit dem übergebenen Index zurück.
-     * @param index    Der Index des Accounts, dessen Mail-Adresse abgerufen wird.
-     * @return Die Mail-Adresse des Accounts mit dem angegebenen Index.
-     */
-    public String getAccountMail(int index) {
-        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getContext(), "server:client_id:" + Constants.WEB_CLIENT_ID);
-        return credential.getAllAccounts()[index].name;
-    }
-
-    /**
      * Gibt die Anzahl der registrierten Accounts des Geräts zurück.
      * @return Die Anzahl der Accounts auf dem Testgerät.
      */

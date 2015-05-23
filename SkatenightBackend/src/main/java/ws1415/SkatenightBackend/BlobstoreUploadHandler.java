@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ws1415.SkatenightBackend.model.BlobKeyContainer;
 import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.Picture;
 
@@ -44,23 +45,38 @@ public class BlobstoreUploadHandler extends HttpServlet {
      */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String containerClass = req.getParameter("class");
+        String containerId = req.getParameter("id");
+
+        if (containerClass == null || containerClass.isEmpty() || containerId == null || containerId.isEmpty()) {
+            throw new IllegalArgumentException("containerClass and containerId have to be specified");
+        }
+
         Map<String, List<BlobKey>> uploads = blobstoreService.getUploads(req);
-        BlobKey blobKey = uploads.get("file").get(0);
+        List<BlobKey> blobKeys = uploads.get("files");
 
-        try {
-            Picture picture = new GalleryEndpoint().getPicture(Long.parseLong(req.getParameter("pictureId")));
-            picture.setImageBlobKey(blobKey);
-            ofy().save().entity(picture).now();
+        if (!blobKeys.isEmpty()) {
+            try {
+                BlobKeyContainer container = (BlobKeyContainer) ofy().load().kind(containerClass).id(Long.parseLong(containerId)).safe();
+                container.consumeBlobKeys(blobKeys);
+                ofy().save().entity(container).now();
 
-            // BlobKey zurück an den Client senden
-            resp.setCharacterEncoding("UTF-8");
-            resp.getWriter().print(blobKey.getKeyString());
-            resp.getWriter().flush();
-            resp.getWriter().close();
-        } catch(Exception ex) {
-            // Im Falle eines Fehlers den gespeicherten Blob löschen
-            blobstoreService.delete(blobKey);
-            throw ex;
+                // BlobKey zurück an den Client senden
+                resp.setCharacterEncoding("UTF-8");
+                for (BlobKey key : blobKeys.subList(0, blobKeys.size() - 1)) {
+                    resp.getWriter().println(key.getKeyString());
+                }
+                resp.getWriter().print(blobKeys.get(blobKeys.size() - 1).getKeyString());
+                resp.getWriter().flush();
+                resp.getWriter().close();
+            } catch(Exception ex) {
+                // Im Falle eines Fehlers die gespeicherten Blobs löschen
+                for (BlobKey key : blobKeys) {
+                    blobstoreService.delete(key);
+                }
+
+                throw ex;
+            }
         }
     }
 

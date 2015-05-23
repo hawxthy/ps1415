@@ -1,11 +1,11 @@
 package ws1415.common.controller;
 
-import android.util.Log;
-
-import com.google.api.client.util.IOUtils;
 import com.skatenight.skatenightAPI.model.BlobKey;
+import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Gallery;
+import com.skatenight.skatenightAPI.model.GalleryViewOptions;
 import com.skatenight.skatenightAPI.model.Picture;
+import com.skatenight.skatenightAPI.model.PictureMetaDataList;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -17,7 +17,6 @@ import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -32,13 +31,88 @@ import ws1415.common.task.ExtendedTaskDelegate;
 public abstract class GalleryController {
 
     /**
+     * Erstellt die angegebene Gallery auf dem Server.
+     * @param handler    Der Handler, der die erstellte Gallery übergeben bekommt.
+     * @param gallery    Die zu erstellende Gallery.
+     */
+    public static void createGallery(ExtendedTaskDelegate<Void, Gallery> handler, final Gallery gallery) {
+        new ExtendedTask<Void, Void, Gallery>(handler) {
+            @Override
+            protected Gallery doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().galleryEndpoint().createGallery(gallery).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Editiert die angegebene Gallery.
+     * @param handler    Der Handler, der die editierte Gallery übergeben bekommt.
+     * @param gallery    Die zu editierende Gallery.
+     */
+    public static void editGallery(ExtendedTaskDelegate<Void, Gallery> handler, final Gallery gallery) {
+        new ExtendedTask<Void, Void, Gallery>(handler) {
+            @Override
+            protected Gallery doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().galleryEndpoint().editGallery(gallery).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Löscht die Gallery mit der angegebenen ID.
+     * @param handler      Der Handler, der über den Status des Task informiert wird.
+     * @param galleryId    Die ID der zu löschenden Gallery.
+     */
+    public static void deleteGallery(ExtendedTaskDelegate<Void, Void> handler, final long galleryId) {
+        new ExtendedTask<Void, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().galleryEndpoint().deleteGallery(galleryId).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * Ruft eine Liste von PictureMetaData-Objekten ab. Diese werden zusammen mit der String-Repräsentation
+     * des Cursors, der die Daten aus dem Datastore gelesen hat, zurückgegeben. Bei einem weiteren
+     * Aufruf kann dieser String übergeben werden, um das abrufen der Daten an dieser Stelle fortzusetzen.
+     * @param handler        Der Handler, der die abgerufenen Daten übergeben bekommt.
+     * @param viewOptions    Die Filter-Optionen, die beim Abrufen der Bilder angewandt werden.
+     */
+    public static void listPictures(ExtendedTaskDelegate<Void, PictureMetaDataList> handler, final GalleryViewOptions viewOptions) {
+        new ExtendedTask<Void, Void, PictureMetaDataList>(handler) {
+            @Override
+            protected PictureMetaDataList doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().galleryEndpoint().listPictures(viewOptions).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.execute();
+    }
+
+    /**
      * Lädt das angegebene Bild in den Google Blobstore hoch. Der Task gibt ebenfalls das dafür
      * angelegte Picture-Objekt inklusive des BlobKeys zurück.
      * @param handler    Der Handler, der beim Abschluss des Vorgangs aufgerufen werden soll.
      * @param image      Das hochzuladende Bild.
      */
-    public static void uploadImage(ExtendedTaskDelegate<Void, Picture> handler, final InputStream image,
-                                   final String title, final String description) {
+    public static void uploadPicture(ExtendedTaskDelegate<Void, Picture> handler, final InputStream image,
+                                     final String title, final String description) {
         new ExtendedTask<Void, Void, Picture>(handler) {
             @Override
             protected Picture doInBackground(Void... params) {
@@ -58,8 +132,9 @@ public abstract class GalleryController {
 
                     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                     builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-                    builder.addPart("file", new InputStreamBody(image, "file"));
-                    builder.addTextBody("pictureId", picture.getId().toString());
+                    builder.addPart("files", new InputStreamBody(image, "files"));
+                    builder.addTextBody("id", picture.getId().toString());
+                    builder.addTextBody("class", "Picture");
 
                     HttpEntity entity = builder.build();
                     post.setEntity(entity);

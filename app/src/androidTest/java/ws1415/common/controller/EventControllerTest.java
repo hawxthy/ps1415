@@ -6,7 +6,9 @@ import com.skatenight.skatenightAPI.model.EventMetaData;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -197,49 +199,61 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
         neuesEvent.setFee(100);
         neuesEvent.setRoute(route2);
 
-        EventController.createEvent(new ExtendedTaskDelegateAdapter<Void, Event>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Event event) {
-                assertNotNull(event);
-                assertNotNull("id", event.getId());
-                assertEquals("title", neuesEvent.getTitle(), event.getTitle());
-                assertEquals("icon", neuesEvent.getIcon(), event.getIcon());
-                assertEquals("date", neuesEvent.getDate().getValue(), event.getDate().getValue());
-                assertEquals("routeFieldFirst", neuesEvent.getRouteFieldFirst(), event.getRouteFieldFirst());
-                assertEquals("routeFieldLast", neuesEvent.getRouteFieldLast(), event.getRouteFieldLast());
-                assertEquals("headerImage", neuesEvent.getHeaderImage(), event.getHeaderImage());
-                assertEquals("description", neuesEvent.getDescription(), event.getDescription());
-                assertEquals("meetingPlace", neuesEvent.getMeetingPlace(), event.getMeetingPlace());
-                assertEquals("fee", neuesEvent.getFee(), event.getFee());
+        InputStream iconInputStream = null;
+        List<InputStream> imagesInputStreams = new LinkedList<>();
+        try {
+            iconInputStream = getClass().getClassLoader().getResourceAsStream("image/test.png");
+            imagesInputStreams.add(getClass().getClassLoader().getResourceAsStream("image/test.png"));
+            imagesInputStreams.add(getClass().getClassLoader().getResourceAsStream("image/test.png"));
+            imagesInputStreams.add(getClass().getClassLoader().getResourceAsStream("image/test.png"));
 
-                assertTrue("host not contained in member list", event.getMemberList().containsKey(ServiceProvider.getEmail()));
-                assertEquals("host has wrong event role in created event", EventRole.HOST.name(), event.getMemberList().get(ServiceProvider.getEmail()));
-                if (neuesEvent.getImages() != null) {
-                    assertTrue(neuesEvent.getImages().containsAll(event.getImages()));
-                    assertTrue(event.getImages().containsAll(neuesEvent.getImages()));
-                } else {
-                    assertNull(event.getImages());
-                }
+            EventController.createEvent(new ExtendedTaskDelegateAdapter<Void, Event>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, Event event) {
+                    assertNotNull(event);
+                    assertNotNull("id", event.getId());
+                    assertEquals("title", neuesEvent.getTitle(), event.getTitle());
+                    assertNotNull("icon", event.getIcon());
+                    assertEquals("date", neuesEvent.getDate().getValue(), event.getDate().getValue());
+                    assertEquals("routeFieldFirst", neuesEvent.getRouteFieldFirst(), event.getRouteFieldFirst());
+                    assertEquals("routeFieldLast", neuesEvent.getRouteFieldLast(), event.getRouteFieldLast());
+                    assertEquals("headerImage", neuesEvent.getHeaderImage(), event.getHeaderImage());
+                    assertEquals("description", neuesEvent.getDescription(), event.getDescription());
+                    assertEquals("meetingPlace", neuesEvent.getMeetingPlace(), event.getMeetingPlace());
+                    assertEquals("fee", neuesEvent.getFee(), event.getFee());
 
-                assertNotNull("route", event.getRoute());
-                assertEquals("route id", neuesEvent.getRoute().getId(), event.getRoute().getId());
-                assertEquals("route name", neuesEvent.getRoute().getName(), event.getRoute().getName());
-                assertEquals("route length", neuesEvent.getRoute().getLength(), event.getRoute().getLength());
-                // TODO
+                    assertTrue("host not contained in member list", event.getMemberList().containsKey(ServiceProvider.getEmail()));
+                    assertEquals("host has wrong event role in created event", EventRole.HOST.name(), event.getMemberList().get(ServiceProvider.getEmail()));
+
+                    assertNotNull("images", event.getImages());
+
+                    assertNotNull("route", event.getRoute());
+                    assertEquals("route id", neuesEvent.getRoute().getId(), event.getRoute().getId());
+                    assertEquals("route name", neuesEvent.getRoute().getName(), event.getRoute().getName());
+                    assertEquals("route length", neuesEvent.getRoute().getLength(), event.getRoute().getLength());
+                    // TODO
 //                assertEquals("route data", neuesEvent.getRoute().getRouteData().getValue(), event.getRoute().getRouteData().getValue());
 //                assertEquals("route points", neuesEvent.getRoute().getRoutePoints(), event.getRoute().getRoutePoints());
 //                assertEquals("route waypoints", neuesEvent.getRoute().getWaypoints(), event.getRoute().getWaypoints());
 
-                eventsToDelete.add(event);
-                signal.countDown();
-            }
+                    eventsToDelete.add(event);
+                    signal.countDown();
+                }
 
-            @Override
-            public void taskFailed(ExtendedTask task, String message) {
-                fail(message);
+                @Override
+                public void taskFailed(ExtendedTask task, String message) {
+                    fail(message);
+                }
+            }, neuesEvent, iconInputStream, imagesInputStreams);
+            signal.await(10, TimeUnit.SECONDS);
+        } finally {
+            if (iconInputStream != null) {
+                iconInputStream.close();
             }
-        }, neuesEvent);
-        signal.await(10, TimeUnit.SECONDS);
+            for (InputStream is : imagesInputStreams) {
+                is.close();
+            }
+        }
     }
 
     public void testEditEvent() throws InterruptedException {
@@ -278,6 +292,8 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
     }
 
     public void testDeleteEvent() throws InterruptedException {
+        // TODO Prüfen, ob auch abhängige Galleries gelöscht werden
+
         final CountDownLatch signal = new CountDownLatch(1);
         EventController.deleteEvent(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override

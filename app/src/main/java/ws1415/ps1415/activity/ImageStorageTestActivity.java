@@ -3,8 +3,6 @@ package ws1415.ps1415.activity;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,15 +12,15 @@ import android.view.View;
 import android.widget.Button;
 
 import com.skatenight.skatenightAPI.model.Gallery;
+import com.skatenight.skatenightAPI.model.Picture;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import ws1415.common.component.BlobKeyImageView;
 import ws1415.common.controller.GalleryController;
-import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
@@ -30,10 +28,14 @@ import ws1415.ps1415.R;
 public class ImageStorageTestActivity extends BaseActivity {
     private static final int SELECT_IMAGE_REQUEST_CODE = 1;
 
+    private BlobKeyImageView imageView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_storage_test);
+
+        imageView = (BlobKeyImageView) findViewById(R.id.imageView);
 
         Button upload = (Button) findViewById(R.id.btnUpload);
         upload.setOnClickListener(new View.OnClickListener() {
@@ -49,7 +51,12 @@ public class ImageStorageTestActivity extends BaseActivity {
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Picture picture) {
+                        imageView.loadFromBlobKey(picture.getImageBlobKey());
+                    }
+                }, 5761329797267456l);
             }
         });
     }
@@ -97,7 +104,7 @@ public class ImageStorageTestActivity extends BaseActivity {
                     cursor.close();
 
                     try {
-                        GalleryController.uploadImage(null, new FileInputStream(new File(tempPath)), "Bildtitel", "Dateipfad: " + tempPath);
+                        GalleryController.uploadPicture(null, new FileInputStream(new File(tempPath)), "Bildtitel", "Dateipfad: " + tempPath);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }

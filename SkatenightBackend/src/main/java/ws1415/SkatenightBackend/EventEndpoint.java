@@ -1,6 +1,9 @@
 package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.Named;
+import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -37,6 +40,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * @author Richard Schulze
  */
 public class EventEndpoint extends SkatenightServerEndpoint {
+    private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
     /**
      * Weist dem Benutzer mit der angegebenen Email
@@ -91,10 +95,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param eventId    Die Id des abzurufenden Events.
      * @return Das Event-Objekt inklusive aller Daten.
      */
-    public Event getEvent(@Named("eventId") Long eventId) {
-        if (eventId == null) {
-            return null;
-        }
+    public Event getEvent(@Named("eventId") long eventId) {
         return ofy().load().type(Event.class).id(eventId).safe();
     }
 
@@ -133,7 +134,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             event.setMemberList(new HashMap<String, EventRole>());
         }
         event.getMemberList().put(user.getEmail(), EventRole.HOST);
-
+        event.setImagesUploadUrl(blobstoreService.createUploadUrl("/images/upload"));
         ofy().save().entity(event).now();
 
         return event;
@@ -152,6 +153,9 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
+
+        // TODO BlobKeys aktualisieren und alte Blobs löschen
+
         Event oldEvent = ofy().load().type(Event.class).id(event.getId()).safe();
         if (!hasPrivilege(oldEvent, user.getEmail(), Privilege.EDIT_EVENT)) {
             throw new OAuthRequestException("insufficient privileges");
@@ -166,20 +170,24 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param user Der aufrufende Benutzer.
      * @param id   Die ID des zu löschenden Events.
      */
-    public void deleteEvent(User user, @Named("id") Long id) throws OAuthRequestException {
-        if (id != null) {
-            if (user == null) {
-                throw new OAuthRequestException("no user submitted");
+    public void deleteEvent(User user, @Named("id") long id) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(id).now();
+        if (event != null) {
+            if (!hasPrivilege(event, user.getEmail(), Privilege.DELETE_EVENT)) {
+                throw new OAuthRequestException("insufficient privileges");
             }
-            Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(id).now();
-            if (event != null) {
-                if (!hasPrivilege(event, user.getEmail(), Privilege.DELETE_EVENT)) {
-                    throw new OAuthRequestException("insufficient privileges");
+            if (event.getIcon() != null) {
+                blobstoreService.delete(event.getIcon());
+            }
+            if (event.getImages() != null && !event.getImages().isEmpty()) {
+                for (BlobKey key : event.getImages()) {
+                    blobstoreService.delete(key);
                 }
-                // TODO Gallery und alle zugehörigen Blobs löschen
-
-                ofy().delete().entity(event).now();
             }
+            ofy().delete().entity(event).now();
         }
     }
 
@@ -188,18 +196,16 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param user       Der aufrufende Benutzer, der dem Event hinzugefügt werden soll
      * @param eventId    Die ID des Events, dem beigetreten wird.
      */
-    public void joinEvent(User user, @Named("eventId") Long eventId) throws OAuthRequestException {
+    public void joinEvent(User user, @Named("eventId") long eventId) throws OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        if (eventId != null) {
-            Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
-            if (!event.getMemberList().containsKey(user.getEmail())) {
-                event.getMemberList().put(user.getEmail(), EventRole.PARTICIPANT);
-                ofy().save().entity(event).now();
-                // new UserEndpoint().getUserProfile(user, user.getEmail()).addEvent(event);
-                // TODO Muss geändertes EndUser-Objekt gespeichert werden?
-            }
+        Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
+        if (!event.getMemberList().containsKey(user.getEmail())) {
+            event.getMemberList().put(user.getEmail(), EventRole.PARTICIPANT);
+            ofy().save().entity(event).now();
+            // new UserEndpoint().getUserProfile(user, user.getEmail()).addEvent(event);
+            // TODO Muss geändertes EndUser-Objekt gespeichert werden?
         }
     }
 
@@ -209,20 +215,18 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param eventId    Die ID des Events, das verlassen wird.
      * @throws IllegalStateException falls der letzte Host versucht aus dem Event auszutreten.
      */
-    public void leaveEvent(User user, @Named("eventId") Long eventId) throws OAuthRequestException {
+    public void leaveEvent(User user, @Named("eventId") long eventId) throws OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        if (eventId != null) {
-            Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
-            event.getMemberList().remove(user.getEmail());
-            if (!event.getMemberList().containsValue(EventRole.HOST)) {
-                throw new IllegalStateException("the last host of an event can not leave");
-            }
-            //new UserEndpoint().getUserProfile(user, user.getEmail()).removeEvent(event);
-            // TODO Muss geändertes EndUser-Objekt gespeichert werden?
-            ofy().save().entity(event).now();
+        Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
+        event.getMemberList().remove(user.getEmail());
+        if (!event.getMemberList().containsValue(EventRole.HOST)) {
+            throw new IllegalStateException("the last host of an event can not leave");
         }
+        //new UserEndpoint().getUserProfile(user, user.getEmail()).removeEvent(event);
+        // TODO Muss geändertes EndUser-Objekt gespeichert werden?
+        ofy().save().entity(event).now();
     }
 
 

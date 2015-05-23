@@ -23,7 +23,7 @@ import javax.jdo.annotations.Persistent;
  * @author Richard Schulze
  */
 @Entity
-public class Picture {
+public class Picture implements BlobKeyContainer {
     @Id
     private Long id;
     private String title;
@@ -113,5 +113,12 @@ public class Picture {
 
     public void setUploadUrl(String uploadUrl) {
         this.uploadUrl = uploadUrl;
+    }
+
+    @Override
+    public void consumeBlobKeys(List<BlobKey> keys) {
+        if (keys != null && !keys.isEmpty()) {
+            imageBlobKey = keys.get(0);
+        }
     }
 }

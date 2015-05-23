@@ -1,6 +1,11 @@
 package ws1415.common.controller;
 
+import com.google.api.client.util.DateTime;
+import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.Gallery;
 import com.skatenight.skatenightAPI.model.Picture;
+import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +16,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
+import ws1415.common.model.Role;
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
@@ -35,7 +41,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
             is = getClass().getClassLoader().getResourceAsStream("image/test.png");
             assertNotNull("test file could not be found", is);
 
-            GalleryController.uploadImage(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+            GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, Picture picture) {
                     picture1 = picture;
@@ -55,6 +61,75 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         }
     }
 
+    public void testCreateGallery() throws InterruptedException, IOException {
+        // Sicherstellen, dass der eingeloggte Benutzer auf dem Server angemeldet ist und ein Admin ist
+        if (!ServiceProvider.getService().userEndpoint().existsUser(getAccountMail(0)).execute().getValue()) {
+            ServiceProvider.getService().userEndpoint().createUser(getAccountMail(0)).execute();
+        }
+        assertTrue("user has to be an admin", ServiceProvider.getService().roleEndpoint().isAdmin(getAccountMail(0)).execute().getValue());
+
+        // Testroute für das Testevent erstellen
+        Route route = new Route();
+        route.setLength("5 km");
+        route.setName("Route 1");
+        // TODO Routenpunkte, Wegpunkte und Routendaten
+        route = ServiceProvider.getService().routeEndpoint().addRoute(route).execute();
+
+        // Testevent erstellen, das als Container für die Gallery dient
+        Event event = new Event();
+        event.setTitle("Container-Event");
+        event.setDate(new DateTime(1431442800000l));
+        event.setRouteFieldFirst(19);
+        event.setRouteFieldLast(23);
+        event.setDescription(new Text().setValue("Dient als Container für die zu testende Gallery"));
+        event.setMeetingPlace("Ort");
+        event.setFee(100);
+        event.setRoute(route);
+        event = ServiceProvider.getService().eventEndpoint().createEvent(event).execute();
+        final Long eventId = event.getId();
+
+        final String TEST_TITLE = "Testgallery";
+
+        final Gallery neueGallery = new Gallery();
+        neueGallery.setTitle(TEST_TITLE);
+        neueGallery.setContainerClass(Event.class.getName());
+        neueGallery.setContainerId(event.getId());
+
+        final CountDownLatch signal = new CountDownLatch(1);
+        GalleryController.createGallery(new ExtendedTaskDelegateAdapter<Void, Gallery>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Gallery gallery) {
+                assertNotNull("gallery is null", gallery);
+                assertNotNull("gallery was not saved", gallery.getId());
+                assertEquals("title", TEST_TITLE, gallery.getTitle());
+                assertEquals("container class", Event.class.getName(), gallery.getContainerClass());
+                assertEquals("container id", eventId, gallery.getContainerId());
+
+                // ID der Gallery setzen, damit diese in der Testmethode gelöscht werden kann
+                neueGallery.setId(gallery.getId());
+
+                signal.countDown();
+            }
+        }, neueGallery);
+        signal.await(10, TimeUnit.SECONDS);
+
+        ServiceProvider.getService().galleryEndpoint().deleteGallery(neueGallery.getId()).execute();
+        ServiceProvider.getService().eventEndpoint().deleteEvent(event.getId()).execute();
+        ServiceProvider.getService().routeEndpoint().deleteRoute(route.getId()).execute();
+    }
+
+    public void testEditGallery() throws InterruptedException {
+        final CountDownLatch signal = new CountDownLatch(1);
+        // TODO
+        signal.await(10, TimeUnit.SECONDS);
+    }
+
+    public void testDeleteGallery() throws InterruptedException {
+        final CountDownLatch signal = new CountDownLatch(1);
+        // TODO
+        signal.await(10, TimeUnit.SECONDS);
+    }
+
     public void testUploadImage() throws IOException, InterruptedException {
         final String TEST_TITEL = "Testtitel";
         final String TEST_BESCHREIBUNG = "Testbeschreibung";
@@ -65,7 +140,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
             is = getClass().getClassLoader().getResourceAsStream("image/test.png");
             assertNotNull("test file could not be found", is);
 
-            GalleryController.uploadImage(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+            GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, Picture picture) {
                     assertNotNull("picture is null", picture);
@@ -79,6 +154,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
 
                     signal.countDown();
                 }
+
                 @Override
                 public void taskFailed(ExtendedTask task, String message) {
                     fail(message);

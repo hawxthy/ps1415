@@ -2,13 +2,17 @@ package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Text;
+import com.google.appengine.api.oauth.OAuthRequestException;
+import com.google.appengine.api.users.User;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +24,7 @@ import ws1415.SkatenightBackend.transport.EventParticipationData;
  * @author Richard Schulze
  */
 @Entity
-public class Event {
+public class Event implements BlobKeyContainer, GalleryContainer {
     @Id
     private Long id;
     private BlobKey icon;
@@ -41,6 +45,14 @@ public class Event {
     @Load(unless = {EventMetaData.class, EventParticipationData.class})
     @Index
     private Ref<Route> route;
+    private List<Ref<Gallery>> galleries;
+
+    /**
+     * Speichert die Upload-URL für den Upload in den Blobstore. Dient nur der Übertragung an die App
+     * und wird aus diesem Grund nicht persistiert.
+     */
+    @Ignore
+    private String imagesUploadUrl;
 
     public Long getId() {
         return id;
@@ -156,5 +168,97 @@ public class Event {
         } else {
             return null;
         }
+    }
+
+    public List<Gallery> getGalleries() {
+        if (galleries == null) {
+            return null;
+        }
+        List<Gallery> resolvedGalleries = new LinkedList<>();
+        for (Ref<Gallery> g : galleries) {
+            resolvedGalleries.add(g.get());
+        }
+        return resolvedGalleries;
+    }
+
+    public void setGalleries(List<Gallery> galleries) {
+        if (galleries == null) {
+            this.galleries = null;
+        }
+        this.galleries = new LinkedList<>();
+        for (Gallery g : galleries) {
+            this.galleries.add(Ref.create(g));
+        }
+    }
+
+    public String getImagesUploadUrl() {
+        return imagesUploadUrl;
+    }
+
+    public void setImagesUploadUrl(String imagesUploadUrl) {
+        this.imagesUploadUrl = imagesUploadUrl;
+    }
+
+    @Override
+    public void consumeBlobKeys(List<BlobKey> keys) {
+        if (keys != null && !keys.isEmpty()) {
+            icon = keys.get(0);
+            images = new LinkedList<>(keys.subList(1, keys.size()));
+        }
+    }
+
+    @Override
+    public void addGallery(User user, Gallery gallery) throws OAuthRequestException {
+        if (gallery == null) {
+            throw new IllegalArgumentException("null, as a gallery, can not be added");
+        }
+
+        // User prüfen
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (!canAddGallery(user)) {
+            throw new OAuthRequestException("insufficient privileges");
+        }
+
+        if (galleries == null) {
+            galleries = new LinkedList<>();
+        }
+        galleries.add(Ref.create(gallery));
+    }
+
+    @Override
+    public void removeGallery(User user, Gallery gallery) throws OAuthRequestException {
+        if (galleries == null) {
+            return;
+        }
+        if (gallery == null) {
+            throw new IllegalArgumentException("null, as a gallery, can not be removed");
+        }
+
+        // User prüfen
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (!canRemoveGallery(user)) {
+            throw new OAuthRequestException("insufficient privileges");
+        }
+
+        galleries.remove(Ref.create(gallery));
+    }
+
+    @Override
+    public boolean canAddGallery(User user) {
+        return memberList.get(user.getEmail()) != null && memberList.get(user.getEmail()).hasPrivilege(Privilege.ADD_GALLERY);
+    }
+
+    @Override
+    public boolean canEditGallery(User user) {
+        return memberList.get(user.getEmail()) != null && memberList.get(user.getEmail()).hasPrivilege(Privilege.EDIT_GALLERY);
+    }
+
+    @Override
+    public boolean canRemoveGallery(User user) {
+        return memberList.get(user.getEmail()) != null && memberList.get(user.getEmail()).hasPrivilege(Privilege.REMOVE_GALLERY);
     }
 }

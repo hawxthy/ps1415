@@ -1,17 +1,27 @@
 package ws1415.SkatenightBackend;
 
+import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.cmd.Query;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
+import ws1415.SkatenightBackend.model.Gallery;
+import ws1415.SkatenightBackend.model.GalleryContainer;
 import ws1415.SkatenightBackend.model.Picture;
+import ws1415.SkatenightBackend.transport.GalleryViewOptions;
+import ws1415.SkatenightBackend.transport.PictureMetaData;
+import ws1415.SkatenightBackend.transport.PictureMetaDataList;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -21,6 +31,120 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  */
 public class GalleryEndpoint extends SkatenightServerEndpoint {
     private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+
+    /**
+     * Erstellt eine Gallery und fügt sie dem Container hinzu, der im Gallery-Objekt angegeben ist.
+     * @param user           Der Benutzer, der die Gallery erstellt.
+     * @param gallery        Die zu erstellende Gallery.
+     * @return Die erstellte Gallery mit gesetztem ID-Feld.
+     */
+    public Gallery createGallery(User user, Gallery gallery)
+            throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+
+        // Gallery prüfen
+        if (gallery.getId() != null) {
+            throw new IllegalArgumentException("gallery was already created (id is not null)");
+        }
+        if (gallery.getTitle() == null || gallery.getTitle().isEmpty()) {
+            throw new IllegalArgumentException("title can not be empty");
+        }
+
+        // Container abrufen und Rechte prüfen
+        GalleryContainer container = (GalleryContainer) ofy().load().kind(gallery.getContainerClass()).id(gallery.getContainerId()).safe();
+        if (!container.canAddGallery(user)) {
+            throw new OAuthRequestException("insufficient privileges");
+        }
+
+        // Gallery speichern und dem Container hinzufügen
+        ofy().save().entity(gallery).now();
+        container.addGallery(user, gallery);
+        ofy().save().entity(container).now();
+
+        return gallery;
+    }
+
+    /**
+     * Editiert die angegebene Gallery.
+     * @param user       Der aufrufende Benutzer.
+     * @param gallery    Die zu editierende Gallery.
+     * @return Die editierte Gallery.
+     */
+    public Gallery editGallery(User user, Gallery gallery) throws OAuthRequestException {
+        // TODO: Problem, wenn das Gallery-Objekt geänderte Container-Daten enthält
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (gallery.getId() == null) {
+            throw new IllegalArgumentException("gallery has to be created first");
+        }
+        GalleryContainer container = (GalleryContainer) ofy().load().kind(gallery.getContainerClass()).id(gallery.getContainerId()).safe();
+        if (!container.canEditGallery(user)) {
+            throw new OAuthRequestException("insufficient privileges");
+        }
+        if (gallery.getTitle() == null || gallery.getTitle().isEmpty()) {
+            throw new IllegalArgumentException("title can not be empty");
+        }
+
+        ofy().save().entity(gallery).now();
+        return gallery;
+    }
+
+    /**
+     * Löscht die Gallery mit der angegebenen ID.
+     * @param user         Der Benutzer, der die Gallery löschen möchte.
+     * @param galleryId    Die ID der zu löschenden Gallery.
+     */
+    public void deleteGallery(User user, @Named("galleryId") long galleryId) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+
+        Gallery gallery = ofy().load().type(Gallery.class).id(galleryId).safe();
+        GalleryContainer container = (GalleryContainer) ofy().load().kind(gallery.getContainerClass()).id(gallery.getContainerId()).safe();
+        if (!container.canRemoveGallery(user)) {
+            throw new OAuthRequestException("insufficient privileges");
+        }
+        container.removeGallery(user, gallery);
+        ofy().save().entity(container).now();
+
+        ofy().delete().entity(gallery).now();
+    }
+
+    /**
+     * Gibt eine Liste von Bild-Metadaten zurück, die anhand der übergebenen ViewOptions ausgewählt
+     * werden.
+     * Für diese Methode ist explizit angegeben, dass sie die HTTP-Methode POST verwendet, damit der
+     * Parameter {@code viewOptions} übertragen werden kann.
+     * @param user           Der aufrufende Benutzer.
+     * @param viewOptions    Die anzuwendenden ViewOptions.
+     * @return Eine Liste von Bild-Metadaten, die anhand der ViewOptions ausgewählt werden.
+     */
+    @ApiMethod(httpMethod = "POST")
+    public PictureMetaDataList listPictures(User user, GalleryViewOptions viewOptions) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+
+        Query<Picture> q = ofy().load().group(PictureMetaData.class).type(Picture.class).limit(viewOptions.getLimit());
+        if (viewOptions.getCursorString() != null) {
+            q = q.startAt(Cursor.fromWebSafeString(viewOptions.getCursorString()));
+        }
+        QueryResultIterator<Picture> iterator = q.iterator();
+
+        PictureMetaDataList result = new PictureMetaDataList();
+        result.setList(new LinkedList<PictureMetaData>());
+        int count = 0;
+        while (count < viewOptions.getLimit() && iterator.hasNext()) {
+            result.getList().add(new PictureMetaData(iterator.next()));
+            count++;
+        }
+        result.setCursorString(iterator.getCursor().toWebSafeString());
+
+        return result;
+    }
 
     /**
      * Erstellt ein Picture-Objekt, das zunächst ohne BlobKey zurück gegeben wird. Das Picture-Objekt enthält

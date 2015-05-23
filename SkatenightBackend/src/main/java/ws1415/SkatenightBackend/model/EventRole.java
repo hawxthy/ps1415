@@ -11,7 +11,10 @@ public enum EventRole {
     HOST(Arrays.asList(
             Privilege.ASSIGN_ROLE,
             Privilege.EDIT_EVENT,
-            Privilege.DELETE_EVENT
+            Privilege.DELETE_EVENT,
+            Privilege.ADD_GALLERY,
+            Privilege.EDIT_GALLERY,
+            Privilege.REMOVE_GALLERY
     )),
     MEDIC(null),
     MARSHALL(null),
@@ -19,7 +22,7 @@ public enum EventRole {
 
     private List<Privilege> privileges;
 
-    private EventRole(List<Privilege> privileges) {
+    EventRole(List<Privilege> privileges) {
         this.privileges = privileges;
     }
 
