@@ -595,9 +595,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             }
 
             RouteEndpoint routeEndpoint = new RouteEndpoint();
-            routeEndpoint.calculateCurrentWaypoint(pm, userLocation);
+            routeEndpoint.calculateCurrentWaypoint(userLocation);
             if (System.currentTimeMillis() - lastFieldUpdateTime >= routeEndpoint.FIELD_UPDATE_INTERVAL) {
-                routeEndpoint.calculateField(pm, userLocation.getCurrentEventId());
+                routeEndpoint.calculateField(userLocation.getCurrentEventId());
                 lastFieldUpdateTime = System.currentTimeMillis();
             }
             pm.makePersistent(userLocation);

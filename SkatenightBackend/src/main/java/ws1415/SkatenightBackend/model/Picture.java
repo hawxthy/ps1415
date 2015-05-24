@@ -6,9 +6,12 @@ import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
+import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 import com.googlecode.objectify.annotation.Parent;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,17 +23,18 @@ import javax.jdo.annotations.Persistent;
  * @author Richard Schulze
  */
 @Entity
-public class Picture {
+public class Picture implements BlobKeyContainer {
     @Id
     private Long id;
+    private String title;
+    private Date date;
+    @Index
+    private String uploader;
     private Text description;
     private Map<String, Integer> ratings;
     private Double avgRating;
     private BlobKey imageBlobKey;
-    @Parent
-    @Load
-    private Ref<PictureMetaData> metaData;
-    // private List<PictureComment> pictureComments;
+    // TODO Comments einbinden
 
     /**
      * Speichert die Upload-URL für den Upload in den Blobstore. Dient nur der Übertragung an die App
@@ -39,13 +43,36 @@ public class Picture {
     @Ignore
     private String uploadUrl;
 
-
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getUploader() {
+        return uploader;
+    }
+
+    public void setUploader(String uploader) {
+        this.uploader = uploader;
     }
 
     public Text getDescription() {
@@ -80,31 +107,18 @@ public class Picture {
         this.imageBlobKey = imageBlobKey;
     }
 
-    public PictureMetaData getMetaData() {
-        if (metaData != null) {
-            return metaData.get();
-        } else {
-            return null;
-        }
-    }
-
-    public void setMetaData(PictureMetaData metaData) {
-        this.metaData = Ref.create(metaData);
-    }
-
-//    public List<PictureComment> getPictureComments() {
-//        return pictureComments;
-//    }
-//
-//    public void setPictureComments(List<PictureComment> pictureComments) {
-//        this.pictureComments = pictureComments;
-//    }
-
     public String getUploadUrl() {
         return uploadUrl;
     }
 
     public void setUploadUrl(String uploadUrl) {
         this.uploadUrl = uploadUrl;
+    }
+
+    @Override
+    public void consumeBlobKeys(List<BlobKey> keys) {
+        if (keys != null && !keys.isEmpty()) {
+            imageBlobKey = keys.get(0);
+        }
     }
 }

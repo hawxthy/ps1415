@@ -1,11 +1,25 @@
 package ws1415.common.controller;
 
+import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventMetaData;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.LinkedList;
 import java.util.List;
 
+import ws1415.common.model.EventRole;
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
@@ -15,6 +29,28 @@ import ws1415.common.task.ExtendedTaskDelegate;
  * @author Richard Schulze
  */
 public abstract class EventController {
+
+    /**
+     * Weißt dem Benutzer mit der übergebenen Mail-Adresse die Rolle in dem Event mit der ID
+     * {@code eventId} zu.
+     * @param handler     Der Handler, der über den Status des Tasks informiert wird.
+     * @param eventId     Die ID des Events, in dem die Rolle zugewiesen wird.
+     * @param userMail    Die Mail des Benutzers, dem die Rolle zugewiesen wird.
+     * @param role        Die zuzuweisende Rolle.
+     */
+    public static void assignRole(ExtendedTaskDelegate<Void, Void> handler, final long eventId, final String userMail, final EventRole role) {
+        new ExtendedTask<Void, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().eventEndpoint().assignRole(eventId, userMail, role.name()).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        }.execute();
+    }
 
     /**
      * Ruft eine Liste aller Events ab, die auf dem Server gespeichert sind. Es werden dabei nur die
@@ -57,12 +93,86 @@ public abstract class EventController {
      * @param handler    Der Handler, der das erstellte Event übergeben bekommt.
      * @param event      Das zu erstellende Event.
      */
-    public static void createEvent(ExtendedTaskDelegate<Void, Event> handler, final Event event) {
+    public static void createEvent(ExtendedTaskDelegate<Void, Event> handler, final Event event,
+                                   final InputStream icon, final InputStream headerImage,
+                                   final List<InputStream> images) {
+        // TODO Ggf. Event auf Gültigkeit prüfen
+
         new ExtendedTask<Void, Void, Event>(handler) {
             @Override
             protected Event doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().eventEndpoint().createEvent(event).execute();
+                    Event createdEvent = ServiceProvider.getService().eventEndpoint().createEvent(event).execute();
+
+                    // POST-Anfrage für den Upload erstellen
+                    try {
+                        HttpClient client = new DefaultHttpClient();
+                        HttpPost post = new HttpPost(createdEvent.getImagesUploadUrl());
+
+                        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+                        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+                        builder.addPart("files", new InputStreamBody(icon, "files"));
+                        builder.addPart("files", new InputStreamBody(headerImage, "files"));
+                        for (InputStream is : images) {
+                            builder.addPart("files", new InputStreamBody(is, "files"));
+                        }
+                        builder.addTextBody("id", createdEvent.getId().toString());
+                        builder.addTextBody("class", "Event");
+
+                        HttpEntity entity = builder.build();
+                        post.setEntity(entity);
+
+                        HttpResponse response = client.execute(post);
+                        HttpEntity httpEntity = response.getEntity();
+
+                        String encoding;
+                        if (httpEntity.getContentEncoding() == null) {
+                            // UTF-8 verwenden, falls keine Kodierung für die Antwort übertragen wurde
+                            encoding = "UTF-8";
+                        } else {
+                            encoding = httpEntity.getContentEncoding().getValue();
+                        }
+
+                        String[] keyStrings = EntityUtils.toString(httpEntity, encoding).split("\n");
+                        BlobKey blobKey = new BlobKey();
+                        blobKey.setKeyString(keyStrings[0]);
+                        createdEvent.setIcon(blobKey);
+                        createdEvent.setImages(new LinkedList<BlobKey>());
+                        for (int i = 1; i < keyStrings.length; i++) {
+                            blobKey = new BlobKey();
+                            blobKey.setKeyString(keyStrings[i]);
+                            createdEvent.getImages().add(blobKey);
+                        }
+                    } catch(IOException ex) {
+                        // Bei Fehlern versuchen das bereits erstellte Picture-Objekt zu löschen
+                        try {
+                            ServiceProvider.getService().galleryEndpoint().deletePicture(createdEvent.getId()).execute();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        throw new RuntimeException(ex);
+                    }
+
+                    return createdEvent;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Editiert das angegebene Event auf dem Server. Das Event muss dazu bereits auf dem Server
+     * existieren.
+     * @param handler    Der Handler, der über den Status des Tasks informiert wird.
+     * @param event      Das angepasste Event.
+     */
+    public static void editEvent(ExtendedTaskDelegate<Void, Event> handler, final Event event) {
+        new ExtendedTask<Void, Void, Event>(handler) {
+            @Override
+            protected Event doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().eventEndpoint().editEvent(event).execute();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

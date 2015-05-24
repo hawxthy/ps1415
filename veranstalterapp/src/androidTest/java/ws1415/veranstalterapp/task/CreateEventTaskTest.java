@@ -71,8 +71,7 @@ public class CreateEventTaskTest extends AuthTaskTestCase {
                 .execute().getItems();
         if (routes != null) {
             for (Route r : routes) {
-                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getKey()
-                        .getId()).execute();
+                ServiceProvider.getService().routeEndpoint().deleteRoute(r.getId()).execute();
             }
         }
 
@@ -116,7 +115,6 @@ public class CreateEventTaskTest extends AuthTaskTestCase {
 
         // Route und Event löschen
         ServiceProvider.getService().eventEndpoint().deleteEvent(serverEvent.getId()).execute();
-        ServiceProvider.getService().routeEndpoint().deleteRoute(serverEvent.getRoute().getKey()
-                .getId()).execute();
+        ServiceProvider.getService().routeEndpoint().deleteRoute(serverEvent.getRoute().getId()).execute();
     }
 }

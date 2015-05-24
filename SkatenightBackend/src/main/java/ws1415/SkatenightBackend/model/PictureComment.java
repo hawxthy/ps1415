@@ -6,7 +6,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 
 /**
- * Repräsentiert einen Kommentar eines Benutzers zu einem Bild.
+ * ReprÃ¤sentiert einen Kommentar eines Benutzers zu einem Bild.
  * @author Richard Schulze
  */
 @PersistenceCapable

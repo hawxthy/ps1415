@@ -2,6 +2,8 @@ package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
 
 import java.util.ArrayList;
 
@@ -12,25 +14,19 @@ import javax.jdo.annotations.PrimaryKey;
 
 /**
  * Repräsentiert eine Strecke mit den zugehörigen Metadaten.
- * Created by Richard on 31.10.2014.
+ * @author Richard Schulze
  */
-@PersistenceCapable
+@Entity
 public class Route {
-    @PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
-    private Key key;
-    @Persistent
+    @Id
+    private Long id;
     private String name;
     /**
      * Speichert die Koordinaten der Route als komprimierten String ab.
      */
-    @Persistent
     private Text routeData;
-    @Persistent(serialized = "true", defaultFetchGroup = "true")
     private ArrayList<RoutePoint> routePoints;
-    @Persistent
     private String length;
-    @Persistent(serialized = "true", defaultFetchGroup = "true")
     private ArrayList<ServerWaypoint> waypoints = new ArrayList<>();
 
     public String getName() {
@@ -66,15 +62,19 @@ public class Route {
         this.length = length;
     }
 
-    public Key getKey() {
-        return key;
-    }
-
     public ArrayList<ServerWaypoint> getWaypoints() {
         return waypoints;
     }
 
     public void setWaypoints(ArrayList<ServerWaypoint> waypoints) {
         this.waypoints = waypoints;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

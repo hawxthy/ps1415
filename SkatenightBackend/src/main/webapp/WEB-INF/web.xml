@@ -44,15 +44,20 @@
     </servlet>
 
 
-    <!-- Blobstore Upload Handler -->
+    <!-- Blobstore Handler -->
     <servlet>
-        <servlet-name>BlobstoreUploadHandler</servlet-name>
-        <servlet-class>ws1415.SkatenightBackend.BlobstoreUploadHandler</servlet-class>
+        <servlet-name>BlobstoreHandler</servlet-name>
+        <servlet-class>ws1415.SkatenightBackend.BlobstoreHandler</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>BlobstoreUploadHandler</servlet-name>
+        <servlet-name>BlobstoreHandler</servlet-name>
         <url-pattern>/images/upload</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BlobstoreHandler</servlet-name>
+        <url-pattern>/images/serve</url-pattern>
+    </servlet-mapping>
+
 
     <!-- Listener für Server-Start -->
     <listener>
