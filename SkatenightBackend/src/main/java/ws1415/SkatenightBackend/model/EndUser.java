@@ -10,7 +10,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
- * Die EndUser-Klasse repraesentiert einen Benutzer.
+ * Die EndUser-Klasse repräsentiert einen Benutzer.
  *
  * @author Martin Wrodarczyk
  */
@@ -23,24 +23,34 @@ public class EndUser {
     private Integer globalRole;
     @Persistent
     private Boolean optOutSearch;
+    @Persistent
+    private Integer showPrivateGroups;
     @Unowned
-    private UserProfile userProfile;
+    private UserInfo userInfo;
+    @Unowned
+    private UserPicture userPicture;
     @Unowned
     private UserLocation userLocation;
     @Persistent
-    private List<String> myFriends;
-    @Persistent
     private List<String> myUserGroups;
+    @Persistent
+    private List<Long> myEvents;
+    @Persistent
+    private List<String> myFriends;
 
     public EndUser() {
     }
 
-    public EndUser(String email, UserProfile userProfile, UserLocation userLocation) {
+    public EndUser(String email, UserLocation userLocation, UserInfo userInfo, UserPicture userPicture) {
         this.email = email;
-        this.userProfile = userProfile;
         this.userLocation = userLocation;
+        this.userInfo = userInfo;
+        this.userPicture = userPicture;
         globalRole = GlobalRole.USER.getId();
         optOutSearch = false;
+        showPrivateGroups = Visibility.PUBLIC.getId();
+        myUserGroups = new ArrayList<>();
+        myEvents = new ArrayList<>();
         myFriends = new ArrayList<>();
     }
 
@@ -68,6 +78,14 @@ public class EndUser {
         this.optOutSearch = optOutSearch;
     }
 
+    public Integer getShowPrivateGroups() {
+        return showPrivateGroups;
+    }
+
+    public void setShowPrivateGroups(Integer showPrivateGroups) {
+        this.showPrivateGroups = showPrivateGroups;
+    }
+
     public UserLocation getUserLocation() {
         return userLocation;
     }
@@ -76,20 +94,20 @@ public class EndUser {
         this.userLocation = userLocation;
     }
 
-    public UserProfile getUserProfile() {
-        return userProfile;
+    public UserInfo getUserInfo() {
+        return userInfo;
     }
 
-    public void setUserProfile(UserProfile userProfile) {
-        this.userProfile = userProfile;
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
     }
 
-    public List<String> getMyFriends() {
-        return myFriends;
+    public UserPicture getUserPicture() {
+        return userPicture;
     }
 
-    public void setMyFriends(List<String> myFriends) {
-        this.myFriends = myFriends;
+    public void setUserPicture(UserPicture userPicture) {
+        this.userPicture = userPicture;
     }
 
     public List<String> getMyUserGroups() {
@@ -100,11 +118,35 @@ public class EndUser {
         this.myUserGroups = myUserGroups;
     }
 
+    public List<Long> getMyEvents() {
+        return myEvents;
+    }
+
+    public void setMyEvents(List<Long> myEvents) {
+        this.myEvents = myEvents;
+    }
+
+    public List<String> getMyFriends() {
+        return myFriends;
+    }
+
+    public void setMyFriends(List<String> myFriends) {
+        this.myFriends = myFriends;
+    }
+
     public void addUserGroup(UserGroup userGroup) {
         if (userGroup != null) getMyUserGroups().add(userGroup.getName());
     }
 
     public void removeUserGroup(UserGroup userGroup) {
         if (userGroup != null) getMyUserGroups().remove(userGroup.getName());
+    }
+
+    public void addEvent(Event event) {
+        if (event != null) getMyEvents().add(event.getId());
+    }
+
+    public void removeEvent(Event event) {
+        if (event != null) getMyEvents().remove(event.getId());
     }
 }
