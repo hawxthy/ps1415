@@ -58,6 +58,20 @@
         <url-pattern>/images/serve</url-pattern>
     </servlet-mapping>
 
+    <!-- Blobstore Handler for Userpictures -->
+    <servlet>
+        <servlet-name>UserBlobstoreHandler</servlet-name>
+        <servlet-class>ws1415.SkatenightBackend.UserBlobstoreHandler</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UserBlobstoreHandler</servlet-name>
+        <url-pattern>/userImages/upload</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserBlobstoreHandler</servlet-name>
+        <url-pattern>/userImages/serve</url-pattern>
+    </servlet-mapping>
+
 
     <!-- Listener für Server-Start -->
     <listener>
