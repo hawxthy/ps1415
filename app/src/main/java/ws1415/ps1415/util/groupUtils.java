@@ -34,7 +34,7 @@ public class groupUtils {
      * @return
      */
     public static boolean isUserInGroup(String email, UserGroup group){
-        for(String member : group.getMembers()){
+        for(String member : group.getMemberRights().keySet()){
             String value = member;
             if(value.equals(email)) return true;
         }

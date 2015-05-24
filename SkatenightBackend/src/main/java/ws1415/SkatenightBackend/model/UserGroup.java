@@ -1,37 +1,38 @@
 package ws1415.SkatenightBackend.model;
 
-import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Load;
-import com.googlecode.objectify.annotation.Mapify;
-import com.googlecode.objectify.annotation.Parent;
-import com.googlecode.objectify.mapper.Mapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import ws1415.SkatenightBackend.transport.UserGroupBlackBoardTransport;
+import ws1415.SkatenightBackend.transport.UserGroupMetaData;
+import ws1415.SkatenightBackend.transport.UserGroupNewsBoardTransport;
+import ws1415.SkatenightBackend.transport.UserGroupPicture;
 
 /**
  * Repräsentiert eine Benutzergruppe.
+ *
  * @author Bernd Eissing
  */
 @Entity
 public class UserGroup {
     @Id
     private String name;            // Eindeutiger Name der Gruppe
-    private boolean open;
     private String creator;
-    private Picture picture;
-    @Load
-    private ArrayList<GroupMemberRights> memberRanks;
-    @Load
-    @Parent
-    private Ref<GroupMetaData> metaData;
-    private ArrayList<Ref<BoardEntry>> news;
-    private ArrayList<Ref<BoardEntry>> blackBoard;
+    private boolean open;
+    private int memberCount;
+    @Load(unless = UserGroupMetaData.class)
+    private HashMap<String, ArrayList<String>> memberRights;
+    @Load(UserGroupPicture.class)
+    private Ref<UserGroupPicture> picture;
+    @Load(UserGroupBlackBoardTransport.class)
+    private ArrayList<BoardEntry> blackBoard;
+    @Load(UserGroupNewsBoardTransport.class)
+    private ArrayList<BoardEntry> newsBoard;
 
 
     public UserGroup() {
@@ -43,11 +44,12 @@ public class UserGroup {
             throw new IllegalArgumentException("creator can not be null");
         }
         this.creator = creator;
-        memberRanks = new ArrayList<GroupMemberRights>();
-        news = new ArrayList<Ref<BoardEntry>>();
-        blackBoard = new ArrayList<Ref<BoardEntry>>();
+
     }
 
+    public String getCreator() {
+        return creator;
+    }
 
     public String getName() {
         return name;
@@ -57,28 +59,6 @@ public class UserGroup {
         this.name = name;
     }
 
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public ArrayList<GroupMemberRights> getMemberRanks() {
-        return memberRanks;
-    }
-
-    public void setMemberRanks(ArrayList<GroupMemberRights> memberRanks) {
-        this.memberRanks = memberRanks;
-    }
-
-    /**
-     * Methode um die Rechte von Mitgliedern der Usergruppe zu setzen. Hier wird
-     * Ref versteckt, damit eine normale Liste von GroupMemberRights zurück gegeben
-     * werden kann.
-     *
-     * @return Liste von GroupMemberRights
-     */
-
-
     public boolean isOpen() {
         return open;
     }
@@ -87,131 +67,139 @@ public class UserGroup {
         this.open = open;
     }
 
+    public int getMemberCount() {
+        return memberCount;
+    }
+
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
+
+    public UserGroupPicture getPicture() {
+        if (picture != null) {
+            return picture.get();
+        }
+        return null;
+    }
+
+    public void setPicture(UserGroupPicture picture) {
+        this.picture = Ref.create(picture);
+    }
+
+    public HashMap<String, ArrayList<String>> getMemberRights() {
+        if (memberRights != null) {
+            return memberRights;
+        }
+        return null;
+    }
+
+    public void setMemberRights(HashMap<String, ArrayList<String>> memberRights) {
+        this.memberRights = memberRights;
+    }
+
+    public void addGroupMember(String member, ArrayList<String> rights) {
+        memberRights.put(member, rights);
+        memberCount++;
+    }
+
+    public void removeGroupMember(String member) {
+        memberRights.remove(member);
+        memberCount--;
+    }
 
     public ArrayList<BoardEntry> getBlackBoard() {
-        if(this.blackBoard == null){
-            return null;
-        }
-        ArrayList<BoardEntry> blackBoard = new ArrayList<BoardEntry>();
-        for(Ref<BoardEntry> tmp : this.blackBoard){
-            blackBoard.add(tmp.get());
-        }
         return blackBoard;
     }
 
     public void setBlackBoard(ArrayList<BoardEntry> blackBoard) {
-        ArrayList<Ref<BoardEntry>> blackBoardRef = new ArrayList<>();
-        for(BoardEntry tmp : blackBoard){
-            blackBoardRef.add(Ref.create(tmp));
-        }
-        this.blackBoard = blackBoardRef;
+        this.blackBoard = blackBoard;
     }
 
-
-    public ArrayList<BoardEntry> getNews() {
-        if(this.news == null){
-            return null;
-        }
-        ArrayList<BoardEntry> news = new ArrayList<BoardEntry>();
-        for(Ref<BoardEntry> tmp : this.news){
-            news.add(tmp.get());
-        }
-        return news;
+    public ArrayList<BoardEntry> getNewsBoard() {
+        return newsBoard;
     }
 
-    public void setNews(List<BoardEntry> news) {
-        ArrayList<Ref<BoardEntry>> newsRef = new ArrayList<>();
-        for(BoardEntry tmp : news){
-            newsRef.add(Ref.create(tmp));
+    public void setNewsBoard(ArrayList<BoardEntry> newsBoard) {
+        this.newsBoard = newsBoard;
+    }
+
+    public void addBlackBoardMessage(BoardEntry be){
+        if(blackBoard == null){
+            blackBoard = new ArrayList<BoardEntry>();
         }
-        this.news = newsRef;
+        blackBoard.add(be);
     }
 
-    public Picture getPicture() {
-        return picture;
-    }
-
-    public void setPicture(Picture picture) {
-        this.picture = picture;
-    }
-
-    public GroupMetaData getMetaData() {
-        return metaData.get();
-    }
-
-    public void setMetaData(GroupMetaData metaData) {
-        this.metaData = Ref.create(metaData);
-    }
-
-    /**
-     * Eine embedded Klasse zum speichern von Rechten zu jedem Mitglied der
-     * Nutzergrppe. Die Klasse hat zwei Felder, eins mit dem Namen des Mitglieds
-     * und das andere mit einer Liste von Rechten, die das Mitglied hat.
-     */
-    private static class GroupMemberRights{
-        String member;
-        ArrayList<String> rights;
-
-        public GroupMemberRights(){
-        }
-
-        public String getMember() {
-            return member;
-        }
-
-        public void setMember(String member) {
-            this.member = member;
-        }
-
-        public ArrayList<String> getRights() {
-            return rights;
-        }
-
-        public void setRights(ArrayList<String> rights) {
-            this.rights = rights;
-        }
-    }
-
-    public void addGroupMember(String member, ArrayList<String> rights){
-        GroupMemberRights gmr = new GroupMemberRights();
-        gmr.setMember(member);
-        gmr.setRights(rights);
-        memberRanks.add(gmr);
-    }
-
-    public void removeGroupMember(String member){
-        for (GroupMemberRights gmr : getMemberRanks()){
-            if(gmr.getMember().equals(member)){
-                getMemberRanks().remove(gmr);
+    public void removeBlackBoardMessage(long boardEntryId){
+        if(blackBoard != null){
+            for(int i = 0; i < blackBoard.size(); i++){
+                if(blackBoard.get(i).getId() == boardEntryId){
+                    blackBoard.remove(blackBoard.get(i));
+                }
             }
         }
     }
 
-    public List<String> getMembers(){
-        ArrayList<String> memberList = new ArrayList<>();
-        for(GroupMemberRights gmr : getMemberRanks()){
-            memberList.add(gmr.getMember());
+    public void addNewsBoardMessage(BoardEntry be){
+        if(newsBoard == null){
+            newsBoard = new ArrayList<BoardEntry>();
         }
-        return memberList;
+        newsBoard.add(be);
     }
 
-    public void addBlackBoardMessage(BoardEntry be){
-        if(be != null){
-            ArrayList<BoardEntry> blackBoard = getBlackBoard();
-            blackBoard.add(be);
-            setBlackBoard(blackBoard);
-        }
-    }
-
-    public void removeBoardMessage(BoardEntry be){
-        if(be != null){
-            getBlackBoard().remove(be);
+    public void removeNewsBoardMessage(long boardEntryId){
+        if(newsBoard != null){
+            for(int i = 0; i < newsBoard.size(); i++){
+                if(newsBoard.get(i).getId() == boardEntryId){
+                    newsBoard.remove(newsBoard.get(i));
+                }
+            }
         }
     }
 
-    public void addNewsMessage(BoardEntry be){
-        if(be != null){
-            getNews().add(be);
+    /**
+     * Embedded Klasse zum modellieren von BlackBoard einträgen. Hier sollte
+     * IMMER der Konstruktor BoardEntry(String writer, String message) benutzt
+     * werden, sonst kann dieser BoardEntry später nicht im BlackBoard
+     * gefunden werden.
+     */
+    public static class BoardEntry {
+        private long id;
+        private String writer;
+        private String message;
+
+        public BoardEntry() {
+            // Konstruktor für GAE
+        }
+
+        public BoardEntry(String message, String writer, long id) {
+            this.writer = writer;
+            this.message = message;
+            this.id = id;
+        }
+        private void setId(long id){
+            this.id = id;
+        }
+
+        public long getId(){
+            return id;
+        }
+
+        public String getWriter() {
+            return writer;
+        }
+
+        public void setWriter(String writer) {
+            this.writer = writer;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
         }
     }
 }
+

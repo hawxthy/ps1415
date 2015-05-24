@@ -48,6 +48,7 @@ public class AddUserGroupActivity extends Activity {
      * @param view
      */
     public void apply(View view) throws Exception {
+        //TODO die Variable isOpen muss noch in der app gesetzt werden
         final String groupName = addGroupEditText.getText().toString();
         if (!groupName.equals("")) {
             new QueryUserGroupsTask(new ExtendedTaskDelegateAdapter<Void, List<UserGroup>>() {
@@ -67,7 +68,7 @@ public class AddUserGroupActivity extends Activity {
                         public void taskDidFinish(ExtendedTask task, Void aVoid) {
                             UsergroupActivity.getUserGroupActivity().refresh();
                         }
-                    }, groupName);
+                    }, groupName, true);
                 }
             }).execute();
         } else {
