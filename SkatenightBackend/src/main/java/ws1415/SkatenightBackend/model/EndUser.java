@@ -10,7 +10,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
- * Die EndUser-Klasse repräsentiert einen Benutzer.
+ * Die EndUser-Klasse repraesentiert einen Benutzer.
  *
  * @author Martin Wrodarczyk
  */
