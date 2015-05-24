@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     // Festlegen, welcher Build Type für die Tests genutzt werden soll. Definiert, welche Signing-
     // Configuration für das Testpaket genutzt wird.
-    testBuildType "debug"
+    testBuildType "release"
 		
     signingConfigs {
         release {
