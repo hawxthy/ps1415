@@ -41,7 +41,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
 
         // Sicherstellen, dass der eingeloggte Benutzer auf dem Server angemeldet ist und ein Admin ist
         if (!ServiceProvider.getService().userEndpoint().existsUser(ServiceProvider.getEmail()).execute().getValue()) {
-            ServiceProvider.getService().userEndpoint().createUser(ServiceProvider.getEmail(), null).set("firstName", "").set("lastName", "").execute();
+            ServiceProvider.getService().userEndpoint().createUser(ServiceProvider.getEmail()).set("firstName", "").set("lastName", "").execute();
         }
         assertTrue("user has to be an admin", ServiceProvider.getService().roleEndpoint().isAdmin(ServiceProvider.getEmail()).execute().getValue());
 

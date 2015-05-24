@@ -19,7 +19,9 @@ import android.widget.Toast;
 import com.google.api.client.util.Base64;
 import com.skatenight.skatenightAPI.model.Text;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 /**
  * @author Richard
@@ -68,6 +70,7 @@ public abstract class ImageUtil {
      * @return Byte-Array der Bitmap
      */
     public static byte[] BitmapToByteArray(Bitmap bitmap) {
+        if(bitmap == null) return null;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
         return out.toByteArray();
@@ -187,4 +190,10 @@ public abstract class ImageUtil {
         }
     }
 
+    public static InputStream BitmapToInputStream(Bitmap bitmap) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
+        byte[] bitmapdata = bos.toByteArray();
+        return new ByteArrayInputStream(bitmapdata);
+    }
 }

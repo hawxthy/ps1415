@@ -4,7 +4,8 @@ import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.api.server.spi.config.Nullable;
 import com.google.api.server.spi.response.UnauthorizedException;
-import com.google.appengine.api.datastore.Text;
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
@@ -26,9 +27,9 @@ import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserInfo;
 import ws1415.SkatenightBackend.model.UserLocation;
-import ws1415.SkatenightBackend.model.UserPicture;
 import ws1415.SkatenightBackend.model.Visibility;
 import ws1415.SkatenightBackend.transport.ListWrapper;
+import ws1415.SkatenightBackend.transport.StringWrapper;
 import ws1415.SkatenightBackend.transport.UserListData;
 import ws1415.SkatenightBackend.transport.UserProfile;
 
@@ -39,6 +40,17 @@ import ws1415.SkatenightBackend.transport.UserProfile;
  */
 public class UserEndpoint extends SkatenightServerEndpoint {
     public long lastFieldUpdateTime = 0;
+    private static final BlobstoreService blobstoreService =
+            BlobstoreServiceFactory.getBlobstoreService();
+
+    /**
+     * Gibt die UploadUrl des Blobstores zurück. Dient zum Uploaden von Bildern an den Blobstore.
+     *
+     * @return UploadUrl
+     */
+    public StringWrapper getUploadUrl(){
+        return new StringWrapper(blobstoreService.createUploadUrl("/userImages/upload"));
+    }
 
     /**
      * Erstellt ein Member-Objekt für die angegebene
@@ -128,15 +140,13 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @return true, wenn Benutzer erstellt wurde, false andernfalls
      */
     public BooleanWrapper createUser(@Named("userMail") String userMail, @Nullable @Named("firstName") String firstName,
-                                     @Nullable @Named("lastName") String lastName, Text picture) {
+                                     @Nullable @Named("lastName") String lastName) {
         if (!existsUser(userMail).value) {
             UserLocation userLocation = new UserLocation(userMail);
-            UserPicture userPicture = new UserPicture(userMail);
             UserInfo userInfo = new UserInfo(userMail);
-            if (picture.getValue() != null) userPicture.setPicture(picture);
             userInfo.setFirstName(firstName);
             userInfo.setLastName(new UserInfo.InfoPair(lastName, Visibility.PUBLIC.getId()));
-            EndUser user = new EndUser(userMail, userLocation, userInfo, userPicture);
+            EndUser user = new EndUser(userMail, userLocation, userInfo);
 
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
             try {
@@ -186,7 +196,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             // Stellt sicher das Objekte der Assoziation auch runtergeladen werden
-            endUser.getUserPicture();
             endUser.getUserInfo();
             endUser.getUserLocation();
             return endUser;
@@ -231,7 +240,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             List<String> friends = endUser.getMyFriends();
-            endUser.getUserPicture();
             endUser.getUserInfo();
 
             UserInfo detachedUserInfo = pm.detachCopy(endUser.getUserInfo());
@@ -243,7 +251,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
 
             UserProfile result = new UserProfile();
             result.setUserInfo(detachedUserInfo);
-            result.setUserPicture(endUser.getUserPicture());
+            result.setUserPicture(endUser.getPictureBlobKey());
             result.setEmail(endUser.getEmail());
             result.setOptOutSearch(endUser.isOptOutSearch());
             result.setShowPrivateGroups(endUser.getShowPrivateGroups());
@@ -300,7 +308,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @return Allgemeine Informationen zum Benutzer, falls nicht gefunden: null
      */
     @ApiMethod(path = "user_info")
-    public UserListData getUserInfo(User user, @Named("userMail") String userMail, @Named("withPicture") boolean withPicture) {
+    public UserListData getUserInfo(User user, @Named("userMail") String userMail) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
@@ -309,9 +317,8 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             UserInfo detachedUserInfo = pm.detachCopy(endUser.getUserInfo());
             setUpVisibility(detachedUserInfo, user, userMail, friends);
 
-            UserListData result = new UserListData(endUser.getEmail(), detachedUserInfo);
-            if (withPicture) result.setUserPicture(endUser.getUserPicture());
-            return result;
+            return new UserListData(endUser.getEmail(), detachedUserInfo,
+                    endUser.getPictureBlobKey());
         } catch (Exception e) {
             return null;
         } finally {
@@ -372,25 +379,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Gibt das Profilbild des Benuters mit der angegebenen E-Mail Adresse aus.
-     *
-     * @param userMail E-Mail Adresse des Benutzers
-     * @return Profilbild des Benutzers, falls nicht gefunden: null
-     */
-    @ApiMethod(path = "user_picture")
-    public UserPicture getUserPicture(@Named("userMail") String userMail) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            return pm.getObjectById(UserPicture.class, userMail);
-        } catch (Exception e) {
-            return null;
-        } finally {
-            pm.close();
-        }
-    }
-
-
-    /**
      * Listet die allgemeinen Informationen der Benutzer auf, dessen E-Mail Adressen übergeben
      * wurden.
      *
@@ -398,34 +386,15 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @return Liste von allgemeinen Informationen
      */
     @ApiMethod(path = "user_info_list")
-    public List<UserListData> listUserInfo(User user, @Named("userMails") List<String> userMails,
-                                           @Named("withPicture") boolean withPicture) {
+    public List<UserListData> listUserInfo(User user, @Named("userMails") List<String> userMails) {
         List<UserListData> result = new ArrayList<>();
         UserListData userInfo;
         for (String userMail : userMails) {
-            userInfo = getUserInfo(user, userMail, withPicture);
+            userInfo = getUserInfo(user, userMail);
             if (userInfo != null) result.add(userInfo);
         }
         return result;
     }
-
-    /**
-     * Listet die Profilbilder der Benutzer auf, dessen E-Mail Adressen übergeben wurden.
-     *
-     * @param userMails Liste der E-Mail Adressen der Benutzer
-     * @return Liste von Profilbildern
-     */
-    @ApiMethod(path = "user_picture_list")
-    public List<UserPicture> listUserPicture(@Named("userMails") List<String> userMails) {
-        List<UserPicture> result = new ArrayList<>();
-        UserPicture userPicture;
-        for (String userMail : userMails) {
-            userPicture = getUserPicture(userMail);
-            if (userPicture != null) result.add(userPicture);
-        }
-        return result;
-    }
-
 
     /**
      * Erstellt eine Liste mit allgemeinen Informationen zu den Freunden eines Benutzers.
@@ -448,17 +417,17 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         } finally {
             pm.close();
         }
-        return listUserInfo(user, friendMails, true);
+        return listUserInfo(user, friendMails);
     }
 
     /**
      * Durchsucht die Benutzer nach der Eingabe und gibt die allgemeinen Nutzerinformationen
      * zu den Ergebnissen in einer Liste aus.
-     *
+     * TODO: LISTDATA OBJEKTE ZURÜCKGEBEN
      * @param input Eingabe
      * @return Liste von allgemeinen Informationen zu Benutzern
      */
-    public ListWrapper searchUsers(User user, @Named("input") String input) throws OAuthRequestException {
+    public ListWrapper searchUsers(@Named("input") String input) throws OAuthRequestException {
         List<String> cache;
         Set<String> resultMails = new HashSet<>();
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
@@ -532,31 +501,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             userInfo.setGender(newUserInfo.getGender());
             userInfo.setPostalCode(newUserInfo.getPostalCode());
             return userInfo;
-        } finally {
-            pm.close();
-        }
-    }
-
-    /**
-     * Aktualisiert das Profilbild eines Benutzers.
-     *
-     * @param user     User-Objekt für die Authentifikation
-     * @param userMail E-Mail Adresse des Benutzers
-     * @throws UnauthorizedException Wird geworfen, falls Benutzer nicht authorisiert ist die Daten
-     *                               zu ändern
-     * @throws OAuthRequestException Wird geworfen, falls kein User-Objekt übergeben wird
-     */
-    @ApiMethod(path = "user_picture")
-    public void updateUserPicture(User user, @Named("userMail") String userMail, Text encodedImage) throws
-            UnauthorizedException, OAuthRequestException {
-        EndpointUtil.throwIfNoUser(user);
-        EndpointUtil.throwIfEndUserNotExists(user.getEmail());
-        EndpointUtil.throwIfUserNotSame(user.getEmail(), userMail);
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            UserPicture userPicture = pm.getObjectById(UserPicture.class, userMail);
-            if(encodedImage.getValue() != null)userPicture.setPicture(encodedImage);
-            else userPicture.setPicture(null);
         } finally {
             pm.close();
         }
@@ -671,8 +615,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         if (existsUser(userMail).value) {
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+
+            if(endUser.getPictureBlobKey() != null) blobstoreService.delete(endUser.getPictureBlobKey());
             try {
-                pm.deletePersistent(endUser.getUserPicture());
                 pm.deletePersistent(endUser.getUserInfo());
                 pm.deletePersistent(endUser.getUserLocation());
                 pm.deletePersistent(endUser);

@@ -1,7 +1,8 @@
 package ws1415.SkatenightBackend.transport;
 
+import com.google.appengine.api.blobstore.BlobKey;
+
 import ws1415.SkatenightBackend.model.UserInfo;
-import ws1415.SkatenightBackend.model.UserPicture;
 
 /**
  * Dient ausschließlich der Übertragung der Benutzerdaten, die für die Anzeige von
@@ -10,7 +11,7 @@ import ws1415.SkatenightBackend.model.UserPicture;
 public class UserListData {
     private String email;
     private UserInfo userInfo;
-    private UserPicture userPicture;
+    private BlobKey userPicture;
 
     public UserListData() {
     }
@@ -20,7 +21,7 @@ public class UserListData {
         this.userInfo = userInfo;
     }
 
-    public UserListData(String email, UserInfo userInfo, UserPicture userPicture) {
+    public UserListData(String email, UserInfo userInfo, BlobKey userPicture) {
         this.email = email;
         this.userInfo = userInfo;
         this.userPicture = userPicture;
@@ -42,11 +43,11 @@ public class UserListData {
         this.userInfo = userInfo;
     }
 
-    public UserPicture getUserPicture() {
+    public BlobKey getUserPicture() {
         return userPicture;
     }
 
-    public void setUserPicture(UserPicture userPicture) {
+    public void setUserPicture(BlobKey userPicture) {
         this.userPicture = userPicture;
     }
 }

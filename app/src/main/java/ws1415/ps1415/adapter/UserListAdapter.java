@@ -9,8 +9,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.skatenight.skatenightAPI.model.Text;
+import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserListData;
 
@@ -19,9 +20,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.common.controller.UserController;
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.ProfileActivity;
+import ws1415.ps1415.util.UserImageLoader;
 import ws1415.ps1415.util.UniversalUtil;
 
 /**
@@ -84,26 +89,31 @@ public class UserListAdapter extends BaseAdapter {
         UserListData item = getItem(i);
         UserInfo userInfo = item.getUserInfo();
 
-        Bitmap bitmapPicture = setUpImage(item);
         String primaryText = setUpPrimaryText(userInfo);
         String secondaryText = setUpSecondaryText(userInfo);
 
-        if(bitmapPicture != null){
-            holder.picture.setImageBitmap(ImageUtil.getRoundedBitmap(bitmapPicture));
-        } else {
-            holder.picture.setImageBitmap(defaultBitmap);
-        }
+        holder.picture.setImageBitmap(defaultBitmap);
+        UserImageLoader.getInstance().displayImage(item.getUserPicture(), holder.picture);
         holder.primaryText.setText(primaryText);
         holder.secondaryText.setText(secondaryText);
 
         return convertView;
     }
 
-    private Bitmap setUpImage(UserListData item) {
-        Text picture = item.getUserPicture().getPicture();
-        Bitmap bitmapPicture = null;
-        if(picture != null) bitmapPicture = ImageUtil.DecodeTextToBitmap(item.getUserPicture().getPicture());
-        return bitmapPicture;
+    private void setImage(final ImageView userPictureView, final BlobKey userPictureKey) {
+        if(userPictureKey != null) {
+            UserController.getUserPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
+                    userPictureView.setImageBitmap(ImageUtil.getRoundedBitmap(bitmap));
+                }
+
+                @Override
+                public void taskFailed(ExtendedTask task, String message) {
+                    Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+                }
+            }, userPictureKey);
+        }
     }
 
     private String setUpPrimaryText(UserInfo userInfo) {

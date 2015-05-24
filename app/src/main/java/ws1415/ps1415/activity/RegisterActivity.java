@@ -42,12 +42,14 @@ import ws1415.ps1415.util.PrefManager;
  */
 public class RegisterActivity extends Activity {
     private static final String TAG = "Skatenight";
+
+    // RequestCodes für die ActivityOnResult-Methode
     private static final int REQUEST_CAMERA_CAPTURE = 101;
     private static final int REQUEST_PICTURE_CROP = 102;
     private static final int REQUEST_SELECT_PICTURE = 200;
     public static final int REQUEST_ACCOUNT_PICKER = 1;
 
-    // UI
+    // UI-Komponenten
     private ImageView mPictureView;
     private EditText mFirstNameView;
     private EditText mLastNameView;
@@ -58,10 +60,6 @@ public class RegisterActivity extends Activity {
     // Für das Einloggen mit dem Google Account
     private GoogleAccountCredential credential;
     private static String accountName;
-
-    // Komponenten und Variablen für GCM
-    private GoogleCloudMessaging gcm;
-    private String regid;
 
     // Für das Verwalten des Profilbildes
     private Bitmap selectedPicture;
@@ -88,8 +86,7 @@ public class RegisterActivity extends Activity {
         mRegisterButton = (Button) findViewById(R.id.register_button);
 
         // Default-Bild setzen
-        Bitmap bm = BitmapFactory.decodeResource(getResources(),
-                R.drawable.default_picture);
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_picture);
         mPictureView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
 
         mRegisterButton.setOnClickListener(new OnClickListener() {
@@ -113,40 +110,70 @@ public class RegisterActivity extends Activity {
 
         if(firstName.length() < 3){
             correctParameters = false;
-            Toast.makeText(RegisterActivity.this, "Vorname muss mindestens 3 Zeichen lang sein", Toast.LENGTH_LONG).show();
+            Toast.makeText(RegisterActivity.this, getString(R.string.first_name_too_short), Toast.LENGTH_LONG).show();
         }
 
         if(accountName == null || accountName.equals("")){
             correctParameters = false;
-            Toast.makeText(RegisterActivity.this, "E-Mail Adresse wurde nicht ausgewählt", Toast.LENGTH_LONG).show();
+            Toast.makeText(RegisterActivity.this, getString(R.string.email_not_chosed), Toast.LENGTH_LONG).show();
             startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
         }
 
         if(correctParameters) {
             showProgress(true);
-            UserController.createUser(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            createUser(firstName, lastName);
+        }
+    }
+
+    private void createUser(String firstName, String lastName) {
+        UserController.createUser(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                ServiceProvider.login(credential);
+                initGCM(context);
+                PrefManager.setSelectedUserMail(getApplicationContext(), accountName);
+                if (aBoolean) {
+                    Toast.makeText(getApplicationContext(), "Benutzer erfolgreich erstellt", Toast.LENGTH_LONG).show();
+                    uploadUserPicture();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Benutzer existiert bereits. Login erfolgreich.", Toast.LENGTH_LONG).show();
+                    context.startActivity(new Intent(RegisterActivity.this, ShowEventsActivity.class));
+                    finish();
+                }
+            }
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                Toast.makeText(getApplicationContext(), "Serverfehler", Toast.LENGTH_LONG).show();
+            }
+        }, accountName, firstName, lastName);
+    }
+
+    private void uploadUserPicture() {
+        if(selectedPicture != null) {
+            UserController.uploadUserPicture(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
-                    if (aBoolean) {
-                        Toast.makeText(getApplicationContext(), "Benutzer erfolgreich erstellt", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Benutzer existiert bereits. Login erfolgreich.", Toast.LENGTH_LONG).show();
-                    }
-                    PrefManager.setSelectedUserMail(getApplicationContext(), accountName);
-                    ServiceProvider.login(credential);
-                    initGCM(context);
+                    if(aBoolean) Toast.makeText(context, "Bild hochgeladen", Toast.LENGTH_LONG).show();
+                    else Toast.makeText(context, "Konnte Bild nicht hochladen", Toast.LENGTH_LONG).show();
                     context.startActivity(new Intent(RegisterActivity.this, ShowEventsActivity.class));
                     finish();
                 }
 
                 @Override
                 public void taskFailed(ExtendedTask task, String message) {
-                    Toast.makeText(getApplicationContext(), "Serverfehler", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Serverfehler beim Profilbildupload", Toast.LENGTH_LONG).show();
+                    context.startActivity(new Intent(RegisterActivity.this, ShowEventsActivity.class));
+                    finish();
                 }
-            }, accountName, firstName, lastName, selectedPicture);
+            }, accountName, ImageUtil.BitmapToInputStream(selectedPicture));
         }
     }
 
+    /**
+     * Leitet die Auswahl des Bildes weiter.
+     *
+     * @param view
+     */
     public void setUpImage(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
         builder.setTitle(R.string.profile_picture)
@@ -171,7 +198,7 @@ public class RegisterActivity extends Activity {
     /**
      * Prüft, ob für einen Nutzer bereits ein Benutzer existiert.
      */
-    public void attemptLogin(){
+    private void attemptLogin(){
         showProgress(true);
         UserController.existsUser(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
@@ -252,8 +279,8 @@ public class RegisterActivity extends Activity {
     private void initGCM(Context context) {
         context = this;
         if (GCMUtil.checkPlayServices(this)) {
-            gcm = GoogleCloudMessaging.getInstance(this);
-            regid = LocalGCMUtil.getRegistrationId(context);
+            GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
+            String regid = LocalGCMUtil.getRegistrationId(context);
 
             if (regid.isEmpty()) {
                 LocalGCMUtil.registerInBackground(context, gcm);

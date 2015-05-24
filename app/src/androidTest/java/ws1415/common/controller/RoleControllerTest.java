@@ -1,4 +1,4 @@
-package ws1415.ps1415.authTest;
+package ws1415.common.controller;
 
 import android.test.suitebuilder.annotation.SmallTest;
 
@@ -12,8 +12,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
-import ws1415.common.controller.RoleController;
-import ws1415.common.controller.UserController;
 import ws1415.common.model.GlobalRole;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
@@ -21,16 +19,14 @@ import ws1415.common.task.ExtendedTaskDelegateAdapter;
 /**
  * Dient dazu Funktionalitäten zu testen, die mit Adminrollen zu tun haben.
  *
- * Ausführer der Tests muss eingetragener Admin auf dem Server sein. Dies ist beispielsweise
- * umsetzbar in dem man als "FIRST_ADMIN" seine E-Mail Adresse einträgt, sodass anschließend bei
- * Serverstart ein mit der angegebenen E-Mail als Administrator angelegt wird.
- *
- * ADMIN_MAIL muss mit dem zu testenden Administrator ersetzt werden.
- * TEST_MAIL muss mit einer weiteren eingetragenen E-Mail Adresse ersetzt werden.
+ * Die aufgeführten E-Mail Accounts müssen zum Testen auf dem Gerät registriert sein. Dazu
+ * müssen sie in den Einstellungen des Gerätes mit dem Passwort: "skatenight123" hinzugefügt
+ * werden.
  */
-public class AdminRoleAuthTest extends AuthenticatedAndroidTestCase {
-    public static String ADMIN_MAIL = "martin.wrod@googlemail.com";
-    public static String TEST_MAIL = "skatenight.dev@gmail.com";
+public class RoleControllerTest extends AuthenticatedAndroidTestCase {
+    public static String ADMIN_MAIL = "skatenight.host@gmail.com";
+    public static String TEST_MAIL = "skatenight.user1@gmail.com";
+    public static List<String> TEST_MAILS = Arrays.asList(ADMIN_MAIL, TEST_MAIL);
 
     public static final GlobalRole TEST_ROLE = GlobalRole.ADMIN;
 
@@ -49,7 +45,7 @@ public class AdminRoleAuthTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Boolean result) {
                 createSignal.countDown();
             }
-        }, TEST_MAIL, "", "", null);
+        }, TEST_MAIL, "", "");
         assertTrue(createSignal.await(30, TimeUnit.SECONDS));
 
         changeAccount(ADMIN_MAIL);
@@ -90,9 +86,6 @@ public class AdminRoleAuthTest extends AuthenticatedAndroidTestCase {
         }, TEST_MAIL, TEST_ROLE);
         assertTrue(assignSignal.await(30, TimeUnit.SECONDS));
 
-        // Server zum aktualisieren Zeit lasen
-        Thread.sleep(500);
-
         final CountDownLatch getSignal = new CountDownLatch(1);
         UserController.getFullUser(new ExtendedTaskDelegateAdapter<Void, EndUser>() {
             @Override
@@ -105,7 +98,7 @@ public class AdminRoleAuthTest extends AuthenticatedAndroidTestCase {
     }
 
     /**
-     * Prüft, ob globale Administratoren richtig abgerufen werden.
+     * Prüft, ob die im Test genutzten Administratoren richtig abgerufen werden.
      *
      * @throws InterruptedException
      */
@@ -120,18 +113,15 @@ public class AdminRoleAuthTest extends AuthenticatedAndroidTestCase {
         }, TEST_MAIL, TEST_ROLE);
         assertTrue(assignSignal.await(30, TimeUnit.SECONDS));
 
-        final List<String> adminMails = Arrays.asList(TEST_MAIL, ADMIN_MAIL);
         final CountDownLatch listSignal = new CountDownLatch(1);
         RoleController.listGlobalAdmins(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<UserListData> admins){
-                List<String> adminMailsRetrieved = new ArrayList<String>();
+                List<String> adminMailsServer = new ArrayList<String>();
                 for(UserListData admin : admins){
-                    adminMailsRetrieved.add(admin.getEmail());
+                    adminMailsServer.add(admin.getEmail());
                 }
-                assertEquals(adminMails.size(), adminMailsRetrieved.size());
-                assertTrue(adminMailsRetrieved.containsAll(adminMails)
-                        && adminMails.containsAll(adminMailsRetrieved));
+                assertTrue(adminMailsServer.containsAll(TEST_MAILS));
                 listSignal.countDown();
             }
         });

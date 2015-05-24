@@ -117,6 +117,8 @@
         <item>Aus Album auswählen</item>
         <item>Bild aufnehmen</item>
     </string-array>
+    <string name="first_name_too_short">Vorname muss mindestens 3 Zeichen lang sein</string>
+    <string name="email_not_chosed">E-Mail Adresse wurde nicht ausgewählt</string>
 
     <!-- Strings zu ProfileActivity -->
     <string name="group_tab">Gruppen</string>

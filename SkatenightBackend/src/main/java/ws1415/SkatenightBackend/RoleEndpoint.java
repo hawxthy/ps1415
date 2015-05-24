@@ -65,7 +65,7 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
 
             adminUsers = (List<EndUser>) pm.newQuery(q).execute(GlobalRole.ADMIN.getId());
             for(EndUser adminUser : adminUsers){
-                result.add(new UserEndpoint().getUserInfo(user, adminUser.getEmail(), true));
+                result.add(new UserEndpoint().getUserInfo(user, adminUser.getEmail()));
             }
             return result;
         } finally {

@@ -1,23 +1,36 @@
 package ws1415.common.controller;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
+import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.EndUser;
-import com.skatenight.skatenightAPI.model.Text;
 import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserListData;
 import com.skatenight.skatenightAPI.model.UserLocation;
-import com.skatenight.skatenightAPI.model.UserPicture;
 import com.skatenight.skatenightAPI.model.UserProfile;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import ws1415.common.model.Visibility;
+import ws1415.common.net.Constants;
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.util.ImageUtil;
 
 /**
  * Der UserController steuert den Datenfluss zwischen den Benutzerdaten und den View-Komponenten.
@@ -38,15 +51,12 @@ public class UserController {
      * @param handler
      * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void createUser(ExtendedTaskDelegate handler, String userMail, final String firstName, final String lastName, Bitmap picture) {
-        Text encodedPicture = new Text().setValue(null);
-        if(picture != null) encodedPicture = ImageUtil.EncodeBitmapToText(picture);
-        final Text pictureFinal = encodedPicture;
+    public static void createUser(ExtendedTaskDelegate handler, String userMail, final String firstName, final String lastName) {
         new ExtendedTask<String, Void, Boolean>(handler) {
             @Override
             protected Boolean doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().createUser(params[0], pictureFinal)
+                    return ServiceProvider.getService().userEndpoint().createUser(params[0])
                             .set("firstName", firstName)
                             .set("lastName", lastName)
                             .execute().getValue();
@@ -145,65 +155,21 @@ public class UserController {
     }
 
     /**
-     * Gibt das Profilbild eines Benutzers aus.
-     *
-     * @param handler
-     * @param userMail E-Mail Adresse des Benutzers
-     */
-    public static void getUserPicture(ExtendedTaskDelegate handler, final String userMail) {
-        new ExtendedTask<Void, Void, UserPicture>(handler) {
-            @Override
-            protected UserPicture doInBackground(Void... voids) {
-                try {
-                    return ServiceProvider.getService().userEndpoint().getUserPicture(userMail).execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    publishError("Profilbild konnte nicht abgerufen werden");
-                    return null;
-                }
-            }
-        }.execute();
-    }
-
-    /**
      * Listet Informationen der Benutzer auf, dessen E-Mail Adressen übergeben wurden.
      *
      * @param handler
      * @param userMails Liste der E-Mail Adressen der Benutzer
-     * @param withPicture true, falls Profilbilder mit abgerufen werden sollen, false andernfalls
      */
     @SuppressWarnings("unchecked")
-    public static void listUserInfo(ExtendedTaskDelegate handler, List<String> userMails, final Boolean withPicture) {
+    public static void listUserInfo(ExtendedTaskDelegate handler, List<String> userMails) {
         new ExtendedTask<List<String>, Void, List<UserListData>>(handler) {
             @Override
             protected List<UserListData> doInBackground(List<String>... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().listUserInfo(params[0], withPicture).execute().getItems();
+                    return ServiceProvider.getService().userEndpoint().listUserInfo(params[0]).execute().getItems();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Liste von Benutzern konnte nicht abgerufen werden");
-                    return null;
-                }
-            }
-        }.execute(userMails);
-    }
-
-    /**
-     * Listet die Profilbilder der Benutzer auf, dessen E-Mail Adressen übergeben wurden.
-     *
-     * @param handler
-     * @param userMails Liste der E-Mail Adressen der Benutzer
-     */
-    @SuppressWarnings("unchecked")
-    public static void listUserPicture(ExtendedTaskDelegate handler, List<String> userMails) {
-        new ExtendedTask<List<String>, Void, List<UserPicture>>(handler) {
-            @Override
-            protected List<UserPicture> doInBackground(List<String>... params) {
-                try {
-                    return ServiceProvider.getService().userEndpoint().listUserPicture(params[0]).execute().getItems();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    publishError("Liste von Profilbildern konnte nicht abgerufen werden");
                     return null;
                 }
             }
@@ -261,41 +227,17 @@ public class UserController {
      * @param optOutSearch
      * @param showPrivateGroups
      */
-    public static void updateUserProfile(ExtendedTaskDelegate handler, final UserInfo newInfo, final Boolean optOutSearch, final Visibility showPrivateGroups) {
+    public static void updateUserProfile(ExtendedTaskDelegate handler, final UserInfo newInfo,
+                                         final Boolean optOutSearch, final Visibility showPrivateGroups) {
         new ExtendedTask<Void, Void, UserInfo>(handler) {
             @Override
             protected UserInfo doInBackground(Void... voids) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().updateUserProfile(optOutSearch, showPrivateGroups.getId(), newInfo).execute();
+                    return ServiceProvider.getService().userEndpoint().updateUserProfile(optOutSearch,
+                            showPrivateGroups.getId(), newInfo).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Benutzerdaten konnten nicht geändert werden");
-                    return null;
-                }
-            }
-        }.execute();
-    }
-
-
-    /**
-     * Aktualisiert das Profilbild eines Benutzers.
-     *
-     * @param handler
-     * @param userMail E-Mail Adresse des Benutzers
-     * @param picture  Bitmap des neuen Profilbildes
-     */
-    public static void updateUserPicture(ExtendedTaskDelegate handler, final String userMail, final Bitmap picture) {
-        Text encodedImage = null;
-        if(picture != null) encodedImage = ImageUtil.EncodeBitmapToText(picture);
-        final Text encodedImageFinal = encodedImage;
-        new ExtendedTask<Void, Void, Void>(handler) {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    return ServiceProvider.getService().userEndpoint().updateUserPicture(userMail, encodedImageFinal).execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    publishError("Profilbild konnte nicht geändert werden");
                     return null;
                 }
             }
@@ -392,5 +334,88 @@ public class UserController {
                 }
             }
         }.execute(userMail);
+    }
+
+    /**
+     * Aktualisiert das Profilbild eines Benutzers mit Hilfe des Blobstores.
+     *
+     * @param handler
+     * @param userMail E-Mail Adresse des Benutzers
+     * @param image Neues Profilbild
+     */
+    public static void uploadUserPicture(ExtendedTaskDelegate handler, final String userMail,
+                                         final InputStream image) {
+        new ExtendedTask<Void, Void, Boolean>(handler){
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                String uploadUrl;
+                try {
+                    uploadUrl = ServiceProvider.getService().userEndpoint().getUploadUrl().execute().getString();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Profilbild konnte nicht hochgeladen werden");
+                    return null;
+                }
+
+                try {
+                    HttpClient client = new DefaultHttpClient();
+                    HttpPost post = new HttpPost(uploadUrl);
+
+                    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+                    builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+                    builder.addPart("myFile", new InputStreamBody(image, "myFile"));
+                    builder.addTextBody("id", userMail);
+
+                    HttpEntity entity = builder.build();
+                    post.setEntity(entity);
+
+                    HttpResponse response = client.execute(post);
+                    HttpEntity httpEntity = response.getEntity();
+
+                    String encoding;
+                    if (httpEntity.getContentEncoding() == null) {
+                        // UTF-8 verwenden, falls keine Kodierung für die Antwort übertragen wurde
+                        encoding = "UTF-8";
+                    } else {
+                        encoding = httpEntity.getContentEncoding().getValue();
+                    }
+                    String answer = EntityUtils.toString(httpEntity, encoding);
+                    return answer.equals("true");
+                } catch (IOException e){
+                    e.printStackTrace();
+                    publishError("Profilbild konnte nicht hochgeladen werden");
+                    return null;
+                }
+            }
+        }.execute();
+    }
+
+    public static void getUserPicture(ExtendedTaskDelegate handler, final BlobKey pictureKey){
+        new ExtendedTask<Void, Void, Bitmap>(handler) {
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                ByteArrayInputStream is = null;
+                try {
+                    HttpClient client = new DefaultHttpClient();
+                    HttpGet get = new HttpGet(Constants.SERVER_URL + "/userImages/serve?key=" + pictureKey.getKeyString());
+                    HttpResponse response = client.execute(get);
+                    HttpEntity httpEntity = response.getEntity();
+
+                    is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
+                    return BitmapFactory.decodeStream(is);
+                } catch(Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    if (is != null) {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                return null;
+            }
+        }.execute();
     }
 }

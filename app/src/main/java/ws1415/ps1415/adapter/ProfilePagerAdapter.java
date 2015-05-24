@@ -1,5 +1,6 @@
 package ws1415.ps1415.adapter;
 
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -12,10 +13,12 @@ import ws1415.ps1415.fragment.ProfileGroupsFragment;
 import ws1415.ps1415.fragment.ProfileInfoFragment;
 
 /**
- * Created by Martin on 21.05.2015.
+ * Verwaltet die Fragmente auf dem Benutzerprofil.
+ *
+ * @author Martin Wrodarczyk
  */
 public class ProfilePagerAdapter extends FragmentStatePagerAdapter {
-    private List<Fragment> myTabs = new ArrayList<Fragment>();
+    private List<Fragment> myTabs = new ArrayList<>();
     String titles[];
 
     public ProfilePagerAdapter(FragmentManager fm, String[] titles) {
@@ -24,6 +27,10 @@ public class ProfilePagerAdapter extends FragmentStatePagerAdapter {
         myTabs.add(new ProfileGroupsFragment());
         myTabs.add(new ProfileInfoFragment());
         myTabs.add(new ProfileEventsFragment());
+    }
+
+    public void setItem(int index, Fragment fragment){
+        myTabs.set(index, fragment);
     }
 
     public ProfileGroupsFragment getGroupFragment(){
@@ -51,5 +58,11 @@ public class ProfilePagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         return myTabs.size();
+    }
+
+    @Override
+    public Parcelable saveState()
+    {
+        return null;
     }
 }

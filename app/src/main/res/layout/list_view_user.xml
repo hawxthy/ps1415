@@ -2,38 +2,45 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingBottom="20dp"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:paddingTop="20dp">
+    android:minHeight="72dp">
 
     <ImageView
         android:id="@+id/list_item_user_picture"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentLeft="true" />
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
 
-    <TextView
-        android:id="@+id/list_item_user_primary"
+    <LinearLayout
+        android:layout_toRightOf="@id/list_item_user_picture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/list_item_user_picture"
-        android:layout_marginTop="3dp"
-        android:paddingLeft="16dp"
-        android:text="Primary Text"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:layout_alignWithParentIfMissing="true">
 
-    <TextView
-        android:id="@+id/list_item_user_secondary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/list_item_user_primary"
-        android:layout_toRightOf="@id/list_item_user_picture"
-        android:paddingLeft="16dp"
-        android:text="Secondary Text"
-        android:fontFamily="sans-serif-light"
-        android:textSize="14sp" />
+        <TextView
+            android:id="@+id/list_item_user_primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Primary Text"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/list_item_user_secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Secondary Text"
+            android:fontFamily="sans-serif-light"
+            android:textSize="15sp" />
+    </LinearLayout>
+
 
 </RelativeLayout>

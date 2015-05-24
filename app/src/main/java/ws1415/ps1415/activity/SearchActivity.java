@@ -23,6 +23,11 @@ import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.UserListAdapter;
 
+/**
+ * Diese Activity wird dafür genutzt, um das Ergebnis einer Benutzersuche anzuzeigen.
+ *
+ * @author Martin Wrodarczyk
+ */
 public class SearchActivity extends BaseActivity {
     private ListView mResultListView;
     private UserListAdapter mAdapter;
@@ -57,7 +62,7 @@ public class SearchActivity extends BaseActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             setProgressBarIndeterminateVisibility(Boolean.TRUE);
             final String query = intent.getStringExtra(SearchManager.QUERY);
-
+            setTitle(query);
             UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<String>>(){
                 @Override
                 public void taskDidFinish(ExtendedTask task, final List<String> stringList) {
@@ -67,22 +72,9 @@ public class SearchActivity extends BaseActivity {
                         mAdapter = null;
                         mResultListView.setAdapter(mAdapter);
                     } else {
-                        UserController.listUserInfo(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
-                            @Override
-                            public void taskDidFinish(ExtendedTask task, List<UserListData> userListDatas) {
-                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                                setUpList(stringList, userListDatas);
-                            }
-
-                            @Override
-                            public void taskFailed(ExtendedTask task, String message) {
-                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                                Toast.makeText(SearchActivity.this, message, Toast.LENGTH_LONG).show();
-                            }
-                        }, stringList, true);
+                        listUserInfo(stringList);
                     }
                 }
-
                 @Override
                 public void taskFailed(ExtendedTask task, String message) {
                     setProgressBarIndeterminateVisibility(Boolean.FALSE);
@@ -90,6 +82,26 @@ public class SearchActivity extends BaseActivity {
                 }
             }, query);
         }
+    }
+
+    /**
+     * Ruft die Informationen der Benutzer zu dem Ergebnis der Suche ab.
+     *
+     * @param stringList Ergebnis der Suche
+     */
+    private void listUserInfo(final List<String> stringList) {
+        UserController.listUserInfo(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserListData> userListDatas) {
+                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                setUpList(stringList, userListDatas);
+            }
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                Toast.makeText(SearchActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        }, stringList);
     }
 
     /**

@@ -1,5 +1,6 @@
 package ws1415.SkatenightBackend.model;
 
+import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.datanucleus.annotations.Unowned;
 
 import java.util.ArrayList;
@@ -25,10 +26,10 @@ public class EndUser {
     private Boolean optOutSearch;
     @Persistent
     private Integer showPrivateGroups;
+    @Persistent
+    private BlobKey pictureBlobKey;
     @Unowned
     private UserInfo userInfo;
-    @Unowned
-    private UserPicture userPicture;
     @Unowned
     private UserLocation userLocation;
     @Persistent
@@ -41,11 +42,10 @@ public class EndUser {
     public EndUser() {
     }
 
-    public EndUser(String email, UserLocation userLocation, UserInfo userInfo, UserPicture userPicture) {
+    public EndUser(String email, UserLocation userLocation, UserInfo userInfo) {
         this.email = email;
         this.userLocation = userLocation;
         this.userInfo = userInfo;
-        this.userPicture = userPicture;
         globalRole = GlobalRole.USER.getId();
         optOutSearch = false;
         showPrivateGroups = Visibility.PUBLIC.getId();
@@ -94,20 +94,20 @@ public class EndUser {
         this.userLocation = userLocation;
     }
 
+    public BlobKey getPictureBlobKey() {
+        return pictureBlobKey;
+    }
+
+    public void setPictureBlobKey(BlobKey pictureBlobKey) {
+        this.pictureBlobKey = pictureBlobKey;
+    }
+
     public UserInfo getUserInfo() {
         return userInfo;
     }
 
     public void setUserInfo(UserInfo userInfo) {
         this.userInfo = userInfo;
-    }
-
-    public UserPicture getUserPicture() {
-        return userPicture;
-    }
-
-    public void setUserPicture(UserPicture userPicture) {
-        this.userPicture = userPicture;
     }
 
     public List<String> getMyUserGroups() {

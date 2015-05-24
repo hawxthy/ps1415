@@ -1,4 +1,4 @@
-package ws1415.ps1415.authTest;
+package ws1415.ps1415.controller;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,18 +12,22 @@ import java.util.List;
 import ws1415.AuthenticatedAndroidTestCase;
 import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
-import ws1415.ps1415.controller.MessageDbController;
 import ws1415.ps1415.model.Conversation;
 import ws1415.ps1415.model.LocalMessageType;
 import ws1415.ps1415.model.Message;
 
 /**
- * Created by Martin on 23.05.2015.
+ * Diese Testklasse wird dazu genutzt die Funktionalitäten des Controllers für die Zugriffe
+ * auf die Nachrichtendatenbank zu testen.
+ *
+ * Der aufgeführte E-Mail Account "skatenight.user1@gmail.com" muss zum Testen auf dem Gerät
+ * registriert sein. Dazu muss dieser in den Einstellungen des Gerätes mit dem Passwort:
+ * "skatenight123" hinzugefügt werden.
  */
 public class MessageDbControllerTest extends AuthenticatedAndroidTestCase{
     private static boolean initialized = false;
 
-    public static final String TEST_MAIL = "test@gmail.com";
+    public static final String TEST_MAIL = "skatenight.user1@gmail.com";
     public static final String TEST_FIRST_NAME = "Martin";
     public static final String TEST_LAST_NAME = "Müller";
 
@@ -33,7 +37,6 @@ public class MessageDbControllerTest extends AuthenticatedAndroidTestCase{
 
     public static final String TEST_NEW_FIRST_NAME = "Peter";
     public static final String TEST_NEW_LAST_NAME = "Meier";
-    public static final int TEST_NEW_COUNT_NEW_MESSAGES = 3;
 
     public static final String TEST_MAIL_PICTURE = "test3@gmail.com";
 
@@ -51,7 +54,9 @@ public class MessageDbControllerTest extends AuthenticatedAndroidTestCase{
     private static final List<Conversation> TEST_LIST_CONVERSATIONS = Arrays.asList(TEST_CONVERSATION, TEST_CONVERSATION_2);
 
     @Override
-    public void setUp(){
+    public void setUp() throws Exception {
+        super.setUp();
+        changeAccount(TEST_MAIL);
         dbController = MessageDbController.getInstance(getContext());
 
         if(!initialized) {

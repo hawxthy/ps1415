@@ -1,10 +1,11 @@
 package ws1415.SkatenightBackend.transport;
 
+import com.google.appengine.api.blobstore.BlobKey;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.SkatenightBackend.model.UserInfo;
-import ws1415.SkatenightBackend.model.UserPicture;
 
 /**
  * Die UserProfile-Klasse ist für die Übertragung der Nutzerprofildaten an die Anwendung
@@ -16,18 +17,17 @@ public class UserProfile{
     private String email;
     private boolean optOutSearch;
     private Integer showPrivateGroups;
+    private BlobKey userPicture;
     private UserInfo userInfo;
-    private UserPicture userPicture;
     private List<UserGroupMetaData> myUserGroups;
     private List<EventMetaData> myEvents;
 
     public UserProfile(){
     }
 
-    public UserProfile(String email, UserInfo userInfo, UserPicture userPicture) {
+    public UserProfile(String email, UserInfo userInfo) {
         this.email = email;
         this.userInfo = userInfo;
-        this.userPicture = userPicture;
         myUserGroups = new ArrayList<>();
         myEvents = new ArrayList<>();
     }
@@ -56,20 +56,20 @@ public class UserProfile{
         this.optOutSearch = optOutSearch;
     }
 
+    public BlobKey getUserPicture() {
+        return userPicture;
+    }
+
+    public void setUserPicture(BlobKey userPicture) {
+        this.userPicture = userPicture;
+    }
+
     public UserInfo getUserInfo() {
         return userInfo;
     }
 
     public void setUserInfo(UserInfo userInfo) {
         this.userInfo = userInfo;
-    }
-
-    public UserPicture getUserPicture() {
-        return userPicture;
-    }
-
-    public void setUserPicture(UserPicture userPicture) {
-        this.userPicture = userPicture;
     }
 
     public List<UserGroupMetaData> getMyUserGroups() {

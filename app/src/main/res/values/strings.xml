@@ -117,12 +117,12 @@
     <string name="last_name_hint">Nachname</string>
     <string name="register">Register</string>
     <string name="profile_picture">Profile Picture</string>
-    <string name="set_email">Setze E-Mail</string>
     <string-array name="image_selection">
         <item>Choose out of album</item>
         <item>Take a picture</item>
     </string-array>
-    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="first_name_too_short">First name must be at least 3 characters long</string>
+    <string name="email_not_chosed">E-mail address has not been selected</string>
 
     <!-- Strings zu ProfileActivity -->
     <string name="group_tab">Groups</string>

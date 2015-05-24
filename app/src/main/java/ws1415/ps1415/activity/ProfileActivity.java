@@ -18,14 +18,12 @@ import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.EventMetaData;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 import com.skatenight.skatenightAPI.model.UserInfo;
-import com.skatenight.skatenightAPI.model.UserPicture;
 import com.skatenight.skatenightAPI.model.UserProfile;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -40,10 +38,15 @@ import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.ProfilePagerAdapter;
 import ws1415.ps1415.util.UniversalUtil;
+import ws1415.ps1415.util.UserImageLoader;
 import ws1415.ps1415.widget.SlidingTabLayout;
 
 public class ProfileActivity extends FragmentActivity{
     public static final SimpleDateFormat DATE_OF_BIRTH_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
+
+    // Für das Wiederherstellen einer Activity
+    private static final String STATE_EMAIL = "email";
+
     // Für das TabLayout
     private ViewPager mViewPager;
     private SlidingTabLayout mTabs;
@@ -56,18 +59,27 @@ public class ProfileActivity extends FragmentActivity{
     private TextView mName;
     private TextView mDescription;
 
+    // Felder für die runtergeladenen Daten
     private UserProfile mUserProfile;
+    private Bitmap mUserPicture;
     private String email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Prüft ob der Benutzer eingeloggt ist
+        UniversalUtil.checkLogin(this);
+
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_profile);
 
+        if (savedInstanceState != null) {
+            email = savedInstanceState.getString(STATE_EMAIL);
+        }
+
         // Intent
         Intent intent = getIntent();
-        email = intent.getStringExtra("email");
+        if(intent != null) email = intent.getStringExtra("email");
 
         // Header initialisieren
         mPicture = (ImageView) findViewById(R.id.profile_picture);
@@ -79,19 +91,7 @@ public class ProfileActivity extends FragmentActivity{
 
         if(email != null) {
             setProgressBarIndeterminateVisibility(Boolean.TRUE);
-            UserController.getUserProfile(new ExtendedTaskDelegateAdapter<Void, UserProfile>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, UserProfile userProfile) {
-                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                    if(mAdapter != null) setUpProfile(userProfile);
-                }
-
-                @Override
-                public void taskFailed(ExtendedTask task, String message) {
-                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                    Toast.makeText(ProfileActivity.this, message, Toast.LENGTH_LONG).show();
-                }
-            }, email);
+            getUserProfile();
         }
 
         // Tab Layout initialisieren
@@ -119,6 +119,40 @@ public class ProfileActivity extends FragmentActivity{
         mViewPager.setCurrentItem(1);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putString(STATE_EMAIL, "email");
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        email = intent.getStringExtra("email");
+        if(email != null) {
+            setProgressBarIndeterminateVisibility(Boolean.TRUE);
+            getUserProfile();
+        }
+    }
+
+    // Lädt das Profil eines Benutzer vom Server runter
+    private void getUserProfile() {
+        UserController.getUserProfile(new ExtendedTaskDelegateAdapter<Void, UserProfile>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserProfile userProfile) {
+                if (mAdapter != null) {
+                    UserImageLoader.getInstance().displayImageFramed(userProfile.getUserPicture(), mPicture);
+                    setUpProfile(userProfile);
+                }
+                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+            }
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                Toast.makeText(ProfileActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        }, email);
+    }
+
     /**
      * Füllt das Profil mit den abgerufenen Daten.
      *
@@ -127,7 +161,6 @@ public class ProfileActivity extends FragmentActivity{
     private void setUpProfile(UserProfile userProfile) {
         mUserProfile = userProfile;
         UserInfo userInfo = userProfile.getUserInfo();
-        UserPicture userPicture = userProfile.getUserPicture();
         List<UserGroupMetaData> userGroups = userProfile.getMyUserGroups();
         userGroups = (userGroups == null) ? new ArrayList<UserGroupMetaData>() : userGroups;
         List<EventMetaData> events = userProfile.getMyEvents();
@@ -152,19 +185,13 @@ public class ProfileActivity extends FragmentActivity{
         mName.setText(fullName);
         setTitle(fullName);
 
-        // Profilbild setzen
-        if(userProfile.getUserPicture().getPicture() != null) {
-            Bitmap profilePicture = ImageUtil.DecodeTextToBitmap(userPicture.getPicture());
-            mPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(profilePicture));
-        }
-
         // Beschreibung setzen
         String description = userProfile.getUserInfo().getDescription().getValue();
         if(description != null) mDescription.setText(description);
 
         // Tab setzen
-        tabs[0] = tabs[0] + " (" + userGroups.size() + ")";
-        tabs[2] = tabs[2] + " (" + events.size() + ")";
+        tabs[0] = getString(R.string.group_tab) + " (" + userGroups.size() + ")";
+        tabs[2] = getString(R.string.events_tab) + " (" + events.size() + ")";
         mTabs.setViewPager(mViewPager);
 
         // Daten für Allgemeines sammeln und Fragment übergeben
@@ -179,6 +206,12 @@ public class ProfileActivity extends FragmentActivity{
         mAdapter.getGroupFragment().setUpData(userGroups);
     }
 
+    /**
+     * Sammelt Informationen um diese in der Liste anzuzeigen
+     *
+     * @param generalData Informationen, die angezeigt werden sollen
+     * @param userInfo Alle Informationen zu einem Benutzer
+     */
     private void setUpGeneralData(List<Entry<String, String>> generalData, UserInfo userInfo){
         String postalCode = userInfo.getPostalCode().getValue();
         String city = userInfo.getCity().getValue();
@@ -257,13 +290,9 @@ public class ProfileActivity extends FragmentActivity{
                 if(mUserProfile != null) {
                     Intent editIntent = new Intent(ProfileActivity.this, EditProfileActivity.class);
                     UserInfo userInfo = mUserProfile.getUserInfo();
-                    String userPicture = null;
-                    if(mUserProfile.getUserPicture().getPicture() != null) {
-                        userPicture = mUserProfile.getUserPicture().getPicture().getValue();
-                    }
                     // Da UserInfo nicht serialisierbar auf Client Seite und es auch nicht möglich ist es mit Json zu senden
                     editIntent.putExtra("email", userInfo.getEmail());
-                    editIntent.putExtra("userPicture", userPicture);
+                    editIntent.putExtra("userPicture", mUserProfile.getUserPicture().getKeyString());
                     editIntent.putExtra("firstName", userInfo.getFirstName());
                     editIntent.putExtra("gender", userInfo.getGender());
                     editIntent.putExtra("lastName", userInfo.getLastName().getValue());

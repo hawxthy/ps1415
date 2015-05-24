@@ -24,8 +24,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.InfoPair;
-import com.skatenight.skatenightAPI.model.Text;
 import com.skatenight.skatenightAPI.model.UserInfo;
 
 import java.io.File;
@@ -40,17 +40,28 @@ import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
+import ws1415.ps1415.util.UserImageLoader;
 
+/**
+ * Diese Activity wird zum Editieren eines Benutzerprofils genutzt. Dabei bekommt dieser über einen
+ * Intent die Informationen zu dem Benutzer.
+ *
+ * @author Martin Wrodarczyk
+ */
 public class EditProfileActivity extends Activity {
+    // RequestCodes für die ActivityOnResult-Methode
     private static final int REQUEST_CAMERA_CAPTURE = 101;
     private static final int REQUEST_PICTURE_CROP = 102;
     private static final int REQUEST_SELECT_PICTURE = 200;
 
+    // Zum Speichern der Daten, die über den Intent übergeben worden sind
     private UserInfo mUserInfo;
+    private BlobKey userPicture;
     private Bitmap mImage;
     private boolean mOptOutSearch;
     private Visibility mShowPrivateGroups;
 
+    // UI Komponenten
     private ImageView mImageViewPicture;
     private EditText mEditTextFirstName;
     private EditText mEditTextLastName;
@@ -67,10 +78,12 @@ public class EditProfileActivity extends Activity {
     private CheckBox mCheckBoxOptOut;
     private Spinner mSpinnerPrivateGroupsVisibility;
 
+    // Felder, die für den DatePicker für das Geburtsdatum genutzt werden
     Calendar DateOfBirthCal = Calendar.getInstance();
     private boolean dateSet;
     private boolean normalClose;
 
+    // Felder für das Verwalten einer Profilbildänderung
     private boolean changedPicture;
     private Uri pictureUri;
     private File tempFile;
@@ -114,12 +127,11 @@ public class EditProfileActivity extends Activity {
         mSpinnerDescriptionVisibility.setSelection(mUserInfo.getDescription().getVisibility());
         mCheckBoxOptOut.setChecked(mOptOutSearch);
         mSpinnerPrivateGroupsVisibility.setSelection(mShowPrivateGroups.getId());
-        if(mImage != null) {
-            mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(mImage));
-        }
-        else {
-            Bitmap bm = BitmapFactory.decodeResource(getResources(),
-                    R.drawable.default_picture);
+
+        if (userPicture != null) {
+            UserImageLoader.getInstance().displayImageFramed(userPicture, mImageViewPicture);
+        } else {
+            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_picture);
             mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
         }
 
@@ -130,10 +142,8 @@ public class EditProfileActivity extends Activity {
     }
 
     private void handleIntent(Intent intent) {
-        String userPicture = intent.getStringExtra("userPicture");
-        if (userPicture != null) {
-            mImage = ImageUtil.DecodeTextToBitmap(new Text().setValue(intent.getStringExtra("userPicture")));
-        }
+        String pictureString = intent.getStringExtra("userPicture");
+        userPicture = (pictureString == null) ? null : new BlobKey().setKeyString(pictureString);
         mUserInfo = new UserInfo();
         mUserInfo.setEmail(intent.getStringExtra("email"));
         mUserInfo.setFirstName(intent.getStringExtra("firstName"));
@@ -157,6 +167,13 @@ public class EditProfileActivity extends Activity {
         mShowPrivateGroups = Visibility.getValue(intent.getIntExtra("showPrivateGroups", 0));
     }
 
+    /**
+     * Beim Drücken des Profilbildes wird hier das Dialogauswahlfenster erstellt, bei dem
+     * man wählen kann, ob ein Bild aus dem Album wählen möchte, ein Bild aufnehmen will oder
+     * sein Profilbild löschen möchte. Dementsprechend werden dann die Activities gestartet.
+     *
+     * @param view
+     */
     public void setUpImageEdit(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(EditProfileActivity.this);
         builder.setTitle(R.string.profile_picture)
@@ -174,8 +191,7 @@ public class EditProfileActivity extends Activity {
                                 break;
                             case 2:
                                 mImage = null;
-                                Bitmap bm = BitmapFactory.decodeResource(getResources(),
-                                        R.drawable.default_picture);
+                                Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_picture);
                                 mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
                                 changedPicture = true;
                         }
@@ -210,6 +226,7 @@ public class EditProfileActivity extends Activity {
         }
     }
 
+    // Erstellt temporäre Datei um das gecroppte Bild zwischenzuspeichern
     private Uri createTempFile(){
         try {
             tempFile = File.createTempFile("crop", "png", Environment
@@ -220,6 +237,7 @@ public class EditProfileActivity extends Activity {
         return Uri.fromFile(tempFile);
     }
 
+    // Initialisiert das Geburtsdatum-Feld und setzt den Listener für den DatePicker
     private void setUpDateOfBirth() {
         try {
             if(mUserInfo.getDateOfBirth().getValue() != null) {
@@ -299,28 +317,28 @@ public class EditProfileActivity extends Activity {
                 if(!changedPicture) {
                     editDone();
                 } else {
-                    UserController.updateUserPicture(new ExtendedTaskDelegateAdapter<Void, Void>() {
-                        @Override
-                        public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                            editDone();
-                        }
-
-                        @Override
-                        public void taskFailed(ExtendedTask task, String message) {
-                            editFailed(message);
-                            super.taskFailed(task, message);
-                        }
-                    }, mUserInfo.getEmail(), mImage);
+                    uploadUserPicture();
                 }
             }
-
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 editFailed(message);
-                super.taskFailed(task, message);
             }
         }, mUserInfo, mOptOutSearch, mShowPrivateGroups);
 
+    }
+
+    private void uploadUserPicture() {
+        UserController.uploadUserPicture(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                editDone();
+            }
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                editFailed(message);
+            }
+        }, mUserInfo.getEmail(), ImageUtil.BitmapToInputStream(mImage));
     }
 
     private void editFailed(String message) {
@@ -332,7 +350,7 @@ public class EditProfileActivity extends Activity {
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
         Toast.makeText(EditProfileActivity.this, "Profilinformationen wurden geändert", Toast.LENGTH_LONG).show();
         Intent profile_intent = new Intent(EditProfileActivity.this, ProfileActivity.class);
-        profile_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        profile_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         profile_intent.putExtra("email", mUserInfo.getEmail());
         startActivity(profile_intent);
         finish();

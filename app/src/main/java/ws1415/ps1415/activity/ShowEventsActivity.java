@@ -1,6 +1,5 @@
 package ws1415.ps1415.activity;
 
-import android.accounts.AccountManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +8,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +24,6 @@ import java.util.Date;
 import java.util.List;
 
 import ws1415.common.gcm.GCMUtil;
-import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.task.QueryEventsTask;
@@ -34,8 +31,7 @@ import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.EventsCursorAdapter;
-import ws1415.ps1415.util.LocalGCMUtil;
-import ws1415.ps1415.util.PrefManager;
+import ws1415.ps1415.util.UniversalUtil;
 
 public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDelegate<Void, List<Event>> {
     /**
@@ -75,16 +71,9 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
 
         // SharePreferences skatenight.app laden
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        credential = GoogleAccountCredential.usingAudience(this, "server:client_id:" + Constants.WEB_CLIENT_ID);
 
-        if(PrefManager.getSelectedUserMail(context).equals("")){
-            context.startActivity(new Intent(this, RegisterActivity.class));
-            finish();
-        } else {
-            credential.setSelectedAccountName(PrefManager.getSelectedUserMail(context));
-            ServiceProvider.login(credential);
-            initGCM();
-        }
+        //Prüft ob der Benutzer eingeloggt ist
+        UniversalUtil.checkLogin(this);
 
         super.onCreate(savedInstanceState);
 
@@ -151,23 +140,6 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
         new QueryEventsTask(ShowEventsActivity.this).execute();
     }
 
-    private void initGCM() {
-        // GCM initialisieren
-        context = this;
-        if (GCMUtil.checkPlayServices(this)) {
-            gcm = GoogleCloudMessaging.getInstance(this);
-            regid = LocalGCMUtil.getRegistrationId(context);
-
-            if (regid.isEmpty()) {
-                LocalGCMUtil.registerInBackground(context, gcm);
-            } else {
-                LocalGCMUtil.sendRegistrationIdToBackend(regid);
-            }
-        } else {
-            Log.i(TAG, "No valid Google Play Services APK found.");
-        }
-    }
-
     /**
      * Setzt die Events in die Liste
      */
@@ -220,34 +192,5 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
     public void taskFailed(ExtendedTask task, String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
         setProgressBarIndeterminateVisibility(false);
-    }
-
-    /**
-     * Callback-Methode für den Account-Picker.
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQUEST_ACCOUNT_PICKER:
-                if (data != null && data.getExtras() != null) {
-                    String accountName = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
-                    if (accountName != null) {
-                        credential.setSelectedAccountName(accountName);
-
-                        // accountName in den SharedPreferences speichern
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString("accountName", accountName);
-                        editor.commit();
-
-                        ServiceProvider.login(credential);
-                        initGCM();
-
-                        Log.i(TAG, "User: " + ServiceProvider.getEmail() + " created.");
-                        PrefManager.setSelectedUserMail(context, ServiceProvider.getEmail());
-                    }
-                }
-                break;
-        }
     }
 }

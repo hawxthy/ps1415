@@ -54,6 +54,6 @@ public class Constants {
      * Definiert die Benutzer, der als Administrator beim Start der Servers erstellt werden sollen,
      * falls diese nicht bereits existiert.
      */
-    public static final String[] INITIAL_ADMINS = {"martin.wrod@googlemail.com",
+    public static final String[] INITIAL_ADMINS = {"skatenight.host@gmail.com", "martin.wrod@googlemail.com",
             "Bernd.Eissing@gmail.com", "richard-schulze@online.de"};
 }

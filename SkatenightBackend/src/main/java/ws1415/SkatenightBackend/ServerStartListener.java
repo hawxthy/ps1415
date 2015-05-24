@@ -1,8 +1,6 @@
 package ws1415.SkatenightBackend;
 
 
-import com.google.appengine.api.datastore.Text;
-
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.servlet.ServletContextEvent;
@@ -17,7 +15,7 @@ public class ServerStartListener implements ServletContextListener {
         for(String admin: Constants.INITIAL_ADMINS){
             PersistenceManager pm = JDOHelper.getPersistenceManagerFactory(
                     "transactions-optional").getPersistenceManager();
-            new UserEndpoint().createUser(admin, "", "", new Text(null));
+            new UserEndpoint().createUser(admin, "", "");
             try {
                 EndUser user = pm.getObjectById(EndUser.class, admin);
                 user.setGlobalRole(GlobalRole.ADMIN.getId());
