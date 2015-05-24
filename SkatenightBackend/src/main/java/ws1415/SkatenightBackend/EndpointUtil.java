@@ -53,7 +53,7 @@ public class EndpointUtil {
         }
         UserGroup group = new GroupEndpoint().getUserGroup(groupName);
         if(group == null){
-            throw new IllegalArgumentException("user group with submitted name could not be found");
+            throw new IllegalArgumentException("user group with submitted name "+groupName+ " could not be found");
         }
         return group;
     }
@@ -76,7 +76,7 @@ public class EndpointUtil {
      */
     public static void throwIfUserGroupAlreadyExists(String groupName){
         if(new GroupEndpoint().getUserGroupMetaData(groupName) != null){
-           throw new IllegalArgumentException("user group with submitted name already exists");
+           throw new IllegalArgumentException("user group with submitted name "+groupName+ " already exists");
         }
     }
 
@@ -100,7 +100,7 @@ public class EndpointUtil {
      */
     public static void throwIfNotCreatorOfUserGroup(UserGroup group, String email){
         if (!group.getCreator().equals(email)) {
-            throw new IllegalArgumentException("user is not creator of group");
+            throw new IllegalArgumentException("user "+email+ " is not creator of group");
         }
     }
 
@@ -143,7 +143,7 @@ public class EndpointUtil {
      * @throws IllegalAccessException
      */
     public static void throwIfNoRights(){
-        throw new IllegalArgumentException("the user doesn't have the needed rights to delete this user group");
+        throw new IllegalArgumentException("the user doesn't have the needed rights to do this action");
     }
 
     /**
@@ -155,7 +155,7 @@ public class EndpointUtil {
      */
     public static void throwIfUserAlreadyInGroup(UserGroup group, String email){
         if(group.getMemberRights().keySet().contains(email)){
-            throw new IllegalArgumentException("the user is already a member of they group");
+            throw new IllegalArgumentException("the user "+email+ " is already a member of they group");
         }
     }
 
@@ -181,7 +181,7 @@ public class EndpointUtil {
      */
     public static void throwIfUserNotInGroup(UserGroup group, String email){
         if(!group.getMemberRights().keySet().contains(email)){
-            throw new IllegalArgumentException("the submitted user is not part of this group "+group.getName());
+            throw new IllegalArgumentException("the submitted user "+email+ " is not part of this group "+group.getName());
         }
     }
 }

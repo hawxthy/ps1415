@@ -1,6 +1,7 @@
 package ws1415.common.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.common.net.ServiceProvider;
@@ -11,11 +12,11 @@ import ws1415.common.task.ExtendedTaskDelegate;
  * Created by Bernd Eissing on 02.05.2015.
  */
 public class RightController {
-    private RightController instance;
+    private static RightController instance;
 
     private RightController(){}
 
-    public RightController getInstance(){
+    public static RightController getInstance(){
         if(instance == null){
             instance = new RightController();
         }
@@ -77,7 +78,7 @@ public class RightController {
      * @param userNames Die EndUser
      * @param rightName Das Recht
      */
-    public void giveRightToUsers(ExtendedTaskDelegate handler, String groupName, final List<String> userNames, final String rightName){
+    public void giveRightToUsers(ExtendedTaskDelegate handler, String groupName, final ArrayList<String> userNames, final String rightName){
         new ExtendedTask<String, Void, Void>(handler){
             @Override
             protected Void doInBackground(String... params){
@@ -100,14 +101,15 @@ public class RightController {
      * @param userNames Die EndUser
      * @param rightNames Die Rechte
      */
-    public void giveRightsToUsers(ExtendedTaskDelegate handler, String groupName, final List<String> userNames, final List<String> rightNames){
+    public void giveRightsToUsers(ExtendedTaskDelegate handler, String groupName, ArrayList<String> userNames, final List<String> rightNames){
+        final ArrayList<String> users = userNames;
         new ExtendedTask<String, Void, Void>(handler){
             @Override
             protected Void doInBackground(String... params){
                 try{
-                    return ServiceProvider.getService().rightEndpoint().distributeRightsToUsers(params[0], rightNames, userNames).execute();
+                    return ServiceProvider.getService().rightEndpoint().distributeRightsToUsers(params[0], rightNames, users).execute();
                 }catch(IOException e){
-                    publishError("Das Recht konnt nicht verteilt werden");
+                    publishError("Das Recht konnte nicht verteilt werden");
                     return null;
                 }
             }
