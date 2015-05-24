@@ -137,8 +137,11 @@ public abstract class EventController {
                         BlobKey blobKey = new BlobKey();
                         blobKey.setKeyString(keyStrings[0]);
                         createdEvent.setIcon(blobKey);
+                        blobKey = new BlobKey();
+                        blobKey.setKeyString(keyStrings[1]);
+                        createdEvent.setHeaderImage(blobKey);
                         createdEvent.setImages(new LinkedList<BlobKey>());
-                        for (int i = 1; i < keyStrings.length; i++) {
+                        for (int i = 2; i < keyStrings.length; i++) {
                             blobKey = new BlobKey();
                             blobKey.setKeyString(keyStrings[i]);
                             createdEvent.getImages().add(blobKey);
@@ -146,7 +149,7 @@ public abstract class EventController {
                     } catch(IOException ex) {
                         // Bei Fehlern versuchen das bereits erstellte Picture-Objekt zu löschen
                         try {
-                            ServiceProvider.getService().galleryEndpoint().deletePicture(createdEvent.getId()).execute();
+                            ServiceProvider.getService().eventEndpoint().deleteEvent(createdEvent.getId()).execute();
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

@@ -3,7 +3,6 @@ package ws1415.SkatenightBackend.transport;
 import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.SkatenightBackend.model.GroupMetaData;
 import ws1415.SkatenightBackend.model.UserInfo;
 import ws1415.SkatenightBackend.model.UserPicture;
 
@@ -19,7 +18,7 @@ public class UserProfile{
     private Integer showPrivateGroups;
     private UserInfo userInfo;
     private UserPicture userPicture;
-    private List<GroupMetaData> myUserGroups;
+    private List<UserGroupMetaData> myUserGroups;
     private List<EventMetaData> myEvents;
 
     public UserProfile(){
@@ -73,11 +72,11 @@ public class UserProfile{
         this.userPicture = userPicture;
     }
 
-    public List<GroupMetaData> getMyUserGroups() {
+    public List<UserGroupMetaData> getMyUserGroups() {
         return myUserGroups;
     }
 
-    public void setMyUserGroups(List<GroupMetaData> myUserGroups) {
+    public void setMyUserGroups(List<UserGroupMetaData> myUserGroups) {
         this.myUserGroups = myUserGroups;
     }
 

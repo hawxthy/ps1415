@@ -48,16 +48,17 @@ public class AuthenticatedAndroidTestCase extends AndroidTestCase {
      * @param email    E-Mail Adresse des Accounts, der ausgewählt wird.
      */
     public void changeAccount(String email) {
-        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(getContext(), "server:client_id:" + Constants.WEB_CLIENT_ID);
-        if (credential.getSelectedAccountName() == null) {
-            int i = 0;
-            for(Account account : credential.getAllAccounts()){
-                if(account.name.equals(email)){
-                    credential.setSelectedAccountName(account.name);
-                    selectedAccount = i;
-                }
-                i++;
+        int i = 0;
+        for(Account account : credential.getAllAccounts()){
+            if(account.name.equals(email)){
+                credential.setSelectedAccountName(account.name);
+                selectedAccount = i;
+                break;
             }
+            i++;
+        }
+        if (credential.getSelectedAccountName() == null || !credential.getSelectedAccountName().equals(email)) {
+            throw new IllegalArgumentException("email is not registered on device");
         }
         ServiceProvider.login(credential);
     }

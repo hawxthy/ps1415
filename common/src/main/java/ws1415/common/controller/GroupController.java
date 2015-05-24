@@ -5,7 +5,6 @@ import com.skatenight.skatenightAPI.model.Picture;
 import com.skatenight.skatenightAPI.model.BoardEntry;
 import com.skatenight.skatenightAPI.model.BooleanWrapper;
 import com.skatenight.skatenightAPI.model.UserGroup;
-import com.skatenight.skatenightAPI.model.UserGroupBlackBoard;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
 import com.skatenight.skatenightAPI.model.UserGroupPicture;
 

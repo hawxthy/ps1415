@@ -56,7 +56,7 @@ public class ImageStorageTestActivity extends BaseActivity {
                     public void taskDidFinish(ExtendedTask task, Picture picture) {
                         imageView.loadFromBlobKey(picture.getImageBlobKey());
                     }
-                }, 6321351656734720l);
+                }, 5751399832879104l);
             }
         });
     }

@@ -7,7 +7,6 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.BoardEntry;
-import com.skatenight.skatenightAPI.model.GroupMemberRights;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
 

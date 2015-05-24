@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.EventMetaData;
-import com.skatenight.skatenightAPI.model.GroupMetaData;
+import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserPicture;
 import com.skatenight.skatenightAPI.model.UserProfile;
@@ -128,8 +128,8 @@ public class ProfileActivity extends FragmentActivity{
         mUserProfile = userProfile;
         UserInfo userInfo = userProfile.getUserInfo();
         UserPicture userPicture = userProfile.getUserPicture();
-        List<GroupMetaData> userGroups = userProfile.getMyUserGroups();
-        userGroups = (userGroups == null) ? new ArrayList<GroupMetaData>() : userGroups;
+        List<UserGroupMetaData> userGroups = userProfile.getMyUserGroups();
+        userGroups = (userGroups == null) ? new ArrayList<UserGroupMetaData>() : userGroups;
         List<EventMetaData> events = userProfile.getMyEvents();
         events = (events == null) ? new ArrayList<EventMetaData>() : events;
 
@@ -139,8 +139,8 @@ public class ProfileActivity extends FragmentActivity{
         events.add(test);
         events.add(test);
 
-        GroupMetaData testGroup = new GroupMetaData();
-        testGroup.setMembers(Arrays.asList("test", "test2"));
+        UserGroupMetaData testGroup = new UserGroupMetaData();
+        testGroup.setMemberCount(2);
         testGroup.setName("Martin");
         userGroups.add(testGroup);
         userGroups.add(testGroup);

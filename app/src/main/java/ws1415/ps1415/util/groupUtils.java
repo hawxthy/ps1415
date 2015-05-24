@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.support.v4.app.FragmentActivity;
 
-import com.skatenight.skatenightAPI.model.GroupMemberRights;
 import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.util.List;

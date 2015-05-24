@@ -42,7 +42,7 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
         // Für diesen Test werden 2 Accounts benötigt, der erste Account muss ein Admin sein
         for (int i = 0; i < 2; i++) {
             if (!ServiceProvider.getService().userEndpoint().existsUser(getAccountMail(i)).execute().getValue()) {
-                ServiceProvider.getService().userEndpoint().createUser(getAccountMail(i)).execute();
+                ServiceProvider.getService().userEndpoint().createUser(getAccountMail(i), null).set("firstName", "").set("lastName", "").execute();
             }
         }
         if (!ServiceProvider.getService().roleEndpoint().isAdmin(getAccountMail(0)).execute().getValue()) {

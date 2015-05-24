@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.skatenight.skatenightAPI.model.GroupMetaData;
+import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class ProfileGroupsFragment extends Fragment {
      *
      * @param data Informationen
      */
-    public void setUpData(List<GroupMetaData> data){
+    public void setUpData(List<UserGroupMetaData> data){
         if(this.getActivity() != null) mAdapter = new ProfileGroupAdapter(data, this.getActivity());
         if(mGroupListView != null) mGroupListView.setAdapter(mAdapter);
     }

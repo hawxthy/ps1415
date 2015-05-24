@@ -51,8 +51,9 @@ public class Constants {
     public static final String GCM_API_KEY = "AIzaSyDO8mosWwYXjjGZ9besu9CZw1LDEEXrFXE";
 
     /**
-     * Definiert den Benutzer, der als Administrator beim Start der Servers erstellt werden soll,
-     * falls dieser nicht bereits existiert.
+     * Definiert die Benutzer, der als Administrator beim Start der Servers erstellt werden sollen,
+     * falls diese nicht bereits existiert.
      */
-    public static final String FIRST_ADMIN = "richard-schulze@online.de";
+    public static final String[] INITIAL_ADMINS = {"martin.wrod@googlemail.com",
+            "Bernd.Eissing@gmail.com", "richard-schulze@online.de"};
 }

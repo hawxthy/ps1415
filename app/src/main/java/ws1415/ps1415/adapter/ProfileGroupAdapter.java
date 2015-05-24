@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.skatenight.skatenightAPI.model.GroupMetaData;
+import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +20,11 @@ import ws1415.ps1415.R;
  * @author Martin Wrodarczyk
  */
 public class ProfileGroupAdapter extends BaseAdapter {
-    private List<GroupMetaData> mData = new ArrayList<>();
+    private List<UserGroupMetaData> mData = new ArrayList<>();
     private LayoutInflater mInflater;
     private Context mContext;
 
-    public ProfileGroupAdapter(List<GroupMetaData> data, Context context){
+    public ProfileGroupAdapter(List<UserGroupMetaData> data, Context context){
         mData = data;
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -36,7 +36,7 @@ public class ProfileGroupAdapter extends BaseAdapter {
     }
 
     @Override
-    public GroupMetaData getItem(int i) {
+    public UserGroupMetaData getItem(int i) {
         return mData.get(i);
     }
 
@@ -64,9 +64,8 @@ public class ProfileGroupAdapter extends BaseAdapter {
             holder = (Holder)convertView.getTag();
         }
 
-        GroupMetaData item = getItem(i);
-        if(item.getMembers() == null) item.setMembers(new ArrayList<String>());
-        String secondaryText = mContext.getString(R.string.members) + ": " + item.getMembers().size();
+        UserGroupMetaData item = getItem(i);
+        String secondaryText = mContext.getString(R.string.members) + ": " + item.getMemberCount();
 
         holder.primaryText.setText(item.getName());
         holder.secondaryText.setText(secondaryText);
