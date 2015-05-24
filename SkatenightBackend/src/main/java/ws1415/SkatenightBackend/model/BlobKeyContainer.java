@@ -5,7 +5,7 @@ import com.google.appengine.api.blobstore.BlobKey;
 import java.util.List;
 
 /**
- * Repräsentiert eine Entity, die BlobKeys enthält. BlobKeyContainer können vom BlobstoreUploadHandler
+ * Repräsentiert eine Entity, die BlobKeys enthält. BlobKeyContainer können vom BlobstoreHandler
  * verarbeitet werden.
  * @author Richard Schulze
  */

@@ -33,6 +33,20 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
     private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
     /**
+     * Ruft die Gallery mit der angegebenen ID ab.
+     * @param user         Der Benutzer, der die Gallery abrufen möchte.
+     * @param galleryId    Die ID der abzurufenden Gallery.
+     * @return Die Gallery mit der angegebenen ID.
+     */
+    public Gallery getGallery(User user, @Named("galleryId") long galleryId) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        // TODO Rechte des Benutzers prüfen
+        return ofy().load().type(Gallery.class).id(galleryId).safe();
+    }
+
+    /**
      * Erstellt eine Gallery und fügt sie dem Container hinzu, der im Gallery-Objekt angegeben ist.
      * @param user           Der Benutzer, der die Gallery erstellt.
      * @param gallery        Die zu erstellende Gallery.
@@ -50,6 +64,9 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         }
         if (gallery.getTitle() == null || gallery.getTitle().isEmpty()) {
             throw new IllegalArgumentException("title can not be empty");
+        }
+        if (gallery.getContainerClass() == null || gallery.getContainerClass().isEmpty()) {
+            throw new IllegalArgumentException("container class can not be empty");
         }
 
         // Container abrufen und Rechte prüfen
@@ -73,13 +90,22 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
      * @return Die editierte Gallery.
      */
     public Gallery editGallery(User user, Gallery gallery) throws OAuthRequestException {
-        // TODO: Problem, wenn das Gallery-Objekt geänderte Container-Daten enthält
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
         if (gallery.getId() == null) {
             throw new IllegalArgumentException("gallery has to be created first");
         }
+
+        // Sicherstellen, dass die Container-Daten nicht geändert werden
+        Gallery oldGallery = ofy().load().type(Gallery.class).id(gallery.getId()).safe();
+        if (!oldGallery.getContainerClass().equals(gallery.getContainerClass())) {
+            throw new IllegalArgumentException("container class can not be changed");
+        }
+        if (oldGallery.getContainerId() != gallery.getContainerId()) {
+            throw new IllegalArgumentException("container id can not be changed");
+        }
+
         GalleryContainer container = (GalleryContainer) ofy().load().kind(gallery.getContainerClass()).id(gallery.getContainerId()).safe();
         if (!container.canEditGallery(user)) {
             throw new OAuthRequestException("insufficient privileges");
@@ -128,6 +154,7 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
             throw new OAuthRequestException("no user submitted");
         }
 
+        // TODO Filtern nach Gallery implementieren
         Query<Picture> q = ofy().load().group(PictureMetaData.class).type(Picture.class).limit(viewOptions.getLimit());
         if (viewOptions.getCursorString() != null) {
             q = q.startAt(Cursor.fromWebSafeString(viewOptions.getCursorString()));
@@ -148,7 +175,7 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
 
     /**
      * Erstellt ein Picture-Objekt, das zunächst ohne BlobKey zurück gegeben wird. Das Picture-Objekt enthält
-     * eine Upload-URL, über die das Bild anschließend hochgeladen werden kann. Der BlobstoreUploadHandler
+     * eine Upload-URL, über die das Bild anschließend hochgeladen werden kann. Der BlobstoreHandler
      * sorgt dafür, dass der BlobKey in dem Picture-Objekt gesetzt wird, sobald das Bild im Blobstore
      * gespeichert wurde. Er erstellt ebenfalls ein Thumbnail für das Bild.
      * @param user           Der Benutzer, der das Bild erstellt.

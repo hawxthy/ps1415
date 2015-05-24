@@ -200,9 +200,11 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
         neuesEvent.setRoute(route2);
 
         InputStream iconInputStream = null;
+        InputStream headerImageInputStream = null;
         List<InputStream> imagesInputStreams = new LinkedList<>();
         try {
             iconInputStream = getClass().getClassLoader().getResourceAsStream("image/test.png");
+            headerImageInputStream = getClass().getClassLoader().getResourceAsStream("image/test.png");
             imagesInputStreams.add(getClass().getClassLoader().getResourceAsStream("image/test.png"));
             imagesInputStreams.add(getClass().getClassLoader().getResourceAsStream("image/test.png"));
             imagesInputStreams.add(getClass().getClassLoader().getResourceAsStream("image/test.png"));
@@ -244,11 +246,14 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
                 public void taskFailed(ExtendedTask task, String message) {
                     fail(message);
                 }
-            }, neuesEvent, iconInputStream, imagesInputStreams);
+            }, neuesEvent, iconInputStream, headerImageInputStream, imagesInputStreams);
             signal.await(10, TimeUnit.SECONDS);
         } finally {
             if (iconInputStream != null) {
                 iconInputStream.close();
+            }
+            if (headerImageInputStream != null) {
+                headerImageInputStream.close();
             }
             for (InputStream is : imagesInputStreams) {
                 is.close();

@@ -1,10 +1,10 @@
 package ws1415.common.component;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.skatenight.skatenightAPI.model.BlobKey;
@@ -13,21 +13,16 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
+import ws1415.common.R;
 import ws1415.common.net.Constants;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
 
 /**
  * Erweitert das Android-Widget ImageView um Funktionalität zum asynchronen Laden von Bildern aus
@@ -59,13 +54,18 @@ public class BlobKeyImageView extends ImageView implements ExtendedTaskDelegate<
             return;
         }
 
+        setImageResource(R.drawable.ic_action_loading);
+        Animation loading = AnimationUtils.loadAnimation(getContext(), R.anim.loading);
+        startAnimation(loading);
+
         new ExtendedTask<Void, Void, Drawable>(this) {
             @Override
             protected Drawable doInBackground(Void... params) {
+
                 ByteArrayInputStream is = null;
                 try {
                     HttpClient client = new DefaultHttpClient();
-                    HttpGet get = new HttpGet("https://skatenight-ms-testing.appspot.com/images/serve?key=" + blobKey.getKeyString());
+                    HttpGet get = new HttpGet(Constants.SERVER_URL + "/images/serve?key=" + blobKey.getKeyString());
                     HttpResponse response = client.execute(get);
                     HttpEntity httpEntity = response.getEntity();
 
@@ -94,10 +94,14 @@ public class BlobKeyImageView extends ImageView implements ExtendedTaskDelegate<
      */
     @Override
     public void taskDidFinish(ExtendedTask task, Drawable drawable) {
+        clearAnimation();
+        setRotation(0);
         setImageDrawable(drawable);
     }
     @Override
     public void taskDidProgress(ExtendedTask task, Void... progress) { }
     @Override
-    public void taskFailed(ExtendedTask task, String message) { }
+    public void taskFailed(ExtendedTask task, String message) {
+        clearAnimation();
+    }
 }

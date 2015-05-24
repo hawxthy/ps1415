@@ -31,6 +31,24 @@ import ws1415.common.task.ExtendedTaskDelegate;
 public abstract class GalleryController {
 
     /**
+     * Ruft die Gallery mit der angegebenen ID ab und übergibt sie dem Handler.
+     * @param handler      Der Handler, der die Gallery übergeben bekommt.
+     * @param galleryId    Die ID der abzurufenden Gallery.
+     */
+    public static void getGallery(ExtendedTaskDelegate<Void, Gallery> handler, final long galleryId) {
+        new ExtendedTask<Void, Void, Gallery>(handler) {
+            @Override
+            protected Gallery doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().galleryEndpoint().getGallery(galleryId).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.execute();
+    }
+
+    /**
      * Erstellt die angegebene Gallery auf dem Server.
      * @param handler    Der Handler, der die erstellte Gallery übergeben bekommt.
      * @param gallery    Die zu erstellende Gallery.

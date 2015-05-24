@@ -201,9 +201,10 @@ public class Event implements BlobKeyContainer, GalleryContainer {
 
     @Override
     public void consumeBlobKeys(List<BlobKey> keys) {
-        if (keys != null && !keys.isEmpty()) {
+        if (keys != null && keys.size() >= 2) {
             icon = keys.get(0);
-            images = new LinkedList<>(keys.subList(1, keys.size()));
+            headerImage = keys.get(1);
+            images = new LinkedList<>(keys.subList(2, keys.size()));
         }
     }
 

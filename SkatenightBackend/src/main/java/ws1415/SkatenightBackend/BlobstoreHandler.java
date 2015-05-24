@@ -26,10 +26,11 @@ import ws1415.SkatenightBackend.model.Picture;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
- * Nimmt POST-Anfragen für einen Upload in den Blobstore entgegen.
+ * Nimmt POST-Anfragen für einen Upload in den Blobstore entgegen und bietet Blobstore-Daten per GET
+ * anhand des BlobKeys an.
  * @author Richard Schulze
  */
-public class BlobstoreUploadHandler extends HttpServlet {
+public class BlobstoreHandler extends HttpServlet {
     private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
     /**
@@ -78,6 +79,18 @@ public class BlobstoreUploadHandler extends HttpServlet {
                 throw ex;
             }
         }
+    }
+
+    /**
+     * TODO Kommentieren
+     * @param req
+     * @param resp
+     * @throws IOException
+     */
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        BlobKey key = new BlobKey(req.getParameter("key"));
+        blobstoreService.serve(key, resp);
     }
 
 }

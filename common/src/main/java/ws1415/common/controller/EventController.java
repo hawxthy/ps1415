@@ -94,7 +94,8 @@ public abstract class EventController {
      * @param event      Das zu erstellende Event.
      */
     public static void createEvent(ExtendedTaskDelegate<Void, Event> handler, final Event event,
-                                   final InputStream icon, final List<InputStream> images) {
+                                   final InputStream icon, final InputStream headerImage,
+                                   final List<InputStream> images) {
         // TODO Ggf. Event auf Gültigkeit prüfen
 
         new ExtendedTask<Void, Void, Event>(handler) {
@@ -111,6 +112,7 @@ public abstract class EventController {
                         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
                         builder.addPart("files", new InputStreamBody(icon, "files"));
+                        builder.addPart("files", new InputStreamBody(headerImage, "files"));
                         for (InputStream is : images) {
                             builder.addPart("files", new InputStreamBody(is, "files"));
                         }
