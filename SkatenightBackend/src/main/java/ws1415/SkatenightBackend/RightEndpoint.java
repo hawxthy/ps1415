@@ -1,14 +1,18 @@
 package ws1415.SkatenightBackend;
 
+import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
+import ws1415.SkatenightBackend.transport.ListWrapper;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -85,15 +89,15 @@ public class RightEndpoint extends SkatenightServerEndpoint {
      * @throws OAuthRequestException
      * @throws IllegalArgumentException
      */
-    public void distributeRightToUsers(User user, @Named("groupName") String groupName, @Named("rightName") String rightName, @Named("userNames") ArrayList<String> userNames) throws OAuthRequestException {
+    public void distributeRightToUsers(User user, @Named("groupName") String groupName, @Named("rightName") String rightName, ListWrapper userNames) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
-            for (int i = 0; i < userNames.size(); i++) {
-                EndpointUtil.throwIfUserNotInGroup(group, userNames.get(i));
-                if (!group.getMemberRights().get(userNames.get(i)).contains(rightName) && isRight(rightName)) {
-                    group.getMemberRights().get(userNames.get(i)).add(rightName);
+            for (int i = 0; i < userNames.stringList.size(); i++) {
+                EndpointUtil.throwIfUserNotInGroup(group, userNames.stringList.get(i));
+                if (!group.getMemberRights().get(userNames.stringList.get(i)).contains(rightName) && isRight(rightName)) {
+                    group.getMemberRights().get(userNames.stringList.get(i)).add(rightName);
                 }
             }
             ofy().save().entity(group).now();

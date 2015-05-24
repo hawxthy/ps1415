@@ -1,5 +1,7 @@
 package ws1415.common.controller;
 
+import com.skatenight.skatenightAPI.model.ListWrapper;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,18 +80,18 @@ public class RightController {
      * @param userNames Die EndUser
      * @param rightName Das Recht
      */
-    public void giveRightToUsers(ExtendedTaskDelegate handler, String groupName, final ArrayList<String> userNames, final String rightName){
-        new ExtendedTask<String, Void, Void>(handler){
+    public void giveRightToUsers(ExtendedTaskDelegate handler, final String groupName, List<String> userNames, final String rightName){
+        new ExtendedTask<List<String>, Void, Void>(handler){
             @Override
-            protected Void doInBackground(String... params){
+            protected Void doInBackground(List<String>... params){
                 try{
-                    return ServiceProvider.getService().rightEndpoint().distributeRightToUsers(params[0], rightName, userNames).execute();
+                    return ServiceProvider.getService().rightEndpoint().distributeRightToUsers(groupName, rightName, new ListWrapper().setStringList(params[0])).execute();
                 }catch(IOException e){
                     publishError("Das Recht konnt nicht verteilt werden");
                     return null;
                 }
             }
-        }.execute(groupName);
+        }.execute(userNames);
     }
 
     /**
