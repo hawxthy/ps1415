@@ -60,15 +60,15 @@ public class RightEndpoint extends SkatenightServerEndpoint {
      * @throws OAuthRequestException
      * @throws IllegalArgumentException
      */
-    public void distributeRightsToUser(User user, @Named("groupName") String groupName, @Named("rightNames") ArrayList<String> rightNames, @Named("userName") String userName) throws OAuthRequestException {
+    public void distributeRightsToUser(User user, @Named("groupName") String groupName, ListWrapper rightNames, @Named("userName") String userName) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
             EndpointUtil.throwIfUserNotInGroup(group, userName);
-            for (int i = 0; i < rightNames.size(); i++) {
-                if (!group.getMemberRights().get(userName).contains(rightNames.get(i)) && isRight(rightNames.get(i))) {
-                    group.getMemberRights().get(userName).add(rightNames.get(i));
+            for (String right : rightNames.stringList) {
+                if (!group.getMemberRights().get(userName).contains(right) && isRight(right)) {
+                    group.getMemberRights().get(userName).add(right);
                     ofy().save().entity(group).now();
                 }
             }
@@ -94,10 +94,10 @@ public class RightEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
-            for (int i = 0; i < userNames.stringList.size(); i++) {
-                EndpointUtil.throwIfUserNotInGroup(group, userNames.stringList.get(i));
-                if (!group.getMemberRights().get(userNames.stringList.get(i)).contains(rightName) && isRight(rightName)) {
-                    group.getMemberRights().get(userNames.stringList.get(i)).add(rightName);
+            for (String userName : userNames.stringList) {
+                EndpointUtil.throwIfUserNotInGroup(group, userName);
+                if (!group.getMemberRights().get(userName).contains(rightName) && isRight(rightName)) {
+                    group.getMemberRights().get(userName).add(rightName);
                 }
             }
             ofy().save().entity(group).now();
@@ -119,16 +119,17 @@ public class RightEndpoint extends SkatenightServerEndpoint {
      * @throws OAuthRequestException
      * @throws IllegalArgumentException
      */
-    public void distributeRightsToUsers(User user, @Named("groupName") String groupName, @Named("rightNames")  ArrayList<String> rightNames, @Named("userNames") ArrayList<String> userNames) throws OAuthRequestException {
+    public void distributeRightsToUsers(User user, @Named("groupName") String groupName, ListWrapper rightNames, @Named("userNames") List<String> userNames) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
-            for (int i = 0; i < userNames.size(); i++) {
-                EndpointUtil.throwIfUserNotInGroup(group, userNames.get(i));
-                for (int j = 0; j < rightNames.size(); j++) {
-                    if (!group.getMemberRights().get(userNames.get(i)).contains(rightNames.get(j)) && isRight(rightNames.get(j))) {
-                        group.getMemberRights().get(userNames.get(i)).add(rightNames.get(j));
+            String[] users = userNames.get(0).split(",");
+            for (String member : users) {
+                EndpointUtil.throwIfUserNotInGroup(group, member);
+                for (String right : rightNames.stringList) {
+                    if (!group.getMemberRights().get(member).contains(right) && isRight(right)) {
+                        group.getMemberRights().get(member).add(right);
                     }
                 }
             }
@@ -177,13 +178,13 @@ public class RightEndpoint extends SkatenightServerEndpoint {
      * @param userName   Der EndUser dem Rechtw weggenommen werden sollen
      * @throws OAuthRequestException
      */
-    public void takeRightsFromUser(User user, @Named("groupName") String groupName, @Named("rightNames") List<String> rightNames, @Named("userName") String userName) throws OAuthRequestException {
+    public void takeRightsFromUser(User user, @Named("groupName") String groupName, ListWrapper rightNames, @Named("userName") String userName) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
             EndpointUtil.throwIfUserNotInGroup(group, userName);
-            for (String right : rightNames) {
+            for (String right : rightNames.stringList) {
                 if (!right.equals(Right.FULLRIGHTS.name()) && !right.equals(Right.NEWMEMBERRIGHTS.name()) && group.getMemberRights().get(userName).contains(right)) {
                     group.getMemberRights().get(userName).remove(right);
                 }
@@ -207,12 +208,12 @@ public class RightEndpoint extends SkatenightServerEndpoint {
      * @throws OAuthRequestException
      * @throws IllegalArgumentException
      */
-    public void takeRightFromUsers(User user, @Named("groupName") String groupName, @Named("rightName") String rightName, @Named("userNames") List<String> userNames) throws OAuthRequestException {
+    public void takeRightFromUsers(User user, @Named("groupName") String groupName, @Named("rightName") String rightName, ListWrapper userNames) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
-            for (String member : userNames) {
+            for (String member : userNames.stringList) {
                 EndpointUtil.throwIfUserNotInGroup(group, member);
                 if (!rightName.equals(Right.FULLRIGHTS.name()) && !rightName.equals(Right.NEWMEMBERRIGHTS.name()) && group.getMemberRights().get(member).contains(rightName)) {
                     group.getMemberRights().get(member).remove(rightName);
@@ -237,14 +238,15 @@ public class RightEndpoint extends SkatenightServerEndpoint {
      * @throws OAuthRequestException
      * @throws IllegalArgumentException
      */
-    public void takeRightsFromUsers(User user, @Named("groupName") String groupName, @Named("rightNames") List<String> rightNames, @Named("userNames") List<String> userNames) throws OAuthRequestException {
+    public void takeRightsFromUsers(User user, @Named("groupName") String groupName, ListWrapper rightNames, @Named("userNames") List<String> userNames) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
-            for (String member : userNames) {
+            String[] users = userNames.get(0).split(",");
+            for (String member : users) {
                 EndpointUtil.throwIfUserNotInGroup(group, member);
-                for (String right : rightNames) {
+                for (String right : rightNames.stringList) {
                     if (!right.equals(Right.FULLRIGHTS.name()) && !right.equals(Right.NEWMEMBERRIGHTS.name()) && group.getMemberRights().get(member).contains(right)) {
                         group.getMemberRights().get(member).remove(right);
                     }
@@ -254,6 +256,34 @@ public class RightEndpoint extends SkatenightServerEndpoint {
         } else {
             EndpointUtil.throwIfNoRights();
         }
+    }
+
+    /**
+     * Ändert den Leader der Nutzergruppe, das heißt die Person mit dem Recht
+     * FULLRIGHTS ändert sich. Der neue Leader newLeader bekommt das Recht
+     * FULLRIGHTS und der alte Leader bekommt statt dessen das Recht
+     * NEWMEMBERRIGHTS.
+     *
+     * @param user Der Aufrufer, der den Leader ändern möchte
+     * @param groupName Der Name der Nutzergruppe
+     * @param newLeader Der neue Leader
+     * @throws OAuthRequestException
+     */
+    public void changeLeader(User user, @Named("groupName") String groupName, @Named("newLeader") String newLeader) throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        EndpointUtil.throwIfEndUserNotExists(newLeader);
+        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        if(hasRights(group, user.getEmail(), Right.FULLRIGHTS.name())){
+            EndpointUtil.throwIfUserNotInGroup(group, newLeader);
+            group.getMemberRights().get(user.getEmail()).remove(Right.FULLRIGHTS.name());
+            group.getMemberRights().get(user.getEmail()).add(Right.NEWMEMBERRIGHTS.name());
+            group.getMemberRights().get(newLeader).remove(Right.NEWMEMBERRIGHTS.name());
+            group.getMemberRights().get(newLeader).add(Right.FULLRIGHTS.name());
+        }else{
+            EndpointUtil.throwIfNoRights();
+        }
+        ofy().save().entity(group).now();
     }
 
 
