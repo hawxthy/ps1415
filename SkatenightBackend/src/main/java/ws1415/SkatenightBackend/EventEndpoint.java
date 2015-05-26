@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -23,6 +24,7 @@ import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
+import ws1415.SkatenightBackend.model.DynamicField;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.EventRole;
@@ -30,6 +32,7 @@ import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Privilege;
 import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.UserLocation;
+import ws1415.SkatenightBackend.transport.EventData;
 import ws1415.SkatenightBackend.transport.EventMetaData;
 import ws1415.SkatenightBackend.transport.EventParticipationData;
 
@@ -40,6 +43,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * @author Richard Schulze
  */
 public class EventEndpoint extends SkatenightServerEndpoint {
+    private static final Logger log = Logger.getLogger(EventEndpoint.class.getName());
+
     private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
     /**
@@ -95,8 +100,8 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param eventId    Die Id des abzurufenden Events.
      * @return Das Event-Objekt inklusive aller Daten.
      */
-    public Event getEvent(@Named("eventId") long eventId) {
-        return ofy().load().type(Event.class).id(eventId).safe();
+    public EventData getEvent(@Named("eventId") long eventId) {
+        return new EventData(ofy().load().type(Event.class).id(eventId).safe());
     }
 
     /**
@@ -284,7 +289,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param email die E-Mail des Teilnehmers
      */
     public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
-        Event event = getEvent(keyId);
+        Event event = ofy().load().type(Event.class).id(keyId).safe();
         Set<String> memberKeys = event.getMemberList().keySet();
         if (!memberKeys.contains(email)) {
             event.getMemberList().put(email, EventRole.PARTICIPANT);
@@ -331,7 +336,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param email Die E-Mail des Members
      */
     public void removeMemberFromEvent(@Named("id") long keyId, @Named("email") String email) {
-        Event event = getEvent(keyId);
+        Event event = ofy().load().type(Event.class).id(keyId).safe();
 
         Set<String> memberKeys = event.getMemberList().keySet();
         if (memberKeys.contains(email)) {
@@ -347,7 +352,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @return List von Teilnehmern
      */
     public List<EndUser> getMembersFromEvent(@Named("id") long keyId) {
-        Event event = getEvent(keyId);
+        Event event = ofy().load().type(Event.class).id(keyId).safe();
 
         List<EndUser> endUsers = new ArrayList<>(event.getMemberList().size());
         for (String email: event.getMemberList().keySet()) {
@@ -363,7 +368,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @return
      */
     public List<UserLocation> getMemberLocationsFromEvent(@Named("id") long keyId) {
-        Event event = getEvent(keyId);
+        Event event = ofy().load().type(Event.class).id(keyId).safe();
 
         List<UserLocation> userLocations = new ArrayList<>();
         for (String email: event.getMemberList().keySet()) {
@@ -417,7 +422,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             // Events nocheinmal abrufen, da die Route nicht vollständig über ein QUery abgerufen werden kann
             List<Event> events = new ArrayList<>();
             for (Event e : result) {
-                events.add(getEvent(e.getId()));
+                events.add(ofy().load().type(Event.class).id(e.getId()).safe());
             }
             return events;
         } else {

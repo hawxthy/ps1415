@@ -1,6 +1,7 @@
 package ws1415.common.task;
 
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.EventData;
 
 import java.io.IOException;
 
@@ -13,9 +14,9 @@ import ws1415.common.net.ServiceProvider;
  *
  * Created by Bernd Eissing, Martin Wrodarczyk on 04.11.2014.
  */
-public class GetEventTask extends ExtendedTask<Long, Void, Event> {
+public class GetEventTask extends ExtendedTask<Long, Void, EventData> {
 
-    public GetEventTask(ExtendedTaskDelegate<Void, Event> delegate) {
+    public GetEventTask(ExtendedTaskDelegate<Void, EventData> delegate) {
         super(delegate);
     }
 
@@ -25,7 +26,7 @@ public class GetEventTask extends ExtendedTask<Long, Void, Event> {
      * @param params Das Event, das vom Server abgefragt werden soll
      */
     @Override
-    protected Event doInBackground(Long... params) {
+    protected EventData doInBackground(Long... params) {
         Long keyId = params[0];
         try {
             return ServiceProvider.getService().eventEndpoint().getEvent(keyId).execute();

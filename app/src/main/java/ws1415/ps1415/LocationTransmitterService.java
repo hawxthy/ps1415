@@ -23,6 +23,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.EventData;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -439,9 +440,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             Log.v(LOG_TAG, "Received alarm: " + keyId + " " + alarmId + " " + responsible + " " + started);
 
             if (keyId != 0 && alarmId != 0 && responsible && !started) {
-                new GetEventTask(new ExtendedTaskDelegate<Void, Event>() {
+                new GetEventTask(new ExtendedTaskDelegate<Void, EventData>() {
                     @Override
-                    public void taskDidFinish(ExtendedTask task, Event e) {
+                    public void taskDidFinish(ExtendedTask task, EventData e) {
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
                         prefs.edit().putBoolean(keyId + "-started", true).commit();
 

@@ -26,6 +26,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.Member;
 
 import java.text.ParseException;
@@ -479,11 +480,12 @@ public class ShowRouteActivity extends Activity {
     * Aktualisiert die Anzeige des aktuellen Felds.
     */
     private void refreshField() {
-        new GetEventTask(new ExtendedTaskDelegate<Void, Event>() {
+        new GetEventTask(new ExtendedTaskDelegate<Void, EventData>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Event event) {
-                fieldFirst = event.getRouteFieldFirst();
-                fieldLast = event.getRouteFieldLast();
+            public void taskDidFinish(ExtendedTask task, EventData event) {
+                // TODO Feld auslesen
+//                fieldFirst = event.getRouteFieldFirst();
+//                fieldLast = event.getRouteFieldLast();
                 highlightRoute(fieldFirst, fieldLast);
             }
 

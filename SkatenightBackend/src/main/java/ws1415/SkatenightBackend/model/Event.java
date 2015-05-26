@@ -45,7 +45,9 @@ public class Event implements BlobKeyContainer, GalleryContainer {
     @Load(unless = {EventMetaData.class, EventParticipationData.class})
     @Index
     private Ref<Route> route;
+    @Load(unless = {EventMetaData.class, EventParticipationData.class})
     private List<Ref<Gallery>> galleries;
+    private List<DynamicField> dynamicFields;
 
     /**
      * Speichert die Upload-URL für den Upload in den Blobstore. Dient nur der Übertragung an die App
@@ -193,6 +195,14 @@ public class Event implements BlobKeyContainer, GalleryContainer {
 
     public String getImagesUploadUrl() {
         return imagesUploadUrl;
+    }
+
+    public List<DynamicField> getDynamicFields() {
+        return dynamicFields;
+    }
+
+    public void setDynamicFields(List<DynamicField> dynamicFields) {
+        this.dynamicFields = dynamicFields;
     }
 
     public void setImagesUploadUrl(String imagesUploadUrl) {

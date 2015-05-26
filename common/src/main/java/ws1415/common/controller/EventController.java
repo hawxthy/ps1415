@@ -2,6 +2,7 @@ package ws1415.common.controller;
 
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.EventMetaData;
 
 import org.apache.http.HttpEntity;
@@ -75,10 +76,10 @@ public abstract class EventController {
      * @param handler   Der Handler, der das abgerufene Event übergeben bekommt.
      * @param eventId   Die ID des abzurufenden Events.
      */
-    public static void getEvent(ExtendedTaskDelegate<Void, Event> handler, final long eventId) {
-        new ExtendedTask<Void, Void, Event>(handler) {
+    public static void getEvent(ExtendedTaskDelegate<Void, EventData> handler, final long eventId) {
+        new ExtendedTask<Void, Void, EventData>(handler) {
             @Override
-            protected Event doInBackground(Void... params) {
+            protected EventData doInBackground(Void... params) {
                 try {
                     return ServiceProvider.getService().eventEndpoint().getEvent(eventId).execute();
                 } catch (IOException e) {

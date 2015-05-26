@@ -285,8 +285,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         Event event;
         List<Event> result = new ArrayList<>();
         for (long key : eventIds) {
-            event = new EventEndpoint().getEvent(key);
-            if (event != null) result.add(event);
+            // TODO Methode ggf. in den EventEndpoint verschieben
+//            event = new EventEndpoint().getEvent(key);
+//            if (event != null) result.add(event);
         }
         return result;
     }

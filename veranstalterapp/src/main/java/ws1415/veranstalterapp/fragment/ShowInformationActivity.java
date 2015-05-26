@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.EventData;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
@@ -36,9 +37,9 @@ public class ShowInformationActivity extends Activity {
         setContentView(R.layout.activity_show_information);
 
         long id = getIntent().getLongExtra("event", 0);
-        new GetEventTask(new ExtendedTaskDelegateAdapter<Void, Event>() {
+        new GetEventTask(new ExtendedTaskDelegateAdapter<Void, EventData>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Event event) {
+            public void taskDidFinish(ExtendedTask task, EventData event) {
                 setEventInformation(event);
             }
         }).execute(id);
@@ -49,7 +50,7 @@ public class ShowInformationActivity extends Activity {
      *
      * @param e Das neue Event-Objekt.
      */
-    public void setEventInformation(Event e) {
+    public void setEventInformation(EventData e) {
         if (e != null) {
             setTitle(e.getTitle());
             // TODO Verwendung von Dynamic Fields anpassen

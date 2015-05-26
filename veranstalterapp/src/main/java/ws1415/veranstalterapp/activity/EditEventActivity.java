@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.Route;
 
 import ws1415.common.task.ExtendedTask;
@@ -44,7 +45,7 @@ public class EditEventActivity extends Activity {
     private Route route;
 
     // das zu ändernde Event
-    private Event event;
+    private EventData event;
 
     /**
      * Erstellt die View, initialisiert die Attribute, setzt die Listener für die Buttons.
@@ -57,9 +58,9 @@ public class EditEventActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_event);
 
-        new GetEventTask(new ExtendedTaskDelegateAdapter<Void, Event>() {
+        new GetEventTask(new ExtendedTaskDelegateAdapter<Void, EventData>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Event event) {
+            public void taskDidFinish(ExtendedTask task, EventData event) {
                 setEventDataToView(event);
             }
         }).execute(getIntent().getLongExtra("event", 0));
@@ -131,20 +132,20 @@ public class EditEventActivity extends Activity {
                 // Überprüfen ob wirklich alle daten des Events gesetzt sind
                 if (event.getTitle() != null && !event.getTitle().isEmpty()) { //&& !((EditText) listView.getChildAt(titleId).findViewById(R.id.list_view_item_announce_information_uniquetext_editText)).getText().toString().isEmpty()){
                     // Erstelle Event auf dem Server
-                    new EditEventTask(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
-                        @Override
-                        public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
-                            if (aBoolean != null && aBoolean == true) {
-                                // Benachrichtige den Benutzer mit einem Toast
-                                Toast.makeText(EditEventActivity.this, getResources().getString(R.string.eventedited), Toast.LENGTH_LONG).show();
-                                finish();
-                                // Update die Informationen in ShowInformationFragment
-                                HoldTabsActivity.updateInformation();
-                            } else {
-                                Toast.makeText(EditEventActivity.this, getResources().getString(R.string.eventediting_failed), Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    }).execute(event);
+//                    new EditEventTask(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+//                        @Override
+//                        public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+//                            if (aBoolean != null && aBoolean == true) {
+//                                // Benachrichtige den Benutzer mit einem Toast
+//                                Toast.makeText(EditEventActivity.this, getResources().getString(R.string.eventedited), Toast.LENGTH_LONG).show();
+//                                finish();
+//                                // Update die Informationen in ShowInformationFragment
+//                                HoldTabsActivity.updateInformation();
+//                            } else {
+//                                Toast.makeText(EditEventActivity.this, getResources().getString(R.string.eventediting_failed), Toast.LENGTH_LONG).show();
+//                            }
+//                        }
+//                    }).execute(event);
                 } else {
                     cancelInfo(false);
                 }
@@ -179,7 +180,7 @@ public class EditEventActivity extends Activity {
      *
      * @param e Das Event
      */
-    public void setEventDataToView(Event e){
+    public void setEventDataToView(EventData e){
         event = e;
         // TODO Verwendung von Dynamic Fields anpassen
         // listAdapter = new AnnounceCursorAdapter(this, e.getDynamicFields(), e);
