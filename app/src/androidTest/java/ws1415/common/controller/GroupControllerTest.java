@@ -1,4 +1,4 @@
-package ws1415.ps1415.authTest;
+package ws1415.common.controller;
 
 import android.test.suitebuilder.annotation.SmallTest;
 
@@ -21,7 +21,7 @@ import ws1415.common.model.Right;
 /**
  * Created by Bernd on 14.05.2015.
  */
-public class GroupControllerUserGroupTest extends AuthenticatedAndroidTestCase {
+public class GroupControllerTest extends AuthenticatedAndroidTestCase {
     private String MY_MAIL = "";
     private String MY_SECOND_MAIL = "";
     final private String TEST_GROUP_NAME = "Testgruppe1";
