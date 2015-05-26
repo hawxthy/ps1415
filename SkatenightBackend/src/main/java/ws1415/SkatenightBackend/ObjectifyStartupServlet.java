@@ -10,11 +10,14 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import ws1415.SkatenightBackend.model.Board;
+import ws1415.SkatenightBackend.model.BoardEntry;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.UserGroup;
+import ws1415.SkatenightBackend.model.UserGroupPicture;
 
 /**
  * TODO JavaDoc + von anderem Interface oder Klasse erben, damit nicht alle Methoden implementiert werden müssen
@@ -28,6 +31,9 @@ public class ObjectifyStartupServlet implements Servlet {
         ObjectifyService.register(Gallery.class);
         ObjectifyService.register(Picture.class);
         ObjectifyService.register(UserGroup.class);
+        ObjectifyService.register(UserGroupPicture.class);
+        ObjectifyService.register(BoardEntry.class);
+        ObjectifyService.register(Board.class);
     }
 
     @Override

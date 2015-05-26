@@ -11,6 +11,7 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 import java.util.List;
 
 import ws1415.common.controller.GroupController;
+import ws1415.common.model.UserGroupType;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
@@ -68,7 +69,7 @@ public class AddUserGroupActivity extends Activity {
                         public void taskDidFinish(ExtendedTask task, Void aVoid) {
                             UsergroupActivity.getUserGroupActivity().refresh();
                         }
-                    }, groupName, true);
+                    }, groupName, true, UserGroupType.NORMALGROUP);
                 }
             }).execute();
         } else {

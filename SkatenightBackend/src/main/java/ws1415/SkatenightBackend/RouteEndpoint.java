@@ -20,6 +20,7 @@ import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.RoutePoint;
 import ws1415.SkatenightBackend.model.UserGroup;
+import ws1415.SkatenightBackend.model.UserGroupType;
 import ws1415.SkatenightBackend.model.UserLocation;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -77,7 +78,7 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
             UserGroup group = new GroupEndpoint().getUserGroup("Simulationsgruppe");
             if (group == null) {
-                UserGroup ug = new UserGroup(admin.getEmail());
+                UserGroup ug = new UserGroup(admin.getEmail(), UserGroupType.NORMALGROUP.name());
                 ug.setName("Simulationsgruppe");
                 admin.addUserGroup(ug);
                 pm.makePersistent(admin);

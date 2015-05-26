@@ -9,7 +9,7 @@ import javax.jdo.PersistenceManager;
 
 import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
-import ws1415.SkatenightBackend.model.UserGroup.BoardEntry;
+import ws1415.SkatenightBackend.model.BoardEntry;
 
 /**
  * Created by Martin on 13.05.2015.

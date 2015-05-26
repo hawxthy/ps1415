@@ -9,11 +9,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
-import ws1415.common.controller.GroupController;
-import ws1415.common.controller.RightController;
+import ws1415.common.model.UserGroupType;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
-import ws1415.common.util.Right;
+import ws1415.common.model.Right;
 
 /**
  * Created by Bernd on 22.05.2015.
@@ -23,6 +22,7 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
     private String MY_SECOND_MAIL = "";
     final private String TEST_GROUP_NAME = "Testgruppe1";
     final private boolean TEST_BOOLEAN_IS_OPEN = true;
+    final private UserGroupType TEST_GROUP_TYPE = UserGroupType.NORMALGROUP;
     final private String TEST_RIGHT_FULLRIGHTS = Right.FULLRIGHTS.name();
     final private String TEST_RIGHT_DELETEGROUP = Right.DELETEGROUP.name();
     final private String TEST_RIGHT_POSTBLACKBOARD = Right.POSTBLACKBOARD.name();
@@ -44,7 +44,7 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_BOOLEAN_IS_OPEN);
+        }, TEST_GROUP_NAME, TEST_BOOLEAN_IS_OPEN, TEST_GROUP_TYPE);
         try {
             assertTrue("setUp for createUserGroup failed", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {

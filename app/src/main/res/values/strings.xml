@@ -17,6 +17,7 @@
         <item>User Groups</item>
         <item>Image Storage Test</item>
         <item>Search</item>
+        <item>Upload Group Image</item>
     </string-array>
 
     <array name="nav_drawer_icons">
@@ -208,4 +209,5 @@
         <item quantity="one">%1$d year old</item>
         <item quantity="other">%1$d years old</item>
     </plurals>
+    <string name="title_activity_upload_image">UploadImageActivity</string>
 </resources>

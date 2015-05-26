@@ -1,17 +1,33 @@
 package ws1415.common.controller;
 
+import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.Picture;
 import com.skatenight.skatenightAPI.model.BoardEntry;
 import com.skatenight.skatenightAPI.model.BooleanWrapper;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
+import com.skatenight.skatenightAPI.model.UserGroupMetaData;
+import com.skatenight.skatenightAPI.model.UserGroupNewsBoardTransport;
 import com.skatenight.skatenightAPI.model.UserGroupPicture;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.acl.Group;
 import java.util.List;
 
+import ws1415.common.model.UserGroupType;
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
@@ -39,12 +55,12 @@ public class GroupController {
      * @param handler Der Task, der mit dem Server kommuniziert
      * @param groupName Der Name der zu erstellenden UserGroup
      */
-    public void createUserGroup(ExtendedTaskDelegate handler, String groupName, final boolean isOpen){
+    public void createUserGroup(ExtendedTaskDelegate handler, String groupName, final boolean isOpen, final UserGroupType groupType){
         new ExtendedTask<String, Void, Void>(handler){
             @Override
             protected Void doInBackground(String... params){
                 try{
-                    return ServiceProvider.getService().groupEndpoint().createUserGroup(params[0], isOpen).execute();
+                    return ServiceProvider.getService().groupEndpoint().createUserGroup(params[0], isOpen, groupType.name()).execute();
                 }catch(IOException e){
                     publishError("Die Nutzergruppe konnte nicht erstellt werden");
                     return null;
@@ -68,6 +84,27 @@ public class GroupController {
                     return ServiceProvider.getService().groupEndpoint().getUserGroup(params[0]).execute();
                 }catch(IOException e){
                     publishError("Die Nutzergruppe konnte nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um die Metadaten zu einer
+     * Nutzergruppe abzurufen.
+     *
+     * @param handler
+     * @param groupName Der Name der Nutzergruppe
+     */
+    public void getUserGroupMetaData(ExtendedTaskDelegate handler, String groupName){
+        new ExtendedTask<String, Void, UserGroupMetaData>(handler){
+            @Override
+            protected  UserGroupMetaData doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().getUserGroupMetaData(params[0]).execute();
+                }catch(IOException e){
+                    publishError("Die Metadaten der Nutzergruppe konnte nnicht abgerufen werden");
                     return null;
                 }
             }
@@ -258,7 +295,7 @@ public class GroupController {
      * @param group Die UserGroup, deren BlackBoard Nachricht gelöscht werden soll
      * @param boardEntryId Der BoardEntry der gelöscht werden soll
      */
-    public void deleteBoardMessage(ExtendedTaskDelegate handler, final String group, final long boardEntryId){
+    public void deleteBoardMessage(ExtendedTaskDelegate handler, final String group, final Long boardEntryId){
         new ExtendedTask<String, Void, Void>(handler){
             @Override
             protected Void doInBackground(String... params){
@@ -287,6 +324,71 @@ public class GroupController {
                     return ServiceProvider.getService().groupEndpoint().getUserGroupBlackBoard(params[0]).execute();
                 }catch(IOException e){
                     publishError("Das Blackboard der Nutzergruppe konnte nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um eine Nachricht an das NewsBoard
+     * einer Nutzergruppe zu posten.
+     *
+     * @param handler
+     * @param groupName Der Name der Nutzergruppe
+     * @param newsMessage Der Inhalt der Nachricht
+     */
+    public void postNewsBoard(ExtendedTaskDelegate handler, String groupName, final String newsMessage){
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected  Void doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().postNewsBoard(params[0], newsMessage).execute();
+                }catch(IOException e){
+                    publishError("Die Nachricht konnte nicht gepostet werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndoint kommunizert um eine NewsMessage einer
+     * Nutzergruppe zu löschen.
+     *
+     * @param handler
+     * @param groupName Der Name der Nutzergruppe
+     * @param boardEntryId Die Id der BoardEntries
+     */
+    public void deleteNewsMessage(ExtendedTaskDelegate handler, String groupName, final Long boardEntryId){
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().deleteNewsBoardMessage(boardEntryId, params[0]).execute();
+                }catch(IOException e){
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um das NewsBoard einer
+     * Nutzergruppe abzurufen.
+     *
+     * @param handler
+     * @param groupName Der Name der Nutzergruppe
+     */
+    public void getNewsBoard(ExtendedTaskDelegate handler, String groupName){
+        new ExtendedTask<String, Void, UserGroupNewsBoardTransport>(handler){
+            @Override
+            protected  UserGroupNewsBoardTransport doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().getUserGroupNewsBoard(params[0]).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
                     return null;
                 }
             }
@@ -345,27 +447,69 @@ public class GroupController {
     /**
      * Methode, welche mit dem GroupEndpoint kommuniziert um das Bild einer
      * UserGroup zu ändern.
-     *
+     * //TODO Kommentar anpassen
      * @param handler Der Task, der mit dem Server kommuniziert
-     * @param group Die UserGroup dessen Bild geändert werden soll
-     * @param p Das neue Bild
+     * @param groupName Die UserGroup dessen Bild geändert werden soll
      * @return Nachricht über das Ergebnis des änderns
      *          true = Das Bild wurde erfolgreich gelöscht
      *          false = Das Bild wurde nicht gelöscht, Fehler
      */
-    public boolean changePicture(ExtendedTaskDelegate handler, String group, UserGroupPicture p){
-        final String groupFinal = group;
-        new ExtendedTask<UserGroupPicture, Void, BooleanWrapper>(handler){
+    public void changePicture(ExtendedTaskDelegate handler, String groupName, final FileInputStream pictureFile){
+        new ExtendedTask<String, Void, UserGroupPicture>(handler){
+            UserGroupPicture picture;
             @Override
-            protected BooleanWrapper doInBackground(UserGroupPicture... params){
+            protected UserGroupPicture doInBackground(String... params){
                 try{
-                    return ServiceProvider.getService().groupEndpoint().changePicture(groupFinal, params[0]).execute();
+                    picture = ServiceProvider.getService().groupEndpoint().changePicture(params[0]).execute();
                 }catch (IOException e){
-                    publishError("Member konnte nicht entfernt werden");
+                    e.printStackTrace();
+                    return null;
+                }
+                try {
+                    HttpClient httpclient = new DefaultHttpClient();
+                    HttpPost httppost = new HttpPost(picture.getPictureUrl());
+
+                    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+                    builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+                    builder.addPart("file", new InputStreamBody(pictureFile, "file"));
+                    builder.addTextBody("id", picture.getId().toString());
+
+                    HttpEntity entity = builder.build();
+                    httppost.setEntity(entity);
+                    HttpResponse response = httpclient.execute(httppost);
+                    HttpEntity httpEntity = response.getEntity();
+
+                    String encoding;
+                    if (httpEntity.getContentEncoding() == null) {
+                        // UTF-8 verwenden, falls keine Kodierung für die Antwort übertragen wurde
+                        encoding = "UTF-8";
+                    } else {
+                        encoding = httpEntity.getContentEncoding().getValue();
+                    }
+
+                    String keyString = EntityUtils.toString(httpEntity, encoding);
+                    BlobKey blobKey = new BlobKey();
+                    blobKey.setKeyString(keyString);
+                    picture.setPictureBlobKey(blobKey);
+                }catch(IOException e){
+                    e.printStackTrace();
+                }
+                return picture;
+            }
+        }.execute(groupName);
+    }
+
+    public void getUserGroupPicture(ExtendedTaskDelegate handler, String groupName){
+        new ExtendedTask<String, Void, UserGroupPicture>(handler){
+            @Override
+            protected UserGroupPicture doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().getUserGroupPicture(params[0]).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
                     return null;
                 }
             }
-        }.execute(p);
-        return true;
+        }.execute(groupName);
     }
 }

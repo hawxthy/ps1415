@@ -1,29 +1,22 @@
 package ws1415.ps1415.authTest;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.BoardEntry;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
+import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
 import ws1415.common.controller.GroupController;
-import ws1415.common.net.ServiceProvider;
+import ws1415.common.model.UserGroupType;
 import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
-import ws1415.common.util.Right;
-import ws1415.ps1415.Constants;
-import ws1415.ps1415.activity.ShowInformationActivity;
+import ws1415.common.model.Right;
 
 /**
  * Created by Bernd on 14.05.2015.
@@ -33,12 +26,14 @@ public class GroupControllerUserGroupTest extends AuthenticatedAndroidTestCase {
     private String MY_SECOND_MAIL = "";
     final private String TEST_GROUP_NAME = "Testgruppe1";
     final private boolean TEST_BOOLEAN_IS_OPEN = true;
+    final private UserGroupType TEST_GROUP_TYPE = UserGroupType.NORMALGROUP;
     final private String TEST_BLACK_BOARD_MESSAGE = "Das ist eine Blackboard Message";
     final private String TEST_BLACK_BOARD_MESSAGE_2 = "Das ist die zweite Blackboard Message";
     final private String TEST_BLACK_BOARD_MESSAGE_3 = "Das ist die dritte Blackboard Message";
 
     // Variablen zum füllen von wichtigen Attributen, wie BoardEntries
     private boolean found;
+    private Long boardEntryId;
 
 
     @Override
@@ -55,7 +50,7 @@ public class GroupControllerUserGroupTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_BOOLEAN_IS_OPEN);
+        }, TEST_GROUP_NAME, TEST_BOOLEAN_IS_OPEN, TEST_GROUP_TYPE);
         try {
             assertTrue("setUp for createUserGroup failed", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -93,6 +88,7 @@ public class GroupControllerUserGroupTest extends AuthenticatedAndroidTestCase {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
                 assertTrue("Die erstellte Nutzergruppe hat den falschen namen", group.getName().equals(TEST_GROUP_NAME));
+                assertTrue("Die erstellte Nutzergruppe ist nicht vom Typ " + TEST_GROUP_TYPE.name(), group.getGroupType().equals(TEST_GROUP_TYPE.name()));
                 signal.countDown();
             }
         }, TEST_GROUP_NAME);
@@ -197,6 +193,80 @@ public class GroupControllerUserGroupTest extends AuthenticatedAndroidTestCase {
         }, TEST_GROUP_NAME);
         try {
             assertTrue("testBlackBoardMessageValue2 failed", signal4.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SmallTest
+    public void testRemoveBlackBoardMessage() {
+        final CountDownLatch signal = new CountDownLatch(1);
+        GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                signal.countDown();
+            }
+        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE);
+        try {
+            assertTrue("postBlackBoard failed", signal.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal2 = new CountDownLatch(1);
+        GroupController.getInstance().getBlackBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupBlackBoardTransport>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserGroupBlackBoardTransport blackBoard) {
+                found = false;
+                for (BoardEntry be : blackBoard.getBoardEntries()) {
+                    assertFalse("Message_3 sollte nicht enthalten sein", be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE_3));
+                    assertFalse("Message_2 sollte nicht enthalten sein", be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE_2));
+                    if (be.getMessage().toString().equals(TEST_BLACK_BOARD_MESSAGE)) {
+                        boardEntryId = be.getId();
+                        found = true;
+                    }
+                }
+                assertTrue("Die erste Blackboard Message ist nicht enthalten", found);
+                signal2.countDown();
+            }
+        }, TEST_GROUP_NAME);
+        try {
+            assertTrue("testRemoveBlackBoardMessage failed to get the BoardEntry", signal2.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal3 = new CountDownLatch(1);
+        GroupController.getInstance().deleteBoardMessage(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                signal3.countDown();
+            }
+        }, TEST_GROUP_NAME, boardEntryId);
+        try {
+            assertTrue("deleteBoardMessage failed", signal3.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal4 = new CountDownLatch(1);
+        GroupController.getInstance().getBlackBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupBlackBoardTransport>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserGroupBlackBoardTransport blackBoard) {
+                found = false;
+                if (blackBoard.getBoardEntries() != null) {
+                    for (BoardEntry be : blackBoard.getBoardEntries()) {
+                        if (be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE)) {
+                            found = true;
+                        }
+                    }
+                }
+                assertFalse("Die Blackboard Message 1 sollte nicht mehr enthalten sein", found);
+                signal4.countDown();
+            }
+        }, TEST_GROUP_NAME);
+        try {
+            assertTrue("testRemoveBlackBoardMessage failed to check the removed BoardEntry", signal4.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -342,5 +412,17 @@ public class GroupControllerUserGroupTest extends AuthenticatedAndroidTestCase {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @SmallTest
+    public void testGetUserGroupMetaData(){
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        GroupController.getInstance().getUserGroupMetaData(new ExtendedTaskDelegateAdapter<Void, UserGroupMetaData>(){
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserGroupMetaData metaData){
+
+            }
+        }, TEST_GROUP_NAME);
     }
 }

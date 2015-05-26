@@ -17,6 +17,7 @@
         <item>Nutzergruppen</item>
         <item>Image Storage Test</item>
         <item>Suche</item>
+        <item>Upload Group Image</item>
     </string-array>
 
     <array name="nav_drawer_icons">
