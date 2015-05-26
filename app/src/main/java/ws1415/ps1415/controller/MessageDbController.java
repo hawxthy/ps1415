@@ -49,13 +49,33 @@ public class MessageDbController {
 
         ContentValues values = new ContentValues();
         values.put(MessageDbHelper.KEY_ID_CONVERSATION, conversation.getEmail());
-        values.put(MessageDbHelper.KEY_PICTURE, conversation.getPicture());
+        values.put(MessageDbHelper.KEY_PICTURE, conversation.getPictureKey());
         values.put(MessageDbHelper.KEY_FIRST_NAME, conversation.getFirstName());
         values.put(MessageDbHelper.KEY_LAST_NAME, conversation.getLastName());
         values.put(MessageDbHelper.KEY_COUNT_NEW_MESSAGES, 0);
 
         long rowId = db.insert(MessageDbHelper.TABLE_CONVERSATION, null, values);
         return !(rowId == -1);
+    }
+
+    /**
+     * Prüft ob bereits eine Konversation existiert.
+     *
+     * @param userMail E-Mail Adresse der Konversation
+     * @return true, falls Konversation existiert, false andernfalls
+     */
+    public boolean existsConversation(String userMail){
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT " + MessageDbHelper.KEY_ID_CONVERSATION + " FROM " +
+                MessageDbHelper.TABLE_CONVERSATION + " WHERE " + MessageDbHelper.KEY_ID_CONVERSATION + "=?",
+                new String[]{userMail});
+
+        try {
+            return cursor.moveToFirst();
+        } finally {
+            cursor.close();
+        }
     }
 
     /**
@@ -125,7 +145,7 @@ public class MessageDbController {
         // Konversation abrufen
         return new Conversation(
                 cursor.getString(cursor.getColumnIndex(MessageDbHelper.KEY_ID_CONVERSATION)),
-                cursor.getBlob(cursor.getColumnIndex(MessageDbHelper.KEY_PICTURE)),
+                cursor.getString(cursor.getColumnIndex(MessageDbHelper.KEY_PICTURE)),
                 cursor.getString(cursor.getColumnIndex(MessageDbHelper.KEY_FIRST_NAME)),
                 cursor.getString(cursor.getColumnIndex(MessageDbHelper.KEY_LAST_NAME)),
                 cursor.getInt(cursor.getColumnIndex(MessageDbHelper.KEY_COUNT_NEW_MESSAGES)),
@@ -171,14 +191,14 @@ public class MessageDbController {
      * Aktualisiert das Profilbild der Person, zu der die Konversation gehört.
      *
      * @param userMail E-Mail Adresse der Person
-     * @param picture Neues Profilbild
+     * @param pictureKey Neues Profilbild
      * @return true, falls Aktualisierung erfolgreich, false andernfalls
      */
-    public boolean updateConversation(String userMail, byte[] picture){
+    public boolean updateConversation(String userMail, String pictureKey){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(MessageDbHelper.KEY_PICTURE, picture);
+        values.put(MessageDbHelper.KEY_PICTURE, pictureKey);
 
         int updatedRows = db.update(MessageDbHelper.TABLE_CONVERSATION, values, MessageDbHelper.KEY_ID_CONVERSATION + " = ?",
                 new String[]{userMail});

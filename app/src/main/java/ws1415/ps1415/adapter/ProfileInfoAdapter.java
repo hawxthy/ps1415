@@ -58,7 +58,7 @@ public class ProfileInfoAdapter extends BaseAdapter {
 
         if(convertView == null){
             holder = new Holder();
-            convertView = mInflater.inflate(R.layout.list_view_profile_info, viewGroup, false);
+            convertView = mInflater.inflate(R.layout.list_view_item_profile_info, viewGroup, false);
             holder.primaryText = (TextView) convertView.findViewById(R.id.list_item_profile_info_primary);
             holder.secondaryText = (TextView) convertView.findViewById(R.id.list_item_profile_info_secondary);
             convertView.setTag(holder);

@@ -41,7 +41,7 @@ public class MessageDbHelper extends SQLiteOpenHelper {
     // Tabellen Create Statements
     private static final String CREATE_TABLE_CONVERSATION = "CREATE TABLE "
             + TABLE_CONVERSATION + "(" + KEY_ID_CONVERSATION + " TEXT PRIMARY KEY,"
-            + KEY_PICTURE + " BLOB,"
+            + KEY_PICTURE + " TEXT,"
             + KEY_FIRST_NAME + " TEXT," + KEY_LAST_NAME + " TEXT,"
             + KEY_COUNT_NEW_MESSAGES + " INTEGER," + FOREIGN_KEY_LAST_MESSAGE + " INTEGER,"
             + " FOREIGN KEY (" + FOREIGN_KEY_LAST_MESSAGE + ") REFERENCES " + TABLE_MESSAGE + " ("

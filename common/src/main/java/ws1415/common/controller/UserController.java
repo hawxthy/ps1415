@@ -7,7 +7,6 @@ import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserListData;
-import com.skatenight.skatenightAPI.model.UserLocation;
 import com.skatenight.skatenightAPI.model.UserProfile;
 
 import org.apache.http.HttpEntity;
@@ -37,13 +36,7 @@ import ws1415.common.task.ExtendedTaskDelegate;
  *
  * @author Martin Wrodarczyk
  */
-public class UserController {
-    /**
-     * Keine Instanziierung ermöglichen.
-     */
-    private UserController() {
-    }
-
+public abstract class UserController {
     /**
      * Erstellt einen Benutzer auf dem Server, falls noch keiner zu der angegebenen E-Mail Adresse
      * existiert.
@@ -112,28 +105,6 @@ public class UserController {
     }
 
     /**
-     * Gibt die Standordinformationen eines Benutzers mit der angegebenen E-Mail Adresse aus.
-     *
-     * @param handler
-     * @param userMail E-Mail Adresse des Benutzers
-     */
-    @SuppressWarnings("unchecked")
-    public static void getUserLocation(ExtendedTaskDelegate handler, String userMail) {
-        new ExtendedTask<String, Void, UserLocation>(handler) {
-            @Override
-            protected UserLocation doInBackground(String... params) {
-                try {
-                    return ServiceProvider.getService().userEndpoint().getUserLocation(params[0]).execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    publishError("Standort konnte nicht abgerufen werden");
-                    return null;
-                }
-            }
-        }.execute(userMail);
-    }
-
-    /**
      * Gibt das Benutzerprofil aus.
      *
      * @param handler
@@ -150,6 +121,96 @@ public class UserController {
                     publishError("Benutzerprofil konnte nicht abgerufen werden");
                     return null;
                 }
+            }
+        }.execute();
+    }
+
+    /**
+     * Aktualisiert das Profilbild eines Benutzers mit Hilfe des Blobstores.
+     *
+     * @param handler
+     * @param userMail E-Mail Adresse des Benutzers
+     * @param image Neues Profilbild
+     */
+    public static void uploadUserPicture(ExtendedTaskDelegate handler, final String userMail,
+                                         final InputStream image) {
+        new ExtendedTask<Void, Void, Boolean>(handler){
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                String uploadUrl;
+                try {
+                    uploadUrl = ServiceProvider.getService().userEndpoint().getUploadUrl().execute().getString();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Profilbild konnte nicht hochgeladen werden");
+                    return null;
+                }
+
+                try {
+                    HttpClient client = new DefaultHttpClient();
+                    HttpPost post = new HttpPost(uploadUrl);
+
+                    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+                    builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+                    builder.addPart("myFile", new InputStreamBody(image, "myFile"));
+                    builder.addTextBody("id", userMail);
+
+                    HttpEntity entity = builder.build();
+                    post.setEntity(entity);
+
+                    HttpResponse response = client.execute(post);
+                    HttpEntity httpEntity = response.getEntity();
+
+                    String encoding;
+                    if (httpEntity.getContentEncoding() == null) {
+                        // UTF-8 verwenden, falls keine Kodierung für die Antwort übertragen wurde
+                        encoding = "UTF-8";
+                    } else {
+                        encoding = httpEntity.getContentEncoding().getValue();
+                    }
+                    String answer = EntityUtils.toString(httpEntity, encoding);
+                    return answer.equals("true");
+                } catch (IOException e){
+                    e.printStackTrace();
+                    publishError("Profilbild konnte nicht hochgeladen werden");
+                    return null;
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Lädt das Bild mit dem übergebenen BlobKey vom Blobstore runter und gibt dieses als Bitmap
+     * zurück.
+     *
+     * @param handler
+     * @param pictureKey BlobKey
+     */
+    public static void getUserPicture(ExtendedTaskDelegate handler, final BlobKey pictureKey){
+        new ExtendedTask<Void, Void, Bitmap>(handler) {
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                ByteArrayInputStream is = null;
+                try {
+                    HttpClient client = new DefaultHttpClient();
+                    HttpGet get = new HttpGet(Constants.SERVER_URL + "/userImages/serve?key=" + pictureKey.getKeyString());
+                    HttpResponse response = client.execute(get);
+                    HttpEntity httpEntity = response.getEntity();
+
+                    is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
+                    return BitmapFactory.decodeStream(is);
+                } catch(Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    if (is != null) {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                return null;
             }
         }.execute();
     }
@@ -183,11 +244,11 @@ public class UserController {
      * @param userMail E-Mail Adresse des Benutzers
      */
     public static void listFriends(ExtendedTaskDelegate handler, String userMail) {
-        new ExtendedTask<String, Void, List<UserListData>>(handler) {
+        new ExtendedTask<String, Void, List<String>>(handler) {
             @Override
-            protected List<UserListData> doInBackground(String... params) {
+            protected List<String> doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().listFriends(params[0]).execute().getItems();
+                    return ServiceProvider.getService().userEndpoint().listFriends(params[0]).execute().getStringList();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Freundesliste konnte nicht abgerufen werden");
@@ -198,11 +259,11 @@ public class UserController {
     }
 
     /**
-     * Durchsucht die Benutzer nach der Eingabe und gibt die allgemeinen Nutzerinformationen
-     * zu den Ergebnissen in einer Liste aus.
+     * Durchsucht die Benutzer nach der Eingabe und gibt das Ergebnis als Liste von E-Mail Adressen
+     * der Benutzer aus.
      *
      * @param handler
-     * @param input   Eingabe
+     * @param input Eingabe
      */
     public static void searchUsers(ExtendedTaskDelegate handler, final String input) {
         new ExtendedTask<String, Void, List<String>>(handler) {
@@ -282,7 +343,7 @@ public class UserController {
             @Override
             protected Boolean doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().addFriend(userMail, friendMail).execute().getValue();
+                    return ServiceProvider.getService().userEndpoint().addFriend(friendMail, userMail).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Benutzer konnte nicht der Freundesliste hinzugefügt werden");
@@ -304,7 +365,7 @@ public class UserController {
             @Override
             protected Boolean doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().removeFriend(userMail, friendMail).execute().getValue();
+                    return ServiceProvider.getService().userEndpoint().removeFriend(friendMail, userMail).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Benutzer konnte nicht aus der Freundesliste entfernt werden");
@@ -334,88 +395,5 @@ public class UserController {
                 }
             }
         }.execute(userMail);
-    }
-
-    /**
-     * Aktualisiert das Profilbild eines Benutzers mit Hilfe des Blobstores.
-     *
-     * @param handler
-     * @param userMail E-Mail Adresse des Benutzers
-     * @param image Neues Profilbild
-     */
-    public static void uploadUserPicture(ExtendedTaskDelegate handler, final String userMail,
-                                         final InputStream image) {
-        new ExtendedTask<Void, Void, Boolean>(handler){
-            @Override
-            protected Boolean doInBackground(Void... params) {
-                String uploadUrl;
-                try {
-                    uploadUrl = ServiceProvider.getService().userEndpoint().getUploadUrl().execute().getString();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    publishError("Profilbild konnte nicht hochgeladen werden");
-                    return null;
-                }
-
-                try {
-                    HttpClient client = new DefaultHttpClient();
-                    HttpPost post = new HttpPost(uploadUrl);
-
-                    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-                    builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-                    builder.addPart("myFile", new InputStreamBody(image, "myFile"));
-                    builder.addTextBody("id", userMail);
-
-                    HttpEntity entity = builder.build();
-                    post.setEntity(entity);
-
-                    HttpResponse response = client.execute(post);
-                    HttpEntity httpEntity = response.getEntity();
-
-                    String encoding;
-                    if (httpEntity.getContentEncoding() == null) {
-                        // UTF-8 verwenden, falls keine Kodierung für die Antwort übertragen wurde
-                        encoding = "UTF-8";
-                    } else {
-                        encoding = httpEntity.getContentEncoding().getValue();
-                    }
-                    String answer = EntityUtils.toString(httpEntity, encoding);
-                    return answer.equals("true");
-                } catch (IOException e){
-                    e.printStackTrace();
-                    publishError("Profilbild konnte nicht hochgeladen werden");
-                    return null;
-                }
-            }
-        }.execute();
-    }
-
-    public static void getUserPicture(ExtendedTaskDelegate handler, final BlobKey pictureKey){
-        new ExtendedTask<Void, Void, Bitmap>(handler) {
-            @Override
-            protected Bitmap doInBackground(Void... params) {
-                ByteArrayInputStream is = null;
-                try {
-                    HttpClient client = new DefaultHttpClient();
-                    HttpGet get = new HttpGet(Constants.SERVER_URL + "/userImages/serve?key=" + pictureKey.getKeyString());
-                    HttpResponse response = client.execute(get);
-                    HttpEntity httpEntity = response.getEntity();
-
-                    is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
-                    return BitmapFactory.decodeStream(is);
-                } catch(Exception ex) {
-                    ex.printStackTrace();
-                } finally {
-                    if (is != null) {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                return null;
-            }
-        }.execute();
     }
 }

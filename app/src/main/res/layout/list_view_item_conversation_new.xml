@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="72dp">
+
+    <ImageView
+        android:id="@+id/list_item_conversation_picture"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <LinearLayout
+        android:layout_toRightOf="@id/list_item_conversation_picture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:layout_alignWithParentIfMissing="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/list_item_conversation_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="25dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:layout_weight="1"
+                android:text="Primary Text"
+                android:textSize="17sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/list_item_conversation_last_message_time"
+                android:text="19:26"
+                android:textSize="15sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/list_item_conversation_last_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Secondary Text"
+            android:fontFamily="sans-serif-light"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+
+</RelativeLayout>

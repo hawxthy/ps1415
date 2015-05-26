@@ -193,17 +193,10 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
      * @throws InterruptedException
      */
     @SmallTest
-    public void testGetUserLocation() throws InterruptedException {
-        final CountDownLatch getSignal = new CountDownLatch(1);
-        UserController.getUserLocation(new ExtendedTaskDelegateAdapter<Void, UserLocation>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, UserLocation userLocation) {
-                assertNotNull(userLocation);
-                assertEquals(TEST_MAIL_1, userLocation.getEmail());
-                getSignal.countDown();
-            }
-        }, TEST_MAIL_1);
-        assertTrue(getSignal.await(30, TimeUnit.SECONDS));
+    public void testGetUserLocation() throws InterruptedException, IOException {
+        UserLocation userLocation = ServiceProvider.getService().userEndpoint().getUserLocation(TEST_MAIL_1).execute();
+        assertNotNull(userLocation);
+        assertEquals(TEST_MAIL_1, userLocation.getEmail());
     }
 
     /**

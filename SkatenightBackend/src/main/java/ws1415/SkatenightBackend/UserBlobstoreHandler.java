@@ -17,12 +17,22 @@ import javax.servlet.http.HttpServletResponse;
 import ws1415.SkatenightBackend.model.EndUser;
 
 /**
- * Created by Martin on 24.05.2015.
+ * Dieser Handler nimmt Anfragen an den Blobstore für Benutzerbilder entgegen.
+ *
+ * @author Martin Wrodarczyk
  */
 public class UserBlobstoreHandler extends HttpServlet {
     private static final BlobstoreService blobstoreService =
             BlobstoreServiceFactory.getBlobstoreService();
 
+    /**
+     * Wird beim Upload eines neuen Benutzerbildes aufgerufen, dabei werden im Request die Blobs
+     * und die Benutzermail entgegengenommen und als Response das Ergebnis des Uploads gesendet.
+     *
+     * @param req Request mit Blobs und Usermail
+     * @param resp true, falls Upload erfolgreich, false andernfalls
+     * @throws IOException
+     */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String userMail = req.getParameter("id");
@@ -42,6 +52,7 @@ public class UserBlobstoreHandler extends HttpServlet {
                 resp.getWriter().print("true");
             } catch (Exception e) {
                 resp.getWriter().print("false");
+                blobstoreService.delete(blobKeys.get(0));
             } finally {
                 pm.close();
                 resp.getWriter().flush();
@@ -50,6 +61,13 @@ public class UserBlobstoreHandler extends HttpServlet {
         }
     }
 
+    /**
+     * Wird bei einer Anfrage eines Benutzerbild-Downloads aufgerufen.
+     *
+     * @param req Request mit Blobkey als String
+     * @param resp Response in das die Bitmap geladen und gesendet wird
+     * @throws IOException
+     */
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         BlobKey key = new BlobKey(req.getParameter("key"));

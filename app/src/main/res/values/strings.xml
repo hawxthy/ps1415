@@ -13,6 +13,8 @@
 
     <string-array name="nav_drawer_items">
         <item>My Profile</item>
+        <item>Friends</item>
+        <item>Messages</item>
         <item>Events</item>
         <item>User Groups</item>
         <item>Image Storage Test</item>
@@ -21,6 +23,8 @@
 
     <array name="nav_drawer_icons">
         <item>@drawable/ic_action_person</item>
+        <item>@drawable/ic_group</item>
+        <item>@drawable/ic_action_chat</item>
         <item>@drawable/ic_event</item>
         <item>@drawable/ic_group</item>
         <item>@drawable/common_ic_googleplayservices</item>
@@ -208,4 +212,26 @@
         <item quantity="one">%1$d year old</item>
         <item quantity="other">%1$d years old</item>
     </plurals>
+
+    <!-- FriendsActivity -->
+    <string name="title_activity_friend">Friends</string>
+    <string name="sure_delete_friend_dialog">Are you sure you want to delete this friend?</string>
+    <string name="friend_delete_succeeded">Friend has been successfully removed</string>
+    <string name="friend_does_not_exist">Freund existiert nicht mehr</string>
+    <plurals name="friends_selected">
+        <item quantity="one">%1$d friend selected</item>
+        <item quantity="other">%1$d friends selected</item>
+    </plurals>
+
+    <!-- MessagingActivity -->
+    <string name="title_activity_messaging">Messaging</string>
+    <string name="create_new_conversation_dialog">There is no conversation with this user. Would you like to create a new conversation?</string>
+    <string-array name="conversation_menu_array">
+        <item>View Profile</item>
+        <item>Delete Conversation</item>
+    </string-array>
+    <string name="sure_delete_conversation_dialog">Are you sure you want to delete this conversation?</string>
+    <string name="conversation_deleted">Conversation deleted</string>
+    <string name="error_delete_conversation">Error while deleting</string>
+    <string name="title_activity_conversation">ConversationActivity</string>
 </resources>

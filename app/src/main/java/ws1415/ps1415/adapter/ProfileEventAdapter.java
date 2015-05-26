@@ -62,7 +62,7 @@ public class ProfileEventAdapter extends BaseAdapter {
 
         if(convertView == null){
             holder = new Holder();
-            convertView = mInflater.inflate(R.layout.list_view_profile_event, viewGroup, false);
+            convertView = mInflater.inflate(R.layout.list_view_item_profile_event, viewGroup, false);
             holder.icon = (ImageView) convertView.findViewById(R.id.list_item_profile_event_icon);
             holder.primaryText = (TextView) convertView.findViewById(R.id.list_item_profile_event_primary);
             holder.secondaryText = (TextView) convertView.findViewById(R.id.list_item_profile_event_secondary);

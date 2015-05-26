@@ -7,7 +7,7 @@ package ws1415.ps1415.model;
  */
 public class Conversation {
     private String email;
-    private byte[] picture;
+    private String pictureKey;
     private String firstName;
     private String lastName;
     private int countNewMessages;
@@ -21,18 +21,18 @@ public class Conversation {
         lastMessage = null;
     }
 
-    public Conversation(String email, byte[] picture, String firstName, String lastName) {
+    public Conversation(String email, String pictureKey, String firstName, String lastName) {
         this.email = email;
-        this.picture = picture;
+        this.pictureKey = pictureKey;
         this.firstName = firstName;
         this.lastName = lastName;
         countNewMessages = 0;
         lastMessage = null;
     }
 
-    public Conversation(String email, byte[] picture, String firstName, String lastName, int countNewMessages, Message lastMessage) {
+    public Conversation(String email, String pictureKey, String firstName, String lastName, int countNewMessages, Message lastMessage) {
         this.email = email;
-        this.picture = picture;
+        this.pictureKey = pictureKey;
         this.firstName = firstName;
         this.lastName = lastName;
         this.countNewMessages = countNewMessages;
@@ -47,15 +47,17 @@ public class Conversation {
         this.email = email;
     }
 
-    public byte[] getPicture() {
-        return picture;
+    public String getPictureKey() {
+        if(pictureKey == null) return "";
+        return pictureKey;
     }
 
-    public void setPicture(byte[] picture) {
-        this.picture = picture;
+    public void setPictureKey(String pictureKey) {
+        this.pictureKey = pictureKey;
     }
 
     public String getFirstName() {
+        if(firstName == null) return "";
         return firstName;
     }
 
@@ -64,8 +66,10 @@ public class Conversation {
     }
 
     public String getLastName() {
+        if(lastMessage == null) return "";
         return lastName;
     }
+
 
     public void setLastName(String lastName) {
         this.lastName = lastName;

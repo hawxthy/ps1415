@@ -26,11 +26,13 @@ import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserInfo;
+import ws1415.SkatenightBackend.model.UserInfo.InfoPair;
 import ws1415.SkatenightBackend.model.UserLocation;
 import ws1415.SkatenightBackend.model.Visibility;
 import ws1415.SkatenightBackend.transport.ListWrapper;
 import ws1415.SkatenightBackend.transport.StringWrapper;
 import ws1415.SkatenightBackend.transport.UserListData;
+import ws1415.SkatenightBackend.transport.UserLocationInfo;
 import ws1415.SkatenightBackend.transport.UserProfile;
 
 /**
@@ -53,73 +55,15 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Erstellt ein Member-Objekt für die angegebene
-     * E-Mail.
-     *
-     * @param mail
-     */
-    public void createMember(@Named("mail") String mail) {
-        Member m = getMember(mail);
-        if (m == null) {
-            m = new Member();
-            m.setEmail(mail);
-            m.setName(mail);
-
-            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-            try {
-                pm.makePersistent(m);
-            } finally {
-                pm.close();
-            }
-        }
-    }
-
-    /**
-     * Liefert das auf dem Server hinterlegte Member-Objekt mit der angegebenen Mail.
-     *
-     * @param email Die Mail-Adresse des Member-Objekts, das abgerufen werden soll.
-     * @return Das aktuelle Member-Objekt.
-     */
-    public Member getMember(@Named("email") String email) {
-        Member member = null;
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            Query q = pm.newQuery(Member.class);
-            q.setFilter("email == emailParam");
-            q.declareParameters("String emailParam");
-            List<Member> results = (List<Member>) q.execute(email);
-            if (!results.isEmpty()) {
-                member = results.get(0);
-            }
-        } catch (JDOObjectNotFoundException e) {
-            // Wird geworfen, wenn kein Objekt mit dem angegebenen Schlüssel existiert
-            // In diesem Fall null zurückgeben
-            return null;
-        } finally {
-            pm.close();
-        }
-        return member;
-    }
-
-    /**
      * Wird von den Benutzer-Apps aufgerufen, wenn der Benutzer noch kein zu verwendendes Konto an-
-     * gegeben hat. Es wird außerdem ein Member-Objekt für den Benutzer erstellt, falls es noch nicht
-     * existiert.
+     * gegeben hat.
      *
-     * @param user
-     * @param regid
+     * @param user User-Objekt zur Authentifizierung
+     * @param regid GCM-ID
      */
     public void registerForGCM(User user, @Named("regid") String regid) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
-        Member m = getMember(user.getEmail());
-        if (m == null) {
-            createMember(user.getEmail());
-        }
-        //if (!existsUser(user.getEmail()).value) {
-        //    createUser(user.getEmail());
-        //}
         RegistrationManager registrationManager;
-        // Den GCM-Manager abrufen, falls er existiert, sonst einen neuen Manager anlegen.
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             registrationManager = getRegistrationManager(pm);
@@ -200,7 +144,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             endUser.getUserLocation();
             return endUser;
         } catch (Exception e) {
-            // User mit der Email wurde nicht gefunden
             return null;
         } finally {
             pm.close();
@@ -208,12 +151,58 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Gibt die Standordinformationen eines Benutzers mit der angegebenen E-Mail Adresse aus.
+     * Gibt die E-Mail, den Namen und die Standortinformationen des Benutzers aus. Wird für
+     * die Anzeige von Benutzern auf der Karte verwendet.
      *
+     * @param user User-Objekt zur Authentifizierung
      * @param userMail E-Mail Adresse des Benutzers
-     * @return Standortinformationen zum Benutzer, falls nicht gefunden: null
+     * @return Informationen zum Benutzer
      */
     @ApiMethod(path = "user_location")
+    public UserLocationInfo getUserLocationInfo(User user, @Named("userMail") String userMail) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            UserLocation userLocation = endUser.getUserLocation();
+            String firstName = endUser.getUserInfo().getFirstName();
+            InfoPair lastNamePair = endUser.getUserInfo().getLastName();
+            String lastName = null;
+            if(isVisible(user, userMail, lastNamePair.getVisibility(), getFriends(user)).value){
+                lastName = lastNamePair.getValue();
+            }
+            return new UserLocationInfo(userMail, firstName, lastName, userLocation.getLatitude(),
+                    userLocation.getLongitude());
+        } catch (Exception e) {
+            return null;
+        } finally {
+            pm.close();
+        }
+    }
+
+
+    /**
+     * Gibt die Liste von Benutzern aus, die mit dem übergebenen Benutzer befreundet sind.
+     *
+     * @param user Benutzer
+     * @return Liste von Freunden
+     */
+    private List<String> getFriends(User user){
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, user.getEmail());
+            return endUser.getMyFriends();
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Wird für die Feldberechnung verwendet.
+     *
+     * @param userMail E-Mail Adresse des Benutzers
+     * @return Standortinformationen
+     */
     public UserLocation getUserLocation(@Named("userMail") String userMail) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
@@ -229,6 +218,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * Gibt die allgemeinen Informationen und das Profilbild zu einem Benutzer mit der angegebenen
      * E-Mail Adresse aus.
      *
+     * @param user User-Objekt zur Authentifizierung
      * @param userMail E-Mail Adresse des Benutzers
      * @return Informationen und Profilbild vom Benutzer, falls nicht gefunden: null
      */
@@ -261,6 +251,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         }
     }
 
+
     /**
      * Gibt eine Liste von allen Nutzergruppen aus, bei denen der Benutzer als Mitglied eingetragen
      * ist.
@@ -269,7 +260,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @return Liste von beigetretenen oder erstellten Nutzergruppen
      */
     private List<UserGroup> listUserGroups(EndUser endUser) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         List<String> userGroupIds = endUser.getMyUserGroups();
         UserGroup userGroup;
         List<UserGroup> result = new ArrayList<>();
@@ -299,11 +289,11 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         return result;
     }
 
-
     /**
      * Gibt die allgemeinen Informationen zu einem Benutzer mit der angegebenen E-Mail Adresse
      * aus.
      *
+     * @param user User-Objekt zur Authentifizierung
      * @param userMail E-Mail Adresse des Benutzers
      * @return Allgemeine Informationen zum Benutzer, falls nicht gefunden: null
      */
@@ -397,33 +387,31 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Erstellt eine Liste mit allgemeinen Informationen zu den Freunden eines Benutzers.
+     * Erstellt eine Liste mit den E-Mail Adressen der Freunde eines Benutzers.
      *
      * @param user     User-Objekt für die Authentifikation
      * @param userMail E-Mail Adresse des Benutzers
-     * @return Liste von Informationen zu Freunden
+     * @return Liste von E-Mail Adressen der Freunde
      * @throws OAuthRequestException
      * @throws UnauthorizedException
      */
     @ApiMethod(path = "friends_list")
-    public List<UserListData> listFriends(User user, @Named("userMail") String userMail) throws OAuthRequestException, UnauthorizedException {
+    public ListWrapper listFriends(User user, @Named("userMail") String userMail) throws OAuthRequestException, UnauthorizedException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfEndUserNotExists(userMail);
         EndpointUtil.throwIfUserNotSame(user.getEmail(), userMail);
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        List<String> friendMails;
         try {
-            friendMails = pm.getObjectById(EndUser.class, userMail).getMyFriends();
+            return new ListWrapper(pm.getObjectById(EndUser.class, userMail).getMyFriends());
         } finally {
             pm.close();
         }
-        return listUserInfo(user, friendMails);
     }
 
     /**
      * Durchsucht die Benutzer nach der Eingabe und gibt die allgemeinen Nutzerinformationen
      * zu den Ergebnissen in einer Liste aus.
-     * TODO: LISTDATA OBJEKTE ZURÜCKGEBEN
+     *
      * @param input Eingabe
      * @return Liste von allgemeinen Informationen zu Benutzern
      */
@@ -558,6 +546,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @return true, falls Benutzer hinzugefügt wurde, false falls dieser nicht existiert
      * @throws OAuthRequestException
      */
+    @ApiMethod(path = "friends_add")
     public BooleanWrapper addFriend(User user, @Named("userMail") String userMail, @Named("friendMail") String friendMail) throws OAuthRequestException, UnauthorizedException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserNotSame(user.getEmail(), userMail);
@@ -588,6 +577,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @return true, falls Benutzer entfernt wurde, false falls dieser nicht exisiert
      * @throws OAuthRequestException
      */
+    @ApiMethod(path = "friends_remove")
     public BooleanWrapper removeFriend(User user, @Named("userMail") String userMail, @Named("friendMail") String friendMail)
             throws OAuthRequestException, UnauthorizedException {
         EndpointUtil.throwIfNoUser(user);
@@ -642,9 +632,57 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             // pm.makePersistent(userGroup);
             //}
 
-
-            // Aus Domänen löschen
         }
+    }
 
+    /**
+     * ALTE METHODEN
+     */
+    /**
+     * Erstellt ein Member-Objekt für die angegebene E-Mail.
+     *
+     * @param mail
+     */
+    public void createMember(@Named("mail") String mail) {
+        Member m = getMember(mail);
+        if (m == null) {
+            m = new Member();
+            m.setEmail(mail);
+            m.setName(mail);
+
+            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+            try {
+                pm.makePersistent(m);
+            } finally {
+                pm.close();
+            }
+        }
+    }
+
+    /**
+     * Liefert das auf dem Server hinterlegte Member-Objekt mit der angegebenen Mail.
+     *
+     * @param email Die Mail-Adresse des Member-Objekts, das abgerufen werden soll.
+     * @return Das aktuelle Member-Objekt.
+     */
+    public Member getMember(@Named("email") String email) {
+        Member member = null;
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            Query q = pm.newQuery(Member.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Member> results = (List<Member>) q.execute(email);
+            if (!results.isEmpty()) {
+                member = results.get(0);
+            }
+        } catch (JDOObjectNotFoundException e) {
+            // Wird geworfen, wenn kein Objekt mit dem angegebenen Schlüssel existiert
+            // In diesem Fall null zurückgeben
+            return null;
+        } finally {
+            pm.close();
+        }
+        return member;
     }
 }

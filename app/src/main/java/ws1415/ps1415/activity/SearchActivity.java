@@ -13,8 +13,6 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import com.skatenight.skatenightAPI.model.UserListData;
-
 import java.util.List;
 
 import ws1415.common.controller.UserController;
@@ -72,7 +70,8 @@ public class SearchActivity extends BaseActivity {
                         mAdapter = null;
                         mResultListView.setAdapter(mAdapter);
                     } else {
-                        listUserInfo(stringList);
+                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                        setUpList(stringList);
                     }
                 }
                 @Override
@@ -85,33 +84,12 @@ public class SearchActivity extends BaseActivity {
     }
 
     /**
-     * Ruft die Informationen der Benutzer zu dem Ergebnis der Suche ab.
-     *
-     * @param stringList Ergebnis der Suche
-     */
-    private void listUserInfo(final List<String> stringList) {
-        UserController.listUserInfo(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, List<UserListData> userListDatas) {
-                setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                setUpList(stringList, userListDatas);
-            }
-            @Override
-            public void taskFailed(ExtendedTask task, String message) {
-                setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                Toast.makeText(SearchActivity.this, message, Toast.LENGTH_LONG).show();
-            }
-        }, stringList);
-    }
-
-    /**
      * Füllt die Liste mit dem Ergebnis des Querys.
      *
      * @param userMails E-Mail Adressen der Benutzer des Ergebnisses
-     * @param userListDatas Informationen zu den Benutzern des Ergebnisses
      */
-    private void setUpList(List<String> userMails, List<UserListData> userListDatas){
-        mAdapter = new UserListAdapter(userMails, userListDatas, this);
+    private void setUpList(List<String> userMails){
+        mAdapter = new UserListAdapter(userMails, this);
         if(mResultListView != null) mResultListView.setAdapter(mAdapter);
     }
 

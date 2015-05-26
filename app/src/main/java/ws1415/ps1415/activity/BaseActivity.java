@@ -71,6 +71,8 @@ public class BaseActivity extends Activity {
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1)));
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[6], navMenuIcons.getResourceId(6, -1)));
 
         navMenuIcons.recycle();
 
@@ -114,21 +116,29 @@ public class BaseActivity extends Activity {
                     startActivity(profile_intent);
                     break;
                 case 1:
+                    Intent friends_intent = new Intent(BaseActivity.this, FriendsActivity.class);
+                    startActivity(friends_intent);
+                    break;
+                case 2:
+                    Intent messaging_intent = new Intent(BaseActivity.this, MessagingActivity.class);
+                    startActivity(messaging_intent);
+                    break;
+                case 3:
                     Intent show_events_intent = new Intent(BaseActivity.this, ShowEventsActivity.class);
                     show_events_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(show_events_intent);
                     break;
-                case 2:
+                case 4:
                     Intent user_group_intent = new Intent(BaseActivity.this, UsergroupActivity.class);
                     user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(user_group_intent);
                     break;
-                case 3:
+                case 5:
                     Intent cloud_storage_test_intent = new Intent(BaseActivity.this, ImageStorageTestActivity.class);
                     cloud_storage_test_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(cloud_storage_test_intent);
                     break;
-                case 4:
+                case 6:
                     Intent search_intent = new Intent(BaseActivity.this, SearchActivity.class);
                     search_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(search_intent);

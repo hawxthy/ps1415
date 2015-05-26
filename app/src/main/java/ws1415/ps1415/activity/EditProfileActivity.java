@@ -311,6 +311,10 @@ public class EditProfileActivity extends Activity {
         mOptOutSearch = mCheckBoxOptOut.isChecked();
         mShowPrivateGroups = Visibility.getValue(mSpinnerPrivateGroupsVisibility.getSelectedItemPosition());
 
+        if(mUserInfo.getFirstName().length() < 3){
+            Toast.makeText(this, getString(R.string.first_name_too_short), Toast.LENGTH_LONG).show();
+            return;
+        }
         UserController.updateUserProfile(new ExtendedTaskDelegateAdapter<Void, UserInfo>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserInfo userInfo) {

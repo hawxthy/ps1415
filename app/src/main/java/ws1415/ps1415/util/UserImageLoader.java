@@ -40,17 +40,19 @@ public class UserImageLoader {
      * @param imageView ImageView
      */
     public void displayImage(final BlobKey blobKey, final ImageView imageView){
-        Bitmap bitmap = memoryCache.get(blobKey.getKeyString());
-        if(bitmap != null){
-            imageView.setImageBitmap(ImageUtil.getRoundedBitmap(bitmap));
-        } else {
-            UserController.getUserPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>(){
-                @Override
-                public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
-                    memoryCache.put(blobKey.getKeyString(), bitmap);
-                    imageView.setImageBitmap(ImageUtil.getRoundedBitmap(bitmap));
-                }
-            }, blobKey);
+        if(blobKey != null && !blobKey.getKeyString().equals("") && blobKey.getKeyString() != null) {
+            Bitmap bitmap = memoryCache.get(blobKey.getKeyString());
+            if (bitmap != null) {
+                imageView.setImageBitmap(ImageUtil.getRoundedBitmap(bitmap));
+            } else {
+                UserController.getUserPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
+                        memoryCache.put(blobKey.getKeyString(), bitmap);
+                        imageView.setImageBitmap(ImageUtil.getRoundedBitmap(bitmap));
+                    }
+                }, blobKey);
+            }
         }
     }
 
@@ -64,17 +66,19 @@ public class UserImageLoader {
      * @param imageView ImageView
      */
     public void displayImageFramed(final BlobKey blobKey, final ImageView imageView){
-        Bitmap bitmap = memoryCache.get(blobKey.getKeyString());
-        if(bitmap != null){
-            imageView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bitmap));
-        } else {
-            UserController.getUserPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>(){
-                @Override
-                public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
-                    memoryCache.put(blobKey.getKeyString(), bitmap);
-                    imageView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bitmap));
-                }
-            }, blobKey);
+        if(blobKey != null && !blobKey.getKeyString().equals("") && blobKey.getKeyString() != null) {
+            Bitmap bitmap = memoryCache.get(blobKey.getKeyString());
+            if (bitmap != null) {
+                imageView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bitmap));
+            } else {
+                UserController.getUserPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
+                        memoryCache.put(blobKey.getKeyString(), bitmap);
+                        imageView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bitmap));
+                    }
+                }, blobKey);
+            }
         }
     }
 

@@ -1,6 +1,8 @@
 package ws1415.ps1415.activity;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -37,6 +39,8 @@ import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.ProfilePagerAdapter;
+import ws1415.ps1415.controller.MessageDbController;
+import ws1415.ps1415.model.Conversation;
 import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.util.UserImageLoader;
 import ws1415.ps1415.widget.SlidingTabLayout;
@@ -63,6 +67,9 @@ public class ProfileActivity extends FragmentActivity{
     private UserProfile mUserProfile;
     private Bitmap mUserPicture;
     private String email;
+
+    // Feld um zu prüfen, ob gleicher Serveraufruf stattfindet
+    private boolean addingFriendRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -283,34 +290,98 @@ public class ProfileActivity extends FragmentActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case android.R.id.home:
-                //NavUtils.navigateUpFromSameTask(this);
                 finish();
                 return true;
             case R.id.action_edit_profile:
                 if(mUserProfile != null) {
                     Intent editIntent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-                    UserInfo userInfo = mUserProfile.getUserInfo();
-                    // Da UserInfo nicht serialisierbar auf Client Seite und es auch nicht möglich ist es mit Json zu senden
-                    editIntent.putExtra("email", userInfo.getEmail());
-                    editIntent.putExtra("userPicture", mUserProfile.getUserPicture().getKeyString());
-                    editIntent.putExtra("firstName", userInfo.getFirstName());
-                    editIntent.putExtra("gender", userInfo.getGender());
-                    editIntent.putExtra("lastName", userInfo.getLastName().getValue());
-                    editIntent.putExtra("lastNameVisibility", userInfo.getLastName().getVisibility());
-                    editIntent.putExtra("dateOfBirth", userInfo.getDateOfBirth().getValue());
-                    editIntent.putExtra("dateOfBirthVisibility", userInfo.getDateOfBirth().getVisibility());
-                    editIntent.putExtra("city", userInfo.getCity().getValue());
-                    editIntent.putExtra("cityVisibility", userInfo.getCity().getVisibility());
-                    editIntent.putExtra("plz", userInfo.getPostalCode().getValue());
-                    editIntent.putExtra("plzVisibility", userInfo.getPostalCode().getVisibility());
-                    editIntent.putExtra("description", userInfo.getDescription().getValue());
-                    editIntent.putExtra("descriptionVisibility", userInfo.getDescription().getVisibility());
-                    editIntent.putExtra("optOutSearch", mUserProfile.getOptOutSearch());
-                    editIntent.putExtra("showPrivateGroups", mUserProfile.getShowPrivateGroups());
+                    prepareEditIntentData(editIntent);
                     startActivity(editIntent);
                 }
                 return true;
+            case R.id.action_add_friend:
+                if(email != null && !addingFriendRunning) {
+                    addingFriendRunning = true;
+                    addFriend();
+                }
+                return true;
+            case R.id.action_message_profile:
+                if(mUserProfile != null && email != null) {
+                    if(MessageDbController.getInstance(ProfileActivity.this).existsConversation(email)){
+                        // TODO: Change to Conversation
+                    } else {
+                        createConversationDialog(mUserProfile);
+                    }
+                }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void createConversationDialog(final UserProfile userProfile) {
+        new AlertDialog.Builder(ProfileActivity.this)
+                .setMessage(getString(R.string.create_new_conversation_dialog))
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        String firstName = userProfile.getUserInfo().getFirstName();
+                        firstName = (firstName == null) ? "" : firstName;
+                        String lastName = userProfile.getUserInfo().getLastName().getValue();
+                        lastName = (lastName == null) ? "" : lastName;
+                        String blobKey = userProfile.getUserPicture().getKeyString();
+                        blobKey = (blobKey == null) ? "" : blobKey;
+                        Conversation conversation = new Conversation(userProfile.getEmail(),
+                                blobKey, firstName, lastName);
+                        MessageDbController.getInstance(ProfileActivity.this).insertConversation(conversation);
+                        // TODO: Change to Conversation
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
+    }
+
+    private void addFriend() {
+        setProgressBarIndeterminateVisibility(Boolean.TRUE);
+        UserController.addFriend(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                if (aBoolean) {
+                    Toast.makeText(ProfileActivity.this, "Freund hinzugefügt", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Ist bereits dein Freund", Toast.LENGTH_SHORT).show();
+                }
+                addingFriendRunning = false;
+                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+            }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                Toast.makeText(ProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                addingFriendRunning = false;
+                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+            }
+        }, ServiceProvider.getEmail(), email);
+    }
+
+    private void prepareEditIntentData(Intent editIntent) {
+        UserInfo userInfo = mUserProfile.getUserInfo();
+        // Da UserInfo nicht serialisierbar auf Client Seite und es auch nicht möglich ist es mit Json zu senden
+        editIntent.putExtra("email", userInfo.getEmail());
+        editIntent.putExtra("userPicture", mUserProfile.getUserPicture().getKeyString());
+        editIntent.putExtra("firstName", userInfo.getFirstName());
+        editIntent.putExtra("gender", userInfo.getGender());
+        editIntent.putExtra("lastName", userInfo.getLastName().getValue());
+        editIntent.putExtra("lastNameVisibility", userInfo.getLastName().getVisibility());
+        editIntent.putExtra("dateOfBirth", userInfo.getDateOfBirth().getValue());
+        editIntent.putExtra("dateOfBirthVisibility", userInfo.getDateOfBirth().getVisibility());
+        editIntent.putExtra("city", userInfo.getCity().getValue());
+        editIntent.putExtra("cityVisibility", userInfo.getCity().getVisibility());
+        editIntent.putExtra("plz", userInfo.getPostalCode().getValue());
+        editIntent.putExtra("plzVisibility", userInfo.getPostalCode().getVisibility());
+        editIntent.putExtra("description", userInfo.getDescription().getValue());
+        editIntent.putExtra("descriptionVisibility", userInfo.getDescription().getVisibility());
+        editIntent.putExtra("optOutSearch", mUserProfile.getOptOutSearch());
+        editIntent.putExtra("showPrivateGroups", mUserProfile.getShowPrivateGroups());
     }
 }

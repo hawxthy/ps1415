@@ -2,17 +2,17 @@ package ws1415.ps1415.task;
 
 import android.content.Context;
 
-import com.skatenight.skatenightAPI.model.Member;
 import com.skatenight.skatenightAPI.model.UserGroup;
+import com.skatenight.skatenightAPI.model.UserLocationInfo;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.net.ServiceProvider;
 import ws1415.ps1415.util.PrefManager;
 
 /**
@@ -21,7 +21,7 @@ import ws1415.ps1415.util.PrefManager;
  *
  * @author Bernd Eissing
  */
-public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Member, String>> {
+public class QueryVisibleUsersTask extends ExtendedTask<Void, Void, HashMap<UserLocationInfo, String>> {
     private Context context;
 
     /**
@@ -29,7 +29,7 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
      *
      * @param delegate Klasse die Rückmeldungen zum Fortschritt des Task erhalten soll.
      */
-    public QueryVisibleMembersTask(ExtendedTaskDelegate<Void, HashMap<Member, String>> delegate, Context context) {
+    public QueryVisibleUsersTask(ExtendedTaskDelegate<Void, HashMap<UserLocationInfo, String>> delegate, Context context) {
         super(delegate);
         this.context = context;
     }
@@ -38,13 +38,13 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
     /**
      * Ruft die sichtbaren Mitglieder vom Server ab.
      *
-     * @return Member mit der dazugehörigen Bezeichnung der Gruppe
+     * @return Benutzerinformationen mit der dazugehörigen Bezeichnung der Gruppe
      */
     @Override
-    protected HashMap<Member, String> doInBackground(Void... params) {
+    protected HashMap<UserLocationInfo, String> doInBackground(Void... params) {
         List<UserGroup> tmpGroups = null;
-        List<Member> groupMembers = new ArrayList<Member>();
-        HashMap<Member, String> farbenMap = new HashMap<Member, String>();
+        List<UserLocationInfo> groupMembers = new ArrayList<UserLocationInfo>();
+        HashMap<UserLocationInfo, String> farbenMap = new HashMap<UserLocationInfo, String>();
         try {
             tmpGroups = (ArrayList) ServiceProvider.getService().groupEndpoint().fetchMyUserGroups().execute().getItems();
         } catch (IOException e) {
@@ -54,10 +54,10 @@ public class QueryVisibleMembersTask extends ExtendedTask<Void, Void, HashMap<Me
             for (UserGroup userGroup : tmpGroups) {
                 if (PrefManager.getGroupVisibility(context, userGroup.getName())) {
                     try {
-                        //TODO auf EndUser umstellen
+                        //TODO auf UserLocationInfo umstellen
                         //groupMembers = ServiceProvider.getService().groupEndpoint().fetchGroupMembers(userGroup.getName()).execute().getItems();
-                        for (Member m : groupMembers) {
-                            farbenMap.put(m, userGroup.getName());
+                        for (UserLocationInfo u : groupMembers) {
+                            farbenMap.put(u, userGroup.getName());
                         }
                     } finally {
                         // damit man übersetzen kann

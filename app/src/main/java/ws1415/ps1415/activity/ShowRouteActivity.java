@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Member;
+import com.skatenight.skatenightAPI.model.UserLocationInfo;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ import ws1415.common.task.GetEventTask;
 import ws1415.common.util.LocationUtils;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.ps1415.task.QueryVisibleMembersTask;
+import ws1415.ps1415.task.QueryVisibleUsersTask;
 
 
 /**
@@ -432,9 +433,9 @@ public class ShowRouteActivity extends Activity {
     }
 
     private void refreshVisibleMembers(){
-        new QueryVisibleMembersTask(new ExtendedTaskDelegate<Void, HashMap<Member, String>>() {
+        new QueryVisibleUsersTask(new ExtendedTaskDelegate<Void, HashMap<UserLocationInfo, String>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, HashMap<Member, String> memberStringHashMap) {
+            public void taskDidFinish(ExtendedTask task, HashMap<UserLocationInfo, String> userStringHashMap) {
                 for(Marker m : groupMarker){
                     m.remove();
                 }
@@ -449,16 +450,20 @@ public class ShowRouteActivity extends Activity {
 
                 HashMap<String, Integer> gruppenFarben = new HashMap<>();
 
-                for(Member m : memberStringHashMap.keySet()){
-                    if(!gruppenFarben.containsKey(memberStringHashMap.get(m))){
-                        gruppenFarben.put(memberStringHashMap.get(m), farben.get(0));
+                for(UserLocationInfo user : userStringHashMap.keySet()){
+                    if(!gruppenFarben.containsKey(userStringHashMap.get(user))){
+                        gruppenFarben.put(userStringHashMap.get(user), farben.get(0));
                         farben.remove(0);
                     }
+                    String firstName = (user.getFirstName() == null) ? "" : user.getFirstName();
+                    String lastName = (user.getLastName() == null) ? "" : user.getLastName();
+                    double latitude = (user.getLatitude() == null) ? 0L : user.getLatitude();
+                    double longitude = (user.getLongitude() == null) ? 0L : user.getLongitude();
                     groupMarker.add(googleMap.addMarker(new MarkerOptions()
-                            .title(m.getName())
-                            .snippet(getString(R.string.group) +memberStringHashMap.get(m))
-                            .icon(BitmapDescriptorFactory.fromResource(gruppenFarben.get(memberStringHashMap.get(m))))
-                            .position(new LatLng(m.getLatitude(), m.getLongitude()))
+                            .title(firstName + " " + lastName)
+                            .snippet(getString(R.string.group) + userStringHashMap.get(user))
+                            .icon(BitmapDescriptorFactory.fromResource(gruppenFarben.get(userStringHashMap.get(user))))
+                            .position(new LatLng(latitude, longitude))
                             .draggable(false)));
                 }
             }
