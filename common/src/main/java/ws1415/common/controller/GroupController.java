@@ -10,6 +10,7 @@ import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 import com.skatenight.skatenightAPI.model.UserGroupNewsBoardTransport;
 import com.skatenight.skatenightAPI.model.UserGroupPicture;
+import com.skatenight.skatenightAPI.model.UserGroupVisibleMembers;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -55,12 +56,12 @@ public class GroupController {
      * @param handler Der Task, der mit dem Server kommuniziert
      * @param groupName Der Name der zu erstellenden UserGroup
      */
-    public void createUserGroup(ExtendedTaskDelegate handler, String groupName, final boolean isOpen, final UserGroupType groupType){
+    public void createUserGroup(ExtendedTaskDelegate handler, String groupName, final boolean isPrivat, final UserGroupType groupType, final String password){
         new ExtendedTask<String, Void, Void>(handler){
             @Override
             protected Void doInBackground(String... params){
                 try{
-                    return ServiceProvider.getService().groupEndpoint().createUserGroup(params[0], isOpen, groupType.name()).execute();
+                    return ServiceProvider.getService().groupEndpoint().createUserGroup(params[0], isPrivat, groupType.name(), password).execute();
                 }catch(IOException e){
                     publishError("Die Nutzergruppe konnte nicht erstellt werden");
                     return null;
@@ -175,13 +176,14 @@ public class GroupController {
      * einen EndUser einer UserGroup zuzuordnen.
      *
      * @param handler Der Task, der mit dem Server kommuniziert
+     * @param password Das Password, falls eins beötigt wird kann leer aber nicht null sein
      */
-    public void joinUserGroup(ExtendedTaskDelegate handler, String groupName){
+    public void joinUserGroup(ExtendedTaskDelegate handler, String groupName, final String password){
         new ExtendedTask<String, Void, Void>(handler){
             @Override
             protected Void doInBackground(String... params){
                 try{
-                    return ServiceProvider.getService().groupEndpoint().joinUserGroup(params[0]).execute();
+                    return ServiceProvider.getService().groupEndpoint().joinUserGroup(params[0], password).execute();
                 }catch(IOException e){
                     publishError("Der Nutzergruppe konnte beigetreten werden");
                     return null;
@@ -499,6 +501,13 @@ public class GroupController {
         }.execute(groupName);
     }
 
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um das Bild einer
+     * Nutzergruppe herunter zu laden.
+     *
+     * @param handler
+     * @param groupName Der Name der Nutzergruppe
+     */
     public void getUserGroupPicture(ExtendedTaskDelegate handler, String groupName){
         new ExtendedTask<String, Void, UserGroupPicture>(handler){
             @Override
@@ -509,6 +518,96 @@ public class GroupController {
                     e.printStackTrace();
                     return null;
                 }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um die sichtbaren Mitglieder einer
+     * Nutzergruppe zu erhalten.
+     *
+     * @param handler
+     * @param groupName Der Name der Nutzergruppe
+     */
+    public void getUserGroupVisibleMembers(ExtendedTaskDelegate handler, String groupName){
+        new ExtendedTask<String, Void, UserGroupVisibleMembers>(handler){
+            @Override
+            protected UserGroupVisibleMembers doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().getUserGroupVisibleMembers(params[0]).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um die Sichtbarkeit von einem
+     * Mitglied der Nutzergruppe zu ändern. Diese Methode kann verwentet werden, wenn
+     * ein Mitglied einer Nutzergruppe nicht von anderen Mitglieder auf der Karte bei
+     * laufenden Event gesehen zu werden.
+     *
+     * @param handler
+     * @param groupName Der Name der Nutzergruppe
+     */
+    public void changeMyVisibility(ExtendedTaskDelegate handler, String groupName){
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().changeMyVisibility(params[0]).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um das Passwort einer Nutzergruppe
+     * zu ändern. Dabei muss das derzeitige Passwort angegeben werden.
+     *
+     * @param handler
+     * @param groupName Der Name der Nutzergruppe
+     * @param currentPw Das derzeitige Passwort der Nutzergruppe kann null sein
+     * @param newPw Das neue Passwort der Nutzergruppe kann nicht null sein
+     */
+    public void changeUserGroupPassword(ExtendedTaskDelegate handler, String groupName, final String currentPw, final String newPw){
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().changeUserGroupPassword(params[0], currentPw, newPw).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um die Öffentlichkeit einer Nutzergruppe
+     * zu ändern.
+     *
+     * @param handler
+     * @param groupName Der Name der Nutzergruppe
+     * @param privat Die Öffentlichkeit true = privat, false = offen
+     */
+    public void changeUserGroupPrivacy(ExtendedTaskDelegate handler, String groupName, final boolean privat){
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().changeUserGroupPrivacy(params[0], privat).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    return null;
+                }
+
             }
         }.execute(groupName);
     }

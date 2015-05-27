@@ -62,6 +62,7 @@ public class groupUtils {
      * @param userGroup Nutzergruppe, die ausgewählt wurde
      */
     public static AlertDialog createDialogJoin(final FragmentActivity activity, final UserGroup userGroup) {
+        //TODO Das Joinen von Nutzergruppen in der app überarbeiten
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(userGroup.getName());
         builder.setMessage(R.string.dialog_join_group);
@@ -73,7 +74,7 @@ public class groupUtils {
                     public void taskDidFinish(ExtendedTask task, Void aVoid) {
                         ((UsergroupActivity) activity).refresh();
                     }
-                }, userGroup.getName());
+                }, userGroup.getName(), null);
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

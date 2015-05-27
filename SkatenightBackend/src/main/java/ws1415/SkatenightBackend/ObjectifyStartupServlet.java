@@ -18,6 +18,7 @@ import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserGroupPicture;
+import ws1415.SkatenightBackend.transport.UserGroupVisibleMembers;
 
 /**
  * TODO JavaDoc + von anderem Interface oder Klasse erben, damit nicht alle Methoden implementiert werden müssen
@@ -34,6 +35,7 @@ public class ObjectifyStartupServlet implements Servlet {
         ObjectifyService.register(UserGroupPicture.class);
         ObjectifyService.register(BoardEntry.class);
         ObjectifyService.register(Board.class);
+        ObjectifyService.register(UserGroupVisibleMembers.class);
     }
 
     @Override

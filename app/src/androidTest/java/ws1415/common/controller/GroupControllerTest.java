@@ -12,7 +12,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
-import ws1415.common.controller.GroupController;
 import ws1415.common.model.UserGroupType;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
@@ -25,8 +24,9 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
     private String MY_MAIL = "";
     private String MY_SECOND_MAIL = "";
     final private String TEST_GROUP_NAME = "Testgruppe1";
-    final private boolean TEST_BOOLEAN_IS_OPEN = true;
+    final private boolean TEST_BOOLEAN_GROUP_PRIVAT = false;
     final private UserGroupType TEST_GROUP_TYPE = UserGroupType.NORMALGROUP;
+    final private String TEST_GROUP_PASSWORD = "Testgruppe1";
     final private String TEST_BLACK_BOARD_MESSAGE = "Das ist eine Blackboard Message";
     final private String TEST_BLACK_BOARD_MESSAGE_2 = "Das ist die zweite Blackboard Message";
     final private String TEST_BLACK_BOARD_MESSAGE_3 = "Das ist die dritte Blackboard Message";
@@ -50,7 +50,7 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_BOOLEAN_IS_OPEN, TEST_GROUP_TYPE);
+        }, TEST_GROUP_NAME, TEST_BOOLEAN_GROUP_PRIVAT, TEST_GROUP_TYPE, TEST_GROUP_PASSWORD);
         try {
             assertTrue("setUp for createUserGroup failed", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -284,7 +284,7 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME);
+        }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD);
         try {
             assertTrue("Die joinUserGroup Methode konnte nicht ausgeführt werden", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -347,7 +347,7 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME);
+        }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD);
         try {
             assertTrue("Die joinUserGroup Methode konnte nicht ausgeführt werden", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -425,4 +425,6 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
             }
         }, TEST_GROUP_NAME);
     }
+
+
 }

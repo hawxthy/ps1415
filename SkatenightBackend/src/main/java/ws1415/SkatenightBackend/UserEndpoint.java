@@ -32,6 +32,8 @@ import ws1415.SkatenightBackend.transport.ListWrapper;
 import ws1415.SkatenightBackend.transport.UserListData;
 import ws1415.SkatenightBackend.transport.UserProfile;
 
+import static com.googlecode.objectify.ObjectifyService.ofy;
+
 /**
  * Der UserEndpoint stellt Hilfsmethoden bereit, die genutzt werden um die Benutzer zu verwalten.
  *
@@ -266,7 +268,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         UserGroup userGroup;
         List<UserGroup> result = new ArrayList<>();
         for (String userGroupId : userGroupIds) {
-            userGroup = new GroupEndpoint().getUserGroup(userGroupId);
+            userGroup = ofy().load().type(UserGroup.class).id(userGroupId).now();
             if (userGroup != null) result.add(userGroup);
         }
         return result;

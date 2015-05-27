@@ -36,7 +36,7 @@ public class RightEndpoint extends SkatenightServerEndpoint {
     public void distributeRightToUser(User user, @Named("groupName") String groupName, @Named("rightName") String rightName, @Named("userName") String userName) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
-        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        UserGroup group = ofy().load().type(UserGroup.class).id(groupName).safe();
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
             EndpointUtil.throwIfUserNotInGroup(group, userName);
             if (!group.getMemberRights().get(userName).contains(rightName) && isRight(rightName)) {
@@ -63,7 +63,7 @@ public class RightEndpoint extends SkatenightServerEndpoint {
     public void distributeRightsToUser(User user, @Named("groupName") String groupName, ListWrapper rightNames, @Named("userName") String userName) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
-        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        UserGroup group = ofy().load().type(UserGroup.class).id(groupName).safe();
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
             EndpointUtil.throwIfUserNotInGroup(group, userName);
             for (String right : rightNames.stringList) {
@@ -92,7 +92,7 @@ public class RightEndpoint extends SkatenightServerEndpoint {
     public void distributeRightToUsers(User user, @Named("groupName") String groupName, @Named("rightName") String rightName, ListWrapper userNames) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
-        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        UserGroup group = ofy().load().type(UserGroup.class).id(groupName).safe();
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
             for (String userName : userNames.stringList) {
                 EndpointUtil.throwIfUserNotInGroup(group, userName);
@@ -122,7 +122,7 @@ public class RightEndpoint extends SkatenightServerEndpoint {
     public void distributeRightsToUsers(User user, @Named("groupName") String groupName, ListWrapper rightNames, @Named("userNames") List<String> userNames) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
-        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        UserGroup group = ofy().load().type(UserGroup.class).id(groupName).safe();
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
             String[] users = userNames.get(0).split(",");
             for (String member : users) {
@@ -154,7 +154,7 @@ public class RightEndpoint extends SkatenightServerEndpoint {
         // TODO die ganzen Abfragen generell zu Ranks versuchen zu reduzieren
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
-        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        UserGroup group = ofy().load().type(UserGroup.class).id(groupName).safe();
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
             EndpointUtil.throwIfUserNotInGroup(group, userName);
             if (!rightName.equals(Right.FULLRIGHTS.name()) && !rightName.equals(Right.NEWMEMBERRIGHTS.name()) && group.getMemberRights().get(userName).contains(rightName)) {
@@ -181,7 +181,7 @@ public class RightEndpoint extends SkatenightServerEndpoint {
     public void takeRightsFromUser(User user, @Named("groupName") String groupName, ListWrapper rightNames, @Named("userName") String userName) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
-        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        UserGroup group = ofy().load().type(UserGroup.class).id(groupName).safe();
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
             EndpointUtil.throwIfUserNotInGroup(group, userName);
             for (String right : rightNames.stringList) {
@@ -211,7 +211,7 @@ public class RightEndpoint extends SkatenightServerEndpoint {
     public void takeRightFromUsers(User user, @Named("groupName") String groupName, @Named("rightName") String rightName, ListWrapper userNames) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
-        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        UserGroup group = ofy().load().type(UserGroup.class).id(groupName).safe();
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
             for (String member : userNames.stringList) {
                 EndpointUtil.throwIfUserNotInGroup(group, member);
@@ -241,7 +241,7 @@ public class RightEndpoint extends SkatenightServerEndpoint {
     public void takeRightsFromUsers(User user, @Named("groupName") String groupName, ListWrapper rightNames, @Named("userNames") List<String> userNames) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
-        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        UserGroup group = ofy().load().type(UserGroup.class).id(groupName).safe();
         if (hasRights(group, user.getEmail(), Right.DISTRIBUTERIGHTS.name())) {
             String[] users = userNames.get(0).split(",");
             for (String member : users) {
@@ -273,7 +273,7 @@ public class RightEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         EndpointUtil.throwIfEndUserNotExists(newLeader);
-        UserGroup group = EndpointUtil.throwIfNoUserGroupExists(groupName);
+        UserGroup group = ofy().load().type(UserGroup.class).id(groupName).safe();
         if(hasRights(group, user.getEmail(), Right.FULLRIGHTS.name())){
             EndpointUtil.throwIfUserNotInGroup(group, newLeader);
             group.getMemberRights().get(user.getEmail()).remove(Right.FULLRIGHTS.name());

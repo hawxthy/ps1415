@@ -11,6 +11,7 @@ import java.util.HashMap;
 import ws1415.SkatenightBackend.transport.UserGroupBlackBoardTransport;
 import ws1415.SkatenightBackend.transport.UserGroupMetaData;
 import ws1415.SkatenightBackend.transport.UserGroupNewsBoardTransport;
+import ws1415.SkatenightBackend.transport.UserGroupVisibleMembers;
 
 /**
  * Repräsentiert eine Benutzergruppe.
@@ -21,34 +22,46 @@ import ws1415.SkatenightBackend.transport.UserGroupNewsBoardTransport;
 public class UserGroup {
     @Id
     private String name;            // Eindeutiger Name der Gruppe
+    private String password;
     private String creator;
-    private boolean open;
+    private boolean privat;
     private int memberCount;
     private String groupType;
-    @Load(unless = UserGroupMetaData.class)
+    @Load(unless = {UserGroupMetaData.class, UserGroupBlackBoardTransport.class, UserGroupNewsBoardTransport.class, UserGroupPicture.class})
     private HashMap<String, ArrayList<String>> memberRights;
-    @Load(UserGroupPicture.class)
+    @Load(unless = {UserGroupMetaData.class, UserGroupBlackBoardTransport.class, UserGroupNewsBoardTransport.class, UserGroupVisibleMembers.class})
     private Ref<UserGroupPicture> picture;
-    @Load(UserGroupBlackBoardTransport.class)
+    @Load(unless = {UserGroupMetaData.class, UserGroupNewsBoardTransport.class, UserGroupPicture.class, UserGroupVisibleMembers.class})
     private Ref<Board> blackBoard;
-    @Load(UserGroupNewsBoardTransport.class)
+    @Load(unless = {UserGroupMetaData.class, UserGroupBlackBoardTransport.class, UserGroupPicture.class, UserGroupVisibleMembers.class})
     private Ref<Board> newsBoard;
+    @Load(unless = {UserGroupMetaData.class, UserGroupBlackBoardTransport.class, UserGroupNewsBoardTransport.class, UserGroupPicture.class})
+    private Ref<UserGroupVisibleMembers> visibleMembers;
 
 
     public UserGroup() {
         // Konstruktor für GAE
     }
 
-    public UserGroup(String creator, String groupType) {
+    public UserGroup(String creator, String groupType, String password) {
         if (creator == null) {
             throw new IllegalArgumentException("creator can not be null");
         }
         this.creator = creator;
         this.groupType = groupType;
+        this.password = password;
     }
 
     public String getCreator() {
         return creator;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password){
+        this.password = password;
     }
 
     public String getName() {
@@ -59,12 +72,12 @@ public class UserGroup {
         this.name = name;
     }
 
-    public boolean isOpen() {
-        return open;
+    public boolean isPrivat() {
+        return privat;
     }
 
-    public void setOpen(boolean open) {
-        this.open = open;
+    public void setPrivat(boolean privat) {
+        this.privat = privat;
     }
 
     public int getMemberCount() {
@@ -133,7 +146,15 @@ public class UserGroup {
         this.newsBoard = Ref.create(board);
     }
 
+    public UserGroupVisibleMembers getVisibleMembers() {
+        if(visibleMembers != null){
+            return visibleMembers.get();
+        }
+        return null;
+    }
 
-
+    public void setVisibleMembers(UserGroupVisibleMembers visibleMembers) {
+        this.visibleMembers = Ref.create(visibleMembers);
+    }
 }
 
