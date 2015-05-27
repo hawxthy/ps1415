@@ -1,7 +1,6 @@
 package ws1415.SkatenightBackend.gcm;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,12 +19,12 @@ public class RegistrationManager {
     /**
      * Die Liste aller zurzeit registrierter Benutzer.
      */
-    @Persistent(serialized = "true", defaultFetchGroup = "true")
+    @Persistent(defaultFetchGroup = "true")
     private Set<String> registeredUser = new HashSet<>();
     /**
      * Speichert für jede Mail-Adresse (für jeden Benutzer) eine Liste der zugehörigen IDs.
      */
-    @Persistent(serialized = "true", defaultFetchGroup = "true")
+    @Persistent(defaultFetchGroup = "true")
     private Map<String, String> userIDs = new HashMap<>();
 
     public List<String> getRegisteredUser() {

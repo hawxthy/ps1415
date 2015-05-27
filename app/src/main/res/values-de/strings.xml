@@ -218,4 +218,10 @@
     <string name="sure_delete_conversation_dialog">Sind Sie sicher, dass Sie diese Konversation entfernen wollen?</string>
     <string name="conversation_deleted">Konversation gelöscht</string>
     <string name="error_delete_conversation">Fehler beim Löschvorgang</string>
+
+    <!-- ConversationActivity -->
+    <string name="input_required">Eingabe erforderlich</string>
+    <string name="title_activity_conversation">Konversation</string>
+    <string name="input_message">Nachricht eingeben</string>
+    <string name="message_could_not_be_sent">Nachricht konnte nicht zugestellt werden</string>
 </resources>

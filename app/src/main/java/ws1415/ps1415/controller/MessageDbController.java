@@ -11,9 +11,9 @@ import java.util.Date;
 import java.util.List;
 
 import ws1415.ps1415.database.MessageDbHelper;
-import ws1415.ps1415.model.Conversation;
-import ws1415.ps1415.model.LocalMessageType;
-import ws1415.ps1415.model.Message;
+import ws1415.common.model.Conversation;
+import ws1415.common.model.LocalMessageType;
+import ws1415.common.model.Message;
 
 /**
  * Created by Martin on 16.05.2015.
@@ -26,7 +26,7 @@ public class MessageDbController {
     private Context mContext;
 
     private MessageDbController(Context context) {
-        mContext = context;
+        mContext = context.getApplicationContext();
     }
 
     public static synchronized MessageDbController getInstance(Context context) {
@@ -336,6 +336,18 @@ public class MessageDbController {
 
         cursor.close();
         return messages;
+    }
+
+    /**
+     * Löscht eine Nachricht aus der Datenbank.
+     *
+     * @param messageId Id der Nachricht
+     * @return true, falls Vorgang erfolgreich, false andernfalls
+     */
+    public boolean deleteMessage(long messageId){
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        return db.delete(MessageDbHelper.TABLE_MESSAGE, MessageDbHelper.KEY_ID_MESSAGE +  "=?",
+                new String[]{String.valueOf(messageId)}) > 0;
     }
 
     // -- Hilfsmethoden -- //

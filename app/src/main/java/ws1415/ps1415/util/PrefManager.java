@@ -11,6 +11,10 @@ import android.preference.PreferenceManager;
  */
 public class PrefManager {
     private static final String SELECTED_USER_MAIL = "selectedUserMail";
+    private static final String USER_PICTURE = "userPicture";
+    private static final String USER_FIRST_NAME = "userFirstName";
+    private static final String USER_LAST_NAME = "userLastName";
+
     private PrefManager(){}
 
     private static SharedPreferences getSharedPreferences(Context context) {
@@ -59,6 +63,60 @@ public class PrefManager {
         SharedPreferences sp = getSharedPreferences(context);
         if (sp != null) {
             return sp.getString(SELECTED_USER_MAIL, "");
+        } else {
+            return "";
+        }
+    }
+
+    public static void setUserPicture(Context context, String blobKeyString){
+        SharedPreferences sp = getSharedPreferences(context);
+        if (sp != null) {
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString(USER_PICTURE, blobKeyString);
+            editor.commit();
+        }
+    }
+
+    public static String getUserPicture(Context context){
+        SharedPreferences sp = getSharedPreferences(context);
+        if (sp != null) {
+            return sp.getString(USER_PICTURE, "");
+        } else {
+            return "";
+        }
+    }
+
+    public static void setUserFirstName(Context context, String firstName){
+        SharedPreferences sp = getSharedPreferences(context);
+        if (sp != null) {
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString(USER_FIRST_NAME, firstName);
+            editor.commit();
+        }
+    }
+
+    public static String getUserFirstName(Context context){
+        SharedPreferences sp = getSharedPreferences(context);
+        if (sp != null) {
+            return sp.getString(USER_FIRST_NAME, "");
+        } else {
+            return "";
+        }
+    }
+
+    public static void setUserLastName(Context context, String lastName){
+        SharedPreferences sp = getSharedPreferences(context);
+        if (sp != null) {
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString(USER_LAST_NAME, lastName);
+            editor.commit();
+        }
+    }
+
+    public static String getUserLastName(Context context){
+        SharedPreferences sp = getSharedPreferences(context);
+        if (sp != null) {
+            return sp.getString(USER_LAST_NAME, "");
         } else {
             return "";
         }

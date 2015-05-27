@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.api.client.util.DateTime;
+import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.EventMetaData;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 import com.skatenight.skatenightAPI.model.UserInfo;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import ws1415.common.controller.UserController;
+import ws1415.common.model.Conversation;
 import ws1415.common.model.Gender;
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
@@ -40,7 +42,6 @@ import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.ProfilePagerAdapter;
 import ws1415.ps1415.controller.MessageDbController;
-import ws1415.ps1415.model.Conversation;
 import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.util.UserImageLoader;
 import ws1415.ps1415.widget.SlidingTabLayout;
@@ -147,7 +148,7 @@ public class ProfileActivity extends FragmentActivity{
             @Override
             public void taskDidFinish(ExtendedTask task, UserProfile userProfile) {
                 if (mAdapter != null) {
-                    UserImageLoader.getInstance().displayImageFramed(userProfile.getUserPicture(), mPicture);
+                    UserImageLoader.getInstance(ProfileActivity.this).displayImageFramed(userProfile.getUserPicture(), mPicture);
                     setUpProfile(userProfile);
                 }
                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
@@ -308,13 +309,25 @@ public class ProfileActivity extends FragmentActivity{
             case R.id.action_message_profile:
                 if(mUserProfile != null && email != null) {
                     if(MessageDbController.getInstance(ProfileActivity.this).existsConversation(email)){
-                        // TODO: Change to Conversation
+                        Intent conversation_intent = new Intent(ProfileActivity.this, ConversationActivity.class);
+                        prepareConversationIntent(conversation_intent);
+                        startActivity(conversation_intent);
                     } else {
                         createConversationDialog(mUserProfile);
                     }
                 }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void prepareConversationIntent(Intent conversation_intent) {
+        String firstName = mUserProfile.getUserInfo().getFirstName();
+        if(firstName == null) firstName = "";
+        String lastName = mUserProfile.getUserInfo().getLastName().getValue();
+        if(lastName == null) lastName = "";
+        conversation_intent.putExtra("email", mUserProfile.getEmail());
+        conversation_intent.putExtra("firstName", firstName);
+        conversation_intent.putExtra("lastName", lastName);
     }
 
     private void createConversationDialog(final UserProfile userProfile) {
@@ -326,10 +339,10 @@ public class ProfileActivity extends FragmentActivity{
                         firstName = (firstName == null) ? "" : firstName;
                         String lastName = userProfile.getUserInfo().getLastName().getValue();
                         lastName = (lastName == null) ? "" : lastName;
-                        String blobKey = userProfile.getUserPicture().getKeyString();
-                        blobKey = (blobKey == null) ? "" : blobKey;
+                        BlobKey blobKey = userProfile.getUserPicture();
+                        String blobKeyString = (blobKey == null) ? "" : blobKey.getKeyString();
                         Conversation conversation = new Conversation(userProfile.getEmail(),
-                                blobKey, firstName, lastName);
+                                blobKeyString, firstName, lastName);
                         MessageDbController.getInstance(ProfileActivity.this).insertConversation(conversation);
                         // TODO: Change to Conversation
                     }
@@ -366,9 +379,11 @@ public class ProfileActivity extends FragmentActivity{
 
     private void prepareEditIntentData(Intent editIntent) {
         UserInfo userInfo = mUserProfile.getUserInfo();
+        BlobKey blobKey = mUserProfile.getUserPicture();
+        String blobKeyString = (blobKey == null) ? null : blobKey.getKeyString();
         // Da UserInfo nicht serialisierbar auf Client Seite und es auch nicht möglich ist es mit Json zu senden
         editIntent.putExtra("email", userInfo.getEmail());
-        editIntent.putExtra("userPicture", mUserProfile.getUserPicture().getKeyString());
+        editIntent.putExtra("userPicture", blobKeyString);
         editIntent.putExtra("firstName", userInfo.getFirstName());
         editIntent.putExtra("gender", userInfo.getGender());
         editIntent.putExtra("lastName", userInfo.getLastName().getValue());

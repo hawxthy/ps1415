@@ -33,7 +33,7 @@
                 android:id="@+id/list_item_conversation_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="3dp"
                 android:layout_marginRight="25dp"
                 android:ellipsize="end"
                 android:singleLine="true"
@@ -46,6 +46,8 @@
                 android:id="@+id/list_item_conversation_last_message_time"
                 android:text="19:26"
                 android:textSize="15sp"
+                android:fontFamily="sans-serif-light"
+                android:layout_marginTop="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -57,6 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Secondary Text"
+            android:layout_marginTop="3dp"
             android:fontFamily="sans-serif-light"
             android:ellipsize="end"
             android:singleLine="true"

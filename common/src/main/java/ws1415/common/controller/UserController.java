@@ -7,6 +7,7 @@ import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserListData;
+import com.skatenight.skatenightAPI.model.UserPrimaryData;
 import com.skatenight.skatenightAPI.model.UserProfile;
 
 import org.apache.http.HttpEntity;
@@ -102,6 +103,26 @@ public abstract class UserController {
                 }
             }
         }.execute(userMail);
+    }
+
+    /**
+     * Gibt die eigenen nötigsten Benutzerinformationen aus.
+     *
+     * @param handler
+     */
+    public static void getPrimaryData(ExtendedTaskDelegate handler){
+        new ExtendedTask<Void, Void, UserPrimaryData>(handler){
+            @Override
+            protected UserPrimaryData doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().getPrimaryData().execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Benutzer konnte nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute();
     }
 
     /**

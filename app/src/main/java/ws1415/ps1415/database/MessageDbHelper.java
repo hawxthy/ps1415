@@ -74,8 +74,7 @@ public class MessageDbHelper extends SQLiteOpenHelper {
     public static synchronized MessageDbHelper getInstance(Context context) {
         if (instance == null) {
             instance = new MessageDbHelper(context.getApplicationContext());
-        }
-        else if(!DATABASE_USER_ID.equals(ServiceProvider.getEmail())){
+        } else if(!DATABASE_USER_ID.equals(ServiceProvider.getEmail())){
             instance = new MessageDbHelper(context.getApplicationContext());
             DATABASE_USER_ID = ServiceProvider.getEmail();
         }

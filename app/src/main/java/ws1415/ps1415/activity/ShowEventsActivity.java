@@ -16,8 +16,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
 
 import java.util.Date;
@@ -27,7 +25,6 @@ import ws1415.common.gcm.GCMUtil;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.task.QueryEventsTask;
-import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.EventsCursorAdapter;
@@ -39,25 +36,10 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
      * Events aktualisiert.
      */
     public static final String REFRESH_EVENTS_ACTION = "REFRESH_EVENTS";
-    private static final String TAG = "Skatenight";
-    public static final int SETTINGS_RESULT = 1;
-    public static final int REQUEST_ACCOUNT_PICKER = 2;
 
     private ListView eventListView;
     private List<Event> eventList;
     private EventsCursorAdapter mAdapter;
-
-    // Komponenten und Variablen für GCM
-    private String SENDER_ID = Constants.GCM_PROJECT_ID;
-    public static final String EXTRA_MESSAGE = "message";
-    public static final String PROPERTY_REG_ID = "registration_id";
-    private static final String PROPERTY_APP_VERSION = "appVersion";
-    private GoogleCloudMessaging gcm;
-    private String regid;
-    private Context context;
-
-    private SharedPreferences prefs;
-    private GoogleAccountCredential credential;
 
 
     /**
@@ -67,11 +49,6 @@ public class ShowEventsActivity extends BaseActivity implements ExtendedTaskDele
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        context = this;
-
-        // SharePreferences skatenight.app laden
-        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
         //Prüft ob der Benutzer eingeloggt ist
         UniversalUtil.checkLogin(this);
 

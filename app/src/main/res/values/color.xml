@@ -9,4 +9,6 @@
 
     <color name="colorProfilePrimary">#FF5722</color>
     <color name="colorProfileScroll">#FFFFFF</color>
+
+    <color name="conversationBg">#E3E3E3</color>
 </resources>

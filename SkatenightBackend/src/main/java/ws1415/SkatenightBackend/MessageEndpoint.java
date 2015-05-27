@@ -1,5 +1,6 @@
 package ws1415.SkatenightBackend;
 
+import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
@@ -13,6 +14,7 @@ import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
+import ws1415.SkatenightBackend.model.BooleanWrapper;
 
 /**
  * Der MessageEndpoint stellt Hilfsmethoden bereit, die genutzt werden um den Nachrichtenfluss zwischen
@@ -25,16 +27,22 @@ public class MessageEndpoint extends SkatenightServerEndpoint {
     /**
      * Sendet über GCM eine Nachricht an den Benutzer mit der angegebenen Email.
      *
-     * @param user      User zur Authentifizierung
-     * @param receiver  Empfänger der Nachricht
-     * @param messageId Lokale Nachrichten Id des Senders zur Bestätigung
-     * @param content   Inhalt der Nachricht
-     * @param sendDate  Sendedatum der Nachricht
+     * @param user       User zur Authentifizierung
+     * @param receiver   Empfänger der Nachricht
+     * @param senderName Name des Nachrichtensenders
+     * @param messageId  Id der lokalen Nachricht des Senders
+     * @param sendDate   Sendedatum der Nachricht
+     * @param content    Inhalt der Nachricht
+     *
+     * @return true, falls Übertragung erfolgreich, false andernfalls
+     *
      * @throws IOException
      * @throws OAuthRequestException
      */
-    public void sendMessage(User user, @Named("receiver") String receiver, @Named("messageId") Long messageId,
-                            @Named("content") String content, @Named("sendDate") Long sendDate) throws IOException, OAuthRequestException {
+    @ApiMethod(path = "local_message_send")
+    public BooleanWrapper sendMessage(User user, @Named("receiver") String receiver, @Named("senderName") String senderName,
+                                      @Named("messageId") Long messageId, @Named("sendDate") Long sendDate,
+                                      @Named("content") String content) throws IOException, OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
@@ -54,32 +62,35 @@ public class MessageEndpoint extends SkatenightServerEndpoint {
                 .addData("type", MessageType.USER_NEW_MESSAGE.name())
                 .addData("messageId", Long.toString(messageId))
                 .addData("sender", user.getEmail())
+                .addData("receiver", receiver)
                 .addData("sendDate", Long.toString(sendDate))
                 .addData("content", content)
-                .addData("title", "Skatenight-App")
+                .addData("title", senderName)
                 .build();
         try {
             GCMSender.send(m, id, 3);
         } catch (IOException e) {
-            throw new IOException("Nachricht konnte nicht gesendet werden");
+            return new BooleanWrapper(false);
+        } finally {
+            pm.close();
         }
-        if (pm != null) pm.close();
+        return new BooleanWrapper(true);
     }
 
 
     /**
      * Sendet über GCM eine Bestätigung des Erhaltes einer Nachricht.
      *
-     * @param user User zur Authentifizierung
-     * @param receiver Empfänger der Bestätigung
+     * @param user      User zur Authentifizierung
+     * @param receiver  Empfänger der Bestätigung
      * @param messageId Lokale Nachrichten Id des ursprünglichen Senders
-     * @param sendDate Sendedatum der ursprünglichen Nachricht
-     *
+     * @param sendDate  Sendedatum der ursprünglichen Nachricht
      * @throws OAuthRequestException
      * @throws IOException
      */
-    public void sendConfirmation(User user, @Named("receiver") String receiver,
-                                 @Named("messageId") Long messageId, @Named("sendDate") Long sendDate) throws OAuthRequestException, IOException {
+    @ApiMethod(path = "local_message_confirmation")
+    public BooleanWrapper sendConfirmation(User user, @Named("receiver") String receiver,
+                                           @Named("messageId") Long messageId, @Named("sendDate") Long sendDate) throws OAuthRequestException, IOException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
@@ -101,11 +112,14 @@ public class MessageEndpoint extends SkatenightServerEndpoint {
                 .addData("sender", user.getEmail())
                 .addData("sendDate", Long.toString(sendDate))
                 .build();
+
         try {
             GCMSender.send(m, id, 3);
         } catch (IOException e) {
-            throw new IOException("Nachricht konnte nicht gesendet werden");
+            return new BooleanWrapper(false);
+        } finally {
+            pm.close();
         }
-        if (pm != null) pm.close();
+        return new BooleanWrapper(true);
     }
 }

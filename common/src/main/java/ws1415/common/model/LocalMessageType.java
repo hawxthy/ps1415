@@ -4,9 +4,9 @@ package ws1415.common.model;
  * Das LocalMessageType-Enum dient zum einfachen Unterscheiden von Nachrichten.
  */
 public enum LocalMessageType {
-    OUTGOING_NOT_RECEIVED(1),
-    OUTGOING_RECEIVED(2),
-    INCOMING(3);
+    OUTGOING_NOT_RECEIVED(0),
+    OUTGOING_RECEIVED(1),
+    INCOMING(2);
 
     private int id;
 

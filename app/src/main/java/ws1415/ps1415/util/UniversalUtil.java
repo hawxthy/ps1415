@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -75,6 +76,16 @@ public abstract class UniversalUtil {
         if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR))
             age--;
         return age;
+    }
+
+    /**
+     * Zeigt einen Toast mit der übergebenen Nachricht an.
+     *
+     * @param context Context
+     * @param message Inhalt des Toasts
+     */
+    public static void showToast(Context context, String message){
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
 

@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -18,7 +19,7 @@ import java.util.List;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.MessagingAdapter;
 import ws1415.ps1415.controller.MessageDbController;
-import ws1415.ps1415.model.Conversation;
+import ws1415.common.model.Conversation;
 
 /**
  * Diese Activity dient der Anzeige aller Konversationen des eingeloggten Benutzers.
@@ -35,6 +36,17 @@ public class MessagingActivity extends BaseActivity {
         setContentView(R.layout.activity_messaging);
 
         mListViewMessaging = (ListView) findViewById(R.id.messaging_list_view);
+        mListViewMessaging.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Conversation conversation = mAdapter.getItem(i);
+                Intent conversation_intent = new Intent(MessagingActivity.this, ConversationActivity.class);
+                conversation_intent.putExtra("email", conversation.getEmail());
+                conversation_intent.putExtra("firstName", conversation.getFirstName());
+                conversation_intent.putExtra("lastName", conversation.getLastName());
+                startActivity(conversation_intent);
+            }
+        });
         mListViewMessaging.setOnItemLongClickListener(new OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {

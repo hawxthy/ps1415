@@ -33,6 +33,7 @@ import ws1415.SkatenightBackend.transport.ListWrapper;
 import ws1415.SkatenightBackend.transport.StringWrapper;
 import ws1415.SkatenightBackend.transport.UserListData;
 import ws1415.SkatenightBackend.transport.UserLocationInfo;
+import ws1415.SkatenightBackend.transport.UserPrimaryData;
 import ws1415.SkatenightBackend.transport.UserProfile;
 
 /**
@@ -144,6 +145,27 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             endUser.getUserLocation();
             return endUser;
         } catch (Exception e) {
+            return null;
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Gibt die eigenen nötigsten Benutzerinformationen aus.
+     *
+     * @param user User-Objekt zur Authentifizierung
+     * @return primäre Benutzerdaten
+     */
+    public UserPrimaryData getPrimaryData(User user) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfEndUserNotExists(user.getEmail());
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, user.getEmail());
+            return new UserPrimaryData(user.getEmail(), endUser.getPictureBlobKey(),
+                    endUser.getUserInfo().getFirstName(), endUser.getUserInfo().getLastName().getValue());
+        } catch (Exception e){
             return null;
         } finally {
             pm.close();

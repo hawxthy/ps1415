@@ -25,15 +25,19 @@ public class MessageController {
      *
      * @param handler
      * @param receiver E-Mail Adresse des Empfängers
-     * @param m Nachricht
+     * @param mes Nachricht
      */
-    public static void sendMessage(ExtendedTaskDelegate handler, final String receiver,
-                                   final Message m) {
-        new ExtendedTask<Void, Void, Void>(handler) {
+    public static void sendMessage(ExtendedTaskDelegate handler, final String receiver, final String senderName,
+                                   final Message mes) {
+        final Long messageId = mes.get_id();
+        final Long sendDate = mes.getSendDate().getTime();
+        final String content = mes.getContent();
+        new ExtendedTask<Void, Void, Boolean>(handler) {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Boolean doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().messageEndpoint().sendMessage(receiver, m.get_id(), m.getContent(), m.getSendDate().getTime()).execute();
+                    return ServiceProvider.getService().messageEndpoint().sendMessage(content, messageId,
+                            receiver, sendDate, senderName).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Nachricht konnte nicht gesendet werden");
@@ -53,11 +57,11 @@ public class MessageController {
      */
     public static void sendConfirmation(ExtendedTaskDelegate handler, final String receiver, final long messageId,
                                         final Long sendDate){
-        new ExtendedTask<Void, Void, Void>(handler) {
+        new ExtendedTask<Void, Void, Boolean>(handler) {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Boolean doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().messageEndpoint().sendConfirmation(receiver, messageId, sendDate).execute();
+                    return ServiceProvider.getService().messageEndpoint().sendConfirmation(messageId, receiver, sendDate).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Nachricht konnte nicht bestätigt werden");

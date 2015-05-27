@@ -144,8 +144,7 @@ public class UserListAdapter extends BaseAdapter {
         String primaryText = setUpPrimaryText(userInfo);
         String secondaryText = setUpSecondaryText(userInfo);
 
-        holder.picture.setImageBitmap(defaultBitmap);
-        UserImageLoader.getInstance().displayImage(userPicture, holder.picture);
+        UserImageLoader.getInstance(mContext).displayImage(userPicture, holder.picture);
         holder.primaryText.setText(primaryText);
         holder.secondaryText.setText(secondaryText);
 

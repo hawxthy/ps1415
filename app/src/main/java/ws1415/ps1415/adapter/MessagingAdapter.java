@@ -19,8 +19,8 @@ import java.util.List;
 
 import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
-import ws1415.ps1415.model.Conversation;
-import ws1415.ps1415.model.Message;
+import ws1415.common.model.Conversation;
+import ws1415.common.model.Message;
 import ws1415.ps1415.util.UserImageLoader;
 
 /**
@@ -74,7 +74,7 @@ public class MessagingAdapter extends BaseAdapter {
 
         if (convertView == null) {
             holder = new Holder();
-            convertView = mInflater.inflate(R.layout.list_view_item_conversation_new, viewGroup, false);
+            convertView = mInflater.inflate(R.layout.list_view_item_conversation, viewGroup, false);
             holder.userPicture = (ImageView) convertView.findViewById(R.id.list_item_conversation_picture);
             holder.userName = (TextView) convertView.findViewById(R.id.list_item_conversation_name);
             holder.lastMessage = (TextView) convertView.findViewById(R.id.list_item_conversation_last_message);
@@ -91,12 +91,7 @@ public class MessagingAdapter extends BaseAdapter {
         String lastMessageContent = (lastMessage == null) ? "" : lastMessage.getContent();
         String lastMessageTime = (lastMessage == null) ? "" : convertToMessageTime(lastMessage.getSendDate());
 
-        if(blobKey != null){
-            UserImageLoader.getInstance().displayImage(new BlobKey().setKeyString(blobKey),
-                    holder.userPicture);
-        } else {
-            holder.userPicture.setImageBitmap(defaultBitmap);
-        }
+        UserImageLoader.getInstance(mContext).displayImage(new BlobKey().setKeyString(blobKey), holder.userPicture);
         holder.userName.setText(userName);
         holder.lastMessage.setText(lastMessageContent);
         holder.lastMessageTime.setText(lastMessageTime);
@@ -109,7 +104,7 @@ public class MessagingAdapter extends BaseAdapter {
      *
      * @param conversation Konversation
      */
-    public void removeItem(Conversation conversation){
+    public void removeItem(Conversation conversation) {
         mData.remove(conversation);
         notifyDataSetChanged();
     }

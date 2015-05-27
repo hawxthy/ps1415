@@ -12,9 +12,9 @@ import java.util.List;
 import ws1415.AuthenticatedAndroidTestCase;
 import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
-import ws1415.ps1415.model.Conversation;
-import ws1415.ps1415.model.LocalMessageType;
-import ws1415.ps1415.model.Message;
+import ws1415.common.model.Conversation;
+import ws1415.common.model.LocalMessageType;
+import ws1415.common.model.Message;
 
 /**
  * Diese Testklasse wird dazu genutzt die Funktionalitäten des Controllers für die Zugriffe
@@ -87,7 +87,7 @@ public class MessageDbControllerTest extends AuthenticatedAndroidTestCase{
     public void testCreateConversation() {
         final Bitmap testImage = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.default_picture);
         final byte[] testImageByte = ImageUtil.BitmapToByteArrayJPEG(testImage);
-        Conversation testConversation = new Conversation(TEST_MAIL_PICTURE, testImageByte, TEST_FIRST_NAME, TEST_LAST_NAME);
+        Conversation testConversation = new Conversation(TEST_MAIL_PICTURE, TEST_FIRST_NAME, TEST_LAST_NAME);
 
         boolean succeed = dbController.insertConversation(testConversation);
         assertTrue(succeed);
@@ -96,7 +96,6 @@ public class MessageDbControllerTest extends AuthenticatedAndroidTestCase{
 
         assertNotNull(conversation);
         assertEquals(TEST_MAIL_PICTURE, conversation.getEmail());
-        assertTrue(Arrays.equals(testImageByte, conversation.getPicture()));
         assertEquals(TEST_FIRST_NAME, conversation.getFirstName());
         assertEquals(TEST_LAST_NAME, conversation.getLastName());
 

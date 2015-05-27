@@ -128,12 +128,7 @@ public class EditProfileActivity extends Activity {
         mCheckBoxOptOut.setChecked(mOptOutSearch);
         mSpinnerPrivateGroupsVisibility.setSelection(mShowPrivateGroups.getId());
 
-        if (userPicture != null) {
-            UserImageLoader.getInstance().displayImageFramed(userPicture, mImageViewPicture);
-        } else {
-            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_picture);
-            mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
-        }
+        UserImageLoader.getInstance(this).displayImageFramed(userPicture, mImageViewPicture);
 
         setUpDateOfBirth();
 

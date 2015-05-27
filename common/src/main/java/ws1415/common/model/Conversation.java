@@ -1,4 +1,4 @@
-package ws1415.ps1415.model;
+package ws1415.common.model;
 
 /**
  * Die Conversation-Klasse repräsentiert ein Gespräch

@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.skatenight.skatenightAPI.model.UserPrimaryData;
 
 import java.io.File;
 import java.io.IOException;
@@ -166,7 +167,21 @@ public class RegisterActivity extends Activity {
                     finish();
                 }
             }, accountName, ImageUtil.BitmapToInputStream(selectedPicture));
+        } else {
+            context.startActivity(new Intent(RegisterActivity.this, ShowEventsActivity.class));
+            finish();
         }
+    }
+
+    private void setUpPrimaryData(){
+        UserController.getPrimaryData(new ExtendedTaskDelegateAdapter<Void, UserPrimaryData>(){
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserPrimaryData userPrimaryData) {
+                PrefManager.setUserFirstName(RegisterActivity.this, userPrimaryData.getFirstName());
+                PrefManager.setUserLastName(RegisterActivity.this, userPrimaryData.getLastName());
+                PrefManager.setUserPicture(RegisterActivity.this, userPrimaryData.getPicture().getKeyString());
+            }
+        });
     }
 
     /**

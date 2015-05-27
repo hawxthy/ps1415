@@ -118,7 +118,8 @@
         <activity
             android:name=".activity.EditProfileActivity"
             android:label="@string/title_activity_edit_profile"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:parentActivityName=".activity.ProfileActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.activity.ProfileActivity" />
@@ -149,7 +150,12 @@
         </activity>
         <activity
             android:name=".activity.ConversationActivity"
-            android:label="@string/title_activity_conversation" >
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_conversation"
+            android:parentActivityName=".activity.MessagingActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.activity.MessagingActivity" />
         </activity>
     </application>
 

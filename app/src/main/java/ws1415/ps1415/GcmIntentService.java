@@ -14,8 +14,11 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import java.util.Date;
 
 import ws1415.common.gcm.MessageType;
+import ws1415.common.model.LocalMessageType;
+import ws1415.common.model.Message;
 import ws1415.ps1415.activity.ShowEventsActivity;
 import ws1415.ps1415.activity.UsergroupActivity;
+import ws1415.ps1415.controller.MessageDbController;
 import ws1415.ps1415.util.PrefManager;
 
 public class GcmIntentService extends IntentService {
@@ -79,11 +82,28 @@ public class GcmIntentService extends IntentService {
                         break;
                     case USER_NEW_MESSAGE:
                         sendNotification(extras);
+                        String receiver = extras.getString("receiver");
+                        if(PrefManager.getSelectedUserMail(this).equals(receiver)){
+                            Long sendDate = Long.parseLong(extras.getString("sendDate"));
+                            String content = extras.getString("content");
+                            String sender = extras.getString("sender");
+                            insertNewMessage(sender, sendDate, content);
+                        }
+                        break;
                 }
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         GcmBroadcastReceiver.completeWakefulIntent(intent);
+    }
+
+    private void insertNewMessage(String sender, Long sendDate, String content) {
+        if(!MessageDbController.getInstance(this).existsConversation(sender)){
+            // TODO
+        } else {
+            Message message = new Message(new Date(sendDate), content, LocalMessageType.INCOMING);
+            MessageDbController.getInstance(this).insertMessage(sender, message);
+        }
     }
 
     // Put the message into a notification and post it.

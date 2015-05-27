@@ -14,9 +14,9 @@ import java.util.Date;
 import java.util.List;
 
 import ws1415.ps1415.controller.MessageDbController;
-import ws1415.ps1415.model.Conversation;
-import ws1415.ps1415.model.LocalMessageType;
-import ws1415.ps1415.model.Message;
+import ws1415.common.model.Conversation;
+import ws1415.common.model.LocalMessageType;
+import ws1415.common.model.Message;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
