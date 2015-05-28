@@ -110,12 +110,12 @@ public abstract class UserController {
      *
      * @param handler
      */
-    public static void getPrimaryData(ExtendedTaskDelegate handler){
+    public static void getPrimaryData(ExtendedTaskDelegate handler, final String userMail){
         new ExtendedTask<Void, Void, UserPrimaryData>(handler){
             @Override
             protected UserPrimaryData doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().getPrimaryData().execute();
+                    return ServiceProvider.getService().userEndpoint().getPrimaryData(userMail).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Benutzer konnte nicht abgerufen werden");
@@ -232,6 +232,27 @@ public abstract class UserController {
                     }
                 }
                 return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * Löscht das Profilbild eines Benutzers.
+     *
+     * @param handler
+     * @param userMail Benutzer, dessen Profilbild gelöscht werden soll
+     */
+    public static void removeUserPicture(ExtendedTaskDelegate<Void, Boolean> handler, final String userMail){
+        new ExtendedTask<Void, Void, Boolean>(handler){
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().removeUserPicture(userMail).execute().getValue();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Profilbild konnte nicht gelöscht werden");
+                    return null;
+                }
             }
         }.execute();
     }

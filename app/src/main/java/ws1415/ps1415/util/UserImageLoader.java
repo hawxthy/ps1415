@@ -45,6 +45,8 @@ public class UserImageLoader {
      * @param imageView ImageView
      */
     public void displayImage(final BlobKey blobKey, final ImageView imageView){
+        Bitmap bm = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.default_picture);
+        imageView.setImageBitmap(ImageUtil.getRoundedBitmap(bm));
         if(blobKey != null && !blobKey.getKeyString().equals("") && blobKey.getKeyString() != null) {
             Bitmap bitmap = memoryCache.get(blobKey.getKeyString());
             if (bitmap != null) {
@@ -58,9 +60,6 @@ public class UserImageLoader {
                     }
                 }, blobKey);
             }
-        } else {
-            Bitmap bm = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.default_picture);
-            imageView.setImageBitmap(ImageUtil.getRoundedBitmap(bm));
         }
     }
 
@@ -74,6 +73,8 @@ public class UserImageLoader {
      * @param imageView ImageView
      */
     public void displayImageFramed(final BlobKey blobKey, final ImageView imageView){
+        Bitmap bm = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.default_picture);
+        imageView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
         if(blobKey != null && !blobKey.getKeyString().equals("") && blobKey.getKeyString() != null) {
             Bitmap bitmap = memoryCache.get(blobKey.getKeyString());
             if (bitmap != null) {
@@ -87,9 +88,6 @@ public class UserImageLoader {
                     }
                 }, blobKey);
             }
-        } else {
-            Bitmap bm = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.default_picture);
-            imageView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
         }
     }
 

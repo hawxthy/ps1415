@@ -21,6 +21,7 @@ import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.UserListAdapter;
+import ws1415.ps1415.util.UniversalUtil;
 
 /**
  * Diese Activity dient dazu, die Freunde des eingeloggten Benutzers anzuzeigen.
@@ -33,9 +34,13 @@ public class FriendsActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Prüft ob der Benutzer eingeloggt ist
+        UniversalUtil.checkLogin(this);
+
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_friends);
+        setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
         mListViewFriends = (ListView) findViewById(R.id.friends_list_view);
         mListViewFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -54,8 +59,6 @@ public class FriendsActivity extends BaseActivity {
                 return true;
             }
         });
-
-        if(ServiceProvider.getEmail() != null) getFriendList();
     }
 
     @Override
@@ -95,6 +98,7 @@ public class FriendsActivity extends BaseActivity {
         UserController.removeFriend(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                setProgressBarIndeterminateVisibility(Boolean.FALSE);
                 if (aBoolean) {
                     Toast.makeText(FriendsActivity.this, getString(R.string.friend_delete_succeeded), Toast.LENGTH_LONG).show();
                     mAdapter.removeUser(i);
@@ -102,7 +106,6 @@ public class FriendsActivity extends BaseActivity {
                     Toast.makeText(FriendsActivity.this, getString(R.string.friend_does_not_exist), Toast.LENGTH_LONG).show();
                     getFriendList();
                 }
-                setProgressBarIndeterminateVisibility(Boolean.FALSE);
             }
 
             @Override

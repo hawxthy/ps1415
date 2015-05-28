@@ -11,9 +11,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import ws1415.ps1415.R;
 import ws1415.common.model.LocalMessageType;
 import ws1415.common.model.Message;
+import ws1415.ps1415.R;
 
 /**
  * Dieser Adapter dient dazu, die Liste von Nachrichten in einer Konversation zu füllen.
@@ -33,6 +33,17 @@ public class MessageAdapter extends BaseAdapter {
         mData = data;
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    /**
+     * Übergibt die neuesten Daten dem Adapter.
+     *
+     * @param data Daten
+     */
+    public void setUpData(List<Message> data){
+        mData.clear();
+        mData.addAll(data);
+        this.notifyDataSetChanged();
     }
 
     @Override

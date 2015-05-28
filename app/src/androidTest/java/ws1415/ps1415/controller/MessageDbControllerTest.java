@@ -35,6 +35,7 @@ public class MessageDbControllerTest extends AuthenticatedAndroidTestCase{
     public static final String TEST_FIRST_NAME_2 = "Peter";
     public static final String TEST_LAST_NAME_2 = "Meier";
 
+    public static final String TEST_NEW_PICTURE = "NewPictureKey";
     public static final String TEST_NEW_FIRST_NAME = "Peter";
     public static final String TEST_NEW_LAST_NAME = "Meier";
 
@@ -147,10 +148,12 @@ public class MessageDbControllerTest extends AuthenticatedAndroidTestCase{
      */
     @SmallTest
     public void testUpdateConversation() {
-        boolean succeed = dbController.updateConversation(TEST_MAIL, TEST_NEW_FIRST_NAME, TEST_NEW_LAST_NAME);
+        boolean succeed = dbController.updateConversation(TEST_MAIL, TEST_NEW_PICTURE,
+                TEST_NEW_FIRST_NAME, TEST_NEW_LAST_NAME);
         assertTrue(succeed);
 
         Conversation conversation = dbController.getConversation(TEST_MAIL);
+        assertEquals(TEST_NEW_PICTURE, conversation.getPictureKey());
         assertEquals(TEST_NEW_FIRST_NAME, conversation.getFirstName());
         assertEquals(TEST_NEW_LAST_NAME, conversation.getLastName());
 

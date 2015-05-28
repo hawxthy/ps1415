@@ -20,6 +20,7 @@ import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.UserListAdapter;
+import ws1415.ps1415.util.UniversalUtil;
 
 /**
  * Diese Activity wird dafür genutzt, um das Ergebnis einer Benutzersuche anzuzeigen.
@@ -29,12 +30,17 @@ import ws1415.ps1415.adapter.UserListAdapter;
 public class SearchActivity extends BaseActivity {
     private ListView mResultListView;
     private UserListAdapter mAdapter;
+    private MenuItem mSearchItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Prüft ob der Benutzer eingeloggt ist
+        UniversalUtil.checkLogin(this);
+
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_search);
+        setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
         mResultListView = (ListView) findViewById(R.id.search_users_list_view);
         if(mAdapter != null) mResultListView.setAdapter(mAdapter);
@@ -61,6 +67,7 @@ public class SearchActivity extends BaseActivity {
             setProgressBarIndeterminateVisibility(Boolean.TRUE);
             final String query = intent.getStringExtra(SearchManager.QUERY);
             setTitle(query);
+            mSearchItem.collapseActionView();
             UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<String>>(){
                 @Override
                 public void taskDidFinish(ExtendedTask task, final List<String> stringList) {
@@ -99,7 +106,8 @@ public class SearchActivity extends BaseActivity {
 
         // SearchView initialisieren
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        mSearchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) mSearchItem.getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         return true;

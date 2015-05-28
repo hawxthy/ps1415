@@ -37,6 +37,14 @@ public class MessageDbController {
         return instance;
     }
 
+    public static synchronized MessageDbController getInstance(Context context, String userMail) {
+        if (instance == null) {
+            instance = new MessageDbController(context.getApplicationContext());
+        }
+        dbHelper = MessageDbHelper.getInstance(context, userMail);
+        return instance;
+    }
+
     //-- Methoden für die Conversation-Tabelle -- //
 
     /**
@@ -167,38 +175,21 @@ public class MessageDbController {
     }
 
     /**
-     * Aktualisiert den Vor- und Nachnamen der Person, zu der die Konversation gehört.
+     * Aktualisiert das Profilbid, den Vor- und Nachnamen der Person, zu der die Konversation gehört.
      *
      * @param userMail     E-Mail Adresse der Person
+     * @param pictureKey BlobKey Wert des neuen Profilbildes
      * @param firstName Neuer Vorname
      * @param lastName  Neuer Nachname
      * @return true, falls Aktualisierung erfolgreich, false andernfalls
      */
-    public boolean updateConversation(String userMail, String firstName, String lastName) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(MessageDbHelper.KEY_FIRST_NAME, firstName);
-        values.put(MessageDbHelper.KEY_LAST_NAME, lastName);
-
-        int updatedRows = db.update(MessageDbHelper.TABLE_CONVERSATION, values, MessageDbHelper.KEY_ID_CONVERSATION + " = ?",
-                new String[]{userMail});
-
-        return updatedRows == 1;
-    }
-
-    /**
-     * Aktualisiert das Profilbild der Person, zu der die Konversation gehört.
-     *
-     * @param userMail E-Mail Adresse der Person
-     * @param pictureKey Neues Profilbild
-     * @return true, falls Aktualisierung erfolgreich, false andernfalls
-     */
-    public boolean updateConversation(String userMail, String pictureKey){
+    public boolean updateConversation(String userMail, String pictureKey, String firstName, String lastName) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(MessageDbHelper.KEY_PICTURE, pictureKey);
+        values.put(MessageDbHelper.KEY_FIRST_NAME, firstName);
+        values.put(MessageDbHelper.KEY_LAST_NAME, lastName);
 
         int updatedRows = db.update(MessageDbHelper.TABLE_CONVERSATION, values, MessageDbHelper.KEY_ID_CONVERSATION + " = ?",
                 new String[]{userMail});
@@ -344,8 +335,27 @@ public class MessageDbController {
      * @param messageId Id der Nachricht
      * @return true, falls Vorgang erfolgreich, false andernfalls
      */
-    public boolean deleteMessage(long messageId){
+    public boolean deleteMessage(String userMail, long messageId){
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // Neue last message id holen und setzen
+//        Cursor cursor = db.rawQuery("SELECT " + MessageDbHelper.KEY_ID_MESSAGE + " FROM " +
+//                MessageDbHelper.TABLE_MESSAGE + " WHERE " + MessageDbHelper.FOREIGN_KEY_CONVERSATION
+//                + "=?" + " ORDER BY " + MessageDbHelper.KEY_ID_MESSAGE +
+//                " DESC LIMIT 2", new String[]{userMail});
+//
+//        ContentValues values = new ContentValues();
+//        if(cursor.moveToLast()){
+//            Long newLastMessageId = cursor.getLong(cursor.getColumnIndex(MessageDbHelper.KEY_ID_MESSAGE));
+//            values.put(MessageDbHelper.FOREIGN_KEY_LAST_MESSAGE, newLastMessageId);
+//        } else {
+//            values.putNull(MessageDbHelper.FOREIGN_KEY_LAST_MESSAGE);
+//        }
+//
+//        db.update(MessageDbHelper.TABLE_CONVERSATION, values, MessageDbHelper.KEY_ID_CONVERSATION + "=?",
+//                new String[]{userMail});
+
+        // Nachricht löschen
         return db.delete(MessageDbHelper.TABLE_MESSAGE, MessageDbHelper.KEY_ID_MESSAGE +  "=?",
                 new String[]{String.valueOf(messageId)}) > 0;
     }

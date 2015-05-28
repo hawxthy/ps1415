@@ -11,6 +11,7 @@ import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
+import ws1415.SkatenightBackend.model.EndUser;
 
 /**
  * Stellt Hilfsmethoden bereit, die von allen Endpoints der Skatenight-API benötigt werden.
@@ -45,6 +46,28 @@ public abstract class SkatenightServerEndpoint {
             registrationManager = new RegistrationManager();
         }
         return registrationManager;
+    }
+
+    /**
+     * Prüft ob ein Benutzer mit einem anderen Benutzer befreundet ist.
+     *
+     * @param userMail E-Mail Adresse des Benutzers mit der Freundeliste
+     * @param mailToCheck E-Mail Adresse des Benutzers, dessen Freundschaft geprüft wird
+     * @return true, falls Freundschaft besteht, false andernfalls
+     */
+    protected Boolean isFriendWith(String userMail, String mailToCheck){
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            for(String friend : endUser.getMyFriends()){
+                if(friend.equals(mailToCheck)) return true;
+            }
+        } catch (Exception e){
+            return false;
+        } finally {
+            pm.close();
+        }
+        return false;
     }
 
 }

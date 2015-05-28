@@ -27,13 +27,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="2dp">
 
             <TextView
                 android:id="@+id/list_item_conversation_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
                 android:layout_marginRight="25dp"
                 android:ellipsize="end"
                 android:singleLine="true"
@@ -47,23 +47,54 @@
                 android:text="19:26"
                 android:textSize="15sp"
                 android:fontFamily="sans-serif-light"
-                android:layout_marginTop="5dp"
+                android:layout_gravity="end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
         </LinearLayout>
 
-
-        <TextView
-            android:id="@+id/list_item_conversation_last_message"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Secondary Text"
-            android:layout_marginTop="3dp"
-            android:fontFamily="sans-serif-light"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:textSize="15sp" />
+            android:layout_marginTop="2dp">
+
+            <ImageView
+                android:id="@+id/list_item_conversation_reply"
+                android:src="@drawable/ic_action_reply"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="-4dp"
+                android:paddingRight="-4dp"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/list_item_conversation_last_message"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Secondary Text"
+                android:layout_marginRight="20dp"
+                android:fontFamily="sans-serif-light"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textSize="15sp" />
+
+            <FrameLayout
+                android:id="@+id/list_item_conversation_last_message_count_layout"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:background="@drawable/bg_last_message_count"
+                android:visibility="gone">
+                <TextView
+                    android:id="@+id/list_item_conversation_last_message_count_textview"
+                    android:textColor="@android:color/white"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </FrameLayout>
+
+
+        </LinearLayout>
     </LinearLayout>
 
 

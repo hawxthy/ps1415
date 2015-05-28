@@ -228,11 +228,15 @@
     <string name="create_new_conversation_dialog">There is no conversation with this user. Would you like to create a new conversation?</string>
     <string-array name="conversation_menu_array">
         <item>View Profile</item>
+        <item>Update Profile Data</item>
         <item>Delete Conversation</item>
     </string-array>
     <string name="sure_delete_conversation_dialog">Are you sure you want to delete this conversation?</string>
     <string name="conversation_deleted">Conversation deleted</string>
     <string name="error_delete_conversation">Error while deleting</string>
+    <string name="error_update">Update Error</string>
+    <string name="profile_updated">Updated Profile Data</string>
+    <string name="yesterday">Yesterday</string>
 
     <!-- ConversationActivity -->
     <string name="title_activity_conversation">Conversation</string>

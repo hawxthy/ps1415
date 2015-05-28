@@ -80,6 +80,7 @@ public class ProfileActivity extends FragmentActivity{
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_profile);
+        setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
         if (savedInstanceState != null) {
             email = savedInstanceState.getString(STATE_EMAIL);
@@ -87,7 +88,7 @@ public class ProfileActivity extends FragmentActivity{
 
         // Intent
         Intent intent = getIntent();
-        if(intent != null) email = intent.getStringExtra("email");
+        if(intent.getStringExtra("email") != null) email = intent.getStringExtra("email");
 
         // Header initialisieren
         mPicture = (ImageView) findViewById(R.id.profile_picture);
@@ -129,7 +130,7 @@ public class ProfileActivity extends FragmentActivity{
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putString(STATE_EMAIL, "email");
+        savedInstanceState.putString(STATE_EMAIL, email);
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -344,7 +345,10 @@ public class ProfileActivity extends FragmentActivity{
                         Conversation conversation = new Conversation(userProfile.getEmail(),
                                 blobKeyString, firstName, lastName);
                         MessageDbController.getInstance(ProfileActivity.this).insertConversation(conversation);
-                        // TODO: Change to Conversation
+
+                        Intent conversation_intent = new Intent(ProfileActivity.this, ConversationActivity.class);
+                        prepareConversationIntent(conversation_intent);
+                        startActivity(conversation_intent);
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {

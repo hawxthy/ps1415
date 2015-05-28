@@ -4,6 +4,7 @@ import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.api.server.spi.config.Nullable;
 import com.google.api.server.spi.response.UnauthorizedException;
+import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.oauth.OAuthRequestException;
@@ -51,7 +52,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      *
      * @return UploadUrl
      */
-    public StringWrapper getUploadUrl(){
+    public StringWrapper getUploadUrl() {
         return new StringWrapper(blobstoreService.createUploadUrl("/userImages/upload"));
     }
 
@@ -59,7 +60,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * Wird von den Benutzer-Apps aufgerufen, wenn der Benutzer noch kein zu verwendendes Konto an-
      * gegeben hat.
      *
-     * @param user User-Objekt zur Authentifizierung
+     * @param user  User-Objekt zur Authentifizierung
      * @param regid GCM-ID
      */
     public void registerForGCM(User user, @Named("regid") String regid) throws OAuthRequestException {
@@ -157,16 +158,25 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param user User-Objekt zur Authentifizierung
      * @return primäre Benutzerdaten
      */
-    public UserPrimaryData getPrimaryData(User user) throws OAuthRequestException {
+    public UserPrimaryData getPrimaryData(User user, @Named("userMail") String userMail) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
-        EndpointUtil.throwIfEndUserNotExists(user.getEmail());
+        EndpointUtil.throwIfEndUserNotExists(userMail);
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            EndUser endUser = pm.getObjectById(EndUser.class, user.getEmail());
-            return new UserPrimaryData(user.getEmail(), endUser.getPictureBlobKey(),
-                    endUser.getUserInfo().getFirstName(), endUser.getUserInfo().getLastName().getValue());
-        } catch (Exception e){
-            return null;
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            if (user.getEmail().equals(userMail)) {
+                return new UserPrimaryData(userMail, endUser.getPictureBlobKey(),
+                        endUser.getUserInfo().getFirstName(), endUser.getUserInfo().getLastName().getValue());
+            } else {
+                List<String> friends = endUser.getMyFriends();
+                String lastName = "";
+                Integer lastNameVis = endUser.getUserInfo().getLastName().getVisibility();
+                if (isVisible(user.getEmail(), userMail, lastNameVis, friends).value) {
+                    lastName = endUser.getUserInfo().getLastName().getValue();
+                }
+                return new UserPrimaryData(userMail, endUser.getPictureBlobKey(),
+                        endUser.getUserInfo().getFirstName(), lastName);
+            }
         } finally {
             pm.close();
         }
@@ -176,7 +186,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * Gibt die E-Mail, den Namen und die Standortinformationen des Benutzers aus. Wird für
      * die Anzeige von Benutzern auf der Karte verwendet.
      *
-     * @param user User-Objekt zur Authentifizierung
+     * @param user     User-Objekt zur Authentifizierung
      * @param userMail E-Mail Adresse des Benutzers
      * @return Informationen zum Benutzer
      */
@@ -190,7 +200,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             String firstName = endUser.getUserInfo().getFirstName();
             InfoPair lastNamePair = endUser.getUserInfo().getLastName();
             String lastName = null;
-            if(isVisible(user, userMail, lastNamePair.getVisibility(), getFriends(user)).value){
+            if (isVisible(user.getEmail(), userMail, lastNamePair.getVisibility(), getFriends(user)).value) {
                 lastName = lastNamePair.getValue();
             }
             return new UserLocationInfo(userMail, firstName, lastName, userLocation.getLatitude(),
@@ -209,7 +219,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param user Benutzer
      * @return Liste von Freunden
      */
-    private List<String> getFriends(User user){
+    private List<String> getFriends(User user) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, user.getEmail());
@@ -240,7 +250,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * Gibt die allgemeinen Informationen und das Profilbild zu einem Benutzer mit der angegebenen
      * E-Mail Adresse aus.
      *
-     * @param user User-Objekt zur Authentifizierung
+     * @param user     User-Objekt zur Authentifizierung
      * @param userMail E-Mail Adresse des Benutzers
      * @return Informationen und Profilbild vom Benutzer, falls nicht gefunden: null
      */
@@ -255,7 +265,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             endUser.getUserInfo();
 
             UserInfo detachedUserInfo = pm.detachCopy(endUser.getUserInfo());
-            setUpVisibility(detachedUserInfo, user, userMail, friends);
+            setUpVisibility(detachedUserInfo, user.getEmail(), userMail, friends);
 
             // TODO: Events abrufen und setzen
 
@@ -315,7 +325,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * Gibt die allgemeinen Informationen zu einem Benutzer mit der angegebenen E-Mail Adresse
      * aus.
      *
-     * @param user User-Objekt zur Authentifizierung
+     * @param user     User-Objekt zur Authentifizierung
      * @param userMail E-Mail Adresse des Benutzers
      * @return Allgemeine Informationen zum Benutzer, falls nicht gefunden: null
      */
@@ -327,7 +337,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             List<String> friends = endUser.getMyFriends();
 
             UserInfo detachedUserInfo = pm.detachCopy(endUser.getUserInfo());
-            setUpVisibility(detachedUserInfo, user, userMail, friends);
+            setUpVisibility(detachedUserInfo, user.getEmail(), userMail, friends);
 
             return new UserListData(endUser.getEmail(), detachedUserInfo,
                     endUser.getPictureBlobKey());
@@ -341,26 +351,26 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     /**
      * Setzt die Informationen der UserInfo auf null, die für den User nicht sichtbar sein sollen.
      *
-     * @param userInfo    Informationen die aufgerufen werden
-     * @param user        User, der Informationen abrufen will
-     * @param mailToCheck E-Mail Adresse des Benutzers mit den Informationen
-     * @param friends     E-Mail Adressen der Freunde des Benutzers mit den Informationen
+     * @param userInfo     Informationen die aufgerufen werden
+     * @param mailOfCaller User, der Informationen abrufen will
+     * @param mailOfCalled E-Mail Adresse des Benutzers mit den Informationen
+     * @param friends      E-Mail Adressen der Freunde des Benutzers mit den Informationen
      * @return Informationen mit Sichtbarkeitsanpassungen
      */
-    private UserInfo setUpVisibility(UserInfo userInfo, User user, String mailToCheck, List<String> friends) {
-        if (!isVisible(user, mailToCheck, userInfo.getLastName().getVisibility(), friends).value) {
+    private UserInfo setUpVisibility(UserInfo userInfo, String mailOfCaller, String mailOfCalled, List<String> friends) {
+        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getLastName().getVisibility(), friends).value) {
             userInfo.getLastName().setValue(null);
         }
-        if (!isVisible(user, mailToCheck, userInfo.getCity().getVisibility(), friends).value) {
+        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getCity().getVisibility(), friends).value) {
             userInfo.getCity().setValue(null);
         }
-        if (!isVisible(user, mailToCheck, userInfo.getDateOfBirth().getVisibility(), friends).value) {
+        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getDateOfBirth().getVisibility(), friends).value) {
             userInfo.getDateOfBirth().setValue(null);
         }
-        if (!isVisible(user, mailToCheck, userInfo.getDescription().getVisibility(), friends).value) {
+        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getDescription().getVisibility(), friends).value) {
             userInfo.getDescription().setValue(null);
         }
-        if (!isVisible(user, mailToCheck, userInfo.getPostalCode().getVisibility(), friends).value) {
+        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getPostalCode().getVisibility(), friends).value) {
             userInfo.getPostalCode().setValue(null);
         }
         return userInfo;
@@ -369,21 +379,21 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     /**
      * Hilfsmethode, um die Sichtbarkeit abzufragen.
      *
-     * @param user        Benutzer, der Informationen abrufen will
-     * @param mailToCheck Benutzer, deren Informationen abgerufen werden
-     * @param visibility  Sichtbarkeit der Information
-     * @param friends     E-Mail Adressen der Freunde des Benutzers, dessen Informationen abgerufen werden
+     * @param mailOfCaller Benutzer, der Informationen abrufen will
+     * @param mailOfCalled Benutzer, deren Informationen abgerufen werden
+     * @param visibility   Sichtbarkeit der Information
+     * @param friends      E-Mail Adressen der Freunde des Benutzers, dessen Informationen abgerufen werden
      * @return true, falls Information sichtbar, false andernfalls
      */
-    private BooleanWrapper isVisible(User user, String mailToCheck, Integer visibility, List<String> friends) {
+    protected BooleanWrapper isVisible(String mailOfCaller, String mailOfCalled, Integer visibility, List<String> friends) {
         if (visibility.equals(Visibility.PUBLIC.getId())) return new BooleanWrapper(true);
         if (visibility.equals(Visibility.ONLY_ME.getId()))
-            return new BooleanWrapper(user.getEmail().equals(mailToCheck));
+            return new BooleanWrapper(mailOfCaller.equals(mailOfCalled));
         if (visibility.equals(Visibility.FRIENDS.getId())) {
-            if(user.getEmail().equals(mailToCheck)) return new BooleanWrapper(true);
+            if (mailOfCaller.equals(mailOfCalled)) return new BooleanWrapper(true);
             if (friends == null) return new BooleanWrapper(false);
             for (String friend : friends) {
-                if (friend.equals(user.getEmail())) return new BooleanWrapper(true);
+                if (friend.equals(mailOfCaller)) return new BooleanWrapper(true);
             }
             return new BooleanWrapper(false);
         }
@@ -464,9 +474,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             resultMails.addAll(cache);
 
             Set<String> cacheMails = new HashSet<>();
-            for(String userMail : resultMails){
+            for (String userMail : resultMails) {
                 EndUser endUser = pm.getObjectById(EndUser.class, userMail);
-                if(!endUser.isOptOutSearch()){
+                if (!endUser.isOptOutSearch()) {
                     cacheMails.add(userMail);
                 }
             }
@@ -511,6 +521,33 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             userInfo.setGender(newUserInfo.getGender());
             userInfo.setPostalCode(newUserInfo.getPostalCode());
             return userInfo;
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Löscht das Profilbild eines Benutzers.
+     *
+     * @param user User-Objekt zur Authentifizierung
+     * @param userMail Benutzer, dessen Profilbild gelöscht werden soll
+     * @return true, falls Löschvorgang erfolgreich, false andernfalls
+     * @throws OAuthRequestException
+     * @throws UnauthorizedException
+     */
+    public BooleanWrapper removeUserPicture(User user, @Named("userMail") String userMail) throws OAuthRequestException, UnauthorizedException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfEndUserNotExists(userMail);
+        EndpointUtil.throwIfUserNotSame(user.getEmail(), userMail);
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            BlobKey picture = endUser.getPictureBlobKey();
+            if (picture != null) blobstoreService.delete(picture);
+            endUser.setPictureBlobKey(null);
+            return new BooleanWrapper(true);
+        } catch (Exception e) {
+            return new BooleanWrapper(false);
         } finally {
             pm.close();
         }
@@ -569,7 +606,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @throws OAuthRequestException
      */
     @ApiMethod(path = "friends_add")
-    public BooleanWrapper addFriend(User user, @Named("userMail") String userMail, @Named("friendMail") String friendMail) throws OAuthRequestException, UnauthorizedException {
+    public BooleanWrapper addFriend(User user, @Named("userMail") String
+            userMail, @Named("friendMail") String friendMail) throws
+            OAuthRequestException, UnauthorizedException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserNotSame(user.getEmail(), userMail);
         EndpointUtil.throwIfEndUserNotExists(userMail);
@@ -600,7 +639,8 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @throws OAuthRequestException
      */
     @ApiMethod(path = "friends_remove")
-    public BooleanWrapper removeFriend(User user, @Named("userMail") String userMail, @Named("friendMail") String friendMail)
+    public BooleanWrapper removeFriend(User user, @Named("userMail") String
+            userMail, @Named("friendMail") String friendMail)
             throws OAuthRequestException, UnauthorizedException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserNotSame(user.getEmail(), userMail);
@@ -620,6 +660,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      *
      * @param userMail E-Mail Adresse des Benutzers
      */
+
     public void deleteUser(User user, @Named("userMail") String userMail) throws UnauthorizedException, OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfNoRights(user.getEmail(), userMail);
@@ -628,7 +669,8 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
 
-            if(endUser.getPictureBlobKey() != null) blobstoreService.delete(endUser.getPictureBlobKey());
+            if (endUser.getPictureBlobKey() != null)
+                blobstoreService.delete(endUser.getPictureBlobKey());
             try {
                 pm.deletePersistent(endUser.getUserInfo());
                 pm.deletePersistent(endUser.getUserLocation());

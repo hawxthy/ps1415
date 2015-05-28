@@ -27,20 +27,17 @@ public class MessageEndpoint extends SkatenightServerEndpoint {
     /**
      * Sendet über GCM eine Nachricht an den Benutzer mit der angegebenen Email.
      *
-     * @param user       User zur Authentifizierung
+     * @param user       Sender der Nachricht
      * @param receiver   Empfänger der Nachricht
-     * @param senderName Name des Nachrichtensenders
      * @param messageId  Id der lokalen Nachricht des Senders
      * @param sendDate   Sendedatum der Nachricht
      * @param content    Inhalt der Nachricht
-     *
      * @return true, falls Übertragung erfolgreich, false andernfalls
-     *
      * @throws IOException
      * @throws OAuthRequestException
      */
     @ApiMethod(path = "local_message_send")
-    public BooleanWrapper sendMessage(User user, @Named("receiver") String receiver, @Named("senderName") String senderName,
+    public BooleanWrapper sendMessage(User user, @Named("receiver") String receiver,
                                       @Named("messageId") Long messageId, @Named("sendDate") Long sendDate,
                                       @Named("content") String content) throws IOException, OAuthRequestException {
         if (user == null) {
@@ -65,11 +62,10 @@ public class MessageEndpoint extends SkatenightServerEndpoint {
                 .addData("receiver", receiver)
                 .addData("sendDate", Long.toString(sendDate))
                 .addData("content", content)
-                .addData("title", senderName)
                 .build();
         try {
             GCMSender.send(m, id, 3);
-        } catch (IOException e) {
+        } catch (Exception e) {
             return new BooleanWrapper(false);
         } finally {
             pm.close();
@@ -110,12 +106,13 @@ public class MessageEndpoint extends SkatenightServerEndpoint {
                 .addData("type", MessageType.USER_CONFIRMATION_MESSAGE.name())
                 .addData("messageId", Long.toString(messageId))
                 .addData("sender", user.getEmail())
+                .addData("receiver", receiver)
                 .addData("sendDate", Long.toString(sendDate))
                 .build();
 
         try {
             GCMSender.send(m, id, 3);
-        } catch (IOException e) {
+        } catch (Exception e) {
             return new BooleanWrapper(false);
         } finally {
             pm.close();

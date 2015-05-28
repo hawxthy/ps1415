@@ -1,6 +1,7 @@
 package ws1415.ps1415;
 
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -10,21 +11,34 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.skatenight.skatenightAPI.model.BlobKey;
+import com.skatenight.skatenightAPI.model.UserPrimaryData;
 
 import java.util.Date;
 
+import de.greenrobot.event.EventBus;
+import ws1415.common.controller.MessageController;
+import ws1415.common.controller.UserController;
 import ws1415.common.gcm.MessageType;
+import ws1415.common.model.Conversation;
 import ws1415.common.model.LocalMessageType;
 import ws1415.common.model.Message;
+import ws1415.common.net.ServiceProvider;
+import ws1415.common.task.ExtendedTask;
+import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.activity.ConversationActivity;
 import ws1415.ps1415.activity.ShowEventsActivity;
 import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.controller.MessageDbController;
+import ws1415.ps1415.event.NewMessageEvent;
 import ws1415.ps1415.util.PrefManager;
 
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
+    private Context mContext;
 
     public GcmIntentService() {
         super("GcmIntentService");
@@ -32,6 +46,7 @@ public class GcmIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        mContext = this;
         Bundle extras = intent.getExtras();
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
         String messageType = gcm.getMessageType(intent);
@@ -47,15 +62,15 @@ public class GcmIntentService extends IntentService {
                 MessageType type;
                 try {
                     type = MessageType.valueOf(extras.getString("type"));
-                } catch(IllegalArgumentException e) {
+                } catch (IllegalArgumentException e) {
                     type = null;
                 }
                 switch (type) {
                     case NOTIFICATION_MESSAGE:
-                        sendNotification(extras);
+                        sendNotificationMessaging(extras);
                         break;
                     case EVENT_NOTIFICATION_MESSAGE:
-                        sendNotification(extras);
+                        sendNotificationMessaging(extras);
                         // Event-Liste in der ShowEventsActivity aktualisieren
                         Intent refreshIntent = new Intent(ShowEventsActivity.REFRESH_EVENTS_ACTION);
                         LocalBroadcastManager.getInstance(this).sendBroadcast(refreshIntent);
@@ -71,7 +86,7 @@ public class GcmIntentService extends IntentService {
                     case EVENT_START_MESSAGE:
                         break;
                     case GROUP_DELETED_NOTIFICATION_MESSAGE:
-                        sendNotification(extras);
+                        sendNotificationMessaging(extras);
                         // Einstellung für die Gruppe entfernen, falls vorhanden
                         PrefManager.deleteGroupVisibility(this, extras.getString("content"));
                         break;
@@ -81,13 +96,24 @@ public class GcmIntentService extends IntentService {
                         LocalBroadcastManager.getInstance(this).sendBroadcast(refreshGroupsIntent);
                         break;
                     case USER_NEW_MESSAGE:
-                        sendNotification(extras);
                         String receiver = extras.getString("receiver");
-                        if(PrefManager.getSelectedUserMail(this).equals(receiver)){
+                        if (PrefManager.getSelectedUserMail(this).equals(receiver)) {
+                            Long messageId = Long.parseLong(extras.getString("messageId"));
                             Long sendDate = Long.parseLong(extras.getString("sendDate"));
                             String content = extras.getString("content");
                             String sender = extras.getString("sender");
-                            insertNewMessage(sender, sendDate, content);
+                            login();
+                            insertNewMessage(receiver, sender, sendDate, content);
+                            sendMessageReceived(sender, messageId, sendDate);
+                        }
+                        break;
+                    case USER_CONFIRMATION_MESSAGE:
+                        String receiverConf = extras.getString("receiver");
+                        if (PrefManager.getSelectedUserMail(this).equals(receiverConf)) {
+                            Long messageId = Long.parseLong(extras.getString("messageId"));
+                            Long sendDate = Long.parseLong(extras.getString("sendDate"));
+                            String sender = extras.getString("sender");
+                            updateMessageReceived(receiverConf, messageId, sendDate, sender);
                         }
                         break;
                 }
@@ -97,19 +123,73 @@ public class GcmIntentService extends IntentService {
         GcmBroadcastReceiver.completeWakefulIntent(intent);
     }
 
-    private void insertNewMessage(String sender, Long sendDate, String content) {
-        if(!MessageDbController.getInstance(this).existsConversation(sender)){
-            // TODO
-        } else {
-            Message message = new Message(new Date(sendDate), content, LocalMessageType.INCOMING);
-            MessageDbController.getInstance(this).insertMessage(sender, message);
+    private void login() {
+        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(mContext,
+                "server:client_id:" + Constants.WEB_CLIENT_ID);
+        if (!PrefManager.getSelectedUserMail(mContext).equals("")) {
+            credential.setSelectedAccountName(PrefManager.getSelectedUserMail(mContext));
+            ServiceProvider.login(credential);
         }
+    }
+
+    private void updateMessageReceived(String receiverConf, Long messageId, Long sendDate, String sender) {
+        boolean succeed = MessageDbController.getInstance(this, receiverConf).
+                updateMessageReceived(messageId, sendDate);
+        if (succeed) EventBus.getDefault().post(new NewMessageEvent(sender));
+    }
+
+    private void sendMessageReceived(String receiver, Long messageId, Long sendDate) {
+        if (ServiceProvider.getEmail() != null)
+            MessageController.sendConfirmation(null, receiver, messageId, sendDate);
+    }
+
+    private void insertNewMessage(final String receiver, final String sender, Long sendDate, final String content) {
+        if (!MessageDbController.getInstance(this, receiver).existsConversation(sender)) {
+            if (ServiceProvider.getEmail() != null) {
+                handleNewConversation(receiver, sender, content, sendDate);
+                return;
+            }
+        }
+        createNewMessage(receiver, sender, sendDate, content);
+    }
+
+    private void createNewMessage(String receiver, String sender, Long sendDate, String content) {
+        Message message = new Message(new Date(sendDate), content, LocalMessageType.INCOMING);
+        long id = MessageDbController.getInstance(this, receiver).insertMessage(sender, message);
+        if(id >= 0){
+            Conversation con = MessageDbController.getInstance(this, receiver).getConversation(sender);
+            sendNotificationMessaging(sender, content, con.getFirstName(), con.getLastName());
+            EventBus.getDefault().post(new NewMessageEvent(sender));
+        }
+    }
+
+    private void handleNewConversation(final String receiver, final String sender, final String content,
+                                       final Long sendDate) {
+        UserController.getPrimaryData(new ExtendedTaskDelegateAdapter<Void, UserPrimaryData>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserPrimaryData userPrimaryData) {
+                BlobKey picture = userPrimaryData.getPicture();
+                String pictureKey = (picture == null) ? null : picture.getKeyString();
+                String firstName = (userPrimaryData.getFirstName() == null) ? "" : userPrimaryData.getFirstName();
+                String lastName = (userPrimaryData.getLastName() == null) ? "" : userPrimaryData.getLastName();
+                Conversation conversation = new Conversation(sender, pictureKey, firstName, lastName);
+                MessageDbController.getInstance(mContext, receiver).insertConversation(conversation);
+                createNewMessage(receiver, sender, sendDate, content);
+            }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                Conversation conversation = new Conversation(sender, null, sender, "");
+                MessageDbController.getInstance(mContext, receiver).insertConversation(conversation);
+                createNewMessage(receiver, sender, sendDate, content);
+            }
+        }, sender);
     }
 
     // Put the message into a notification and post it.
     // This is just one simple example of what you might choose to do with
     // a GCM message.
-    private void sendNotification(Bundle extras) {
+    private void sendNotificationMessaging(Bundle extras) {
         String title = extras.getString("title");
         String msg = extras.getString("content");
         mNotificationManager = (NotificationManager)
@@ -128,5 +208,34 @@ public class GcmIntentService extends IntentService {
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+    }
+
+    private void sendNotificationMessaging(String sender, String content, String senderFirstName,
+                                           String senderLastName) {
+        mNotificationManager = (NotificationManager)
+                this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Intent intent = new Intent(this, ConversationActivity.class);
+        intent.putExtra("email", sender);
+        intent.putExtra("firstName", senderFirstName);
+        intent.putExtra("lastName", senderLastName);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_notification)
+                        .setContentTitle(senderFirstName + " " + senderLastName)
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                                .bigText(content))
+                        .setContentText(content);
+
+        mBuilder.setAutoCancel(true);
+        mBuilder.setContentIntent(contentIntent);
+
+        Notification note = mBuilder.build();
+        note.defaults |= Notification.DEFAULT_VIBRATE;
+        note.defaults |= Notification.DEFAULT_SOUND;
+
+        mNotificationManager.notify(NOTIFICATION_ID, note);
     }
 }

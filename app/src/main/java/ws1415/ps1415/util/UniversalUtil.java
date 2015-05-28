@@ -38,7 +38,7 @@ public abstract class UniversalUtil {
         } else {
             credential.setSelectedAccountName(PrefManager.getSelectedUserMail(context));
             ServiceProvider.login(credential);
-            initGCM(activity);
+            //initGCM(activity);
         }
     }
 

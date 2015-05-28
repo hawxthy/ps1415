@@ -27,7 +27,7 @@ public class MessageController {
      * @param receiver E-Mail Adresse des Empfängers
      * @param mes Nachricht
      */
-    public static void sendMessage(ExtendedTaskDelegate handler, final String receiver, final String senderName,
+    public static void sendMessage(ExtendedTaskDelegate handler, final String receiver, final String sender,
                                    final Message mes) {
         final Long messageId = mes.get_id();
         final Long sendDate = mes.getSendDate().getTime();
@@ -37,7 +37,7 @@ public class MessageController {
             protected Boolean doInBackground(Void... params) {
                 try {
                     return ServiceProvider.getService().messageEndpoint().sendMessage(content, messageId,
-                            receiver, sendDate, senderName).execute().getValue();
+                            receiver, sendDate).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Nachricht konnte nicht gesendet werden");

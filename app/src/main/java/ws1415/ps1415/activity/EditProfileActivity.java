@@ -40,6 +40,7 @@ import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
+import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.util.UserImageLoader;
 
 /**
@@ -90,13 +91,19 @@ public class EditProfileActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Prüft ob der Benutzer eingeloggt ist
+        UniversalUtil.checkLogin(this);
+
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_edit_profile);
+        setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
+        // Intent verarbeiten
         Intent intent = getIntent();
         handleIntent(intent);
 
+        // UI-Komponenten initialisieren
         mImageViewPicture = (ImageView) findViewById(R.id.activity_edit_profile_picture);
         mEditTextFirstName = (EditText) findViewById(R.id.activity_edit_profile_first_name);
         mEditTextLastName = (EditText) findViewById(R.id.activity_edit_profile_last_name);
@@ -113,6 +120,7 @@ public class EditProfileActivity extends Activity {
         mCheckBoxOptOut = (CheckBox) findViewById(R.id.activity_edit_profile_findable);
         mSpinnerPrivateGroupsVisibility = (Spinner) findViewById(R.id.activity_edit_profile_private_groups_visibility);
 
+        // UI-Komponenten mit den Daten des Intents füllen
         mEditTextFirstName.setText(mUserInfo.getFirstName());
         mEditTextLastName.setText(mUserInfo.getLastName().getValue());
         mSpinnerLastNameVisibility.setSelection(mUserInfo.getLastName().getVisibility());
@@ -127,15 +135,21 @@ public class EditProfileActivity extends Activity {
         mSpinnerDescriptionVisibility.setSelection(mUserInfo.getDescription().getVisibility());
         mCheckBoxOptOut.setChecked(mOptOutSearch);
         mSpinnerPrivateGroupsVisibility.setSelection(mShowPrivateGroups.getId());
-
         UserImageLoader.getInstance(this).displayImageFramed(userPicture, mImageViewPicture);
 
+        // Listener für den EditText des Geburtsdatums setzen
         setUpDateOfBirth();
 
+        // Up-Navigation aktivieren
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
 
+    /**
+     * Verarbeitet die Daten, die über den Intent gesendet worden sind.
+     *
+     * @param intent Intent
+     */
     private void handleIntent(Intent intent) {
         String pictureString = intent.getStringExtra("userPicture");
         userPicture = (pictureString == null) ? null : new BlobKey().setKeyString(pictureString);
@@ -164,7 +178,7 @@ public class EditProfileActivity extends Activity {
 
     /**
      * Beim Drücken des Profilbildes wird hier das Dialogauswahlfenster erstellt, bei dem
-     * man wählen kann, ob ein Bild aus dem Album wählen möchte, ein Bild aufnehmen will oder
+     * man wählen kann, ob man ein Bild aus dem Album wählen möchte, ein Bild aufnehmen will oder
      * sein Profilbild löschen möchte. Dementsprechend werden dann die Activities gestartet.
      *
      * @param view
@@ -215,7 +229,7 @@ public class EditProfileActivity extends Activity {
                     mImage = extras.getParcelable("data");
                     mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(mImage));
                     changedPicture = true;
-                    tempFile.delete();
+                    tempFile.deleteOnExit();
                     break;
             }
         }
@@ -224,7 +238,7 @@ public class EditProfileActivity extends Activity {
     // Erstellt temporäre Datei um das gecroppte Bild zwischenzuspeichern
     private Uri createTempFile(){
         try {
-            tempFile = File.createTempFile("crop", "png", Environment
+            tempFile = File.createTempFile("crop", ".png", Environment
                     .getExternalStorageDirectory());
         } catch (IOException e) {
             e.printStackTrace();
@@ -289,6 +303,10 @@ public class EditProfileActivity extends Activity {
         });
     }
 
+    /**
+     * Verarbeitet die eingegebenen Daten, prüft ob die Eingaben korrekt sind und updated das
+     * Profil mit diesen Daten.
+     */
     private void sendData() {
         setProgressBarIndeterminateVisibility(Boolean.TRUE);
         mUserInfo.setFirstName(mEditTextFirstName.getText().toString());
@@ -308,6 +326,7 @@ public class EditProfileActivity extends Activity {
 
         if(mUserInfo.getFirstName().length() < 3){
             Toast.makeText(this, getString(R.string.first_name_too_short), Toast.LENGTH_LONG).show();
+            setProgressBarIndeterminateVisibility(Boolean.FALSE);
             return;
         }
         UserController.updateUserProfile(new ExtendedTaskDelegateAdapter<Void, UserInfo>() {
@@ -316,7 +335,8 @@ public class EditProfileActivity extends Activity {
                 if(!changedPicture) {
                     editDone();
                 } else {
-                    uploadUserPicture();
+                    if(mImage != null) uploadUserPicture();
+                    else removeUserPicture();
                 }
             }
             @Override
@@ -327,6 +347,9 @@ public class EditProfileActivity extends Activity {
 
     }
 
+    /**
+     * Lädt das neue Profilbild hoch.
+     */
     private void uploadUserPicture() {
         UserController.uploadUserPicture(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
@@ -340,11 +363,35 @@ public class EditProfileActivity extends Activity {
         }, mUserInfo.getEmail(), ImageUtil.BitmapToInputStream(mImage));
     }
 
+    /**
+     * Löscht das Profilbild.
+     */
+    private void removeUserPicture(){
+        UserController.removeUserPicture(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                editDone();
+            }
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                editFailed(message);
+            }
+        }, mUserInfo.getEmail());
+    }
+
+    /**
+     * Wird bei einem Fehler beim Updaten des Profils ausgeführt.
+     *
+     * @param message
+     */
     private void editFailed(String message) {
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
         Toast.makeText(EditProfileActivity.this, message, Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Wird beim erfolgreichen Updaten des Profils ausgeführt.
+     */
     private void editDone() {
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
         Toast.makeText(EditProfileActivity.this, "Profilinformationen wurden geändert", Toast.LENGTH_LONG).show();

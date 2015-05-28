@@ -3,6 +3,8 @@ package ws1415.ps1415.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,17 +13,22 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
+
+import java.util.ArrayList;
 import java.util.Date;
 
+import de.greenrobot.event.EventBus;
 import ws1415.common.controller.MessageController;
+import ws1415.common.model.Conversation;
 import ws1415.common.model.LocalMessageType;
 import ws1415.common.model.Message;
+import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.MessageAdapter;
 import ws1415.ps1415.controller.MessageDbController;
+import ws1415.ps1415.event.NewMessageEvent;
 import ws1415.ps1415.util.UniversalUtil;
 
 /**
@@ -31,6 +38,9 @@ import ws1415.ps1415.util.UniversalUtil;
  * @author Martin Wrodarczyk
  */
 public class ConversationActivity extends Activity {
+    // Für das Wiederherstellen einer Activity
+    private static final String STATE_EMAIL = "email";
+
     // UI-Komponenten
     private ListView mListViewMessages;
     private EditText mEditTextInput;
@@ -41,54 +51,126 @@ public class ConversationActivity extends Activity {
 
     // Daten vom Intent
     private String mEmail;
-    private String mFirstName;
-    private String mLastName;
+    private Conversation mConversation;
+
+    // Feld um den Sendevorgang zu prüfen
+    private boolean sending;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Prüft ob der Benutzer eingeloggt ist
+        UniversalUtil.checkLogin(this);
+
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_conversation);
+        setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
+        // Im Falle einer Wiederherstellung der Activity die Email abrufen
+        if (savedInstanceState != null) mEmail = savedInstanceState.getString(STATE_EMAIL);
+
+        // Email vom Intent speichern
         Intent intent = getIntent();
-        mEmail = intent.getStringExtra("email");
-        mFirstName = intent.getStringExtra("firstName");
-        mLastName = intent.getStringExtra("lastName");
+        String email = intent.getStringExtra("email");
+        if(email != null) mEmail = email;
 
-        if (mFirstName != null & mLastName != null) {
-            setTitle(mFirstName + " " + mLastName);
+        if(!MessageDbController.getInstance(this).existsConversation(mEmail)) {
+            Intent messaging_intent = new Intent(ConversationActivity.this, MessagingActivity.class);
+            startActivity(messaging_intent);
+            finish();
+            return;
         }
 
-        mListViewMessages = (ListView) findViewById(R.id.conversation_list_view);
+        // Conversation abrufen
+        mConversation = MessageDbController.getInstance(this).getConversation(mEmail);
+        String firstName = mConversation.getFirstName();
+        String lastName = mConversation.getLastName();
+
+        // Titel setzen
+        if (firstName != null & lastName != null) setTitle(firstName + " " + lastName);
+
+        // Anzahl neuer Nachrichten auf 0 setzen, falls diese != 0 sind
+        if (mConversation.getCountNewMessages() != 0)
+            MessageDbController.getInstance(this).resetNewMessages(mEmail);
+
+        // UI Komponenten initialisieren
         mEditTextInput = (EditText) findViewById(R.id.conversation_input);
         mImageViewSend = (ImageView) findViewById(R.id.conversation_send_image);
-        mListViewMessages.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 
+        // Liste initialisieren
+        mListViewMessages = (ListView) findViewById(R.id.conversation_list_view);
+        mListViewMessages.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+        mAdapter = new MessageAdapter(new ArrayList<Message>(), this);
+        mListViewMessages.setAdapter(mAdapter);
+
+        // Listener für das Senden einer Nachricht
         mImageViewSend.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                String input = mEditTextInput.getText().toString();
-                if (input.equals(""))
-                    Toast.makeText(ConversationActivity.this, getString(R.string.input_required),
-                            Toast.LENGTH_LONG).show();
-                else {
-                    setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                    final Message message = new Message(new Date(), input, LocalMessageType.OUTGOING_NOT_RECEIVED);
-                    long id = MessageDbController.getInstance(ConversationActivity.this).insertMessage(mEmail, message);
-                    message.set_id(id);
-                    sendMessage(message);
+                if(!sending) {
+                    String input = mEditTextInput.getText().toString();
+                    if (input.equals("")) {
+                        UniversalUtil.showToast(ConversationActivity.this, getString(R.string.input_required));
+                    } else {
+                        setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                        sending = true;
+                        final Message message = new Message(new Date(), input, LocalMessageType.OUTGOING_NOT_RECEIVED);
+                        long id = MessageDbController.getInstance(ConversationActivity.this).insertMessage(mEmail, message);
+                        message.set_id(id);
+                        sendMessage(message);
+                    }
                 }
             }
         });
     }
 
     @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putString(STATE_EMAIL, mEmail);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    // Ruft die Nachrichten ab und setzt die Daten im Adapter
+    private void setUpData(){
+        mAdapter.setUpData(MessageDbController.getInstance(this).getAllMessages(mEmail));
+        mListViewMessages.setSelection(mAdapter.getCount() - 1);
+    }
+
+    /**
+     * Registriert EventBus und ruft Nachrichten ab
+     */
+    @Override
     protected void onStart() {
         super.onStart();
+        EventBus.getDefault().register(this);
         if (mEmail != null) {
-            mAdapter = new MessageAdapter(MessageDbController.getInstance(this).getAllMessages(mEmail), this);
-            mListViewMessages.setAdapter(mAdapter);
-            mListViewMessages.setSelection(mAdapter.getCount() - 1);
+            setUpData();
+        }
+    }
+
+    /**
+     * Abmelden des EventBus.
+     */
+    @Override
+    protected void onStop(){
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    /**
+     * Wird aufgerufen wenn eine neue Nachricht auf dem Gerät ankommt.
+     *
+     * @param event Event mit der Email als Information
+     */
+    public void onEvent(NewMessageEvent event){
+        if(mEmail != null){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setUpData();
+                    MessageDbController.getInstance(ConversationActivity.this).resetNewMessages(mEmail);
+                }
+            });
         }
     }
 
@@ -106,8 +188,9 @@ public class ConversationActivity extends Activity {
                     mEditTextInput.getText().clear();
                 } else {
                     UniversalUtil.showToast(ConversationActivity.this, getString(R.string.message_could_not_be_sent));
-                    MessageDbController.getInstance(ConversationActivity.this).deleteMessage(localMessage.get_id());
+                    MessageDbController.getInstance(ConversationActivity.this).deleteMessage(mEmail, localMessage.get_id());
                 }
+                sending = false;
                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
             }
 
@@ -115,9 +198,10 @@ public class ConversationActivity extends Activity {
             public void taskFailed(ExtendedTask task, String message) {
                 UniversalUtil.showToast(ConversationActivity.this, message);
                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                MessageDbController.getInstance(ConversationActivity.this).deleteMessage(localMessage.get_id());
+                sending = false;
+                MessageDbController.getInstance(ConversationActivity.this).deleteMessage(mEmail, localMessage.get_id());
             }
-        }, mEmail, mFirstName + " " + mLastName, localMessage);
+        }, mEmail, ServiceProvider.getEmail(), localMessage);
     }
 
 
@@ -132,7 +216,14 @@ public class ConversationActivity extends Activity {
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                onBackPressed();
+                Intent upIntent = NavUtils.getParentActivityIntent(this);
+                if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+                    TaskStackBuilder.create(this)
+                            .addNextIntentWithParentStack(upIntent)
+                            .startActivities();
+                } else {
+                    NavUtils.navigateUpTo(this, upIntent);
+                }
                 return true;
         }
 

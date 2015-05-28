@@ -3,10 +3,12 @@ package ws1415.ps1415.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,10 +19,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.common.model.Conversation;
+import ws1415.common.model.LocalMessageType;
+import ws1415.common.model.Message;
 import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
-import ws1415.common.model.Conversation;
-import ws1415.common.model.Message;
 import ws1415.ps1415.util.UserImageLoader;
 
 /**
@@ -46,6 +49,17 @@ public class MessagingAdapter extends BaseAdapter {
                 decodeResource(context.getResources(), R.drawable.default_picture));
     }
 
+    /**
+     * Übergibt die neuesten Daten dem Adapter.
+     *
+     * @param data Daten
+     */
+    public void setUpData(List<Conversation> data){
+        mData.clear();
+        mData.addAll(data);
+        this.notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
         return mData.size();
@@ -64,8 +78,11 @@ public class MessagingAdapter extends BaseAdapter {
     private class Holder {
         private ImageView userPicture;
         private TextView userName;
+        private ImageView lastMessageReply;
         private TextView lastMessage;
         private TextView lastMessageTime;
+        private FrameLayout lastMessageCountLayout;
+        private TextView lastMessageCountTextView;
     }
 
     @Override
@@ -77,8 +94,11 @@ public class MessagingAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.list_view_item_conversation, viewGroup, false);
             holder.userPicture = (ImageView) convertView.findViewById(R.id.list_item_conversation_picture);
             holder.userName = (TextView) convertView.findViewById(R.id.list_item_conversation_name);
+            holder.lastMessageReply = (ImageView) convertView.findViewById(R.id.list_item_conversation_reply);
             holder.lastMessage = (TextView) convertView.findViewById(R.id.list_item_conversation_last_message);
             holder.lastMessageTime = (TextView) convertView.findViewById(R.id.list_item_conversation_last_message_time);
+            holder.lastMessageCountLayout = (FrameLayout) convertView.findViewById(R.id.list_item_conversation_last_message_count_layout);
+            holder.lastMessageCountTextView = (TextView) convertView.findViewById(R.id.list_item_conversation_last_message_count_textview);
             convertView.setTag(holder);
         } else {
             holder = (Holder) convertView.getTag();
@@ -88,13 +108,31 @@ public class MessagingAdapter extends BaseAdapter {
         Message lastMessage = item.getLastMessage();
         String blobKey = item.getPictureKey();
         String userName = item.getFirstName() + item.getLastName();
+        LocalMessageType lastMessageType = (lastMessage == null) ? null : lastMessage.getType();
         String lastMessageContent = (lastMessage == null) ? "" : lastMessage.getContent();
         String lastMessageTime = (lastMessage == null) ? "" : convertToMessageTime(lastMessage.getSendDate());
+        int lastMessageCount = item.getCountNewMessages();
 
         UserImageLoader.getInstance(mContext).displayImage(new BlobKey().setKeyString(blobKey), holder.userPicture);
         holder.userName.setText(userName);
         holder.lastMessage.setText(lastMessageContent);
         holder.lastMessageTime.setText(lastMessageTime);
+
+        if((lastMessageType != null) && (lastMessageType.equals(LocalMessageType.OUTGOING_NOT_RECEIVED) ||
+                lastMessageType.equals(LocalMessageType.OUTGOING_RECEIVED))){
+            holder.lastMessageReply.setVisibility(View.VISIBLE);
+        } else {
+            holder.lastMessageReply.setVisibility(View.GONE);
+        }
+        
+        if(lastMessageCount != 0){
+            holder.lastMessageCountLayout.setVisibility(View.VISIBLE);
+            holder.lastMessageCountTextView.setText(String.valueOf(lastMessageCount));
+            holder.lastMessage.setTypeface(null, Typeface.BOLD);
+        } else {
+            holder.lastMessageCountLayout.setVisibility(View.GONE);
+            holder.lastMessage.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
+        }
 
         return convertView;
     }
@@ -114,11 +152,13 @@ public class MessagingAdapter extends BaseAdapter {
         if (checkSameDay(new Date(), date)) {
             sdf = new SimpleDateFormat("HH:mm");
             return sdf.format(date);
-        } else if (checkYesterday(new Date(), date)) {
-            return "Yesterday";
         } else {
-            sdf = new SimpleDateFormat("dd MMM yyyy");
-            return sdf.format(date);
+            if (checkYesterday(new Date(), date)) {
+                return mContext.getString(R.string.yesterday);
+            } else {
+                sdf = new SimpleDateFormat("dd MMM yyyy");
+                return sdf.format(date);
+            }
         }
     }
 

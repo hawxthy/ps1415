@@ -1,6 +1,6 @@
 package ws1415.ps1415.adapter;
 
-import android.app.ProgressDialog;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -42,6 +42,7 @@ public class UserListAdapter extends BaseAdapter {
     private List<UserListData> mData;
     private LayoutInflater mInflater;
     private Context mContext;
+    private Activity mActivity;
     private Bitmap defaultBitmap;
     private boolean loadingData;
 
@@ -64,12 +65,33 @@ public class UserListAdapter extends BaseAdapter {
     }
 
     /**
+     * Übergibt man statt dem context eine Activity, so wird der FEATURE_INDETERMINATE_PROGRESS beim
+     * Downloaden von neuen Benutzerinformationen angezeigt. Dafür muss bei der übergebenen Activity
+     * zu Beginn von onCreate requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS) ausgeführt
+     * werden.
+     *
+     * @param userMails
+     * @param activity
+     */
+    public UserListAdapter(List<String> userMails, Activity activity) {
+        this.mailData = userMails;
+        mContext = activity;
+        mActivity = activity;
+        mData = new ArrayList<>();
+        mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        defaultBitmap = ImageUtil.getRoundedBitmap(BitmapFactory.
+                decodeResource(mContext.getResources(), R.drawable.default_picture));
+        addNextUserInfo(userMails);
+    }
+
+    /**
      * Ruft die Informationen der Benutzer der Ergebnisteilliste der Suche ab.
      *
      * @param userMails Ergebnis der Suche
      */
     private void addNextUserInfo(final List<String> userMails) {
         if (!loadingData) {
+            if(mActivity != null) mActivity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
             int dataSize = (userMails.size() < NEXT_DATA_COUNT) ? userMails.size() : NEXT_DATA_COUNT;
             final List<String> subList = new ArrayList<>(userMails.subList(0, dataSize));
             loadingData = true;
@@ -80,23 +102,17 @@ public class UserListAdapter extends BaseAdapter {
                     mailData.removeAll(subList);
                     notifyDataSetChanged();
                     loadingData = false;
+                    if(mActivity != null) mActivity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
                 }
 
                 @Override
                 public void taskFailed(ExtendedTask task, String message) {
                     Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
                     loadingData = false;
+                    if(mActivity != null) mActivity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
                 }
             }, subList);
         }
-    }
-
-    private ProgressDialog showLoading(){
-        ProgressDialog dialog = new ProgressDialog(mContext);
-        dialog.setIndeterminate(true);
-        dialog.setCancelable(true);
-        dialog.show();
-        return dialog;
     }
 
     @Override

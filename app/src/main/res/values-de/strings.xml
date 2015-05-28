@@ -212,12 +212,15 @@
     <string name="create_new_conversation_dialog">Es existiert noch keine Konversation mit diesem Benutzer. Möchten Sie eine neue Konversation erstellen?</string>
     <string-array name="conversation_menu_array">
         <item>Profil anzeigen</item>
+        <item>Profildaten aktualisieren</item>
         <item>Konversation löschen</item>
     </string-array>
-
     <string name="sure_delete_conversation_dialog">Sind Sie sicher, dass Sie diese Konversation entfernen wollen?</string>
     <string name="conversation_deleted">Konversation gelöscht</string>
     <string name="error_delete_conversation">Fehler beim Löschvorgang</string>
+    <string name="yesterday">Gestern</string>
+    <string name="error_update">Aktualisierungsfehler</string>
+    <string name="profile_updated">Profildaten aktualisiert</string>
 
     <!-- ConversationActivity -->
     <string name="input_required">Eingabe erforderlich</string>

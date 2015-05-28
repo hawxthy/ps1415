@@ -19,8 +19,7 @@
         <TextView
             android:id="@+id/item_message_content"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="test" />
+            android:layout_height="wrap_content"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -35,8 +34,7 @@
                 android:layout_gravity="right"
                 android:paddingTop="2dp"
                 android:textSize="13sp"
-                android:fontFamily="sans-serif-light"
-                android:text="Dec 23 19:26" />
+                android:fontFamily="sans-serif-light" />
 
             <ImageView
                 android:layout_width="wrap_content"

@@ -45,7 +45,7 @@ public class MessageDbHelper extends SQLiteOpenHelper {
             + KEY_FIRST_NAME + " TEXT," + KEY_LAST_NAME + " TEXT,"
             + KEY_COUNT_NEW_MESSAGES + " INTEGER," + FOREIGN_KEY_LAST_MESSAGE + " INTEGER,"
             + " FOREIGN KEY (" + FOREIGN_KEY_LAST_MESSAGE + ") REFERENCES " + TABLE_MESSAGE + " ("
-            + KEY_ID_MESSAGE + "))";
+            + KEY_ID_MESSAGE + ")" + " ON DELETE SET NULL" + ")";
 
     private static final String CREATE_TABLE_MESSAGE = "CREATE TABLE "
             + TABLE_MESSAGE + "(" + KEY_ID_MESSAGE + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -71,12 +71,27 @@ public class MessageDbHelper extends SQLiteOpenHelper {
         DATABASE_USER_ID = ServiceProvider.getEmail();
     }
 
+    private MessageDbHelper(Context context, String userMail) {
+        super(context, DATABASE_NAME + userMail, null, DATABASE_VERSION);
+        DATABASE_USER_ID = userMail;
+    }
+
     public static synchronized MessageDbHelper getInstance(Context context) {
         if (instance == null) {
             instance = new MessageDbHelper(context.getApplicationContext());
         } else if(!DATABASE_USER_ID.equals(ServiceProvider.getEmail())){
             instance = new MessageDbHelper(context.getApplicationContext());
             DATABASE_USER_ID = ServiceProvider.getEmail();
+        }
+        return instance;
+    }
+
+    public static synchronized MessageDbHelper getInstance(Context context, String userMail) {
+        if (instance == null) {
+            instance = new MessageDbHelper(context.getApplicationContext(), userMail);
+        } else if(!DATABASE_USER_ID.equals(userMail)){
+            instance = new MessageDbHelper(context.getApplicationContext(), userMail);
+            DATABASE_USER_ID = userMail;
         }
         return instance;
     }
