@@ -4,6 +4,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Menu;
@@ -12,15 +13,25 @@ import android.view.View;
 import android.widget.Button;
 
 import com.skatenight.skatenightAPI.model.Gallery;
+import com.skatenight.skatenightAPI.model.GalleryViewOptions;
 import com.skatenight.skatenightAPI.model.Picture;
+import com.skatenight.skatenightAPI.model.PictureData;
+import com.skatenight.skatenightAPI.model.PictureMetaData;
+import com.skatenight.skatenightAPI.model.PictureMetaDataList;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import ws1415.common.component.BlobKeyImageView;
 import ws1415.common.controller.GalleryController;
+import ws1415.common.model.PictureVisibility;
+import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
@@ -51,12 +62,57 @@ public class ImageStorageTestActivity extends BaseActivity {
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+                GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
                     @Override
-                    public void taskDidFinish(ExtendedTask task, Picture picture) {
+                    public void taskDidFinish(ExtendedTask task, PictureData picture) {
                         imageView.loadFromBlobKey(picture.getImageBlobKey());
                     }
                 }, 5751399832879104l);
+            }
+        });
+        final Button loeschen = (Button) findViewById(R.id.btnLoeschen);
+        loeschen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loeschen.setEnabled(false);
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        final GalleryViewOptions viewOptions = new GalleryViewOptions();
+                        viewOptions.setLimit(10);
+                        viewOptions.setUserId(ServiceProvider.getEmail());
+
+                        final List<PictureMetaData> pictureList = new LinkedList<>();
+                        do {
+                            for (PictureMetaData p : pictureList) {
+                                try {
+                                    ServiceProvider.getService().galleryEndpoint().deletePicture(p.getId()).execute();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            pictureList.clear();
+
+                            try {
+                                PictureMetaDataList result = ServiceProvider.getService().galleryEndpoint().listPictures(viewOptions).execute();
+                                viewOptions.setCursorString(result.getCursorString());
+                                if (result.getList() != null) {
+                                    pictureList.addAll(result.getList());
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } while(!pictureList.isEmpty());
+
+                        loeschen.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                loeschen.setEnabled(true);
+                            }
+                        });
+                        return null;
+                    }
+                }.execute();
             }
         });
     }
@@ -104,7 +160,7 @@ public class ImageStorageTestActivity extends BaseActivity {
                     cursor.close();
 
                     try {
-                        GalleryController.uploadPicture(null, new FileInputStream(new File(tempPath)), "Bildtitel", "Dateipfad: " + tempPath);
+                        GalleryController.uploadPicture(null, new FileInputStream(new File(tempPath)), "Bildtitel", "Dateipfad: " + tempPath, PictureVisibility.PRIVATE);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }

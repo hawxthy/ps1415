@@ -3,8 +3,11 @@ package ws1415.common.controller;
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Gallery;
+import com.skatenight.skatenightAPI.model.GalleryMetaData;
 import com.skatenight.skatenightAPI.model.GalleryViewOptions;
 import com.skatenight.skatenightAPI.model.Picture;
+import com.skatenight.skatenightAPI.model.PictureData;
+import com.skatenight.skatenightAPI.model.PictureMetaData;
 import com.skatenight.skatenightAPI.model.PictureMetaDataList;
 
 import org.apache.http.HttpEntity;
@@ -19,7 +22,9 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
+import ws1415.common.model.PictureVisibility;
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
@@ -31,16 +36,16 @@ import ws1415.common.task.ExtendedTaskDelegate;
 public abstract class GalleryController {
 
     /**
-     * Ruft die Gallery mit der angegebenen ID ab und übergibt sie dem Handler.
+     * Ruft die Metadaten der Gallery mit der angegebenen ID ab und übergibt sie dem Handler.
      * @param handler      Der Handler, der die Gallery übergeben bekommt.
      * @param galleryId    Die ID der abzurufenden Gallery.
      */
-    public static void getGallery(ExtendedTaskDelegate<Void, Gallery> handler, final long galleryId) {
-        new ExtendedTask<Void, Void, Gallery>(handler) {
+    public static void getGalleryMetaData(ExtendedTaskDelegate<Void, GalleryMetaData> handler, final long galleryId) {
+        new ExtendedTask<Void, Void, GalleryMetaData>(handler) {
             @Override
-            protected Gallery doInBackground(Void... params) {
+            protected GalleryMetaData doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().galleryEndpoint().getGallery(galleryId).execute();
+                    return ServiceProvider.getService().galleryEndpoint().getGalleryMetaData(galleryId).execute();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -110,12 +115,14 @@ public abstract class GalleryController {
      * @param handler        Der Handler, der die abgerufenen Daten übergeben bekommt.
      * @param viewOptions    Die Filter-Optionen, die beim Abrufen der Bilder angewandt werden.
      */
-    public static void listPictures(ExtendedTaskDelegate<Void, PictureMetaDataList> handler, final GalleryViewOptions viewOptions) {
-        new ExtendedTask<Void, Void, PictureMetaDataList>(handler) {
+    public static void listPictures(ExtendedTaskDelegate<Void, List<PictureMetaData>> handler, final GalleryViewOptions viewOptions) {
+        new ExtendedTask<Void, Void, List<PictureMetaData>>(handler) {
             @Override
-            protected PictureMetaDataList doInBackground(Void... params) {
+            protected List<PictureMetaData> doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().galleryEndpoint().listPictures(viewOptions).execute();
+                    PictureMetaDataList result = ServiceProvider.getService().galleryEndpoint().listPictures(viewOptions).execute();
+                    viewOptions.setCursorString(result.getCursorString());
+                    return result.getList();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -130,7 +137,7 @@ public abstract class GalleryController {
      * @param image      Das hochzuladende Bild.
      */
     public static void uploadPicture(ExtendedTaskDelegate<Void, Picture> handler, final InputStream image,
-                                     final String title, final String description) {
+                                     final String title, final String description, final PictureVisibility visibility) {
         new ExtendedTask<Void, Void, Picture>(handler) {
             @Override
             protected Picture doInBackground(Void... params) {
@@ -138,7 +145,7 @@ public abstract class GalleryController {
                 Picture picture = null;
                 try {
                     picture = ServiceProvider.getService().galleryEndpoint().createPicture(
-                            title, description).execute();
+                            title, description, visibility.name()).execute();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -192,10 +199,10 @@ public abstract class GalleryController {
      * @param handler      Der Handler, der das abgerufene Bild übergeben bekommt.
      * @param pictureId    Die ID des abzurufenden Bildes.
      */
-    public static void getPicture(ExtendedTaskDelegate<Void, Picture> handler, final long pictureId) {
-        new ExtendedTask<Void, Void, Picture>(handler) {
+    public static void getPicture(ExtendedTaskDelegate<Void, PictureData> handler, final long pictureId) {
+        new ExtendedTask<Void, Void, PictureData>(handler) {
             @Override
-            protected Picture doInBackground(Void... params) {
+            protected PictureData doInBackground(Void... params) {
                 try {
                     return ServiceProvider.getService().galleryEndpoint().getPicture(pictureId).execute();
                 } catch (IOException e) {
@@ -237,6 +244,69 @@ public abstract class GalleryController {
             protected Void doInBackground(Void... params) {
                 try {
                     ServiceProvider.getService().galleryEndpoint().ratePicture(pictureId, rating).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * Fügt das Bild mit der angegebenen ID der Gallery hinzu.
+     * @param handler      Der Handler, der über den Status des Tasks informiert wird.
+     * @param pictureId    Die ID des Bildes, das zur Gallery hinzugefügt werden soll.
+     * @param galleryId    Die ID der Gallery zu der das Bild hinzugefügt wird.
+     */
+    public static void addPictureToGallery(ExtendedTaskDelegate<Void, Void> handler, final long pictureId, final long galleryId) {
+        new ExtendedTask<Void, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().galleryEndpoint().addPictureToGallery(pictureId, galleryId).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * Löscht das Bild mit der angegebenen ID aus der Gallery.
+     * @param handler      Der Handler, der über den Status des Tasks informiert wird.
+     * @param pictureId    Die ID des Bildes, das aus der Gallery entfernt wird.
+     * @param galleryId    Die ID der Gallery aus der das Bild entfernt wird.
+     */
+    public static void removePictureFromGallery(ExtendedTaskDelegate<Void, Void> handler, final long pictureId, final long galleryId) {
+        new ExtendedTask<Void, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().galleryEndpoint().removePictureFromGallery(pictureId, galleryId).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * Ändert die Sichtbarkeitseinstellungen für das Bild mit der angegebenen ID.
+     * @param handler       Der Handler, der über den Status des Tasks informiert wird.
+     * @param pictureId     Die ID des Bildes, dessen Sichtbarkeit geändert wird.
+     * @param visibility    Die neue Sichtbarkeit des Bildes.
+     */
+    public static void changeVisibility(ExtendedTaskDelegate<Void, Void> handler, final long pictureId, final PictureVisibility visibility) {
+        if (visibility == null) {
+            throw new IllegalArgumentException("null is not a valid visibility");
+        }
+        new ExtendedTask<Void, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().galleryEndpoint().changeVisibility(pictureId, visibility.name()).execute();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

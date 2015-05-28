@@ -14,12 +14,18 @@ public class PictureMetaData {
     private Long id;
     private String title;
     private Date date;
+    private String uploader;
     private BlobKey imageBlobKey;
+
+    public PictureMetaData() {
+        
+    }
 
     public PictureMetaData(Picture picture) {
         this.id = picture.getId();
         this.title = picture.getTitle();
         this.date = picture.getDate();
+        this.uploader = picture.getUploader();
         this.imageBlobKey = picture.getImageBlobKey();
     }
 
@@ -45,6 +51,14 @@ public class PictureMetaData {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getUploader() {
+        return uploader;
+    }
+
+    public void setUploader(String uploader) {
+        this.uploader = uploader;
     }
 
     public BlobKey getImageBlobKey() {

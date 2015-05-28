@@ -4,7 +4,6 @@ import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.DynamicField;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventData;
-import com.skatenight.skatenightAPI.model.EventDynamicData;
 import com.skatenight.skatenightAPI.model.EventMetaData;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;

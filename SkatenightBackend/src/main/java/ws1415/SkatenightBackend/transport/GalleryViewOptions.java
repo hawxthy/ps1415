@@ -15,9 +15,13 @@ public class GalleryViewOptions {
      */
     private int limit;
     /**
-     * Die ID der Gallery, für die Bilder abgerufen werden.
+     * Die ID der Gallery, für die Bilder abgerufen werden sollen.
      */
-    private long galleryId;
+    private Long galleryId;
+    /**
+     * Die ID des Users (E-Mail), für den die Bilder abgerufen werden sollen.
+     */
+    private String userId;
 
     public String getCursorString() {
         return cursorString;
@@ -35,11 +39,19 @@ public class GalleryViewOptions {
         this.limit = limit;
     }
 
-    public long getGalleryId() {
+    public Long getGalleryId() {
         return galleryId;
     }
 
-    public void setGalleryId(long galleryId) {
+    public void setGalleryId(Long galleryId) {
         this.galleryId = galleryId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

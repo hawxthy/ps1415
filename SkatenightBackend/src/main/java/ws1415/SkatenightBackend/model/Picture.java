@@ -8,15 +8,13 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
-import com.googlecode.objectify.annotation.Parent;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.jdo.annotations.PersistenceCapable;
-import javax.jdo.annotations.Persistent;
+import ws1415.SkatenightBackend.transport.PictureMetaData;
 
 /**
  * Speichert die kompletten Bilddaten inklusive Metadaten, Kommentaren und Bewertungen.
@@ -27,6 +25,7 @@ public class Picture implements BlobKeyContainer {
     @Id
     private Long id;
     private String title;
+    @Index
     private Date date;
     @Index
     private String uploader;
@@ -34,6 +33,11 @@ public class Picture implements BlobKeyContainer {
     private Map<String, Integer> ratings;
     private Double avgRating;
     private BlobKey imageBlobKey;
+    private PictureVisibility visibility;
+
+    @Index
+    @Load(unless = {PictureMetaData.class})
+    private List<Ref<Gallery>> galleries = new LinkedList<>();
     // TODO Comments einbinden
 
     /**
@@ -107,6 +111,37 @@ public class Picture implements BlobKeyContainer {
         this.imageBlobKey = imageBlobKey;
     }
 
+    public PictureVisibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(PictureVisibility visibility) {
+        this.visibility = visibility;
+    }
+
+    public List<Gallery> getGalleries() {
+        if (galleries == null) {
+            return null;
+        } else {
+            List<Gallery> galleries = new LinkedList<>();
+            for (Ref<Gallery> ref : this.galleries) {
+                galleries.add(ref.get());
+            }
+            return galleries;
+        }
+    }
+
+    public void setGalleries(List<Gallery> galleries) {
+        if (galleries == null) {
+            this.galleries = null;
+        } else {
+            this.galleries = new LinkedList<>();
+            for (Gallery gallery : galleries) {
+                this.galleries.add(Ref.create(gallery));
+            }
+        }
+    }
+
     public String getUploadUrl() {
         return uploadUrl;
     }
@@ -120,5 +155,19 @@ public class Picture implements BlobKeyContainer {
         if (keys != null && !keys.isEmpty()) {
             imageBlobKey = keys.get(0);
         }
+    }
+
+    public void addGallery(Gallery gallery) {
+        if (gallery == null) {
+            throw new NullPointerException("null, as a gallery, can not be added");
+        }
+        galleries.add(Ref.create(gallery));
+    }
+
+    public void removeGallery(Gallery gallery) {
+        if (gallery == null) {
+            throw new NullPointerException("null, as a gallery, can not be removed");
+        }
+        galleries.remove(Ref.create(gallery));
     }
 }

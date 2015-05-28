@@ -3,9 +3,12 @@ package ws1415.SkatenightBackend.model;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Load;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import ws1415.SkatenightBackend.transport.GalleryMetaData;
 
 /**
  * Repräsentiert eine Bilder-Gallery mit einem Titel und einer Menge von Bildern.
@@ -16,7 +19,8 @@ public class Gallery {
     @Id
     private Long id;
     private String title;
-    private List<Ref<Picture>> pictures;
+    @Load(unless = {GalleryMetaData.class})
+    private List<Ref<Picture>> pictures = new LinkedList<>();
 
     // Referenz auf den Container, in dem die Gallery gespeichert ist
     private String containerClass;
@@ -73,5 +77,19 @@ public class Gallery {
 
     public void setContainerId(long containerId) {
         this.containerId = containerId;
+    }
+
+    public void addPicture(Picture picture) {
+        if (picture == null) {
+            throw new NullPointerException("null, as a picture, can not be added");
+        }
+        pictures.add(Ref.create(picture));
+    }
+
+    public void removePicture(Picture picture) {
+        if (picture == null) {
+            throw new NullPointerException("null, as a picture, can not be removed");
+        }
+        pictures.remove(Ref.create(picture));
     }
 }

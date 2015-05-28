@@ -703,4 +703,19 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         }
 
     }
+
+    protected Boolean isFriendWith(String userMail, String mailToCheck){
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            for(String friend : endUser.getMyFriends()){
+                if(friend.equals(mailToCheck)) return true;
+            }
+        } catch (Exception e){
+            return false;
+        } finally {
+            pm.close();
+        }
+        return false;
+    }
 }
