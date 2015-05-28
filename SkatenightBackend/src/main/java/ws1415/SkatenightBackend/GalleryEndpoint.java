@@ -17,7 +17,6 @@ import com.googlecode.objectify.cmd.Query;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -26,11 +25,10 @@ import ws1415.SkatenightBackend.model.GalleryContainer;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.PictureVisibility;
 import ws1415.SkatenightBackend.transport.GalleryMetaData;
-import ws1415.SkatenightBackend.transport.GalleryViewOptions;
+import ws1415.SkatenightBackend.transport.PictureFilter;
 import ws1415.SkatenightBackend.transport.PictureData;
 import ws1415.SkatenightBackend.transport.PictureMetaData;
 import ws1415.SkatenightBackend.transport.PictureMetaDataList;
-import ws1415.SkatenightBackend.transport.UserListData;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -160,42 +158,42 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
      * Gibt eine Liste von Bild-Metadaten zurück, die anhand der übergebenen ViewOptions ausgewählt
      * werden.
      * Für diese Methode ist explizit angegeben, dass sie die HTTP-Methode POST verwendet, damit der
-     * Parameter {@code viewOptions} übertragen werden kann.
+     * Parameter {@code filter} übertragen werden kann.
      * @param user           Der aufrufende Benutzer.
-     * @param viewOptions    Die anzuwendenden ViewOptions. Falls sowohl eine Gallery- als auch eine
+     * @param filter    Die anzuwendenden ViewOptions. Falls sowohl eine Gallery- als auch eine
      *                       User-ID angegeben ist, so wird die User-ID ignoriert.
      * @return Eine Liste von Bild-Metadaten, die anhand der ViewOptions ausgewählt werden.
      */
     @ApiMethod(httpMethod = "POST")
-    public PictureMetaDataList listPictures(User user, GalleryViewOptions viewOptions) throws OAuthRequestException, UnauthorizedException {
+    public PictureMetaDataList listPictures(User user, PictureFilter filter) throws OAuthRequestException, UnauthorizedException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        if (viewOptions == null) {
-            throw new NullPointerException("no view options submitted");
+        if (filter == null) {
+            throw new NullPointerException("no filter submitted");
         }
-        if (viewOptions.getLimit() <= 0 || (viewOptions.getGalleryId() == null && viewOptions.getUserId() == null)) {
-            throw new IllegalArgumentException("invalid view options: limit has to be positive and either galleryId or userId has to be non-null");
+        if (filter.getLimit() <= 0 || (filter.getGalleryId() == null && filter.getUserId() == null)) {
+            throw new IllegalArgumentException("invalid filter: limit has to be positive and either galleryId or userId has to be non-null");
         }
 
-        Query<Picture> q = ofy().load().group(PictureMetaData.class).type(Picture.class).limit(viewOptions.getLimit());
-        if (viewOptions.getGalleryId() != null) {
+        Query<Picture> q = ofy().load().group(PictureMetaData.class).type(Picture.class).limit(filter.getLimit());
+        if (filter.getGalleryId() != null) {
             // Nach Gallery filtern
-            q = q.filter("galleries", Ref.create(Key.create(Gallery.class, viewOptions.getGalleryId())));
+            q = q.filter("galleries", Ref.create(Key.create(Gallery.class, filter.getGalleryId())));
         } else {
             // Nach aufrufendem Benutzer als Uploader filtern
-            q = q.filter("uploader", viewOptions.getUserId());
+            q = q.filter("uploader", filter.getUserId());
         }
         q = q.order("-date");
-        if (viewOptions.getCursorString() != null) {
-            q = q.startAt(Cursor.fromWebSafeString(viewOptions.getCursorString()));
+        if (filter.getCursorString() != null) {
+            q = q.startAt(Cursor.fromWebSafeString(filter.getCursorString()));
         }
         QueryResultIterator<Picture> iterator = q.iterator();
 
         // Minimale Sichtbarkeitseinstellung bestimmen, bei der der aufrufende Benutzer ein Bild abrufen darf
         PictureVisibility minVisibility;
-        if (viewOptions.getGalleryId() != null) {
-            Gallery gallery = ofy().load().type(Gallery.class).id(viewOptions.getGalleryId()).safe();
+        if (filter.getGalleryId() != null) {
+            Gallery gallery = ofy().load().type(Gallery.class).id(filter.getGalleryId()).safe();
             if (gallery.getContainerClass().equals("User")/* && id == ... */) {
                 // TODO Fall implementieren: Es wird eine Benutzergallery abgerufen
                 // Hier muss wieder geprüft werden, ob der Benutzer, dessen Gallery abgerufen wird,
@@ -208,12 +206,12 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
                 minVisibility = PictureVisibility.PUBLIC;
             }
         } else {
-            if (user.getEmail().equals(viewOptions.getUserId())) {
+            if (user.getEmail().equals(filter.getUserId())) {
                 // Falls der Benutzer seine eigenen Bilder abruft
                 minVisibility = PictureVisibility.PRIVATE;
             } else {
                 // Sonst testen, ob der abrufende Benutzer ein Freund ist
-                boolean friend = new UserEndpoint().isFriendWith(viewOptions.getUserId(), user.getEmail());
+                boolean friend = new UserEndpoint().isFriendWith(filter.getUserId(), user.getEmail());
 
                 if (friend) {
                     minVisibility = PictureVisibility.FRIENDS;
@@ -228,7 +226,7 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         int count = 0;
         Picture tmpPicture;
         PictureMetaData tmpMetaData;
-        while (count < viewOptions.getLimit() && iterator.hasNext()) {
+        while (count < filter.getLimit() && iterator.hasNext()) {
             tmpPicture = iterator.next();
             if (tmpPicture.getVisibility().compareTo(minVisibility) >= 0) {
                 tmpMetaData = new PictureMetaData(tmpPicture);

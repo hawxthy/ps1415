@@ -11,11 +11,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 
-import com.skatenight.skatenightAPI.model.Gallery;
-import com.skatenight.skatenightAPI.model.GalleryViewOptions;
-import com.skatenight.skatenightAPI.model.Picture;
 import com.skatenight.skatenightAPI.model.PictureData;
+import com.skatenight.skatenightAPI.model.PictureFilter;
 import com.skatenight.skatenightAPI.model.PictureMetaData;
 import com.skatenight.skatenightAPI.model.PictureMetaDataList;
 
@@ -25,10 +24,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import ws1415.common.component.BlobKeyImageView;
+import ws1415.common.component.EventAdapter;
 import ws1415.common.controller.GalleryController;
 import ws1415.common.model.PictureVisibility;
 import ws1415.common.net.ServiceProvider;
@@ -78,9 +76,9 @@ public class ImageStorageTestActivity extends BaseActivity {
                 new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
-                        final GalleryViewOptions viewOptions = new GalleryViewOptions();
-                        viewOptions.setLimit(10);
-                        viewOptions.setUserId(ServiceProvider.getEmail());
+                        final PictureFilter filter = new PictureFilter();
+                        filter.setLimit(10);
+                        filter.setUserId(ServiceProvider.getEmail());
 
                         final List<PictureMetaData> pictureList = new LinkedList<>();
                         do {
@@ -94,8 +92,8 @@ public class ImageStorageTestActivity extends BaseActivity {
                             pictureList.clear();
 
                             try {
-                                PictureMetaDataList result = ServiceProvider.getService().galleryEndpoint().listPictures(viewOptions).execute();
-                                viewOptions.setCursorString(result.getCursorString());
+                                PictureMetaDataList result = ServiceProvider.getService().galleryEndpoint().listPictures(filter).execute();
+                                filter.setCursorString(result.getCursorString());
                                 if (result.getList() != null) {
                                     pictureList.addAll(result.getList());
                                 }
@@ -115,6 +113,9 @@ public class ImageStorageTestActivity extends BaseActivity {
                 }.execute();
             }
         });
+
+        ListView listView = (ListView) findViewById(R.id.eventList);
+        listView.setAdapter(new EventAdapter());
     }
 
     @Override

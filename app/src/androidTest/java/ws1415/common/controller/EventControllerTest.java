@@ -4,6 +4,7 @@ import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.DynamicField;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventData;
+import com.skatenight.skatenightAPI.model.EventFilter;
 import com.skatenight.skatenightAPI.model.EventMetaData;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
@@ -117,7 +118,10 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
     public void testListEventsMetaData() throws InterruptedException {
         final CountDownLatch signal = new CountDownLatch(1);
 
-        EventController.listEventsMetaData(new ExtendedTaskDelegateAdapter<Void, List<EventMetaData>>() {
+        EventFilter filter = new EventFilter();
+        filter.setLimit(10);
+
+        EventController.listEvents(new ExtendedTaskDelegateAdapter<Void, List<EventMetaData>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<EventMetaData> events) {
                 assertNotNull("Es existieren keine Events auf dem Server", events);
@@ -137,12 +141,11 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
                 }
                 fail("Die Eventmetadaten enthalten das Testevent nicht");
             }
-
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 fail(message);
             }
-        });
+        }, filter);
         signal.await(10, TimeUnit.SECONDS);
     }
 

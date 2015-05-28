@@ -1,12 +1,11 @@
 package ws1415.common.controller;
 
 import com.skatenight.skatenightAPI.model.BlobKey;
-import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Gallery;
 import com.skatenight.skatenightAPI.model.GalleryMetaData;
-import com.skatenight.skatenightAPI.model.GalleryViewOptions;
 import com.skatenight.skatenightAPI.model.Picture;
 import com.skatenight.skatenightAPI.model.PictureData;
+import com.skatenight.skatenightAPI.model.PictureFilter;
 import com.skatenight.skatenightAPI.model.PictureMetaData;
 import com.skatenight.skatenightAPI.model.PictureMetaDataList;
 
@@ -113,15 +112,15 @@ public abstract class GalleryController {
      * des Cursors, der die Daten aus dem Datastore gelesen hat, zurückgegeben. Bei einem weiteren
      * Aufruf kann dieser String übergeben werden, um das abrufen der Daten an dieser Stelle fortzusetzen.
      * @param handler        Der Handler, der die abgerufenen Daten übergeben bekommt.
-     * @param viewOptions    Die Filter-Optionen, die beim Abrufen der Bilder angewandt werden.
+     * @param filter         Die Filter-Optionen, die beim Abrufen der Bilder angewandt werden.
      */
-    public static void listPictures(ExtendedTaskDelegate<Void, List<PictureMetaData>> handler, final GalleryViewOptions viewOptions) {
+    public static void listPictures(ExtendedTaskDelegate<Void, List<PictureMetaData>> handler, final PictureFilter filter) {
         new ExtendedTask<Void, Void, List<PictureMetaData>>(handler) {
             @Override
             protected List<PictureMetaData> doInBackground(Void... params) {
                 try {
-                    PictureMetaDataList result = ServiceProvider.getService().galleryEndpoint().listPictures(viewOptions).execute();
-                    viewOptions.setCursorString(result.getCursorString());
+                    PictureMetaDataList result = ServiceProvider.getService().galleryEndpoint().listPictures(filter).execute();
+                    filter.setCursorString(result.getCursorString());
                     return result.getList();
                 } catch (IOException e) {
                     throw new RuntimeException(e);

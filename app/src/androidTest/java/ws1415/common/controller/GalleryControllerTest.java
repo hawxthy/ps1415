@@ -1,15 +1,12 @@
 package ws1415.common.controller;
 
-import android.app.Service;
-import android.util.Log;
-
 import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Gallery;
 import com.skatenight.skatenightAPI.model.GalleryMetaData;
-import com.skatenight.skatenightAPI.model.GalleryViewOptions;
 import com.skatenight.skatenightAPI.model.Picture;
 import com.skatenight.skatenightAPI.model.PictureData;
+import com.skatenight.skatenightAPI.model.PictureFilter;
 import com.skatenight.skatenightAPI.model.PictureMetaData;
 import com.skatenight.skatenightAPI.model.PictureMetaDataList;
 import com.skatenight.skatenightAPI.model.Route;
@@ -17,7 +14,6 @@ import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -255,9 +251,9 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         // Liste der Testbilder umdrehen, da diese sortiert nach Hochladedatum abgerufen werden
         Collections.reverse(testPictures);
 
-        final GalleryViewOptions viewOptions = new GalleryViewOptions();
-        viewOptions.setLimit(TEST_LIMIT);
-        viewOptions.setUserId(ServiceProvider.getEmail());
+        final PictureFilter filter = new PictureFilter();
+        filter.setLimit(TEST_LIMIT);
+        filter.setUserId(ServiceProvider.getEmail());
         for (int i = 0; i < 3; i++) {
             final int index = i;
             final CountDownLatch signal = new CountDownLatch(1);
@@ -283,7 +279,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
 
                     signal.countDown();
                 }
-            }, viewOptions);
+            }, filter);
             signal.await(10, TimeUnit.SECONDS);
         }
     }
@@ -322,9 +318,9 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
 
         // Beim Abrufen der Bilder für den eingeloggten Benutzer sollte das in setUp erstellte
         // Testbild nun nicht mit abgerufen werden
-        GalleryViewOptions viewOptions = new GalleryViewOptions();
-        viewOptions.setLimit(2);
-        viewOptions.setUserId(ServiceProvider.getEmail());
+        PictureFilter filter = new PictureFilter();
+        filter.setLimit(2);
+        filter.setUserId(ServiceProvider.getEmail());
         final CountDownLatch signal2 = new CountDownLatch(1);
         GalleryController.listPictures(new ExtendedTaskDelegateAdapter<Void, List<PictureMetaData>>() {
             @Override
@@ -336,7 +332,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
                 }
                 signal2.countDown();
             }
-        }, viewOptions);
+        }, filter);
         boolean timeout = !signal2.await(10, TimeUnit.SECONDS);
 
         // Das erstellte Bild wieder löschen
@@ -398,9 +394,9 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         String uploader = ServiceProvider.getEmail();
 
         // Den Benutzer die eigenen Bilder abrufen lassen: Sollte alle Bilder liefern
-        GalleryViewOptions viewOptions = new GalleryViewOptions();
-        viewOptions.setLimit(3);
-        viewOptions.setUserId(uploader);
+        PictureFilter filter = new PictureFilter();
+        filter.setLimit(3);
+        filter.setUserId(uploader);
         final CountDownLatch signal1 = new CountDownLatch(1);
         GalleryController.listPictures(new ExtendedTaskDelegateAdapter<Void, List<PictureMetaData>>() {
             @Override
@@ -412,7 +408,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
                 }
                 signal1.countDown();
             }
-        }, viewOptions);
+        }, filter);
         assertTrue("timeout reached", signal1.await(10, TimeUnit.SECONDS));
 
         // Einen Freund die Bilder abrufen lassen: Sollte ein "leeres" Bild anstatt des privaten und
@@ -421,7 +417,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         ServiceProvider.getService().userEndpoint().addFriend(ServiceProvider.getEmail(), getAccountMail(1)).execute();
         changeAccount(1);
         // Cursor zurücksetzen
-        viewOptions.setCursorString(null);
+        filter.setCursorString(null);
         final CountDownLatch signal2 = new CountDownLatch(1);
         GalleryController.listPictures(new ExtendedTaskDelegateAdapter<Void, List<PictureMetaData>>() {
             @Override
@@ -435,7 +431,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
                 }
                 signal2.countDown();
             }
-        }, viewOptions);
+        }, filter);
         assertTrue("timeout reached", signal2.await(10, TimeUnit.SECONDS));
 
         // Einen Benutzer, der kein Freund ist, die Bilder abrufen lassen: Sollte nur das öffentliche
@@ -445,7 +441,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         ServiceProvider.getService().userEndpoint().removeFriend(ServiceProvider.getEmail(), getAccountMail(1)).execute();
         changeAccount(1);
         // Cursor zurücksetzen
-        viewOptions.setCursorString(null);
+        filter.setCursorString(null);
         final CountDownLatch signal3 = new CountDownLatch(1);
         GalleryController.listPictures(new ExtendedTaskDelegateAdapter<Void, List<PictureMetaData>>() {
             @Override
@@ -460,7 +456,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
                 assertEquals("public picture expected", pictures[2].getImageBlobKey(), pictureMetaDataList.get(2).getImageBlobKey());
                 signal3.countDown();
             }
-        }, viewOptions);
+        }, filter);
         assertTrue("timeout reached", signal3.await(10, TimeUnit.SECONDS));
     }
 
@@ -620,10 +616,10 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         }
 
         // Beim Abrufen der Bilder für die Testgallery sollte nun nur das erste Testbild zurückgegeben werden
-        GalleryViewOptions viewOptions = new GalleryViewOptions();
-        viewOptions.setLimit(2);
-        viewOptions.setGalleryId(testGallery.getId());
-        PictureMetaDataList data = ServiceProvider.getService().galleryEndpoint().listPictures(viewOptions).execute();
+        PictureFilter filter = new PictureFilter();
+        filter.setLimit(2);
+        filter.setGalleryId(testGallery.getId());
+        PictureMetaDataList data = ServiceProvider.getService().galleryEndpoint().listPictures(filter).execute();
         assertNotNull("no pictures fetched", data);
         assertNotNull("no pictures fetched", data.getList());
         assertEquals("wrong count of pictures fetched", 1, data.getList().size());
@@ -640,10 +636,10 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         assertTrue("timeout reached", signal2.await(10, TimeUnit.SECONDS));
 
         // Beim Abrufen der Bilder für die Testgallery sollte nun kein Bild zurückgegeben werden
-        viewOptions = new GalleryViewOptions();
-        viewOptions.setLimit(2);
-        viewOptions.setGalleryId(testGallery.getId());
-        data = ServiceProvider.getService().galleryEndpoint().listPictures(viewOptions).execute();
+        filter = new PictureFilter();
+        filter.setLimit(2);
+        filter.setGalleryId(testGallery.getId());
+        data = ServiceProvider.getService().galleryEndpoint().listPictures(filter).execute();
         assertNotNull("no data fetched", data);
         assertNull("pictures fetched", data.getList());
     }

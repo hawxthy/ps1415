@@ -1,11 +1,15 @@
 package ws1415.SkatenightBackend;
 
+import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.cmd.Query;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,24 +21,22 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
-import javax.management.relation.Role;
 
 import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
-import ws1415.SkatenightBackend.model.DynamicField;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.EventRole;
-import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Privilege;
 import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.UserLocation;
 import ws1415.SkatenightBackend.transport.EventData;
+import ws1415.SkatenightBackend.transport.EventFilter;
 import ws1415.SkatenightBackend.transport.EventMetaData;
+import ws1415.SkatenightBackend.transport.EventMetaDataList;
 import ws1415.SkatenightBackend.transport.EventParticipationData;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -85,14 +87,43 @@ public class EventEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Gibt eine Liste aller auf dem Server gespeicherter Metadaten von Events zurück.
-     * @return Eine Liste aller auf dem Server gespeicherter EventMetaData-Objekte.
+     * Ruft die Metadaten von Events auf dem Server ab.
+     * Für diese Methode ist explizit angegeben, dass sie die HTTP-Methode POST verwendet, damit der
+     * Parameter {@code filter} übertragen werden kann.
+     * @param user      Der aufrufende Benutzer.
+     * @param filter    Der Filter, nach dem die Events abgerufen werden sollen. Falls keine User-Id
+     *                  im Filter angegeben ist, werden alle Events abgerufen.
+     * @return Eine Liste aller auf dem Server gespeicherter EventMetaData-Objekte, die die Kriterien
+     * des Filters erfüllen.
      */
-    public List<EventMetaData> getEventsMetaData() {
-        List<EventMetaData> result = new LinkedList<>();
-        for (Event e : ofy().load().group(EventMetaData.class).type(Event.class).list()) {
-            result.add(new EventMetaData(e));
+    @ApiMethod(httpMethod = "POST")
+    public EventMetaDataList listEvents(User user, EventFilter filter) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
         }
+        if (filter == null) {
+            throw new IllegalArgumentException("no filter submitted");
+        }
+        if (filter.getLimit() <= 0) {
+            throw new IllegalArgumentException("invalid filter parameters: limit has to be positive");
+        }
+
+        Query<Event> q = ofy().load().group(EventMetaData.class).type(Event.class).limit(filter.getLimit());
+        if (filter.getCursorString() != null) {
+            q = q.startAt(Cursor.fromWebSafeString(filter.getCursorString()));
+        }
+        if (filter.getUserId() != null) {
+            // TODO Die Events abrufen, an denen ein User teilnimmt und prüfen, welche der aufrufende Benutzer davon sehen darf
+        }
+        QueryResultIterator<Event> iterator = q.iterator();
+
+        EventMetaDataList result = new EventMetaDataList();
+        result.setList(new LinkedList<EventMetaData>());
+        while (iterator.hasNext()) {
+            result.getList().add(new EventMetaData(iterator.next()));
+        }
+        result.setCursorString(iterator.getCursor().toWebSafeString());
+
         return result;
     }
 

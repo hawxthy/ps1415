@@ -3,7 +3,9 @@ package ws1415.common.controller;
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventData;
+import com.skatenight.skatenightAPI.model.EventFilter;
 import com.skatenight.skatenightAPI.model.EventMetaData;
+import com.skatenight.skatenightAPI.model.EventMetaDataList;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -57,13 +59,16 @@ public abstract class EventController {
      * Ruft eine Liste aller Events ab, die auf dem Server gespeichert sind. Es werden dabei nur die
      * Metadaten der Events abgerufen.
      * @param handler Der Handler, der die abgerufene Liste übergeben bekommt.
+     * @param filter  Der anzuwendende Filter.
      */
-    public static void listEventsMetaData(ExtendedTaskDelegate<Void, List<EventMetaData>> handler) {
+    public static void listEvents(ExtendedTaskDelegate<Void, List<EventMetaData>> handler, final EventFilter filter) {
         new ExtendedTask<Void, Void, List<EventMetaData>>(handler) {
             @Override
             protected List<EventMetaData> doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().eventEndpoint().getEventsMetaData().execute().getItems();
+                    EventMetaDataList result = ServiceProvider.getService().eventEndpoint().listEvents(filter).execute();
+                    filter.setCursorString(result.getCursorString());
+                    return result.getList();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

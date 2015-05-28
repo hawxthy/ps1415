@@ -4,7 +4,7 @@ package ws1415.SkatenightBackend.transport;
  * Repräsentiert die Daten eines Filters, anhand dessen Picture-Objekte aus dem Datastore geladen werden.
  * @author Richard Schulze
  */
-public class GalleryViewOptions {
+public class PictureFilter {
     /**
      * Speichert den Cursor, der beim vorherigen Abruf von PictureMetaData-Objekten entstanden ist,
      * damit an dieser Stelle weiter gemacht werden kann.
