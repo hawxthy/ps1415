@@ -11,12 +11,17 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.EntityUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -95,13 +100,12 @@ public abstract class EventController {
     }
 
     /**
-     * Erstellt das angegebene Event auf dem Server.
+     * TODO Kommentar
      * @param handler    Der Handler, der das erstellte Event übergeben bekommt.
      * @param event      Das zu erstellende Event.
      */
     public static void createEvent(ExtendedTaskDelegate<Void, Event> handler, final Event event,
-                                   final InputStream icon, final InputStream headerImage,
-                                   final List<InputStream> images) {
+                                   final File icon, final File headerImage, final List<File> images) {
         // TODO Ggf. Event auf Gültigkeit prüfen
 
         new ExtendedTask<Void, Void, Event>(handler) {
@@ -117,10 +121,10 @@ public abstract class EventController {
 
                         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-                        builder.addPart("files", new InputStreamBody(icon, "files"));
-                        builder.addPart("files", new InputStreamBody(headerImage, "files"));
-                        for (InputStream is : images) {
-                            builder.addPart("files", new InputStreamBody(is, "files"));
+                        builder.addBinaryBody("files", icon);
+                        builder.addBinaryBody("files", headerImage);
+                        for (File f : images) {
+                            builder.addBinaryBody("files", f);
                         }
                         builder.addTextBody("id", createdEvent.getId().toString());
                         builder.addTextBody("class", "Event");

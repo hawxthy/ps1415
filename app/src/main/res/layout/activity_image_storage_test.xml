@@ -13,7 +13,7 @@
         android:id="@+id/imageView" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
         <Button
@@ -33,7 +33,23 @@
             android:layout_height="wrap_content"
             android:text="Alle Bilder löschen"
             android:id="@+id/btnLoeschen" />
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Testevents erstellen"
+            android:id="@+id/testEventsErstellen" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alle Events löschen"
+            android:id="@+id/eventsLoeschen" />
     </LinearLayout>
 
     <ListView
