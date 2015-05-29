@@ -19,6 +19,7 @@ import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventFilter;
 import com.skatenight.skatenightAPI.model.EventMetaData;
+import com.skatenight.skatenightAPI.model.EventMetaDataList;
 import com.skatenight.skatenightAPI.model.PictureData;
 import com.skatenight.skatenightAPI.model.PictureFilter;
 import com.skatenight.skatenightAPI.model.PictureMetaData;
@@ -30,7 +31,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
@@ -39,7 +39,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.common.component.BlobKeyImageView;
-import ws1415.common.component.EventAdapter;
+import ws1415.ps1415.adapter.EventAdapter;
 import ws1415.common.controller.EventController;
 import ws1415.common.controller.GalleryController;
 import ws1415.common.model.PictureVisibility;
@@ -54,6 +54,7 @@ public class ImageStorageTestActivity extends BaseActivity {
 
     private BlobKeyImageView imageView;
     private Button btnTestEventsErstellen;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,32 +146,41 @@ public class ImageStorageTestActivity extends BaseActivity {
         btnEventsLoeschen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EventFilter filter = new EventFilter();
-                filter.setLimit(30);
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        EventFilter filter = new EventFilter();
+                        filter.setLimit(30);
 
-                final List<EventMetaData> eventsToDelete = new LinkedList<>();
-                do {
-                    for (EventMetaData event : eventsToDelete) {
-                        try {
-                            ServiceProvider.getService().eventEndpoint().deleteEvent(event.getId()).execute();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    eventsToDelete.clear();
-                    EventController.listEvents(new ExtendedTaskDelegateAdapter<Void, List<EventMetaData>>() {
-                        @Override
-                        public void taskDidFinish(ExtendedTask task, List<EventMetaData> events) {
-                            if (events != null) {
-                                eventsToDelete.addAll(events);
+                        final List<EventMetaData> eventsToDelete = new LinkedList<>();
+                        do {
+                            for (EventMetaData event : eventsToDelete) {
+                                try {
+                                    ServiceProvider.getService().eventEndpoint().deleteEvent(event.getId()).execute();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
-                        }
-                    }, filter);
-                } while(!eventsToDelete.isEmpty());
+                            eventsToDelete.clear();
+
+                            try {
+                                EventMetaDataList result = ServiceProvider.getService().eventEndpoint().listEvents(filter).execute();
+                                if (result.getList() != null) {
+                                    filter.setCursorString(result.getCursorString());
+                                    eventsToDelete.addAll(result.getList());
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        } while(!eventsToDelete.isEmpty());
+                        return null;
+                    }
+                }.execute();
             }
         });
 
-        ListView listView = (ListView) findViewById(R.id.eventList);
+        listView = (ListView) findViewById(R.id.eventList);
         EventFilter filter = new EventFilter();
         filter.setLimit(10);
         listView.setAdapter(new EventAdapter(this, filter));
@@ -255,14 +265,14 @@ public class ImageStorageTestActivity extends BaseActivity {
                                 e.printStackTrace();
                             }
 
-                            Event event = new Event();
-                            event.setDescription(new Text().setValue("Beschreibung"));
-                            event.setMeetingPlace("Münster");
-                            event.setFee(100);
-                            event.setRoute(route);
                             long time = new Date().getTime();
                             for (int i = 1; i <= 30; i++) {
                                 final int index = i;
+                                Event event = new Event();
+                                event.setDescription(new Text().setValue("Beschreibung"));
+                                event.setMeetingPlace("Münster");
+                                event.setFee(100);
+                                event.setRoute(route);
                                 event.setTitle("Testevent #" + i);
                                 event.setDate(new DateTime(time + i * 86400000));
                                 EventController.createEvent(new ExtendedTaskDelegateAdapter<Void, Event>() {
@@ -284,5 +294,9 @@ public class ImageStorageTestActivity extends BaseActivity {
                 }
                 break;
         }
+    }
+
+    public void refreshList(View view) {
+        ((EventAdapter) listView.getAdapter()).refresh();
     }
 }

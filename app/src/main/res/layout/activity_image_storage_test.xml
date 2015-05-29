@@ -52,6 +52,12 @@
             android:id="@+id/eventsLoeschen" />
     </LinearLayout>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Liste aktualisieren"
+        android:onClick="refreshList"/>
+
     <ListView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

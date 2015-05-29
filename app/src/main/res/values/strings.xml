@@ -208,4 +208,7 @@
         <item quantity="one">%1$d year old</item>
         <item quantity="other">%1$d years old</item>
     </plurals>
+
+    <!-- EventAdapter -->
+    <string name="event_adapter_fetch_error">No additional events could be fetched</string>
 </resources>

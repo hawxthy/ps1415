@@ -115,6 +115,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         if (filter.getUserId() != null) {
             // TODO Die Events abrufen, an denen ein User teilnimmt und prüfen, welche der aufrufende Benutzer davon sehen darf
         }
+        q = q.order("-date");
         QueryResultIterator<Event> iterator = q.iterator();
 
         EventMetaDataList result = new EventMetaDataList();

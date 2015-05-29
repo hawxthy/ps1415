@@ -1,28 +1,26 @@
-package ws1415.common.component;
+package ws1415.ps1415.adapter;
 
 import android.content.Context;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.EventFilter;
 import com.skatenight.skatenightAPI.model.EventMetaData;
-import com.skatenight.skatenightAPI.model.PictureMetaData;
 
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import ws1415.common.R;
 import ws1415.common.controller.EventController;
-import ws1415.common.controller.GalleryController;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.R;
 
 /**
  * Adapter für Events. Erwartet einen Event-Filter als Parameter und fragt anschließend die
@@ -45,6 +43,7 @@ public class EventAdapter extends BaseAdapter {
     private EventFilter filter;
     private List<EventMetaData> events = new LinkedList<>();
     private int fetchDistance;
+    private boolean keepFetching = true;
 
     /**
      * Speichert, ob der Adapter gerade Daten abruft.
@@ -61,7 +60,7 @@ public class EventAdapter extends BaseAdapter {
         this.context = context;
         this.filter = filter;
         fetchDistance = (int) (filter.getLimit() * 0.4);
-        fetchData();
+        fetchData(true);
     }
 
     @Override
@@ -79,7 +78,6 @@ public class EventAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        // TODO
         return 0;
     }
 
@@ -122,7 +120,7 @@ public class EventAdapter extends BaseAdapter {
         }
 
         if (events.size() - position < fetchDistance) {
-            fetchData();
+            fetchData(false);
         }
 
         return view;
@@ -130,10 +128,12 @@ public class EventAdapter extends BaseAdapter {
 
     /**
      * Ruft weitere Events vom Server ab.
+     * @param refresh    Falls true, so wird die Liste der Events aktualisiert, d.h. die Liste wird
+     *                   neu vom Server abgerufen und nicht erweitert.
      */
-    private void fetchData() {
+    private void fetchData(boolean refresh) {
         // TODO Geht der synchronized-Block besser?
-        if (fetching) {
+        if (!keepFetching || fetching) {
             return;
         }
         synchronized (fetching) {
@@ -149,19 +149,24 @@ public class EventAdapter extends BaseAdapter {
         // Lade-Icon anzeigen lassen
         notifyDataSetChanged();
 
+        if (refresh) {
+            filter.setCursorString(null);
+        }
+
         EventController.listEvents(new ExtendedTaskDelegateAdapter<Void, List<EventMetaData>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<EventMetaData> newEvents) {
                 if (newEvents != null) {
                     events.addAll(newEvents);
                 } else {
-                    fetchDistance = 0;
+                    keepFetching = false;
                 }
                 finish();
             }
+
             @Override
             public void taskFailed(ExtendedTask task, String message) {
-                // TODO Ggf. Fehlermeldung (Toast) anzeigen
+                Toast.makeText(context, R.string.event_adapter_fetch_error, Toast.LENGTH_LONG).show();
                 finish();
             }
 
@@ -176,11 +181,32 @@ public class EventAdapter extends BaseAdapter {
         }, filter);
     }
 
+    /**
+     * Gibt die Distanz zurück, die zwischen dem zuletzt gezeichneten Listeneintrag und dem Ende der
+     * Liste liegen muss, damit neue Daten abgerufen werden.
+     * @return Die Distanz, die zwischen dem zuletzt gezeichneten Listeneintrag und dem Ende der Liste
+     * liegen muss, damit neue Daten abgerufen werden.
+     */
     public int getFetchDistance() {
         return fetchDistance;
     }
 
+    /**
+     * Setzt die Distanz, die zwischen dem zuletzt gezeichneten Listeneintrag und dem Ende der Liste
+     * liegen muss, damit neue Daten abgerufen werden.
+     * @param fetchDistance    Die neue Distanz.
+     */
     public void setFetchDistance(int fetchDistance) {
         this.fetchDistance = fetchDistance;
+    }
+
+    /**
+     * Veranlasst den Adapter die Eventliste neu herunterzuladen. Es wird dabei an den Anfang der
+     * Liste gescrollt.
+     */
+    public void refresh() {
+        events.clear();
+        keepFetching = true;
+        fetchData(true);
     }
 }

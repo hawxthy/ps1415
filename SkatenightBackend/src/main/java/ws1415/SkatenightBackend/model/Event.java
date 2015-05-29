@@ -32,6 +32,7 @@ public class Event implements BlobKeyContainer, GalleryContainer {
     private Long id;
     private BlobKey icon;
     private String title;
+    @Index
     private Date date;
     private int routeFieldFirst;
     private int routeFieldLast;
