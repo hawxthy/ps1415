@@ -38,17 +38,18 @@ import ws1415.SkatenightBackend.transport.UserPrimaryData;
 import ws1415.SkatenightBackend.transport.UserProfile;
 
 /**
- * Der UserEndpoint stellt Hilfsmethoden bereit, die genutzt werden um die Benutzer zu verwalten.
+ * Der UserEndpoint stellt Methoden bereit, die genutzt werden um die Benutzer auf dem Server zu
+ * verwalten.
  *
  * @author Martin Wrodarczyk
  */
 public class UserEndpoint extends SkatenightServerEndpoint {
-    public long lastFieldUpdateTime = 0;
+    private long lastFieldUpdateTime = 0;
     private static final BlobstoreService blobstoreService =
             BlobstoreServiceFactory.getBlobstoreService();
 
     /**
-     * Gibt die UploadUrl des Blobstores zurück. Dient zum Uploaden von Bildern an den Blobstore.
+     * Gibt die UploadUrl des Blobstores zurück. Dient zum Uploaden von Bildern in den Blobstore.
      *
      * @return UploadUrl
      */
@@ -57,8 +58,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Wird von den Benutzer-Apps aufgerufen, wenn der Benutzer noch kein zu verwendendes Konto an-
-     * gegeben hat.
+     * Registriert den Benutzer mit seiner Registration Id für Google Cloud Messaging.
      *
      * @param user  User-Objekt zur Authentifizierung
      * @param regid GCM-ID
@@ -83,7 +83,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param userMail  E-Mail Adresse des zu erstellenden Benutzers
      * @param firstName Vorname des zu erstellenden Benutzers
      * @param lastName  Nachname des zu erstellenden Benutzers
-     * @return true, wenn Benutzer erstellt wurde, false andernfalls
+     * @return true, wenn der Benutzer erstellt wurde, false andernfalls
      */
     public BooleanWrapper createUser(@Named("userMail") String userMail, @Nullable @Named("firstName") String firstName,
                                      @Nullable @Named("lastName") String lastName) {
@@ -106,12 +106,10 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Prüft ob ein Benutzer mit der angegebenen E-Mail Adresse existiert. Es wird ein
-     * BooleanWrapper Objekt zurückgegeben da man auf dem Server keine primitive Datentypen
-     * als Rückgabetypen verwenden kann.
+     * Prüft, ob ein Benutzer mit der angegebenen E-Mail Adresse existiert.
      *
      * @param userMail E-Mail Adresse des zu prüfenden Benutzers
-     * @return true, falls Benutzer existiert, sonst false
+     * @return true, falls der Benutzer existiert, sonst false
      */
     public BooleanWrapper existsUser(@Named("userMail") String userMail) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
@@ -131,10 +129,10 @@ public class UserEndpoint extends SkatenightServerEndpoint {
 
     /**
      * Gibt den Benutzer mit allen Informationen zu der angegebenen E-Mail Adresse aus.
+     * TODO: Wirklich nötig?
      *
      * @param userMail E-Mail Adresse des zu auszugebenen Benutzers
      * @return Benutzer mit der angegebenen E-Mail Adresse, falls nicht gefunden: null
-     * TODO: Wirklich nötig?
      */
     @ApiMethod(path = "enduser")
     public EndUser getFullUser(@Named("userMail") String userMail) {
@@ -153,10 +151,10 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Gibt die eigenen nötigsten Benutzerinformationen aus.
+     * Gibt die primären Informationen Vorname, Nachname und Key des Profilbildes des Benutzers aus.
      *
      * @param user User-Objekt zur Authentifizierung
-     * @return primäre Benutzerdaten
+     * @return Vorname, Nachname und Key des Profilbildes des Benutzers
      */
     public UserPrimaryData getPrimaryData(User user, @Named("userMail") String userMail) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
@@ -188,7 +186,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      *
      * @param user     User-Objekt zur Authentifizierung
      * @param userMail E-Mail Adresse des Benutzers
-     * @return Informationen zum Benutzer
+     * @return E-Mail, Name und Standortinformationen vom Benutzer
      */
     @ApiMethod(path = "user_location")
     public UserLocationInfo getUserLocationInfo(User user, @Named("userMail") String userMail) throws OAuthRequestException {
@@ -196,11 +194,12 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            List<String> friends = endUser.getMyFriends();
             UserLocation userLocation = endUser.getUserLocation();
             String firstName = endUser.getUserInfo().getFirstName();
             InfoPair lastNamePair = endUser.getUserInfo().getLastName();
             String lastName = null;
-            if (isVisible(user.getEmail(), userMail, lastNamePair.getVisibility(), getFriends(user)).value) {
+            if (isVisible(user.getEmail(), userMail, lastNamePair.getVisibility(), friends).value) {
                 lastName = lastNamePair.getValue();
             }
             return new UserLocationInfo(userMail, firstName, lastName, userLocation.getLatitude(),
@@ -212,28 +211,11 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         }
     }
 
-
     /**
-     * Gibt die Liste von Benutzern aus, die mit dem übergebenen Benutzer befreundet sind.
-     *
-     * @param user Benutzer
-     * @return Liste von Freunden
-     */
-    private List<String> getFriends(User user) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            EndUser endUser = pm.getObjectById(EndUser.class, user.getEmail());
-            return endUser.getMyFriends();
-        } finally {
-            pm.close();
-        }
-    }
-
-    /**
-     * Wird für die Feldberechnung verwendet.
+     * Gibt die Standortinformationen eines Benutzers aus. Wird für die Feldberechnung verwendet.
      *
      * @param userMail E-Mail Adresse des Benutzers
-     * @return Standortinformationen
+     * @return Standortinformationen des Benutzers
      */
     public UserLocation getUserLocation(@Named("userMail") String userMail) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
@@ -247,12 +229,12 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Gibt die allgemeinen Informationen und das Profilbild zu einem Benutzer mit der angegebenen
-     * E-Mail Adresse aus.
+     * Gibt die Profilinformationen eines Benutzers mit der angegebenen E-Mail Adresse aus.
      *
      * @param user     User-Objekt zur Authentifizierung
      * @param userMail E-Mail Adresse des Benutzers
-     * @return Informationen und Profilbild vom Benutzer, falls nicht gefunden: null
+     * @return Allgemeine Informationen, beigretene Gruppen, teilgenommene Veranstaltungen und
+     * Einstellungen des Benutzers
      */
     @ApiMethod(path = "user_profile")
     public UserProfile getUserProfile(User user, @Named("userMail") String userMail) throws OAuthRequestException {
@@ -327,7 +309,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      *
      * @param user     User-Objekt zur Authentifizierung
      * @param userMail E-Mail Adresse des Benutzers
-     * @return Allgemeine Informationen zum Benutzer, falls nicht gefunden: null
+     * @return Allgemeine Informationen und Profilbild des Benutzers, falls nicht gefunden: null
      */
     @ApiMethod(path = "user_info")
     public UserListData getUserInfo(User user, @Named("userMail") String userMail) {
@@ -401,11 +383,11 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Listet die allgemeinen Informationen der Benutzer auf, dessen E-Mail Adressen übergeben
-     * wurden.
+     * Listet die allgemeinen Informationen und die Profilbilder der Benutzer auf, dessen E-Mail
+     * Adressen übergeben wurden.
      *
-     * @param userMails Liste der E-Mail Adressen der Benutzer
-     * @return Liste von allgemeinen Informationen
+     * @param userMails Liste von E-Mail Adressen der Benutzer
+     * @return Liste von allgemeinen Informationen und Profilbildern der Benutzer
      */
     @ApiMethod(path = "user_info_list")
     public List<UserListData> listUserInfo(User user, @Named("userMails") List<String> userMails) {
@@ -441,11 +423,12 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Durchsucht die Benutzer nach der Eingabe und gibt die allgemeinen Nutzerinformationen
-     * zu den Ergebnissen in einer Liste aus.
+     * Durchsucht die Benutzer nach der Eingabe und gibt die allgemeinen Informationen und
+     * Profilbilder zu den Ergebnissen in einer Liste aus.
      *
-     * @param input Eingabe
-     * @return Liste von allgemeinen Informationen zu Benutzern
+     * @param input Eingabe nach der gesucht werden soll, wobei nach der E-Mail, dem Vornamen und
+     *              dem Nachnamen gesucht wird
+     * @return E-Mail Adressen der Ergebnisbenutzer
      */
     public ListWrapper searchUsers(@Named("input") String input) throws OAuthRequestException {
         List<String> cache;
@@ -494,10 +477,14 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Aktualisiert die allgemeinen Informationen zu einem Benutzer.
+     * Aktualisiert die Profilinformationen eines Benutzers.
      *
-     * @param user        User-Objekt für die Authentifikation
-     * @param newUserInfo Neue allgemeine Informationen zu dem Benutzer
+     * @param user              User-Objekt für die Authentifikation
+     * @param newUserInfo       Neue allgemeine Informationen zu dem Benutzer
+     * @param optOutSearch      True, falls der Benutzer aus der Suche ausgetragen werden soll, false
+     *                          andernfalls
+     * @param showPrivateGroups True, falls private Gruppen des Benutzers auf dem Profil angezeigt
+     *                          werden sollen, false andernfalls
      * @throws UnauthorizedException Wird geworfen, falls Benutzer nicht authorisiert ist, die Aktion auszuführen
      * @throws OAuthRequestException Wird geworfen, falls kein User-Objekt übergeben wird
      */
@@ -529,7 +516,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     /**
      * Löscht das Profilbild eines Benutzers.
      *
-     * @param user User-Objekt zur Authentifizierung
+     * @param user     User-Objekt zur Authentifizierung
      * @param userMail Benutzer, dessen Profilbild gelöscht werden soll
      * @return true, falls Löschvorgang erfolgreich, false andernfalls
      * @throws OAuthRequestException
@@ -598,10 +585,11 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Fügt einen Benutzer der Freundeliste hinzu.
+     * Fügt einen Benutzer der Freundesliste hinzu.
      *
-     * @param user     User-Objekt für die Authentifikation
-     * @param userMail E-Mail Adresse des Benutzers
+     * @param user       User-Objekt für die Authentifikation
+     * @param userMail   E-Mail Adresse des Benutzers, dessen Freundesliste ergänzt wird
+     * @param friendMail E-Mail Adresse des Freundes
      * @return true, falls Benutzer hinzugefügt wurde, false falls dieser nicht existiert
      * @throws OAuthRequestException
      */
@@ -655,12 +643,10 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Löscht einen Benutzer auf dem Server, falls dieser vorhanden ist. Wird zur Zeit nur für
-     * die Tests verwendet.
+     * Löscht einen Benutzer, falls dieser vorhanden ist. Wird zur Zeit nur für die Tests verwendet.
      *
      * @param userMail E-Mail Adresse des Benutzers
      */
-
     public void deleteUser(User user, @Named("userMail") String userMail) throws UnauthorizedException, OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfNoRights(user.getEmail(), userMail);

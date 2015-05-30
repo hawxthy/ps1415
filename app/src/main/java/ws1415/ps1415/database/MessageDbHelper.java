@@ -114,7 +114,7 @@ public class MessageDbHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Wird beim upgraden der Datenbank auf eine neue Version aufgerufen. Derzeit löscht diese
+     * Wird beim Upgraden der Datenbank auf eine neue Version aufgerufen. Derzeit löscht diese
      * Methode bei einer neuen Version die Tabellen und erstellt die Tabellen der neuen Version.
      *
      * @param db         Datenbank

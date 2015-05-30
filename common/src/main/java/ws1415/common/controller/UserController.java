@@ -33,19 +33,20 @@ import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 
 /**
- * Der UserController steuert den Datenfluss zwischen den Benutzerdaten und den View-Komponenten.
+ * Der UserController steuert den Datenfluss zwischen den Benutzerdaten auf dem Server und den
+ * Komponenten in der Anwendung.
  *
  * @author Martin Wrodarczyk
  */
 public abstract class UserController {
     /**
-     * Erstellt einen Benutzer auf dem Server, falls noch keiner zu der angegebenen E-Mail Adresse
-     * existiert.
+     * Erstellt einen Benutzer, falls noch keiner zu der angegebenen E-Mail Adresse existiert.
      *
-     * @param handler
+     * @param handler  Auszuführender Task
      * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void createUser(ExtendedTaskDelegate handler, String userMail, final String firstName, final String lastName) {
+    public static void createUser(ExtendedTaskDelegate<Void, Boolean> handler, String userMail,
+                                  final String firstName, final String lastName) {
         new ExtendedTask<String, Void, Boolean>(handler) {
             @Override
             protected Boolean doInBackground(String... params) {
@@ -64,12 +65,12 @@ public abstract class UserController {
     }
 
     /**
-     * Prüft ob ein Benutzer mit der E-Mail Adresse existiert.
+     * Prüft, ob ein Benutzer mit der E-Mail Adresse existiert.
      *
-     * @param handler
-     * @param userMail E-Mail Adresse
+     * @param handler  Auszuführender Task
+     * @param userMail E-Mail Adressen des Benutzers
      */
-    public static void existsUser(ExtendedTaskDelegate handler, String userMail) {
+    public static void existsUser(ExtendedTaskDelegate<Void, Boolean> handler, String userMail) {
         new ExtendedTask<String, Void, Boolean>(handler) {
             @Override
             protected Boolean doInBackground(String... params) {
@@ -77,7 +78,7 @@ public abstract class UserController {
                     return ServiceProvider.getService().userEndpoint().existsUser(params[0]).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
+                    publishError("Serververbindung fehlgeschlagen");
                     return null;
                 }
             }
@@ -87,10 +88,10 @@ public abstract class UserController {
     /**
      * Gibt den Benutzer mit allen Informationen zu der angegebenen E-Mail Adresse aus.
      *
-     * @param handler
+     * @param handler  Auszuführender Task
      * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void getFullUser(ExtendedTaskDelegate handler, String userMail) {
+    public static void getFullUser(ExtendedTaskDelegate<Void, EndUser> handler, String userMail) {
         new ExtendedTask<String, Void, EndUser>(handler) {
             @Override
             protected EndUser doInBackground(String... params) {
@@ -106,12 +107,14 @@ public abstract class UserController {
     }
 
     /**
-     * Gibt die eigenen nötigsten Benutzerinformationen aus.
+     * Gibt die primären Informationen Vorname, Nachname und Key des Profilbildes des Benutzers aus.
      *
-     * @param handler
+     * @param handler  Auszuführender Task
+     * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void getPrimaryData(ExtendedTaskDelegate handler, final String userMail){
-        new ExtendedTask<Void, Void, UserPrimaryData>(handler){
+    public static void getPrimaryData(ExtendedTaskDelegate<Void, UserPrimaryData> handler,
+                                      final String userMail) {
+        new ExtendedTask<Void, Void, UserPrimaryData>(handler) {
             @Override
             protected UserPrimaryData doInBackground(Void... params) {
                 try {
@@ -126,12 +129,13 @@ public abstract class UserController {
     }
 
     /**
-     * Gibt das Benutzerprofil aus.
+     * Gibt das Profil des Benutzers aus.
      *
-     * @param handler
+     * @param handler  Auszuführender Task
      * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void getUserProfile(ExtendedTaskDelegate handler, final String userMail) {
+    public static void getUserProfile(ExtendedTaskDelegate<Void, UserProfile> handler,
+                                      final String userMail) {
         new ExtendedTask<Void, Void, UserProfile>(handler) {
             @Override
             protected UserProfile doInBackground(Void... voids) {
@@ -149,13 +153,13 @@ public abstract class UserController {
     /**
      * Aktualisiert das Profilbild eines Benutzers mit Hilfe des Blobstores.
      *
-     * @param handler
+     * @param handler  Auszuführender Task
      * @param userMail E-Mail Adresse des Benutzers
-     * @param image Neues Profilbild
+     * @param image    Neues Profilbild
      */
-    public static void uploadUserPicture(ExtendedTaskDelegate handler, final String userMail,
-                                         final InputStream image) {
-        new ExtendedTask<Void, Void, Boolean>(handler){
+    public static void uploadUserPicture(ExtendedTaskDelegate<Void, Boolean> handler,
+                                         final String userMail, final InputStream image) {
+        new ExtendedTask<Void, Void, Boolean>(handler) {
             @Override
             protected Boolean doInBackground(Void... params) {
                 String uploadUrl;
@@ -191,7 +195,7 @@ public abstract class UserController {
                     }
                     String answer = EntityUtils.toString(httpEntity, encoding);
                     return answer.equals("true");
-                } catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Profilbild konnte nicht hochgeladen werden");
                     return null;
@@ -201,26 +205,27 @@ public abstract class UserController {
     }
 
     /**
-     * Lädt das Bild mit dem übergebenen BlobKey vom Blobstore runter und gibt dieses als Bitmap
+     * Lädt das Bild mit dem übergebenen BlobKey vom Blobstore runter und gibt das Bild als Bitmap
      * zurück.
      *
-     * @param handler
+     * @param handler    Auszuführender Task
      * @param pictureKey BlobKey
      */
-    public static void getUserPicture(ExtendedTaskDelegate handler, final BlobKey pictureKey){
+    public static void getUserPicture(ExtendedTaskDelegate<Void, Bitmap> handler, final BlobKey pictureKey) {
         new ExtendedTask<Void, Void, Bitmap>(handler) {
             @Override
             protected Bitmap doInBackground(Void... params) {
                 ByteArrayInputStream is = null;
                 try {
                     HttpClient client = new DefaultHttpClient();
-                    HttpGet get = new HttpGet(Constants.SERVER_URL + "/userImages/serve?key=" + pictureKey.getKeyString());
+                    HttpGet get = new HttpGet(Constants.SERVER_URL + "/userImages/serve?key=" +
+                            pictureKey.getKeyString());
                     HttpResponse response = client.execute(get);
                     HttpEntity httpEntity = response.getEntity();
 
                     is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
                     return BitmapFactory.decodeStream(is);
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 } finally {
                     if (is != null) {
@@ -239,11 +244,11 @@ public abstract class UserController {
     /**
      * Löscht das Profilbild eines Benutzers.
      *
-     * @param handler
-     * @param userMail Benutzer, dessen Profilbild gelöscht werden soll
+     * @param handler  Auszuführender Task
+     * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void removeUserPicture(ExtendedTaskDelegate<Void, Boolean> handler, final String userMail){
-        new ExtendedTask<Void, Void, Boolean>(handler){
+    public static void removeUserPicture(ExtendedTaskDelegate<Void, Boolean> handler, final String userMail) {
+        new ExtendedTask<Void, Void, Boolean>(handler) {
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
@@ -260,32 +265,32 @@ public abstract class UserController {
     /**
      * Listet Informationen der Benutzer auf, dessen E-Mail Adressen übergeben wurden.
      *
-     * @param handler
+     * @param handler   Auszuführender Task
      * @param userMails Liste der E-Mail Adressen der Benutzer
      */
-    @SuppressWarnings("unchecked")
-    public static void listUserInfo(ExtendedTaskDelegate handler, List<String> userMails) {
-        new ExtendedTask<List<String>, Void, List<UserListData>>(handler) {
+    public static void listUserInfo(ExtendedTaskDelegate<Void, List<UserListData>> handler,
+                                    final List<String> userMails) {
+        new ExtendedTask<Void, Void, List<UserListData>>(handler) {
             @Override
-            protected List<UserListData> doInBackground(List<String>... params) {
+            protected List<UserListData> doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().listUserInfo(params[0]).execute().getItems();
+                    return ServiceProvider.getService().userEndpoint().listUserInfo(userMails).execute().getItems();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Liste von Benutzern konnte nicht abgerufen werden");
                     return null;
                 }
             }
-        }.execute(userMails);
+        }.execute();
     }
 
     /**
-     * Erstellt eine Liste mit allgemeinen Informationen zu den Freunden eines Benutzers.
+     * Gibt eine Liste mit den E-Mail Adressen der Freunde eines Benutzers aus.
      *
-     * @param handler
+     * @param handler  Auszuführender Task
      * @param userMail E-Mail Adresse des Benutzers
      */
-    public static void listFriends(ExtendedTaskDelegate handler, String userMail) {
+    public static void listFriends(ExtendedTaskDelegate<Void, List<String>> handler, String userMail) {
         new ExtendedTask<String, Void, List<String>>(handler) {
             @Override
             protected List<String> doInBackground(String... params) {
@@ -304,10 +309,11 @@ public abstract class UserController {
      * Durchsucht die Benutzer nach der Eingabe und gibt das Ergebnis als Liste von E-Mail Adressen
      * der Benutzer aus.
      *
-     * @param handler
-     * @param input Eingabe
+     * @param handler Auszuführender Task
+     * @param input   Eingabe nach der gesucht werden soll, wobei nach der E-Mail, dem Vornamen und
+     *                dem Nachnamen gesucht wird
      */
-    public static void searchUsers(ExtendedTaskDelegate handler, final String input) {
+    public static void searchUsers(ExtendedTaskDelegate<Void, List<String>> handler, final String input) {
         new ExtendedTask<String, Void, List<String>>(handler) {
             @Override
             protected List<String> doInBackground(String... params) {
@@ -315,7 +321,7 @@ public abstract class UserController {
                     return ServiceProvider.getService().userEndpoint().searchUsers(input).execute().getStringList();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Suche nach Benutzern konnte nicht durchgeführt werden");
+                    publishError("Suche konnte nicht durchgeführt werden");
                     return null;
                 }
             }
@@ -325,12 +331,14 @@ public abstract class UserController {
     /**
      * Aktualisiert die allgemeinen Informationen zu einem Benutzer.
      *
-     * @param handler
-     * @param newInfo         Neue allgemeine Informationen zu dem Benutzer
-     * @param optOutSearch
-     * @param showPrivateGroups
+     * @param handler           Auszuführender Task
+     * @param newInfo           Allgemeine Informationen zu dem Benutzer
+     * @param optOutSearch      True, falls der Benutzer aus der Suche ausgetragen werden soll, false
+     *                          andernfalls
+     * @param showPrivateGroups True, falls private Gruppen des Benutzers auf dem Profil angezeigt
+     *                          werden sollen, false andernfalls
      */
-    public static void updateUserProfile(ExtendedTaskDelegate handler, final UserInfo newInfo,
+    public static void updateUserProfile(ExtendedTaskDelegate<Void, UserInfo> handler, final UserInfo newInfo,
                                          final Boolean optOutSearch, final Visibility showPrivateGroups) {
         new ExtendedTask<Void, Void, UserInfo>(handler) {
             @Override
@@ -350,13 +358,13 @@ public abstract class UserController {
     /**
      * Aktualisiert die Standortinformationen eines Benutzers.
      *
-     * @param handler
+     * @param handler        Auszuführender Task
      * @param userMail       E-Mail Adresse des Benutzers
-     * @param latitude       Neue Latitude
-     * @param longitude      Neue Longitude
-     * @param currentEventId Neue Event Id
+     * @param latitude       Latitude
+     * @param longitude      Longitude
+     * @param currentEventId Event Id
      */
-    public static void updateUserLocation(ExtendedTaskDelegate handler, final String userMail,
+    public static void updateUserLocation(ExtendedTaskDelegate<Void, Void> handler, final String userMail,
                                           final double latitude, final double longitude, final long currentEventId) {
         new ExtendedTask<Void, Void, Void>(handler) {
             @Override
@@ -376,11 +384,12 @@ public abstract class UserController {
     /**
      * Fügt einen Benutzer der eigenen Freundeliste hinzu.
      *
-     * @param handler
-     * @param userMail E-Mail Adresse dessen Freundeliste ergänzt wird
+     * @param handler    Auszuführender Task
+     * @param userMail   E-Mail Adresse des Benutzers, dessen Freundeliste ergänzt wird
      * @param friendMail E-Mail Adresse des zu hinzufügenden Freundes
      */
-    public static void addFriend(ExtendedTaskDelegate handler, final String userMail, final String friendMail) {
+    public static void addFriend(ExtendedTaskDelegate<Void, Boolean> handler, final String userMail,
+                                 final String friendMail) {
         new ExtendedTask<String, Void, Boolean>(handler) {
             @Override
             protected Boolean doInBackground(String... params) {
@@ -398,11 +407,12 @@ public abstract class UserController {
     /**
      * Entfernt einen Benutzer aus der eigenen Freundeliste.
      *
-     * @param handler
-     * @param userMail E-Mail Adresse dessen Freundeliste bearbeitet wird
+     * @param handler    Auszuführender Task
+     * @param userMail   E-Mail Adresse des Benutzers, dessen Freundeliste bearbeitet wird
      * @param friendMail E-Mail Adresse des Freundes, der entfernt werden soll
      */
-    public static void removeFriend(ExtendedTaskDelegate handler, final String userMail, final String friendMail) {
+    public static void removeFriend(ExtendedTaskDelegate<Void, Boolean> handler, final String userMail,
+                                    final String friendMail) {
         new ExtendedTask<String, Void, Boolean>(handler) {
             @Override
             protected Boolean doInBackground(String... params) {
@@ -418,13 +428,12 @@ public abstract class UserController {
     }
 
     /**
-     * Löscht einen Benutzer auf dem Server, falls dieser vorhanden ist. Wird zur Zeit nur für
-     * die Tests verwendet.
+     * Löscht einen Benutzer, falls dieser vorhanden ist.
      *
+     * @param handler  Auszuführender Task
      * @param userMail E-Mail Adresse des Benutzers
      */
-    @SuppressWarnings("unchecked")
-    public static void deleteUser(ExtendedTaskDelegate handler, String userMail) {
+    public static void deleteUser(ExtendedTaskDelegate<Void, Void> handler, String userMail) {
         new ExtendedTask<String, Void, Void>(handler) {
             @Override
             protected Void doInBackground(String... params) {

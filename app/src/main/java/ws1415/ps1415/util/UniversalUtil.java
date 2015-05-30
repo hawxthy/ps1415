@@ -43,6 +43,20 @@ public abstract class UniversalUtil {
     }
 
     /**
+     * Loggt den Benutzer mit seiner im lokalen Speicher gespeicherten E-Mail Adresse ein.
+     *
+     * @param context Context
+     */
+    public static void simpleLogin(Context context){
+        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(context,
+                "server:client_id:" + Constants.WEB_CLIENT_ID);
+        if (!PrefManager.getSelectedUserMail(context).equals("")) {
+            credential.setSelectedAccountName(PrefManager.getSelectedUserMail(context));
+            ServiceProvider.login(credential);
+        }
+    }
+
+    /**
      * Initialisiert GCM.
      *
      * @param activity Activity

@@ -44,7 +44,8 @@ public class AuthenticatedAndroidTestCase extends AndroidTestCase {
     }
 
     /**
-     * Wechselt auf den Account des Testgeräts mit dem angegebenen Index.
+     * Wechselt auf den Account des Testgeräts mit der angegebenen E-Mail Adresse.
+     *
      * @param email    E-Mail Adresse des Accounts, der ausgewählt wird.
      */
     public void changeAccount(String email) {

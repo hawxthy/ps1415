@@ -14,11 +14,13 @@ import com.skatenight.skatenightAPI.model.Text;
 import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserListData;
 import com.skatenight.skatenightAPI.model.UserLocation;
+import com.skatenight.skatenightAPI.model.UserPrimaryData;
 import com.skatenight.skatenightAPI.model.UserProfile;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -36,14 +38,17 @@ import ws1415.ps1415.R;
  * Diese Klasse wird dazu genutzt die Funktionalitäten des UserControllers zu testen, die
  * Authorisierung benötigen.
  *
- * Die aufgeführten E-Mail Accounts müssen zum Testen auf dem Gerät registriert sein. Dazu
- * müssen sie in den Einstellungen des Gerätes mit dem Passwort: "skatenight123" hinzugefügt
+ * Folgende E-Mail Accounts müssen auf dem Gerät registriert sein um die Tests auszuführen:
+ * - {@code ADMIN_MAIL}
+ * - {@code TEST_MAIL_1}
+ * - {@code TEST_MAIL_2}
+ * Dazu müssen diese in den Einstellungen des Gerätes mit dem Passwort: "skatenight123" hinzugefügt
  * werden.
  *
  * @author Martin Wrodarczyk
  */
 public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
-    // Testdaten
+    // Testdaten für die Benutzererstellung
     public static final String ADMIN_MAIL = "skatenight.host@gmail.com";
     public static final String TEST_MAIL_1 = "skatenight.user1@gmail.com";
     public static final String TEST_MAIL_2 = "skatenight.user2@gmail.com";
@@ -53,12 +58,16 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     public static final String TEST_INITIAL_LAST_NAME_1 = "testNachname1";
     public static final String TEST_INITIAL_LAST_NAME_2 = "testNachname2";
 
+    // Testdaten für das Updaten der Standortinformationen
     public static final double TEST_LONGITUDE = 7.626135;
     public static final double TEST_LATITUDE = 51.960665;
     public static final Long TEST_CURRENT_EVENT_ID = 5L;
 
+    // Testdaten für das Updaten des Benutzerprofils
     public static final String TEST_FIRST_NAME = "Martin";
     public static final Gender TEST_GENDER = Gender.MALE;
+    public static final Visibility TEST_GROUP_VISIBILITY = Visibility.FRIENDS;
+    public static final Boolean TEST_OPT_OUT_SEARCH = true;
 
     public static final String TEST_LAST_NAME = "Müller";
     public static final Visibility TEST_LAST_NAME_VISIBILITY = Visibility.FRIENDS;
@@ -90,11 +99,8 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
             setValue(TEST_POSTAL_CODE).
             setVisibility(TEST_POSTAL_CODE_VISIBILITY.getId());
 
-    public static final Visibility TEST_GROUP_VISIBILITY = Visibility.PUBLIC;
-    public static final Boolean TEST_OPT_OUT_SEARCH = true;
-
     /**
-     * Loggt den Benutzer ein und erstellt zwei Benutzer zum Testen.
+     * Loggt den Benutzer ein und erstellt zwei Benutzer.
      *
      * @throws Exception
      */
@@ -119,11 +125,11 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
                 createSignal.countDown();
             }
         }, TEST_MAIL_2, TEST_INITIAL_FIRST_NAME_2, TEST_INITIAL_LAST_NAME_2);
-        assertTrue(createSignal.await(30, TimeUnit.SECONDS));
+        assertTrue(createSignal.await(45, TimeUnit.SECONDS));
     }
 
     /**
-     * Löscht die beiden Benutzer die in setUp erstellt worden sind.
+     * Löscht die beiden Benutzer die in {@link #setUp()} erstellt worden sind.
      *
      * @throws Exception
      */
@@ -143,13 +149,13 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
                 deleteSignal1.countDown();
             }
         }, email);
-        assertTrue(deleteSignal1.await(30, TimeUnit.SECONDS));
+        assertTrue(deleteSignal1.await(45, TimeUnit.SECONDS));
     }
 
     /**
-     * Prüft, ob die Existenz eines Benutzers richtig abgefragt wird.
+     * Prüft, ob die Existenz eines Benutzers richtig abgerufen wird.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
     public void testExistsUser() throws InterruptedException {
@@ -167,7 +173,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     /**
      * Prüft ob ein Benutzer richtig auf dem Server gespeichert wird.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
     public void testGetUser() throws InterruptedException {
@@ -190,7 +196,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     /**
      * Prüft, ob die Standortinformationen eines Benutzers richtig abgerufen werden.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
     public void testGetUserLocation() throws InterruptedException, IOException {
@@ -202,7 +208,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     /**
      * Prüft, ob das Profil eines Benutzers richtig abgerufen wird.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
     public void testGetUserProfile() throws InterruptedException {
@@ -223,7 +229,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     /**
      * Prüft ob die Informationen von mehreren Benutzern richtig abgerufen werden.
      *
-     * @throws Exception
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
     public void testListUserInfo() throws InterruptedException {
@@ -247,7 +253,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     /**
      * Prüft, ob die Suche das richtige Ergebnis liefert.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
     public void testSearchUsers() throws InterruptedException {
@@ -291,7 +297,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     /**
      * Prüft, ob Standortinformationen eines Benutzers richtig aktualisiert werden.
      * TODO: GÜLTIGES EVENT ZUWEISEN
-     * @throws InterruptedException
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
     public void testUpdateUserLocation() throws InterruptedException {
@@ -325,8 +331,8 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
      * Prüft, ob die allgemeinen Informationen eines Benutzers richtig geändert werden und
      * ob Sichtbarkeitseinstellungen richtig umgesetzt wurden.
      *
-     * TODO: Groupvisibility
-     * @throws InterruptedException
+     * TODO: Groupvisibility + Events + Gruppen
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
     public void testUpdateUserInfo() throws InterruptedException {
@@ -388,12 +394,12 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
 
 
     /**
-     * Prüft, ob das Profilbild eines Benutzers richtig geändert wird.
+     * Prüft, ob das Profilbild eines Benutzers richtig hochgeladen wird und abgerufen wird.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
-    public void testUpdateUserPicture() throws InterruptedException {
+    public void testUploadAndGetUserPicture() throws InterruptedException {
         changeAccount(TEST_MAIL_1);
         final Bitmap pictureTest = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.default_picture);
         final byte[] pictureTestByte = ImageUtil.BitmapToByteArray(pictureTest);
@@ -416,7 +422,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
                 retrievedImageKey[0] = userListData.get(0).getUserPicture();
                 listSignal.countDown();
             }
-        }, Arrays.asList(TEST_MAIL_1));
+        }, Collections.singletonList(TEST_MAIL_1));
         assertTrue(listSignal.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch getSignal = new CountDownLatch(1);
@@ -432,9 +438,90 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     }
 
     /**
+     * Prüft, ob das Profilbild eines Benutzers entfernt wird.
+     *
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
+     */
+    @SmallTest
+    public void testRemoveUserPicture() throws InterruptedException {
+        changeAccount(TEST_MAIL_1);
+        final Bitmap pictureTest = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.default_picture);
+
+        final CountDownLatch updateSignal = new CountDownLatch(1);
+        UserController.uploadUserPicture(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                assertTrue(aBoolean);
+                updateSignal.countDown();
+            }
+        }, TEST_MAIL_1, ImageUtil.BitmapToInputStream(pictureTest));
+        assertTrue(updateSignal.await(120, TimeUnit.SECONDS));
+
+        final CountDownLatch removeSignal = new CountDownLatch(1);
+        UserController.removeUserPicture(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                assertTrue(aBoolean);
+                removeSignal.countDown();
+            }
+        }, TEST_MAIL_1);
+        assertTrue(removeSignal.await(30, TimeUnit.SECONDS));
+    }
+
+    @SmallTest
+    public void testGetPrimaryData() throws InterruptedException {
+        changeAccount(TEST_MAIL_1);
+        final BlobKey blobKeyTest = uploadUserPicture();
+
+        final CountDownLatch getSignal = new CountDownLatch(1);
+        UserController.getPrimaryData(new ExtendedTaskDelegateAdapter<Void, UserPrimaryData>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserPrimaryData userPrimaryData) {
+                assertNotNull(userPrimaryData);
+                assertNotNull(userPrimaryData.getPicture());
+                assertEquals(TEST_MAIL_1, userPrimaryData.getEmail());
+                assertEquals(TEST_INITIAL_FIRST_NAME_1, userPrimaryData.getFirstName());
+                assertEquals(TEST_INITIAL_LAST_NAME_1, userPrimaryData.getLastName());
+                assertEquals(blobKeyTest.getKeyString(), userPrimaryData.getPicture().getKeyString());
+                getSignal.countDown();
+            }
+        }, TEST_MAIL_1);
+        assertTrue(getSignal.await(30, TimeUnit.SECONDS));
+    }
+
+    // Damit beim Abrufen der PrimaryData, der Abruf des Profilbildes getestet werden kann
+    private BlobKey uploadUserPicture() throws InterruptedException {
+        final Bitmap pictureTest = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.default_picture);
+        final byte[] pictureTestByte = ImageUtil.BitmapToByteArray(pictureTest);
+        final BlobKey[] retrievedImageKey = new BlobKey[1];
+
+        final CountDownLatch updateSignal = new CountDownLatch(1);
+        UserController.uploadUserPicture(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                assertTrue(aBoolean);
+                updateSignal.countDown();
+            }
+        }, TEST_MAIL_1, ImageUtil.BitmapToInputStream(pictureTest));
+        assertTrue(updateSignal.await(120, TimeUnit.SECONDS));
+
+        final CountDownLatch listSignal = new CountDownLatch(1);
+        UserController.listUserInfo(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserListData> userListData) {
+                retrievedImageKey[0] = userListData.get(0).getUserPicture();
+                listSignal.countDown();
+            }
+        }, Collections.singletonList(TEST_MAIL_1));
+        assertTrue(listSignal.await(30, TimeUnit.SECONDS));
+
+        return retrievedImageKey[0];
+    }
+
+    /**
      * Prüft, ob ein Freund richtig hinzugefügt und auch wieder entfernt wird.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
     public void testAddAndRemoveFriend() throws InterruptedException {
@@ -486,7 +573,7 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
     /**
      * Prüft, ob die Liste der Freunde richtig abgerufen werden.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
     public void testListFriends() throws InterruptedException {
@@ -502,27 +589,15 @@ public class UserControllerAuthTest extends AuthenticatedAndroidTestCase {
         assertTrue(addFriendSignal.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch listFriendsSignal = new CountDownLatch(1);
-        UserController.listFriends(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
+        UserController.listFriends(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserListData> friendInfos) {
+            public void taskDidFinish(ExtendedTask task, List<String> friendInfos) {
                 assertTrue(friendInfos.size() == 1);
-                assertEquals(TEST_MAIL_2, friendInfos.get(0).getEmail());
+                assertEquals(TEST_MAIL_2, friendInfos.get(0));
                 listFriendsSignal.countDown();
             }
         }, TEST_MAIL_1);
         assertTrue(listFriendsSignal.await(30, TimeUnit.SECONDS));
-    }
-
-    // TODO: Wenn Eventcontroller fertig
-    @SmallTest
-    public void testListEvents() {
-
-    }
-
-    // TODO: Wenn Groupcontroller fertig
-    @SmallTest
-    public void testListUserGroups() {
-
     }
 
     private Event createEvent() throws IOException {

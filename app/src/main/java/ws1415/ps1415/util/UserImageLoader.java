@@ -19,10 +19,9 @@ import ws1415.ps1415.R;
  * @author Martin Wrodarczyk
  */
 public class UserImageLoader {
-    private MemoryCache memoryCache = new MemoryCache();
-    private Context mContext;
-
     private static UserImageLoader INSTANCE;
+    private MemoryCache memoryCache = MemoryCache.getInstance();
+    private Context mContext;
 
     private UserImageLoader(Context context){
         mContext = context.getApplicationContext();

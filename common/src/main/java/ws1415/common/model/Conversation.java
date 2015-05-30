@@ -66,7 +66,7 @@ public class Conversation {
     }
 
     public String getLastName() {
-        if(lastMessage == null) return "";
+        if(lastName == null) return "";
         return lastName;
     }
 

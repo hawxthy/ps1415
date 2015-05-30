@@ -22,7 +22,6 @@ import ws1415.common.controller.MessageController;
 import ws1415.common.model.Conversation;
 import ws1415.common.model.LocalMessageType;
 import ws1415.common.model.Message;
-import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
@@ -201,7 +200,7 @@ public class ConversationActivity extends Activity {
                 sending = false;
                 MessageDbController.getInstance(ConversationActivity.this).deleteMessage(mEmail, localMessage.get_id());
             }
-        }, mEmail, ServiceProvider.getEmail(), localMessage);
+        }, mEmail, localMessage);
     }
 
 

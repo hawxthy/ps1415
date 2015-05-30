@@ -72,11 +72,11 @@ public class MessageDbController {
      * @param userMail E-Mail Adresse der Konversation
      * @return true, falls Konversation existiert, false andernfalls
      */
-    public boolean existsConversation(String userMail){
+    public boolean existsConversation(String userMail) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery("SELECT " + MessageDbHelper.KEY_ID_CONVERSATION + " FROM " +
-                MessageDbHelper.TABLE_CONVERSATION + " WHERE " + MessageDbHelper.KEY_ID_CONVERSATION + "=?",
+                        MessageDbHelper.TABLE_CONVERSATION + " WHERE " + MessageDbHelper.KEY_ID_CONVERSATION + "=?",
                 new String[]{userMail});
 
         try {
@@ -177,10 +177,10 @@ public class MessageDbController {
     /**
      * Aktualisiert das Profilbid, den Vor- und Nachnamen der Person, zu der die Konversation gehört.
      *
-     * @param userMail     E-Mail Adresse der Person
+     * @param userMail   E-Mail Adresse der Person
      * @param pictureKey BlobKey Wert des neuen Profilbildes
-     * @param firstName Neuer Vorname
-     * @param lastName  Neuer Nachname
+     * @param firstName  Neuer Vorname
+     * @param lastName   Neuer Nachname
      * @return true, falls Aktualisierung erfolgreich, false andernfalls
      */
     public boolean updateConversation(String userMail, String pictureKey, String firstName, String lastName) {
@@ -200,7 +200,7 @@ public class MessageDbController {
     /**
      * Setzt die Anzahl der neuen Nachrichten auf 0.
      *
-     * @param userMail            E-Mail Adresse der Person
+     * @param userMail E-Mail Adresse der Person
      * @return true, falls Aktualisierung erfolgreich, false andernfalls
      */
     public boolean resetNewMessages(String userMail) {
@@ -243,7 +243,8 @@ public class MessageDbController {
         db.update(MessageDbHelper.TABLE_CONVERSATION, values, MessageDbHelper.KEY_ID_CONVERSATION + "=?",
                 new String[]{conversationMail});
 
-        if(message.getType().equals(LocalMessageType.INCOMING)) increaseNewMessages(conversationMail);
+        if (message.getType().equals(LocalMessageType.INCOMING))
+            increaseNewMessages(conversationMail);
 
         return rowId;
     }
@@ -251,7 +252,7 @@ public class MessageDbController {
     /**
      * Erhöht die Anzahl der neuen Nachrichten um 1.
      *
-     * @param email            E-Mail Adresse der Person
+     * @param email E-Mail Adresse der Person
      * @return true, falls Aktualisierung erfolgreich, false andernfalls
      */
     private boolean increaseNewMessages(String email) {
@@ -271,7 +272,7 @@ public class MessageDbController {
      * Stimmt es überein, wird die Nachricht auf "erhalten" gesetzt.
      *
      * @param messageId Id der Nachricht
-     * @param sendDate Sendedatum
+     * @param sendDate  Sendedatum
      * @return true, falls update erfolgreich, false andernfalls
      */
     public boolean updateMessageReceived(long messageId, long sendDate) {
@@ -281,7 +282,7 @@ public class MessageDbController {
                         + " WHERE " + MessageDbHelper.KEY_ID_MESSAGE + "=?" + " AND " + MessageDbHelper.KEY_SEND_DATE + "=?",
                 new String[]{String.valueOf(messageId), String.valueOf(sendDate)});
 
-        if (!cursor.moveToFirst()){
+        if (!cursor.moveToFirst()) {
             cursor.close();
             return false;
         }
@@ -335,29 +336,32 @@ public class MessageDbController {
      * @param messageId Id der Nachricht
      * @return true, falls Vorgang erfolgreich, false andernfalls
      */
-    public boolean deleteMessage(String userMail, long messageId){
+    public boolean deleteMessage(String userMail, long messageId) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        // Neue last message id holen und setzen
-//        Cursor cursor = db.rawQuery("SELECT " + MessageDbHelper.KEY_ID_MESSAGE + " FROM " +
-//                MessageDbHelper.TABLE_MESSAGE + " WHERE " + MessageDbHelper.FOREIGN_KEY_CONVERSATION
-//                + "=?" + " ORDER BY " + MessageDbHelper.KEY_ID_MESSAGE +
-//                " DESC LIMIT 2", new String[]{userMail});
-//
-//        ContentValues values = new ContentValues();
-//        if(cursor.moveToLast()){
-//            Long newLastMessageId = cursor.getLong(cursor.getColumnIndex(MessageDbHelper.KEY_ID_MESSAGE));
-//            values.put(MessageDbHelper.FOREIGN_KEY_LAST_MESSAGE, newLastMessageId);
-//        } else {
-//            values.putNull(MessageDbHelper.FOREIGN_KEY_LAST_MESSAGE);
-//        }
-//
-//        db.update(MessageDbHelper.TABLE_CONVERSATION, values, MessageDbHelper.KEY_ID_CONVERSATION + "=?",
-//                new String[]{userMail});
-
         // Nachricht löschen
-        return db.delete(MessageDbHelper.TABLE_MESSAGE, MessageDbHelper.KEY_ID_MESSAGE +  "=?",
+        boolean deleteSucceed = db.delete(MessageDbHelper.TABLE_MESSAGE, MessageDbHelper.KEY_ID_MESSAGE + "=?",
                 new String[]{String.valueOf(messageId)}) > 0;
+
+        // Neue letzte Nachricht abrufen
+        Cursor cursor = db.rawQuery("SELECT " + MessageDbHelper.KEY_ID_MESSAGE + " FROM " +
+                MessageDbHelper.TABLE_MESSAGE + " WHERE " + MessageDbHelper.FOREIGN_KEY_CONVERSATION
+                + "=?" + " ORDER BY " + MessageDbHelper.KEY_ID_MESSAGE +
+                " DESC LIMIT 1", new String[]{userMail});
+
+        // Neue letzte Nachricht setzen
+        if (cursor.moveToFirst() && deleteSucceed) {
+            Long newLastMessageId = cursor.getLong(cursor.getColumnIndex(MessageDbHelper.KEY_ID_MESSAGE));
+            ContentValues values = new ContentValues();
+            values.put(MessageDbHelper.FOREIGN_KEY_LAST_MESSAGE, newLastMessageId);
+
+            db.update(MessageDbHelper.TABLE_CONVERSATION, values, MessageDbHelper.KEY_ID_CONVERSATION + "=?",
+                    new String[]{userMail});
+        }
+
+        cursor.close();
+
+        return deleteSucceed;
     }
 
     // -- Hilfsmethoden -- //
@@ -374,7 +378,7 @@ public class MessageDbController {
     }
 
     // Für das Testen
-    public void deleteAllConversation(){
+    public void deleteAllConversation() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(MessageDbHelper.TABLE_CONVERSATION, null, null);
     }

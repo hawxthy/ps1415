@@ -17,6 +17,18 @@ import java.util.Map.Entry;
  * @author Martin Wrodarczyk
  */
 public class MemoryCache {
+    private static MemoryCache instance;
+
+    private MemoryCache(){
+    }
+
+    public static MemoryCache getInstance(){
+        if(instance == null){
+            instance = new MemoryCache();
+        }
+        return instance;
+    }
+
     private static final String TAG = "MemoryCache";
 
     // Cache mit LRU-Verfahren

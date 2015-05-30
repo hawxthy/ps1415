@@ -17,16 +17,20 @@ import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 
 /**
- * Dient dazu Funktionalitäten zu testen, die mit Adminrollen zu tun haben.
+ * Dient dazu Funktionalitäten zu testen, die mit globalen Rollen zu tun haben.
  *
- * Die aufgeführten E-Mail Accounts müssen zum Testen auf dem Gerät registriert sein. Dazu
- * müssen sie in den Einstellungen des Gerätes mit dem Passwort: "skatenight123" hinzugefügt
+ * Folgende E-Mail Accounts müssen auf dem Gerät registriert sein um die Tests auszuführen:
+ * - {@code ADMIN_MAIL}
+ * - {@code TEST_MAIL}
+ * Dazu müssen diese in den Einstellungen des Gerätes mit dem Passwort: "skatenight123" hinzugefügt
  * werden.
+ *
+ * @author Martin Wrodarczyk
  */
 public class RoleControllerTest extends AuthenticatedAndroidTestCase {
-    public static String ADMIN_MAIL = "skatenight.host@gmail.com";
-    public static String TEST_MAIL = "skatenight.user1@gmail.com";
-    public static List<String> TEST_MAILS = Arrays.asList(ADMIN_MAIL, TEST_MAIL);
+    public static final String ADMIN_MAIL = "skatenight.host@gmail.com";
+    public static final String TEST_MAIL = "skatenight.user1@gmail.com";
+    public static final List<String> TEST_MAILS = Arrays.asList(ADMIN_MAIL, TEST_MAIL);
 
     public static final GlobalRole TEST_ROLE = GlobalRole.ADMIN;
 
@@ -73,7 +77,7 @@ public class RoleControllerTest extends AuthenticatedAndroidTestCase {
     /**
      * Prüft, ob einem Benutzer die Rolle richtig zugewiesen wird.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
     public void testAssignGlobalRole() throws InterruptedException {
@@ -100,7 +104,7 @@ public class RoleControllerTest extends AuthenticatedAndroidTestCase {
     /**
      * Prüft, ob die im Test genutzten Administratoren richtig abgerufen werden.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
     public void testListGlobalAdmins() throws InterruptedException {

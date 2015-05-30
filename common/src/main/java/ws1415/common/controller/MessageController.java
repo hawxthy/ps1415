@@ -9,25 +9,19 @@ import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 
 /**
- * Der MessageController steuert die Verwaltung der Nachrichten.
+ * Der MessageController steuert die Übertragung von Nachrichten.
  *
  * @author Martin Wrodarczyk
  */
-public class MessageController {
-    /**
-     * Keine Instanziierung ermöglichen.
-     */
-    private MessageController() {
-    }
-
+public abstract class MessageController {
     /**
      * Sendet eine Nachricht an einen Benutzer.
      *
-     * @param handler
+     * @param handler  Auszuführender Task
      * @param receiver E-Mail Adresse des Empfängers
-     * @param mes Nachricht
+     * @param mes      Nachricht
      */
-    public static void sendMessage(ExtendedTaskDelegate handler, final String receiver, final String sender,
+    public static void sendMessage(ExtendedTaskDelegate<Void, Boolean> handler, final String receiver,
                                    final Message mes) {
         final Long messageId = mes.get_id();
         final Long sendDate = mes.getSendDate().getTime();
@@ -50,18 +44,19 @@ public class MessageController {
     /**
      * Sendet eine Bestätigung über den Erhalt einer Nachricht an einen Benutzer.
      *
-     * @param handler
-     * @param receiver E-Mail Adresse des Empfängers
-     * @param messageId Nachrichten Id der ursprünglichen Nachricht
-     * @param sendDate Sendedatum der ursprünglichen Nachricht
+     * @param handler   Auszuführender Task
+     * @param receiver  E-Mail Adresse des Empfängers
+     * @param messageId Lokale Nachrichten Id der ursprünglichen Nachricht
+     * @param sendDate  Sendedatum der ursprünglichen Nachricht
      */
-    public static void sendConfirmation(ExtendedTaskDelegate handler, final String receiver, final long messageId,
-                                        final Long sendDate){
+    public static void sendConfirmation(ExtendedTaskDelegate<Void, Boolean> handler, final String receiver,
+                                        final long messageId, final Long sendDate) {
         new ExtendedTask<Void, Void, Boolean>(handler) {
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().messageEndpoint().sendConfirmation(messageId, receiver, sendDate).execute().getValue();
+                    return ServiceProvider.getService().messageEndpoint().sendConfirmation(messageId,
+                            receiver, sendDate).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Nachricht konnte nicht bestätigt werden");
@@ -69,8 +64,5 @@ public class MessageController {
                 }
             }
         }.execute();
-
     }
-
-
 }

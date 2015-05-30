@@ -11,7 +11,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.UserPrimaryData;
 
@@ -33,6 +32,7 @@ import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.controller.MessageDbController;
 import ws1415.ps1415.event.NewMessageEvent;
 import ws1415.ps1415.util.PrefManager;
+import ws1415.ps1415.util.UniversalUtil;
 
 public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
@@ -102,9 +102,10 @@ public class GcmIntentService extends IntentService {
                             Long sendDate = Long.parseLong(extras.getString("sendDate"));
                             String content = extras.getString("content");
                             String sender = extras.getString("sender");
-                            login();
-                            insertNewMessage(receiver, sender, sendDate, content);
-                            sendMessageReceived(sender, messageId, sendDate);
+                            UniversalUtil.simpleLogin(mContext);
+                            handleNewMessage(receiver, sender, sendDate, content);
+                            if (ServiceProvider.getEmail() != null)
+                                MessageController.sendConfirmation(null, receiver, messageId, sendDate);
                         }
                         break;
                     case USER_CONFIRMATION_MESSAGE:
@@ -123,27 +124,19 @@ public class GcmIntentService extends IntentService {
         GcmBroadcastReceiver.completeWakefulIntent(intent);
     }
 
-    private void login() {
-        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(mContext,
-                "server:client_id:" + Constants.WEB_CLIENT_ID);
-        if (!PrefManager.getSelectedUserMail(mContext).equals("")) {
-            credential.setSelectedAccountName(PrefManager.getSelectedUserMail(mContext));
-            ServiceProvider.login(credential);
-        }
-    }
-
-    private void updateMessageReceived(String receiverConf, Long messageId, Long sendDate, String sender) {
-        boolean succeed = MessageDbController.getInstance(this, receiverConf).
+    // Setzt mit den Informationen der Bestätigung die Nachricht auf "erhalten".
+    private void updateMessageReceived(String receiver, Long messageId, Long sendDate, String sender) {
+        boolean succeed = MessageDbController.getInstance(this, receiver).
                 updateMessageReceived(messageId, sendDate);
         if (succeed) EventBus.getDefault().post(new NewMessageEvent(sender));
     }
 
-    private void sendMessageReceived(String receiver, Long messageId, Long sendDate) {
-        if (ServiceProvider.getEmail() != null)
-            MessageController.sendConfirmation(null, receiver, messageId, sendDate);
-    }
-
-    private void insertNewMessage(final String receiver, final String sender, Long sendDate, final String content) {
+    /**
+     * Verarbeitet den Erhalt einer neuen Nachricht. Dabei wird geprüft, ob bereits eine
+     * Konversation zu dem Sender der Nachricht existiert. Existiert keine, so wird eine
+     * neue Konversation erstellt. Abschließend wird die neue Nachricht hinzugefügt.
+     */
+    private void handleNewMessage(final String receiver, final String sender, Long sendDate, final String content) {
         if (!MessageDbController.getInstance(this, receiver).existsConversation(sender)) {
             if (ServiceProvider.getEmail() != null) {
                 handleNewConversation(receiver, sender, content, sendDate);
@@ -153,6 +146,9 @@ public class GcmIntentService extends IntentService {
         createNewMessage(receiver, sender, sendDate, content);
     }
 
+    /**
+     * Fügt die empfangene Nachricht hinzu.
+     */
     private void createNewMessage(String receiver, String sender, Long sendDate, String content) {
         Message message = new Message(new Date(sendDate), content, LocalMessageType.INCOMING);
         long id = MessageDbController.getInstance(this, receiver).insertMessage(sender, message);
@@ -163,6 +159,11 @@ public class GcmIntentService extends IntentService {
         }
     }
 
+    /**
+     * Lädt Informationen zu dem Sender der Nachricht vom Server und erstellt mit Hilfe dieser
+     * eine neue Konversation. Im Falle, dass die Informationen nicht abgerufen werden können,
+     * wird eine Konversation mit der E-Mail Adresse als Namen erstellt.
+     */
     private void handleNewConversation(final String receiver, final String sender, final String content,
                                        final Long sendDate) {
         UserController.getPrimaryData(new ExtendedTaskDelegateAdapter<Void, UserPrimaryData>() {

@@ -11,26 +11,20 @@ import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 
 /**
- * Der RoleController steuert die Verwaltung der Rollen der Benutzer zwischen dem Server und den
- * View-Komponenten in der App.
+ * Der RoleController steuert die Verwaltung der Rollen der Benutzer auf dem Server.
  *
  * @author Martin Wrodarczyk
  */
-public class RoleController {
-    /**
-     * Keine Instanziierung ermöglichen.
-     */
-    private RoleController() {
-    }
-
+public abstract class RoleController {
     /**
      * Weist einem Benutzer eine globale Rolle zu.
      *
-     * @param handler
+     * @param handler Auszuführender Task
      * @param userMail E-Mail Adresse des Benutzers
      * @param role Neue Rolle
      */
-    public static void assignGlobalRole(ExtendedTaskDelegate handler, final String userMail, final GlobalRole role) {
+    public static void assignGlobalRole(ExtendedTaskDelegate<Void, Void> handler, final String userMail,
+                                        final GlobalRole role) {
         new ExtendedTask<Void, Void, Void>(handler) {
             @Override
             protected Void doInBackground(Void... params) {
@@ -38,7 +32,7 @@ public class RoleController {
                     return ServiceProvider.getService().roleEndpoint().assignGlobalRole(role.getId(), userMail).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Globale Rolle des Benutzers konnte nicht gesetzt werden");
+                    publishError("Rolle des Benutzers konnte nicht gesetzt werden");
                     return null;
                 }
             }
@@ -48,9 +42,9 @@ public class RoleController {
     /**
      * Gibt eine Liste von globalen Administratoren aus.
      *
-     * @param handler
+     * @param handler Auszuführender Task
      */
-    public static void listGlobalAdmins(ExtendedTaskDelegate handler){
+    public static void listGlobalAdmins(ExtendedTaskDelegate<Void, List<UserListData>> handler){
         new ExtendedTask<Void, Void, List<UserListData>>(handler) {
             @Override
             protected List<UserListData> doInBackground(Void... params) {
@@ -58,7 +52,7 @@ public class RoleController {
                     return ServiceProvider.getService().roleEndpoint().listGlobalAdmins().execute().getItems();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Liste von Administratoren konnte nicht abgerufen werden");
+                    publishError("Administratoren konnte nicht abgerufen werden");
                     return null;
                 }
             }

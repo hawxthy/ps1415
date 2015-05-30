@@ -16,9 +16,6 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.widget.Toast;
 
-import com.google.api.client.util.Base64;
-import com.skatenight.skatenightAPI.model.Text;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -34,7 +31,7 @@ public abstract class ImageUtil {
      *
      * @param options  Die Größe und Auflösung des Bildes.
      * @param reqWidth Die Zielbreite
-     * @return Eine passende SampleSIze, die zum Dekodieren des Bildes genutzt werden kann
+     * @return Eine passende SampleSize, die zum Dekodieren des Bildes genutzt werden kann
      */
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth) {
         int width = options.outWidth;
@@ -64,7 +61,7 @@ public abstract class ImageUtil {
     }
 
     /**
-     * Wandelt eine Bitmap in ein byte-array verlustlos um.
+     * Wandelt eine Bitmap verlustlos in ein Byte-Array um.
      *
      * @param bitmap Bitmap
      * @return Byte-Array der Bitmap
@@ -77,33 +74,10 @@ public abstract class ImageUtil {
     }
 
     /**
-     * Enkodiert eine Bitmap in ein Text mit Hilfe von Base64.
+     * Erstellt aus einer Bitmap eine abgerundete Bitmap mit einer Umrandung.
+     * Credit im Tag.
      *
-     * @param bitmap Bitmap
-     * @return Bitmap als Text
-     */
-    public static Text EncodeBitmapToText(Bitmap bitmap) {
-        byte[] byteArray = ImageUtil.BitmapToByteArrayJPEG(bitmap);
-        String encodedImage = Base64.encodeBase64String(byteArray);
-        return new Text().setValue(encodedImage);
-    }
-
-    /**
-     * Dekodiert einen Text in eine Bitmap mit Hilfe von Base64.
-     *
-     * @param text
-     * @return
-     */
-    public static Bitmap DecodeTextToBitmap(Text text) {
-        byte[] byteArray = Base64.decodeBase64(text.getValue());
-        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-    }
-
-    /**
-     * Erstellt aus einer Bitmap eine abgerundete Bitmap.
-     * <p/>
-     * Credit: http://stackoverflow.com/questions/17040475/adding-a-round-frame-circle-on-rounded-bitmap
-     *
+     * @see <a href="Stackoverflow: Adding a round frame circle on rounded bitmap">http://stackoverflow.com/questions/17040475/adding-a-round-frame-circle-on-rounded-bitmap</a>
      * @param bitmap Bitmap
      * @return abgerundete Bitmap
      */
@@ -135,8 +109,10 @@ public abstract class ImageUtil {
     }
 
     /**
-     * Credit: http://evel.io/2013/07/21/rounded-avatars-in-android/
+     * Erstellt aus einer Bitmap eine abgerundete Bitmap.
+     * Credit im Tag.
      *
+     * @see <a href="Rounded Avatars in Adnroid">http://evel.io/2013/07/21/rounded-avatars-in-android/</a>
      * @param bitmap Bitmap
      * @return abgerundete Bitmap
      */
@@ -171,7 +147,6 @@ public abstract class ImageUtil {
     public static void performCrop(Uri picUri, Context context, int requestCode, Uri tempUri) {
         try {
             Intent cropIntent = new Intent("com.android.camera.action.CROP");
-            //indicate image type and Uri
             cropIntent.setDataAndType(picUri, "image/*");
             cropIntent.putExtra("crop", "true");
             cropIntent.putExtra("aspectX", 1);
@@ -190,6 +165,12 @@ public abstract class ImageUtil {
         }
     }
 
+    /**
+     * Wandelt eine Bitmap in einen InputStream verlustlos um.
+     *
+     * @param bitmap Bitmap
+     * @return InputStream der Bitmap
+     */
     public static InputStream BitmapToInputStream(Bitmap bitmap) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
