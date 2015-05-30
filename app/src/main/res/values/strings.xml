@@ -211,4 +211,7 @@
 
     <!-- EventAdapter -->
     <string name="event_adapter_fetch_error">No additional events could be fetched</string>
+
+    <!-- ShowEventActivity -->
+    <string name="meeting_place_label">Meeting place:</string>
 </resources>

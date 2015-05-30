@@ -9,7 +9,7 @@ import java.io.IOException;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.common.net.ServiceProvider;
-import ws1415.ps1415.activity.ShowEventsActivity;
+import ws1415.ps1415.activity.ListEventsActivity;
 
 /**
  * Created by Daniel on 21.11.2014.
@@ -55,7 +55,7 @@ public class ToggleMemberEventAttendanceTask extends ExtendedTask<Void, Void, Bo
     @Override
     public void onPostExecute(Boolean result) {
         super.onPostExecute(result);
-        Intent refreshIntent = new Intent(ShowEventsActivity.REFRESH_EVENTS_ACTION);
+        Intent refreshIntent = new Intent(ListEventsActivity.REFRESH_EVENTS_ACTION);
         LocalBroadcastManager.getInstance(context).sendBroadcast(refreshIntent);
     }
 

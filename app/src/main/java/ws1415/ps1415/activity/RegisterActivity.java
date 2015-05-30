@@ -135,7 +135,7 @@ public class RegisterActivity extends Activity {
                     PrefManager.setSelectedUserMail(getApplicationContext(), accountName);
                     ServiceProvider.login(credential);
                     initGCM(context);
-                    context.startActivity(new Intent(RegisterActivity.this, ShowEventsActivity.class));
+                    context.startActivity(new Intent(RegisterActivity.this, ListEventsActivity.class));
                     finish();
                 }
 
@@ -181,7 +181,7 @@ public class RegisterActivity extends Activity {
                     PrefManager.setSelectedUserMail(getApplicationContext(), accountName);
                     ServiceProvider.login(credential);
                     initGCM(context);
-                    context.startActivity(new Intent(RegisterActivity.this, ShowEventsActivity.class));
+                    context.startActivity(new Intent(RegisterActivity.this, ListEventsActivity.class));
                     finish();
                 } else {
                     showProgress(false);

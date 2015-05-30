@@ -17,7 +17,7 @@ import java.util.List;
 import ws1415.ps1415.R;
 
 /**
- * Klasse zum Füllen der ListView in ShowEventsActivity.
+ * Klasse zum Füllen der ListView in ListEventsActivity.
  *
  * Created by Bernd Eissing, Martin Wrodarczyk on 18.11.2014.
  */

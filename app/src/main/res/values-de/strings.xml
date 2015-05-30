@@ -193,4 +193,7 @@
 
     <!-- EventAdapter -->
     <string name="event_adapter_fetch_error">Es konnten keine weiteren Events abgerufen werden</string>
+
+    <!-- ShowEventActivity -->
+    <string name="meeting_place_label">Treffpunkt:</string>
 </resources>

@@ -2,11 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ws1415.ps1415.activity.ShowEventsActivity">
+    tools:context="ws1415.ps1415.activity.ListEventsActivity">
 
-    <ListView
-        android:id="@+id/activity_show_events_list_view"
+    <fragment
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </ListView>
+        android:layout_height="match_parent"
+        android:name="ws1415.ps1415.fragment.EventListFragment"
+        android:id="@+id/eventFragment" />
+
 </FrameLayout>

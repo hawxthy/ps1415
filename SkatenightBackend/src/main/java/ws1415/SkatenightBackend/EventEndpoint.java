@@ -175,6 +175,8 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         event.setImagesUploadUrl(blobstoreService.createUploadUrl("/images/upload"));
         ofy().save().entity(event).now();
 
+        // TODO GCM-Nachricht an Geräte schicken, damit Event-Liste aktualisiert wird
+
         return event;
     }
 
@@ -225,6 +227,9 @@ public class EventEndpoint extends SkatenightServerEndpoint {
                     blobstoreService.delete(key);
                 }
             }
+
+            // TODO Teilnehmer durchgehen und Event entfernen
+
             // Abhängige Gallerien löschen
             ofy().delete().entities(event.getGalleries()).now();
             ofy().delete().entity(event).now();

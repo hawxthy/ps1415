@@ -14,7 +14,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import java.util.Date;
 
 import ws1415.common.gcm.MessageType;
-import ws1415.ps1415.activity.ShowEventsActivity;
+import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.util.PrefManager;
 
@@ -53,8 +53,8 @@ public class GcmIntentService extends IntentService {
                         break;
                     case EVENT_NOTIFICATION_MESSAGE:
                         sendNotification(extras);
-                        // Event-Liste in der ShowEventsActivity aktualisieren
-                        Intent refreshIntent = new Intent(ShowEventsActivity.REFRESH_EVENTS_ACTION);
+                        // Event-Liste in der ListEventsActivity aktualisieren
+                        Intent refreshIntent = new Intent(ListEventsActivity.REFRESH_EVENTS_ACTION);
                         LocalBroadcastManager.getInstance(this).sendBroadcast(refreshIntent);
 
                         // Falls sich die Startzeit geändert hat, dann Alarm aktualisieren
@@ -96,7 +96,7 @@ public class GcmIntentService extends IntentService {
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, ShowEventsActivity.class), 0);
+                new Intent(this, ListEventsActivity.class), 0);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)

@@ -11,10 +11,12 @@
     android:paddingEnd="5dp" >
 
     <ImageView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:id="@+id/eventIcon"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true"
+        android:paddingRight="10dp"
+        android:paddingEnd="10dp" />
 
     <TextView
         android:layout_width="fill_parent"
@@ -23,8 +25,9 @@
         android:text="Event-Title"
         android:layout_toRightOf="@id/eventIcon"
         android:layout_toEndOf="@id/eventIcon"
+        android:layout_alignTop="@id/eventIcon"
         android:textStyle="bold"
-        android:textSize="8pt"/>
+        android:textSize="8pt" />
 
     <TextView
         android:layout_width="fill_parent"

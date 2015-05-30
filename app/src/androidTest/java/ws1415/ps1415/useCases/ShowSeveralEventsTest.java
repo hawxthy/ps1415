@@ -13,7 +13,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
 import ws1415.common.net.ServiceProvider;
-import ws1415.ps1415.activity.ShowEventsActivity;
+import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.ShowInformationActivity;
 
 /**
@@ -23,7 +23,7 @@ import ws1415.ps1415.activity.ShowInformationActivity;
  *
  * @author Tristan Rust
  */
-public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<ShowEventsActivity> {
+public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<ListEventsActivity> {
 
     // Test Event-Daten
     private static final String TEST_TITLE = "TestEventEdit";
@@ -31,19 +31,19 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
     private static final String TEST_LOCATION = "TestStadtEdit";
     // private static final String TEST_DATE = "24-02-2015 20:00";
 
-    // Die ShowEventsActivity
-    private ShowEventsActivity mActivity;
+    // Die ListEventsActivity
+    private ListEventsActivity mActivity;
 
     // ShowEventActivity UI Elemente
     private ListView mList;
     private ListAdapter mListData;
 
     public ShowSeveralEventsTest() {
-        super(ShowEventsActivity.class);
+        super(ListEventsActivity.class);
     }
 
     /**
-     * Loggt den User ein und führt die ShowEventsActivity aus.
+     * Loggt den User ein und führt die ListEventsActivity aus.
      */
     @Override
     protected void setUp() throws Exception {
@@ -59,7 +59,7 @@ public class ShowSeveralEventsTest extends ActivityInstrumentationTestCase2<Show
 
         Thread.sleep(5000); // Zeit zum initialisieren
 
-        // Die ShowEventsActivity wird gestartet
+        // Die ListEventsActivity wird gestartet
         mActivity = getActivity();
 
         Thread.sleep(5000); // Zeit zum initialisieren

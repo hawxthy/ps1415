@@ -1,6 +1,5 @@
 package ws1415.ps1415.activity;
 
-import android.app.Service;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
@@ -35,11 +34,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-import ws1415.common.component.BlobKeyImageView;
-import ws1415.ps1415.adapter.EventAdapter;
 import ws1415.common.controller.EventController;
 import ws1415.common.controller.GalleryController;
 import ws1415.common.model.PictureVisibility;
@@ -47,12 +42,12 @@ import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
+import ws1415.ps1415.adapter.EventAdapter;
 
 public class ImageStorageTestActivity extends BaseActivity {
     private static final int SELECT_IMAGE_REQUEST_CODE = 1;
     private static final int SELECT_EVENT_ICON_CODE = 2;
 
-    private BlobKeyImageView imageView;
     private Button btnTestEventsErstellen;
     private ListView listView;
 
@@ -61,7 +56,6 @@ public class ImageStorageTestActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_storage_test);
 
-        imageView = (BlobKeyImageView) findViewById(R.id.imageView);
 
         Button upload = (Button) findViewById(R.id.btnUpload);
         upload.setOnClickListener(new View.OnClickListener() {
@@ -71,18 +65,6 @@ public class ImageStorageTestActivity extends BaseActivity {
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 intent.setType("image/*");
                 startActivityForResult(Intent.createChooser(intent, "Bild wählen..."), SELECT_IMAGE_REQUEST_CODE);
-            }
-        });
-        Button download = (Button) findViewById(R.id.btnDownload);
-        download.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
-                    @Override
-                    public void taskDidFinish(ExtendedTask task, PictureData picture) {
-                        imageView.loadFromBlobKey(picture.getImageBlobKey());
-                    }
-                }, 5751399832879104l);
             }
         });
         final Button loeschen = (Button) findViewById(R.id.btnLoeschen);

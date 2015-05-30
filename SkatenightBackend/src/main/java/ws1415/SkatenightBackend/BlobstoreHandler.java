@@ -4,7 +4,9 @@ import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.images.Image;
+import com.google.appengine.api.images.ImagesService;
 import com.google.appengine.api.images.ImagesServiceFactory;
+import com.google.appengine.api.images.ServingUrlOptions;
 import com.google.appengine.api.images.Transform;
 import com.google.appengine.api.urlfetch.HTTPRequest;
 import com.google.appengine.api.urlfetch.HTTPResponse;
@@ -32,6 +34,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  */
 public class BlobstoreHandler extends HttpServlet {
     private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+    private static final ImagesService imagesService = ImagesServiceFactory.getImagesService();
 
     /**
      * Wird aufgerufen, wenn der Upload in den Blobstore fertiggestellt wurde.
@@ -90,7 +93,18 @@ public class BlobstoreHandler extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         BlobKey key = new BlobKey(req.getParameter("key"));
-        blobstoreService.serve(key, resp);
+
+        if (req.getParameter("crop") != null) {
+            // Crop
+            int imageSize = Integer.parseInt(req.getParameter("crop"));
+            String servingUrl = imagesService.getServingUrl(ServingUrlOptions.Builder.withBlobKey(key).imageSize(imageSize).crop(true));
+            resp.setCharacterEncoding("UTF-8");
+            resp.getWriter().print(servingUrl);
+            resp.getWriter().flush();
+            resp.getWriter().close();
+        } else {
+            blobstoreService.serve(key, resp);
+        }
     }
 
 }

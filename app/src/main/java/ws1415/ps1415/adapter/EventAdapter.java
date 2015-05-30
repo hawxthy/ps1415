@@ -21,6 +21,8 @@ import ws1415.common.controller.EventController;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
+import ws1415.ps1415.util.DiskCacheImageLoader;
+import ws1415.ps1415.util.UniversalUtil;
 
 /**
  * Adapter für Events. Erwartet einen Event-Filter als Parameter und fragt anschließend die
@@ -78,7 +80,11 @@ public class EventAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        if (position < events.size()) {
+            return events.get(position).getId();
+        } else {
+            return -1;
+        }
     }
 
     @Override
@@ -115,8 +121,11 @@ public class EventAdapter extends BaseAdapter {
             ImageView iconView = (ImageView) view.findViewById(R.id.eventIcon);
             TextView titleView = (TextView) view.findViewById(R.id.eventTitle);
             TextView dateView = (TextView) view.findViewById(R.id.eventDate);
+
+            DiskCacheImageLoader.getInstance().loadImage(iconView, event.getIcon(), iconView.getWidth());
             titleView.setText(event.getTitle());
-            dateView.setText(DateFormat.getMediumDateFormat(parent.getContext()).format(new Date(event.getDate().getValue())));
+            Date date = new Date(event.getDate().getValue());
+            dateView.setText(DateFormat.getMediumDateFormat(context).format(date) + " " + DateFormat.getTimeFormat(context).format(date));
         }
 
         if (events.size() - position < fetchDistance) {
