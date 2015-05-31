@@ -137,7 +137,7 @@ public class RegisterActivity extends Activity {
                     uploadUserPicture();
                 } else {
                     Toast.makeText(getApplicationContext(), "Benutzer existiert bereits. Login erfolgreich.", Toast.LENGTH_LONG).show();
-                    context.startActivity(new Intent(RegisterActivity.this, ShowEventsActivity.class));
+                    context.startActivity(new Intent(RegisterActivity.this, ListEventsActivity.class));
                     finish();
                 }
             }

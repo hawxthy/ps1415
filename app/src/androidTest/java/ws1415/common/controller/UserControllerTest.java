@@ -34,6 +34,7 @@ import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
+import ws1415.ps1415.model.UserGroupType;
 
 /**
  * Diese Klasse wird dazu genutzt die Funktionalitäten des UserControllers zu testen, die
@@ -413,7 +414,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
         changeAccount(TEST_MAIL_1);
         // An Veranstaltung teilnehmen und Nutzergruppe beitreten
         ServiceProvider.getService().eventEndpoint().joinEvent(testEvent.getId()).execute();
-        ServiceProvider.getService().groupEndpoint().joinUserGroup(testUserGroup.getName()).execute();
+        ServiceProvider.getService().groupEndpoint().joinUserGroup(testUserGroup.getName(), testUserGroup.getName()).execute();
 
         final CountDownLatch getSignal = new CountDownLatch(1);
         UserController.getUserProfile(new ExtendedTaskDelegateAdapter<Void, UserProfile>() {
@@ -672,7 +673,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
 
     // Erstellt eine Nutzergruppe
     private UserGroup createUserGroup() throws IOException {
-        ServiceProvider.getService().groupEndpoint().createUserGroup("Testgruppe", true).execute();
+        ServiceProvider.getService().groupEndpoint().createUserGroup("Testgruppe", false, UserGroupType.NORMALGROUP.name(), "Testgruppe").execute();
         return ServiceProvider.getService().groupEndpoint().getUserGroup("Testgruppe").execute();
     }
 

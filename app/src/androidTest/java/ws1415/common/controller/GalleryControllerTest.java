@@ -348,7 +348,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         // Für den ersten Benutzer wurde dies bereits in der setUp-Methode erledigt
         changeAccount(1);
         if (!ServiceProvider.getService().userEndpoint().existsUser(ServiceProvider.getEmail()).execute().getValue()) {
-            ServiceProvider.getService().userEndpoint().createUser(ServiceProvider.getEmail(), null).set("firstName", "").set("lastName", "").execute();
+            ServiceProvider.getService().userEndpoint().createUser(ServiceProvider.getEmail()).set("firstName", "").set("lastName", "").execute();
         }
         changeAccount(0);
 

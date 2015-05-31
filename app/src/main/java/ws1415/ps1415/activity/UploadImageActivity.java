@@ -1,6 +1,5 @@
 package ws1415.ps1415.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -18,9 +17,7 @@ import com.skatenight.skatenightAPI.model.UserGroupPicture;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 
-import ws1415.common.component.BlobKeyImageView;
 import ws1415.common.controller.GroupController;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
@@ -31,7 +28,7 @@ public class UploadImageActivity extends BaseActivity {
     private String selectedImagePath;
     private Button downloadPictureButton;
     private Button choosePictureButton;
-    private BlobKeyImageView blobStoreImageView;
+    private ImageView blobStoreImageView;
     final private String TEST_GROUP_NAME = "Testgruppe1";
 
     @Override
@@ -41,17 +38,17 @@ public class UploadImageActivity extends BaseActivity {
 
         downloadPictureButton = (Button) findViewById(R.id.downloadPicture);
         choosePictureButton = (Button) findViewById(R.id.choosePictureButton);
-        blobStoreImageView = (BlobKeyImageView) findViewById(R.id.imageView);
+        blobStoreImageView = (ImageView) findViewById(R.id.imageView);
 
         downloadPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GroupController.getInstance().getUserGroupPicture(new ExtendedTaskDelegateAdapter<Void, UserGroupPicture>(){
-                    @Override
-                    public void taskDidFinish(ExtendedTask task, UserGroupPicture picture){
-                        blobStoreImageView.loadFromBlobKey(picture.getPictureBlobKey());
-                    }
-                }, TEST_GROUP_NAME);
+//                GroupController.getInstance().getUserGroupPicture(new ExtendedTaskDelegateAdapter<Void, UserGroupPicture>(){
+//                    @Override
+//                    public void taskDidFinish(ExtendedTask task, UserGroupPicture picture){
+//                        blobStoreImageView.loadFromBlobKey(picture.getPictureBlobKey());
+//                    }
+//                }, TEST_GROUP_NAME);
             }
         });
 

@@ -7,6 +7,8 @@ import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 import com.googlecode.objectify.cmd.Query;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,27 +25,23 @@ import ws1415.SkatenightBackend.gcm.MessageType;
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
 import ws1415.SkatenightBackend.model.Board;
+import ws1415.SkatenightBackend.model.BoardEntry;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
-import ws1415.SkatenightBackend.model.BoardEntry;
-import ws1415.SkatenightBackend.model.UserGroupType;
-import ws1415.SkatenightBackend.transport.ListWrapper;
 import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
-import ws1415.SkatenightBackend.model.UserGroup.BoardEntry;
+import ws1415.SkatenightBackend.model.UserGroupPicture;
+import ws1415.SkatenightBackend.model.UserGroupType;
 import ws1415.SkatenightBackend.transport.UserGroupBlackBoardTransport;
 import ws1415.SkatenightBackend.transport.UserGroupMetaData;
 import ws1415.SkatenightBackend.transport.UserGroupNewsBoardTransport;
-import ws1415.SkatenightBackend.model.UserGroupPicture;
 import ws1415.SkatenightBackend.transport.UserGroupVisibleMembers;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 
 /**
- * Created by Richard on 01.05.2015.
+ * @author Bernd Eissing
  */
 public class GroupEndpoint extends SkatenightServerEndpoint {
     private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
@@ -59,7 +57,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
     public void createUserGroup(User user, @Named("groupName") String groupName, @Named("groupPrivacy") boolean privat, @Named("groupType") UserGroupType groupType, @Named("groupPassword") String password) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         throwIfUserGroupAlreadyExists(groupName);
-        EndUser endUser = throwIfNoEndUserFound(user.getEmail());
+        EndpointUtil.throwIfEndUserNotExists(user.getEmail());
 
         if (groupType.equals(UserGroupType.SECURITYGROUP) && privat == false) {
             throw new IllegalArgumentException("a security user group cannot be open to everyone");
@@ -67,22 +65,22 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         if (privat == true && (password.isEmpty() || password == null )) {
             throw new IllegalArgumentException("password for private user groups has to be submitted");
         }
-        UserGroup ug = new UserGroup(endUser.getEmail(), groupType.name(), hashPassword(password));
+        UserGroup ug = new UserGroup(user.getEmail(), groupType.name(), hashPassword(password));
         ug.setName(groupName);
         ug.setMemberRights(new HashMap<String, ArrayList<String>>());
-        ug.addGroupMember(endUser.getEmail(), createFullRightsList());
+        ug.addGroupMember(user.getEmail(), createFullRightsList());
         ug.setMemberCount(1);
         ug.setPrivat(privat);
 
         // Der Ersteller der Nutzergruppe ist zu Anfang auch Sichtbar auf der Karte
         UserGroupVisibleMembers visibleMembers = new UserGroupVisibleMembers();
         visibleMembers.setGroupName(groupName);
-        visibleMembers.addVisibleMember(endUser.getEmail());
+        visibleMembers.addVisibleMember(user.getEmail());
         ofy().save().entity(visibleMembers).now();
         ug.setVisibleMembers(visibleMembers);
         ofy().save().entity(ug).now();
-        addGroupToUser(endUser.getEmail(), ug);
-        saveEndUserAndSendNotification(endUser);
+        new UserEndpoint().addGroupToUser(user.getEmail(), ug);
+        saveEndUserAndSendNotification(user.getEmail());
     }
 
     /**
@@ -282,7 +280,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         ofy().save().entity(group).now();
 
         // Dem EndUser die Nutzergruppe hinzufügen
-        addGroupToUser(endUser.getEmail(), group);
+        new UserEndpoint().addGroupToUser(endUser.getEmail(), group);
         return new BooleanWrapper(true);
     }
 
@@ -303,7 +301,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         ofy().save().entity(group.getVisibleMembers()).now();
         ofy().save().entity(group).now();
 
-        removeGroupFromUser(user.getEmail(), group);
+        new UserEndpoint().removeGroupFromUser(user.getEmail(), group);
     }
 
     /**
@@ -322,7 +320,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             group.removeGroupMember(userName);
             ofy().save().entity(group).now();
 
-            removeGroupFromUser(userName, group);
+            new UserEndpoint().removeGroupFromUser(userName, group);
         } else {
             EndpointUtil.throwIfNoRights();
         }
@@ -728,7 +726,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             Set<String> regids = new HashSet<>();
             RegistrationManager rm = getRegistrationManager(pm);
             for (EndUser enduser : members) {
-                removeGroupFromUser(enduser.getEmail(), group);
+                new UserEndpoint().removeGroupFromUser(enduser.getEmail(), group);
                 regids.add(rm.getUserIdByMail(enduser.getEmail()));
             }
 

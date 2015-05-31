@@ -72,7 +72,7 @@ public class AddUserGroupActivity extends Activity {
                         public void taskDidFinish(ExtendedTask task, Void aVoid) {
                             UsergroupActivity.getUserGroupActivity().refresh();
                         }
-                    }, groupName, true, UserGroupType.NORMALGROUP, null);
+                    }, groupName, true, UserGroupType.NORMALGROUP, "");
                 }
             }).execute();
         } else {

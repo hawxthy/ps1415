@@ -25,6 +25,7 @@ import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.Member;
+import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserInfo;
 import ws1415.SkatenightBackend.model.UserInfo.InfoPair;
 import ws1415.SkatenightBackend.model.UserLocation;
@@ -250,7 +251,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
 
             // TODO: Events abrufen und setzen
 
-            List<UserGroupMetaData> userGroups = listUserGroupMetaData(user.getEmail(), endUser);
+            List<UserGroupMetaData> userGroups = listUserGroupMetaData(user, endUser);
 
             UserProfile result = new UserProfile();
             result.setUserInfo(detachedUserInfo);
@@ -674,24 +675,24 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * Gibt eine Liste von den Nutzergruppen aus, bei denen der Benutzer als Mitglied eingetragen
      * ist, wenn diese sichtbar sein soll für den aufgerufenen Benutzer.
      *
-     * @param mailOfCaller E-Mail Adresse des Benutzers, der die Gruppen abfragt
+     * @param caller E-Mail Adresse des Benutzers, der die Gruppen abfragt
      * @param endUser      Benutzer dessen Gruppen abgerufen werden
      * @return Liste von beigetretenen oder erstellten Nutzergruppen
      */
-    private List<UserGroupMetaData> listUserGroupMetaData(String mailOfCaller, EndUser endUser) {
+    private List<UserGroupMetaData> listUserGroupMetaData(User caller, EndUser endUser) throws OAuthRequestException {
         Integer showPrivateGroupsVisibility = endUser.getShowPrivateGroups();
         List<String> friends = endUser.getMyFriends();
-        Boolean showPrivateGroups = isVisible(mailOfCaller, endUser.getEmail(),
+        Boolean showPrivateGroups = isVisible(caller.getEmail(), endUser.getEmail(),
                 showPrivateGroupsVisibility, friends);
         List<String> userGroupIds = endUser.getMyUserGroups();
         UserGroupMetaData userGroup;
         List<UserGroupMetaData> result = new ArrayList<>();
         for (String userGroupId : userGroupIds) {
-            userGroup = new GroupEndpoint().getUserGroupMetaData(userGroupId);
+            userGroup = new GroupEndpoint().getUserGroupMetaData(caller, userGroupId);
             if (userGroup != null) {
-                if (!userGroup.isOpen() && showPrivateGroups) {
+                if (userGroup.getPrivat() && showPrivateGroups) {
                     result.add(userGroup);
-                } else if (userGroup.isOpen()) {
+                } else if (!userGroup.getPrivat()) {
                     result.add(userGroup);
                 }
             }
@@ -751,6 +752,13 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         return member;
     }
 
+    /**
+     * Prüft ob ein Benutzer mit einem anderen Benutzer befreundet ist.
+     *
+     * @param userMail E-Mail Adresse des Benutzers mit der Freundeliste
+     * @param mailToCheck E-Mail Adresse des Benutzers, dessen Freundschaft geprüft wird
+     * @return true, falls Freundschaft besteht, false andernfalls
+     */
     protected Boolean isFriendWith(String userMail, String mailToCheck){
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
@@ -764,5 +772,69 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             pm.close();
         }
         return false;
+    }
+
+    /**
+     * In der Liste der beigetretenen Gruppen des Benutzers wird die übergebene Gruppe hinzugefügt.
+     *
+     * @param userMail E-Mail des Benutzers
+     * @param userGroup Nutzergruppe
+     */
+    protected void addGroupToUser(String userMail, UserGroup userGroup) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            endUser.addUserGroup(userGroup);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * In der Liste der beigetretenen Gruppen des Benutzers wird die übergebene Gruppe entfernt.
+     *
+     * @param userMail E-Mail des Benutzers
+     * @param userGroup Nutzergruppe
+     */
+    protected void removeGroupFromUser(String userMail, UserGroup userGroup) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            endUser.removeUserGroup(userGroup);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * In der Liste der teilgenommenen Veranstaltungen des Benutzers wird die übergebene
+     * Veranstaltung hinzugefügt.
+     *
+     * @param userMail E-Mail des Benutzers
+     */
+    protected void addEventToUser(String userMail, Event event) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            endUser.addEvent(event);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * In der Liste der teilgenommenen Veranstaltungen des Benutzers wird die übergebene
+     * Veranstaltung entfernt.
+     *
+     * @param userMail E-Mail des Benutzers
+     */
+    protected void removeEventFromUser(String userMail, Event event) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            endUser.removeEvent(event);
+        } finally {
+            pm.close();
+        }
     }
 }

@@ -5,7 +5,7 @@ android {
     compileSdkVersion 21
     buildToolsVersion "21.0.1"
 
-    defaultPublishConfig "debug"
+    defaultPublishConfig "release"
 
     defaultConfig {
         minSdkVersion 15
