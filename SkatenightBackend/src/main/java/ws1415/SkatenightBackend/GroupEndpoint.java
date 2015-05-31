@@ -155,7 +155,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
 //        if(listOfNames.stringList == null){
 //            throw new IllegalArgumentException("no list submitted");
 //        }
-//        
+//
 //    }
 
     /**

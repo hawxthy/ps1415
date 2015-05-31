@@ -2,6 +2,7 @@ package ws1415.common.controller;
 
 import android.test.suitebuilder.annotation.SmallTest;
 
+import com.skatenight.skatenightAPI.model.BooleanWrapper;
 import com.skatenight.skatenightAPI.model.UserGroup;
 
 import java.util.ArrayList;
@@ -55,9 +56,10 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
         changeAccount(1);
         final CountDownLatch signal2 = new CountDownLatch(1);
 
-        GroupController.getInstance().joinUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().joinUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+            public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
+                assertTrue("Der User " +MY_SECOND_MAIL+ " sollte erfolgreich der Nutzergruppe " +TEST_GROUP_NAME+ " beigetreten sein",result.getValue());
                 signal2.countDown();
             }
         }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD);
