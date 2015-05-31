@@ -25,13 +25,13 @@ import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.Member;
-import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserInfo;
 import ws1415.SkatenightBackend.model.UserInfo.InfoPair;
 import ws1415.SkatenightBackend.model.UserLocation;
 import ws1415.SkatenightBackend.model.Visibility;
 import ws1415.SkatenightBackend.transport.ListWrapper;
 import ws1415.SkatenightBackend.transport.StringWrapper;
+import ws1415.SkatenightBackend.transport.UserGroupMetaData;
 import ws1415.SkatenightBackend.transport.UserListData;
 import ws1415.SkatenightBackend.transport.UserLocationInfo;
 import ws1415.SkatenightBackend.transport.UserPrimaryData;
@@ -139,7 +139,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
-            // Stellt sicher das Objekte der Assoziation auch runtergeladen werden
             endUser.getUserInfo();
             endUser.getUserLocation();
             return endUser;
@@ -169,7 +168,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
                 List<String> friends = endUser.getMyFriends();
                 String lastName = "";
                 Integer lastNameVis = endUser.getUserInfo().getLastName().getVisibility();
-                if (isVisible(user.getEmail(), userMail, lastNameVis, friends).value) {
+                if (isVisible(user.getEmail(), userMail, lastNameVis, friends)) {
                     lastName = endUser.getUserInfo().getLastName().getValue();
                 }
                 return new UserPrimaryData(userMail, endUser.getPictureBlobKey(),
@@ -198,8 +197,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             UserLocation userLocation = endUser.getUserLocation();
             String firstName = endUser.getUserInfo().getFirstName();
             InfoPair lastNamePair = endUser.getUserInfo().getLastName();
-            String lastName = null;
-            if (isVisible(user.getEmail(), userMail, lastNamePair.getVisibility(), friends).value) {
+            String lastName = "";
+            Integer lastNameVis = lastNamePair.getVisibility();
+            if (isVisible(user.getEmail(), userMail, lastNameVis, friends)) {
                 lastName = lastNamePair.getValue();
             }
             return new UserLocationInfo(userMail, firstName, lastName, userLocation.getLatitude(),
@@ -244,19 +244,19 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             List<String> friends = endUser.getMyFriends();
-            endUser.getUserInfo();
 
             UserInfo detachedUserInfo = pm.detachCopy(endUser.getUserInfo());
             setUpVisibility(detachedUserInfo, user.getEmail(), userMail, friends);
 
             // TODO: Events abrufen und setzen
 
-            // TODO: Benutzergruppen abrufen und setzen
+            List<UserGroupMetaData> userGroups = listUserGroupMetaData(user.getEmail(), endUser);
 
             UserProfile result = new UserProfile();
             result.setUserInfo(detachedUserInfo);
             result.setUserPicture(endUser.getPictureBlobKey());
             result.setEmail(endUser.getEmail());
+            result.setMyUserGroups(userGroups);
             result.setOptOutSearch(endUser.isOptOutSearch());
             result.setShowPrivateGroups(endUser.getShowPrivateGroups());
             return result;
@@ -264,26 +264,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             pm.close();
         }
     }
-
-
-    /**
-     * Gibt eine Liste von allen Nutzergruppen aus, bei denen der Benutzer als Mitglied eingetragen
-     * ist.
-     *
-     * @param endUser Benutzer dessen Gruppen abgerufen werden
-     * @return Liste von beigetretenen oder erstellten Nutzergruppen
-     */
-    private List<UserGroup> listUserGroups(EndUser endUser) {
-        List<String> userGroupIds = endUser.getMyUserGroups();
-        UserGroup userGroup;
-        List<UserGroup> result = new ArrayList<>();
-        for (String userGroupId : userGroupIds) {
-            userGroup = new GroupEndpoint().getUserGroup(userGroupId);
-            if (userGroup != null) result.add(userGroup);
-        }
-        return result;
-    }
-
 
     /**
      * Gibt eine Liste von allen Veranstaltungen aus, an denen der Benutzer teilgenommen hat bzw.
@@ -328,58 +308,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         } finally {
             pm.close();
         }
-    }
-
-    /**
-     * Setzt die Informationen der UserInfo auf null, die für den User nicht sichtbar sein sollen.
-     *
-     * @param userInfo     Informationen die aufgerufen werden
-     * @param mailOfCaller User, der Informationen abrufen will
-     * @param mailOfCalled E-Mail Adresse des Benutzers mit den Informationen
-     * @param friends      E-Mail Adressen der Freunde des Benutzers mit den Informationen
-     * @return Informationen mit Sichtbarkeitsanpassungen
-     */
-    private UserInfo setUpVisibility(UserInfo userInfo, String mailOfCaller, String mailOfCalled, List<String> friends) {
-        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getLastName().getVisibility(), friends).value) {
-            userInfo.getLastName().setValue(null);
-        }
-        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getCity().getVisibility(), friends).value) {
-            userInfo.getCity().setValue(null);
-        }
-        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getDateOfBirth().getVisibility(), friends).value) {
-            userInfo.getDateOfBirth().setValue(null);
-        }
-        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getDescription().getVisibility(), friends).value) {
-            userInfo.getDescription().setValue(null);
-        }
-        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getPostalCode().getVisibility(), friends).value) {
-            userInfo.getPostalCode().setValue(null);
-        }
-        return userInfo;
-    }
-
-    /**
-     * Hilfsmethode, um die Sichtbarkeit abzufragen.
-     *
-     * @param mailOfCaller Benutzer, der Informationen abrufen will
-     * @param mailOfCalled Benutzer, deren Informationen abgerufen werden
-     * @param visibility   Sichtbarkeit der Information
-     * @param friends      E-Mail Adressen der Freunde des Benutzers, dessen Informationen abgerufen werden
-     * @return true, falls Information sichtbar, false andernfalls
-     */
-    protected BooleanWrapper isVisible(String mailOfCaller, String mailOfCalled, Integer visibility, List<String> friends) {
-        if (visibility.equals(Visibility.PUBLIC.getId())) return new BooleanWrapper(true);
-        if (visibility.equals(Visibility.ONLY_ME.getId()))
-            return new BooleanWrapper(mailOfCaller.equals(mailOfCalled));
-        if (visibility.equals(Visibility.FRIENDS.getId())) {
-            if (mailOfCaller.equals(mailOfCalled)) return new BooleanWrapper(true);
-            if (friends == null) return new BooleanWrapper(false);
-            for (String friend : friends) {
-                if (friend.equals(mailOfCaller)) return new BooleanWrapper(true);
-            }
-            return new BooleanWrapper(false);
-        }
-        return new BooleanWrapper(false);
     }
 
     /**
@@ -522,6 +450,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @throws OAuthRequestException
      * @throws UnauthorizedException
      */
+    @ApiMethod(path = "user_picture")
     public BooleanWrapper removeUserPicture(User user, @Named("userMail") String userMail) throws OAuthRequestException, UnauthorizedException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfEndUserNotExists(userMail);
@@ -578,7 +507,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
                 routeEndpoint.calculateField(userLocation.getCurrentEventId());
                 lastFieldUpdateTime = System.currentTimeMillis();
             }
-            pm.makePersistent(userLocation);
         } finally {
             pm.close();
         }
@@ -684,6 +612,92 @@ public class UserEndpoint extends SkatenightServerEndpoint {
 
         }
     }
+
+    /**
+     * Hilfsmethoden
+     */
+
+    /**
+     * Setzt die Informationen der UserInfo auf null, die für den User nicht sichtbar sein sollen.
+     *
+     * @param userInfo     Informationen die aufgerufen werden
+     * @param mailOfCaller User, der Informationen abrufen will
+     * @param mailOfCalled E-Mail Adresse des Benutzers mit den Informationen
+     * @param friends      E-Mail Adressen der Freunde des Benutzers mit den Informationen
+     * @return Informationen mit Sichtbarkeitsanpassungen
+     */
+    private UserInfo setUpVisibility(UserInfo userInfo, String mailOfCaller, String mailOfCalled, List<String> friends) {
+        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getLastName().getVisibility(), friends)) {
+            userInfo.getLastName().setValue(null);
+        }
+        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getCity().getVisibility(), friends)) {
+            userInfo.getCity().setValue(null);
+        }
+        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getDateOfBirth().getVisibility(), friends)) {
+            userInfo.getDateOfBirth().setValue(null);
+        }
+        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getDescription().getVisibility(), friends)) {
+            userInfo.getDescription().setValue(null);
+        }
+        if (!isVisible(mailOfCaller, mailOfCalled, userInfo.getPostalCode().getVisibility(), friends)) {
+            userInfo.getPostalCode().setValue(null);
+        }
+        return userInfo;
+    }
+
+    /**
+     * Hilfsmethode, um die Sichtbarkeit abzufragen.
+     *
+     * @param mailOfCaller Benutzer, der Informationen abrufen will
+     * @param mailOfCalled Benutzer, deren Informationen abgerufen werden
+     * @param visibility   Sichtbarkeit der Information
+     * @param friends      E-Mail Adressen der Freunde des Benutzers, dessen Informationen abgerufen werden
+     * @return true, falls Information sichtbar, false andernfalls
+     */
+    protected Boolean isVisible(String mailOfCaller, String mailOfCalled, Integer visibility, List<String> friends) {
+        if (visibility.equals(Visibility.PUBLIC.getId())) return true;
+        if (visibility.equals(Visibility.ONLY_ME.getId()))
+            return mailOfCaller.equals(mailOfCalled);
+        if (visibility.equals(Visibility.FRIENDS.getId())) {
+            if (mailOfCaller.equals(mailOfCalled)) return true;
+            if (friends == null) return false;
+            for (String friend : friends) {
+                if (friend.equals(mailOfCaller)) return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    /**
+     * Gibt eine Liste von den Nutzergruppen aus, bei denen der Benutzer als Mitglied eingetragen
+     * ist, wenn diese sichtbar sein soll für den aufgerufenen Benutzer.
+     *
+     * @param mailOfCaller E-Mail Adresse des Benutzers, der die Gruppen abfragt
+     * @param endUser      Benutzer dessen Gruppen abgerufen werden
+     * @return Liste von beigetretenen oder erstellten Nutzergruppen
+     */
+    private List<UserGroupMetaData> listUserGroupMetaData(String mailOfCaller, EndUser endUser) {
+        Integer showPrivateGroupsVisibility = endUser.getShowPrivateGroups();
+        List<String> friends = endUser.getMyFriends();
+        Boolean showPrivateGroups = isVisible(mailOfCaller, endUser.getEmail(),
+                showPrivateGroupsVisibility, friends);
+        List<String> userGroupIds = endUser.getMyUserGroups();
+        UserGroupMetaData userGroup;
+        List<UserGroupMetaData> result = new ArrayList<>();
+        for (String userGroupId : userGroupIds) {
+            userGroup = new GroupEndpoint().getUserGroupMetaData(userGroupId);
+            if (userGroup != null) {
+                if (!userGroup.isOpen() && showPrivateGroups) {
+                    result.add(userGroup);
+                } else if (userGroup.isOpen()) {
+                    result.add(userGroup);
+                }
+            }
+        }
+        return result;
+    }
+
 
     /**
      * ALTE METHODEN

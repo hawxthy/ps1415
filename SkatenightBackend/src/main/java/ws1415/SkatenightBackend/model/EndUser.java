@@ -26,7 +26,7 @@ public class EndUser {
     private Boolean optOutSearch;
     @Persistent
     private Integer showPrivateGroups;
-    @Persistent
+    @Persistent(defaultFetchGroup = "true")
     private BlobKey pictureBlobKey;
     @Unowned
     private UserInfo userInfo;

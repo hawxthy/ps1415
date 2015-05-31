@@ -24,31 +24,31 @@ public class UserInfo {
 
     @Persistent(defaultFetchGroup = "true")
     @Embedded(members = {
-            @Persistent(name="value", columns=@Column(name="lastName")),
+            @Persistent(name="value", columns=@Column(name="lastNameValue")),
             @Persistent(name="visibility", columns=@Column(name="lastNameVisibility")),})
     private InfoPair lastName;
 
     @Persistent(defaultFetchGroup = "true")
     @Embedded(members = {
-            @Persistent(name="value", columns=@Column(name="dateOfBirth")),
+            @Persistent(name="value", columns=@Column(name="dateOfBirthValue")),
             @Persistent(name="visibility", columns=@Column(name="dateOfBirthVisibility")),})
     private InfoPair dateOfBirth;
 
     @Persistent(defaultFetchGroup = "true")
     @Embedded(members = {
-            @Persistent(name="value", columns=@Column(name="city")),
+            @Persistent(name="value", columns=@Column(name="cityValue")),
             @Persistent(name="visibility", columns=@Column(name="cityVisibility")),})
     private InfoPair city;
 
     @Persistent(defaultFetchGroup = "true")
     @Embedded(members = {
-            @Persistent(name="value", columns=@Column(name="postalCode")),
+            @Persistent(name="value", columns=@Column(name="postalCodeValue")),
             @Persistent(name="visibility", columns=@Column(name="postalCodeVisibility")),})
     private InfoPair postalCode;
 
     @Persistent(defaultFetchGroup = "true")
     @Embedded(members = {
-            @Persistent(name="value", columns=@Column(name="description")),
+            @Persistent(name="value", columns=@Column(name="descriptionValue")),
             @Persistent(name="visibility", columns=@Column(name="descriptionVisibility")),})
     private InfoPair description;
 

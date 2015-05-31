@@ -12,6 +12,8 @@ import javax.jdo.Query;
 
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.model.EndUser;
+import ws1415.SkatenightBackend.model.Event;
+import ws1415.SkatenightBackend.model.UserGroup;
 
 /**
  * Stellt Hilfsmethoden bereit, die von allen Endpoints der Skatenight-API benötigt werden.
@@ -70,4 +72,67 @@ public abstract class SkatenightServerEndpoint {
         return false;
     }
 
+    /**
+     * In der Liste der beigetretenen Gruppen des Benutzers wird die übergebene Gruppe hinzugefügt.
+     *
+     * @param userMail E-Mail des Benutzers
+     * @param userGroup Nutzergruppe
+     */
+    protected void addGroupToUser(String userMail, UserGroup userGroup) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            endUser.addUserGroup(userGroup);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * In der Liste der beigetretenen Gruppen des Benutzers wird die übergebene Gruppe entfernt.
+     *
+     * @param userMail E-Mail des Benutzers
+     * @param userGroup Nutzergruppe
+     */
+    protected void removeGroupFromUser(String userMail, UserGroup userGroup) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            endUser.removeUserGroup(userGroup);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * In der Liste der teilgenommenen Veranstaltungen des Benutzers wird die übergebene
+     * Veranstaltung hinzugefügt.
+     *
+     * @param userMail E-Mail des Benutzers
+     */
+    protected void addEventToUser(String userMail, Event event) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            endUser.addEvent(event);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * In der Liste der teilgenommenen Veranstaltungen des Benutzers wird die übergebene
+     * Veranstaltung entfernt.
+     *
+     * @param userMail E-Mail des Benutzers
+     */
+    protected void removeEventFromUser(String userMail, Event event) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            endUser.removeEvent(event);
+        } finally {
+            pm.close();
+        }
+    }
 }

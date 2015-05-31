@@ -3,7 +3,6 @@ package ws1415.SkatenightBackend;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
-import com.googlecode.objectify.Key;
 import com.googlecode.objectify.cmd.Query;
 
 import java.io.IOException;
@@ -23,11 +22,11 @@ import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.gcm.Sender;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
+import ws1415.SkatenightBackend.model.Right;
+import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserGroup.BoardEntry;
 import ws1415.SkatenightBackend.transport.UserGroupBlackBoardTransport;
 import ws1415.SkatenightBackend.transport.UserGroupMetaData;
-import ws1415.SkatenightBackend.model.Right;
-import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.transport.UserGroupNewsBoardTransport;
 import ws1415.SkatenightBackend.transport.UserGroupPicture;
 
@@ -59,7 +58,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         ug.setMemberCount(1);
         ug.setOpen(isOpen);
         ofy().save().entity(ug).now();
-        endUser.addUserGroup(ug);
+        addGroupToUser(endUser.getEmail(), ug);
         saveEndUserAndSendNotification(endUser);
     }
 
@@ -189,14 +188,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         group.addGroupMember(endUser.getEmail(), createNewMemberRightsList());
         ofy().save().entity(group).now();
 
-        // Dem EndUser die Nutzergruppe hinzufügen
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            endUser.addUserGroup(group);
-            pm.makePersistent(endUser);
-        } finally {
-            pm.close();
-        }
+        addGroupToUser(endUser.getEmail(), group);
     }
 
     /**
@@ -214,7 +206,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         group.removeGroupMember(user.getEmail());
         ofy().save().entity(group).now();
 
-        removeGroupFromEndUser(group, user.getEmail());
+        removeGroupFromUser(user.getEmail(), group);
     }
 
     /**
@@ -233,7 +225,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             group.removeGroupMember(userName);
             ofy().save().entity(group).now();
 
-            removeGroupFromEndUser(group, userName);
+            removeGroupFromUser(userName, group);
         }else{
             EndpointUtil.throwIfNoRights();
         }
@@ -461,6 +453,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         EndUser user;
         try {
             user = pm.getObjectById(EndUser.class, email);
+            user.getUserInfo();
+            user.getUserLocation();
         } catch (Exception e) {
             user = null;
         } finally {
@@ -480,6 +474,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
     private void saveEndUser(EndUser endUser) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
+            endUser.getUserLocation();
+            endUser.getUserInfo();
             pm.makePersistent(endUser);
         } finally {
             pm.close();
@@ -513,7 +509,6 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
     private void saveEndUserAndSendNotification(EndUser endUser) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            pm.makePersistent(endUser);
             RegistrationManager rm = getRegistrationManager(pm);
             Message m = new Message.Builder()
                     .collapseKey("createUserGroup")
@@ -542,8 +537,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             Set<String> regids = new HashSet<>();
             RegistrationManager rm = getRegistrationManager(pm);
             for (EndUser enduser : members) {
-                enduser.removeUserGroup(group);
-                pm.makePersistent(enduser);
+                removeGroupFromUser(enduser.getEmail(), group);
                 regids.add(rm.getUserIdByMail(enduser.getEmail()));
             }
 
