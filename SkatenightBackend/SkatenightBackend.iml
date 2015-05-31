@@ -49,6 +49,7 @@
     <orderEntry type="library" exported="" name="datanucleus-appengine-2.1.2" level="project" />
     <orderEntry type="library" exported="" name="json-simple-1.1.1" level="project" />
     <orderEntry type="library" exported="" name="objectify-5.1.5" level="project" />
+    <orderEntry type="library" exported="" name="jbcrypt-0.3m" level="project" />
     <orderEntry type="library" exported="" name="appengine-api-1.0-sdk-1.9.8" level="project" />
     <orderEntry type="library" exported="" name="jta-1.1" level="project" />
     <orderEntry type="library" exported="" name="datanucleus-enhancer-3.1.1" level="project" />

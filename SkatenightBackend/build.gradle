@@ -33,6 +33,7 @@ dependencies {
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
     compile "javax.servlet:servlet-api:2.5"
     compile 'com.googlecode.objectify:objectify:5.1.5'
+    compile 'org.mindrot:jbcrypt:0.3m'
 }
 
 appengine {

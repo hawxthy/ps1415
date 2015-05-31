@@ -26,6 +26,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.acl.Group;
+import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.common.model.UserGroupType;
@@ -113,6 +114,26 @@ public class GroupController {
     }
 
     /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um eine Liste von Metadaten zu allen
+     * Nutzergruppen zu erhalten.
+     *
+     * @param handler
+     */
+    public void getUserGroupMetaDatas(ExtendedTaskDelegate handler){
+        new ExtendedTask<Void, Void, List<UserGroupMetaData>>(handler){
+            @Override
+            protected  List<UserGroupMetaData> doInBackground(Void... params){
+                try{
+                    return ServiceProvider.getService().groupEndpoint().getAllUserGroupMetaDatas().execute().getItems();
+                }catch(IOException e){
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        }.execute();
+    }
+
+    /**
      * Methode, welche mit dem GroupEndpoint via den QueryUserGroupsTask
      * kommuniziert um alle UserGroups zu laden
      *
@@ -179,9 +200,9 @@ public class GroupController {
      * @param password Das Password, falls eins beötigt wird kann leer aber nicht null sein
      */
     public void joinUserGroup(ExtendedTaskDelegate handler, String groupName, final String password){
-        new ExtendedTask<String, Void, Void>(handler){
+        new ExtendedTask<String, Void, BooleanWrapper>(handler){
             @Override
-            protected Void doInBackground(String... params){
+            protected BooleanWrapper doInBackground(String... params){
                 try{
                     return ServiceProvider.getService().groupEndpoint().joinUserGroup(params[0], password).execute();
                 }catch(IOException e){
@@ -576,9 +597,9 @@ public class GroupController {
      * @param newPw Das neue Passwort der Nutzergruppe kann nicht null sein
      */
     public void changeUserGroupPassword(ExtendedTaskDelegate handler, String groupName, final String currentPw, final String newPw){
-        new ExtendedTask<String, Void, Void>(handler){
+        new ExtendedTask<String, Void, BooleanWrapper>(handler){
             @Override
-            protected Void doInBackground(String... params){
+            protected BooleanWrapper doInBackground(String... params){
                 try{
                     return ServiceProvider.getService().groupEndpoint().changeUserGroupPassword(params[0], currentPw, newPw).execute();
                 }catch (IOException e){
