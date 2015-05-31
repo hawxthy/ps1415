@@ -71,9 +71,9 @@ public class ConversationActivity extends Activity {
         // Email vom Intent speichern
         Intent intent = getIntent();
         String email = intent.getStringExtra("email");
-        if(email != null) mEmail = email;
+        if (email != null) mEmail = email;
 
-        if(!MessageDbController.getInstance(this).existsConversation(mEmail)) {
+        if (!MessageDbController.getInstance(this).existsConversation(mEmail)) {
             Intent messaging_intent = new Intent(ConversationActivity.this, MessagingActivity.class);
             startActivity(messaging_intent);
             finish();
@@ -106,7 +106,7 @@ public class ConversationActivity extends Activity {
         mImageViewSend.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!sending) {
+                if (!sending) {
                     String input = mEditTextInput.getText().toString();
                     if (input.equals("")) {
                         UniversalUtil.showToast(ConversationActivity.this, getString(R.string.input_required));
@@ -130,7 +130,7 @@ public class ConversationActivity extends Activity {
     }
 
     // Ruft die Nachrichten ab und setzt die Daten im Adapter
-    private void setUpData(){
+    private void setUpData() {
         mAdapter.setUpData(MessageDbController.getInstance(this).getAllMessages(mEmail));
         mListViewMessages.setSelection(mAdapter.getCount() - 1);
     }
@@ -151,7 +151,7 @@ public class ConversationActivity extends Activity {
      * Abmelden des EventBus.
      */
     @Override
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
     }
@@ -161,15 +161,10 @@ public class ConversationActivity extends Activity {
      *
      * @param event Event mit der Email als Information
      */
-    public void onEvent(NewMessageEvent event){
-        if(mEmail != null){
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    setUpData();
-                    MessageDbController.getInstance(ConversationActivity.this).resetNewMessages(mEmail);
-                }
-            });
+    public void onEventMainThread(NewMessageEvent event) {
+        if (mEmail != null) {
+            setUpData();
+            MessageDbController.getInstance(ConversationActivity.this).resetNewMessages(mEmail);
         }
     }
 

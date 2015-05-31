@@ -61,7 +61,7 @@ public class GcmIntentService extends IntentService {
                 MessageType type;
                 try {
                     type = MessageType.valueOf(extras.getString("type"));
-                } catch (IllegalArgumentException e) {
+                } catch (Exception e) {
                     type = null;
                 }
                 switch (type) {

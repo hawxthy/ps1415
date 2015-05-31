@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
 
+import ws1415.ps1415.activity.PermissionManagementActivity;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.FriendsActivity;
@@ -11,7 +12,6 @@ import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.MessagingActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.activity.SearchActivity;
-import ws1415.ps1415.activity.UploadImageActivity;
 import ws1415.ps1415.activity.UsergroupActivity;
 
 /**
@@ -122,6 +122,25 @@ public class NavDrawerList {
                     Intent search_intent = new Intent(parent.getContext(), SearchActivity.class);
                     search_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(search_intent);
+                }
+            },
+
+            // ---------- Rechteverwaltung ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.permission_management;
+                }
+
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_action_accounts;
+                }
+
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent admins_intent = new Intent(parent.getContext(), PermissionManagementActivity.class);
+                    parent.getContext().startActivity(admins_intent);
                 }
             }
     };

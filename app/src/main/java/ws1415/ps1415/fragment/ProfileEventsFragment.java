@@ -7,12 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.skatenight.skatenightAPI.model.EventMetaData;
-
-import java.util.List;
+import com.skatenight.skatenightAPI.model.EventFilter;
 
 import ws1415.ps1415.R;
-import ws1415.ps1415.adapter.ProfileEventAdapter;
+import ws1415.ps1415.adapter.EventAdapter;
 
 /**
  * Das ProfileEventsFragment wird zur Anzeige der Veranstaltungen eines Benutzers verwendet.
@@ -21,7 +19,7 @@ import ws1415.ps1415.adapter.ProfileEventAdapter;
  */
 public class ProfileEventsFragment extends Fragment {
     private ListView mEventListView;
-    private ProfileEventAdapter mAdapter;
+    private EventAdapter mAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -37,10 +35,13 @@ public class ProfileEventsFragment extends Fragment {
     /**
      * Füllt die Liste mit den übergebenen Informationen.
      *
-     * @param data Informationen
+     * @param userMail E-Mail Adresse des Benutzers
      */
-    public void setUpData(List<EventMetaData> data){
-        if(this.getActivity() != null) mAdapter = new ProfileEventAdapter(data, this.getActivity());
+    public void setUpData(String userMail){
+        EventFilter eventFiler = new EventFilter();
+        eventFiler.setUserId(userMail);
+        eventFiler.setLimit(10);
+        if(this.getActivity() != null) mAdapter = new EventAdapter(this.getActivity(), eventFiler);
         if(mEventListView != null) mEventListView.setAdapter(mAdapter);
     }
 }

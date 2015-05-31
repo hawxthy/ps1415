@@ -3,9 +3,7 @@ package ws1415.ps1415.controller;
 import android.test.suitebuilder.annotation.SmallTest;
 
 import com.skatenight.skatenightAPI.model.EndUser;
-import com.skatenight.skatenightAPI.model.UserListData;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -15,8 +13,6 @@ import ws1415.AuthenticatedAndroidTestCase;
 import ws1415.ps1415.model.GlobalRole;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.controller.RoleController;
-import ws1415.ps1415.controller.UserController;
 
 /**
  * Dient dazu Funktionalitäten zu testen, die mit globalen Rollen zu tun haben.
@@ -84,9 +80,10 @@ public class RoleControllerTest extends AuthenticatedAndroidTestCase {
     @SmallTest
     public void testAssignGlobalRole() throws InterruptedException {
         final CountDownLatch assignSignal = new CountDownLatch(1);
-        RoleController.assignGlobalRole(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        RoleController.assignGlobalRole(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void avoid) {
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                assertTrue(aBoolean);
                 assignSignal.countDown();
             }
         }, TEST_MAIL, TEST_ROLE);
@@ -111,23 +108,20 @@ public class RoleControllerTest extends AuthenticatedAndroidTestCase {
     @SmallTest
     public void testListGlobalAdmins() throws InterruptedException {
         final CountDownLatch assignSignal = new CountDownLatch(1);
-        RoleController.assignGlobalRole(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        RoleController.assignGlobalRole(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void avoid) {
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                assertTrue(aBoolean);
                 assignSignal.countDown();
             }
         }, TEST_MAIL, TEST_ROLE);
         assertTrue(assignSignal.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch listSignal = new CountDownLatch(1);
-        RoleController.listGlobalAdmins(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
+        RoleController.listGlobalAdmins(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<UserListData> admins){
-                List<String> adminMailsServer = new ArrayList<String>();
-                for(UserListData admin : admins){
-                    adminMailsServer.add(admin.getEmail());
-                }
-                assertTrue(adminMailsServer.containsAll(TEST_MAILS));
+            public void taskDidFinish(ExtendedTask task, List<String> admins){
+                assertTrue(admins.containsAll(TEST_MAILS));
                 listSignal.countDown();
             }
         });

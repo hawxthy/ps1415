@@ -16,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.EventMetaData;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
@@ -32,15 +31,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 
-import ws1415.ps1415.controller.UserController;
+import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.adapter.ProfilePagerAdapter;
+import ws1415.ps1415.controller.MessageDbController;
+import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.model.Conversation;
 import ws1415.ps1415.model.Gender;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
-import ws1415.ps1415.adapter.ProfilePagerAdapter;
-import ws1415.ps1415.controller.MessageDbController;
 import ws1415.ps1415.util.ImageUtil;
 import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.util.UserImageLoader;
@@ -69,7 +68,7 @@ public class ProfileActivity extends FragmentActivity{
     private Bitmap mUserPicture;
     private String email;
 
-    // Feld um zu prüfen, ob gleicher Serveraufruf stattfindet
+    // Feld um zu prüfen, ob Serveraufruf grade läuft stattfindet
     private boolean addingFriendRunning;
 
     @Override
@@ -173,13 +172,13 @@ public class ProfileActivity extends FragmentActivity{
         List<UserGroupMetaData> userGroups = userProfile.getMyUserGroups();
         userGroups = (userGroups == null) ? new ArrayList<UserGroupMetaData>() : userGroups;
         List<EventMetaData> events = userProfile.getMyEvents();
-        events = (events == null) ? new ArrayList<EventMetaData>() : events;
+        int eventListSize = (events == null) ? 0 : events.size();
 
-        EventMetaData test = new EventMetaData();
-        test.setDate(new DateTime(new Date()));
-        test.setTitle("Primary Title");
-        events.add(test);
-        events.add(test);
+//        EventMetaData test = new EventMetaData();
+//        test.setDate(new DateTime(new Date()));
+//        test.setTitle("Primary Title");
+//        events.add(test);
+//        events.add(test);
 
         UserGroupMetaData testGroup = new UserGroupMetaData();
         testGroup.setMemberCount(2);
@@ -200,7 +199,7 @@ public class ProfileActivity extends FragmentActivity{
 
         // Tab setzen
         tabs[0] = getString(R.string.group_tab) + " (" + userGroups.size() + ")";
-        tabs[2] = getString(R.string.events_tab) + " (" + events.size() + ")";
+        tabs[2] = getString(R.string.events_tab) + " (" + eventListSize + ")";
         mTabs.setViewPager(mViewPager);
 
         // Daten für Allgemeines sammeln und Fragment übergeben
@@ -209,7 +208,7 @@ public class ProfileActivity extends FragmentActivity{
         mAdapter.getInfoFragment().setUpData(generalData);
 
         // Daten für Veranstaltungen dem Fragment übergeben
-        mAdapter.getEventFragment().setUpData(events);
+        mAdapter.getEventFragment().setUpData(email);
 
         // Daten für Gruppen dem Fragment übergeben
         mAdapter.getGroupFragment().setUpData(userGroups);

@@ -12,5 +12,6 @@
     <string name="user_groups">Benutzergruppen</string>
     <string name="search">Suche</string>
     <string name="upload_group_image">Upload Group Image</string>
+    <string name="permission_management">Rechteverwaltung</string>
 
 </resources>

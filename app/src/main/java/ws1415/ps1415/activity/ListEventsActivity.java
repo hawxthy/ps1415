@@ -11,12 +11,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+
 import com.skatenight.skatenightAPI.model.EventFilter;
 
-import ws1415.ps1415.gcm.GCMUtil;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.EventAdapter;
 import ws1415.ps1415.fragment.EventListFragment;
+import ws1415.ps1415.gcm.GCMUtil;
 import ws1415.ps1415.util.UniversalUtil;
 
 public class ListEventsActivity extends BaseActivity implements EventListFragment.OnEventClickListener {
@@ -41,14 +42,13 @@ public class ListEventsActivity extends BaseActivity implements EventListFragmen
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         //Prüft ob der Benutzer eingeloggt ist
         if (!UniversalUtil.checkLogin(this)) {
             finish();
-            super.onCreate(savedInstanceState);
             return;
         }
-
-        super.onCreate(savedInstanceState);
 
         // Einstellungen müssen als erstes beim App Start geladenw werden
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);

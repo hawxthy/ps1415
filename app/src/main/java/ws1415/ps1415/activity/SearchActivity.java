@@ -71,13 +71,12 @@ public class SearchActivity extends BaseActivity {
             UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<String>>(){
                 @Override
                 public void taskDidFinish(ExtendedTask task, final List<String> stringList) {
+                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
                     if(stringList == null){
-                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
                         Toast.makeText(SearchActivity.this, getString(R.string.no_user_found), Toast.LENGTH_LONG).show();
                         mAdapter = null;
-                        mResultListView.setAdapter(mAdapter);
+                        mResultListView.setAdapter(null);
                     } else {
-                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
                         setUpList(stringList);
                     }
                 }

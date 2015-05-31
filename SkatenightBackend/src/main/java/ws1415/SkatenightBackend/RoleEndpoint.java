@@ -6,7 +6,6 @@ import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -15,7 +14,7 @@ import javax.jdo.Query;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.GlobalRole;
-import ws1415.SkatenightBackend.transport.UserListData;
+import ws1415.SkatenightBackend.transport.ListWrapper;
 
 /**
  * Der RoleEndpoint stellt Hilfsmethoden bereit, die genutzt werden um die Rollen der Benutzer
@@ -32,16 +31,16 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
      * @return true, falls Benutzer ein Administrator ist, false andernfalls
      */
     @ApiMethod(path = "global_admin")
-    public BooleanWrapper isAdmin(@Named("email") String email){
-        if(!new UserEndpoint().existsUser(email).value){
+    public BooleanWrapper isAdmin(@Named("email") String email) {
+        if (!new UserEndpoint().existsUser(email).value) {
             return new BooleanWrapper(false);
         }
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try{
+        try {
             EndUser endUser = pm.getObjectById(EndUser.class, email);
-            if(endUser.getGlobalRole().equals(GlobalRole.ADMIN.getId())){
+            if (endUser.getGlobalRole().equals(GlobalRole.ADMIN.getId())) {
                 return new BooleanWrapper(true);
-            } else{
+            } else {
                 return new BooleanWrapper(false);
             }
         } finally {
@@ -55,19 +54,18 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
      * @return Liste von Administratoren
      */
     @ApiMethod(path = "global_admin")
-    public List<UserListData> listGlobalAdmins(User user) throws OAuthRequestException {
+    public ListWrapper listGlobalAdmins(User user) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        List<EndUser> adminUsers;
-        List<UserListData> result = new ArrayList<>();
+        List<String> result;
         try {
             Query q = pm.newQuery(EndUser.class);
-            q.setFilter("globalRole == p1");
+            q.setFilter("globalRole == roleParam");
+            q.declareParameters("Integer roleParam");
+            q.setResult("this.email");
 
-            adminUsers = (List<EndUser>) pm.newQuery(q).execute(GlobalRole.ADMIN.getId());
-            for(EndUser adminUser : adminUsers){
-                result.add(new UserEndpoint().getUserInfo(user, adminUser.getEmail()));
-            }
-            return result;
+            result = (List<String>) q.execute(GlobalRole.ADMIN.getId());
+            return new ListWrapper(result);
         } finally {
             pm.close();
         }
@@ -82,16 +80,18 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
      * @throws OAuthRequestException
      */
     @ApiMethod(path = "global_role")
-    public void assignGlobalRole(User user, @Named("userMail") String userMail, @Named("role") int role) throws OAuthRequestException, UnauthorizedException {
-        if (user == null) {
-            throw new OAuthRequestException("no user submitted");
-        } else if(!isAdmin(user.getEmail()).value){
+    public BooleanWrapper assignGlobalRole(User user, @Named("userMail") String userMail, @Named("role") int role) throws OAuthRequestException, UnauthorizedException {
+        EndpointUtil.throwIfNoUser(user);
+        if (!isAdmin(user.getEmail()).value) {
             throw new UnauthorizedException("user is not an admin");
         }
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             endUser.setGlobalRole(role);
+            return new BooleanWrapper(true);
+        } catch (Exception e) {
+            return new BooleanWrapper(false);
         } finally {
             pm.close();
         }

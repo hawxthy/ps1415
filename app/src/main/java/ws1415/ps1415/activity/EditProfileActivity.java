@@ -382,7 +382,7 @@ public class EditProfileActivity extends Activity {
     /**
      * Wird bei einem Fehler beim Updaten des Profils ausgeführt.
      *
-     * @param message
+     * @param message Fehlernachricht
      */
     private void editFailed(String message) {
         setProgressBarIndeterminateVisibility(Boolean.FALSE);

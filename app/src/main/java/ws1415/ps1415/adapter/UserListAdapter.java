@@ -22,11 +22,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.ps1415.R;
+import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
-import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.util.ImageUtil;
 import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.util.UserImageLoader;
@@ -37,7 +37,7 @@ import ws1415.ps1415.util.UserImageLoader;
  * @author Martin Wrodarczyk
  */
 public class UserListAdapter extends BaseAdapter {
-    private static final int NEXT_DATA_COUNT = 15;
+    private static final int DATA_PER_REQUEST = 15;
     private List<String> mailData;
     private List<UserListData> mData;
     private LayoutInflater mInflater;
@@ -48,8 +48,8 @@ public class UserListAdapter extends BaseAdapter {
 
     /**
      * Erwartet die komplette Liste der E-Mail Adressen der Benutzer die angezeigt werden sollen.
-     * Dabei werden zu Beginn nur die ersten NEXT_DATA_COUNT Benutzer angezeigt und beim Scrollen
-     * werden die nächsten NEXT_DATA_COUNT Benutzer geladen.
+     * Dabei werden zu Beginn nur die ersten {@code DATA_PER_REQUEST} Benutzer angezeigt und beim Scrollen
+     * werden die nächsten {@code DATA_PER_REQUEST} Benutzer geladen.
      *
      * @param userMails Liste der E-Mail Adressen
      * @param context Context
@@ -65,10 +65,10 @@ public class UserListAdapter extends BaseAdapter {
     }
 
     /**
-     * Übergibt man statt dem context eine Activity, so wird der FEATURE_INDETERMINATE_PROGRESS beim
-     * Downloaden von neuen Benutzerinformationen angezeigt. Dafür muss bei der übergebenen Activity
-     * zu Beginn von onCreate requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS) ausgeführt
-     * werden.
+     * Übergibt man statt dem context eine Activity, so wird der {@code FEATURE_INDETERMINATE_PROGRESS]
+     * beim Downloaden von neuen Benutzerinformationen angezeigt. Dafür muss bei der übergebenen
+     * Activity zu Beginn von onCreate {@code requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS))
+     * ausgeführt werden.
      *
      * @param userMails
      * @param activity
@@ -92,7 +92,7 @@ public class UserListAdapter extends BaseAdapter {
     private void addNextUserInfo(final List<String> userMails) {
         if (!loadingData) {
             if(mActivity != null) mActivity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
-            int dataSize = (userMails.size() < NEXT_DATA_COUNT) ? userMails.size() : NEXT_DATA_COUNT;
+            int dataSize = (userMails.size() < DATA_PER_REQUEST) ? userMails.size() : DATA_PER_REQUEST;
             final List<String> subList = new ArrayList<>(userMails.subList(0, dataSize));
             loadingData = true;
             UserController.listUserInfo(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {

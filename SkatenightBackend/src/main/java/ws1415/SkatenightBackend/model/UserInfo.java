@@ -13,7 +13,7 @@ import javax.jdo.annotations.PrimaryKey;
  * @author Martin Wrodarczyk
  */
 @PersistenceCapable(detachable="true")
-public class UserInfo {
+public class UserInfo implements javax.jdo.listener.StoreCallback {
     @PrimaryKey
     @Persistent
     private String email;
@@ -21,6 +21,23 @@ public class UserInfo {
     private String firstName;
     @Persistent
     private Integer gender;
+
+    // Wird für die Suche verwendet, da lowerCase und Zusammensetzung von Feldern bei JDO Queries nicht angeboten wird
+    private String fullNameLc;
+    @Override
+    public void jdoPreStore() {
+        InfoPair lastNamePair = getLastName();
+        String lastName = null;
+        if(lastNamePair.getValue() != null && !lastNamePair.getValue().isEmpty() && lastNamePair.
+                getVisibility().equals(Visibility.PUBLIC.getId())) {
+            lastName = lastNamePair.getValue();
+        }
+        String firstName = (this.firstName == null || this.firstName.isEmpty()) ? null : this.firstName;
+        if(firstName != null && lastName != null) fullNameLc = firstName.toLowerCase() + " " + lastName.toLowerCase();
+        else if (firstName != null) fullNameLc = firstName.toLowerCase();
+        else if (lastName != null) fullNameLc = lastName.toLowerCase();
+        else fullNameLc = null;
+    }
 
     @Persistent(defaultFetchGroup = "true")
     @Embedded(members = {

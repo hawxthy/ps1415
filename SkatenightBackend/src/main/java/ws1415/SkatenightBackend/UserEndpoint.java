@@ -322,10 +322,10 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     @ApiMethod(path = "user_info_list")
     public List<UserListData> listUserInfo(User user, @Named("userMails") List<String> userMails) {
         List<UserListData> result = new ArrayList<>();
-        UserListData userInfo;
-        for (String userMail : userMails) {
-            userInfo = getUserInfo(user, userMail);
-            if (userInfo != null) result.add(userInfo);
+            UserListData userInfo;
+            for (String userMail : userMails) {
+                userInfo = getUserInfo(user, userMail);
+                if (userInfo != null) result.add(userInfo);
         }
         return result;
     }
@@ -373,10 +373,10 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             resultMails.addAll(cache);
 
             q = pm.newQuery(UserInfo.class);
-            q.setFilter("firstName.startsWith(inputParam)");
+            q.setFilter("fullNameLc.startsWith(inputParam)");
             q.declareParameters("String inputParam");
             q.setResult("this.email");
-            cache = (List<String>) q.execute(input);
+            cache = (List<String>) q.execute(input.toLowerCase());
             resultMails.addAll(cache);
 
             q = pm.newQuery(UserInfo.class);
