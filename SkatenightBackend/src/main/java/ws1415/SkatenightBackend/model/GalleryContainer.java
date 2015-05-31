@@ -42,4 +42,20 @@ public interface GalleryContainer {
      * @return true, wenn der Benutzer die Gallery löschen darf, sonst false.
      */
     boolean canRemoveGallery(User user);
+
+    /**
+     * Prüft, ob der angegebene Benutzer Gallerien in diesem Container Bilder hinzufügen darf.
+     * @param user                  Der Benutzer, der ein Bild hinzufügen möchte.
+     * @param picture               Das Bild, das hinzugefügt werden soll.
+     * @return true, wenn der Benutzer Bilder hinzufügen darf, sonst false.
+     */
+    boolean canAddPictures(User user, Picture picture);
+
+    /**
+     * Prüft, ob der angegebene Benutzer Bilder aus Gallerien dieses Containers entfernen darf.
+     * @param user                  Der Benutzer, der ein Bild entfernen möchte.
+     * @param picture               Das Bild, das entfernt werden soll.
+     * @return true, wenn der Benutzer das Bild entfernen darf, sonst false.
+     */
+    boolean canRemovePictures(User user, Picture picture);
 }

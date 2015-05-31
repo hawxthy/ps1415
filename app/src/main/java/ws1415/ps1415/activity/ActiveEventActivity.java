@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.EventData;
 
 import java.util.Date;
 import java.util.Timer;
@@ -36,7 +37,7 @@ import ws1415.common.task.GetEventTask;
 import ws1415.ps1415.util.LocalAnalysisData;
 import ws1415.ps1415.util.LocalStorageUtil;
 
-public class ActiveEventActivity extends Activity implements ExtendedTaskDelegate<Void, Event> {
+public class ActiveEventActivity extends Activity implements ExtendedTaskDelegate<Void, EventData> {
     public static final String LOG_TAG = ActiveEventActivity.class.getSimpleName();
     public static final String EXTRA_KEY_ID = "active_event_extra_key_id";
 
@@ -240,7 +241,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         timerTextView.setText(getString(R.string.active_event_timer_format, sign, h, m, s));
     }
 
-    private boolean isEventNull(Event e) {
+    private boolean isEventNull(EventData e) {
         if (e == null) {
             return true;
         }
@@ -255,7 +256,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     }
 
     @Override
-    public void taskDidFinish(ExtendedTask task, Event event) {
+    public void taskDidFinish(ExtendedTask task, EventData event) {
         setProgressBarIndeterminateVisibility(false);
         if (!isEventNull(event)) {
             startDate = new Date(event.getDate().getValue());

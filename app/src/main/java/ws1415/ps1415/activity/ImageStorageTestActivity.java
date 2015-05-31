@@ -4,38 +4,58 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 
-import com.skatenight.skatenightAPI.model.Gallery;
-import com.skatenight.skatenightAPI.model.Picture;
+import com.google.api.client.util.DateTime;
+import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.EventFilter;
+import com.skatenight.skatenightAPI.model.EventMetaData;
+import com.skatenight.skatenightAPI.model.EventMetaDataList;
+import com.skatenight.skatenightAPI.model.PictureData;
+import com.skatenight.skatenightAPI.model.PictureFilter;
+import com.skatenight.skatenightAPI.model.PictureMetaData;
+import com.skatenight.skatenightAPI.model.PictureMetaDataList;
+import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
-import ws1415.common.component.BlobKeyImageView;
+import ws1415.common.controller.EventController;
 import ws1415.common.controller.GalleryController;
+import ws1415.common.model.PictureVisibility;
+import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
+import ws1415.ps1415.adapter.EventAdapter;
 
 public class ImageStorageTestActivity extends BaseActivity {
     private static final int SELECT_IMAGE_REQUEST_CODE = 1;
+    private static final int SELECT_EVENT_ICON_CODE = 2;
 
-    private BlobKeyImageView imageView;
+    private Button btnTestEventsErstellen;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_storage_test);
 
-        imageView = (BlobKeyImageView) findViewById(R.id.imageView);
 
         Button upload = (Button) findViewById(R.id.btnUpload);
         upload.setOnClickListener(new View.OnClickListener() {
@@ -47,18 +67,105 @@ public class ImageStorageTestActivity extends BaseActivity {
                 startActivityForResult(Intent.createChooser(intent, "Bild wählen..."), SELECT_IMAGE_REQUEST_CODE);
             }
         });
-        Button download = (Button) findViewById(R.id.btnDownload);
-        download.setOnClickListener(new View.OnClickListener() {
+        final Button loeschen = (Button) findViewById(R.id.btnLoeschen);
+        loeschen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+                loeschen.setEnabled(false);
+                new AsyncTask<Void, Void, Void>() {
                     @Override
-                    public void taskDidFinish(ExtendedTask task, Picture picture) {
-                        imageView.loadFromBlobKey(picture.getImageBlobKey());
+                    protected Void doInBackground(Void... params) {
+                        final PictureFilter filter = new PictureFilter();
+                        filter.setLimit(10);
+                        filter.setUserId(ServiceProvider.getEmail());
+
+                        final List<PictureMetaData> pictureList = new LinkedList<>();
+                        do {
+                            for (PictureMetaData p : pictureList) {
+                                try {
+                                    ServiceProvider.getService().galleryEndpoint().deletePicture(p.getId()).execute();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            pictureList.clear();
+
+                            try {
+                                PictureMetaDataList result = ServiceProvider.getService().galleryEndpoint().listPictures(filter).execute();
+                                filter.setCursorString(result.getCursorString());
+                                if (result.getList() != null) {
+                                    pictureList.addAll(result.getList());
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } while(!pictureList.isEmpty());
+
+                        loeschen.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                loeschen.setEnabled(true);
+                            }
+                        });
+                        return null;
                     }
-                }, 5751399832879104l);
+                }.execute();
             }
         });
+
+        btnTestEventsErstellen = (Button) findViewById(R.id.testEventsErstellen);
+        btnTestEventsErstellen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                startActivityForResult(Intent.createChooser(intent, "Bild wählen..."), SELECT_EVENT_ICON_CODE);
+            }
+        });
+
+        Button btnEventsLoeschen = (Button) findViewById(R.id.eventsLoeschen);
+        btnEventsLoeschen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        EventFilter filter = new EventFilter();
+                        filter.setLimit(30);
+
+                        final List<EventMetaData> eventsToDelete = new LinkedList<>();
+                        do {
+                            for (EventMetaData event : eventsToDelete) {
+                                try {
+                                    ServiceProvider.getService().eventEndpoint().deleteEvent(event.getId()).execute();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            eventsToDelete.clear();
+
+                            try {
+                                EventMetaDataList result = ServiceProvider.getService().eventEndpoint().listEvents(filter).execute();
+                                if (result.getList() != null) {
+                                    filter.setCursorString(result.getCursorString());
+                                    eventsToDelete.addAll(result.getList());
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        } while(!eventsToDelete.isEmpty());
+                        return null;
+                    }
+                }.execute();
+            }
+        });
+
+        listView = (ListView) findViewById(R.id.eventList);
+        EventFilter filter = new EventFilter();
+        filter.setLimit(10);
+        listView.setAdapter(new EventAdapter(this, filter));
     }
 
     @Override
@@ -103,13 +210,71 @@ public class ImageStorageTestActivity extends BaseActivity {
                     final String tempPath = cursor.getString(column_index);
                     cursor.close();
 
-                    try {
-                        GalleryController.uploadPicture(null, new FileInputStream(new File(tempPath)), "Bildtitel", "Dateipfad: " + tempPath);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                    GalleryController.uploadPicture(null, new File(tempPath), "Bildtitel", "Dateipfad: " + tempPath, PictureVisibility.PRIVATE);
+                }
+                break;
+
+            case SELECT_EVENT_ICON_CODE:
+                if (data != null) {
+                    btnTestEventsErstellen.setEnabled(false);
+
+                    Uri selectedImageUri = data.getData();
+                    String[] projection = {MediaStore.MediaColumns.DATA};
+                    CursorLoader cl = new CursorLoader(this);
+                    cl.setUri(selectedImageUri);
+                    cl.setProjection(projection);
+                    Cursor cursor = cl.loadInBackground();
+                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                    cursor.moveToFirst();
+                    final String tempPath = cursor.getString(column_index);
+                    cursor.close();
+                    final File file = new File(tempPath);
+
+                    new AsyncTask<Void, Void, Void>() {
+
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            Route route = new Route();
+                            route.setName("Test");
+                            route.setLength("10 km");
+                            try {
+                                route = ServiceProvider.getService().routeEndpoint().addRoute(route).execute();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            long time = new Date().getTime();
+                            for (int i = 1; i <= 30; i++) {
+                                final int index = i;
+                                Event event = new Event();
+                                event.setDescription(new Text().setValue("Beschreibung"));
+                                event.setMeetingPlace("Münster");
+                                event.setFee(100);
+                                event.setRoute(route);
+                                event.setTitle("Testevent #" + i);
+                                event.setDate(new DateTime(time + i * 86400000));
+                                EventController.createEvent(new ExtendedTaskDelegateAdapter<Void, Event>() {
+                                    @Override
+                                    public void taskDidFinish(ExtendedTask task, Event event) {
+                                        Log.d("TEST", "Testevent #" + index + " erstellt");
+                                    }
+                                }, event, file, file, Arrays.asList(file));
+                            }
+                            btnTestEventsErstellen.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    btnTestEventsErstellen.setEnabled(true);
+                                }
+                            });
+                            return null;
+                        }
+                    }.execute();
                 }
                 break;
         }
+    }
+
+    public void refreshList(View view) {
+        ((EventAdapter) listView.getAdapter()).refresh();
     }
 }

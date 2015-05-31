@@ -52,70 +52,70 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
                                         @Named("latitudes") String latitudeParam,
                                         @Named("longitudes") String longitudeParam,
                                         @Named("currentEventId") long currentEventId) {
-        StringTokenizer st = new StringTokenizer(mailParam, "=");
-        String[] mail = new String[st.countTokens()];
-        for (int i = 0; i < mail.length; i++) {
-            mail[i] = st.nextToken();
-        }
-        st = new StringTokenizer(latitudeParam, "=");
-        double[] latitude = new double[st.countTokens()];
-        for (int i = 0; i < mail.length; i++) {
-            latitude[i] = Double.parseDouble(st.nextToken());
-        }
-        st = new StringTokenizer(longitudeParam, "=");
-        double[] longitude = new double[st.countTokens()];
-        for (int i = 0; i < mail.length; i++) {
-            longitude[i] = Double.parseDouble(st.nextToken());
-        }
-
-        if (mail != null && latitude != null && longitude != null) {
-            Event event = new EventEndpoint().getEvent(currentEventId);
-            int count = Math.min(mail.length, Math.min(latitude.length, longitude.length));
-
-            EndUser admin = new UserEndpoint().getFullUser("richard-schulze@online.de");
-
-            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-            UserGroup group = new GroupEndpoint().getUserGroup("Simulationsgruppe");
-            if (group == null) {
-                UserGroup ug = new UserGroup(admin.getEmail());
-                ug.setName("Simulationsgruppe");
-                admin.addUserGroup(ug);
-                pm.makePersistent(admin);
-                pm.makePersistent(ug);
-            }
-            try {
-                // Member-Objekte laden. Falls für eine angegebene Mail-Adresse kein Objekt besteht,
-                // so wird es angelegt
-                Member member;
-                for (int i = 0; i < count; i++) {
-                    try {
-                        member = pm.getObjectById(Member.class, mail[i]);
-                    } catch (Exception ex) {
-                        // Skater nicht gefunden
-                        member = new Member();
-                        member.setEmail(mail[i]);
-                        member.setName(mail[i]);
-                    }
-                    // Member zum Event hinzufügen, falls noch nicht geschehen
-                    if (!event.getMemberList().containsKey(member.getEmail())) {
-                        event.getMemberList().put(member.getEmail(), EventRole.PARTICIPANT);
-                    }
-                    // Member in die Testgruppe aufnehmen, falls noch nicht geschehen
-                    if (!member.getGroups().contains(group.getName())) {
-                        member.addGroup(group);
-                    }
-                    pm.makePersistent(member);
-                }
-                pm.makePersistent(event);
-                pm.makePersistent(group);
-            } finally {
-                pm.close();
-            }
-
-            for (int i = 0; i < count; i++) {
-                //updateMemberLocation(mail[i], latitude[i], longitude[i], currentEventId);
-            }
-        }
+//        StringTokenizer st = new StringTokenizer(mailParam, "=");
+//        String[] mail = new String[st.countTokens()];
+//        for (int i = 0; i < mail.length; i++) {
+//            mail[i] = st.nextToken();
+//        }
+//        st = new StringTokenizer(latitudeParam, "=");
+//        double[] latitude = new double[st.countTokens()];
+//        for (int i = 0; i < mail.length; i++) {
+//            latitude[i] = Double.parseDouble(st.nextToken());
+//        }
+//        st = new StringTokenizer(longitudeParam, "=");
+//        double[] longitude = new double[st.countTokens()];
+//        for (int i = 0; i < mail.length; i++) {
+//            longitude[i] = Double.parseDouble(st.nextToken());
+//        }
+//
+//        if (mail != null && latitude != null && longitude != null) {
+//            Event event = new EventEndpoint().getEvent(currentEventId);
+//            int count = Math.min(mail.length, Math.min(latitude.length, longitude.length));
+//
+//            EndUser admin = new UserEndpoint().getFullUser("richard-schulze@online.de");
+//
+//            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+//            UserGroup group = new GroupEndpoint().getUserGroup("Simulationsgruppe");
+//            if (group == null) {
+//                UserGroup ug = new UserGroup(admin.getEmail());
+//                ug.setName("Simulationsgruppe");
+//                admin.addUserGroup(ug);
+//                pm.makePersistent(admin);
+//                pm.makePersistent(ug);
+//            }
+//            try {
+//                // Member-Objekte laden. Falls für eine angegebene Mail-Adresse kein Objekt besteht,
+//                // so wird es angelegt
+//                Member member;
+//                for (int i = 0; i < count; i++) {
+//                    try {
+//                        member = pm.getObjectById(Member.class, mail[i]);
+//                    } catch (Exception ex) {
+//                        // Skater nicht gefunden
+//                        member = new Member();
+//                        member.setEmail(mail[i]);
+//                        member.setName(mail[i]);
+//                    }
+//                    // Member zum Event hinzufügen, falls noch nicht geschehen
+//                    if (!event.getMemberList().containsKey(member.getEmail())) {
+//                        event.getMemberList().put(member.getEmail(), EventRole.PARTICIPANT);
+//                    }
+//                    // Member in die Testgruppe aufnehmen, falls noch nicht geschehen
+//                    if (!member.getGroups().contains(group.getName())) {
+//                        member.addGroup(group);
+//                    }
+//                    pm.makePersistent(member);
+//                }
+//                pm.makePersistent(event);
+//                pm.makePersistent(group);
+//            } finally {
+//                pm.close();
+//            }
+//
+//            for (int i = 0; i < count; i++) {
+//                //updateMemberLocation(mail[i], latitude[i], longitude[i], currentEventId);
+//            }
+//        }
     }
 
     protected void calculateCurrentWaypoint(UserLocation userLocation) {

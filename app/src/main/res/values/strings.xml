@@ -4,8 +4,9 @@
     <string name="app_name">Skatenight</string>
     <string name="title_activity_showinformation">Downloading...</string>
     <string name="title_activity_show_route">Route</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+    <string name="loading">Loading…</string>
 
     <!-- Navigation Drawer -->
     <string name="drawer_open">Slider Menu Opened</string>
@@ -243,4 +244,13 @@
     <string name="input_required">Input required</string>
     <string name="input_message">Enter your message</string>
     <string name="message_could_not_be_sent">Message couldn\'t be delivered</string>
+
+    <!-- EventAdapter -->
+    <string name="event_adapter_fetch_error">No additional events could be fetched</string>
+
+    <!-- ShowEventActivity -->
+    <string name="meeting_place_label">Meeting place:</string>
+    <string name="fee_label">Fee:</string>
+    <string name="event_loading_error">Error loading event</string>
+
 </resources>

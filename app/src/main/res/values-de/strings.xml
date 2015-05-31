@@ -4,8 +4,9 @@
     <string name="app_name">Skatenight</string>
     <string name="title_activity_showinformation">Wird abgerufen...</string>
     <string name="title_activity_show_route">Strecke</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Einstellungen</string>
+
+    <string name="loading">Lädt…</string>
 
     <!-- Navigation Drawer -->
     <string name="drawer_open">Slider Menu geöffnet</string>
@@ -227,4 +228,12 @@
     <string name="title_activity_conversation">Konversation</string>
     <string name="input_message">Nachricht eingeben</string>
     <string name="message_could_not_be_sent">Nachricht konnte nicht zugestellt werden</string>
+
+    <!-- EventAdapter -->
+    <string name="event_adapter_fetch_error">Es konnten keine weiteren Events abgerufen werden</string>
+
+    <!-- ShowEventActivity -->
+    <string name="meeting_place_label">Treffpunkt:</string>
+    <string name="fee_label">Gebühr:</string>
+    <string name="event_loading_error">Fehler beim Laden des Events</string>
 </resources>

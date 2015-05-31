@@ -24,7 +24,7 @@ import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.SettingsActivity;
-import ws1415.ps1415.activity.ShowEventsActivity;
+import ws1415.ps1415.activity.ListEventsActivity;
 
 /**
  * Testet den User Case "Übertragung der aktuellen Position an den Server".
@@ -32,11 +32,11 @@ import ws1415.ps1415.activity.ShowEventsActivity;
  *
  * @author Tristan Rust
  */
-public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<ShowEventsActivity> {
+public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<ListEventsActivity> {
 
-    private ShowEventsActivity mActivity;
+    private ListEventsActivity mActivity;
 
-    // ShowEventsActivity UI Elemente
+    // ListEventsActivity UI Elemente
     private ListView mList;
     private ListAdapter mListData;
 
@@ -48,7 +48,7 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
     private final LatLng TEST_POSITION     = new LatLng(35.660866, 108.808594); // Somewhere in China
 
     public SendCurrentPositionTest() {
-        super(ShowEventsActivity.class);
+        super(ListEventsActivity.class);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
         // Touchmode ausschalten, damit auch die UI Elemente getestet werden können
         setActivityInitialTouchMode(false);
 
-        // Die ShowEventsActivity starten
+        // Die ListEventsActivity starten
         mActivity = getActivity();
         // Löschen der Voreinstellungen
         // Alles in den SharedPreferences löschen
@@ -76,7 +76,7 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Sh
 
         Thread.sleep(5000); // Zeit zum initialisieren
         // Holt sich die Event Listen-Elemente
-        mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
+        mList = (ListView) mActivity.findViewById(R.id.eventList);
         mListData = mList.getAdapter();
         Thread.sleep(2000); // Zeit zum initialisieren
 

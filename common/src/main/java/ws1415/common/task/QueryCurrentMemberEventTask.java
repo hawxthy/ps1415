@@ -1,6 +1,7 @@
 package ws1415.common.task;
 
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.Member;
 
 import ws1415.common.task.ExtendedTask;
@@ -10,7 +11,7 @@ import ws1415.common.net.ServiceProvider;
 /**
  * Created by Pascal Otto on 09.12.14.
  */
-public class QueryCurrentMemberEventTask extends ExtendedTask<Void, Void, Event> {
+public class QueryCurrentMemberEventTask extends ExtendedTask<Void, Void, EventData> {
     private String email;
 
     public QueryCurrentMemberEventTask(ExtendedTaskDelegate delegate, String email) {
@@ -19,11 +20,11 @@ public class QueryCurrentMemberEventTask extends ExtendedTask<Void, Void, Event>
     }
 
     @Override
-    protected Event doInBackground(Void... params) {
+    protected EventData doInBackground(Void... params) {
         try {
             Member m = ServiceProvider.getService().userEndpoint().getMember(email).execute();
             // TODO: Fehler, wenn Teilnehmer zu keinem Event angemeldet ist
-            Event e = ServiceProvider.getService().eventEndpoint().getEvent(m.getCurrentEventId()).execute();
+            EventData e = ServiceProvider.getService().eventEndpoint().getEvent(m.getCurrentEventId()).execute();
             return e;
         }
         catch (Exception e) {

@@ -24,8 +24,8 @@ import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.common.net.ServiceProvider;
+import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.SettingsActivity;
-import ws1415.ps1415.activity.ShowEventsActivity;
 
 import ws1415.ps1415.activity.ShowInformationActivity;
 
@@ -35,9 +35,9 @@ import ws1415.ps1415.activity.ShowInformationActivity;
  *
  * @author Tristan Rust
  */
-public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<ShowEventsActivity> {
+public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<ListEventsActivity> {
 
-    private ShowEventsActivity mActivity;
+    private ListEventsActivity mActivity;
 
     // Test Daten zur Positionsübertragung
     private final String TEST_EMAIL        = "tristan.rust@googlemail.com";
@@ -51,7 +51,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
     private Event mEvent;
 
     public SendPositionSettingsTest() {
-        super(ShowEventsActivity.class);
+        super(ListEventsActivity.class);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
         // Touchmode ausschalten, damit auch die UI Elemente getestet werden können
         setActivityInitialTouchMode(false);
 
-        // Die ShowEventsActivity starten
+        // Die ListEventsActivity starten
         getInstrumentation().getTargetContext().getApplicationContext();
         mActivity = getActivity();
         // Löschen der Voreinstellungen // wird nicht mehr benötigt
@@ -79,7 +79,7 @@ public class SendPositionSettingsTest extends ActivityInstrumentationTestCase2<S
 
         Thread.sleep(5000); // Zeit zum initialisieren
         // Holt sich die Event Listen-Elemente
-        mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
+        mList = (ListView) mActivity.findViewById(R.id.eventList);
         mListData = mList.getAdapter();
         Thread.sleep(2000); // Zeit zum initialisieren
 

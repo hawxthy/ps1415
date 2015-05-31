@@ -3,6 +3,7 @@ package ws1415.veranstalterapp.task;
 
 import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
@@ -96,12 +97,12 @@ public class GetEventTaskTest extends AuthTaskTestCase {
 
     public void testTask() throws IOException{
         // Event mit getEvent vom Server abrufen und mit event vergleichen
-        Event testEvent = ServiceProvider.getService().eventEndpoint().getEvent(event1.getId()).execute();
+        EventData testEvent = ServiceProvider.getService().eventEndpoint().getEvent(event1.getId()).execute();
 
         assertEquals("Der Title stimmt nicht überein", event1.getTitle(), testEvent.getTitle());
         assertEquals("Die Fee stimmt nicht überein", event1.getFee(), testEvent.getFee());
         assertEquals("Die Location stimmt nicht überein", event1.getMeetingPlace(), testEvent.getMeetingPlace());
-        assertEquals("Die Beschreibung stimmt nicht überein", event1.getDescription().getValue(), testEvent.getDescription().getValue());
+        assertEquals("Die Beschreibung stimmt nicht überein", event1.getDescription().getValue(), testEvent.getDescription());
         assertEquals("Der Routenname stimmt nicht überein", event1.getRoute().getName(), testEvent.getRoute().getName());
 
         // Bestehende Events löschen

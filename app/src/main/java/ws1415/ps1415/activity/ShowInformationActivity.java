@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.EventData;
 
 import java.util.Date;
 
@@ -49,7 +50,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     private boolean attending;
 
     // Das aktuelle Event
-    private Event event;
+    private EventData event;
     // Ob das Event gerade aktiv
     private boolean active;
     private Date startDate;
@@ -75,9 +76,9 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
 
         if ((intent = getIntent()) != null) {
             keyId = intent.getLongExtra(EXTRA_KEY_ID, 0);
-            new GetEventTask(new ExtendedTaskDelegateAdapter<Void, Event>() {
+            new GetEventTask(new ExtendedTaskDelegateAdapter<Void, EventData>() {
                 @Override
-                public void taskDidFinish(ExtendedTask task, Event event) {
+                public void taskDidFinish(ExtendedTask task, EventData event) {
                     setEventInformation(event);
                 }
             }).execute(keyId);
@@ -163,7 +164,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     //     return listAdapter;
     // }
 
-    public Event getEvent() {
+    public EventData getEvent() {
         return event;
     }
 
@@ -172,7 +173,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
      *
      * @param e Das neue Event-Objekt.
      */
-    public void setEventInformation(Event e) {
+    public void setEventInformation(EventData e) {
         Button attendButton = (Button) findViewById(R.id.show_info_attend_button);
         if (e != null) {
             event = e;
@@ -224,7 +225,7 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
     @Override
     public void taskDidFinish(ExtendedTask task, Object result) {
         if (task instanceof GetEventTask) {
-            setEventInformation((Event) result);
+            setEventInformation((EventData) result);
         }
         else if (task instanceof ToggleMemberEventAttendanceTask) {
             attending = (Boolean) result;
@@ -235,9 +236,9 @@ public class ShowInformationActivity extends Activity implements ExtendedTaskDel
                     prefs.edit().remove(Long.toString(keyId))
                             .commit();
                 }
-                new GetEventTask(new ExtendedTaskDelegate<Void, Event>() {
+                new GetEventTask(new ExtendedTaskDelegate<Void, EventData>() {
                     @Override
-                    public void taskDidFinish(ExtendedTask task, Event e) {
+                    public void taskDidFinish(ExtendedTask task, EventData e) {
                         Date startDate = new Date(e.getDate().getValue());
                         LocationTransmitterService.ScheduleService(ShowInformationActivity.this, keyId, startDate);
                     }

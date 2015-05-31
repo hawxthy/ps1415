@@ -14,7 +14,8 @@ public enum EventRole {
             Privilege.DELETE_EVENT,
             Privilege.ADD_GALLERY,
             Privilege.EDIT_GALLERY,
-            Privilege.REMOVE_GALLERY
+            Privilege.REMOVE_GALLERY,
+            Privilege.REMOVE_PICTURES
     )),
     MEDIC(null),
     MARSHALL(null),

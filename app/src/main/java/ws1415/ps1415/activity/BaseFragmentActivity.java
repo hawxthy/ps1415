@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -108,7 +107,7 @@ public class BaseFragmentActivity extends FragmentActivity {
         private void selectItem(int position) {
             switch(position){
                 case 0:
-                    Intent show_events_intent = new Intent(BaseFragmentActivity.this, ShowEventsActivity.class);
+                    Intent show_events_intent = new Intent(BaseFragmentActivity.this, ListEventsActivity.class);
                     show_events_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(show_events_intent);
                     break;

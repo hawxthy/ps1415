@@ -2,6 +2,7 @@ package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
+import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.datastore.Cursor;
@@ -9,17 +10,23 @@ import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.GalleryContainer;
 import ws1415.SkatenightBackend.model.Picture;
-import ws1415.SkatenightBackend.transport.GalleryViewOptions;
+import ws1415.SkatenightBackend.model.PictureVisibility;
+import ws1415.SkatenightBackend.transport.GalleryMetaData;
+import ws1415.SkatenightBackend.transport.PictureFilter;
+import ws1415.SkatenightBackend.transport.PictureData;
 import ws1415.SkatenightBackend.transport.PictureMetaData;
 import ws1415.SkatenightBackend.transport.PictureMetaDataList;
 
@@ -30,20 +37,22 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * @author Richard Schulze
  */
 public class GalleryEndpoint extends SkatenightServerEndpoint {
+    private Logger log = Logger.getLogger(GalleryEndpoint.class.getName());
+
     private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
     /**
-     * Ruft die Gallery mit der angegebenen ID ab.
+     * Ruft die Metadaten der Gallery mit der angegebenen ID ab.
      * @param user         Der Benutzer, der die Gallery abrufen möchte.
      * @param galleryId    Die ID der abzurufenden Gallery.
      * @return Die Gallery mit der angegebenen ID.
      */
-    public Gallery getGallery(User user, @Named("galleryId") long galleryId) throws OAuthRequestException {
+    public GalleryMetaData getGalleryMetaData(User user, @Named("galleryId") long galleryId) throws OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
         // TODO Rechte des Benutzers prüfen
-        return ofy().load().type(Gallery.class).id(galleryId).safe();
+        return new GalleryMetaData(ofy().load().type(Gallery.class).id(galleryId).safe());
     }
 
     /**
@@ -136,6 +145,12 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         container.removeGallery(user, gallery);
         ofy().save().entity(container).now();
 
+        // Die Gallery aus allen Bildern entfernen, die die Gallery referenzieren
+        for (Picture p : gallery.getPictures()) {
+            p.removeGallery(gallery);
+        }
+        ofy().save().entities(gallery.getPictures()).now();
+
         ofy().delete().entity(gallery).now();
     }
 
@@ -143,29 +158,83 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
      * Gibt eine Liste von Bild-Metadaten zurück, die anhand der übergebenen ViewOptions ausgewählt
      * werden.
      * Für diese Methode ist explizit angegeben, dass sie die HTTP-Methode POST verwendet, damit der
-     * Parameter {@code viewOptions} übertragen werden kann.
+     * Parameter {@code filter} übertragen werden kann.
      * @param user           Der aufrufende Benutzer.
-     * @param viewOptions    Die anzuwendenden ViewOptions.
+     * @param filter    Die anzuwendenden ViewOptions. Falls sowohl eine Gallery- als auch eine
+     *                       User-ID angegeben ist, so wird die User-ID ignoriert.
      * @return Eine Liste von Bild-Metadaten, die anhand der ViewOptions ausgewählt werden.
      */
     @ApiMethod(httpMethod = "POST")
-    public PictureMetaDataList listPictures(User user, GalleryViewOptions viewOptions) throws OAuthRequestException {
+    public PictureMetaDataList listPictures(User user, PictureFilter filter) throws OAuthRequestException, UnauthorizedException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
+        if (filter == null) {
+            throw new NullPointerException("no filter submitted");
+        }
+        if (filter.getLimit() <= 0 || (filter.getGalleryId() == null && filter.getUserId() == null)) {
+            throw new IllegalArgumentException("invalid filter: limit has to be positive and either galleryId or userId has to be non-null");
+        }
 
-        // TODO Filtern nach Gallery implementieren
-        Query<Picture> q = ofy().load().group(PictureMetaData.class).type(Picture.class).limit(viewOptions.getLimit());
-        if (viewOptions.getCursorString() != null) {
-            q = q.startAt(Cursor.fromWebSafeString(viewOptions.getCursorString()));
+        Query<Picture> q = ofy().load().group(PictureMetaData.class).type(Picture.class).limit(filter.getLimit());
+        if (filter.getGalleryId() != null) {
+            // Nach Gallery filtern
+            q = q.filter("galleries", Ref.create(Key.create(Gallery.class, filter.getGalleryId())));
+        } else {
+            // Nach aufrufendem Benutzer als Uploader filtern
+            q = q.filter("uploader", filter.getUserId());
+        }
+        q = q.order("-date");
+        if (filter.getCursorString() != null) {
+            q = q.startAt(Cursor.fromWebSafeString(filter.getCursorString()));
         }
         QueryResultIterator<Picture> iterator = q.iterator();
+
+        // Minimale Sichtbarkeitseinstellung bestimmen, bei der der aufrufende Benutzer ein Bild abrufen darf
+        PictureVisibility minVisibility;
+        if (filter.getGalleryId() != null) {
+            Gallery gallery = ofy().load().type(Gallery.class).id(filter.getGalleryId()).safe();
+            if (gallery.getContainerClass().equals("User")/* && id == ... */) {
+                // TODO Fall implementieren: Es wird eine Benutzergallery abgerufen
+                // Hier muss wieder geprüft werden, ob der Benutzer, dessen Gallery abgerufen wird,
+                // ein Freund ist
+                minVisibility = null;
+            } else {
+                // Es wird eine öffentliche Gallery (z.B. von einem Event) abgerufen
+                // Da einer öffentlichen Gallery nur öffentliche Bilder hinzugefügt werden können,
+                // muss hier nicht in gesonderter Form auf die Sichtabrkeit geachtet werden.
+                minVisibility = PictureVisibility.PUBLIC;
+            }
+        } else {
+            if (user.getEmail().equals(filter.getUserId())) {
+                // Falls der Benutzer seine eigenen Bilder abruft
+                minVisibility = PictureVisibility.PRIVATE;
+            } else {
+                // Sonst testen, ob der abrufende Benutzer ein Freund ist
+                boolean friend = new UserEndpoint().isFriendWith(filter.getUserId(), user.getEmail());
+
+                if (friend) {
+                    minVisibility = PictureVisibility.FRIENDS;
+                } else {
+                    minVisibility = PictureVisibility.PUBLIC;
+                }
+            }
+        }
 
         PictureMetaDataList result = new PictureMetaDataList();
         result.setList(new LinkedList<PictureMetaData>());
         int count = 0;
-        while (count < viewOptions.getLimit() && iterator.hasNext()) {
-            result.getList().add(new PictureMetaData(iterator.next()));
+        Picture tmpPicture;
+        PictureMetaData tmpMetaData;
+        while (count < filter.getLimit() && iterator.hasNext()) {
+            tmpPicture = iterator.next();
+            if (tmpPicture.getVisibility().compareTo(minVisibility) >= 0) {
+                tmpMetaData = new PictureMetaData(tmpPicture);
+            } else {
+                tmpMetaData = new PictureMetaData();
+                tmpMetaData.setId(-1l);
+            }
+            result.getList().add(tmpMetaData);
             count++;
         }
         result.setCursorString(iterator.getCursor().toWebSafeString());
@@ -181,13 +250,15 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
      * @param user           Der Benutzer, der das Bild erstellt.
      * @param title          Der Titel des Bildes.
      * @param description    Die Beschreibung des Bildes.
+     * @param visibility     Die Sichtbarkeitseinstellung für das Bild.
      * @return Das auf dem Server erstellte Picture-Objekt.
      */
-    public Picture createPicture(User user, @Named("title") String title, @Named("description") String description) throws OAuthRequestException {
+    public Picture createPicture(User user, @Named("title") String title, @Named("description") String description,
+                                 @Named("visibility") PictureVisibility visibility) throws OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        if (title == null || title.isEmpty() || description == null || description.isEmpty()) {
+        if (title == null || title.isEmpty() || description == null || description.isEmpty() || visibility == null) {
             throw new IllegalArgumentException("invalid picture parameters");
         }
 
@@ -196,6 +267,7 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         picture.setDate(new Date());
         picture.setUploader(user.getEmail());
         picture.setDescription(new Text(description));
+        picture.setVisibility(visibility);
         picture.setUploadUrl(blobstoreService.createUploadUrl("/images/upload"));
         ofy().save().entity(picture).now();
 
@@ -207,10 +279,13 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
      * @param id Die ID des abzurufenden Picture-Objekts.
      * @return Das Picture-Objekt mit der angegebenen ID.
      */
-    public Picture getPicture(@Named("id") long id) {
-        // TODO Eventuell mit User-Parameter sichern
-        // TODO Nur die durchschnittliche und die eigene Bewertung an die App übertragen
-        return ofy().load().type(Picture.class).id(id).safe();
+    public PictureData getPicture(User user, @Named("id") long id) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+
+        // TODO Sichtbarkeitseinstellungen implementieren
+        return new PictureData(user, ofy().load().type(Picture.class).id(id).safe());
     }
 
     /**
@@ -229,7 +304,12 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
                 throw new OAuthRequestException("user is not the uploader of the picture and not an admin");
             }
 
-            // TODO Bild aus allen Alben löschen, in denen es enthalten ist
+            // Das Bild aus allen Gallerien entfernen, in denen es referenziert wird
+            for (Gallery gallery : picture.getGalleries()) {
+                gallery.removePicture(picture);
+            }
+            ofy().save().entities(picture.getGalleries()).now();
+
             // Blob aus dem Blobstore löschen
             if (picture.getImageBlobKey() != null) {
                 blobstoreService.delete(picture.getImageBlobKey());
@@ -253,7 +333,7 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
             throw new IllegalArgumentException("rating has to be in [0;5]");
         }
 
-        Picture picture = ofy().load().type(Picture.class).id(pictureId).safe();
+        Picture picture = ofy().load().group(PictureMetaData.class).type(Picture.class).id(pictureId).safe();
         Map<String, Integer> ratings = picture.getRatings();
         if (ratings == null) {
             ratings = new HashMap<>();
@@ -272,6 +352,72 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         // Rundungsfehler durch das automatische Casten entstehen
         float count = (float) ratings.size();
         picture.setAvgRating(picture.getAvgRating() * (count - 1) / count + rating / count);
+        ofy().save().entity(picture).now();
+    }
+
+    /**
+     * Fügt das Bild mit der angegebenen ID zu der Gallery hinzu.
+     * @param user         Der Benutzer, der das Bild hinzufügen möchte.
+     * @param pictureId    Die ID des hinzuzufügenden Bildes.
+     * @param galleryId    Die ID der Gallery, zu der das Bild hinzugefügt wird.
+     */
+    public void addPictureToGallery(User user, @Named("pictureId") Long pictureId, @Named("galleryId") Long galleryId) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        // TODO Sichtbarkeitseinstellungen von Bildern beachten
+        Gallery gallery = ofy().load().type(Gallery.class).id(galleryId).safe();
+        GalleryContainer container = (GalleryContainer) ofy().load().kind(gallery.getContainerClass()).id(gallery.getContainerId()).safe();
+        Picture picture = ofy().load().type(Picture.class).id(pictureId).safe();
+        if (!container.canAddPictures(user, picture)) {
+            throw new OAuthRequestException("insufficient privileges");
+        }
+        gallery.addPicture(picture);
+        picture.addGallery(gallery);
+        ofy().save().entities(picture, gallery).now();
+    }
+
+    /**
+     * Entfernt das Bild mit der angegebenen ID aus der Gallery.
+     * @param user         Der Benuter, der das Bild entfernen möchte.
+     * @param pictureId    Die ID des zu entfernenden Bildes.
+     * @param galleryId    Die ID der Gallery, aus der das Bild entfernt wird.
+     */
+    public void removePictureFromGallery(User user, @Named("pictureId") long pictureId, @Named("galleryId") long galleryId) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        // TODO Sichtbarkeitseinstellungen von Bildern beachten
+        Gallery gallery = ofy().load().type(Gallery.class).id(galleryId).safe();
+        GalleryContainer container = (GalleryContainer) ofy().load().kind(gallery.getContainerClass()).id(gallery.getContainerId()).safe();
+        Picture picture = ofy().load().type(Picture.class).id(pictureId).safe();
+        if (!container.canRemovePictures(user, picture)) {
+            throw new OAuthRequestException("insufficient privileges");
+        }
+        gallery.removePicture(picture);
+        picture.removeGallery(gallery);
+        ofy().save().entities(picture, gallery).now();
+    }
+
+    /**
+     * Ändert die Sichtbarkeitseinstellung für das Bild mit der angegebenen ID.
+     * @param user          Der Benutzer, der die Scihtbarkeitseinstellung ändert.
+     * @param pictureId     Die ID des Bildes, dessen Sichtbarkeitseinstellung geändert wird.
+     * @param visibility    Die neue Sichtbarkeitseinstellung für das Bild.
+     */
+    public void changeVisibility(User user, @Named("pictureId") long pictureId, @Named("visibility") PictureVisibility visibility) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (visibility == null) {
+            throw new IllegalArgumentException("null is not a valid visibility");
+        }
+        Picture picture = ofy().load().type(Picture.class).id(pictureId).safe();
+        // TODO Eventuell anders bestimmen, wer zum Ändern der Sichtbarkeit berechtigt ist
+        if (!user.getEmail().equals(picture.getUploader())) {
+            throw new OAuthRequestException("insufficient privileges");
+        }
+        picture.setVisibility(visibility);
         ofy().save().entity(picture).now();
     }
 

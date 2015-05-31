@@ -153,21 +153,23 @@ public class RegisterActivity extends Activity {
             UserController.uploadUserPicture(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
-                    if(aBoolean) Toast.makeText(context, "Bild hochgeladen", Toast.LENGTH_LONG).show();
-                    else Toast.makeText(context, "Konnte Bild nicht hochladen", Toast.LENGTH_LONG).show();
-                    context.startActivity(new Intent(RegisterActivity.this, ShowEventsActivity.class));
+                    if (aBoolean)
+                        Toast.makeText(context, "Bild hochgeladen", Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(context, "Konnte Bild nicht hochladen", Toast.LENGTH_LONG).show();
+                    context.startActivity(new Intent(RegisterActivity.this, ListEventsActivity.class));
                     finish();
                 }
 
                 @Override
                 public void taskFailed(ExtendedTask task, String message) {
                     Toast.makeText(getApplicationContext(), "Serverfehler beim Profilbildupload", Toast.LENGTH_LONG).show();
-                    context.startActivity(new Intent(RegisterActivity.this, ShowEventsActivity.class));
+                    context.startActivity(new Intent(RegisterActivity.this, ListEventsActivity.class));
                     finish();
                 }
             }, accountName, ImageUtil.BitmapToInputStream(selectedPicture));
         } else {
-            context.startActivity(new Intent(RegisterActivity.this, ShowEventsActivity.class));
+            context.startActivity(new Intent(RegisterActivity.this, ListEventsActivity.class));
             finish();
         }
     }
@@ -211,7 +213,7 @@ public class RegisterActivity extends Activity {
                     PrefManager.setSelectedUserMail(getApplicationContext(), accountName);
                     ServiceProvider.login(credential);
                     initGCM(context);
-                    context.startActivity(new Intent(RegisterActivity.this, ShowEventsActivity.class));
+                    context.startActivity(new Intent(RegisterActivity.this, ListEventsActivity.class));
                     finish();
                 } else {
                     showProgress(false);

@@ -12,10 +12,13 @@ import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import ws1415.SkatenightBackend.RoleEndpoint;
+import ws1415.SkatenightBackend.UserEndpoint;
 import ws1415.SkatenightBackend.transport.EventMetaData;
 import ws1415.SkatenightBackend.transport.EventParticipationData;
 
@@ -29,6 +32,7 @@ public class Event implements BlobKeyContainer, GalleryContainer {
     private Long id;
     private BlobKey icon;
     private String title;
+    @Index
     private Date date;
     private int routeFieldFirst;
     private int routeFieldLast;
@@ -39,13 +43,15 @@ public class Event implements BlobKeyContainer, GalleryContainer {
     private int fee;
 
     @Load(unless = {EventMetaData.class})
-    private Map<String, EventRole> memberList;
+    private Map<String, EventRole> memberList = new HashMap<>();
     @Load(unless = {EventMetaData.class, EventParticipationData.class})
-    private List<BlobKey> images;
+    private List<BlobKey> images = new LinkedList<>();
     @Load(unless = {EventMetaData.class, EventParticipationData.class})
     @Index
     private Ref<Route> route;
-    private List<Ref<Gallery>> galleries;
+    @Load(unless = {EventMetaData.class, EventParticipationData.class})
+    private List<Ref<Gallery>> galleries = new LinkedList<>();
+    private List<DynamicField> dynamicFields = new LinkedList<>();
 
     /**
      * Speichert die Upload-URL für den Upload in den Blobstore. Dient nur der Übertragung an die App
@@ -195,6 +201,14 @@ public class Event implements BlobKeyContainer, GalleryContainer {
         return imagesUploadUrl;
     }
 
+    public List<DynamicField> getDynamicFields() {
+        return dynamicFields;
+    }
+
+    public void setDynamicFields(List<DynamicField> dynamicFields) {
+        this.dynamicFields = dynamicFields;
+    }
+
     public void setImagesUploadUrl(String imagesUploadUrl) {
         this.imagesUploadUrl = imagesUploadUrl;
     }
@@ -220,10 +234,6 @@ public class Event implements BlobKeyContainer, GalleryContainer {
         }
         if (!canAddGallery(user)) {
             throw new OAuthRequestException("insufficient privileges");
-        }
-
-        if (galleries == null) {
-            galleries = new LinkedList<>();
         }
         galleries.add(Ref.create(gallery));
     }
@@ -261,5 +271,15 @@ public class Event implements BlobKeyContainer, GalleryContainer {
     @Override
     public boolean canRemoveGallery(User user) {
         return memberList.get(user.getEmail()) != null && memberList.get(user.getEmail()).hasPrivilege(Privilege.REMOVE_GALLERY);
+    }
+
+    @Override
+    public boolean canAddPictures(User user, Picture picture) {
+        return memberList.get(user.getEmail()) != null && picture.getVisibility() == PictureVisibility.PUBLIC;
+    }
+
+    @Override
+    public boolean canRemovePictures(User user, Picture picture) {
+        return picture.getUploader().equals(user.getEmail()) || (memberList.get(user.getEmail()) != null && memberList.get(user.getEmail()).hasPrivilege(Privilege.REMOVE_PICTURES));
     }
 }

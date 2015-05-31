@@ -1,11 +1,15 @@
 package ws1415.SkatenightBackend;
 
+import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.cmd.Query;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,10 +18,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
-import javax.management.relation.Role;
 
 import ws1415.SkatenightBackend.gcm.Message;
 import ws1415.SkatenightBackend.gcm.MessageType;
@@ -30,7 +33,10 @@ import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Privilege;
 import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.UserLocation;
+import ws1415.SkatenightBackend.transport.EventData;
+import ws1415.SkatenightBackend.transport.EventFilter;
 import ws1415.SkatenightBackend.transport.EventMetaData;
+import ws1415.SkatenightBackend.transport.EventMetaDataList;
 import ws1415.SkatenightBackend.transport.EventParticipationData;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -40,6 +46,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * @author Richard Schulze
  */
 public class EventEndpoint extends SkatenightServerEndpoint {
+    private static final Logger log = Logger.getLogger(EventEndpoint.class.getName());
+
     private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
     /**
@@ -79,14 +87,44 @@ public class EventEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Gibt eine Liste aller auf dem Server gespeicherter Metadaten von Events zurück.
-     * @return Eine Liste aller auf dem Server gespeicherter EventMetaData-Objekte.
+     * Ruft die Metadaten von Events auf dem Server ab.
+     * Für diese Methode ist explizit angegeben, dass sie die HTTP-Methode POST verwendet, damit der
+     * Parameter {@code filter} übertragen werden kann.
+     * @param user      Der aufrufende Benutzer.
+     * @param filter    Der Filter, nach dem die Events abgerufen werden sollen. Falls keine User-Id
+     *                  im Filter angegeben ist, werden alle Events abgerufen.
+     * @return Eine Liste aller auf dem Server gespeicherter EventMetaData-Objekte, die die Kriterien
+     * des Filters erfüllen.
      */
-    public List<EventMetaData> getEventsMetaData() {
-        List<EventMetaData> result = new LinkedList<>();
-        for (Event e : ofy().load().group(EventMetaData.class).type(Event.class).list()) {
-            result.add(new EventMetaData(e));
+    @ApiMethod(httpMethod = "POST")
+    public EventMetaDataList listEvents(User user, EventFilter filter) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
         }
+        if (filter == null) {
+            throw new IllegalArgumentException("no filter submitted");
+        }
+        if (filter.getLimit() <= 0) {
+            throw new IllegalArgumentException("invalid filter parameters: limit has to be positive");
+        }
+
+        Query<Event> q = ofy().load().group(EventMetaData.class).type(Event.class).limit(filter.getLimit());
+        if (filter.getCursorString() != null) {
+            q = q.startAt(Cursor.fromWebSafeString(filter.getCursorString()));
+        }
+        if (filter.getUserId() != null) {
+            // TODO Die Events abrufen, an denen ein User teilnimmt und prüfen, welche der aufrufende Benutzer davon sehen darf
+        }
+        q = q.order("-date");
+        QueryResultIterator<Event> iterator = q.iterator();
+
+        EventMetaDataList result = new EventMetaDataList();
+        result.setList(new LinkedList<EventMetaData>());
+        while (iterator.hasNext()) {
+            result.getList().add(new EventMetaData(iterator.next()));
+        }
+        result.setCursorString(iterator.getCursor().toWebSafeString());
+
         return result;
     }
 
@@ -95,8 +133,8 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param eventId    Die Id des abzurufenden Events.
      * @return Das Event-Objekt inklusive aller Daten.
      */
-    public Event getEvent(@Named("eventId") long eventId) {
-        return ofy().load().type(Event.class).id(eventId).safe();
+    public EventData getEvent(@Named("eventId") long eventId) {
+        return new EventData(ofy().load().type(Event.class).id(eventId).safe());
     }
 
     /**
@@ -136,6 +174,8 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         event.getMemberList().put(user.getEmail(), EventRole.HOST);
         event.setImagesUploadUrl(blobstoreService.createUploadUrl("/images/upload"));
         ofy().save().entity(event).now();
+
+        // TODO GCM-Nachricht an Geräte schicken, damit Event-Liste aktualisiert wird
 
         return event;
     }
@@ -187,6 +227,11 @@ public class EventEndpoint extends SkatenightServerEndpoint {
                     blobstoreService.delete(key);
                 }
             }
+
+            // TODO Teilnehmer durchgehen und Event entfernen
+
+            // Abhängige Gallerien löschen
+            ofy().delete().entities(event.getGalleries()).now();
             ofy().delete().entity(event).now();
         }
     }
@@ -284,7 +329,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param email die E-Mail des Teilnehmers
      */
     public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
-        Event event = getEvent(keyId);
+        Event event = ofy().load().type(Event.class).id(keyId).safe();
         Set<String> memberKeys = event.getMemberList().keySet();
         if (!memberKeys.contains(email)) {
             event.getMemberList().put(email, EventRole.PARTICIPANT);
@@ -331,7 +376,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param email Die E-Mail des Members
      */
     public void removeMemberFromEvent(@Named("id") long keyId, @Named("email") String email) {
-        Event event = getEvent(keyId);
+        Event event = ofy().load().type(Event.class).id(keyId).safe();
 
         Set<String> memberKeys = event.getMemberList().keySet();
         if (memberKeys.contains(email)) {
@@ -347,7 +392,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @return List von Teilnehmern
      */
     public List<EndUser> getMembersFromEvent(@Named("id") long keyId) {
-        Event event = getEvent(keyId);
+        Event event = ofy().load().type(Event.class).id(keyId).safe();
 
         List<EndUser> endUsers = new ArrayList<>(event.getMemberList().size());
         for (String email: event.getMemberList().keySet()) {
@@ -363,7 +408,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @return
      */
     public List<UserLocation> getMemberLocationsFromEvent(@Named("id") long keyId) {
-        Event event = getEvent(keyId);
+        Event event = ofy().load().type(Event.class).id(keyId).safe();
 
         List<UserLocation> userLocations = new ArrayList<>();
         for (String email: event.getMemberList().keySet()) {
@@ -417,7 +462,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             // Events nocheinmal abrufen, da die Route nicht vollständig über ein QUery abgerufen werden kann
             List<Event> events = new ArrayList<>();
             for (Event e : result) {
-                events.add(getEvent(e.getId()));
+                events.add(ofy().load().type(Event.class).id(e.getId()).safe());
             }
             return events;
         } else {

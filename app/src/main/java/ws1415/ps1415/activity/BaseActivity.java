@@ -124,7 +124,7 @@ public class BaseActivity extends Activity {
                     startActivity(messaging_intent);
                     break;
                 case 3:
-                    Intent show_events_intent = new Intent(BaseActivity.this, ShowEventsActivity.class);
+                    Intent show_events_intent = new Intent(BaseActivity.this, ListEventsActivity.class);
                     show_events_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(show_events_intent);
                     break;

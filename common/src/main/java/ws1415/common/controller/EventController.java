@@ -2,18 +2,26 @@ package ws1415.common.controller;
 
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.Event;
+import com.skatenight.skatenightAPI.model.EventData;
+import com.skatenight.skatenightAPI.model.EventFilter;
 import com.skatenight.skatenightAPI.model.EventMetaData;
+import com.skatenight.skatenightAPI.model.EventMetaDataList;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.EntityUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -56,13 +64,16 @@ public abstract class EventController {
      * Ruft eine Liste aller Events ab, die auf dem Server gespeichert sind. Es werden dabei nur die
      * Metadaten der Events abgerufen.
      * @param handler Der Handler, der die abgerufene Liste übergeben bekommt.
+     * @param filter  Der anzuwendende Filter.
      */
-    public static void listEventsMetaData(ExtendedTaskDelegate<Void, List<EventMetaData>> handler) {
+    public static void listEvents(ExtendedTaskDelegate<Void, List<EventMetaData>> handler, final EventFilter filter) {
         new ExtendedTask<Void, Void, List<EventMetaData>>(handler) {
             @Override
             protected List<EventMetaData> doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().eventEndpoint().getEventsMetaData().execute().getItems();
+                    EventMetaDataList result = ServiceProvider.getService().eventEndpoint().listEvents(filter).execute();
+                    filter.setCursorString(result.getCursorString());
+                    return result.getList();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -75,10 +86,10 @@ public abstract class EventController {
      * @param handler   Der Handler, der das abgerufene Event übergeben bekommt.
      * @param eventId   Die ID des abzurufenden Events.
      */
-    public static void getEvent(ExtendedTaskDelegate<Void, Event> handler, final long eventId) {
-        new ExtendedTask<Void, Void, Event>(handler) {
+    public static void getEvent(ExtendedTaskDelegate<Void, EventData> handler, final long eventId) {
+        new ExtendedTask<Void, Void, EventData>(handler) {
             @Override
-            protected Event doInBackground(Void... params) {
+            protected EventData doInBackground(Void... params) {
                 try {
                     return ServiceProvider.getService().eventEndpoint().getEvent(eventId).execute();
                 } catch (IOException e) {
@@ -89,13 +100,12 @@ public abstract class EventController {
     }
 
     /**
-     * Erstellt das angegebene Event auf dem Server.
+     * TODO Kommentar
      * @param handler    Der Handler, der das erstellte Event übergeben bekommt.
      * @param event      Das zu erstellende Event.
      */
     public static void createEvent(ExtendedTaskDelegate<Void, Event> handler, final Event event,
-                                   final InputStream icon, final InputStream headerImage,
-                                   final List<InputStream> images) {
+                                   final File icon, final File headerImage, final List<File> images) {
         // TODO Ggf. Event auf Gültigkeit prüfen
 
         new ExtendedTask<Void, Void, Event>(handler) {
@@ -111,10 +121,10 @@ public abstract class EventController {
 
                         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-                        builder.addPart("files", new InputStreamBody(icon, "files"));
-                        builder.addPart("files", new InputStreamBody(headerImage, "files"));
-                        for (InputStream is : images) {
-                            builder.addPart("files", new InputStreamBody(is, "files"));
+                        builder.addBinaryBody("files", icon);
+                        builder.addBinaryBody("files", headerImage);
+                        for (File f : images) {
+                            builder.addBinaryBody("files", f);
                         }
                         builder.addTextBody("id", createdEvent.getId().toString());
                         builder.addTextBody("class", "Event");
