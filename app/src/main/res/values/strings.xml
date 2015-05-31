@@ -20,6 +20,7 @@
         <item>User Groups</item>
         <item>Image Storage Test</item>
         <item>Search</item>
+        <item>Upload Group Image</item>
     </string-array>
 
     <array name="nav_drawer_icons">
@@ -253,4 +254,6 @@
     <string name="fee_label">Fee:</string>
     <string name="event_loading_error">Error loading event</string>
 
+    <!-- UploadImageActivity -->
+    <string name="title_activity_upload_image">UploadImageActivity</string>
 </resources>

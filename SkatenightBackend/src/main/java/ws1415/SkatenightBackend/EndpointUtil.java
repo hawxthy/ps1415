@@ -9,7 +9,7 @@ import javax.jdo.PersistenceManager;
 
 import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
-import ws1415.SkatenightBackend.model.UserGroup.BoardEntry;
+import ws1415.SkatenightBackend.model.BoardEntry;
 
 /**
  * Created by Martin on 13.05.2015.
@@ -58,37 +58,6 @@ public class EndpointUtil {
     public static void throwIfUserNotSame(String mailLoggedIn, String mailUserToChange) throws UnauthorizedException {
         if (!mailLoggedIn.equals(mailUserToChange)) {
             throw new UnauthorizedException("rights missing to perform the action");
-        }
-    }
-
-    /**
-     * Exception wird geworfen, falls kein gültiges UserGroup-Objekt übergeben wird. Oder
-     * keine UserGroup zu dem angegebenen Namen existiert.
-     *
-     * @param groupName
-     * @throws OAuthRequestException
-     */
-    public static UserGroup throwIfNoUserGroupExists(String groupName) throws OAuthRequestException {
-        if (groupName == null || groupName.isEmpty()) {
-            throw new OAuthRequestException("no group name submitted");
-        }
-        UserGroup group = new GroupEndpoint().getUserGroup(groupName);
-        if(group == null){
-            throw new IllegalArgumentException("user group with submitted name "+groupName+ " could not be found");
-        }
-        return group;
-    }
-
-    /**
-     * Exception wird geworfen, fall es schon eine UserGroup mit dem übergebenen
-     * Namen gibt.
-     *
-     * @param groupName
-     * @throws IllegalArgumentException
-     */
-    public static void throwIfUserGroupAlreadyExists(String groupName){
-        if(new GroupEndpoint().getUserGroupMetaData(groupName) != null){
-            throw new IllegalArgumentException("user group with submitted name "+groupName+ " already exists");
         }
     }
 

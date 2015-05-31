@@ -1,4 +1,4 @@
-package ws1415.common.util;
+package ws1415.common.model;
 
 /**
  * Aufzählungstyp für die Rechte, die in einer Gruppe vergeben werden können. Hier

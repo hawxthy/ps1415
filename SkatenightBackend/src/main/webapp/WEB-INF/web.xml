@@ -72,6 +72,24 @@
         <url-pattern>/userImages/serve</url-pattern>
     </servlet-mapping>
 
+    <!--Bernds Blobstore-->
+    <servlet>
+        <servlet-name>Upload</servlet-name>
+        <servlet-class>ws1415.SkatenightBackend.Upload</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Serve</servlet-name>
+        <servlet-class>ws1415.SkatenightBackend.Serve</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Upload</servlet-name>
+        <url-pattern>/Bernd/images/upload</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Serve</servlet-name>
+        <url-pattern>/Bernd/images/serve</url-pattern>
+    </servlet-mapping>
+
 
     <!-- Listener für Server-Start -->
     <listener>

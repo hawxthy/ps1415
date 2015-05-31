@@ -8,13 +8,13 @@ import java.util.HashSet;
 public class UserGroupMetaData {
     private String name;
     private String creator;
-    private boolean isOpen;
+    private boolean isPrivat;
     private int memberCount;
 
-   public UserGroupMetaData(String name, String creator, boolean isOpen, int memberCount){
+   public UserGroupMetaData(String name, String creator, boolean isPrivat, int memberCount){
        this.name = name;
        this.creator = creator;
-       this.isOpen = isOpen;
+       this.isPrivat = isPrivat;
        this.memberCount = memberCount;
    }
 
@@ -34,12 +34,12 @@ public class UserGroupMetaData {
         this.creator = creator;
     }
 
-    public boolean isOpen() {
-        return isOpen;
+    public boolean getPrivat() {
+        return isPrivat;
     }
 
-    public void setIsOpen(boolean isOpen) {
-        this.isOpen = isOpen;
+    public void setIsPrivat(boolean isPrivat) {
+        this.isPrivat = isPrivat;
     }
 
     public int getMemberCount() {

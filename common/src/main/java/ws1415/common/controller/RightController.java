@@ -26,7 +26,7 @@ public class RightController {
     }
 
     /**
-     * Methode, welche mit dem GroupEndoint kommunizert um einem Mitglied einer
+     * Methode, welche mit dem RightEndpoint kommunizert um einem Mitglied einer
      * Nutzergruppe ein neues Recht zu geben.
      *
      * @param handler Der Task, der mit dem Server kommuniziert.
@@ -49,7 +49,7 @@ public class RightController {
     }
 
     /**
-     * Methode, welche mit dem GroupEndoint kommunizert um einem Mitglied einer
+     * Methode, welche mit dem RightEndpoint kommunizert um einem Mitglied einer
      * Nutzergruppe neue Rechte zu geben.
      *
      * @param handler Der Task, der mit dem Server kommuniziert.
@@ -62,7 +62,7 @@ public class RightController {
             @Override
             protected Void doInBackground(String... params){
                 try{
-                    return ServiceProvider.getService().rightEndpoint().distributeRightsToUser(params[0], rightNames, userName).execute();
+                    return ServiceProvider.getService().rightEndpoint().distributeRightsToUser(params[0], userName, new ListWrapper().setStringList(rightNames)).execute();
                 }catch(IOException e){
                     publishError("Die Rechte konnten nicht verteilt werden");
                     return null;
@@ -72,7 +72,7 @@ public class RightController {
     }
 
     /**
-     * Methode, welche mit dem GroupEndoint kommunizert Mitgliedern einer
+     * Methode, welche mit dem RightEndpoint kommunizert Mitgliedern einer
      * Nutzergruppe ein neues Recht zu geben.
      *
      * @param handler Der Task, der mit dem Server kommuniziert.
@@ -95,7 +95,7 @@ public class RightController {
     }
 
     /**
-     * Methode, welche mit dem GroupEndoint kommunizert Mitgliedern einer
+     * Methode, welche mit dem RightEndpoint kommunizert Mitgliedern einer
      * Nutzergruppe neue Rechte zu geben.
      *
      * @param handler Der Task, der mit dem Server kommuniziert.
@@ -103,13 +103,12 @@ public class RightController {
      * @param userNames Die EndUser
      * @param rightNames Die Rechte
      */
-    public void giveRightsToUsers(ExtendedTaskDelegate handler, String groupName, ArrayList<String> userNames, final List<String> rightNames){
-        final ArrayList<String> users = userNames;
+    public void giveRightsToUsers(ExtendedTaskDelegate handler, String groupName, final List<String> userNames, final List<String> rightNames){
         new ExtendedTask<String, Void, Void>(handler){
             @Override
             protected Void doInBackground(String... params){
                 try{
-                    return ServiceProvider.getService().rightEndpoint().distributeRightsToUsers(params[0], rightNames, users).execute();
+                    return ServiceProvider.getService().rightEndpoint().distributeRightsToUsers(params[0], userNames, new ListWrapper().setStringList(rightNames)).execute();
                 }catch(IOException e){
                     publishError("Das Recht konnte nicht verteilt werden");
                     return null;
@@ -119,7 +118,7 @@ public class RightController {
     }
 
     /**
-     * Methode, welche mit dem GroupEndoint kommunizert um einem Mitglied einer
+     * Methode, welche mit dem RightEndpoint kommunizert um einem Mitglied einer
      * Nutzergruppe ein neues Recht zu entziehen.
      *
      * @param handler Der Task, der mit dem Server kommuniziert.
@@ -127,7 +126,7 @@ public class RightController {
      * @param userName Der EndUser
      * @param rightName Das Recht
      */
-    public void takeRankFromUser(ExtendedTaskDelegate handler, String groupName, final String userName, final String rightName){
+    public void takeRightFromUser(ExtendedTaskDelegate handler, String groupName, final String userName, final String rightName){
         new ExtendedTask<String, Void, Void>(handler){
             @Override
             protected Void doInBackground(String... params){
@@ -142,7 +141,7 @@ public class RightController {
     }
 
     /**
-     * Methode, welche mit dem GroupEndoint kommunizert um einem Mitglied einer
+     * Methode, welche mit dem RightEndpoint kommunizert um einem Mitglied einer
      * Nutzergruppe Rechte zu entziehen.
      *
      * @param handler Der Task, der mit dem Server kommuniziert.
@@ -155,7 +154,7 @@ public class RightController {
             @Override
             protected Void doInBackground(String... params){
                 try{
-                    return ServiceProvider.getService().rightEndpoint().takeRightsFromUser(params[0], rightNames, userName).execute();
+                    return ServiceProvider.getService().rightEndpoint().takeRightsFromUser(params[0], userName, new ListWrapper().setStringList(rightNames)).execute();
                 }catch(IOException e){
                     publishError("Das Recht konnt nicht verteilt werden");
                     return null;
@@ -165,7 +164,7 @@ public class RightController {
     }
 
     /**
-     * Methode, welche mit dem GroupEndoint kommunizertum Mitgliedern einer
+     * Methode, welche mit dem RightEndpoint kommunizertum Mitgliedern einer
      * Nutzergruppe ein Recht zu entziehen.
      *
      * @param handler Der Task, der mit dem Server kommuniziert.
@@ -178,7 +177,7 @@ public class RightController {
             @Override
             protected Void doInBackground(String... params){
                 try{
-                    return ServiceProvider.getService().rightEndpoint().takeRightFromUsers(params[0], rightName, userNames).execute();
+                    return ServiceProvider.getService().rightEndpoint().takeRightFromUsers(params[0], rightName, new ListWrapper().setStringList(userNames)).execute();
                 }catch(IOException e){
                     publishError("Das Recht konnt nicht entzogen werden");
                     return null;
@@ -188,7 +187,7 @@ public class RightController {
     }
 
     /**
-     * Methode, welche mit dem GroupEndoint kommunizert um Mitgliedern einer
+     * Methode, welche mit dem RightEndpoint kommunizert um Mitgliedern einer
      * Nutzergruppe Rechte zu entziehen.
      *
      * @param handler Der Task, der mit dem Server kommuniziert.
@@ -201,9 +200,31 @@ public class RightController {
             @Override
             protected Void doInBackground(String... params){
                 try{
-                    return ServiceProvider.getService().rightEndpoint().takeRightsFromUsers(params[0], rightNames, userNames).execute();
+                    return ServiceProvider.getService().rightEndpoint().takeRightsFromUsers(params[0], userNames, new ListWrapper().setStringList(rightNames)).execute();
                 }catch(IOException e){
                     publishError("Die Rechte konnten nicht entzogen werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem RightEndpoint kommunizert um den Leader einer
+     * Nutzergruppe zu ändern.
+     *
+     * @param handler Der Task, der mit dem Server kommuniziert
+     * @param groupName Der Name der Nutzergruppe
+     * @param newLeader Der neue Leader
+     */
+    public void changeLeader(ExtendedTaskDelegate handler, String groupName, final String newLeader){
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected  Void doInBackground(String... params){
+                try{
+                    return ServiceProvider.getService().rightEndpoint().changeLeader(params[0], newLeader).execute();
+                } catch(IOException e){
+                    publishError("Der Leader konnte nicht geändert werden");
                     return null;
                 }
             }

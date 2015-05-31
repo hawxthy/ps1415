@@ -46,4 +46,5 @@
             android:textSize="18sp"
             android:gravity="right"/>
     </LinearLayout>
+
 </LinearLayout>

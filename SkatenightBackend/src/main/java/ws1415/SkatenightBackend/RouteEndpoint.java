@@ -20,6 +20,7 @@ import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.RoutePoint;
 import ws1415.SkatenightBackend.model.UserGroup;
+import ws1415.SkatenightBackend.model.UserGroupType;
 import ws1415.SkatenightBackend.model.UserLocation;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;

@@ -2,7 +2,7 @@ package ws1415.SkatenightBackend.transport;
 
 import java.util.ArrayList;
 
-import ws1415.SkatenightBackend.model.UserGroup.BoardEntry;
+import ws1415.SkatenightBackend.model.BoardEntry;
 
 
 /**

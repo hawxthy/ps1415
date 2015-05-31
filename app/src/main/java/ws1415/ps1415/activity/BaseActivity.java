@@ -51,7 +51,7 @@ public class BaseActivity extends Activity {
         fullLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
         actContent = (FrameLayout) fullLayout.findViewById(R.id.act_content);
 
-        getLayoutInflater().inflate(layoutResID, actContent,  true);
+        getLayoutInflater().inflate(layoutResID, actContent, true);
         super.setContentView(fullLayout);
 
         //Slide Menu Items laden
@@ -73,6 +73,7 @@ public class BaseActivity extends Activity {
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[6], navMenuIcons.getResourceId(6, -1)));
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[7], navMenuIcons.getResourceId(3, -1)));
 
         navMenuIcons.recycle();
 
@@ -142,6 +143,11 @@ public class BaseActivity extends Activity {
                     Intent search_intent = new Intent(BaseActivity.this, SearchActivity.class);
                     search_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(search_intent);
+                    break;
+                case 7:
+                    Intent upload_group_picture_intent = new Intent(BaseActivity.this, UploadImageActivity.class);
+                    upload_group_picture_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(upload_group_picture_intent);
                     break;
             }
             mDrawerLayout.closeDrawer(mDrawerList);
