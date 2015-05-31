@@ -23,14 +23,14 @@ import java.util.Comparator;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
-import ws1415.common.controller.UserController;
-import ws1415.common.model.Conversation;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.MessagingAdapter;
 import ws1415.ps1415.controller.MessageDbController;
+import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.event.NewMessageEvent;
+import ws1415.ps1415.model.Conversation;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.UniversalUtil;
 
 /**

@@ -18,9 +18,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import ws1415.common.controller.GroupController;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.controller.GroupController;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 
 public class UploadImageActivity extends BaseActivity {

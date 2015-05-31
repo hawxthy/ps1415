@@ -17,12 +17,11 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import ws1415.common.controller.EventController;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.controller.EventController;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 import ws1415.ps1415.util.DiskCacheImageLoader;
-import ws1415.ps1415.util.UniversalUtil;
 
 /**
  * Adapter für Events. Erwartet einen Event-Filter als Parameter und fragt anschließend die

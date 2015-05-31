@@ -5,6 +5,14 @@ package ws1415.ps1415;
  */
 public abstract class Constants {
     /**
+     * Die URL des Servers.
+     */
+    public static final String SERVER_URL = "https://skatenight-ms-testing.appspot.com";
+    /**
+     * Die URL der aufzurufenden API.
+     */
+    public static final String API_URL = SERVER_URL + "/_ah/api";
+    /**
      * Die Web-Client ID zur Authentifizierung am Backend.
      */
     public static final String WEB_CLIENT_ID = "644721617929-unb9em0kl73b9evdv2h52ufn26fao20p.apps.googleusercontent.com";

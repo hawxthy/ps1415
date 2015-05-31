@@ -24,10 +24,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
-import ws1415.common.model.PictureVisibility;
-import ws1415.common.net.ServiceProvider;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.model.PictureVisibility;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.controller.GalleryController;
 
 /**
  * Testet die Methoden des Gallery-Controllers.

@@ -18,12 +18,12 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import de.greenrobot.event.EventBus;
-import ws1415.common.controller.MessageController;
-import ws1415.common.model.Conversation;
-import ws1415.common.model.LocalMessageType;
-import ws1415.common.model.Message;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.controller.MessageController;
+import ws1415.ps1415.model.Conversation;
+import ws1415.ps1415.model.LocalMessageType;
+import ws1415.ps1415.model.Message;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.MessageAdapter;
 import ws1415.ps1415.controller.MessageDbController;

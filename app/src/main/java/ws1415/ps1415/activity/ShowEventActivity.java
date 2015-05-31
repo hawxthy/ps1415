@@ -1,10 +1,8 @@
 package ws1415.ps1415.activity;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.JsonReader;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,9 +16,9 @@ import com.skatenight.skatenightAPI.model.EventData;
 
 import java.util.Date;
 
-import ws1415.common.controller.EventController;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.ps1415.controller.EventController;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegate;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.DynamicFieldsAdapter;
 import ws1415.ps1415.util.DiskCacheImageLoader;

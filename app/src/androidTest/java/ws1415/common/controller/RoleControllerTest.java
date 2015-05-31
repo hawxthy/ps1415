@@ -12,9 +12,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
-import ws1415.common.model.GlobalRole;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.model.GlobalRole;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.controller.RoleController;
+import ws1415.ps1415.controller.UserController;
 
 /**
  * Dient dazu Funktionalitäten zu testen, die mit globalen Rollen zu tun haben.
@@ -84,7 +86,7 @@ public class RoleControllerTest extends AuthenticatedAndroidTestCase {
         final CountDownLatch assignSignal = new CountDownLatch(1);
         RoleController.assignGlobalRole(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void avoid){
+            public void taskDidFinish(ExtendedTask task, Void avoid) {
                 assignSignal.countDown();
             }
         }, TEST_MAIL, TEST_ROLE);

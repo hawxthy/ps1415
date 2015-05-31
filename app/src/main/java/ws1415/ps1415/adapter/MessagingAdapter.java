@@ -19,11 +19,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import ws1415.common.model.Conversation;
-import ws1415.common.model.LocalMessageType;
-import ws1415.common.model.Message;
-import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
+import ws1415.ps1415.model.Conversation;
+import ws1415.ps1415.model.LocalMessageType;
+import ws1415.ps1415.model.Message;
+import ws1415.ps1415.util.ImageUtil;
 import ws1415.ps1415.util.UserImageLoader;
 
 /**

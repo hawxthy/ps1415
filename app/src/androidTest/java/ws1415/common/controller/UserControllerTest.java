@@ -27,14 +27,15 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
-import ws1415.common.model.Gender;
-import ws1415.common.model.Visibility;
-import ws1415.common.net.ServiceProvider;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
-import ws1415.common.util.ImageUtil;
+import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.model.Gender;
+import ws1415.ps1415.model.Visibility;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
+import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.model.UserGroupType;
+import ws1415.ps1415.util.ImageUtil;
 
 /**
  * Diese Klasse wird dazu genutzt die Funktionalitäten des UserControllers zu testen, die

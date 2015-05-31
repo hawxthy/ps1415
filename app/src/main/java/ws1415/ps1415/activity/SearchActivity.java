@@ -15,9 +15,9 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import ws1415.common.controller.UserController;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.controller.UserController;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.UserListAdapter;
 import ws1415.ps1415.util.UniversalUtil;

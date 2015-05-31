@@ -6,9 +6,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import java.io.IOException;
 
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.net.ServiceProvider;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.ListEventsActivity;
 
 /**

@@ -10,10 +10,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
-import ws1415.common.model.UserGroupType;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
-import ws1415.common.model.Right;
+import ws1415.ps1415.model.Right;
+import ws1415.ps1415.model.UserGroupType;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.controller.GroupController;
+import ws1415.ps1415.controller.RightController;
 
 /**
  * Created by Bernd on 22.05.2015.

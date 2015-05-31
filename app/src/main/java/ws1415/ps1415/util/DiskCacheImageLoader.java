@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.skatenight.skatenightAPI.model.BlobKey;
@@ -25,9 +24,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import ws1415.common.net.Constants;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.Constants;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 
 /**
  * Utility-Klasse, die das Abrufen von Bildern aus dem Blobstore übernimmt. Die Bilder werden auf dem

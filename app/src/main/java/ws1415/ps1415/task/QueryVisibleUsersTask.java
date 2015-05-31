@@ -10,9 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import ws1415.common.net.ServiceProvider;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegate;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.util.PrefManager;
 
 /**

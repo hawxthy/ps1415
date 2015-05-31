@@ -11,7 +11,6 @@ import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,11 +20,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
-import ws1415.common.model.EventRole;
-import ws1415.common.model.Role;
-import ws1415.common.net.ServiceProvider;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.model.EventRole;
+import ws1415.ps1415.model.Role;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.controller.EventController;
 
 /**
  * Testet die Methoden des EventController.

@@ -25,7 +25,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.Member;
 import com.skatenight.skatenightAPI.model.UserLocationInfo;
@@ -35,13 +34,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.task.GetEventTask;
-import ws1415.common.util.LocationUtils;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegate;
+import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.task.QueryVisibleUsersTask;
+import ws1415.ps1415.util.LocationUtils;
 
 
 /**

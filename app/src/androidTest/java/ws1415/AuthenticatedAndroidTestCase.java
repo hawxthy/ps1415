@@ -5,7 +5,7 @@ import android.test.AndroidTestCase;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
-import ws1415.common.net.ServiceProvider;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.Constants;
 
 /**

@@ -22,7 +22,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventData;
 
 import java.text.ParseException;
@@ -31,13 +30,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import ws1415.common.controller.UserController;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.util.LocationUtils;
-import ws1415.common.task.GetEventTask;
+import ws1415.ps1415.controller.UserController;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegate;
+import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.util.LocalAnalysisData;
 import ws1415.ps1415.util.LocalStorageUtil;
+import ws1415.ps1415.util.LocationUtils;
 
 /**
  * Hintergrundservice der zur Ermittlung/Tracking der aktuellen Position dient und diese auf den

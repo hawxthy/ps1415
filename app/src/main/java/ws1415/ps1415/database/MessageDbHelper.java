@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import ws1415.common.net.ServiceProvider;
+import ws1415.ps1415.ServiceProvider;
 
 /**
  * Der MessageDatabase verwaltet die Datenbank der Nachrichten und Konversationen.

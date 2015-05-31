@@ -16,8 +16,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import ws1415.common.util.ImageUtil;
 import ws1415.ps1415.R;
+import ws1415.ps1415.util.ImageUtil;
 
 /**
  * Dieser Adapter wird genutzt, um eine Liste von Veranstaltungen mit Inhalt zu füllen.

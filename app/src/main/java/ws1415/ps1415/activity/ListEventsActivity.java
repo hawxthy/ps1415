@@ -10,11 +10,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.ListView;
 import com.skatenight.skatenightAPI.model.EventFilter;
 
-import ws1415.common.gcm.GCMUtil;
+import ws1415.ps1415.gcm.GCMUtil;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.EventAdapter;
 import ws1415.ps1415.fragment.EventListFragment;

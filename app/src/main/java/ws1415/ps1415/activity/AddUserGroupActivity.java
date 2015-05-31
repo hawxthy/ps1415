@@ -8,17 +8,14 @@ import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import ws1415.common.controller.GroupController;
-import ws1415.common.model.UserGroupType;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.controller.GroupController;
+import ws1415.ps1415.model.UserGroupType;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
-import ws1415.common.task.QueryUserGroupsTask;
+import ws1415.ps1415.task.QueryUserGroupsTask;
 
 /**
  * Diese Activity ist ein Dialog, der einen Gruppennamen erwartet und eine Gruppe anschließend
