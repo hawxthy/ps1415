@@ -27,7 +27,7 @@ public abstract class UniversalUtil {
      *
      * @param activity Activity
      */
-    public static void checkLogin(Activity activity) {
+    public static boolean checkLogin(Activity activity) {
         Context context = activity.getApplicationContext();
         GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(context, "server:client_id:" + Constants.WEB_CLIENT_ID);
 
@@ -35,10 +35,12 @@ public abstract class UniversalUtil {
             Intent intent = new Intent(context, RegisterActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
+            return false;
         } else {
             credential.setSelectedAccountName(PrefManager.getSelectedUserMail(context));
             ServiceProvider.login(credential);
             //initGCM(activity);
+            return true;
         }
     }
 

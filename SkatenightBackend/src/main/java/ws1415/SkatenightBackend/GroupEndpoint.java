@@ -699,14 +699,17 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             RegistrationManager rm = getRegistrationManager(pm);
-            Message m = new Message.Builder()
-                    .collapseKey("createUserGroup")
-                    .timeToLive(6000)
-                    .delayWhileIdle(false)
-                    .addData("type", MessageType.GROUP_CREATED_NOTIFICATION_MESSAGE.name())
-                    .build();
-            Sender s = new Sender(Constants.GCM_API_KEY);
-            s.send(m, rm.getUserIdByMail(mail), 1);
+            String regId = rm.getUserIdByMail(mail);
+            if (regId != null) {
+                Message m = new Message.Builder()
+                        .collapseKey("createUserGroup")
+                        .timeToLive(6000)
+                        .delayWhileIdle(false)
+                        .addData("type", MessageType.GROUP_CREATED_NOTIFICATION_MESSAGE.name())
+                        .build();
+                Sender s = new Sender(Constants.GCM_API_KEY);
+                s.send(m, regId, 1);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

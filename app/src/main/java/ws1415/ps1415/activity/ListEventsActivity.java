@@ -43,17 +43,17 @@ public class ListEventsActivity extends BaseActivity implements EventListFragmen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //Prüft ob der Benutzer eingeloggt ist
-        UniversalUtil.checkLogin(this);
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            super.onCreate(savedInstanceState);
+            return;
+        }
 
         super.onCreate(savedInstanceState);
 
         // Einstellungen müssen als erstes beim App Start geladenw werden
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
         setContentView(R.layout.activity_show_events);
-        setProgressBarIndeterminateVisibility(true);
 
         // EventFragment initialisieren
         eventFragment = (EventListFragment) getFragmentManager().findFragmentById(R.id.eventFragment);

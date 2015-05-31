@@ -402,7 +402,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         // Einen Freund die Bilder abrufen lassen: Sollte ein "leeres" Bild anstatt des privaten und
         // die anderen beide Bilder zurück geben
         // Sicherstellen, dass der eingeloggte Benutzer mit dem Ersteller der Bilder befreundet ist
-        ServiceProvider.getService().userEndpoint().addFriend(ServiceProvider.getEmail(), getAccountMail(1)).execute();
+        ServiceProvider.getService().userEndpoint().addFriend(getAccountMail(1), ServiceProvider.getEmail()).execute();
         changeAccount(1);
         // Cursor zurücksetzen
         filter.setCursorString(null);
@@ -426,7 +426,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         // Bild und zwei "leere" Bilder liefern
         // Sicherstellen, dass der eingeloggte Benutzer nicht mit dem Ersteller der Bilder befreundet ist
         changeAccount(0);
-        ServiceProvider.getService().userEndpoint().removeFriend(ServiceProvider.getEmail(), getAccountMail(1)).execute();
+        ServiceProvider.getService().userEndpoint().removeFriend(getAccountMail(1), ServiceProvider.getEmail()).execute();
         changeAccount(1);
         // Cursor zurücksetzen
         filter.setCursorString(null);
