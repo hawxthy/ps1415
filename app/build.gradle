@@ -4,7 +4,7 @@ apply plugin: 'org.robolectric'
 android {
     // Festlegen, welcher Build Type für die Tests genutzt werden soll. Definiert, welche Signing-
     // Configuration für das Testpaket genutzt wird.
-    testBuildType "release"
+    testBuildType "jenkins"
 
     signingConfigs {
         release {
@@ -78,4 +78,7 @@ dependencies {
     compile 'com.android.support:support-v4:21.0.3' // required by Robolectric 2.4
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:2.4'
+
+    // Für das Versenden von Nachrichten an Activies oder Fragmenten
+    compile 'de.greenrobot:eventbus:2.4.0'
 }
