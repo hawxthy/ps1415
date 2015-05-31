@@ -8,31 +8,6 @@
 
     <string name="loading">Loading…</string>
 
-    <!-- Navigation Drawer -->
-    <string name="drawer_open">Slider Menu Opened</string>
-    <string name="drawer_close">Slider Menu Closed</string>
-
-    <string-array name="nav_drawer_items">
-        <item>My Profile</item>
-        <item>Friends</item>
-        <item>Messages</item>
-        <item>Events</item>
-        <item>User Groups</item>
-        <item>Image Storage Test</item>
-        <item>Search</item>
-        <item>Upload Group Image</item>
-    </string-array>
-
-    <array name="nav_drawer_icons">
-        <item>@drawable/ic_action_person</item>
-        <item>@drawable/ic_group</item>
-        <item>@drawable/ic_action_chat</item>
-        <item>@drawable/ic_event</item>
-        <item>@drawable/ic_group</item>
-        <item>@drawable/common_ic_googleplayservices</item>
-        <item>@drawable/ic_action_search</item>
-    </array>
-
     <!-- Content Description -->
     <string name="desc_list_item_icon">Item Icon</string>
 

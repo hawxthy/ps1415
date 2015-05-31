@@ -1,8 +1,8 @@
 package ws1415.ps1415.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
@@ -15,25 +15,23 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.NavDrawerListAdapter;
 import ws1415.ps1415.model.NavDrawerItem;
+import ws1415.ps1415.model.NavDrawerList;
 
 /**
- * Diese Activity ist die Oberklasse von allen FragmentActivities die einen Navigation Drawer
- * enthalten.
+ * Diese Activity ist die Oberklasse von allen Activities die einen Navigation Drawer enthalten.
  *
  * @author Martin Wrodarczyk
  */
 public class BaseFragmentActivity extends FragmentActivity {
-    // NavigationDrawer
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
-
-    private String[] navMenuTitles;
-    private TypedArray navMenuIcons;
 
     private ArrayList<NavDrawerItem> navDrawerItems;
     private NavDrawerListAdapter adapter;
@@ -41,25 +39,12 @@ public class BaseFragmentActivity extends FragmentActivity {
     protected LinearLayout fullLayout;
     protected FrameLayout actContent;
 
-    /**
-     * Setzt den Navigation Drawer(fullLayout) und erwartet eine layout Id die im eigentlichen
-     * Content gesetzt wird.
-     *
-     * @param layoutResID
-     */
-    @Override
-    public void setContentView(final int layoutResID){
+    public void setContentView(NavDrawerItem[] items, final int layoutResID) {
         fullLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
         actContent = (FrameLayout) fullLayout.findViewById(R.id.act_content);
 
-        getLayoutInflater().inflate(layoutResID, actContent,  true);
+        getLayoutInflater().inflate(layoutResID, actContent, true);
         super.setContentView(fullLayout);
-
-        //Slide Menu Items laden
-        navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
-
-        //Nav Drawer Icons initialisieren
-        navMenuIcons = getResources().obtainTypedArray(R.array.nav_drawer_icons);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
@@ -67,10 +52,7 @@ public class BaseFragmentActivity extends FragmentActivity {
         navDrawerItems = new ArrayList<NavDrawerItem>();
 
         // Die Nav Drawer Items hinzufügen
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
-
-        navMenuIcons.recycle();
+        navDrawerItems.addAll(Arrays.asList(items));
 
         // Den Nav Drawer Adapter setzen
         adapter = new NavDrawerListAdapter(getApplicationContext(), navDrawerItems);
@@ -95,29 +77,23 @@ public class BaseFragmentActivity extends FragmentActivity {
     }
 
     /**
+     * Setzt den Navigation Drawer(fullLayout) und erwartet eine layout Id die im eigentlichen
+     * Content gesetzt wird.
+     *
+     * @param layoutResID
+     */
+    @Override
+    public void setContentView(final int layoutResID) {
+        setContentView(NavDrawerList.items, layoutResID);
+    }
+
+    /**
      * Slide menu item click listener
      * */
     private class SlideMenuClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
-        }
-
-        /** Swaps fragments in the main content view */
-        private void selectItem(int position) {
-            switch(position){
-                case 0:
-                    Intent show_events_intent = new Intent(BaseFragmentActivity.this, ListEventsActivity.class);
-                    show_events_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    startActivity(show_events_intent);
-                    break;
-                case 1:
-                    Intent user_group_intent = new Intent(BaseFragmentActivity.this, UsergroupActivity.class);
-                    user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    startActivity(user_group_intent);
-                    break;
-            }
-            mDrawerLayout.closeDrawer(mDrawerList);
+            navDrawerItems.get(position).onClick(parent, view, position, id);
         }
     }
 
@@ -126,6 +102,14 @@ public class BaseFragmentActivity extends FragmentActivity {
         if(mDrawerToggle.onOptionsItemSelected(item)){
             return true;
         }
+
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

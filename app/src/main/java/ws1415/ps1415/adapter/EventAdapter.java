@@ -87,20 +87,6 @@ public class EventAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getViewTypeCount() {
-        return 2;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        if (position < events.size()) {
-            return EVENT_VIEW_TYPE;
-        } else {
-            return LOAD_VIEW_TYPE;
-        }
-    }
-
-    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view;
         if (position == events.size()) {
@@ -133,6 +119,22 @@ public class EventAdapter extends BaseAdapter {
 
         return view;
     }
+
+    @Override
+    public int getViewTypeCount() {
+        return 2;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position < events.size()) {
+            return EVENT_VIEW_TYPE;
+        } else {
+            return LOAD_VIEW_TYPE;
+        }
+    }
+
+
 
     /**
      * Ruft weitere Events vom Server ab.

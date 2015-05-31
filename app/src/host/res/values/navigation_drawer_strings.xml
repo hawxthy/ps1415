@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Navigation Drawer -->
+    <string name="drawer_open">Slider Menu Opened</string>
+    <string name="drawer_close">Slider Menu Closed</string>
+
+    <string name="my_profile">My Profile</string>
+    <string name="friends">Friends</string>
+    <string name="messages">Messages</string>
+    <string name="events">Events</string>
+    <string name="user_groups">User Groups</string>
+    <string name="search">Search</string>
+    <string name="upload_group_image">Upload Group Image</string>
+
+</resources>

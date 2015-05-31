@@ -3,7 +3,6 @@ package ws1415.ps1415.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -15,11 +14,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.NavDrawerListAdapter;
 import ws1415.ps1415.model.NavDrawerItem;
+import ws1415.ps1415.model.NavDrawerList;
 
 /**
  * Diese Activity ist die Oberklasse von allen Activities die einen Navigation Drawer enthalten.
@@ -31,34 +32,18 @@ public class BaseActivity extends Activity {
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
 
-    private String[] navMenuTitles;
-    private TypedArray navMenuIcons;
-
     private ArrayList<NavDrawerItem> navDrawerItems;
     private NavDrawerListAdapter adapter;
 
     protected LinearLayout fullLayout;
     protected FrameLayout actContent;
 
-    /**
-     * Setzt den Navigation Drawer(fullLayout) und erwartet eine layout Id die im eigentlichen
-     * Content gesetzt wird.
-     *
-     * @param layoutResID
-     */
-    @Override
-    public void setContentView(final int layoutResID){
+    public void setContentView(NavDrawerItem[] items, final int layoutResID) {
         fullLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
         actContent = (FrameLayout) fullLayout.findViewById(R.id.act_content);
 
         getLayoutInflater().inflate(layoutResID, actContent, true);
         super.setContentView(fullLayout);
-
-        //Slide Menu Items laden
-        navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
-
-        //Nav Drawer Icons initialisieren
-        navMenuIcons = getResources().obtainTypedArray(R.array.nav_drawer_icons);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
@@ -66,16 +51,7 @@ public class BaseActivity extends Activity {
         navDrawerItems = new ArrayList<NavDrawerItem>();
 
         // Die Nav Drawer Items hinzufügen
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1)));
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[6], navMenuIcons.getResourceId(6, -1)));
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[7], navMenuIcons.getResourceId(3, -1)));
-
-        navMenuIcons.recycle();
+        navDrawerItems.addAll(Arrays.asList(items));
 
         // Den Nav Drawer Adapter setzen
         adapter = new NavDrawerListAdapter(getApplicationContext(), navDrawerItems);
@@ -100,57 +76,23 @@ public class BaseActivity extends Activity {
     }
 
     /**
+     * Setzt den Navigation Drawer(fullLayout) und erwartet eine layout Id die im eigentlichen
+     * Content gesetzt wird.
+     *
+     * @param layoutResID
+     */
+    @Override
+    public void setContentView(final int layoutResID) {
+        setContentView(NavDrawerList.items, layoutResID);
+    }
+
+    /**
      * Slide menu item click listener
      * */
     private class SlideMenuClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
-        }
-
-        /** Swaps fragments in the main content view */
-        private void selectItem(int position) {
-            switch(position){
-                case 0:
-                    Intent profile_intent = new Intent(BaseActivity.this, ProfileActivity.class);
-                    profile_intent.putExtra("email", ServiceProvider.getEmail());
-                    startActivity(profile_intent);
-                    break;
-                case 1:
-                    Intent friends_intent = new Intent(BaseActivity.this, FriendsActivity.class);
-                    startActivity(friends_intent);
-                    break;
-                case 2:
-                    Intent messaging_intent = new Intent(BaseActivity.this, MessagingActivity.class);
-                    startActivity(messaging_intent);
-                    break;
-                case 3:
-                    Intent show_events_intent = new Intent(BaseActivity.this, ListEventsActivity.class);
-                    show_events_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    startActivity(show_events_intent);
-                    break;
-                case 4:
-                    Intent user_group_intent = new Intent(BaseActivity.this, UsergroupActivity.class);
-                    user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    startActivity(user_group_intent);
-                    break;
-                case 5:
-                    Intent cloud_storage_test_intent = new Intent(BaseActivity.this, ImageStorageTestActivity.class);
-                    cloud_storage_test_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    startActivity(cloud_storage_test_intent);
-                    break;
-                case 6:
-                    Intent search_intent = new Intent(BaseActivity.this, SearchActivity.class);
-                    search_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    startActivity(search_intent);
-                    break;
-                case 7:
-                    Intent upload_group_picture_intent = new Intent(BaseActivity.this, UploadImageActivity.class);
-                    upload_group_picture_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    startActivity(upload_group_picture_intent);
-                    break;
-            }
-            mDrawerLayout.closeDrawer(mDrawerList);
+            navDrawerItems.get(position).onClick(parent, view, position, id);
         }
     }
 
