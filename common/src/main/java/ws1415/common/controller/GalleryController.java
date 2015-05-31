@@ -19,8 +19,8 @@ import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import ws1415.common.model.PictureVisibility;
@@ -135,7 +135,7 @@ public abstract class GalleryController {
      * @param handler    Der Handler, der beim Abschluss des Vorgangs aufgerufen werden soll.
      * @param image      Das hochzuladende Bild.
      */
-    public static void uploadPicture(ExtendedTaskDelegate<Void, Picture> handler, final InputStream image,
+    public static void uploadPicture(ExtendedTaskDelegate<Void, Picture> handler, final File image,
                                      final String title, final String description, final PictureVisibility visibility) {
         new ExtendedTask<Void, Void, Picture>(handler) {
             @Override
@@ -156,7 +156,7 @@ public abstract class GalleryController {
 
                     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                     builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-                    builder.addPart("files", new InputStreamBody(image, "files"));
+                    builder.addBinaryBody("files", image);
                     builder.addTextBody("id", picture.getId().toString());
                     builder.addTextBody("class", "Picture");
 

@@ -76,7 +76,7 @@ public class SendCurrentPositionTest extends ActivityInstrumentationTestCase2<Li
 
         Thread.sleep(5000); // Zeit zum initialisieren
         // Holt sich die Event Listen-Elemente
-        mList = (ListView) mActivity.findViewById(R.id.activity_show_events_list_view);
+        mList = (ListView) mActivity.findViewById(R.id.eventList);
         mListData = mList.getAdapter();
         Thread.sleep(2000); // Zeit zum initialisieren
 

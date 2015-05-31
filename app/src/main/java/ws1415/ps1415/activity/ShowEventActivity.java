@@ -1,25 +1,39 @@
 package ws1415.ps1415.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.text.format.DateFormat;
+import android.util.JsonReader;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.EventData;
+
+import java.util.Date;
 
 import ws1415.common.controller.EventController;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegate;
 import ws1415.ps1415.R;
+import ws1415.ps1415.adapter.DynamicFieldsAdapter;
+import ws1415.ps1415.util.DiskCacheImageLoader;
 
 public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<Void,EventData> {
+    public static final String EXTRA_EVENT_ID = ShowEventActivity.class.getName() + ".EventId";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_event);
 
-        Long eventId = getIntent().getLongExtra("eventId", -1);
+        Long eventId = getIntent().getLongExtra(EXTRA_EVENT_ID, -1);
         EventController.getEvent(this, eventId);
     }
 
@@ -49,7 +63,22 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
     // -------------------- Callback-Methoden für das Abrufen eines Events --------------------
     @Override
     public void taskDidFinish(ExtendedTask task, EventData eventData) {
+        setTitle(eventData.getTitle());
 
+        ImageView headerImage = (ImageView) findViewById(R.id.headerImage);
+        DiskCacheImageLoader.getInstance().loadImage(headerImage, eventData.getHeaderImage());
+        TextView title = (TextView) findViewById(R.id.title);
+        title.setText(eventData.getTitle());
+        TextView date = (TextView) findViewById(R.id.date);
+        Date tmpDate = new Date(eventData.getDate().getValue());
+        date.setText(DateFormat.getMediumDateFormat(this).format(tmpDate) + " " + DateFormat.getTimeFormat(this).format(tmpDate));
+        TextView description = (TextView) findViewById(R.id.description);
+        description.setText(eventData.getDescription());
+        ListView dynamicFields = (ListView) findViewById(R.id.dynamicFields);
+        dynamicFields.setAdapter(new DynamicFieldsAdapter(eventData.getDynamicFields()));
+        HorizontalScrollView images = (HorizontalScrollView) findViewById(R.id.images);
+
+        findViewById(R.id.eventLoading).setVisibility(View.GONE);
     }
 
     @Override
@@ -57,7 +86,8 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
 
     @Override
     public void taskFailed(ExtendedTask task, String message) {
-
+        Toast.makeText(this, R.string.event_loading_error, Toast.LENGTH_LONG).show();
+        findViewById(R.id.eventLoading).setVisibility(View.GONE);
     }
     // -------------------- Callback-Methoden für das Abrufen eines Events --------------------
 }

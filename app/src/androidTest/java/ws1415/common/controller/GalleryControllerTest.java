@@ -1,6 +1,7 @@
 package ws1415.common.controller;
 
 import com.google.api.client.util.DateTime;
+import com.google.api.client.util.IOUtils;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Gallery;
 import com.skatenight.skatenightAPI.model.GalleryMetaData;
@@ -12,6 +13,8 @@ import com.skatenight.skatenightAPI.model.PictureMetaDataList;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -31,6 +34,8 @@ import ws1415.common.task.ExtendedTaskDelegateAdapter;
  * @author Richard Schulze
  */
 public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
+    private File testImage;
+
     // Enthält Bilder, die in der tearDown-Methode des Tests gelöscht werden sollen
     private List<Picture> picturesToDelete = new LinkedList<>();
 
@@ -45,6 +50,27 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
+        // Die Testdatei über einen InputStream einlesen
+        FileOutputStream fos = null;
+        InputStream is = null;
+        try {
+            is = getClass().getClassLoader().getResourceAsStream("image/test.png");
+            testImage = File.createTempFile("testimage", ".tmp");
+            testImage.deleteOnExit();
+            fos = new FileOutputStream(testImage);
+            IOUtils.copy(is, fos);
+            fos.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+            if (fos != null) {
+                fos.close();
+            }
+        }
+
         // Sicherstellen, dass der eingeloggte Benutzer auf dem Server angemeldet ist und ein Admin ist
         if (!ServiceProvider.getService().userEndpoint().existsUser(ServiceProvider.getEmail()).execute().getValue()) {
             ServiceProvider.getService().userEndpoint().createUser(ServiceProvider.getEmail(), null).set("firstName", "").set("lastName", "").execute();
@@ -52,29 +78,21 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         assertTrue("user has to be an admin", ServiceProvider.getService().roleEndpoint().isAdmin(ServiceProvider.getEmail()).execute().getValue());
 
         final CountDownLatch signal = new CountDownLatch(1);
-        InputStream is = null;
-        try {
-            is = getClass().getClassLoader().getResourceAsStream("image/test.png");
-            assertNotNull("test file could not be found", is);
+        assertNotNull("test file could not be found", is);
 
-            GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, Picture picture) {
-                    picture1 = picture;
-                    signal.countDown();
-                }
-
-                @Override
-                public void taskFailed(ExtendedTask task, String message) {
-                    fail(message);
-                }
-            }, is, "Picture 1", "Das erste Testbild", PictureVisibility.PUBLIC);
-            assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
-        } finally {
-            if (is != null) {
-                is.close();
+        GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Picture picture) {
+                picture1 = picture;
+                signal.countDown();
             }
-        }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                fail(message);
+            }
+        }, testImage, "Picture 1", "Das erste Testbild", PictureVisibility.PUBLIC);
+        assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
 
         // Testroute für das Testevent erstellen
         route = new Route();
@@ -222,29 +240,19 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         testPictures.add(picture1);
         for (int i = 2; i <= 5; i++) {
             final CountDownLatch signal = new CountDownLatch(1);
-            InputStream is = null;
-            try {
-                is = getClass().getClassLoader().getResourceAsStream("image/test.png");
-                assertNotNull("test file could not be found", is);
-
-                GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
-                    @Override
-                    public void taskDidFinish(ExtendedTask task, Picture picture) {
-                        testPictures.add(picture);
-                        signal.countDown();
-                    }
-
-                    @Override
-                    public void taskFailed(ExtendedTask task, String message) {
-                        fail(message);
-                    }
-                }, is, "Picture " + i, "Das " + i + ". Testbild", PictureVisibility.PRIVATE);
-                assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
-            } finally {
-                if (is != null) {
-                    is.close();
+            GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, Picture picture) {
+                    testPictures.add(picture);
+                    signal.countDown();
                 }
-            }
+
+                @Override
+                public void taskFailed(ExtendedTask task, String message) {
+                    fail(message);
+                }
+            }, testImage, "Picture " + i, "Das " + i + ". Testbild", PictureVisibility.PRIVATE);
+            assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
         }
         picturesToDelete.addAll(testPictures);
 
@@ -292,29 +300,19 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         changeAccount(1);
         final Picture[] picture2 = {null};
         final CountDownLatch signal1 = new CountDownLatch(1);
-        InputStream is = null;
-        try {
-            is = getClass().getClassLoader().getResourceAsStream("image/test.png");
-            assertNotNull("test file could not be found", is);
-
-            GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, Picture picture) {
-                    picture2[0] = picture;
-                    signal1.countDown();
-                }
-
-                @Override
-                public void taskFailed(ExtendedTask task, String message) {
-                    fail(message);
-                }
-            }, is, "Picture 2", "Das zweite Testbild (von einem anderen Account hochgeladen).", PictureVisibility.PUBLIC);
-            assertTrue("timeout reached", signal1.await(10, TimeUnit.SECONDS));
-        } finally {
-            if (is != null) {
-                is.close();
+        GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Picture picture) {
+                picture2[0] = picture;
+                signal1.countDown();
             }
-        }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                fail(message);
+            }
+        }, testImage, "Picture 2", "Das zweite Testbild (von einem anderen Account hochgeladen).", PictureVisibility.PUBLIC);
+        assertTrue("timeout reached", signal1.await(10, TimeUnit.SECONDS));
 
         // Beim Abrufen der Bilder für den eingeloggten Benutzer sollte das in setUp erstellte
         // Testbild nun nicht mit abgerufen werden
@@ -359,36 +357,26 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         //      Index 1: Bild für Freunde sichtbar
         //      Index 2: Öffentliches Bild
         final Picture[] pictures = new Picture[3];
-        InputStream is = null;
         for (PictureVisibility visibility : new PictureVisibility[] {PictureVisibility.FRIENDS, PictureVisibility.PRIVATE}) {
-            try {
-                is = getClass().getClassLoader().getResourceAsStream("image/test.png");
-                assertNotNull("test file could not be found", is);
-
-                final CountDownLatch signal = new CountDownLatch(1);
-                GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
-                    @Override
-                    public void taskDidFinish(ExtendedTask task, Picture picture) {
-                        for (int i = pictures.length - 2; i >= 0; i--) {
-                            if (pictures[i] == null) {
-                                pictures[i] = picture;
-                                break;
-                            }
+            final CountDownLatch signal = new CountDownLatch(1);
+            GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, Picture picture) {
+                    for (int i = pictures.length - 2; i >= 0; i--) {
+                        if (pictures[i] == null) {
+                            pictures[i] = picture;
+                            break;
                         }
-                        picturesToDelete.add(picture);
-                        signal.countDown();
                     }
-                    @Override
-                    public void taskFailed(ExtendedTask task, String message) {
-                        fail(message);
-                    }
-                }, is, "Testbild", "Testbild.", visibility);
-                assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
-            } finally {
-                if (is != null) {
-                    is.close();
+                    picturesToDelete.add(picture);
+                    signal.countDown();
                 }
-            }
+                @Override
+                public void taskFailed(ExtendedTask task, String message) {
+                    fail(message);
+                }
+            }, testImage, "Testbild", "Testbild.", visibility);
+            assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
         }
         pictures[2] = picture1;
         String uploader = ServiceProvider.getEmail();
@@ -465,37 +453,27 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         final String TEST_BESCHREIBUNG = "Testbeschreibung";
 
         final CountDownLatch signal = new CountDownLatch(1);
-        InputStream is = null;
-        try {
-            is = getClass().getClassLoader().getResourceAsStream("image/test.png");
-            assertNotNull("test file could not be found", is);
+        GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Picture picture) {
+                assertNotNull("picture is null", picture);
+                assertNotNull("id is null", picture.getId());
 
-            GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, Picture picture) {
-                    assertNotNull("picture is null", picture);
-                    assertNotNull("id is null", picture.getId());
+                picturesToDelete.add(picture);
 
-                    picturesToDelete.add(picture);
+                assertEquals("title", TEST_TITEL, picture.getTitle());
+                assertEquals("description", TEST_BESCHREIBUNG, picture.getDescription().getValue());
+                assertNotNull("picture does not have a blob key", picture.getImageBlobKey());
 
-                    assertEquals("title", TEST_TITEL, picture.getTitle());
-                    assertEquals("description", TEST_BESCHREIBUNG, picture.getDescription().getValue());
-                    assertNotNull("picture does not have a blob key", picture.getImageBlobKey());
-
-                    signal.countDown();
-                }
-
-                @Override
-                public void taskFailed(ExtendedTask task, String message) {
-                    fail(message);
-                }
-            }, is, TEST_TITEL, TEST_BESCHREIBUNG, PictureVisibility.PRIVATE);
-            assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
-        } finally {
-            if (is != null) {
-                is.close();
+                signal.countDown();
             }
-        }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                fail(message);
+            }
+        }, testImage, TEST_TITEL, TEST_BESCHREIBUNG, PictureVisibility.PRIVATE);
+        assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
     }
 
     public void testGetImage() throws InterruptedException {
@@ -590,30 +568,20 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
 
         // Weiteres Testbild hochladen, um das Ergebnis zu testen
         final CountDownLatch signal1 = new CountDownLatch(1);
-        InputStream is = null;
-        try {
-            is = getClass().getClassLoader().getResourceAsStream("image/test.png");
-            assertNotNull("test file could not be found", is);
-
-            GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, Picture picture) {
-                    // Bild nach dem Test direkt wieder löschen, da es nur zum Verifizieren der zu testenden Funktion genutzt wird
-                    picturesToDelete.add(picture);
-                    signal1.countDown();
-                }
-
-                @Override
-                public void taskFailed(ExtendedTask task, String message) {
-                    fail(message);
-                }
-            }, is, "Picture 2", "Das zweite Testbild (von einem anderen Account hochgeladen).", PictureVisibility.PUBLIC);
-            assertTrue("timeout reached", signal1.await(10, TimeUnit.SECONDS));
-        } finally {
-            if (is != null) {
-                is.close();
+        GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Picture picture) {
+                // Bild nach dem Test direkt wieder löschen, da es nur zum Verifizieren der zu testenden Funktion genutzt wird
+                picturesToDelete.add(picture);
+                signal1.countDown();
             }
-        }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                fail(message);
+            }
+        }, testImage, "Picture 2", "Das zweite Testbild (von einem anderen Account hochgeladen).", PictureVisibility.PUBLIC);
+        assertTrue("timeout reached", signal1.await(10, TimeUnit.SECONDS));
 
         // Beim Abrufen der Bilder für die Testgallery sollte nun nur das erste Testbild zurückgegeben werden
         PictureFilter filter = new PictureFilter();
@@ -660,6 +628,8 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
 
     public void tearDown() throws Exception {
         super.tearDown();
+
+        testImage.delete();
 
         // Sicherstellen, dass der Benutzer, der die Bilder hochgeladen hat, angemeldet ist
         changeAccount(0);

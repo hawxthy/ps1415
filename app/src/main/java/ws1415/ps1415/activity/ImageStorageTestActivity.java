@@ -210,11 +210,7 @@ public class ImageStorageTestActivity extends BaseActivity {
                     final String tempPath = cursor.getString(column_index);
                     cursor.close();
 
-                    try {
-                        GalleryController.uploadPicture(null, new FileInputStream(new File(tempPath)), "Bildtitel", "Dateipfad: " + tempPath, PictureVisibility.PRIVATE);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                    GalleryController.uploadPicture(null, new File(tempPath), "Bildtitel", "Dateipfad: " + tempPath, PictureVisibility.PRIVATE);
                 }
                 break;
 

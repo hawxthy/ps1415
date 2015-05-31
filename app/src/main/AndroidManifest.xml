@@ -135,8 +135,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.ShowEventActivity"
-            android:label="@string/title_activity_show_event" >
+            android:name=".activity.ShowEventActivity" >
         </activity>
     </application>
 

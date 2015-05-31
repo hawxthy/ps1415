@@ -1,53 +1,90 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context="ws1415.ps1415.activity.ShowEventActivity">
 
-    <ImageView
+    <ProgressBar
+        android:id="@+id/eventLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:indeterminate="true"
+        android:layout_centerInParent="true"/>
+
+    <ScrollView
+        android:id="@+id/eventData"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/headerImage" />
+        android:layout_below="@id/eventLoading">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/headerImage"
-        android:text="Title" />
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/title"
-        android:text="30.05.2015 16:00 Uhr" />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:id="@+id/headerImage"
+                android:scaleType="centerCrop"
+                android:src="@drawable/image_placeholder" />
 
-    <TextView
-        android:id="@+id/description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/date"
-        android:layout_marginTop="20dp"
-        android:text="Beispielbeschreibung" />
+            <RelativeLayout
+                android:id="@+id/data"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@id/headerImage"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
 
-    <TextView
-        android:id="@+id/meetingPlaceLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/meeting_place_label"
-        android:layout_marginTop="5dp"
-        android:layout_below="@id/description" />
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="11pt"
+                    android:text="@string/loading" />
 
-    <TextView
-        android:id="@+id/meetingPlace"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/meetingPlaceLabel"
-        android:layout_alignBaseline="@id/meetingPlaceLabel"
-        android:paddingLeft="5dp"
-        android:text="Meeting Place" />
+                <TextView
+                    android:id="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/title"
+                    android:text="@string/loading" />
+
+                <TextView
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/date"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/loading" />
+
+                <ListView
+                    android:id="@+id/dynamicFields"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/description">
+
+
+                </ListView>
+
+            </RelativeLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:id="@+id/images"
+                android:background="#d8d8d8"
+                android:layout_below="@id/data" >
+
+            </HorizontalScrollView>
+
+        </RelativeLayout>
+
+    </ScrollView>
 
 </RelativeLayout>

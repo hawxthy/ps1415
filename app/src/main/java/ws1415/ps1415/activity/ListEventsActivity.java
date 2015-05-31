@@ -17,6 +17,7 @@ import android.widget.ListView;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventFilter;
 
 import ws1415.common.gcm.GCMUtil;
@@ -180,29 +181,8 @@ public class ListEventsActivity extends BaseActivity implements EventListFragmen
 
     @Override
     public void onEventClick(ListView l, View v, int position, long id) {
-        // TODO Event anzeigen
-//        Event e = mAdapter.getItem(i);
-//
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-//
-//        Intent intent;
-//
-//        Date startDate = new Date(e.getDate().getValue());
-//        if (new Date().after(startDate) &&
-//                e.getMemberList() != null &&
-//                e.getMemberList().containsKey(prefs.getString("accountName", null))) {
-//
-//            if (!prefs.getBoolean(e.getId()+"-started", false)) {
-//                LocationTransmitterService.ScheduleService(ListEventsActivity.this, e.getId(), startDate);
-//            }
-//
-//            intent = new Intent(ListEventsActivity.this, ActiveEventActivity.class);
-//            intent.putExtra(ActiveEventActivity.EXTRA_KEY_ID, e.getId());
-//        }
-//        else {
-//            intent = new Intent(ListEventsActivity.this, ShowInformationActivity.class);
-//            intent.putExtra(ShowInformationActivity.EXTRA_KEY_ID, e.getId());
-//        }
-//        startActivity(intent);
+        Intent intent = new Intent(this, ShowEventActivity.class);
+        intent.putExtra(ShowEventActivity.EXTRA_EVENT_ID, id);
+        startActivity(intent);
     }
 }

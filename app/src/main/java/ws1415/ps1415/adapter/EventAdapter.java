@@ -109,14 +109,14 @@ public class EventAdapter extends BaseAdapter {
             if (convertView != null && getItemViewType(position) == LOAD_VIEW_TYPE) {
                 view = convertView;
             } else {
-                view = parent.inflate(parent.getContext(), R.layout.listitem_fetching, null);
+                view = View.inflate(parent.getContext(), R.layout.listitem_fetching, null);
             }
         } else {
             EventMetaData event = (EventMetaData) getItem(position);
             if (convertView != null && getItemViewType(position) == EVENT_VIEW_TYPE) {
                 view = convertView;
             } else {
-                view = parent.inflate(parent.getContext(), R.layout.listitem_event_meta_data, null);
+                view = View.inflate(parent.getContext(), R.layout.listitem_event_meta_data, null);
             }
             ImageView iconView = (ImageView) view.findViewById(R.id.eventIcon);
             TextView titleView = (TextView) view.findViewById(R.id.eventTitle);
