@@ -7,6 +7,7 @@ import android.widget.AdapterView;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.FriendsActivity;
+import ws1415.ps1415.activity.HostEventsActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.MessagingActivity;
 import ws1415.ps1415.activity.ProfileActivity;
@@ -120,6 +121,28 @@ public class NavDrawerList {
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent search_intent = new Intent(parent.getContext(), SearchActivity.class);
+                    search_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(search_intent);
+                }
+            },
+
+            // ---------------------------------------------
+            // ---------- Veranstalter-Funktionen ----------
+            // ---------------------------------------------
+
+            // ---------- Veranstaltung erstellen/bearbeiten ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.create_edit_events;
+                }
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_event;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent search_intent = new Intent(parent.getContext(), HostEventsActivity.class);
                     search_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(search_intent);
                 }

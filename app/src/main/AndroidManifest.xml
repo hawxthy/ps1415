@@ -100,9 +100,6 @@
         <service android:name=".GcmIntentService" />
 
         <activity
-            android:name=".activity.ImageStorageTestActivity"
-            android:label="@string/title_activity_blobstore_test" />
-        <activity
             android:name=".activity.RegisterActivity"
             android:label="@string/title_activity_register"
             android:screenOrientation="portrait"

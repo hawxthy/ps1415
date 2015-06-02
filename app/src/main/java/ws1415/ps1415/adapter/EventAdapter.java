@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
@@ -218,5 +219,14 @@ public class EventAdapter extends BaseAdapter {
         events.clear();
         keepFetching = true;
         fetchData(true);
+    }
+
+    /**
+     * Gibt das Event an der angegebenen Position in der Liste zurück.
+     * @param position    Die Position des Events in dem Adapter.
+     * @return Das Event mit der angegebenen Position.
+     */
+    public EventMetaData getEvent(int position) {
+        return events.get(position);
     }
 }

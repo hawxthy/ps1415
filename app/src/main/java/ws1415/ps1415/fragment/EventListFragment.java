@@ -2,7 +2,11 @@ package ws1415.ps1415.fragment;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -11,7 +15,7 @@ import ws1415.ps1415.adapter.EventAdapter;
 /**
  * Ein Fragment zur Anzeige einer Liste von Events.
  */
-public class EventListFragment extends ListFragment {
+public class EventListFragment extends ListFragment implements AdapterView.OnItemLongClickListener {
     private OnEventClickListener mListener;
 
     @Override
@@ -31,6 +35,7 @@ public class EventListFragment extends ListFragment {
             throw new IllegalArgumentException("adapter has to be an event adapter");
         }
         super.setListAdapter(adapter);
+        getListView().setOnItemLongClickListener(this);
     }
 
     @Override
@@ -38,8 +43,14 @@ public class EventListFragment extends ListFragment {
         mListener.onEventClick(l, v, position, id);
     }
 
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        return mListener.onEventLongClick(parent, view, position, id);
+    }
+
     public interface OnEventClickListener {
         void onEventClick(ListView l, View v, int position, long id);
+        boolean onEventLongClick(AdapterView<?> parent, View v, int position, long id);
     }
 
 }

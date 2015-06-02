@@ -11,6 +11,7 @@
     <string name="events">Veranstaltungen</string>
     <string name="user_groups">Benutzergruppen</string>
     <string name="search">Suche</string>
+    <string name="create_edit_events">Veranstaltungen erstellen/editieren</string>
     <string name="upload_group_image">Upload Group Image</string>
 
 </resources>

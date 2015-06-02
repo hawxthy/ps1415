@@ -1,31 +1,24 @@
 package ws1415.ps1415.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
 import com.skatenight.skatenightAPI.model.EventFilter;
 
-import ws1415.ps1415.gcm.GCMUtil;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.EventAdapter;
 import ws1415.ps1415.fragment.EventListFragment;
 import ws1415.ps1415.util.UniversalUtil;
 
-public class ListEventsActivity extends BaseActivity implements EventListFragment.OnEventClickListener {
-    /**
-     * Falls diese Activity einen Intent mit der REFRESH_EVENTS_ACTION erhält, wird die Liste der
-     * Events aktualisiert.
-     */
-    public static final String REFRESH_EVENTS_ACTION = "REFRESH_EVENTS";
+public class HostEventsActivity extends BaseActivity implements EventListFragment.OnEventClickListener {
     /**
      * Bestimmt die Anzahl Events, die pro Aufruf an den Server herunter geladen werden.
      */
@@ -52,7 +45,7 @@ public class ListEventsActivity extends BaseActivity implements EventListFragmen
 
         // Einstellungen müssen als erstes beim App Start geladenw werden
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        setContentView(R.layout.activity_list_events);
+        setContentView(R.layout.activity_host_events);
 
         // EventFragment initialisieren
         eventFragment = (EventListFragment) getFragmentManager().findFragmentById(R.id.eventFragment);
@@ -60,28 +53,11 @@ public class ListEventsActivity extends BaseActivity implements EventListFragmen
         filter.setLimit(EVENTS_PER_REQUEST);
         eventAdapter = new EventAdapter(this, filter);
         eventFragment.setListAdapter(eventAdapter);
-
-        // Listener für REFRESH_EVENTS_ACTION-Intents erstellen
-        LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                refresh();
-            }
-        }, new IntentFilter(REFRESH_EVENTS_ACTION));
     }
 
     private void refresh(){
         eventAdapter.refresh();
     }
-
-    /**
-     * Setzt die Events in die Liste
-     */
-    @Override
-    public void onResume(){
-        super.onResume();
-        GCMUtil.checkPlayServices(this);
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -114,7 +90,31 @@ public class ListEventsActivity extends BaseActivity implements EventListFragmen
     }
 
     @Override
-    public boolean onEventLongClick(AdapterView<?> parent, View v, int position, long id) {
-        return false;
+    public boolean onEventLongClick(AdapterView<?> parent, View v, int position, final long id) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(eventAdapter.getEvent(position).getTitle())
+                .setItems(R.array.host_events_event_actions, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                // Anzeigen
+                                Intent intent = new Intent(HostEventsActivity.this, ShowEventActivity.class);
+                                intent.putExtra(ShowEventActivity.EXTRA_EVENT_ID, id);
+                                startActivity(intent);
+                                break;
+                            case 1:
+                                // Bearbeiten
+                                // TODO
+                                break;
+                            case 2:
+                                // Löschen
+                                // TODO
+                                break;
+                        }
+                    }
+                });
+        builder.create().show();
+        return true;
     }
 }

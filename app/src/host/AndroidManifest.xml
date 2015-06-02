@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="ws1415.ps1415" >
+
+    <application>
+        <activity
+            android:name=".activity.HostEventsActivity"
+            android:label="@string/title_activity_host_events" >
+        </activity>
+    </application>
+
+</manifest>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- HostEventsActivity -->
+    <string name="title_activity_host_events">Veranstaltung erstellen/bearbeiten</string>
+    <array name="host_events_event_actions">
+        <item>Anzeigen</item>
+        <item>Bearbeiten</item>
+        <item>Löschen</item>
+    </array>
+    <string name="action_create_event">Veranstaltung erstellen</string>
+</resources>
