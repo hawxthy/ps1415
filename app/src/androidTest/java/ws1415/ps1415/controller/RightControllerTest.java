@@ -43,12 +43,12 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
         // Nutzergruppe erstellen, die bei jedem Test benötigt wird.
         final CountDownLatch signal = new CountDownLatch(1);
 
-        GroupController.getInstance().createUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().createOpenUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_BOOLEAN_GROUP_PRIVAT, TEST_GROUP_TYPE, TEST_GROUP_PASSWORD);
+        }, TEST_GROUP_NAME);
         try {
             assertTrue("setUp for createUserGroup failed", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {

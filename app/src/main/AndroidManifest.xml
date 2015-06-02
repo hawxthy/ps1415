@@ -116,17 +116,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.ListEventsActivity" />
         </activity>
-        
         <activity
             android:name=".activity.EditProfileActivity"
             android:label="@string/title_activity_edit_profile"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".activity.ProfileActivity">
+            android:parentActivityName=".activity.ProfileActivity"
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.activity.ProfileActivity" />
         </activity>
-        
         <activity
             android:name=".activity.SearchActivity"
             android:label="@string/title_activity_search"
@@ -140,37 +138,35 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-        
-        <activity
-            android:name=".activity.ShowEventActivity" >
+        <activity android:name=".activity.ShowEventActivity" >
         </activity>
-        
         <activity
             android:name=".activity.FriendsActivity"
             android:label="@string/title_activity_friend"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-        
         <activity
             android:name=".activity.MessagingActivity"
             android:label="@string/title_activity_messaging"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" >
         </activity>
-        
         <activity
             android:name=".activity.ConversationActivity"
-            android:screenOrientation="portrait"
             android:label="@string/title_activity_conversation"
-            android:parentActivityName=".activity.MessagingActivity">
+            android:parentActivityName=".activity.MessagingActivity"
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.activity.MessagingActivity" />
         </activity>
-        
         <activity
             android:name=".activity.UploadImageActivity"
             android:label="@string/title_activity_upload_image" >
+        </activity>
+        <activity
+            android:name=".activity.ListUserGroupsActivity"
+            android:label="@string/title_activity_list_user_groups" >
         </activity>
     </application>
 

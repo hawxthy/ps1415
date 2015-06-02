@@ -14,9 +14,9 @@ import android.view.MenuItem;
 import android.view.Window;
 
 import ws1415.ps1415.adapter.TabsUsergroupsAdapter;
-import ws1415.ps1415.fragment.AllUsergroupsFragment;
+//import ws1415.ps1415.fragment.AllUsergroupsFragment;
 import ws1415.ps1415.R;
-import ws1415.ps1415.fragment.MyUsergroupsFragment;
+//import ws1415.ps1415.fragment.MyUsergroupsFragment;
 
 /**
  * Diese Activity wird zum verwalten der Nutzergruppen genutzt. Sie zeigt das All- und
@@ -99,7 +99,7 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
         LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                refresh();
+               // refresh();
             }
         }, new IntentFilter(REFRESH_GROUPS_ACTION));
     }
@@ -107,12 +107,12 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
     /**
      * Refresht die Liste aller Gruppen und eigener Gruppen.
      */
-    public void refresh(){
-        AllUsergroupsFragment allUsergroupsFragment = (AllUsergroupsFragment)mAdapter.getItem(0);
-        MyUsergroupsFragment myUsergroupsFragment = (MyUsergroupsFragment)mAdapter.getItem(1);
-        if(allUsergroupsFragment != null) allUsergroupsFragment.refresh();
-        if(myUsergroupsFragment != null) myUsergroupsFragment.refresh();
-    }
+//    public void refresh(){
+//        AllUsergroupsFragment allUsergroupsFragment = (AllUsergroupsFragment)mAdapter.getItem(0);
+//        MyUsergroupsFragment myUsergroupsFragment = (MyUsergroupsFragment)mAdapter.getItem(1);
+//        if(allUsergroupsFragment != null) allUsergroupsFragment.refresh();
+//        if(myUsergroupsFragment != null) myUsergroupsFragment.refresh();
+//    }
 
     /**
      * Gibt das Activity Objekt zurück
@@ -155,7 +155,7 @@ public class UsergroupActivity extends BaseFragmentActivity implements ActionBar
             startActivity(intent);
             return true;
         } else if(id == R.id.action_refresh_groups) {
-            refresh();
+            //refresh();
         }
         return super.onOptionsItemSelected(item);
     }

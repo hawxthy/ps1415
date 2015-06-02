@@ -88,6 +88,7 @@
     <string name="action_add_user_group">Usergruppe hinzufügen</string>
     <string name="action_refresh_user_groups">Aktualisiere</string>
     <string name="usergroup_adapter_maximum_reached">Maximale Anzahl an sichtbaren Gruppen erreicht</string>
+    <string name="usergroup_member_count">Mitglieder: </string>
 
     <!--Strings zu AddUserGroupActivity-->
     <string name="title_activity_add_user_group">Gruppe hinzufügen</string>

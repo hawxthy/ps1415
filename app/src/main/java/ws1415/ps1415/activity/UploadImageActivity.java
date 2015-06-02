@@ -2,6 +2,7 @@ package ws1415.ps1415.activity;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -17,11 +18,14 @@ import com.skatenight.skatenightAPI.model.UserGroupPicture;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 import ws1415.ps1415.controller.GroupController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
+import ws1415.ps1415.util.ImageUtil;
 
 public class UploadImageActivity extends BaseActivity {
     private static final int SELECT_PHOTO = 1;
@@ -29,7 +33,7 @@ public class UploadImageActivity extends BaseActivity {
     private Button downloadPictureButton;
     private Button choosePictureButton;
     private ImageView blobStoreImageView;
-    final private String TEST_GROUP_NAME = "Testgruppe1";
+    final private String TEST_GROUP_NAME = "Testgruppe";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +47,12 @@ public class UploadImageActivity extends BaseActivity {
         downloadPictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                GroupController.getInstance().getUserGroupPicture(new ExtendedTaskDelegateAdapter<Void, UserGroupPicture>(){
-//                    @Override
-//                    public void taskDidFinish(ExtendedTask task, UserGroupPicture picture){
-//                        blobStoreImageView.loadFromBlobKey(picture.getPictureBlobKey());
-//                    }
-//                }, TEST_GROUP_NAME);
+                GroupController.getInstance().getUserGroupPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Bitmap picture) {
+                        blobStoreImageView.setImageBitmap(picture);
+                    }
+                }, TEST_GROUP_NAME);
             }
         });
 
@@ -90,18 +94,28 @@ public class UploadImageActivity extends BaseActivity {
         switch (requestCode) {
             case SELECT_PHOTO:
                 if (resultCode == RESULT_OK) {
-                    Uri selectedImage = imageReturnedIntent.getData();
-                    selectedImagePath = getPath(selectedImage);
-                    File imageFile = new File(getPath(selectedImage));
-                    try{
-                        GroupController.getInstance().changePicture(new ExtendedTaskDelegateAdapter<Void, UserGroupPicture>(){
-                            @Override
-                            public void taskDidFinish(ExtendedTask task, UserGroupPicture picture){
-                                doneLoading();
-                            }
-                        },TEST_GROUP_NAME, new FileInputStream(imageFile));
-                    } catch (FileNotFoundException e){
+                    InputStream is = null;
+                    try {
+                        Uri imageUri = imageReturnedIntent.getData();
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                        if(bitmap != null){
+                            GroupController.getInstance().changePicture(new ExtendedTaskDelegateAdapter<Void, UserGroupPicture>() {
+                                @Override
+                                public void taskDidFinish(ExtendedTask task, UserGroupPicture picture) {
+                                    doneLoading();
+                                }
+                            }, TEST_GROUP_NAME, ImageUtil.BitmapToInputStream(bitmap));
+                        }
+                    } catch (IOException e) {
                         e.printStackTrace();
+                    } finally {
+                        if (is != null) {
+                            try {
+                                is.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
         }
@@ -123,7 +137,7 @@ public class UploadImageActivity extends BaseActivity {
         }
     }
 
-    public void doneLoading(){
-        Toast.makeText(this, "Done loading picture", Toast.LENGTH_LONG);
+    public void doneLoading() {
+        Toast.makeText(this, "Done loading picture", Toast.LENGTH_LONG).show();
     }
 }

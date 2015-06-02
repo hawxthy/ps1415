@@ -12,8 +12,8 @@ import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.UsergroupActivity;
-import ws1415.ps1415.fragment.AllUsergroupsFragment;
-import ws1415.ps1415.fragment.MyUsergroupsFragment;
+//import ws1415.ps1415.fragment.AllUsergroupsFragment;
+//import ws1415.ps1415.fragment.MyUsergroupsFragment;
 
 /**
  * Utility Klasse für die Nutzergruppen. Unterstützende Klasse um Nutzergruppen beizutreten, zu
@@ -69,7 +69,7 @@ public class groupUtils {
                 GroupController.getInstance().joinUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                        ((UsergroupActivity) activity).refresh();
+                        //((UsergroupActivity) activity).refresh();
                     }
                 }, userGroup.getName(), null);
             }
@@ -100,7 +100,7 @@ public class groupUtils {
                 GroupController.getInstance().leaveUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                        ((UsergroupActivity) activity).refresh();
+                        //((UsergroupActivity) activity).refresh();
                     }
                 }, userGroup.getName());
                 PrefManager.setGroupVisibility(activity, userGroup.getName(), false);
@@ -152,12 +152,12 @@ public class groupUtils {
                 GroupController.getInstance().deleteUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                            AllUsergroupsFragment allUsergroupsFragment =
-                                    (AllUsergroupsFragment) activity.getAdapter().getItem(0);
-                            allUsergroupsFragment.deleteUserGroupFromList(userGroup);
-                            MyUsergroupsFragment myUsergroupsFragment =
-                                    (MyUsergroupsFragment) activity.getAdapter().getItem(1);
-                            myUsergroupsFragment.deleteUserGroupFromList(userGroup);
+//                            AllUsergroupsFragment allUsergroupsFragment =
+//                                    (AllUsergroupsFragment) activity.getAdapter().getItem(0);
+//                            allUsergroupsFragment.deleteUserGroupFromList(userGroup);
+//                            MyUsergroupsFragment myUsergroupsFragment =
+//                                    (MyUsergroupsFragment) activity.getAdapter().getItem(1);
+//                            myUsergroupsFragment.deleteUserGroupFromList(userGroup);
                     }
                 }, userGroup.getName());
             }

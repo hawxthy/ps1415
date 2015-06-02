@@ -674,7 +674,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
 
     // Erstellt eine Nutzergruppe
     private UserGroup createUserGroup() throws IOException {
-        ServiceProvider.getService().groupEndpoint().createUserGroup("Testgruppe", false, UserGroupType.NORMALGROUP.name(), "Testgruppe").execute();
+        ServiceProvider.getService().groupEndpoint().createOpenUserGroup("Testgruppe").execute();
         return ServiceProvider.getService().groupEndpoint().getUserGroup("Testgruppe").execute();
     }
 

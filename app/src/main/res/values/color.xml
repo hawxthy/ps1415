@@ -11,4 +11,10 @@
     <color name="colorProfileScroll">#FFFFFF</color>
 
     <color name="conversationBg">#E3E3E3</color>
+
+    <color name="colorPrimary">#ff3262ff</color>
+    <color name="colorPressed">#ff43ddff</color>
+
+    <color name="ColorPrimary">#FF5722</color>
+    <color name="ColorPrimaryDark">#E64A19</color>
 </resources>
