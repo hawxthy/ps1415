@@ -234,5 +234,7 @@
     <string name="title_activity_upload_image">UploadImageActivity</string>
     <string name="title_activity_list_user_groups">ListUserGroupsActivity</string>
 
-    <string name="hello_world">Hello world!</string>
+    <!-- CreateUserGroupActivity -->
+    <string name="groupName">Groupname</string>
+    <string name="groupDescribtion">Describtion</string>
 </resources>

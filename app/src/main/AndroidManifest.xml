@@ -168,6 +168,10 @@
             android:name=".activity.ListUserGroupsActivity"
             android:label="@string/title_activity_list_user_groups" >
         </activity>
+        <activity
+            android:name=".activity.CreateUserGroupActivity"
+            android:label="@string/title_activity_create_user_group" >
+        </activity>
     </application>
 
 </manifest>

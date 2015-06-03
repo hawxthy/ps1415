@@ -61,6 +61,9 @@ public class UploadImageActivity extends BaseActivity {
             public void onClick(View view) {
                 Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                 photoPickerIntent.setType("image/*");
+                photoPickerIntent.putExtra("crop", "true");
+                photoPickerIntent.putExtra("return-data", true);
+                photoPickerIntent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
                 startActivityForResult(photoPickerIntent, SELECT_PHOTO);
             }
         });
@@ -96,18 +99,19 @@ public class UploadImageActivity extends BaseActivity {
                 if (resultCode == RESULT_OK) {
                     InputStream is = null;
                     try {
-                        Uri imageUri = imageReturnedIntent.getData();
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                        if(bitmap != null){
+                        Bundle extras = imageReturnedIntent.getExtras();
+                        Bitmap cropedBitmap = extras.getParcelable("data");
+
+                        if(cropedBitmap != null){
+                            Toast.makeText(this, "Uploading image", Toast.LENGTH_LONG).show();
+
                             GroupController.getInstance().changePicture(new ExtendedTaskDelegateAdapter<Void, UserGroupPicture>() {
                                 @Override
                                 public void taskDidFinish(ExtendedTask task, UserGroupPicture picture) {
                                     doneLoading();
                                 }
-                            }, TEST_GROUP_NAME, ImageUtil.BitmapToInputStream(bitmap));
+                            }, TEST_GROUP_NAME, ImageUtil.BitmapToInputStream(cropedBitmap));
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     } finally {
                         if (is != null) {
                             try {

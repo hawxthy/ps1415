@@ -1,6 +1,7 @@
 package ws1415.ps1415.activity;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.melnykov.fab.FloatingActionButton;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.List;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.UsergroupAdapter;
 import ws1415.ps1415.controller.GroupController;
+import ws1415.ps1415.model.NavDrawerGroupList;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 
@@ -22,14 +25,24 @@ public class ListUserGroupsActivity extends BaseActivity {
     private ListView mUserGroupListView;
     private List<UserGroupMetaData> mUserGroupList;
     private UsergroupAdapter mAdapter;
+    private FloatingActionButton createUserGroupButton;
     private AlertDialog c_dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_user_groups);
+        super.setContentView(NavDrawerGroupList.items, R.layout.activity_list_user_groups);
 
         mUserGroupListView = (ListView) findViewById(R.id.user_group_list_view);
+        createUserGroupButton = (FloatingActionButton) findViewById(R.id.joinUserGroupButton);
+
+        createUserGroupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent createGroupIntent = new Intent(ListUserGroupsActivity.this, CreateUserGroupActivity.class);
+                ListUserGroupsActivity.this.startActivity(createGroupIntent);
+            }
+        });
     }
 
     @Override
