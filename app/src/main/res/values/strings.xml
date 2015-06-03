@@ -235,6 +235,11 @@
     <string name="title_activity_list_user_groups">ListUserGroupsActivity</string>
 
     <!-- CreateUserGroupActivity -->
+    <string name="title_activity_create_user_group">Create a new Group</string>
     <string name="groupName">Groupname</string>
-    <string name="groupDescribtion">Describtion</string>
+    <string name="groupDescription">Description</string>
+    <string name="groupPrivacy">Group Privacy</string>
+    <string name="groupPrivacyOn">Private Group</string>
+    <string name="groupPrivacyOff">Open Group</string>
+    <string name="check">Check</string>
 </resources>

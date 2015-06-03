@@ -77,6 +77,9 @@ android {
         exclude 'META-INF/LICENSE'
     }
 }
+repositories {
+    jcenter()
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -95,4 +98,8 @@ dependencies {
 
     // Floatin hin edittext
     compile 'com.wrapp.floatlabelededittext:library:0.0.6'
+
+    // Material Design
+    compile 'com.github.navasmdc:MaterialDesign:1.5@aar'
+
 }
