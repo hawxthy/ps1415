@@ -93,7 +93,7 @@ public class RoleControllerTest extends AuthenticatedAndroidTestCase {
         UserController.getFullUser(new ExtendedTaskDelegateAdapter<Void, EndUser>() {
             @Override
             public void taskDidFinish(ExtendedTask task, EndUser enduser) {
-                assertEquals(TEST_ROLE.getId(), enduser.getGlobalRole());
+                assertEquals(TEST_ROLE.name(), enduser.getGlobalRole());
                 getSignal.countDown();
             }
         }, TEST_MAIL);

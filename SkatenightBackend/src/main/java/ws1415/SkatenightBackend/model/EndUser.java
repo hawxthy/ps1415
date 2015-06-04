@@ -5,6 +5,7 @@ import com.google.appengine.api.blobstore.BlobKey;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jdo.annotations.Embedded;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -15,7 +16,7 @@ import javax.jdo.annotations.PrimaryKey;
  * @author Martin Wrodarczyk
  */
 @PersistenceCapable(detachable="true")
-public class EndUser {
+public class EndUser implements javax.jdo.listener.StoreCallback {
     @PrimaryKey
     @Persistent
     private String email;
@@ -28,8 +29,10 @@ public class EndUser {
     @Persistent(defaultFetchGroup = "true")
     private BlobKey userPicture;
     @Persistent
+    @Embedded
     private UserInfo userInfo;
     @Persistent
+    @Embedded
     private UserLocation userLocation;
     @Persistent
     private List<String> myUserGroups;
@@ -51,6 +54,24 @@ public class EndUser {
         myUserGroups = new ArrayList<>();
         myEvents = new ArrayList<>();
         myFriends = new ArrayList<>();
+    }
+
+    // Wird für die Suche verwendet, da lowerCase und Zusammensetzung von Feldern bei JDO Queries nicht angeboten wird
+    private String fullNameLc;
+    @Override
+    public void jdoPreStore() {
+        UserInfo.InfoPair lastNamePair = userInfo.getLastName();
+        String firstNameUserInfo = userInfo.getFirstName();
+        String lastName = null;
+        if(lastNamePair.getValue() != null && !lastNamePair.getValue().isEmpty() && lastNamePair.
+                getVisibility().equals(Visibility.PUBLIC)) {
+            lastName = lastNamePair.getValue();
+        }
+        String firstName = (firstNameUserInfo == null || firstNameUserInfo.isEmpty()) ? null : firstNameUserInfo;
+        if(firstName != null && lastName != null) fullNameLc = firstName.toLowerCase() + " " + lastName.toLowerCase();
+        else if (firstName != null) fullNameLc = firstName.toLowerCase();
+        else if (lastName != null) fullNameLc = lastName.toLowerCase();
+        else fullNameLc = null;
     }
 
     public String getEmail() {

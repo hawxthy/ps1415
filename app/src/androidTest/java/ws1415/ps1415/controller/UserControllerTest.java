@@ -10,6 +10,8 @@ import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.InfoPair;
 import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.RoutePoint;
+import com.skatenight.skatenightAPI.model.ServerWaypoint;
 import com.skatenight.skatenightAPI.model.Text;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserInfo;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +67,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
     // Testdaten für das Updaten der Standortinformationen
     public static final double TEST_LONGITUDE = 7.626135;
     public static final double TEST_LATITUDE = 51.960665;
-    public static final Long TEST_CURRENT_EVENT_ID = 5L;
+    public static Long TEST_CURRENT_EVENT_ID = 5L;
 
     // Testdaten für das Updaten des Benutzerprofils
     public static final String TEST_FIRST_NAME = "Martin";
@@ -188,8 +191,6 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
                 assertNotNull(endUser.getUserInfo());
                 assertNotNull(endUser.getUserLocation());
                 assertEquals(TEST_MAIL_1, endUser.getEmail());
-                assertEquals(TEST_MAIL_1, endUser.getUserInfo().getEmail());
-                assertEquals(TEST_MAIL_1, endUser.getUserLocation().getEmail());
                 getSignal.countDown();
             }
         }, TEST_MAIL_1);
@@ -205,7 +206,6 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
     public void testGetUserLocation() throws InterruptedException, IOException {
         UserLocation userLocation = ServiceProvider.getService().userEndpoint().getUserLocation(TEST_MAIL_1).execute();
         assertNotNull(userLocation);
-        assertEquals(TEST_MAIL_1, userLocation.getEmail());
     }
 
     /**
@@ -289,31 +289,30 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
      * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
-    public void testUpdateUserLocation() throws InterruptedException {
-//        changeAccount(TEST_MAIL_1);
-//        final CountDownLatch updateSignal = new CountDownLatch(1);
-//        UserController.updateUserLocation(new ExtendedTaskDelegateAdapter<Void, Void>() {
-//            @Override
-//            public void taskDidFinish(ExtendedTask task, Void avoid) {
-//                updateSignal.countDown();
-//            }
-//        }, TEST_MAIL_1, TEST_LATITUDE, TEST_LONGITUDE, TEST_CURRENT_EVENT_ID);
-//        assertTrue(updateSignal.await(30, TimeUnit.SECONDS));
-//
-//        final CountDownLatch getSignal = new CountDownLatch(1);
-//        UserController.getUserLocation(new ExtendedTaskDelegateAdapter<Void, UserLocation>() {
-//            @Override
-//            public void taskDidFinish(ExtendedTask task, UserLocation userLocation) {
-//                assertNotNull(userLocation);
-//                assertEquals(TEST_MAIL_1, userLocation.getEmail());
-//                assertEquals(new Date().getTime(), userLocation.getUpdatedAt().getValue(), 10000);
-//                assertEquals(TEST_LONGITUDE, userLocation.getLongitude(), 0.001);
-//                assertEquals(TEST_LATITUDE, userLocation.getLatitude(), 0.001);
-//                assertEquals(TEST_CURRENT_EVENT_ID, userLocation.getCurrentEventId());
-//                getSignal.countDown();
-//            }
-//        }, TEST_MAIL_1);
-//        assertTrue(getSignal.await(30, TimeUnit.SECONDS));
+    public void testUpdateUserLocation() throws InterruptedException, IOException {
+        changeAccount(ADMIN_MAIL);
+        Event testEvent = createEvent();
+        TEST_CURRENT_EVENT_ID = testEvent.getId();
+
+        changeAccount(TEST_MAIL_1);
+        final CountDownLatch updateSignal = new CountDownLatch(1);
+        UserController.updateUserLocation(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void avoid) {
+                updateSignal.countDown();
+            }
+        }, TEST_MAIL_1, TEST_LATITUDE, TEST_LONGITUDE, TEST_CURRENT_EVENT_ID);
+        assertTrue(updateSignal.await(30, TimeUnit.SECONDS));
+
+        UserLocation userLocation = ServiceProvider.getService().userEndpoint().getUserLocation(TEST_MAIL_1).execute();
+        assertNotNull(userLocation);
+        assertEquals(new Date().getTime(), userLocation.getUpdatedAt().getValue(), 10000);
+        assertEquals(TEST_LONGITUDE, userLocation.getLongitude(), 0.001);
+        assertEquals(TEST_LATITUDE, userLocation.getLatitude(), 0.001);
+        assertEquals(TEST_CURRENT_EVENT_ID, userLocation.getCurrentEventId());
+
+        changeAccount(ADMIN_MAIL);
+        deleteEvent(testEvent);
     }
 
     /**
@@ -328,7 +327,6 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
         // Neue Testdaten initialisieren
         UserProfileEdit userProfileEdit = new UserProfileEdit();
         UserInfo newUserInfo = new UserInfo();
-        newUserInfo.setEmail(TEST_MAIL_1);
         newUserInfo.setFirstName(TEST_FIRST_NAME);
         newUserInfo.setGender(TEST_GENDER.name());
         newUserInfo.setLastName(TEST_LAST_NAME_PAIR);
@@ -343,9 +341,10 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
 
         // Profildaten updaten
         final CountDownLatch updateSignal = new CountDownLatch(1);
-        UserController.updateUserProfile(new ExtendedTaskDelegateAdapter<Void, UserInfo>() {
+        UserController.updateUserProfile(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, UserInfo userInfo) {
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                assertTrue(aBoolean);
                 updateSignal.countDown();
             }
         }, userProfileEdit);
@@ -630,10 +629,11 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
     // Erstellt ein Event mit einer Route
     private Event createEvent() throws IOException {
         Route route = new Route();
-        route.setLength("6,8 km");
+        route.setLength("54 m");
         route.setName("Test");
         route.setRouteData(new Text().setValue("cfh|Hy_pm@AJEZMn@CJAJAFAJ?J?L@PF`BFtAJfCF^??JATANChBm@B?nA_@RG\\IFAHA??B@B@@@@BDHDLDHxCdM`BdHv@bDT`AfAfGl@dFVlBLXBFDL@HDLLp@F\\@ZANAJ?L?`@Aj@??Gb@ZATAxAGVAvEIzEUj@A`CG~ACvA?|BGdAEXAT?r@EnAIXC^Ap@C~@E|@C\\Av@CfCEJA|AAl@An@@b@AJ?`A@v@FV@??h@U~@yA|@sAn@_A|@uAXc@^_@fAsAPa@Rc@HUL]DKBGDKLa@HUBKDQFSDOFSFSFOBGHQLSBGFIJIZSHEFE\\OZM\\Kd@O^KZId@KxA[ZEZChAET?N?P?P?XBh@FdARFBhATVBRBf@ANAbAOd@GLAPCNALENIv@G^EJCREFANGRKRMRQTY^e@~AwB`@e@NUPQLKJGb@Sb@O`@KTEXCPHf@LXJD@\\L`@Lx@T\\JJ@RBVBJAJ@HANCREPGPGPEBAdAa@rAUTCt@E\\?\\?t@D\\DZHJBXFXLDB^Lf@VbAr@XP`Ap@vB|ApB|APLd@^jA`Ab@ZTPj@h@LLt@l@ZV~@r@~@p@x@h@~@r@`At@tAfAf@b@B@v@n@b@\\VR`@Zp@h@~@p@dBpA~BjBbBpAXTXR`BnA`@Zv@n@HFjA~@`Ar@lA`Ad@^v@n@f@`@fA|@??RNBMBQTeA??R?HDHDFDFBD@B@D?BAHA@?DCJEJCvAg@NGNENCBAXEPAr@LrA^pBr@??_@|BIZa@lBMh@Wz@M^IRELIPMN??c@y@W_@aAsAi@m@m@k@EEWUw@o@EEcBwAQOy@m@_As@a@Y"));
-        // TODO RoutePoints und Waypoints setzen
+        route.setRoutePoints(Arrays.asList(new RoutePoint().setLongitude(7.61148).setLatitude(51.97001), new RoutePoint().setLongitude(7.61136).setLatitude(51.9701), new RoutePoint().setLongitude(7.61118).setLatitude(51.970220000000005), new RoutePoint().setLongitude(7.61095).setLatitude(51.97039)));
+        route.setWaypoints(Arrays.asList(new ServerWaypoint().setTitle("Wegpunkt 1").setLongitude(7.611478).setLatitude(51.970008), new ServerWaypoint().setTitle("Wegpunkt 2").setLongitude(7.610938999999999).setLatitude(51.970382)));
         route = ServiceProvider.getService().routeEndpoint().addRoute(route).execute();
 
         Event testEvent = new Event();

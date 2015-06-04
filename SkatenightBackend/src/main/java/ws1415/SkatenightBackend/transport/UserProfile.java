@@ -7,8 +7,7 @@ import java.util.List;
 import ws1415.SkatenightBackend.model.Gender;
 
 /**
- * Die UserProfile-Klasse ist für die Übertragung der Nutzerprofildaten an die Anwendung
- * implementiert.
+ * Dient der Übertragung der Nutzerprofildaten an die Anwendung.
  *
  * @author Martin Wrodarczyk
  */

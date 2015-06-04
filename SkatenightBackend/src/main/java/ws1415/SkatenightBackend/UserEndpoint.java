@@ -91,10 +91,8 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     public BooleanWrapper createUser(@Named("userMail") String userMail, @Nullable @Named("firstName") String firstName,
                                      @Nullable @Named("lastName") String lastName) {
         if (!existsUser(userMail).value) {
-            UserLocation userLocation = new UserLocation(userMail);
-            UserInfo userInfo = new UserInfo(userMail);
-            userInfo.setFirstName(firstName);
-            userInfo.setLastName(new UserInfo.InfoPair(lastName, Visibility.PUBLIC));
+            UserLocation userLocation = new UserLocation();
+            UserInfo userInfo = new UserInfo(firstName, lastName);
             EndUser user = new EndUser(userMail, userLocation, userInfo);
 
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
@@ -223,7 +221,8 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     public UserLocation getUserLocation(@Named("userMail") String userMail) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            return pm.getObjectById(UserLocation.class, userMail);
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            return endUser.getUserLocation();
         } catch (Exception e) {
             return null;
         } finally {
@@ -382,14 +381,14 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         Set<String> resultMails = new HashSet<>();
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            Query q = pm.newQuery(UserInfo.class);
+            Query q = pm.newQuery(EndUser.class);
             q.setFilter("email.startsWith(inputParam)");
             q.declareParameters("String inputParam");
             q.setResult("this.email");
             cache = (List<String>) q.execute(query);
             resultMails.addAll(cache);
 
-            q = pm.newQuery(UserInfo.class);
+            q = pm.newQuery(EndUser.class);
             q.setFilter("fullNameLc.startsWith(inputParam)");
             q.declareParameters("String inputParam");
             q.setResult("this.email");
@@ -420,7 +419,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @throws OAuthRequestException Wird geworfen, falls kein User-Objekt übergeben wird
      */
     @ApiMethod(path = "user_profile")
-    public UserInfo updateUserProfile(User user, UserProfileEdit userProfile)
+    public BooleanWrapper updateUserProfile(User user, UserProfileEdit userProfile)
             throws UnauthorizedException, OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfEndUserNotExists(user.getEmail());
@@ -428,18 +427,26 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userProfile.getEmail());
+            UserInfo userInfo = endUser.getUserInfo();
             endUser.setOptOutSearch(userProfile.isOptOutSearch());
             endUser.setShowPrivateGroups(userProfile.getShowPrivateGroups());
-            UserInfo userInfo = endUser.getUserInfo();
+
+            // Workaround für das Aktualisieren der embedded fields, da direktes Aktualisieren nicht übernommen wird
+            UserInfo userInfoDet = pm.detachCopy(userInfo);
             UserInfo newUserInfo = userProfile.getUserInfo();
-            userInfo.setFirstName(newUserInfo.getFirstName());
-            userInfo.setLastName(newUserInfo.getLastName());
-            userInfo.setCity(newUserInfo.getCity());
-            userInfo.setDateOfBirth(newUserInfo.getDateOfBirth());
-            userInfo.setDescription(newUserInfo.getDescription());
-            userInfo.setGender(newUserInfo.getGender());
-            userInfo.setPostalCode(newUserInfo.getPostalCode());
-            return userInfo;
+            userInfoDet.setFirstName(newUserInfo.getFirstName());
+            userInfoDet.setLastName(newUserInfo.getLastName());
+            userInfoDet.setCity(newUserInfo.getCity());
+            userInfoDet.setDateOfBirth(newUserInfo.getDateOfBirth());
+            userInfoDet.setDescription(newUserInfo.getDescription());
+            userInfoDet.setGender(newUserInfo.getGender());
+            userInfoDet.setPostalCode(newUserInfo.getPostalCode());
+            endUser.setUserInfo(userInfoDet);
+            pm.makePersistent(endUser);
+
+            return new BooleanWrapper(true);
+        } catch (Exception e) {
+            return new BooleanWrapper(false);
         } finally {
             pm.close();
         }
@@ -495,22 +502,28 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfUserNotSame(user.getEmail(), userMail);
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            UserLocation userLocation = pm.getObjectById(UserLocation.class, userMail);
-            userLocation.setUpdatedAt(new Date());
-            userLocation.setLatitude(latitude);
-            userLocation.setLongitude(longitude);
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            UserLocation userLocation = endUser.getUserLocation();
+            UserLocation userLocationDet = pm.detachCopy(userLocation);
 
-            if (userLocation.getCurrentEventId() == null || userLocation.getCurrentEventId() != currentEventId) {
-                userLocation.setCurrentEventId(currentEventId);
-                userLocation.setCurrentWaypoint(0);
+            userLocationDet.setUpdatedAt(new Date());
+            userLocationDet.setLatitude(latitude);
+            userLocationDet.setLongitude(longitude);
+
+            if (userLocationDet.getCurrentEventId() == null || userLocationDet.getCurrentEventId() != currentEventId) {
+                userLocationDet.setCurrentEventId(currentEventId);
+                userLocationDet.setCurrentWaypoint(0);
             }
 
             RouteEndpoint routeEndpoint = new RouteEndpoint();
-            routeEndpoint.calculateCurrentWaypoint(userLocation);
+            routeEndpoint.calculateCurrentWaypoint(userLocationDet);
             if (System.currentTimeMillis() - lastFieldUpdateTime >= routeEndpoint.FIELD_UPDATE_INTERVAL) {
-                routeEndpoint.calculateField(userLocation.getCurrentEventId());
+                routeEndpoint.calculateField(userLocationDet.getCurrentEventId());
                 lastFieldUpdateTime = System.currentTimeMillis();
             }
+
+            endUser.setUserLocation(userLocationDet);
+            pm.makePersistent(endUser);
         } finally {
             pm.close();
         }
@@ -590,8 +603,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             if (endUser.getUserPicture() != null)
                 blobstoreService.delete(endUser.getUserPicture());
             try {
-                pm.deletePersistent(endUser.getUserInfo());
-                pm.deletePersistent(endUser.getUserLocation());
                 pm.deletePersistent(endUser);
             } finally {
                 pm.close();
@@ -702,58 +713,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         return result;
     }
 
-
-    /**
-     * ALTE METHODEN
-     */
-    /**
-     * Erstellt ein Member-Objekt für die angegebene E-Mail.
-     *
-     * @param mail
-     */
-    public void createMember(@Named("mail") String mail) {
-        Member m = getMember(mail);
-        if (m == null) {
-            m = new Member();
-            m.setEmail(mail);
-            m.setName(mail);
-
-            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-            try {
-                pm.makePersistent(m);
-            } finally {
-                pm.close();
-            }
-        }
-    }
-
-    /**
-     * Liefert das auf dem Server hinterlegte Member-Objekt mit der angegebenen Mail.
-     *
-     * @param email Die Mail-Adresse des Member-Objekts, das abgerufen werden soll.
-     * @return Das aktuelle Member-Objekt.
-     */
-    public Member getMember(@Named("email") String email) {
-        Member member = null;
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            Query q = pm.newQuery(Member.class);
-            q.setFilter("email == emailParam");
-            q.declareParameters("String emailParam");
-            List<Member> results = (List<Member>) q.execute(email);
-            if (!results.isEmpty()) {
-                member = results.get(0);
-            }
-        } catch (JDOObjectNotFoundException e) {
-            // Wird geworfen, wenn kein Objekt mit dem angegebenen Schlüssel existiert
-            // In diesem Fall null zurückgeben
-            return null;
-        } finally {
-            pm.close();
-        }
-        return member;
-    }
-
     /**
      * Prüft ob ein Benutzer mit einem anderen Benutzer befreundet ist.
      *
@@ -838,5 +797,56 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         } finally {
             pm.close();
         }
+    }
+
+    /**
+     * ALTE METHODEN
+     */
+    /**
+     * Erstellt ein Member-Objekt für die angegebene E-Mail.
+     *
+     * @param mail
+     */
+    public void createMember(@Named("mail") String mail) {
+        Member m = getMember(mail);
+        if (m == null) {
+            m = new Member();
+            m.setEmail(mail);
+            m.setName(mail);
+
+            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+            try {
+                pm.makePersistent(m);
+            } finally {
+                pm.close();
+            }
+        }
+    }
+
+    /**
+     * Liefert das auf dem Server hinterlegte Member-Objekt mit der angegebenen Mail.
+     *
+     * @param email Die Mail-Adresse des Member-Objekts, das abgerufen werden soll.
+     * @return Das aktuelle Member-Objekt.
+     */
+    public Member getMember(@Named("email") String email) {
+        Member member = null;
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            Query q = pm.newQuery(Member.class);
+            q.setFilter("email == emailParam");
+            q.declareParameters("String emailParam");
+            List<Member> results = (List<Member>) q.execute(email);
+            if (!results.isEmpty()) {
+                member = results.get(0);
+            }
+        } catch (JDOObjectNotFoundException e) {
+            // Wird geworfen, wenn kein Objekt mit dem angegebenen Schlüssel existiert
+            // In diesem Fall null zurückgeben
+            return null;
+        } finally {
+            pm.close();
+        }
+        return member;
     }
 }

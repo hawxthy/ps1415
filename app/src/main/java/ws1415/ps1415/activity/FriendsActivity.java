@@ -15,12 +15,12 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import ws1415.ps1415.controller.UserController;
+import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.adapter.UserListAdapter;
+import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
-import ws1415.ps1415.adapter.UserListAdapter;
 import ws1415.ps1415.util.UniversalUtil;
 
 /**
@@ -34,10 +34,14 @@ public class FriendsActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Prüft ob der Benutzer eingeloggt ist
-        UniversalUtil.checkLogin(this);
-
         super.onCreate(savedInstanceState);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_friends);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);

@@ -1,8 +1,8 @@
 package ws1415.SkatenightBackend.model;
 
 /**
- * Diese Enum-Klasse verwaltet die Rollen, die ein Benutzer innerhalb verschiedener
- * Umgebungen annehmen kann.
+ * Diese Enum-Klasse verwaltet die Rollen, die ein Benutzer global in der Anwendung annehmen
+ * kann.
  *
  * @author Martin Wrodarczyk
  */
@@ -18,17 +18,6 @@ public enum GlobalRole {
 
     public Integer getId(){
         return id;
-    }
-
-    public String getRepresentation(){
-        switch(id){
-            case 1:
-                return "Benutzer";
-            case 2:
-                return "Administrator";
-            default:
-                return null;
-        }
     }
 
     public static GlobalRole getValue(Integer i) {

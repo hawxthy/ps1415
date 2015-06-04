@@ -3,7 +3,7 @@ package ws1415.SkatenightBackend.transport;
 import com.google.appengine.api.blobstore.BlobKey;
 
 /**
- * Die primären Daten eines Benutzers.
+ * Dient der Übertragung von primären Benutzerinformationen: Name, Bild und Email.
  *
  * @author Martin Wrodarczyk
  */

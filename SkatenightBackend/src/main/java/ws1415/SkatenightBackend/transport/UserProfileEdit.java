@@ -6,8 +6,7 @@ import ws1415.SkatenightBackend.model.UserInfo;
 import ws1415.SkatenightBackend.model.Visibility;
 
 /**
- * Die UserProfileEdit-Klasse ist für die Übertragung der Nutzerprofildaten zur Bearbeitung eines
- * Nutzerprofils an die Anwendung implementiert.
+ * Dient der Übertragung der Nutzerprofildaten zur Bearbeitung eines Nutzerprofils an die Anwendung.
  *
  * @author Martin Wrodarczyk
  */

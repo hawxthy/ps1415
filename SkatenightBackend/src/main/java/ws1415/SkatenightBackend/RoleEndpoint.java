@@ -11,6 +11,7 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import jdk.nashorn.internal.objects.Global;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.GlobalRole;
@@ -38,7 +39,7 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, email);
-            if (endUser.getGlobalRole().equals(GlobalRole.ADMIN.getId())) {
+            if (endUser.getGlobalRole().equals(GlobalRole.ADMIN)) {
                 return new BooleanWrapper(true);
             } else {
                 return new BooleanWrapper(false);
@@ -61,10 +62,10 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
         try {
             Query q = pm.newQuery(EndUser.class);
             q.setFilter("globalRole == roleParam");
-            q.declareParameters("Integer roleParam");
+            q.declareParameters("GlobalRole roleParam");
             q.setResult("this.email");
 
-            result = (List<String>) q.execute(GlobalRole.ADMIN.getId());
+            result = (List<String>) q.execute(GlobalRole.ADMIN);
             return new ListWrapper(result);
         } finally {
             pm.close();

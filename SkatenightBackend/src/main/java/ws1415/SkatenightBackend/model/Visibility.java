@@ -2,7 +2,7 @@ package ws1415.SkatenightBackend.model;
 
 
 /**
- * Enum-Klasse um die Sichtbarkeit der allgemeinen Informationen eines Benutzers zu vereinfachen.
+ * Enum-Klasse für die Sichtbarkeit der allgemeinen Informationen eines Benutzers.
  */
 public enum Visibility {
     PUBLIC(0),
@@ -17,19 +17,6 @@ public enum Visibility {
 
     public Integer getId() {
         return id;
-    }
-
-    public String getRepresentation(){
-        switch(id){
-            case 0:
-                return "Öffentlich";
-            case 1:
-                return "Freunde";
-            case 2:
-                return "Nur ich";
-            default:
-                return null;
-        }
     }
 
     public static Visibility getValue(Integer i){

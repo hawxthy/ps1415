@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.StringWrapper;
-import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserListData;
 import com.skatenight.skatenightAPI.model.UserPrimaryData;
 import com.skatenight.skatenightAPI.model.UserProfile;
@@ -357,12 +356,12 @@ public abstract class UserController {
      * @param handler         Auszuführender Task
      * @param userProfileEdit Neue Nutzerprofilinformationen
      */
-    public static void updateUserProfile(ExtendedTaskDelegate<Void, UserInfo> handler, final UserProfileEdit userProfileEdit) {
-        new ExtendedTask<Void, Void, UserInfo>(handler) {
+    public static void updateUserProfile(ExtendedTaskDelegate<Void, Boolean> handler, final UserProfileEdit userProfileEdit) {
+        new ExtendedTask<Void, Void, Boolean>(handler) {
             @Override
-            protected UserInfo doInBackground(Void... voids) {
+            protected Boolean doInBackground(Void... voids) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().updateUserProfile(userProfileEdit).execute();
+                    return ServiceProvider.getService().userEndpoint().updateUserProfile(userProfileEdit).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Benutzerdaten konnten nicht geändert werden");

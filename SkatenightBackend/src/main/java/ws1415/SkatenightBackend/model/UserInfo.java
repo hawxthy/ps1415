@@ -5,39 +5,20 @@ import javax.jdo.annotations.Embedded;
 import javax.jdo.annotations.EmbeddedOnly;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
 
 /**
- * Die UserInfo-Klasse speichert die allgemeinen Informationen zu einem Benutzer.
+ * Die UserInfo-Klasse speichert die allgemeinen Informationen zu einem Benutzer, wobei die Felder
+ * dieser Klasse im Datastore im EndUser gespeichert werden.
  *
  * @author Martin Wrodarczyk
  */
-@PersistenceCapable(detachable="true")
-public class UserInfo implements javax.jdo.listener.StoreCallback {
-    @PrimaryKey
-    @Persistent
-    private String email;
+@PersistenceCapable
+@EmbeddedOnly
+public class UserInfo{
     @Persistent
     private String firstName;
     @Persistent
     private Gender gender;
-
-    // Wird für die Suche verwendet, da lowerCase und Zusammensetzung von Feldern bei JDO Queries nicht angeboten wird
-    private String fullNameLc;
-    @Override
-    public void jdoPreStore() {
-        InfoPair lastNamePair = getLastName();
-        String lastName = null;
-        if(lastNamePair.getValue() != null && !lastNamePair.getValue().isEmpty() && lastNamePair.
-                getVisibility().equals(Visibility.PUBLIC)) {
-            lastName = lastNamePair.getValue();
-        }
-        String firstName = (this.firstName == null || this.firstName.isEmpty()) ? null : this.firstName;
-        if(firstName != null && lastName != null) fullNameLc = firstName.toLowerCase() + " " + lastName.toLowerCase();
-        else if (firstName != null) fullNameLc = firstName.toLowerCase();
-        else if (lastName != null) fullNameLc = lastName.toLowerCase();
-        else fullNameLc = null;
-    }
 
     @Persistent(defaultFetchGroup = "true")
     @Embedded(members = {
@@ -103,23 +84,14 @@ public class UserInfo implements javax.jdo.listener.StoreCallback {
     public UserInfo() {
     }
 
-    public UserInfo(String email) {
-        this.email = email;
-        firstName = "";
+    public UserInfo(String firstName, String lastName) {
+        this.firstName = firstName;
         gender = Gender.NA;
-        lastName = new InfoPair("", Visibility.PUBLIC);
+        this.lastName = new InfoPair(lastName , Visibility.PUBLIC);
         dateOfBirth = new InfoPair("", Visibility.PUBLIC);
         city = new InfoPair("", Visibility.PUBLIC);
         postalCode = new InfoPair("", Visibility.PUBLIC);
         description = new InfoPair("", Visibility.PUBLIC);
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getFirstName() {

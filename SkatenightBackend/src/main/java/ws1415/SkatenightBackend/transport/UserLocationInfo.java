@@ -1,7 +1,7 @@
 package ws1415.SkatenightBackend.transport;
 
 /**
- * Dient zur Übertragung von Nutzerinformationen zusammen mit der dazugehörigen Standortinformationen.
+ * Dient der Übertragung des Benutzernamens zusammen mit der dazugehörigen Standortinformationen.
  *
  * @author Martin Wrodarczyk
  */

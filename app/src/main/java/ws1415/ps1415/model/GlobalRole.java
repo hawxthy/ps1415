@@ -1,12 +1,8 @@
 package ws1415.ps1415.model;
 
-import android.content.Context;
-
-import ws1415.ps1415.R;
-
 /**
- * Diese Enum-Klasse verwaltet die Rollen, die ein Benutzer innerhalb verschiedener
- * Umgebungen annehmen kann.
+ * Diese Enum-Klasse verwaltet die Rollen, die ein Benutzer global in der Anwendung annehmen
+ * kann.
  *
  * @author Martin Wrodarczyk
  */
@@ -24,19 +20,7 @@ public enum GlobalRole {
         return id;
     }
 
-    public String getRepresentation(Context context){
-        switch(id){
-            case 1:
-                return context.getString(R.string.user);
-            case 2:
-                return context.getString(R.string.admin);
-            default:
-                return null;
-        }
-    }
-
-    public static GlobalRole getValue(Integer i)
-    {
+    public static GlobalRole getValue(Integer i) {
         for (GlobalRole r : GlobalRole.values()) {
             if (r.getId().equals(i))
                 return r;

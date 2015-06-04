@@ -174,7 +174,6 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
         for (UserLocation userLocation : userLocations) {
             if (userLocation.getCurrentEventId() != null && userLocation.getCurrentEventId() == event.getId() &&
                     userLocation.getCurrentWaypoint() != null && userLocation.getCurrentWaypoint() < memberCountPerRoutePoint.length) {
-                logger.info(userLocation.getEmail() + " current waypoint: " + userLocation.getCurrentWaypoint());
                 memberCountPerRoutePoint[userLocation.getCurrentWaypoint()] = memberCountPerRoutePoint[userLocation.getCurrentWaypoint()] + 1;
             }
         }

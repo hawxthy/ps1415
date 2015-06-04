@@ -89,10 +89,13 @@ public class EditProfileActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Prüft ob der Benutzer eingeloggt ist
-        UniversalUtil.checkLogin(this);
-
         super.onCreate(savedInstanceState);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_edit_profile);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
@@ -322,14 +325,18 @@ public class EditProfileActivity extends Activity {
         } else {
             mUserProfile.setUserPicture(null);
         }
-        UserController.updateUserProfile(new ExtendedTaskDelegateAdapter<Void, UserInfo>() {
+        UserController.updateUserProfile(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, UserInfo userInfo) {
-                if(!changedPicture) {
-                    editDone();
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                if(aBoolean) {
+                    if (!changedPicture) {
+                        editDone();
+                    } else {
+                        if (mImage != null) uploadUserPicture();
+                        else removeUserPicture();
+                    }
                 } else {
-                    if(mImage != null) uploadUserPicture();
-                    else removeUserPicture();
+                    editFailed("Benutzerdaten konnten nicht geändert werden");
                 }
             }
             @Override

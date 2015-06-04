@@ -36,12 +36,13 @@ public abstract class UniversalUtil {
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             return false;
-        } else {
+        } else if(ServiceProvider.getEmail() == null){
             credential.setSelectedAccountName(PrefManager.getSelectedUserMail(context));
             ServiceProvider.login(credential);
             //initGCM(activity);
             return true;
         }
+        return true;
     }
 
     /**
