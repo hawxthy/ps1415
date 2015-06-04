@@ -69,7 +69,7 @@ public class FriendsActivity extends BaseActivity {
      */
     private void createDeleteDialog(final int position) {
         new AlertDialog.Builder(FriendsActivity.this)
-                .setTitle(mAdapter.getItem(position).getUserInfo().getFirstName())
+                .setTitle(mAdapter.getItem(position).getFirstName())
                 .setMessage(getString(R.string.sure_delete_friend_dialog))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {

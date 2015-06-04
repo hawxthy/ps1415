@@ -18,7 +18,7 @@ public class ServerStartListener implements ServletContextListener {
             new UserEndpoint().createUser(admin, "Skatenight Administrator", "");
             try {
                 EndUser user = pm.getObjectById(EndUser.class, admin);
-                user.setGlobalRole(GlobalRole.ADMIN.getId());
+                user.setGlobalRole(GlobalRole.ADMIN);
             } finally {
                 pm.close();
             }

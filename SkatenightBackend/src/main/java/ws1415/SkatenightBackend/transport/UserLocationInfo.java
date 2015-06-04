@@ -12,6 +12,9 @@ public class UserLocationInfo {
     private double latitude;
     private double longitude;
 
+    public UserLocationInfo(){
+    }
+
     public UserLocationInfo(String email, String firstName, String lastName, double latitude, double longitude) {
         this.email = email;
         this.firstName = firstName;

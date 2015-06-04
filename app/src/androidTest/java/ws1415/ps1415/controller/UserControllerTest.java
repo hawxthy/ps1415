@@ -17,6 +17,7 @@ import com.skatenight.skatenightAPI.model.UserListData;
 import com.skatenight.skatenightAPI.model.UserLocation;
 import com.skatenight.skatenightAPI.model.UserPrimaryData;
 import com.skatenight.skatenightAPI.model.UserProfile;
+import com.skatenight.skatenightAPI.model.UserProfileEdit;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,14 +28,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
+import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.Gender;
+import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.model.Visibility;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
-import ws1415.ps1415.controller.UserController;
-import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.util.ImageUtil;
 
 /**
@@ -69,38 +69,38 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
     // Testdaten für das Updaten des Benutzerprofils
     public static final String TEST_FIRST_NAME = "Martin";
     public static final Gender TEST_GENDER = Gender.MALE;
-    public static final Visibility TEST_GROUP_VISIBILITY = Visibility.FRIENDS;
+    public static final Visibility TEST_SHOW_PRIVATE_GROUPS = Visibility.FRIENDS;
     public static final Boolean TEST_OPT_OUT_SEARCH = true;
 
     public static final String TEST_LAST_NAME = "Müller";
     public static final Visibility TEST_LAST_NAME_VISIBILITY = Visibility.FRIENDS;
     public static final InfoPair TEST_LAST_NAME_PAIR = new InfoPair().
             setValue(TEST_LAST_NAME).
-            setVisibility(TEST_LAST_NAME_VISIBILITY.getId());
+            setVisibility(TEST_LAST_NAME_VISIBILITY.name());
 
     public static final String TEST_CITY = "Münster";
     public static final Visibility TEST_CITY_VISIBILITY = Visibility.ONLY_ME;
     public static final InfoPair TEST_CITY_PAIR = new InfoPair().
             setValue(TEST_CITY).
-            setVisibility(TEST_CITY_VISIBILITY.getId());
+            setVisibility(TEST_CITY_VISIBILITY.name());
 
     public static final String TEST_DATE_OF_BIRTH = "1990/01/01";
     public static final Visibility TEST_DATE_OF_BIRTH_VISIBILITY = Visibility.PUBLIC;
     public static final InfoPair TEST_DATE_OF_BIRTH_PAIR = new InfoPair().
             setValue(TEST_DATE_OF_BIRTH).
-            setVisibility(TEST_DATE_OF_BIRTH_VISIBILITY.getId());
+            setVisibility(TEST_DATE_OF_BIRTH_VISIBILITY.name());
 
     public static final String TEST_DESCRIPTION = "Neue Beschreibung";
     public static final Visibility TEST_DESCRIPTION_VISIBILITY = Visibility.PUBLIC;
     public static final InfoPair TEST_DESCRIPTION_PAIR = new InfoPair().
             setValue(TEST_DESCRIPTION).
-            setVisibility(TEST_DESCRIPTION_VISIBILITY.getId());
+            setVisibility(TEST_DESCRIPTION_VISIBILITY.name());
 
     public static final String TEST_POSTAL_CODE = "48159";
     public static final Visibility TEST_POSTAL_CODE_VISIBILITY = Visibility.PUBLIC;
     public static final InfoPair TEST_POSTAL_CODE_PAIR = new InfoPair().
             setValue(TEST_POSTAL_CODE).
-            setVisibility(TEST_POSTAL_CODE_VISIBILITY.getId());
+            setVisibility(TEST_POSTAL_CODE_VISIBILITY.name());
 
     /**
      * Loggt den Benutzer ein und erstellt zwei Benutzer.
@@ -220,9 +220,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
             @Override
             public void taskDidFinish(ExtendedTask task, UserProfile userProfile) {
                 assertNotNull(userProfile);
-                assertNotNull(userProfile.getUserInfo());
                 assertEquals(TEST_MAIL_1, userProfile.getEmail());
-                assertEquals(TEST_MAIL_1, userProfile.getUserInfo().getEmail());
                 getSignal.countDown();
             }
         }, TEST_MAIL_1);
@@ -281,20 +279,8 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
                 assertEquals(result.get(0), TEST_MAIL_1);
                 searchSignal2.countDown();
             }
-        }, TEST_INITIAL_FIRST_NAME_1);
+        }, TEST_INITIAL_FIRST_NAME_1 + " " + TEST_INITIAL_LAST_NAME_1);
         assertTrue(searchSignal2.await(30, TimeUnit.SECONDS));
-
-        final CountDownLatch searchSignal3 = new CountDownLatch(1);
-        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, List<String> result) {
-                assertNotNull(result);
-                assertTrue(result.size() == 1);
-                assertEquals(result.get(0), TEST_MAIL_1);
-                searchSignal3.countDown();
-            }
-        }, TEST_INITIAL_LAST_NAME_1);
-        assertTrue(searchSignal3.await(30, TimeUnit.SECONDS));
     }
 
     /**
@@ -340,15 +326,20 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
     public void testUpdateUserProfile() throws InterruptedException, IOException {
         changeAccount(TEST_MAIL_1);
         // Neue Testdaten initialisieren
+        UserProfileEdit userProfileEdit = new UserProfileEdit();
         UserInfo newUserInfo = new UserInfo();
         newUserInfo.setEmail(TEST_MAIL_1);
         newUserInfo.setFirstName(TEST_FIRST_NAME);
-        newUserInfo.setGender(TEST_GENDER.getId());
+        newUserInfo.setGender(TEST_GENDER.name());
         newUserInfo.setLastName(TEST_LAST_NAME_PAIR);
         newUserInfo.setCity(TEST_CITY_PAIR);
         newUserInfo.setDateOfBirth(TEST_DATE_OF_BIRTH_PAIR);
         newUserInfo.setDescription(TEST_DESCRIPTION_PAIR);
         newUserInfo.setPostalCode(TEST_POSTAL_CODE_PAIR);
+        userProfileEdit.setEmail(TEST_MAIL_1);
+        userProfileEdit.setUserInfo(newUserInfo);
+        userProfileEdit.setOptOutSearch(TEST_OPT_OUT_SEARCH);
+        userProfileEdit.setShowPrivateGroups(TEST_SHOW_PRIVATE_GROUPS.name());
 
         // Profildaten updaten
         final CountDownLatch updateSignal = new CountDownLatch(1);
@@ -357,7 +348,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, UserInfo userInfo) {
                 updateSignal.countDown();
             }
-        }, newUserInfo, TEST_OPT_OUT_SEARCH, TEST_GROUP_VISIBILITY);
+        }, userProfileEdit);
         assertTrue(updateSignal.await(45, TimeUnit.SECONDS));
 
         changeAccount(TEST_MAIL_2);
@@ -365,22 +356,14 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
         UserController.getUserProfile(new ExtendedTaskDelegateAdapter<Void, UserProfile>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserProfile userProfile) {
-                UserInfo userInfo = userProfile.getUserInfo();
-                assertNotNull(userInfo);
-                assertEquals(TEST_MAIL_1, userInfo.getEmail());
-                assertEquals(TEST_FIRST_NAME, userInfo.getFirstName());
-                assertEquals(TEST_GENDER.getId(), userInfo.getGender().intValue());
-                assertEquals(TEST_LAST_NAME_VISIBILITY.getId(), userInfo.getLastName().getVisibility());
-                assertEquals(TEST_CITY_VISIBILITY.getId(), userInfo.getCity().getVisibility());
-                assertEquals(TEST_DATE_OF_BIRTH, userInfo.getDateOfBirth().getValue());
-                assertEquals(TEST_DATE_OF_BIRTH_VISIBILITY.getId(), userInfo.getDateOfBirth().getVisibility());
-                assertEquals(TEST_DESCRIPTION, userInfo.getDescription().getValue());
-                assertEquals(TEST_DESCRIPTION_VISIBILITY.getId(), userInfo.getDescription().getVisibility());
-                assertEquals(TEST_POSTAL_CODE, userInfo.getPostalCode().getValue());
-                assertEquals(TEST_POSTAL_CODE_VISIBILITY.getId(), userInfo.getPostalCode().getVisibility());
-                assertNull(userInfo.getLastName().getValue());
-                assertNull(userInfo.getCity().getValue());
-                assertEquals(TEST_GROUP_VISIBILITY.getId(), userProfile.getShowPrivateGroups());
+                assertEquals(TEST_MAIL_1, userProfile.getEmail());
+                assertEquals(TEST_FIRST_NAME, userProfile.getFirstName());
+                assertEquals(TEST_GENDER.name(), userProfile.getGender());
+                assertEquals(TEST_DATE_OF_BIRTH, userProfile.getDateOfBirth());
+                assertEquals(TEST_DESCRIPTION, userProfile.getDescription());
+                assertEquals(TEST_POSTAL_CODE, userProfile.getPostalCode());
+                assertNull(userProfile.getLastName());
+                assertNull(userProfile.getCity());
                 getSignal.countDown();
             }
         }, TEST_MAIL_1);

@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.BlobKey;
-import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserListData;
 
 import java.text.ParseException;
@@ -154,11 +153,10 @@ public class UserListAdapter extends BaseAdapter {
         }
 
         UserListData item = getItem(i);
-        UserInfo userInfo = item.getUserInfo();
         BlobKey userPicture = item.getUserPicture();
 
-        String primaryText = setUpPrimaryText(userInfo);
-        String secondaryText = setUpSecondaryText(userInfo);
+        String primaryText = setUpPrimaryText(item);
+        String secondaryText = setUpSecondaryText(item);
 
         UserImageLoader.getInstance(mContext).displayImage(userPicture, holder.picture);
         holder.primaryText.setText(primaryText);
@@ -183,15 +181,15 @@ public class UserListAdapter extends BaseAdapter {
         }
     }
 
-    private String setUpPrimaryText(UserInfo userInfo) {
-        String firstName = userInfo.getFirstName();
-        String lastName = userInfo.getLastName().getValue();
+    private String setUpPrimaryText(UserListData userListData) {
+        String firstName = userListData.getFirstName();
+        String lastName = userListData.getLastName();
         return (lastName == null) ? firstName : firstName + " " + lastName;
     }
 
-    private String setUpSecondaryText(UserInfo userInfo) {
-        String city = userInfo.getCity().getValue();
-        String dateOfBirth = userInfo.getDateOfBirth().getValue();
+    private String setUpSecondaryText(UserListData userListData) {
+        String city = userListData.getCity();
+        String dateOfBirth = userListData.getDateOfBirth();
         Integer age = null;
         if (dateOfBirth != null) {
             try {

@@ -193,7 +193,7 @@
     <!-- SearchActivity -->
     <string name="title_activity_search">Suche</string>
     <string name="search_title">Suche</string>
-    <string name="search_hint">E-Mail, Vorname oder Nachname</string>
+    <string name="search_hint">E-Mail oder Namen eingeben</string>
 
     <string name="from_city">aus</string>
     <string name="no_user_found">Keinen passenden Benutzer gefunden</string>
@@ -251,4 +251,5 @@
     <string name="action_add_admin">Administrator hinzufügen</string>
     <string name="cancel">Abbrechen</string>
     <string name="add">Hinzufügen</string>
+    <string name="loading_data">Daten werden geladen</string>
 </resources>

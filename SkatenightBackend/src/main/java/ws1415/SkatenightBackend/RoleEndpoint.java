@@ -88,7 +88,7 @@ public class RoleEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
-            endUser.setGlobalRole(role);
+            endUser.setGlobalRole(GlobalRole.getValue(role));
             return new BooleanWrapper(true);
         } catch (Exception e) {
             return new BooleanWrapper(false);

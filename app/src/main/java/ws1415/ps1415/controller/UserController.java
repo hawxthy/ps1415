@@ -5,10 +5,12 @@ import android.graphics.BitmapFactory;
 
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.EndUser;
+import com.skatenight.skatenightAPI.model.StringWrapper;
 import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserListData;
 import com.skatenight.skatenightAPI.model.UserPrimaryData;
 import com.skatenight.skatenightAPI.model.UserProfile;
+import com.skatenight.skatenightAPI.model.UserProfileEdit;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -28,7 +30,6 @@ import java.util.List;
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.model.Visibility;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
 
@@ -141,6 +142,28 @@ public abstract class UserController {
             protected UserProfile doInBackground(Void... voids) {
                 try {
                     return ServiceProvider.getService().userEndpoint().getUserProfile(userMail).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Benutzerprofil konnte nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Gibt eigene Profildaten eines Benutzers aus, die zur Bearbeitung des Profils dienen.
+     *
+     * @param handler  Auszuführender Task
+     * @param userMail E-Mail Adresse des Benutzers
+     */
+    public static void getUserProfileEdit(ExtendedTaskDelegate<Void, UserProfileEdit> handler,
+                                          final String userMail) {
+        new ExtendedTask<Void, Void, UserProfileEdit>(handler) {
+            @Override
+            protected UserProfileEdit doInBackground(Void... voids) {
+                try {
+                    return ServiceProvider.getService().userEndpoint().getUserProfileEdit(userMail).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Benutzerprofil konnte nicht abgerufen werden");
@@ -318,7 +341,7 @@ public abstract class UserController {
             @Override
             protected List<String> doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().searchUsers(input).execute().getStringList();
+                    return ServiceProvider.getService().userEndpoint().searchUsers(new StringWrapper().setString(input)).execute().getStringList();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Suche konnte nicht durchgeführt werden");
@@ -331,21 +354,15 @@ public abstract class UserController {
     /**
      * Aktualisiert die allgemeinen Informationen zu einem Benutzer.
      *
-     * @param handler           Auszuführender Task
-     * @param newInfo           Allgemeine Informationen zu dem Benutzer
-     * @param optOutSearch      True, falls der Benutzer aus der Suche ausgetragen werden soll, false
-     *                          andernfalls
-     * @param showPrivateGroups True, falls private Gruppen des Benutzers auf dem Profil angezeigt
-     *                          werden sollen, false andernfalls
+     * @param handler         Auszuführender Task
+     * @param userProfileEdit Neue Nutzerprofilinformationen
      */
-    public static void updateUserProfile(ExtendedTaskDelegate<Void, UserInfo> handler, final UserInfo newInfo,
-                                         final Boolean optOutSearch, final Visibility showPrivateGroups) {
+    public static void updateUserProfile(ExtendedTaskDelegate<Void, UserInfo> handler, final UserProfileEdit userProfileEdit) {
         new ExtendedTask<Void, Void, UserInfo>(handler) {
             @Override
             protected UserInfo doInBackground(Void... voids) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().updateUserProfile(optOutSearch,
-                            showPrivateGroups.getId(), newInfo).execute();
+                    return ServiceProvider.getService().userEndpoint().updateUserProfile(userProfileEdit).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Benutzerdaten konnten nicht geändert werden");

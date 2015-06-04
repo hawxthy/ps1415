@@ -1,7 +1,6 @@
 package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.datanucleus.annotations.Unowned;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +20,16 @@ public class EndUser {
     @Persistent
     private String email;
     @Persistent
-    private Integer globalRole;
+    private GlobalRole globalRole;
     @Persistent
     private Boolean optOutSearch;
     @Persistent
-    private Integer showPrivateGroups;
+    private Visibility showPrivateGroups;
     @Persistent(defaultFetchGroup = "true")
-    private BlobKey pictureBlobKey;
-    @Unowned
+    private BlobKey userPicture;
+    @Persistent
     private UserInfo userInfo;
-    @Unowned
+    @Persistent
     private UserLocation userLocation;
     @Persistent
     private List<String> myUserGroups;
@@ -46,9 +45,9 @@ public class EndUser {
         this.email = email;
         this.userLocation = userLocation;
         this.userInfo = userInfo;
-        globalRole = GlobalRole.USER.getId();
+        globalRole = GlobalRole.USER;
         optOutSearch = false;
-        showPrivateGroups = Visibility.PUBLIC.getId();
+        showPrivateGroups = Visibility.PUBLIC;
         myUserGroups = new ArrayList<>();
         myEvents = new ArrayList<>();
         myFriends = new ArrayList<>();
@@ -62,11 +61,11 @@ public class EndUser {
         this.email = email;
     }
 
-    public Integer getGlobalRole() {
+    public GlobalRole getGlobalRole() {
         return globalRole;
     }
 
-    public void setGlobalRole(Integer globalRole) {
+    public void setGlobalRole(GlobalRole globalRole) {
         this.globalRole = globalRole;
     }
 
@@ -78,11 +77,11 @@ public class EndUser {
         this.optOutSearch = optOutSearch;
     }
 
-    public Integer getShowPrivateGroups() {
+    public Visibility getShowPrivateGroups() {
         return showPrivateGroups;
     }
 
-    public void setShowPrivateGroups(Integer showPrivateGroups) {
+    public void setShowPrivateGroups(Visibility showPrivateGroups) {
         this.showPrivateGroups = showPrivateGroups;
     }
 
@@ -94,12 +93,12 @@ public class EndUser {
         this.userLocation = userLocation;
     }
 
-    public BlobKey getPictureBlobKey() {
-        return pictureBlobKey;
+    public BlobKey getUserPicture() {
+        return userPicture;
     }
 
-    public void setPictureBlobKey(BlobKey pictureBlobKey) {
-        this.pictureBlobKey = pictureBlobKey;
+    public void setUserPicture(BlobKey userPicture) {
+        this.userPicture = userPicture;
     }
 
     public UserInfo getUserInfo() {
@@ -111,6 +110,7 @@ public class EndUser {
     }
 
     public List<String> getMyUserGroups() {
+        if(myUserGroups == null) return new ArrayList<>();
         return myUserGroups;
     }
 
@@ -119,6 +119,7 @@ public class EndUser {
     }
 
     public List<Long> getMyEvents() {
+        if(myEvents == null) return new ArrayList<>();
         return myEvents;
     }
 

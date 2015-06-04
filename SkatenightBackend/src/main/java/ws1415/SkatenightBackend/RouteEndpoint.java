@@ -5,22 +5,13 @@ import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 import com.googlecode.objectify.Key;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import javax.jdo.PersistenceManager;
-
 import ws1415.SkatenightBackend.model.BooleanWrapper;
-import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
-import ws1415.SkatenightBackend.model.EventRole;
-import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.RoutePoint;
-import ws1415.SkatenightBackend.model.UserGroup;
-import ws1415.SkatenightBackend.model.UserGroupType;
 import ws1415.SkatenightBackend.model.UserLocation;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;

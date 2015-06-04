@@ -1,5 +1,6 @@
 package ws1415.SkatenightBackend.gcm;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,7 +13,8 @@ import javax.jdo.annotations.Persistent;
 
 /**
  * Verwaltet die Registration-IDs der Benutzer für GCM.
- * @author Richard
+ *
+ * @author Richard Schulze, Martin Wrodarczyk
  */
 @PersistenceCapable
 public class RegistrationManager {
@@ -21,11 +23,18 @@ public class RegistrationManager {
      */
     @Persistent(defaultFetchGroup = "true")
     private Set<String> registeredUser = new HashSet<>();
+
     /**
-     * Speichert für jede Mail-Adresse (für jeden Benutzer) eine Liste der zugehörigen IDs.
+     * Speichert für jede Mail-Adresse (für jeden Benutzer) seine zugehörige ID.
      */
     @Persistent(defaultFetchGroup = "true")
-    private Map<String, String> userIDs = new HashMap<>();
+    private Map<String, String> MailToId = new HashMap<>();
+
+    /**
+     * Speichert für jede ID seine zugehörige E-Mail-Adresse (für jeden Benutzer).
+     */
+    @Persistent(defaultFetchGroup = "true")
+    private Map<String, String> IdToMail = new HashMap<>();
 
     public List<String> getRegisteredUser() {
         return new ArrayList<>(registeredUser);
@@ -33,23 +42,29 @@ public class RegistrationManager {
 
     /**
      * Fügt die Registration-ID zum Manager hinzu, falls diese noch nicht registriert wurde.
+     *
      * @param email Die E-Mail des Benutzers, der die ID registrieren möchte.
      * @param regid Die zu registrierende ID.
      */
     public void addRegistrationId(String email, String regid) {
         registeredUser.add(regid);
-        String oldID = userIDs.get(email);
-        if (oldID != null) {
-            if (oldID.equals(regid)) {
-                // Nichts tun, wenn ID bereits bekannt
-                return;
+        String currentID = MailToId.get(email);
+        if (currentID != null) {
+            if(!currentID.equals(regid)) {
+                registeredUser.remove(currentID);
+                IdToMail.remove(currentID);
             }
-            registeredUser.remove(oldID);
         }
-        userIDs.put(email, regid);
+        String currentMail = IdToMail.get(regid);
+        if(currentMail != null && !currentMail.equals(email)){
+            if(!currentMail.equals(email))
+                MailToId.remove(currentMail);
+        }
+        IdToMail.put(regid, email);
+        MailToId.put(email, regid);
     }
 
     public String getUserIdByMail(String mail) {
-        return userIDs.get(mail);
+        return MailToId.get(mail);
     }
 }

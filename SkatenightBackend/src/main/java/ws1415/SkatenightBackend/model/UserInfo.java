@@ -20,7 +20,7 @@ public class UserInfo implements javax.jdo.listener.StoreCallback {
     @Persistent
     private String firstName;
     @Persistent
-    private Integer gender;
+    private Gender gender;
 
     // Wird für die Suche verwendet, da lowerCase und Zusammensetzung von Feldern bei JDO Queries nicht angeboten wird
     private String fullNameLc;
@@ -29,7 +29,7 @@ public class UserInfo implements javax.jdo.listener.StoreCallback {
         InfoPair lastNamePair = getLastName();
         String lastName = null;
         if(lastNamePair.getValue() != null && !lastNamePair.getValue().isEmpty() && lastNamePair.
-                getVisibility().equals(Visibility.PUBLIC.getId())) {
+                getVisibility().equals(Visibility.PUBLIC)) {
             lastName = lastNamePair.getValue();
         }
         String firstName = (this.firstName == null || this.firstName.isEmpty()) ? null : this.firstName;
@@ -79,9 +79,9 @@ public class UserInfo implements javax.jdo.listener.StoreCallback {
         @Persistent
         private String value;
         @Persistent
-        private Integer visibility;
+        private Visibility visibility;
 
-        public InfoPair(String value, Integer visibility) {
+        public InfoPair(String value, Visibility visibility) {
             this.value = value;
             this.visibility = visibility;
         }
@@ -92,10 +92,10 @@ public class UserInfo implements javax.jdo.listener.StoreCallback {
         public void setValue(String value) {
             this.value = value;
         }
-        public Integer getVisibility() {
+        public Visibility getVisibility() {
             return visibility;
         }
-        public void setVisibility(Integer visibility) {
+        public void setVisibility(Visibility visibility) {
             this.visibility = visibility;
         }
     }
@@ -106,12 +106,12 @@ public class UserInfo implements javax.jdo.listener.StoreCallback {
     public UserInfo(String email) {
         this.email = email;
         firstName = "";
-        gender = Gender.NA.getId();
-        lastName = new InfoPair("", Visibility.PUBLIC.getId());
-        dateOfBirth = new InfoPair("", Visibility.PUBLIC.getId());
-        city = new InfoPair("", Visibility.PUBLIC.getId());
-        postalCode = new InfoPair("", Visibility.PUBLIC.getId());
-        description = new InfoPair("", Visibility.PUBLIC.getId());
+        gender = Gender.NA;
+        lastName = new InfoPair("", Visibility.PUBLIC);
+        dateOfBirth = new InfoPair("", Visibility.PUBLIC);
+        city = new InfoPair("", Visibility.PUBLIC);
+        postalCode = new InfoPair("", Visibility.PUBLIC);
+        description = new InfoPair("", Visibility.PUBLIC);
     }
 
     public String getEmail() {
@@ -130,11 +130,11 @@ public class UserInfo implements javax.jdo.listener.StoreCallback {
         this.firstName = firstName;
     }
 
-    public Integer getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(Integer gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 

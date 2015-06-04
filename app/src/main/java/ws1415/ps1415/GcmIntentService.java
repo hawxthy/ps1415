@@ -17,7 +17,7 @@ import com.skatenight.skatenightAPI.model.UserPrimaryData;
 import java.util.Date;
 
 import de.greenrobot.event.EventBus;
-import ws1415.ps1415.controller.MessageController;
+import ws1415.ps1415.controller.TransferController;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.gcm.MessageType;
 import ws1415.ps1415.model.Conversation;
@@ -104,7 +104,7 @@ public class GcmIntentService extends IntentService {
                             UniversalUtil.simpleLogin(mContext);
                             handleNewMessage(receiver, sender, sendDate, content);
                             if (ServiceProvider.getEmail() != null)
-                                MessageController.sendConfirmation(null, receiver, messageId, sendDate);
+                                TransferController.sendConfirmation(null, sender, messageId, sendDate);
                         }
                         break;
                     case USER_CONFIRMATION_MESSAGE:
@@ -217,9 +217,7 @@ public class GcmIntentService extends IntentService {
 
         Intent intent = new Intent(this, ConversationActivity.class);
         intent.putExtra("email", sender);
-        intent.putExtra("firstName", senderFirstName);
-        intent.putExtra("lastName", senderLastName);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)

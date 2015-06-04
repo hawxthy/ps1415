@@ -184,7 +184,7 @@
     <!-- SearchActivity -->
     <string name="title_activity_search">Search</string>
     <string name="search_title">Search</string>
-    <string name="search_hint">e-mail, first name or last name</string>
+    <string name="search_hint">e-mail or name</string>
 
     <string name="from_city">from</string>
     <string name="no_user_found">No matching user found</string>
@@ -247,4 +247,5 @@
     <string name="action_add_admin">Add Administrator</string>
     <string name="cancel">Cancel</string>
     <string name="add">Add</string>
+    <string name="loading_data">Loading data</string>
 </resources>

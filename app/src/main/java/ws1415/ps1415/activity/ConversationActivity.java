@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import de.greenrobot.event.EventBus;
-import ws1415.ps1415.controller.MessageController;
+import ws1415.ps1415.controller.TransferController;
 import ws1415.ps1415.model.Conversation;
 import ws1415.ps1415.model.LocalMessageType;
 import ws1415.ps1415.model.Message;
@@ -174,11 +174,12 @@ public class ConversationActivity extends Activity {
      * @param localMessage Nachricht
      */
     private void sendMessage(final Message localMessage) {
-        MessageController.sendMessage(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+        TransferController.sendMessage(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
                 if (aBoolean) {
-                    mAdapter.addMessage(localMessage);
+                    if((mAdapter.getCount()-1 >= 0) && mAdapter.getItem(mAdapter.getCount()-1) != localMessage)
+                        mAdapter.addMessage(localMessage);
                     mEditTextInput.getText().clear();
                 } else {
                     UniversalUtil.showToast(ConversationActivity.this, getString(R.string.message_could_not_be_sent));
