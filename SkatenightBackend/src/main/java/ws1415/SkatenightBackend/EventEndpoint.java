@@ -249,8 +249,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         if (!event.getMemberList().containsKey(user.getEmail())) {
             event.getMemberList().put(user.getEmail(), EventRole.PARTICIPANT);
             ofy().save().entity(event).now();
-            // new UserEndpoint().getUserProfile(user, user.getEmail()).addEvent(event);
-            // TODO Muss geändertes EndUser-Objekt gespeichert werden?
+            new UserEndpoint().addEventToUser(user.getEmail(), event);
         }
     }
 
@@ -269,8 +268,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         if (!event.getMemberList().containsValue(EventRole.HOST)) {
             throw new IllegalStateException("the last host of an event can not leave");
         }
-        //new UserEndpoint().getUserProfile(user, user.getEmail()).removeEvent(event);
-        // TODO Muss geändertes EndUser-Objekt gespeichert werden?
+        new UserEndpoint().removeEventFromUser(user.getEmail(), event);
         ofy().save().entity(event).now();
     }
 
@@ -323,85 +321,6 @@ public class EventEndpoint extends SkatenightServerEndpoint {
     // ---------------------------------------------------------------------------------------------
 
     /**
-     * Fügt einen Member zu einem Event hinzu.
-     *
-     * @param keyId Die ID des Events
-     * @param email die E-Mail des Teilnehmers
-     */
-    public void addMemberToEvent(@Named("id") long keyId, @Named("email") String email) {
-        Event event = ofy().load().type(Event.class).id(keyId).safe();
-        Set<String> memberKeys = event.getMemberList().keySet();
-        if (!memberKeys.contains(email)) {
-            event.getMemberList().put(email, EventRole.PARTICIPANT);
-
-            updateEvent(event);
-
-            if (event.isNotificationSend()) {
-                // CurrentEventID setzen
-                Member member = new UserEndpoint().getMember(email);
-                if (member.getCurrentEventId() == null || member.getCurrentEventId() != keyId) {
-                    member.setCurrentEventId(keyId);
-                    member.setCurrentWaypoint(0);
-                }
-
-                PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-                pm.makePersistent(member);
-                RegistrationManager registrationManager = getRegistrationManager(pm);
-
-                Set<String> ids = new HashSet<>();
-                ids.add(registrationManager.getUserIdByMail(email));
-
-                Sender sender = new Sender(Constants.GCM_API_KEY);
-                Message m = new Message.Builder()
-                        .delayWhileIdle(false)
-                        .timeToLive(3600)
-                        .addData("type", MessageType.EVENT_START_MESSAGE.name())
-                        .addData("eventId", Long.toString(keyId))
-                        .build();
-                try {
-                    sender.send(m, new LinkedList<>(ids), 1);
-                }
-                catch (IOException e) {
-
-                }
-                if (pm != null) pm.close();
-            }
-        }
-    }
-
-    /**
-     * Entfernt einen Member von einem Event.
-     *
-     * @param keyId Die ID des Events
-     * @param email Die E-Mail des Members
-     */
-    public void removeMemberFromEvent(@Named("id") long keyId, @Named("email") String email) {
-        Event event = ofy().load().type(Event.class).id(keyId).safe();
-
-        Set<String> memberKeys = event.getMemberList().keySet();
-        if (memberKeys.contains(email)) {
-            event.getMemberList().remove(email);
-            updateEvent(event);
-        }
-    }
-
-    /**
-     * Gibt eine Liste von allen Membern, welche an dem übergenen Event teilnehmen.
-     *
-     * @param keyId die Id von dem Event
-     * @return List von Teilnehmern
-     */
-    public List<EndUser> getMembersFromEvent(@Named("id") long keyId) {
-        Event event = ofy().load().type(Event.class).id(keyId).safe();
-
-        List<EndUser> endUsers = new ArrayList<>(event.getMemberList().size());
-        for (String email: event.getMemberList().keySet()) {
-            endUsers.add(new UserEndpoint().getFullUser(email));
-        }
-        return endUsers;
-    }
-
-    /**
      * Gibt eine Liste von Standortinformationen zu allen Membern, welche an dem übergenen Event teilnehmen.
      *
      * @param keyId
@@ -415,59 +334,5 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             userLocations.add(new UserEndpoint().getUserLocation(email));
         }
         return userLocations;
-    }
-
-    /**
-     * Ändert das bestehende Event auf dem Server mit den Daten von
-     * dem übergebenen Event.
-     *
-     * @param event Das zu ändernde Event
-     */
-    private void updateEvent(Event event) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-
-        Route route;
-        try {
-            route = pm.getObjectById(Route.class, event.getRoute().getId());
-        } catch(Exception ex) {
-            route = null;
-        }
-        if (route != null) {
-            event.setRoute(route);
-        }
-
-        try {
-            pm.makePersistent(event);
-        }
-        finally {
-            pm.close();
-        }
-    }
-
-    /**
-     * Gibt eine ArrayList von allen auf dem Server gespeicherten Events zurück.
-     *
-     * @return Liste mit allen Events
-     */
-    public List<Event> getAllEvents() {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-
-        List<Event> result = null;
-        try {
-            result = (List<Event>) pm.newQuery(Event.class).execute();
-        } finally {
-            pm.close();
-        }
-        if (result != null) {
-            // Events nocheinmal abrufen, da die Route nicht vollständig über ein QUery abgerufen werden kann
-            List<Event> events = new ArrayList<>();
-            for (Event e : result) {
-                events.add(ofy().load().type(Event.class).id(e.getId()).safe());
-            }
-            return events;
-        } else {
-            result = new ArrayList<>();
-        }
-        return result;
     }
 }
