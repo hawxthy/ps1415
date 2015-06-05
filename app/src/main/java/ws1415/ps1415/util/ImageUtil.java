@@ -21,7 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 /**
- * @author Richard
+ * @author Richard Schulze, Martin Wrodarczyk
  */
 public abstract class ImageUtil {
 

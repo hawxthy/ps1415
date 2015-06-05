@@ -17,7 +17,9 @@ import ws1415.ps1415.Constants;
 import ws1415.ps1415.activity.RegisterActivity;
 
 /**
- * Created by Martin on 23.05.2015.
+ * Diverse Hilfsmethoden.
+ *
+ * @author Martin Wrodarczyk
  */
 public abstract class UniversalUtil {
     private static final String TAG = "Skatenight";

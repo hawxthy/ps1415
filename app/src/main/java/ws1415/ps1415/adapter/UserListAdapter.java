@@ -60,7 +60,7 @@ public class UserListAdapter extends BaseAdapter {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         defaultBitmap = ImageUtil.getRoundedBitmap(BitmapFactory.
                 decodeResource(context.getResources(), R.drawable.default_picture));
-        addNextUserInfo(userMails);
+        if(userMails != null && !userMails.isEmpty()) addNextUserInfo(userMails);
     }
 
     /**
@@ -80,7 +80,7 @@ public class UserListAdapter extends BaseAdapter {
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         defaultBitmap = ImageUtil.getRoundedBitmap(BitmapFactory.
                 decodeResource(mContext.getResources(), R.drawable.default_picture));
-        addNextUserInfo(userMails);
+        if(userMails != null && !userMails.isEmpty()) addNextUserInfo(userMails);
     }
 
     /**
