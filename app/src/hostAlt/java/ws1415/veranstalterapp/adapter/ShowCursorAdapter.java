@@ -170,11 +170,11 @@ import java.util.List;
 ////            holder.button.setOnClickListener(new View.OnClickListener() {
 ////                @Override
 ////                public void onClick(View view) {
-////                    Intent intent = new Intent(context, ShowRouteActivity.class);
-////                    intent.putExtra(ShowRouteActivity.EXTRA_TITLE, event.getRoute().getName());
-////                    intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, event.getRoute().getRouteData().getValue());
+////                    Intent intent = new Intent(context, OldShowRouteActivity.class);
+////                    intent.putExtra(OldShowRouteActivity.EXTRA_TITLE, event.getRoute().getName());
+////                    intent.putExtra(OldShowRouteActivity.EXTRA_ROUTE, event.getRoute().getRouteData().getValue());
 ////                    ArrayList<ServerWaypoint> tmp = (ArrayList) event.getRoute().getWaypoints();
-////                    intent.putExtra(ShowRouteActivity.EXTRA_WAYPOINTS, (Serializable) tmp);
+////                    intent.putExtra(OldShowRouteActivity.EXTRA_WAYPOINTS, (Serializable) tmp);
 ////                    context.startActivity(intent);
 ////                }
 ////            });

@@ -106,6 +106,7 @@
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="ok">OK</string>
+    <string name="cancel">Abbrechen</string>
     <string name="context_menu_leave_usergroup">Gruppe verlassen</string>
     <string name="context_menu_delete">Löschen</string>
     <string name="context_menu_visible">Zeige auf der Map</string>
@@ -113,7 +114,7 @@
     <string name="title_fragment_my_user_groups_visible">Sichtbare Gruppen</string>
     <string name="title_fragment_my_user_groups_not_visible">Nicht sichtbare Gruppen</string>
 
-    <!--Strings zu ShowRouteActivity-->
+    <!--Strings zu OldShowRouteActivity-->
     <string name="group">"Gruppe: "</string>
     <!-- Strings zu LocationTransmitterService -->
     <string name="location_transmitter_button_stop">Stop</string>

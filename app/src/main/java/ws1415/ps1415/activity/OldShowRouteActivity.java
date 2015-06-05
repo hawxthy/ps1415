@@ -46,8 +46,8 @@ import ws1415.ps1415.util.LocationUtils;
 /**
  * Zeigt die Strecke des aktuellen Events auf einer Karte an.
  */
-public class ShowRouteActivity extends Activity {
-    private static final String LOG_TAG = ShowRouteActivity.class.getSimpleName();
+public class OldShowRouteActivity extends Activity {
+    private static final String LOG_TAG = OldShowRouteActivity.class.getSimpleName();
 
     public static final String EXTRA_ROUTE = "show_route_extra_route";
     public static final String EXTRA_ROUTE_FIELD_FIRST = "show_route_extra_route_field_first";
@@ -215,7 +215,7 @@ public class ShowRouteActivity extends Activity {
     Runnable mStatusChecker = new Runnable(){
         @Override
         public void run(){
-            Toast.makeText(ShowRouteActivity.this, "Updating...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(OldShowRouteActivity.this, "Updating...", Toast.LENGTH_SHORT).show();
             if (updateUsergroups) {
                 refreshVisibleMembers();
             }
@@ -292,7 +292,7 @@ public class ShowRouteActivity extends Activity {
             return true;
         }
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(ShowRouteActivity.this, SettingsActivity.class);
+            Intent intent = new Intent(OldShowRouteActivity.this, SettingsActivity.class);
             startActivity(intent);
             return true;
         }

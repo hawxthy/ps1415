@@ -2,167 +2,59 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ws1415.ps1415" >
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-
-    <permission
-        android:name="ws1415.ps1415.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-
-    <uses-permission android:name="ws1415.ps1415.permission.C2D_MESSAGE" />
-
-    <uses-feature
-        android:glEsVersion="0x00020000"
-        android:required="true" />
-
-    <application
-        android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+    <application>
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".activity.ShowInformationActivity"
-            android:exported="true"
-            android:label="@string/title_activity_showinformation"
-            android:parentActivityName=".activity.ListEventsActivity" >
+            android:name=".activity.ManageEventsActivity"
+            android:label="@string/title_activity_manage_events" >
+        </activity>
+        <activity
+            android:name=".activity.EditEventActivity"
+            android:label="@string/edit_event"
+            android:parentActivityName=".activity.ManageEventsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.ListEventsActivity" />
+                android:value=".activity.ManageEventsActivity" />
+        </activity>
+        <activity
+            android:name=".activity.ManageRoutesActivity"
+            android:label="@string/title_activity_manage_routes" >
+        </activity>
+        <activity
+            android:name=".activity.RouteEditorActivity"
+            android:label="@string/title_activity_route_editor"
+            android:parentActivityName=".activity.ManageRoutesActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.activity.ManageRoutesActivity" />
         </activity>
         <activity
             android:name=".activity.ShowRouteActivity"
             android:label="@string/title_activity_show_route"
-            android:parentActivityName=".activity.ShowInformationActivity" >
+            android:parentActivityName=".activity.ManageRoutesActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ws1415.ps1415.activity.ShowInformationActivity" />
-        </activity>
-
-        <service
-            android:name=".LocationTransmitterService"
-            android:enabled="true"
-            android:exported="true" />
-
-        <activity
-            android:name=".activity.ListEventsActivity"
-            android:label="@string/title_activity_show_events" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                android:value="ws1415.ps1415.activity.ManageRoutesActivity" />
         </activity>
         <activity
-            android:name=".activity.ActiveEventActivity"
-            android:label="@string/title_activity_active_event"
-            android:parentActivityName=".activity.ListEventsActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.ListEventsActivity" />
-        </activity>
-        <activity
-            android:name=".activity.SettingsActivity"
-            android:label="@string/title_activity_settings" />
-        <activity
-            android:name=".activity.UsergroupActivity"
-            android:label="@string/title_activity_user_group_activity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activity.AddUserGroupActivity"
-            android:label="@string/title_activity_add_user_group"
-            android:screenOrientation="portrait"
+            android:name=".dialog.AddRouteDialog"
+            android:label="@string/title_activity_add_route_dialog"
             android:theme="@android:style/Theme.Holo.Dialog" />
-
-        <receiver
-            android:name=".GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND" >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-
-                <category android:name="ws1415.ps1415" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".LocationTransmitterService$StartServiceReceiver" />
-        <receiver android:name=".LocationTransmitterService$CancelServiceReceiver" />
-
-        <service android:name=".GcmIntentService" />
-
         <activity
-            android:name=".activity.ImageStorageTestActivity"
-            android:label="@string/title_activity_blobstore_test" />
+            android:name=".dialog.AddRouteDraftDialog"
+            android:label="@string/title_activity_add_route_dialog"
+            android:theme="@android:style/Theme.Holo.Dialog" />
         <activity
-            android:name=".activity.RegisterActivity"
-            android:label="@string/title_activity_register"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateVisible" />
-        <activity
-            android:name=".activity.ProfileActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" >
+            android:name=".dialog.EditWaypointDialog"
+            android:label="@string/title_activity_edit_waypoint_dialog"
+            android:parentActivityName=".activity.RouteEditorActivity"
+            android:theme="@android:style/Theme.Holo.Dialog" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.ListEventsActivity" />
-        </activity>
-        <activity
-            android:name=".activity.EditProfileActivity"
-            android:label="@string/title_activity_edit_profile"
-            android:parentActivityName=".activity.ProfileActivity"
-            android:screenOrientation="portrait" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ws1415.ps1415.activity.ProfileActivity" />
-        </activity>
-        <activity
-            android:name=".activity.SearchActivity"
-            android:label="@string/title_activity_search"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" >
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
-
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".activity.ShowEventActivity" >
-        </activity>
-        <activity
-            android:name=".activity.FriendsActivity"
-            android:label="@string/title_activity_friend"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activity.MessagingActivity"
-            android:label="@string/title_activity_messaging"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".activity.ConversationActivity"
-            android:label="@string/title_activity_conversation"
-            android:parentActivityName=".activity.MessagingActivity"
-            android:screenOrientation="portrait" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ws1415.ps1415.activity.MessagingActivity" />
-        </activity>
-        <activity
-            android:name=".activity.UploadImageActivity"
-            android:label="@string/title_activity_upload_image" >
+                android:value="ws1415.ps1415.activity.RouteEditorActivity" />
         </activity>
         <activity
             android:name=".activity.PermissionManagementActivity"

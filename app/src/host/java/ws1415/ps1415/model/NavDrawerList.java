@@ -8,7 +8,9 @@ import ws1415.ps1415.activity.PermissionManagementActivity;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.FriendsActivity;
+import ws1415.ps1415.activity.ManageEventsActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
+import ws1415.ps1415.activity.ManageRoutesActivity;
 import ws1415.ps1415.activity.MessagingActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.activity.SearchActivity;
@@ -122,6 +124,47 @@ public class NavDrawerList {
                     Intent search_intent = new Intent(parent.getContext(), SearchActivity.class);
                     search_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(search_intent);
+                }
+            },
+
+            // ---------------------------------------------
+            // ---------- Veranstalter-Funktionen ----------
+            // ---------------------------------------------
+
+            // ---------- Veranstaltung erstellen/bearbeiten ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.create_edit_events;
+                }
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_event;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(parent.getContext(), ManageEventsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(intent);
+                }
+            },
+
+            // ---------- Routen erstellen/bearbeiten ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.create_edit_routes;
+                }
+                @Override
+                // TODO Icon ändern
+                public int getIconId() {
+                    return R.drawable.ic_event;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(parent.getContext(), ManageRoutesActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(intent);
                 }
             },
 

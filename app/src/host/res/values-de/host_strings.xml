@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="http://schemas.android.com/apk/res/android">
+    <!-- ManageEventsActivity -->
+    <string name="title_activity_manage_events">Veranstaltung erstellen/bearbeiten</string>
+    <array name="manage_events_event_actions">
+        <item>Anzeigen</item>
+        <item>Bearbeiten</item>
+        <item>Löschen</item>
+    </array>
+    <string name="delete_event">Veranstaltung löschen?</string>
+    <string name="delete_event_message">Möchten Sie die Veranstaltung wirklich löschen? Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="event_deletion_error">Beim Löschen des Events ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="action_create_event">Veranstaltung erstellen</string>
+
+    <!-- EditEventActivity -->
+    <string name="edit_event">Veranstaltung bearbeiten</string>
+    <string name="create_event">Veranstaltung bearbeiten</string>
+    <string name="template_event_title">Geben Sie einen Titel ein…</string>
+    <string name="template_event_description">Geben Sie eine Beschreibung ein…</string>
+    <string name="template_event_meeting_place">Geben Sie einen Ort ein…</string>
+    <string name="choose_picture">Bild wählen…</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="save_event">Veranstaltung speichern?</string>
+    <string name="save_event_message">Möchten Sie die Veranstaltung speichern?</string>
+    <string name="error_saving_event">Beim Speichern der Veranstaltung ist ein Fehler aufgetreten.</string>
+    <string name="choose_route">Route wählen…</string>
+
+    <!-- DateTimeDialog -->
+    <string name="choose_datetime">Datum und Uhrzeit wählen…</string>
+
+    <!-- ManageRoutesActivity -->
+    <string name="title_activity_manage_routes">Routen erstellen/bearbeiten</string>
+    <string name="action_create_route">Route erstellen</string>
+    <string name="action_refresh_routes">Aktualisieren</string>
+    <array name="manage_routes_route_actions">
+        <item>Anzeigen</item>
+        <item>Als Vorlage verwenden</item>
+        <item>Löschen</item>
+    </array>
+    <string name="delete_route">Route löschen?</string>
+    <string name="delete_route_message">Möchten Sie die Route wirklich löschen? Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="route_deletion_error">Beim Löschen der Route ist ein Fehler aufgetreten. Wird die Route möglicherweise in bestehenden Veranstaltungen verwendet?</string>
+
+    <!-- RouteEditorActivity -->
+    <string name="title_activity_route_editor">Streckeneditor</string>
+    <string name="title_fragment_route_editor_map">Karte</string>
+    <string name="title_fragment_route_editor_waypoints">Wegpunkte</string>
+    <string name="route_editor_error_load_route">Strecke kann nicht geladen werden.</string>
+    <string name="route_editor_waypoint_name_format">Wegpunkt <xliff:g id="number">%1$d</xliff:g></string>
+    <string name="route_editor_waypoint_deleted"><xliff:g id="waypoint_name">%1$s</xliff:g> wurde gelöscht.</string>
+    <string name="route_editor_save_dialog">Strecke speichern?</string>
+    <string name="route_editor_leave_dialog">Es wurde keine Route erstellt. Trotzdem verlassen?</string>
+
+    <!--Strings zu activtiy_add_route_dialog-->
+    <string name="title_activity_add_route_dialog">Erstelle Route</string>
+    <string name="title_activity_add_route_dialog_routename">Routename: </string>
+    <string name="activity_add_route_dialog_cancel">Abbrechen</string>
+    <string name="activity_add_route_dialog_apply">Ok</string>
+    <string name="activity_add_route_dialog_empty">Routenname darf nicht leer sein</string>
+
+    <!--Strings zu EditWaypointDialog-->
+    <string name="activity_edit_waypoint_dialog_cancel">Abbrechen</string>
+    <string name="activity_edit_waypoint_dialog_delete">Löschen</string>
+    <string name="activity_edit_waypoint_dialog_apply">Übernehmen</string>
+    <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
+    <string name="title_activity_edit_waypoint_dialog">Editiere Wegpunkt</string>
+</resources>

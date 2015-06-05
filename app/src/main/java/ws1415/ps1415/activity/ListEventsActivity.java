@@ -10,6 +10,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.EventFilter;
@@ -52,7 +53,7 @@ public class ListEventsActivity extends BaseActivity implements EventListFragmen
 
         // Einstellungen müssen als erstes beim App Start geladenw werden
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        setContentView(R.layout.activity_show_events);
+        setContentView(R.layout.activity_list_events);
 
         // EventFragment initialisieren
         eventFragment = (EventListFragment) getFragmentManager().findFragmentById(R.id.eventFragment);
@@ -86,7 +87,7 @@ public class ListEventsActivity extends BaseActivity implements EventListFragmen
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.show_events, menu);
+        getMenuInflater().inflate(R.menu.menu_list_events, menu);
         return true;
     }
 
@@ -111,5 +112,10 @@ public class ListEventsActivity extends BaseActivity implements EventListFragmen
         Intent intent = new Intent(this, ShowEventActivity.class);
         intent.putExtra(ShowEventActivity.EXTRA_EVENT_ID, id);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onEventLongClick(AdapterView<?> parent, View v, int position, long id) {
+        return false;
     }
 }

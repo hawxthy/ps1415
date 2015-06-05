@@ -4,6 +4,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 
 import java.util.ArrayList;
 
@@ -20,6 +21,7 @@ import javax.jdo.annotations.PrimaryKey;
 public class Route {
     @Id
     private Long id;
+    @Index
     private String name;
     /**
      * Speichert die Koordinaten der Route als komprimierten String ab.

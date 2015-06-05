@@ -22,6 +22,7 @@ import ws1415.ps1415.task.ExtendedTaskDelegate;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.DynamicFieldsAdapter;
 import ws1415.ps1415.util.DiskCacheImageLoader;
+import ws1415.ps1415.util.UniversalUtil;
 
 public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<Void,EventData> {
     public static final String EXTRA_EVENT_ID = ShowEventActivity.class.getName() + ".EventId";
@@ -29,6 +30,13 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_show_event);
 
         Long eventId = getIntent().getLongExtra(EXTRA_EVENT_ID, -1);

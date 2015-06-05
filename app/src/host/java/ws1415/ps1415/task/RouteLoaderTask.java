@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.task;
+package ws1415.ps1415.task;
 
 import android.net.Uri;
 import android.util.Log;
@@ -20,10 +20,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.util.LocationUtils;
-import ws1415.veranstalterapp.activity.RouteEditorActivity;
+import ws1415.ps1415.activity.RouteEditorActivity;
+import ws1415.ps1415.util.LocationUtils;
 
 /**
  * Task zum erstellen einer Route mit den im ArrayAdapter enthaltenen Waypoints als Wegpunkten.
@@ -32,6 +30,7 @@ import ws1415.veranstalterapp.activity.RouteEditorActivity;
  * 2 Wegpunkte übergeben werden. Aufgrund der Einschränkungen der API dürfen neben dem Start-
  * und Endpunkt maximal 8 Wegpunkte übergeben werden. Die Anweisungen werden als JSON String
  * runtergeladen und anschließend in ein Route Objekt eingefügt.
+ * @author Pascal Otto
  */
 public class RouteLoaderTask extends ExtendedTask<ArrayAdapter<RouteEditorActivity.Waypoint>, Void, RouteEditorActivity.Route> {
     private static final String LOG_TAG = RouteLoaderTask.class.getSimpleName();

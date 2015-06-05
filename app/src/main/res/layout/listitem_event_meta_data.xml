@@ -38,6 +38,6 @@
         android:layout_toEndOf="@id/eventIcon"
         android:layout_below="@id/eventTitle"
         android:textSize="6pt"
-        android:textColor="#666666"/>
+        android:textColor="#666666" />
 
 </RelativeLayout>

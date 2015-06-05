@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="http://schemas.android.com/apk/res/android">
+    <!-- ManageEventsActivity -->
+    <string name="title_activity_manage_events">Create/Edit Events</string>
+    <array name="manage_events_event_actions">
+        <item>Show</item>
+        <item>Edit</item>
+        <item>Delete</item>
+    </array>
+    <string name="delete_event">Delete Event?</string>
+    <string name="delete_event_message">Do you really want to delete the selected event? This can not be undone.</string>
+    <string name="event_deletion_error">An error occurred while deleting the event. Please try again.</string>
+    <string name="action_create_event">Create Event</string>
+
+    <!-- EditEventActivity -->
+    <string name="edit_event">Edit Event</string>
+    <string name="create_event">Create Event</string>
+    <string name="template_event_title">Enter a title…</string>
+    <string name="template_event_description">Enter a description…</string>
+    <string name="template_event_meeting_place">Enter a place…</string>
+    <string name="choose_picture">Choose picture…</string>
+    <string name="edit">Edit</string>
+    <string name="save_event">Save Event?</string>
+    <string name="save_event_message">Do you want to save the event?</string>
+    <string name="error_saving_event">An error occurred while saving the event.</string>
+    <string name="choose_route">Choose route…</string>
+
+    <!-- DateTimeDialog -->
+    <string name="choose_datetime">Pick date and time…</string>
+
+    <!-- ManageRoutesActivity -->
+    <string name="title_activity_manage_routes">Create/Edit Routes</string>
+    <string name="action_create_route">Create Route</string>
+    <string name="action_refresh_routes">Refresh</string>
+    <array name="manage_routes_route_actions">
+        <item>Show</item>
+        <item>Use as draft</item>
+        <item>Delete</item>
+    </array>
+    <string name="delete_route">Delete Route?</string>
+    <string name="delete_route_message">Do you really want to delete the selected route? This can not be undone.</string>
+    <string name="route_deletion_error">An error occurred while deleting the route. Is the route being used in existing events?</string>
+
+    <!-- RouteEditorActivity -->
+    <string name="title_activity_route_editor">Route Editor</string>
+    <string name="title_fragment_route_editor_map">Map</string>
+    <string name="title_fragment_route_editor_waypoints">Waypoints</string>
+    <string name="route_editor_error_load_route">Unable to load route.</string>
+    <string name="route_editor_waypoint_name_format">Waypoint <xliff:g id="number">%1$d</xliff:g></string>
+    <string name="route_editor_waypoint_deleted"><xliff:g id="waypoint_name">%1$s</xliff:g> deleted.</string>
+    <string name="route_editor_save_dialog">Save route?</string>
+    <string name="route_editor_leave_dialog">No route has been created. Do you want to leave anyway?</string>
+
+    <!-- Strings zu activtiy_add_route_dialog -->
+    <string name="title_activity_add_route_dialog">Add Route</string>
+    <string name="title_activity_add_route_dialog_routename">Routename: </string>
+    <string name="activity_add_route_dialog_cancel">Cancel</string>
+    <string name="activity_add_route_dialog_apply">Apply</string>
+    <string name="activity_add_route_dialog_empty">Routename can not be empty</string>
+
+    <!--Strings zu EditWaypointDialog-->
+    <string name="activity_edit_waypoint_dialog_cancel">Cancel</string>
+    <string name="activity_edit_waypoint_dialog_delete">Delete</string>
+    <string name="activity_edit_waypoint_dialog_apply">Apply</string>
+    <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
+    <string name="title_activity_edit_waypoint_dialog">Edit Waypoint</string>
+</resources>

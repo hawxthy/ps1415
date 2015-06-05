@@ -80,6 +80,7 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="context_menu_leave_usergroup">Leave Usergroup</string>
     <string name="context_menu_delete">Delete</string>
     <string name="context_menu_visible">Show on Map</string>
@@ -88,7 +89,7 @@
     <string name="title_fragment_my_user_groups_not_visible">Invisible Groups</string>
 
 
-    <!--Strings zu ShowRouteActivity-->
+    <!--Strings zu OldShowRouteActivity-->
     <string name="group">"Group: "</string>
 
     <!-- Strings zu LocationTransmitterService -->
