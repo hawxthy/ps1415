@@ -3,36 +3,28 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/list_view_item_black_board_creator_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_alignParentLeft="true"
         android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
         android:textSize="14sp"
         android:text="Ersteller"/>
-
-    <TextView
-        android:id="@+id/list_view_item_black_board_date_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="16dp"
-        android:text="Date"/>
 
     <TextView
         android:id="@+id/list_view_item_black_board_content_edit_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/list_view_item_black_board_date_text_view"
+        android:layout_below="@+id/list_view_item_black_board_creator_text_view"
         android:layout_marginTop="8dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp"
-        android:text="Contentsdfsdfsdfsdfdsfsdfsdfsdfsdfdsfsdfsdfdsfdsfsdfsdfdsfdsfds"/>
+        android:textSize="16sp"
+        android:text="Contentsdfsdfsdfsdfdsfsdsdfsdfsdfsdfdssfdsfsdfdsfsdsdfsdfdsfdsfsdfsdfdsfdsfds"/>
 
     <com.gc.materialdesign.views.ButtonFlat
         android:id="@+id/list_view_item_black_board_comments_button"
@@ -41,5 +33,17 @@
         android:layout_below="@+id/list_view_item_black_board_content_edit_text"
         android:background="#1E88E5"
         android:text="@string/commentsBlackBoard"/>
+
+    <TextView
+        android:id="@+id/list_view_item_black_board_date_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/list_view_item_black_board_content_edit_text"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:textSize="12sp"
+        android:text="Date"/>
 
 </RelativeLayout>

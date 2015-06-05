@@ -302,6 +302,9 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = ofy().load().group(UserGroupMetaData.class).type(UserGroup.class).id(groupName).safe();
+        if(group.getBlobKey() == null){
+            return new UserGroupMetaData(group.getName(), group.getCreator(), group.isPrivat(), group.getMemberCount(), null);
+        }
         return new UserGroupMetaData(group.getName(), group.getCreator(), group.isPrivat(), group.getMemberCount(), group.getBlobKey().getKeyString());
 
     }
@@ -385,7 +388,11 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         if (query.list() != null) {
             ArrayList<UserGroupMetaData> metaDatas = new ArrayList<>();
             for (UserGroup group : query.list()) {
-                metaDatas.add(new UserGroupMetaData(group.getName(), group.getCreator(), group.isPrivat(), group.getMemberCount(), group.getBlobKey().getKeyString()));
+                if(group.getBlobKey() == null){
+                    metaDatas.add(new UserGroupMetaData(group.getName(), group.getCreator(), group.isPrivat(), group.getMemberCount(), null));
+                }else{
+                    metaDatas.add(new UserGroupMetaData(group.getName(), group.getCreator(), group.isPrivat(), group.getMemberCount(), group.getBlobKey().getKeyString()));
+                }
             }
             return metaDatas;
         }

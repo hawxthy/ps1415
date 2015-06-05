@@ -14,6 +14,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 @Entity
 public class Board {
     @Id
+    private Long id;
     String groupName;
     ArrayList<Ref<BoardEntry>> entries;
 
@@ -24,6 +25,10 @@ public class Board {
     public Board(String groupName, BoardEntry be){
         this.groupName = groupName;
         addBoardMessage(be);
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getGroupName() {

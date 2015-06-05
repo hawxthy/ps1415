@@ -27,7 +27,7 @@ public class GroupMembersFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_profile_groups, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_group_members, container, false);
 
         mMemberListView = (ListView) rootView.findViewById(R.id.group_profile_members_list_view);
         if(mAdapter != null) mMemberListView.setAdapter(mAdapter);

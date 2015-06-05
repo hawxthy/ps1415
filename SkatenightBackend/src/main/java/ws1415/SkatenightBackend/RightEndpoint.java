@@ -323,6 +323,7 @@ public class RightEndpoint extends SkatenightServerEndpoint {
                 Right.POSTBLACKBOARD.name().equals(right) ||
                 Right.INVITEGROUP.name().equals(right) ||
                 Right.CHANGEGROUPPICTURE.name().equals(right) ||
+                Right.CHANGEGROUPPRIVACY.name().equals(right) ||
                 Right.COMMENTBOARDMESSAGE.name().equals(right) ||
                 Right.DELETEGROUP.name().equals(right) ||
                 Right.GLOBALMESSAGE.name().equals(right) ||

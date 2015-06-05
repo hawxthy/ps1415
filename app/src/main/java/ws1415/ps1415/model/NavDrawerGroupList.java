@@ -32,7 +32,7 @@ public class NavDrawerGroupList {
                 AlertDialog dialog;
                 @Override
                 public int getTitleId() {
-                    return R.string.create_user_group;
+                    return R.string.groupFunctions;
                 }
 
                 @Override
@@ -42,6 +42,9 @@ public class NavDrawerGroupList {
 
                 @Override
                 public void onClick(final AdapterView<?> parent, View view, int position, long id) {
+                    // Die Activity holen, damit Methode auf ihr aufgerufen werden können.
+                    final GroupProfileActivity context = (GroupProfileActivity)parent.getContext();
+
                     // AlertDialog mit variabler Anzahl an Buttons erstellen
                     final AlertDialog.Builder altertadd = new AlertDialog.Builder(parent.getContext());
                     LayoutInflater factory = LayoutInflater.from(parent.getContext());
@@ -82,9 +85,7 @@ public class NavDrawerGroupList {
                     changePrivacyButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
+                            context.startChangePrivacyAction();
                             dialog.dismiss();
                         }
                     });
@@ -118,11 +119,18 @@ public class NavDrawerGroupList {
                             dialog.dismiss();
                         }
                     });
+                    ButtonFlat changePasswordButton = (ButtonFlat) functionsView.findViewById(R.id.group_function_change_password);
+                    changePasswordButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            context.startChangePasswordAction();
+                            dialog.dismiss();
+                        }
+                    });
 
                     // Mache die Buttons unsichtbar, bei denen der User kein Recht hat sie zu benutzen
-                    GroupProfileActivity context = (GroupProfileActivity)parent.getContext();
                     List<String> rights = context.getRights();
-                    if(!rights.contains(Right.FULLRIGHTS)){
+                    if(!rights.contains(Right.FULLRIGHTS.name())){
                         if(!rights.contains(Right.DISTRIBUTERIGHTS.name())){
                             distributeRightsButton.setVisibility(View.GONE);
                         }
@@ -141,6 +149,8 @@ public class NavDrawerGroupList {
                         if(!rights.contains(Right.DELETEMEMBER.name())){
                             removeMemberButton.setVisibility(View.GONE);
                         }
+                        // Nur der Leader kann das Passwort ändern
+                        changePasswordButton.setVisibility(View.GONE);
                     }
 
 

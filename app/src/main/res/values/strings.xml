@@ -286,6 +286,10 @@
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
     <string name="alreadyInGroupString">You are already in this Group</string>
+    <string name="makeGroupPrivateString">Make this Group private?</string>
+    <string name="makeGroupOpenString">Make this Group open to everyone? You will loose your Password</string>
+    <string name="groupOpenNoNeedForPw">Open Groups don\'t need Passwords</string>
+    <string name="groupChangePasswordTitle">Change Password?</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="title_fragment_group_black_board">Blackboard</string>
@@ -300,6 +304,7 @@
     <string name="title_fragment_group_members">Member</string>
 
     <!-- Group Functions -->
+    <string name="groupFunctions">Group Functions</string>
     <string name="groupFunctionsTitle">You can perform the following actions</string>
     <string name="createUserGroup">Create Group</string>
     <string name="distributeRights">Distribute Rights</string>
@@ -309,4 +314,5 @@
     <string name="postGlobalMessage">Global Message</string>
     <string name="removeMember">Remove Members</string>
     <string name="abortGroupFunctions">Cancel</string>
+    <string name="changePasswod">Change Password</string>
 </resources>
