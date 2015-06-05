@@ -171,22 +171,6 @@ public class UserListAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private void setImage(final ImageView userPictureView, final BlobKey userPictureKey) {
-        if (userPictureKey != null) {
-            UserController.getUserPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
-                    userPictureView.setImageBitmap(ImageUtil.getRoundedBitmap(bitmap));
-                }
-
-                @Override
-                public void taskFailed(ExtendedTask task, String message) {
-                    Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
-                }
-            }, userPictureKey);
-        }
-    }
-
     private String setUpPrimaryText(UserListData userListData) {
         String firstName = userListData.getFirstName();
         String lastName = userListData.getLastName();
