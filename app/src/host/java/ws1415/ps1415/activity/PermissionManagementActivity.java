@@ -96,9 +96,9 @@ public class PermissionManagementActivity extends BaseActivity {
      * @param position Position des Administrators in der Liste
      */
     private void takeRightsDialog(final int position) {
-        final String userMail = mAdapter.getItem(position).getUserInfo().getEmail();
+        final String userMail = mAdapter.getItem(position).getEmail();
         new AlertDialog.Builder(PermissionManagementActivity.this)
-                .setTitle(mAdapter.getItem(position).getUserInfo().getEmail())
+                .setTitle(mAdapter.getItem(position).getEmail())
                 .setMessage(getString(R.string.sure_take_right_dialog))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
