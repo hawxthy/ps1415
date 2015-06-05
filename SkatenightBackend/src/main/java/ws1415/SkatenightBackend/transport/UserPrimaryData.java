@@ -3,9 +3,7 @@ package ws1415.SkatenightBackend.transport;
 import com.google.appengine.api.blobstore.BlobKey;
 
 /**
- * Die primären Daten eines Benutzers, die im lokalen Speicher des eingeloggten Benutzers,
- * persistent gespeichert werden sollen, sodass von überall aus der Anwendunh, ohne jedes Mal
- * eine Anfrage zu senden, genutzt werden können.
+ * Dient der Übertragung von primären Benutzerinformationen: Name, Bild und Email.
  *
  * @author Martin Wrodarczyk
  */
@@ -14,6 +12,9 @@ public class UserPrimaryData {
     private BlobKey picture;
     private String firstName;
     private String lastName;
+
+    public UserPrimaryData(){
+    }
 
     public UserPrimaryData(String email, BlobKey picture, String firstName, String lastName) {
         this.email = email;

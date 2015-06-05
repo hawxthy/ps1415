@@ -8,6 +8,9 @@
 
     <string name="loading">Lädt…</string>
 
+    <string name="user">Benutzer</string>
+    <string name="admin">Administrator</string>
+
     <!-- Navigation Drawer -->
     <string name="drawer_open">Slider Menu geöffnet</string>
     <string name="drawer_close">Slider Menu geschlossen</string>
@@ -190,7 +193,7 @@
     <!-- SearchActivity -->
     <string name="title_activity_search">Suche</string>
     <string name="search_title">Suche</string>
-    <string name="search_hint">E-Mail, Vorname oder Nachname</string>
+    <string name="search_hint">E-Mail oder Namen eingeben</string>
 
     <string name="from_city">aus</string>
     <string name="no_user_found">Keinen passenden Benutzer gefunden</string>
@@ -208,6 +211,7 @@
         <item quantity="one">%1$d Freund ausgewählt</item>
         <item quantity="other">%1$d Freunde ausgewählt</item>
     </plurals>
+    <string name="action_refresh_friends">Aktualisieren</string>
 
     <!-- MessagingActivity -->
     <string name="title_activity_messaging">Nachrichten</string>
@@ -237,4 +241,15 @@
     <string name="meeting_place_label">Treffpunkt:</string>
     <string name="fee_label">Gebühr:</string>
     <string name="event_loading_error">Fehler beim Laden des Events</string>
+
+    <!-- PermissionManagementActivity -->
+    <string name="sure_take_right_dialog">Sind Sie sicher, dass Sie diesem Benutzer administrative Rechte entziehen möchten?</string>
+    <string name="took_rights">Rechte erfolgreich entzogen</string>
+    <string name="assigned_rights">Rechte erfolgreich zugewiesen</string>
+    <string name="cant_find_user">Benutzer nicht gefunden</string>
+    <string name="action_refresh_admins">Aktualisieren</string>
+    <string name="action_add_admin">Administrator hinzufügen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="add">Hinzufügen</string>
+    <string name="loading_data">Daten werden geladen</string>
 </resources>

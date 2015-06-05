@@ -7,6 +7,8 @@ package ws1415.SkatenightBackend.transport;
 public class StringWrapper {
     public String string;
 
+    public StringWrapper(){string = "";}
+
     public StringWrapper(String string){
         this.string = string;
     }

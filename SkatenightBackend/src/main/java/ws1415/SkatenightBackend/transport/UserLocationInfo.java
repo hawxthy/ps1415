@@ -1,7 +1,7 @@
 package ws1415.SkatenightBackend.transport;
 
 /**
- * Dient zur Übertragung von Nutzerinformationen zusammen mit der dazugehörigen Standortinformationen.
+ * Dient der Übertragung des Benutzernamens zusammen mit der dazugehörigen Standortinformationen.
  *
  * @author Martin Wrodarczyk
  */
@@ -11,6 +11,9 @@ public class UserLocationInfo {
     private String lastName;
     private double latitude;
     private double longitude;
+
+    public UserLocationInfo(){
+    }
 
     public UserLocationInfo(String email, String firstName, String lastName, double latitude, double longitude) {
         this.email = email;

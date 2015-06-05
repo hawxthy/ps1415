@@ -9,11 +9,11 @@ import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
 
 /**
- * Der MessageController steuert die Übertragung von Nachrichten.
+ * Der TransferController steuert die Übertragung von Nachrichten.
  *
  * @author Martin Wrodarczyk
  */
-public abstract class MessageController {
+public abstract class TransferController {
     /**
      * Sendet eine Nachricht an einen Benutzer.
      *
@@ -30,7 +30,7 @@ public abstract class MessageController {
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().messageEndpoint().sendMessage(content, messageId,
+                    return ServiceProvider.getService().transferEndpoint().sendMessage(content, messageId,
                             receiver, sendDate).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -55,7 +55,7 @@ public abstract class MessageController {
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().messageEndpoint().sendConfirmation(messageId,
+                    return ServiceProvider.getService().transferEndpoint().sendConfirmation(messageId,
                             receiver, sendDate).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();

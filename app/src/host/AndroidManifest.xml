@@ -164,6 +164,12 @@
             android:name=".activity.UploadImageActivity"
             android:label="@string/title_activity_upload_image" >
         </activity>
+        <activity
+            android:name=".activity.PermissionManagementActivity"
+            android:label="@string/permission_management"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

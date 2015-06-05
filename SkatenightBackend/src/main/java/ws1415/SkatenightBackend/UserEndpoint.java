@@ -10,6 +10,7 @@ import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -37,6 +38,7 @@ import ws1415.SkatenightBackend.transport.UserListData;
 import ws1415.SkatenightBackend.transport.UserLocationInfo;
 import ws1415.SkatenightBackend.transport.UserPrimaryData;
 import ws1415.SkatenightBackend.transport.UserProfile;
+import ws1415.SkatenightBackend.transport.UserProfileEdit;
 
 /**
  * Der UserEndpoint stellt Methoden bereit, die genutzt werden um die Benutzer auf dem Server zu
@@ -89,10 +91,8 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     public BooleanWrapper createUser(@Named("userMail") String userMail, @Nullable @Named("firstName") String firstName,
                                      @Nullable @Named("lastName") String lastName) {
         if (!existsUser(userMail).value) {
-            UserLocation userLocation = new UserLocation(userMail);
-            UserInfo userInfo = new UserInfo(userMail);
-            userInfo.setFirstName(firstName);
-            userInfo.setLastName(new UserInfo.InfoPair(lastName, Visibility.PUBLIC.getId()));
+            UserLocation userLocation = new UserLocation();
+            UserInfo userInfo = new UserInfo(firstName, lastName);
             EndUser user = new EndUser(userMail, userLocation, userInfo);
 
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
@@ -163,16 +163,16 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             if (user.getEmail().equals(userMail)) {
-                return new UserPrimaryData(userMail, endUser.getPictureBlobKey(),
+                return new UserPrimaryData(userMail, endUser.getUserPicture(),
                         endUser.getUserInfo().getFirstName(), endUser.getUserInfo().getLastName().getValue());
             } else {
                 List<String> friends = endUser.getMyFriends();
                 String lastName = "";
-                Integer lastNameVis = endUser.getUserInfo().getLastName().getVisibility();
+                Visibility lastNameVis = endUser.getUserInfo().getLastName().getVisibility();
                 if (isVisible(user.getEmail(), userMail, lastNameVis, friends)) {
                     lastName = endUser.getUserInfo().getLastName().getValue();
                 }
-                return new UserPrimaryData(userMail, endUser.getPictureBlobKey(),
+                return new UserPrimaryData(userMail, endUser.getUserPicture(),
                         endUser.getUserInfo().getFirstName(), lastName);
             }
         } finally {
@@ -199,7 +199,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             String firstName = endUser.getUserInfo().getFirstName();
             InfoPair lastNamePair = endUser.getUserInfo().getLastName();
             String lastName = "";
-            Integer lastNameVis = lastNamePair.getVisibility();
+            Visibility lastNameVis = lastNamePair.getVisibility();
             if (isVisible(user.getEmail(), userMail, lastNameVis, friends)) {
                 lastName = lastNamePair.getValue();
             }
@@ -221,7 +221,8 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     public UserLocation getUserLocation(@Named("userMail") String userMail) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            return pm.getObjectById(UserLocation.class, userMail);
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            return endUser.getUserLocation();
         } catch (Exception e) {
             return null;
         } finally {
@@ -234,8 +235,8 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      *
      * @param user     User-Objekt zur Authentifizierung
      * @param userMail E-Mail Adresse des Benutzers
-     * @return Allgemeine Informationen, beigretene Gruppen, teilgenommene Veranstaltungen und
-     * Einstellungen des Benutzers
+     * @return Allgemeine Informationen und beigretene Gruppen
+     * @throws OAuthRequestException
      */
     @ApiMethod(path = "user_profile")
     public UserProfile getUserProfile(User user, @Named("userMail") String userMail) throws OAuthRequestException {
@@ -246,43 +247,53 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             List<String> friends = endUser.getMyFriends();
 
-            UserInfo detachedUserInfo = pm.detachCopy(endUser.getUserInfo());
-            setUpVisibility(detachedUserInfo, user.getEmail(), userMail, friends);
-
-            // TODO: Events abrufen und setzen
+            UserInfo userInfo = pm.detachCopy(endUser.getUserInfo());
+            setUpVisibility(userInfo, user.getEmail(), userMail, friends);
 
             List<UserGroupMetaData> userGroups = listUserGroupMetaData(user, endUser);
 
-            UserProfile result = new UserProfile();
-            result.setUserInfo(detachedUserInfo);
-            result.setUserPicture(endUser.getPictureBlobKey());
-            result.setEmail(endUser.getEmail());
-            result.setMyUserGroups(userGroups);
-            result.setOptOutSearch(endUser.isOptOutSearch());
-            result.setShowPrivateGroups(endUser.getShowPrivateGroups());
-            return result;
+            return new UserProfile(userMail,
+                    endUser.getUserPicture(),
+                    userInfo.getFirstName(),
+                    userInfo.getLastName().getValue(),
+                    userInfo.getGender(),
+                    userInfo.getDateOfBirth().getValue(),
+                    userInfo.getCity().getValue(),
+                    userInfo.getPostalCode().getValue(),
+                    userInfo.getDescription().getValue(),
+                    userGroups,
+                    endUser.getMyEvents().size());
         } finally {
             pm.close();
         }
     }
 
+
     /**
-     * Gibt eine Liste von allen Veranstaltungen aus, an denen der Benutzer teilgenommen hat bzw.
-     * teilnimmt.
+     * Gibt die Profilinformationen eines Benutzers mit der angegebenen E-Mail Adresse aus.
      *
-     * @param endUser Benutzer dessen Veranstaltungen abgerufen werden
-     * @return Liste von Veranstaltungen des Benutzers
+     * @param user     User-Objekt zur Authentifizierung
+     * @param userMail E-Mail Adresse des Benutzers
+     * @return Allgemeine Informationen, beigretene Gruppen, teilgenommene Veranstaltungen und
+     * Einstellungen des Benutzers
      */
-    private List<Event> listEvents(EndUser endUser) {
-        List<Long> eventIds = endUser.getMyEvents();
-        Event event;
-        List<Event> result = new ArrayList<>();
-        for (long key : eventIds) {
-            // TODO Methode ggf. in den EventEndpoint verschieben
-//            event = new EventEndpoint().getEvent(key);
-//            if (event != null) result.add(event);
+    @ApiMethod(path = "user_profile_edit")
+    public UserProfileEdit getUserProfileEdit(User user, @Named("userMail") String userMail) throws OAuthRequestException, UnauthorizedException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfEndUserNotExists(userMail);
+        EndpointUtil.throwIfUserNotSame(user.getEmail(), userMail);
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+
+            return new UserProfileEdit(endUser.getEmail(),
+                    endUser.isOptOutSearch(),
+                    endUser.getShowPrivateGroups(),
+                    endUser.getUserPicture(),
+                    endUser.getUserInfo());
+        } finally {
+            pm.close();
         }
-        return result;
     }
 
     /**
@@ -300,11 +311,15 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             List<String> friends = endUser.getMyFriends();
 
-            UserInfo detachedUserInfo = pm.detachCopy(endUser.getUserInfo());
-            setUpVisibility(detachedUserInfo, user.getEmail(), userMail, friends);
+            UserInfo userInfo = pm.detachCopy(endUser.getUserInfo());
+            setUpVisibility(userInfo, user.getEmail(), userMail, friends);
 
-            return new UserListData(endUser.getEmail(), detachedUserInfo,
-                    endUser.getPictureBlobKey());
+            return new UserListData(userMail,
+                    endUser.getUserPicture(),
+                    userInfo.getFirstName(),
+                    userInfo.getLastName().getValue(),
+                    userInfo.getCity().getValue(),
+                    userInfo.getDateOfBirth().getValue());
         } catch (Exception e) {
             return null;
         } finally {
@@ -360,30 +375,24 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      *              dem Nachnamen gesucht wird
      * @return E-Mail Adressen der Ergebnisbenutzer
      */
-    public ListWrapper searchUsers(@Named("input") String input) throws OAuthRequestException {
+    public ListWrapper searchUsers(StringWrapper input) throws OAuthRequestException, UnsupportedEncodingException {
+        String query = input.string.trim();
         List<String> cache;
         Set<String> resultMails = new HashSet<>();
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            Query q = pm.newQuery(UserInfo.class);
+            Query q = pm.newQuery(EndUser.class);
             q.setFilter("email.startsWith(inputParam)");
             q.declareParameters("String inputParam");
             q.setResult("this.email");
-            cache = (List<String>) q.execute(input);
+            cache = (List<String>) q.execute(query);
             resultMails.addAll(cache);
 
-            q = pm.newQuery(UserInfo.class);
-            q.setFilter("firstName.startsWith(inputParam)");
+            q = pm.newQuery(EndUser.class);
+            q.setFilter("fullNameLc.startsWith(inputParam)");
             q.declareParameters("String inputParam");
             q.setResult("this.email");
-            cache = (List<String>) q.execute(input);
-            resultMails.addAll(cache);
-
-            q = pm.newQuery(UserInfo.class);
-            q.setFilter("lastName.value.startsWith(inputParam)");
-            q.declareParameters("String inputParam");
-            q.setResult("this.email");
-            cache = (List<String>) q.execute(input);
+            cache = (List<String>) q.execute(query.toLowerCase());
             resultMails.addAll(cache);
 
             Set<String> cacheMails = new HashSet<>();
@@ -395,11 +404,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             }
             resultMails = cacheMails;
 
-//            List<UserListData> result = new ArrayList<>();
-//            for (String userMail : resultMails) {
-//                result.add(getUserInfo(user, userMail, false));
-//            }
-//            return result;
             return new ListWrapper(new ArrayList<>(resultMails));
         } finally {
             pm.close();
@@ -409,35 +413,40 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     /**
      * Aktualisiert die Profilinformationen eines Benutzers.
      *
-     * @param user              User-Objekt für die Authentifikation
-     * @param newUserInfo       Neue allgemeine Informationen zu dem Benutzer
-     * @param optOutSearch      True, falls der Benutzer aus der Suche ausgetragen werden soll, false
-     *                          andernfalls
-     * @param showPrivateGroups True, falls private Gruppen des Benutzers auf dem Profil angezeigt
-     *                          werden sollen, false andernfalls
+     * @param user        User-Objekt für die Authentifikation
+     * @param userProfile Neue Nutzerprofilinformationen
      * @throws UnauthorizedException Wird geworfen, falls Benutzer nicht authorisiert ist, die Aktion auszuführen
      * @throws OAuthRequestException Wird geworfen, falls kein User-Objekt übergeben wird
      */
     @ApiMethod(path = "user_profile")
-    public UserInfo updateUserProfile(User user, UserInfo newUserInfo, @Named("optOutSearch") Boolean optOutSearch, @Named("showPrivateGroups") Integer showPrivateGroups)
+    public BooleanWrapper updateUserProfile(User user, UserProfileEdit userProfile)
             throws UnauthorizedException, OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfEndUserNotExists(user.getEmail());
-        EndpointUtil.throwIfUserNotSame(user.getEmail(), newUserInfo.getEmail());
+        EndpointUtil.throwIfUserNotSame(user.getEmail(), userProfile.getEmail());
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            EndUser endUser = pm.getObjectById(EndUser.class, newUserInfo.getEmail());
-            endUser.setOptOutSearch(optOutSearch);
-            endUser.setShowPrivateGroups(showPrivateGroups);
+            EndUser endUser = pm.getObjectById(EndUser.class, userProfile.getEmail());
             UserInfo userInfo = endUser.getUserInfo();
-            userInfo.setFirstName(newUserInfo.getFirstName());
-            userInfo.setLastName(newUserInfo.getLastName());
-            userInfo.setCity(newUserInfo.getCity());
-            userInfo.setDateOfBirth(newUserInfo.getDateOfBirth());
-            userInfo.setDescription(newUserInfo.getDescription());
-            userInfo.setGender(newUserInfo.getGender());
-            userInfo.setPostalCode(newUserInfo.getPostalCode());
-            return userInfo;
+            endUser.setOptOutSearch(userProfile.isOptOutSearch());
+            endUser.setShowPrivateGroups(userProfile.getShowPrivateGroups());
+
+            // Workaround für das Aktualisieren der embedded fields, da direktes Aktualisieren nicht übernommen wird
+            UserInfo userInfoDet = pm.detachCopy(userInfo);
+            UserInfo newUserInfo = userProfile.getUserInfo();
+            userInfoDet.setFirstName(newUserInfo.getFirstName());
+            userInfoDet.setLastName(newUserInfo.getLastName());
+            userInfoDet.setCity(newUserInfo.getCity());
+            userInfoDet.setDateOfBirth(newUserInfo.getDateOfBirth());
+            userInfoDet.setDescription(newUserInfo.getDescription());
+            userInfoDet.setGender(newUserInfo.getGender());
+            userInfoDet.setPostalCode(newUserInfo.getPostalCode());
+            endUser.setUserInfo(userInfoDet);
+            pm.makePersistent(endUser);
+
+            return new BooleanWrapper(true);
+        } catch (Exception e) {
+            return new BooleanWrapper(false);
         } finally {
             pm.close();
         }
@@ -460,9 +469,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
-            BlobKey picture = endUser.getPictureBlobKey();
+            BlobKey picture = endUser.getUserPicture();
             if (picture != null) blobstoreService.delete(picture);
-            endUser.setPictureBlobKey(null);
+            endUser.setUserPicture(null);
             return new BooleanWrapper(true);
         } catch (Exception e) {
             return new BooleanWrapper(false);
@@ -493,22 +502,28 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfUserNotSame(user.getEmail(), userMail);
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
-            UserLocation userLocation = pm.getObjectById(UserLocation.class, userMail);
-            userLocation.setUpdatedAt(new Date());
-            userLocation.setLatitude(latitude);
-            userLocation.setLongitude(longitude);
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            UserLocation userLocation = endUser.getUserLocation();
+            UserLocation userLocationDet = pm.detachCopy(userLocation);
 
-            if (userLocation.getCurrentEventId() == null || userLocation.getCurrentEventId() != currentEventId) {
-                userLocation.setCurrentEventId(currentEventId);
-                userLocation.setCurrentWaypoint(0);
+            userLocationDet.setUpdatedAt(new Date());
+            userLocationDet.setLatitude(latitude);
+            userLocationDet.setLongitude(longitude);
+
+            if (userLocationDet.getCurrentEventId() == null || userLocationDet.getCurrentEventId() != currentEventId) {
+                userLocationDet.setCurrentEventId(currentEventId);
+                userLocationDet.setCurrentWaypoint(0);
             }
 
             RouteEndpoint routeEndpoint = new RouteEndpoint();
-            routeEndpoint.calculateCurrentWaypoint(userLocation);
+            routeEndpoint.calculateCurrentWaypoint(userLocationDet);
             if (System.currentTimeMillis() - lastFieldUpdateTime >= routeEndpoint.FIELD_UPDATE_INTERVAL) {
-                routeEndpoint.calculateField(userLocation.getCurrentEventId());
+                routeEndpoint.calculateField(userLocationDet.getCurrentEventId());
                 lastFieldUpdateTime = System.currentTimeMillis();
             }
+
+            endUser.setUserLocation(userLocationDet);
+            pm.makePersistent(endUser);
         } finally {
             pm.close();
         }
@@ -585,11 +600,9 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
 
-            if (endUser.getPictureBlobKey() != null)
-                blobstoreService.delete(endUser.getPictureBlobKey());
+            if (endUser.getUserPicture() != null)
+                blobstoreService.delete(endUser.getUserPicture());
             try {
-                pm.deletePersistent(endUser.getUserInfo());
-                pm.deletePersistent(endUser.getUserLocation());
                 pm.deletePersistent(endUser);
             } finally {
                 pm.close();
@@ -656,11 +669,11 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param friends      E-Mail Adressen der Freunde des Benutzers, dessen Informationen abgerufen werden
      * @return true, falls Information sichtbar, false andernfalls
      */
-    protected Boolean isVisible(String mailOfCaller, String mailOfCalled, Integer visibility, List<String> friends) {
-        if (visibility.equals(Visibility.PUBLIC.getId())) return true;
-        if (visibility.equals(Visibility.ONLY_ME.getId()))
+    protected Boolean isVisible(String mailOfCaller, String mailOfCalled, Visibility visibility, List<String> friends) {
+        if (visibility.equals(Visibility.PUBLIC)) return true;
+        if (visibility.equals(Visibility.ONLY_ME))
             return mailOfCaller.equals(mailOfCalled);
-        if (visibility.equals(Visibility.FRIENDS.getId())) {
+        if (visibility.equals(Visibility.FRIENDS)) {
             if (mailOfCaller.equals(mailOfCalled)) return true;
             if (friends == null) return false;
             for (String friend : friends) {
@@ -675,12 +688,12 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * Gibt eine Liste von den Nutzergruppen aus, bei denen der Benutzer als Mitglied eingetragen
      * ist, wenn diese sichtbar sein soll für den aufgerufenen Benutzer.
      *
-     * @param caller E-Mail Adresse des Benutzers, der die Gruppen abfragt
-     * @param endUser      Benutzer dessen Gruppen abgerufen werden
+     * @param caller  E-Mail Adresse des Benutzers, der die Gruppen abfragt
+     * @param endUser Benutzer dessen Gruppen abgerufen werden
      * @return Liste von beigetretenen oder erstellten Nutzergruppen
      */
     private List<UserGroupMetaData> listUserGroupMetaData(User caller, EndUser endUser) throws OAuthRequestException {
-        Integer showPrivateGroupsVisibility = endUser.getShowPrivateGroups();
+        Visibility showPrivateGroupsVisibility = endUser.getShowPrivateGroups();
         List<String> friends = endUser.getMyFriends();
         Boolean showPrivateGroups = isVisible(caller.getEmail(), endUser.getEmail(),
                 showPrivateGroupsVisibility, friends);
@@ -700,6 +713,91 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         return result;
     }
 
+    /**
+     * Prüft ob ein Benutzer mit einem anderen Benutzer befreundet ist.
+     *
+     * @param userMail    E-Mail Adresse des Benutzers mit der Freundeliste
+     * @param mailToCheck E-Mail Adresse des Benutzers, dessen Freundschaft geprüft wird
+     * @return true, falls Freundschaft besteht, false andernfalls
+     */
+    protected Boolean isFriendWith(String userMail, String mailToCheck) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            for (String friend : endUser.getMyFriends()) {
+                if (friend.equals(mailToCheck)) return true;
+            }
+        } catch (Exception e) {
+            return false;
+        } finally {
+            pm.close();
+        }
+        return false;
+    }
+
+    /**
+     * In der Liste der beigetretenen Gruppen des Benutzers wird die übergebene Gruppe hinzugefügt.
+     *
+     * @param userMail  E-Mail des Benutzers
+     * @param userGroup Nutzergruppe
+     */
+    protected void addGroupToUser(String userMail, UserGroup userGroup) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            endUser.addUserGroup(userGroup);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * In der Liste der beigetretenen Gruppen des Benutzers wird die übergebene Gruppe entfernt.
+     *
+     * @param userMail  E-Mail des Benutzers
+     * @param userGroup Nutzergruppe
+     */
+    protected void removeGroupFromUser(String userMail, UserGroup userGroup) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            endUser.removeUserGroup(userGroup);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * In der Liste der teilgenommenen Veranstaltungen des Benutzers wird die übergebene
+     * Veranstaltung hinzugefügt.
+     *
+     * @param userMail E-Mail des Benutzers
+     */
+    protected void addEventToUser(String userMail, Event event) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            endUser.addEvent(event);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * In der Liste der teilgenommenen Veranstaltungen des Benutzers wird die übergebene
+     * Veranstaltung entfernt.
+     *
+     * @param userMail E-Mail des Benutzers
+     */
+    protected void removeEventFromUser(String userMail, Event event) {
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
+            endUser.removeEvent(event);
+        } finally {
+            pm.close();
+        }
+    }
 
     /**
      * ALTE METHODEN
@@ -750,91 +848,5 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             pm.close();
         }
         return member;
-    }
-
-    /**
-     * Prüft ob ein Benutzer mit einem anderen Benutzer befreundet ist.
-     *
-     * @param userMail E-Mail Adresse des Benutzers mit der Freundeliste
-     * @param mailToCheck E-Mail Adresse des Benutzers, dessen Freundschaft geprüft wird
-     * @return true, falls Freundschaft besteht, false andernfalls
-     */
-    protected Boolean isFriendWith(String userMail, String mailToCheck){
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
-            for(String friend : endUser.getMyFriends()){
-                if(friend.equals(mailToCheck)) return true;
-            }
-        } catch (Exception e){
-            return false;
-        } finally {
-            pm.close();
-        }
-        return false;
-    }
-
-    /**
-     * In der Liste der beigetretenen Gruppen des Benutzers wird die übergebene Gruppe hinzugefügt.
-     *
-     * @param userMail E-Mail des Benutzers
-     * @param userGroup Nutzergruppe
-     */
-    protected void addGroupToUser(String userMail, UserGroup userGroup) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
-            endUser.addUserGroup(userGroup);
-        } finally {
-            pm.close();
-        }
-    }
-
-    /**
-     * In der Liste der beigetretenen Gruppen des Benutzers wird die übergebene Gruppe entfernt.
-     *
-     * @param userMail E-Mail des Benutzers
-     * @param userGroup Nutzergruppe
-     */
-    protected void removeGroupFromUser(String userMail, UserGroup userGroup) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
-            endUser.removeUserGroup(userGroup);
-        } finally {
-            pm.close();
-        }
-    }
-
-    /**
-     * In der Liste der teilgenommenen Veranstaltungen des Benutzers wird die übergebene
-     * Veranstaltung hinzugefügt.
-     *
-     * @param userMail E-Mail des Benutzers
-     */
-    protected void addEventToUser(String userMail, Event event) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
-            endUser.addEvent(event);
-        } finally {
-            pm.close();
-        }
-    }
-
-    /**
-     * In der Liste der teilgenommenen Veranstaltungen des Benutzers wird die übergebene
-     * Veranstaltung entfernt.
-     *
-     * @param userMail E-Mail des Benutzers
-     */
-    protected void removeEventFromUser(String userMail, Event event) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
-            endUser.removeEvent(event);
-        } finally {
-            pm.close();
-        }
     }
 }

@@ -44,10 +44,14 @@ public class MessagingActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Prüft ob der Benutzer eingeloggt ist
-        UniversalUtil.checkLogin(this);
-
         super.onCreate(savedInstanceState);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_messaging);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
@@ -104,21 +108,16 @@ public class MessagingActivity extends BaseActivity {
      *
      * @param event Event mit der Email als Information
      */
-    public void onEvent(NewMessageEvent event) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                setUpData();
-            }
-        });
+    public void onEventMainThread(NewMessageEvent event) {
+        setUpData();
     }
 
     private List<Conversation> sortConversation(List<Conversation> conversations) {
         Collections.sort(conversations, new Comparator<Conversation>() {
                     public int compare(Conversation c1, Conversation c2) {
-                        if(c2.getLastMessage() == null && c1.getLastMessage() == null) return 0;
-                        if(c2.getLastMessage() == null) return -1;
-                        if(c1.getLastMessage() == null) return 1;
+                        if (c2.getLastMessage() == null && c1.getLastMessage() == null) return 0;
+                        if (c2.getLastMessage() == null) return -1;
+                        if (c1.getLastMessage() == null) return 1;
                         return c2.getLastMessage().getSendDate().compareTo(c1.getLastMessage().getSendDate());
                     }
                 }
@@ -158,6 +157,7 @@ public class MessagingActivity extends BaseActivity {
 
     /**
      * Aktualisiert die Profildaten eines Benutzers.
+     *
      * @param item
      */
     private void updateProfileData(Conversation item) {
@@ -173,7 +173,7 @@ public class MessagingActivity extends BaseActivity {
                             userPrimaryData.getLastName();
                     boolean succeed = MessageDbController.getInstance(MessagingActivity.this).updateConversation(userPrimaryData.getEmail(),
                             pictureKey, firstName, lastName);
-                    if(succeed) {
+                    if (succeed) {
                         UniversalUtil.showToast(MessagingActivity.this, getString(R.string.profile_updated));
                         setUpData();
                     } else {

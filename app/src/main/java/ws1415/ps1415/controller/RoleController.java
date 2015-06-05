@@ -1,7 +1,5 @@
 package ws1415.ps1415.controller;
 
-import com.skatenight.skatenightAPI.model.UserListData;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -23,13 +21,13 @@ public abstract class RoleController {
      * @param userMail E-Mail Adresse des Benutzers
      * @param role Neue Rolle
      */
-    public static void assignGlobalRole(ExtendedTaskDelegate<Void, Void> handler, final String userMail,
+    public static void assignGlobalRole(ExtendedTaskDelegate<Void, Boolean> handler, final String userMail,
                                         final GlobalRole role) {
-        new ExtendedTask<Void, Void, Void>(handler) {
+        new ExtendedTask<Void, Void, Boolean>(handler) {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected Boolean doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().roleEndpoint().assignGlobalRole(role.getId(), userMail).execute();
+                    return ServiceProvider.getService().roleEndpoint().assignGlobalRole(role.getId(), userMail).execute().getValue();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Rolle des Benutzers konnte nicht gesetzt werden");
@@ -44,12 +42,12 @@ public abstract class RoleController {
      *
      * @param handler Auszuführender Task
      */
-    public static void listGlobalAdmins(ExtendedTaskDelegate<Void, List<UserListData>> handler){
-        new ExtendedTask<Void, Void, List<UserListData>>(handler) {
+    public static void listGlobalAdmins(ExtendedTaskDelegate<Void, List<String>> handler){
+        new ExtendedTask<Void, Void, List<String>>(handler) {
             @Override
-            protected List<UserListData> doInBackground(Void... params) {
+            protected List<String> doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().roleEndpoint().listGlobalAdmins().execute().getItems();
+                    return ServiceProvider.getService().roleEndpoint().listGlobalAdmins().execute().getStringList();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Administratoren konnte nicht abgerufen werden");

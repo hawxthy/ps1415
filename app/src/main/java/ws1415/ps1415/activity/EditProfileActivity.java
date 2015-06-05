@@ -24,9 +24,8 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.skatenight.skatenightAPI.model.BlobKey;
-import com.skatenight.skatenightAPI.model.InfoPair;
 import com.skatenight.skatenightAPI.model.UserInfo;
+import com.skatenight.skatenightAPI.model.UserProfileEdit;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,11 +33,12 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
+import ws1415.ps1415.R;
 import ws1415.ps1415.controller.UserController;
+import ws1415.ps1415.model.Gender;
 import ws1415.ps1415.model.Visibility;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
 import ws1415.ps1415.util.ImageUtil;
 import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.util.UserImageLoader;
@@ -56,11 +56,9 @@ public class EditProfileActivity extends Activity {
     private static final int REQUEST_SELECT_PICTURE = 200;
 
     // Zum Speichern der Daten, die über den Intent übergeben worden sind
-    private UserInfo mUserInfo;
-    private BlobKey userPicture;
+    private String mEmail;
+    private UserProfileEdit mUserProfile;
     private Bitmap mImage;
-    private boolean mOptOutSearch;
-    private Visibility mShowPrivateGroups;
 
     // UI Komponenten
     private ImageView mImageViewPicture;
@@ -91,17 +89,20 @@ public class EditProfileActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Prüft ob der Benutzer eingeloggt ist
-        UniversalUtil.checkLogin(this);
-
         super.onCreate(savedInstanceState);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_edit_profile);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
         // Intent verarbeiten
         Intent intent = getIntent();
-        handleIntent(intent);
+        mEmail = intent.getStringExtra("email");
 
         // UI-Komponenten initialisieren
         mImageViewPicture = (ImageView) findViewById(R.id.activity_edit_profile_picture);
@@ -120,25 +121,26 @@ public class EditProfileActivity extends Activity {
         mCheckBoxOptOut = (CheckBox) findViewById(R.id.activity_edit_profile_findable);
         mSpinnerPrivateGroupsVisibility = (Spinner) findViewById(R.id.activity_edit_profile_private_groups_visibility);
 
-        // UI-Komponenten mit den Daten des Intents füllen
-        mEditTextFirstName.setText(mUserInfo.getFirstName());
-        mEditTextLastName.setText(mUserInfo.getLastName().getValue());
-        mSpinnerLastNameVisibility.setSelection(mUserInfo.getLastName().getVisibility());
-        mSpinnerGender.setSelection(mUserInfo.getGender());
-        mEditTextDateOfBirth.setText(mUserInfo.getDateOfBirth().getValue());
-        mSpinnerDateOfBirthVisibility.setSelection(mUserInfo.getDateOfBirth().getVisibility());
-        mEditTextCity.setText(mUserInfo.getCity().getValue());
-        mSpinnerCityVisibility.setSelection(mUserInfo.getCity().getVisibility());
-        mEditTextPlz.setText(mUserInfo.getPostalCode().getValue());
-        mSpinnerPlzVisibility.setSelection(mUserInfo.getPostalCode().getVisibility());
-        mEditTextDescription.setText(mUserInfo.getDescription().getValue());
-        mSpinnerDescriptionVisibility.setSelection(mUserInfo.getDescription().getVisibility());
-        mCheckBoxOptOut.setChecked(mOptOutSearch);
-        mSpinnerPrivateGroupsVisibility.setSelection(mShowPrivateGroups.getId());
-        UserImageLoader.getInstance(this).displayImageFramed(userPicture, mImageViewPicture);
+        // Standard-Bild vorerst laden
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_picture);
+        mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
 
-        // Listener für den EditText des Geburtsdatums setzen
-        setUpDateOfBirth();
+        setProgressBarIndeterminateVisibility(Boolean.TRUE);
+        UserController.getUserProfileEdit(new ExtendedTaskDelegateAdapter<Void, UserProfileEdit>(){
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserProfileEdit userProfileEdit) {
+                mUserProfile = userProfileEdit;
+                setUpDateOfBirth(userProfileEdit.getUserInfo());
+                setUpViews(userProfileEdit);
+                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+            }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                UniversalUtil.showToast(EditProfileActivity.this, message);
+                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+            }
+        }, mEmail);
 
         // Up-Navigation aktivieren
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -146,34 +148,26 @@ public class EditProfileActivity extends Activity {
     }
 
     /**
-     * Verarbeitet die Daten, die über den Intent gesendet worden sind.
-     *
-     * @param intent Intent
+     * Setzt die geladenen Informationen in die Views.
      */
-    private void handleIntent(Intent intent) {
-        String pictureString = intent.getStringExtra("userPicture");
-        userPicture = (pictureString == null) ? null : new BlobKey().setKeyString(pictureString);
-        mUserInfo = new UserInfo();
-        mUserInfo.setEmail(intent.getStringExtra("email"));
-        mUserInfo.setFirstName(intent.getStringExtra("firstName"));
-        mUserInfo.setGender(intent.getIntExtra("gender", 0));
-        mUserInfo.setLastName(new InfoPair()
-                .setValue(intent.getStringExtra("lastName"))
-                .setVisibility(intent.getIntExtra("lastNameVisibility", 0)));
-        mUserInfo.setDateOfBirth(new InfoPair()
-                .setValue(intent.getStringExtra("dateOfBirth"))
-                .setVisibility(intent.getIntExtra("dateOfBirthVisibility", 0)));
-        mUserInfo.setCity(new InfoPair()
-                .setValue(intent.getStringExtra("city"))
-                .setVisibility(intent.getIntExtra("cityVisibility", 0)));
-        mUserInfo.setPostalCode(new InfoPair()
-                .setValue(intent.getStringExtra("plz"))
-                .setVisibility(intent.getIntExtra("plzVisibility", 0)));
-        mUserInfo.setDescription(new InfoPair()
-                .setValue(intent.getStringExtra("description"))
-                .setVisibility(intent.getIntExtra("descriptionVisibility", 0)));
-        mOptOutSearch = intent.getBooleanExtra("optOutSearch", false);
-        mShowPrivateGroups = Visibility.getValue(intent.getIntExtra("showPrivateGroups", 0));
+    private void setUpViews(UserProfileEdit userProfileEdit) {
+        // UI-Komponenten mit den Daten des Intents füllen
+        UserInfo userInfo = userProfileEdit.getUserInfo();
+        mEditTextFirstName.setText(userProfileEdit.getUserInfo().getFirstName());
+        mEditTextLastName.setText(userInfo.getLastName().getValue());
+        mSpinnerLastNameVisibility.setSelection(Visibility.valueOf(userInfo.getLastName().getVisibility()).getId());
+        mSpinnerGender.setSelection(Gender.valueOf(userInfo.getGender()).getId());
+        mEditTextDateOfBirth.setText(userInfo.getDateOfBirth().getValue());
+        mSpinnerDateOfBirthVisibility.setSelection(Visibility.valueOf(userInfo.getDateOfBirth().getVisibility()).getId());
+        mEditTextCity.setText(userInfo.getCity().getValue());
+        mSpinnerCityVisibility.setSelection(Visibility.valueOf(userInfo.getCity().getVisibility()).getId());
+        mEditTextPlz.setText(userInfo.getPostalCode().getValue());
+        mSpinnerPlzVisibility.setSelection(Visibility.valueOf(userInfo.getPostalCode().getVisibility()).getId());
+        mEditTextDescription.setText(userInfo.getDescription().getValue());
+        mSpinnerDescriptionVisibility.setSelection(Visibility.valueOf(userInfo.getDescription().getVisibility()).getId());
+        mCheckBoxOptOut.setChecked(userProfileEdit.getOptOutSearch());
+        mSpinnerPrivateGroupsVisibility.setSelection(Visibility.valueOf(userProfileEdit.getShowPrivateGroups()).getId());
+        UserImageLoader.getInstance(this).displayImageFramed(userProfileEdit.getUserPicture(), mImageViewPicture);
     }
 
     /**
@@ -247,10 +241,10 @@ public class EditProfileActivity extends Activity {
     }
 
     // Initialisiert das Geburtsdatum-Feld und setzt den Listener für den DatePicker
-    private void setUpDateOfBirth() {
+    private void setUpDateOfBirth(UserInfo userInfo) {
         try {
-            if(mUserInfo.getDateOfBirth().getValue() != null) {
-                Date date = ProfileActivity.DATE_OF_BIRTH_FORMAT.parse(mUserInfo.getDateOfBirth().getValue());
+            if(userInfo.getDateOfBirth().getValue() != null) {
+                Date date = ProfileActivity.DATE_OF_BIRTH_FORMAT.parse(userInfo.getDateOfBirth().getValue());
                 DateOfBirthCal.setTime(date);
             }
         } catch (ParseException e) {
@@ -309,41 +303,47 @@ public class EditProfileActivity extends Activity {
      */
     private void sendData() {
         setProgressBarIndeterminateVisibility(Boolean.TRUE);
-        mUserInfo.setFirstName(mEditTextFirstName.getText().toString());
-        mUserInfo.getLastName().setValue(mEditTextLastName.getText().toString());
-        mUserInfo.getLastName().setVisibility(mSpinnerLastNameVisibility.getSelectedItemPosition());
-        mUserInfo.setGender(mSpinnerGender.getSelectedItemPosition());
-        mUserInfo.getDateOfBirth().setValue(mEditTextDateOfBirth.getText().toString());
-        mUserInfo.getDateOfBirth().setVisibility(mSpinnerDateOfBirthVisibility.getSelectedItemPosition());
-        mUserInfo.getCity().setValue(mEditTextCity.getText().toString());
-        mUserInfo.getCity().setVisibility(mSpinnerCityVisibility.getSelectedItemPosition());
-        mUserInfo.getPostalCode().setValue(mEditTextPlz.getText().toString());
-        mUserInfo.getPostalCode().setVisibility(mSpinnerPlzVisibility.getSelectedItemPosition());
-        mUserInfo.getDescription().setValue(mEditTextDescription.getText().toString());
-        mUserInfo.getDescription().setVisibility(mSpinnerDescriptionVisibility.getSelectedItemPosition());
-        mOptOutSearch = mCheckBoxOptOut.isChecked();
-        mShowPrivateGroups = Visibility.getValue(mSpinnerPrivateGroupsVisibility.getSelectedItemPosition());
+        mUserProfile.getUserInfo().setFirstName(mEditTextFirstName.getText().toString());
+        mUserProfile.getUserInfo().getLastName().setValue(mEditTextLastName.getText().toString());
+        mUserProfile.getUserInfo().getLastName().setVisibility(Visibility.getValue(mSpinnerLastNameVisibility.getSelectedItemPosition()).name());
+        mUserProfile.getUserInfo().setGender(Gender.getValue(mSpinnerGender.getSelectedItemPosition()).name());
+        mUserProfile.getUserInfo().getDateOfBirth().setValue(mEditTextDateOfBirth.getText().toString());
+        mUserProfile.getUserInfo().getDateOfBirth().setVisibility(Visibility.getValue(mSpinnerDateOfBirthVisibility.getSelectedItemPosition()).name());
+        mUserProfile.getUserInfo().getCity().setValue(mEditTextCity.getText().toString());
+        mUserProfile.getUserInfo().getCity().setVisibility(Visibility.getValue(mSpinnerCityVisibility.getSelectedItemPosition()).name());
+        mUserProfile.getUserInfo().getPostalCode().setValue(mEditTextPlz.getText().toString());
+        mUserProfile.getUserInfo().getPostalCode().setVisibility(Visibility.getValue(mSpinnerPlzVisibility.getSelectedItemPosition()).name());
+        mUserProfile.getUserInfo().getDescription().setValue(mEditTextDescription.getText().toString());
+        mUserProfile.getUserInfo().getDescription().setVisibility(Visibility.getValue(mSpinnerDescriptionVisibility.getSelectedItemPosition()).name());
+        mUserProfile.setOptOutSearch(mCheckBoxOptOut.isChecked());
+        mUserProfile.setShowPrivateGroups(Visibility.getValue(mSpinnerPrivateGroupsVisibility.getSelectedItemPosition()).name());
 
-        if(mUserInfo.getFirstName().length() < 3){
+        if(mUserProfile.getUserInfo().getFirstName().length() < 3){
             Toast.makeText(this, getString(R.string.first_name_too_short), Toast.LENGTH_LONG).show();
             setProgressBarIndeterminateVisibility(Boolean.FALSE);
             return;
+        } else {
+            mUserProfile.setUserPicture(null);
         }
-        UserController.updateUserProfile(new ExtendedTaskDelegateAdapter<Void, UserInfo>() {
+        UserController.updateUserProfile(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, UserInfo userInfo) {
-                if(!changedPicture) {
-                    editDone();
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                if(aBoolean) {
+                    if (!changedPicture) {
+                        editDone();
+                    } else {
+                        if (mImage != null) uploadUserPicture();
+                        else removeUserPicture();
+                    }
                 } else {
-                    if(mImage != null) uploadUserPicture();
-                    else removeUserPicture();
+                    editFailed("Benutzerdaten konnten nicht geändert werden");
                 }
             }
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 editFailed(message);
             }
-        }, mUserInfo, mOptOutSearch, mShowPrivateGroups);
+        }, mUserProfile);
 
     }
 
@@ -356,11 +356,12 @@ public class EditProfileActivity extends Activity {
             public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
                 editDone();
             }
+
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 editFailed(message);
             }
-        }, mUserInfo.getEmail(), ImageUtil.BitmapToInputStream(mImage));
+        }, mUserProfile.getEmail(), ImageUtil.BitmapToInputStream(mImage));
     }
 
     /**
@@ -372,17 +373,18 @@ public class EditProfileActivity extends Activity {
             public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
                 editDone();
             }
+
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 editFailed(message);
             }
-        }, mUserInfo.getEmail());
+        }, mUserProfile.getEmail());
     }
 
     /**
      * Wird bei einem Fehler beim Updaten des Profils ausgeführt.
      *
-     * @param message
+     * @param message Fehlernachricht
      */
     private void editFailed(String message) {
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
@@ -397,7 +399,7 @@ public class EditProfileActivity extends Activity {
         Toast.makeText(EditProfileActivity.this, "Profilinformationen wurden geändert", Toast.LENGTH_LONG).show();
         Intent profile_intent = new Intent(EditProfileActivity.this, ProfileActivity.class);
         profile_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        profile_intent.putExtra("email", mUserInfo.getEmail());
+        profile_intent.putExtra("email", mUserProfile.getEmail());
         startActivity(profile_intent);
         finish();
     }
@@ -415,7 +417,8 @@ public class EditProfileActivity extends Activity {
                 onBackPressed();
                 return true;
             case R.id.action_save:
-                sendData();
+                if(mUserProfile != null) sendData();
+                else UniversalUtil.showToast(this, getString(R.string.loading_data));
                 return true;
         }
         return super.onOptionsItemSelected(item);

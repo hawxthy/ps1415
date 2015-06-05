@@ -2,20 +2,19 @@ package ws1415.SkatenightBackend.model;
 
 import java.util.Date;
 
+import javax.jdo.annotations.EmbeddedOnly;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
 
 /**
- * Die UserLocation-Klasse speichert Standortinformationen zu einem Benutzer.
+ * Die UserLocation-Klasse speichert Standortinformationen zu einem Benutzer, , wobei die Felder
+ * dieser Klasse im Datastore im EndUser gespeichert werden.
  *
  * @author Martin Wrodarczyk
  */
-@PersistenceCapable(detachable="true")
+@PersistenceCapable
+@EmbeddedOnly
 public class UserLocation {
-    @PrimaryKey
-    @Persistent
-    private String email;
     @Persistent
     private double latitude;
     @Persistent
@@ -27,23 +26,12 @@ public class UserLocation {
     @Persistent
     private Integer currentWaypoint;
 
-    public UserLocation(){}
-
-    public UserLocation(String email){
-        this.email = email;
+    public UserLocation(){
         latitude = 0;
         longitude = 0;
         updatedAt = new Date();
         currentEventId = 0L;
         currentWaypoint = 0;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public double getLatitude() {

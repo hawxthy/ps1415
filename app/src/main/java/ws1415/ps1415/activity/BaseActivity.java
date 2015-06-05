@@ -16,11 +16,12 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.R;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.NavDrawerListAdapter;
 import ws1415.ps1415.model.NavDrawerItem;
 import ws1415.ps1415.model.NavDrawerList;
+import ws1415.ps1415.util.UniversalUtil;
 
 /**
  * Diese Activity ist die Oberklasse von allen Activities die einen Navigation Drawer enthalten.
@@ -28,6 +29,8 @@ import ws1415.ps1415.model.NavDrawerList;
  * @author Martin Wrodarczyk
  */
 public class BaseActivity extends Activity {
+    private static boolean GCM_INITIALIZED = false;
+
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -37,6 +40,15 @@ public class BaseActivity extends Activity {
 
     protected LinearLayout fullLayout;
     protected FrameLayout actContent;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        if(!GCM_INITIALIZED && ServiceProvider.getEmail() != null) {
+            UniversalUtil.initGCM(this);
+            GCM_INITIALIZED = true;
+        }
+    }
 
     public void setContentView(NavDrawerItem[] items, final int layoutResID) {
         fullLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
@@ -92,6 +104,7 @@ public class BaseActivity extends Activity {
     private class SlideMenuClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            mDrawerLayout.closeDrawer(mDrawerList);
             navDrawerItems.get(position).onClick(parent, view, position, id);
         }
     }

@@ -107,7 +107,7 @@ public class MessagingAdapter extends BaseAdapter {
         Conversation item = getItem(i);
         Message lastMessage = item.getLastMessage();
         String blobKey = item.getPictureKey();
-        String userName = item.getFirstName() + item.getLastName();
+        String userName = item.getFirstName() + " " + item.getLastName();
         LocalMessageType lastMessageType = (lastMessage == null) ? null : lastMessage.getType();
         String lastMessageContent = (lastMessage == null) ? "" : lastMessage.getContent();
         String lastMessageTime = (lastMessage == null) ? "" : convertToMessageTime(lastMessage.getSendDate());

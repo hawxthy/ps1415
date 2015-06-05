@@ -17,7 +17,9 @@ import ws1415.ps1415.Constants;
 import ws1415.ps1415.activity.RegisterActivity;
 
 /**
- * Created by Martin on 23.05.2015.
+ * Diverse Hilfsmethoden.
+ *
+ * @author Martin Wrodarczyk
  */
 public abstract class UniversalUtil {
     private static final String TAG = "Skatenight";
@@ -36,12 +38,13 @@ public abstract class UniversalUtil {
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
             return false;
-        } else {
+        } else if(ServiceProvider.getEmail() == null){
             credential.setSelectedAccountName(PrefManager.getSelectedUserMail(context));
             ServiceProvider.login(credential);
             //initGCM(activity);
             return true;
         }
+        return true;
     }
 
     /**

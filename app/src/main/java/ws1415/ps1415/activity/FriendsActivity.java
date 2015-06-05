@@ -15,12 +15,12 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import ws1415.ps1415.controller.UserController;
+import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.adapter.UserListAdapter;
+import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
-import ws1415.ps1415.adapter.UserListAdapter;
 import ws1415.ps1415.util.UniversalUtil;
 
 /**
@@ -34,10 +34,14 @@ public class FriendsActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Prüft ob der Benutzer eingeloggt ist
-        UniversalUtil.checkLogin(this);
-
         super.onCreate(savedInstanceState);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_friends);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
@@ -59,26 +63,22 @@ public class FriendsActivity extends BaseActivity {
                 return true;
             }
         });
-    }
-
-    @Override
-    protected void onStart(){
-        super.onStart();
         if(ServiceProvider.getEmail() != null) getFriendList();
     }
 
     /**
      * Erstellt einen Dialog, der abfragt ob der Freund gelöscht werden soll
-     * @param i
+     *
+     * @param position Position des Freundes in der Liste
      */
-    private void createDeleteDialog(final int i) {
+    private void createDeleteDialog(final int position) {
         new AlertDialog.Builder(FriendsActivity.this)
-                .setTitle(mAdapter.getItem(i).getUserInfo().getFirstName())
+                .setTitle(mAdapter.getItem(position).getFirstName())
                 .setMessage(getString(R.string.sure_delete_friend_dialog))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                        removeFriend(i);
+                        removeFriend(position);
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -92,16 +92,16 @@ public class FriendsActivity extends BaseActivity {
     /**
      * Löscht den Freund an der übergebenen Position der Liste.
      *
-     * @param i Position in der Liste
+     * @param position Position des Freundes in der Liste
      */
-    private void removeFriend(final int i) {
+    private void removeFriend(final int position) {
         UserController.removeFriend(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
                 if (aBoolean) {
                     Toast.makeText(FriendsActivity.this, getString(R.string.friend_delete_succeeded), Toast.LENGTH_LONG).show();
-                    mAdapter.removeUser(i);
+                    mAdapter.removeUser(position);
                 } else {
                     Toast.makeText(FriendsActivity.this, getString(R.string.friend_does_not_exist), Toast.LENGTH_LONG).show();
                     getFriendList();
@@ -113,7 +113,7 @@ public class FriendsActivity extends BaseActivity {
                 Toast.makeText(FriendsActivity.this, message, Toast.LENGTH_LONG).show();
                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
             }
-        }, ServiceProvider.getEmail(), mAdapter.getItem(i).getEmail());
+        }, ServiceProvider.getEmail(), mAdapter.getItem(position).getEmail());
     }
 
     /**
@@ -124,8 +124,9 @@ public class FriendsActivity extends BaseActivity {
         UserController.listFriends(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<String> stringList) {
+                setProgressBarIndeterminateVisibility(Boolean.FALSE);
                 if (mListViewFriends != null ) {
-                    if(stringList != null && !stringList.isEmpty()) {
+                    if (stringList != null && !stringList.isEmpty()) {
                         mAdapter = new UserListAdapter(stringList, FriendsActivity.this);
                         mListViewFriends.setAdapter(mAdapter);
                     } else {
@@ -133,7 +134,6 @@ public class FriendsActivity extends BaseActivity {
                         mListViewFriends.setAdapter(null);
                     }
                 }
-                setProgressBarIndeterminateVisibility(Boolean.FALSE);
             }
 
             @Override
@@ -154,8 +154,10 @@ public class FriendsActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id){
+            case R.id.action_refresh_friends:
+                getFriendList();
+                break;
         }
 
         return super.onOptionsItemSelected(item);

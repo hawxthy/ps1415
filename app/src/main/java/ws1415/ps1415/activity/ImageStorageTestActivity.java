@@ -32,14 +32,14 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import ws1415.ps1415.R;
+import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.adapter.EventAdapter;
 import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.controller.GalleryController;
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.PictureVisibility;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
-import ws1415.ps1415.adapter.EventAdapter;
 
 public class ImageStorageTestActivity extends BaseActivity {
     private static final int SELECT_IMAGE_REQUEST_CODE = 1;

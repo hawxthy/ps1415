@@ -46,8 +46,8 @@ public class UserBlobstoreHandler extends HttpServlet {
                     "transactions-optional").getPersistenceManager();
             try {
                 EndUser endUser = pm.getObjectById(EndUser.class, userMail);
-                BlobKey oldBlobKey = endUser.getPictureBlobKey();
-                endUser.setPictureBlobKey(blobKeys.get(0));
+                BlobKey oldBlobKey = endUser.getUserPicture();
+                endUser.setUserPicture(blobKeys.get(0));
                 if(oldBlobKey != null) blobstoreService.delete(oldBlobKey);
                 resp.getWriter().print("true");
             } catch (Exception e) {

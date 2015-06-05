@@ -1,8 +1,8 @@
 package ws1415.ps1415.model;
 
 /**
- * Diese Enum-Klasse verwaltet die Rollen, die ein Benutzer innerhalb verschiedener
- * Umgebungen annehmen kann.
+ * Diese Enum-Klasse verwaltet die Rollen, die ein Benutzer global in der Anwendung annehmen
+ * kann.
  *
  * @author Martin Wrodarczyk
  */
@@ -20,19 +20,7 @@ public enum GlobalRole {
         return id;
     }
 
-    public String getRepresentation(){
-        switch(id){
-            case 1:
-                return "Benutzer";
-            case 2:
-                return "Administrator";
-            default:
-                return null;
-        }
-    }
-
-    public static GlobalRole getValue(Integer i)
-    {
+    public static GlobalRole getValue(Integer i) {
         for (GlobalRole r : GlobalRole.values()) {
             if (r.getId().equals(i))
                 return r;

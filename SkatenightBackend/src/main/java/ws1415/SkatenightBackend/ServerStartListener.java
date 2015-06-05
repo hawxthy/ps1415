@@ -15,10 +15,10 @@ public class ServerStartListener implements ServletContextListener {
         for(String admin: Constants.INITIAL_ADMINS){
             PersistenceManager pm = JDOHelper.getPersistenceManagerFactory(
                     "transactions-optional").getPersistenceManager();
-            new UserEndpoint().createUser(admin, "", "");
+            new UserEndpoint().createUser(admin, "Skatenight Administrator", "");
             try {
                 EndUser user = pm.getObjectById(EndUser.class, admin);
-                user.setGlobalRole(GlobalRole.ADMIN.getId());
+                user.setGlobalRole(GlobalRole.ADMIN);
             } finally {
                 pm.close();
             }

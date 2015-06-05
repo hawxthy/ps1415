@@ -15,11 +15,11 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import ws1415.ps1415.R;
+import ws1415.ps1415.adapter.UserListAdapter;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
-import ws1415.ps1415.adapter.UserListAdapter;
 import ws1415.ps1415.util.UniversalUtil;
 
 /**
@@ -34,10 +34,14 @@ public class SearchActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Prüft ob der Benutzer eingeloggt ist
-        UniversalUtil.checkLogin(this);
-
         super.onCreate(savedInstanceState);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_search);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
@@ -71,13 +75,12 @@ public class SearchActivity extends BaseActivity {
             UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<String>>(){
                 @Override
                 public void taskDidFinish(ExtendedTask task, final List<String> stringList) {
+                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
                     if(stringList == null){
-                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
                         Toast.makeText(SearchActivity.this, getString(R.string.no_user_found), Toast.LENGTH_LONG).show();
                         mAdapter = null;
-                        mResultListView.setAdapter(mAdapter);
+                        mResultListView.setAdapter(null);
                     } else {
-                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
                         setUpList(stringList);
                     }
                 }

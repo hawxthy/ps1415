@@ -8,6 +8,9 @@
 
     <string name="loading">Loading…</string>
 
+    <string name="user">User</string>
+    <string name="admin">Administrator</string>
+
     <!-- Content Description -->
     <string name="desc_list_item_icon">Item Icon</string>
 
@@ -181,7 +184,7 @@
     <!-- SearchActivity -->
     <string name="title_activity_search">Search</string>
     <string name="search_title">Search</string>
-    <string name="search_hint">e-mail, first name or last name</string>
+    <string name="search_hint">e-mail or name</string>
 
     <string name="from_city">from</string>
     <string name="no_user_found">No matching user found</string>
@@ -199,6 +202,7 @@
         <item quantity="one">%1$d friend selected</item>
         <item quantity="other">%1$d friends selected</item>
     </plurals>
+    <string name="action_refresh_friends">Refresh</string>
 
     <!-- MessagingActivity -->
     <string name="title_activity_messaging">Messaging</string>
@@ -231,4 +235,17 @@
 
     <!-- UploadImageActivity -->
     <string name="title_activity_upload_image">UploadImageActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+
+    <!-- PermissionManagementActivity -->
+    <string name="sure_take_right_dialog">Are you sure you want to take administrative right of this user?</string>
+    <string name="took_rights">Successfully took rights</string>
+    <string name="assigned_rights">Successfully assigned rights</string>
+    <string name="cant_find_user">User not found</string>
+    <string name="action_refresh_admins">Refresh</string>
+    <string name="action_add_admin">Add Administrator</string>
+    <string name="cancel">Cancel</string>
+    <string name="add">Add</string>
+    <string name="loading_data">Loading data</string>
 </resources>

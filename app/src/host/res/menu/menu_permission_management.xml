@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ws1415.ps1415.activity.PermissionManagementActivity">
+    <item
+        android:id="@+id/action_refresh_admins"
+        android:title="@string/action_refresh_admins"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_refresh" />
+    <item
+        android:id="@+id/action_add_admin"
+        android:title="@string/action_add_admin"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_new" />
+</menu>

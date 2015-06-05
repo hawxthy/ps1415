@@ -16,11 +16,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.BlobKey;
-import com.skatenight.skatenightAPI.model.EventMetaData;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
-import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserProfile;
 
 import java.text.ParseException;
@@ -32,21 +29,26 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 
-import ws1415.ps1415.controller.UserController;
+import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.adapter.ProfilePagerAdapter;
+import ws1415.ps1415.controller.MessageDbController;
+import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.model.Conversation;
 import ws1415.ps1415.model.Gender;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
-import ws1415.ps1415.adapter.ProfilePagerAdapter;
-import ws1415.ps1415.controller.MessageDbController;
 import ws1415.ps1415.util.ImageUtil;
 import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.util.UserImageLoader;
 import ws1415.ps1415.widget.SlidingTabLayout;
 
-public class ProfileActivity extends FragmentActivity{
+/**
+ * Diese Activity dient der Anzeige eines Benutzerprofils.
+ *
+ * @author Martin Wrodarczyk
+ */
+public class ProfileActivity extends FragmentActivity {
     public static final SimpleDateFormat DATE_OF_BIRTH_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
 
     // Für das Wiederherstellen einer Activity
@@ -69,15 +71,19 @@ public class ProfileActivity extends FragmentActivity{
     private Bitmap mUserPicture;
     private String email;
 
-    // Feld um zu prüfen, ob gleicher Serveraufruf stattfindet
+    // Feld um zu prüfen, ob Serveraufruf grade läuft stattfindet
     private boolean addingFriendRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Prüft ob der Benutzer eingeloggt ist
-        UniversalUtil.checkLogin(this);
-
         super.onCreate(savedInstanceState);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_profile);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
@@ -88,7 +94,7 @@ public class ProfileActivity extends FragmentActivity{
 
         // Intent
         Intent intent = getIntent();
-        if(intent.getStringExtra("email") != null) email = intent.getStringExtra("email");
+        if (intent.getStringExtra("email") != null) email = intent.getStringExtra("email");
 
         // Header initialisieren
         mPicture = (ImageView) findViewById(R.id.profile_picture);
@@ -98,7 +104,7 @@ public class ProfileActivity extends FragmentActivity{
         Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.default_picture);
         mPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bm));
 
-        if(email != null) {
+        if (email != null) {
             setProgressBarIndeterminateVisibility(Boolean.TRUE);
             getUserProfile();
         }
@@ -137,7 +143,7 @@ public class ProfileActivity extends FragmentActivity{
     @Override
     protected void onNewIntent(Intent intent) {
         email = intent.getStringExtra("email");
-        if(email != null) {
+        if (email != null) {
             setProgressBarIndeterminateVisibility(Boolean.TRUE);
             getUserProfile();
         }
@@ -154,6 +160,7 @@ public class ProfileActivity extends FragmentActivity{
                 }
                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
             }
+
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
@@ -169,17 +176,14 @@ public class ProfileActivity extends FragmentActivity{
      */
     private void setUpProfile(UserProfile userProfile) {
         mUserProfile = userProfile;
-        UserInfo userInfo = userProfile.getUserInfo();
         List<UserGroupMetaData> userGroups = userProfile.getMyUserGroups();
         userGroups = (userGroups == null) ? new ArrayList<UserGroupMetaData>() : userGroups;
-        List<EventMetaData> events = userProfile.getMyEvents();
-        events = (events == null) ? new ArrayList<EventMetaData>() : events;
 
-        EventMetaData test = new EventMetaData();
-        test.setDate(new DateTime(new Date()));
-        test.setTitle("Primary Title");
-        events.add(test);
-        events.add(test);
+//        EventMetaData test = new EventMetaData();
+//        test.setDate(new DateTime(new Date()));
+//        test.setTitle("Primary Title");
+//        events.add(test);
+//        events.add(test);
 
         UserGroupMetaData testGroup = new UserGroupMetaData();
         testGroup.setMemberCount(2);
@@ -188,28 +192,29 @@ public class ProfileActivity extends FragmentActivity{
         userGroups.add(testGroup);
 
         // Namen setzen
-        String firstName = userInfo.getFirstName();
-        String lastName = userInfo.getLastName().getValue();
+        String firstName = userProfile.getFirstName();
+        String lastName = userProfile.getLastName();
+        if (firstName == null) firstName = "";
         String fullName = (lastName == null) ? firstName : firstName + " " + lastName;
         mName.setText(fullName);
         setTitle(fullName);
 
         // Beschreibung setzen
-        String description = userProfile.getUserInfo().getDescription().getValue();
-        if(description != null) mDescription.setText(description);
+        String description = userProfile.getDescription();
+        if (description != null) mDescription.setText(description);
 
         // Tab setzen
         tabs[0] = getString(R.string.group_tab) + " (" + userGroups.size() + ")";
-        tabs[2] = getString(R.string.events_tab) + " (" + events.size() + ")";
+        tabs[2] = getString(R.string.events_tab) + " (" + userProfile.getEventCount() + ")";
         mTabs.setViewPager(mViewPager);
 
         // Daten für Allgemeines sammeln und Fragment übergeben
-        List<Entry<String, String>> generalData= new ArrayList<>();
-        setUpGeneralData(generalData, userInfo);
+        List<Entry<String, String>> generalData = new ArrayList<>();
+        setUpGeneralData(generalData, userProfile);
         mAdapter.getInfoFragment().setUpData(generalData);
 
         // Daten für Veranstaltungen dem Fragment übergeben
-        mAdapter.getEventFragment().setUpData(events);
+        mAdapter.getEventFragment().setUpData(email);
 
         // Daten für Gruppen dem Fragment übergeben
         mAdapter.getGroupFragment().setUpData(userGroups);
@@ -219,20 +224,20 @@ public class ProfileActivity extends FragmentActivity{
      * Sammelt Informationen um diese in der Liste anzuzeigen
      *
      * @param generalData Informationen, die angezeigt werden sollen
-     * @param userInfo Alle Informationen zu einem Benutzer
+     * @param userProfile Profilinformationen vom Benutzer
      */
-    private void setUpGeneralData(List<Entry<String, String>> generalData, UserInfo userInfo){
-        String postalCode = userInfo.getPostalCode().getValue();
-        String city = userInfo.getCity().getValue();
+    private void setUpGeneralData(List<Entry<String, String>> generalData, UserProfile userProfile) {
+        String postalCode = userProfile.getPostalCode();
+        String city = userProfile.getCity();
         String residence;
-        if(postalCode != null && city != null) residence = postalCode + ", " + city;
+        if (postalCode != null && city != null) residence = postalCode + ", " + city;
         else if (postalCode == null && city != null) residence = city;
         else if (postalCode != null) residence = postalCode;
         else residence = getString(R.string.na);
         generalData.add(new SimpleEntry<>(getString(R.string.residence), residence));
 
-        String dateOfBirth = userInfo.getDateOfBirth().getValue();
-        if(dateOfBirth != null) {
+        String dateOfBirth = userProfile.getDateOfBirth();
+        if (dateOfBirth != null) {
             try {
                 Date date = DATE_OF_BIRTH_FORMAT.parse(dateOfBirth);
                 Calendar dob = Calendar.getInstance();
@@ -241,7 +246,7 @@ public class ProfileActivity extends FragmentActivity{
                 dateOfBirth = getResources().getQuantityString(R.plurals.result_date_of_birth,
                         age,
                         dob.get(Calendar.DAY_OF_MONTH),
-                        dob.get(Calendar.MONTH)+1,
+                        dob.get(Calendar.MONTH) + 1,
                         dob.get(Calendar.YEAR),
                         age);
             } catch (ParseException e) {
@@ -252,25 +257,25 @@ public class ProfileActivity extends FragmentActivity{
         }
         generalData.add(new SimpleEntry<>(getString(R.string.date_of_birth), dateOfBirth));
 
-        Gender gender = Gender.getValue(userInfo.getGender());
+        Gender gender = Gender.valueOf(userProfile.getGender());
         String genderString = null;
-        if(gender.equals(Gender.NA)) genderString = getString(R.string.na);
+        if (gender.equals(Gender.NA)) genderString = getString(R.string.na);
         else if (gender.equals(Gender.MALE)) genderString = getString(R.string.gender_male);
         else if (gender.equals(Gender.FEMALE)) genderString = getString(R.string.gender_female);
-        generalData.add(new SimpleEntry<>(getString(R.string.gender),genderString));
+        generalData.add(new SimpleEntry<>(getString(R.string.gender), genderString));
 
-        String description = userInfo.getDescription().getValue();
-        if(description == null) description = getString(R.string.na);
+        String description = userProfile.getDescription();
+        if (description == null) description = getString(R.string.na);
         generalData.add(new SimpleEntry<>(getString(R.string.description), description));
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu){
+    public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem editItem = menu.findItem(R.id.action_edit_profile);
         MenuItem messageItem = menu.findItem(R.id.action_message_profile);
         MenuItem friendItem = menu.findItem(R.id.action_add_friend);
 
-        if(email != null && email.equals(ServiceProvider.getEmail())){
+        if (email != null && email.equals(ServiceProvider.getEmail())) {
             editItem.setEnabled(true).setVisible(true);
             messageItem.setEnabled(false).setVisible(false);
             friendItem.setEnabled(false).setVisible(false);
@@ -290,42 +295,48 @@ public class ProfileActivity extends FragmentActivity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 return true;
             case R.id.action_edit_profile:
-                if(mUserProfile != null) {
+                if (email != null) {
                     Intent editIntent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-                    prepareEditIntentData(editIntent);
+                    editIntent.putExtra("email", email);
                     startActivity(editIntent);
+                } else {
+                    UniversalUtil.showToast(this, getString(R.string.loading_data));
                 }
                 return true;
             case R.id.action_add_friend:
-                if(email != null && !addingFriendRunning) {
+                if (email != null && !addingFriendRunning) {
                     addingFriendRunning = true;
                     addFriend();
+                } else {
+                    UniversalUtil.showToast(this, getString(R.string.loading_data));
                 }
                 return true;
             case R.id.action_message_profile:
-                if(mUserProfile != null && email != null) {
-                    if(MessageDbController.getInstance(ProfileActivity.this).existsConversation(email)){
+                if (mUserProfile != null && email != null) {
+                    if (MessageDbController.getInstance(ProfileActivity.this).existsConversation(email)) {
                         Intent conversation_intent = new Intent(ProfileActivity.this, ConversationActivity.class);
                         prepareConversationIntent(conversation_intent);
                         startActivity(conversation_intent);
                     } else {
                         createConversationDialog(mUserProfile);
                     }
+                } else {
+                    UniversalUtil.showToast(this, getString(R.string.loading_data));
                 }
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void prepareConversationIntent(Intent conversation_intent) {
-        String firstName = mUserProfile.getUserInfo().getFirstName();
-        if(firstName == null) firstName = "";
-        String lastName = mUserProfile.getUserInfo().getLastName().getValue();
-        if(lastName == null) lastName = "";
+        String firstName = mUserProfile.getFirstName();
+        if (firstName == null) firstName = "";
+        String lastName = mUserProfile.getLastName();
+        if (lastName == null) lastName = "";
         conversation_intent.putExtra("email", mUserProfile.getEmail());
         conversation_intent.putExtra("firstName", firstName);
         conversation_intent.putExtra("lastName", lastName);
@@ -336,9 +347,9 @@ public class ProfileActivity extends FragmentActivity{
                 .setMessage(getString(R.string.create_new_conversation_dialog))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        String firstName = userProfile.getUserInfo().getFirstName();
+                        String firstName = userProfile.getFirstName();
                         firstName = (firstName == null) ? "" : firstName;
-                        String lastName = userProfile.getUserInfo().getLastName().getValue();
+                        String lastName = userProfile.getLastName();
                         lastName = (lastName == null) ? "" : lastName;
                         BlobKey blobKey = userProfile.getUserPicture();
                         String blobKeyString = (blobKey == null) ? "" : blobKey.getKeyString();
@@ -379,28 +390,5 @@ public class ProfileActivity extends FragmentActivity{
                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
             }
         }, ServiceProvider.getEmail(), email);
-    }
-
-    private void prepareEditIntentData(Intent editIntent) {
-        UserInfo userInfo = mUserProfile.getUserInfo();
-        BlobKey blobKey = mUserProfile.getUserPicture();
-        String blobKeyString = (blobKey == null) ? null : blobKey.getKeyString();
-        // Da UserInfo nicht serialisierbar auf Client Seite und es auch nicht möglich ist es mit Json zu senden
-        editIntent.putExtra("email", userInfo.getEmail());
-        editIntent.putExtra("userPicture", blobKeyString);
-        editIntent.putExtra("firstName", userInfo.getFirstName());
-        editIntent.putExtra("gender", userInfo.getGender());
-        editIntent.putExtra("lastName", userInfo.getLastName().getValue());
-        editIntent.putExtra("lastNameVisibility", userInfo.getLastName().getVisibility());
-        editIntent.putExtra("dateOfBirth", userInfo.getDateOfBirth().getValue());
-        editIntent.putExtra("dateOfBirthVisibility", userInfo.getDateOfBirth().getVisibility());
-        editIntent.putExtra("city", userInfo.getCity().getValue());
-        editIntent.putExtra("cityVisibility", userInfo.getCity().getVisibility());
-        editIntent.putExtra("plz", userInfo.getPostalCode().getValue());
-        editIntent.putExtra("plzVisibility", userInfo.getPostalCode().getVisibility());
-        editIntent.putExtra("description", userInfo.getDescription().getValue());
-        editIntent.putExtra("descriptionVisibility", userInfo.getDescription().getVisibility());
-        editIntent.putExtra("optOutSearch", mUserProfile.getOptOutSearch());
-        editIntent.putExtra("showPrivateGroups", mUserProfile.getShowPrivateGroups());
     }
 }

@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.BlobKey;
-import com.skatenight.skatenightAPI.model.UserInfo;
 import com.skatenight.skatenightAPI.model.UserListData;
 
 import java.text.ParseException;
@@ -22,11 +21,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.ps1415.R;
+import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
-import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.util.ImageUtil;
 import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.util.UserImageLoader;
@@ -37,7 +36,7 @@ import ws1415.ps1415.util.UserImageLoader;
  * @author Martin Wrodarczyk
  */
 public class UserListAdapter extends BaseAdapter {
-    private static final int NEXT_DATA_COUNT = 15;
+    private static final int DATA_PER_REQUEST = 15;
     private List<String> mailData;
     private List<UserListData> mData;
     private LayoutInflater mInflater;
@@ -48,8 +47,8 @@ public class UserListAdapter extends BaseAdapter {
 
     /**
      * Erwartet die komplette Liste der E-Mail Adressen der Benutzer die angezeigt werden sollen.
-     * Dabei werden zu Beginn nur die ersten NEXT_DATA_COUNT Benutzer angezeigt und beim Scrollen
-     * werden die nächsten NEXT_DATA_COUNT Benutzer geladen.
+     * Dabei werden zu Beginn nur die ersten {@code DATA_PER_REQUEST} Benutzer angezeigt und beim Scrollen
+     * werden die nächsten {@code DATA_PER_REQUEST} Benutzer geladen.
      *
      * @param userMails Liste der E-Mail Adressen
      * @param context Context
@@ -61,14 +60,14 @@ public class UserListAdapter extends BaseAdapter {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         defaultBitmap = ImageUtil.getRoundedBitmap(BitmapFactory.
                 decodeResource(context.getResources(), R.drawable.default_picture));
-        addNextUserInfo(userMails);
+        if(userMails != null && !userMails.isEmpty()) addNextUserInfo(userMails);
     }
 
     /**
-     * Übergibt man statt dem context eine Activity, so wird der FEATURE_INDETERMINATE_PROGRESS beim
-     * Downloaden von neuen Benutzerinformationen angezeigt. Dafür muss bei der übergebenen Activity
-     * zu Beginn von onCreate requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS) ausgeführt
-     * werden.
+     * Übergibt man statt dem context eine Activity, so wird der {@code FEATURE_INDETERMINATE_PROGRESS]
+     * beim Downloaden von neuen Benutzerinformationen angezeigt. Dafür muss bei der übergebenen
+     * Activity zu Beginn von onCreate {@code requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS))
+     * ausgeführt werden.
      *
      * @param userMails
      * @param activity
@@ -81,7 +80,7 @@ public class UserListAdapter extends BaseAdapter {
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         defaultBitmap = ImageUtil.getRoundedBitmap(BitmapFactory.
                 decodeResource(mContext.getResources(), R.drawable.default_picture));
-        addNextUserInfo(userMails);
+        if(userMails != null && !userMails.isEmpty()) addNextUserInfo(userMails);
     }
 
     /**
@@ -92,17 +91,22 @@ public class UserListAdapter extends BaseAdapter {
     private void addNextUserInfo(final List<String> userMails) {
         if (!loadingData) {
             if(mActivity != null) mActivity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
-            int dataSize = (userMails.size() < NEXT_DATA_COUNT) ? userMails.size() : NEXT_DATA_COUNT;
+            int dataSize = (userMails.size() < DATA_PER_REQUEST) ? userMails.size() : DATA_PER_REQUEST;
             final List<String> subList = new ArrayList<>(userMails.subList(0, dataSize));
             loadingData = true;
             UserController.listUserInfo(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, List<UserListData> userListDatas) {
-                    mData.addAll(userListDatas);
-                    mailData.removeAll(subList);
-                    notifyDataSetChanged();
+                    if(userListDatas == null){
+                        Toast.makeText(mContext, "Liste von Benutzern konnte nicht abgerufen werden", Toast.LENGTH_LONG).show();
+                    } else {
+                        mData.addAll(userListDatas);
+                        mailData.removeAll(subList);
+                        notifyDataSetChanged();
+                    }
                     loadingData = false;
-                    if(mActivity != null) mActivity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                    if (mActivity != null)
+                        mActivity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
                 }
 
                 @Override
@@ -117,6 +121,7 @@ public class UserListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        if(mData == null) return 0;
         return mData.size();
     }
 
@@ -154,11 +159,10 @@ public class UserListAdapter extends BaseAdapter {
         }
 
         UserListData item = getItem(i);
-        UserInfo userInfo = item.getUserInfo();
         BlobKey userPicture = item.getUserPicture();
 
-        String primaryText = setUpPrimaryText(userInfo);
-        String secondaryText = setUpSecondaryText(userInfo);
+        String primaryText = setUpPrimaryText(item);
+        String secondaryText = setUpSecondaryText(item);
 
         UserImageLoader.getInstance(mContext).displayImage(userPicture, holder.picture);
         holder.primaryText.setText(primaryText);
@@ -167,31 +171,15 @@ public class UserListAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private void setImage(final ImageView userPictureView, final BlobKey userPictureKey) {
-        if (userPictureKey != null) {
-            UserController.getUserPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
-                    userPictureView.setImageBitmap(ImageUtil.getRoundedBitmap(bitmap));
-                }
-
-                @Override
-                public void taskFailed(ExtendedTask task, String message) {
-                    Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
-                }
-            }, userPictureKey);
-        }
-    }
-
-    private String setUpPrimaryText(UserInfo userInfo) {
-        String firstName = userInfo.getFirstName();
-        String lastName = userInfo.getLastName().getValue();
+    private String setUpPrimaryText(UserListData userListData) {
+        String firstName = userListData.getFirstName();
+        String lastName = userListData.getLastName();
         return (lastName == null) ? firstName : firstName + " " + lastName;
     }
 
-    private String setUpSecondaryText(UserInfo userInfo) {
-        String city = userInfo.getCity().getValue();
-        String dateOfBirth = userInfo.getDateOfBirth().getValue();
+    private String setUpSecondaryText(UserListData userListData) {
+        String city = userListData.getCity();
+        String dateOfBirth = userListData.getDateOfBirth();
         Integer age = null;
         if (dateOfBirth != null) {
             try {

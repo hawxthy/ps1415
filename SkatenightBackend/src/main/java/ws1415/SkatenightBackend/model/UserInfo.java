@@ -5,22 +5,20 @@ import javax.jdo.annotations.Embedded;
 import javax.jdo.annotations.EmbeddedOnly;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.PrimaryKey;
 
 /**
- * Die UserInfo-Klasse speichert die allgemeinen Informationen zu einem Benutzer.
+ * Die UserInfo-Klasse speichert die allgemeinen Informationen zu einem Benutzer, wobei die Felder
+ * dieser Klasse im Datastore im EndUser gespeichert werden.
  *
  * @author Martin Wrodarczyk
  */
-@PersistenceCapable(detachable="true")
-public class UserInfo {
-    @PrimaryKey
-    @Persistent
-    private String email;
+@PersistenceCapable
+@EmbeddedOnly
+public class UserInfo{
     @Persistent
     private String firstName;
     @Persistent
-    private Integer gender;
+    private Gender gender;
 
     @Persistent(defaultFetchGroup = "true")
     @Embedded(members = {
@@ -62,9 +60,9 @@ public class UserInfo {
         @Persistent
         private String value;
         @Persistent
-        private Integer visibility;
+        private Visibility visibility;
 
-        public InfoPair(String value, Integer visibility) {
+        public InfoPair(String value, Visibility visibility) {
             this.value = value;
             this.visibility = visibility;
         }
@@ -75,10 +73,10 @@ public class UserInfo {
         public void setValue(String value) {
             this.value = value;
         }
-        public Integer getVisibility() {
+        public Visibility getVisibility() {
             return visibility;
         }
-        public void setVisibility(Integer visibility) {
+        public void setVisibility(Visibility visibility) {
             this.visibility = visibility;
         }
     }
@@ -86,23 +84,14 @@ public class UserInfo {
     public UserInfo() {
     }
 
-    public UserInfo(String email) {
-        this.email = email;
-        firstName = "";
-        gender = Gender.NA.getId();
-        lastName = new InfoPair("", Visibility.PUBLIC.getId());
-        dateOfBirth = new InfoPair("", Visibility.PUBLIC.getId());
-        city = new InfoPair("", Visibility.PUBLIC.getId());
-        postalCode = new InfoPair("", Visibility.PUBLIC.getId());
-        description = new InfoPair("", Visibility.PUBLIC.getId());
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public UserInfo(String firstName, String lastName) {
+        this.firstName = firstName;
+        gender = Gender.NA;
+        this.lastName = new InfoPair(lastName , Visibility.PUBLIC);
+        dateOfBirth = new InfoPair("", Visibility.PUBLIC);
+        city = new InfoPair("", Visibility.PUBLIC);
+        postalCode = new InfoPair("", Visibility.PUBLIC);
+        description = new InfoPair("", Visibility.PUBLIC);
     }
 
     public String getFirstName() {
@@ -113,11 +102,11 @@ public class UserInfo {
         this.firstName = firstName;
     }
 
-    public Integer getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(Integer gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 

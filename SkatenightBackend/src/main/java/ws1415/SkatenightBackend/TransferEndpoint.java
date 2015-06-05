@@ -17,12 +17,12 @@ import ws1415.SkatenightBackend.gcm.Sender;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 
 /**
- * Der MessageEndpoint stellt Hilfsmethoden bereit, die genutzt werden um den Nachrichtenfluss zwischen
+ * Der TransferEndpoint stellt Hilfsmethoden bereit, die genutzt werden um den Nachrichtenfluss zwischen
  * den Benutzern zu verwalten.
  *
  * @author Martin Wrodarczyk
  */
-public class MessageEndpoint extends SkatenightServerEndpoint {
+public class TransferEndpoint extends SkatenightServerEndpoint {
 
     /**
      * Sendet über GCM eine Nachricht an den Benutzer mit der angegebenen Email.

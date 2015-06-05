@@ -29,24 +29,35 @@
             android:paddingTop="10dp"
             android:text="@string/Name" />
 
-
-        <EditText
-            android:id="@+id/activity_edit_profile_first_name"
+        <com.wrapp.floatlabelededittext.FloatLabeledEditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/first_name" />
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/activity_edit_profile_first_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLength="40"
+                android:hint="@string/first_name" />
+        </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="8dp">
 
-            <EditText
-                android:id="@+id/activity_edit_profile_last_name"
+            <com.wrapp.floatlabelededittext.FloatLabeledEditText
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/last_name" />
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/activity_edit_profile_last_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLength="40"
+                    android:hint="@string/last_name" />
+            </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
             <Spinner
                 android:id="@+id/activity_edit_profile_last_name_visibility"
@@ -54,6 +65,7 @@
                 android:layout_height="wrap_content"
                 android:entries="@array/visibility_items_array"
                 android:entryValues="@array/visibility_items_values"
+                android:layout_gravity="bottom"
                 android:paddingLeft="10dp" />
         </LinearLayout>
 
@@ -77,13 +89,18 @@
             android:layout_height="wrap_content"
             android:paddingTop="8dp">
 
-            <EditText
-                android:id="@+id/activity_edit_profile_dateofbirth"
+            <com.wrapp.floatlabelededittext.FloatLabeledEditText
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:focusable="false"
-                android:hint="@string/date_of_birth_profile" />
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/activity_edit_profile_dateofbirth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:hint="@string/date_of_birth_profile" />
+            </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
             <Spinner
                 android:id="@+id/activity_edit_profile_dateofbirth_visibility"
@@ -91,6 +108,7 @@
                 android:layout_height="wrap_content"
                 android:entries="@array/visibility_items_array"
                 android:entryValues="@array/visibility_items_values"
+                android:layout_gravity="bottom"
                 android:paddingLeft="10dp" />
         </LinearLayout>
 
@@ -99,13 +117,19 @@
             android:layout_height="wrap_content"
             android:paddingTop="8dp">
 
-            <EditText
-                android:id="@+id/activity_edit_profile_city"
+            <com.wrapp.floatlabelededittext.FloatLabeledEditText
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/city"
-                android:singleLine="true" />
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/activity_edit_profile_city"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/city"
+                    android:maxLength="40"
+                    android:singleLine="true" />
+            </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
             <Spinner
                 android:id="@+id/activity_edit_profile_city_visibility"
@@ -113,6 +137,7 @@
                 android:layout_height="wrap_content"
                 android:entries="@array/visibility_items_array"
                 android:entryValues="@array/visibility_items_values"
+                android:layout_gravity="bottom"
                 android:paddingLeft="10dp" />
         </LinearLayout>
 
@@ -121,14 +146,20 @@
             android:layout_height="wrap_content"
             android:paddingTop="8dp">
 
-            <EditText
-                android:id="@+id/activity_edit_profile_plz"
+            <com.wrapp.floatlabelededittext.FloatLabeledEditText
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/postal_code"
-                android:inputType="numberSigned"
-                android:singleLine="true" />
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/activity_edit_profile_plz"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/postal_code"
+                    android:inputType="numberSigned"
+                    android:maxLength="5"
+                    android:singleLine="true" />
+            </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
             <Spinner
                 android:id="@+id/activity_edit_profile_plz_visibility"
@@ -136,6 +167,7 @@
                 android:layout_height="wrap_content"
                 android:entries="@array/visibility_items_array"
                 android:entryValues="@array/visibility_items_values"
+                android:layout_gravity="bottom"
                 android:paddingLeft="10dp" />
         </LinearLayout>
 
@@ -144,12 +176,18 @@
             android:layout_height="wrap_content"
             android:paddingTop="8dp">
 
-            <EditText
-                android:id="@+id/activity_edit_profile_description"
+            <com.wrapp.floatlabelededittext.FloatLabeledEditText
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/description_profile" />
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/activity_edit_profile_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLength="500"
+                    android:hint="@string/description_profile" />
+            </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
             <Spinner
                 android:id="@+id/activity_edit_profile_description_visibility"
@@ -157,6 +195,7 @@
                 android:layout_height="wrap_content"
                 android:entries="@array/visibility_items_array"
                 android:entryValues="@array/visibility_items_values"
+                android:layout_gravity="bottom"
                 android:paddingLeft="10dp" />
         </LinearLayout>
 

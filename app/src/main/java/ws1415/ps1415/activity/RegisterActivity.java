@@ -265,7 +265,7 @@ public class RegisterActivity extends Activity {
                     Bundle extras = data.getExtras();
                     selectedPicture = extras.getParcelable("data");
                     mPictureView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(selectedPicture));
-                    tempFile.delete();
+                    tempFile.deleteOnExit();
                     break;
             }
         }

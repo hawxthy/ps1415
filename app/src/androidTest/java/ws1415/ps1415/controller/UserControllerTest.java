@@ -10,6 +10,8 @@ import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.InfoPair;
 import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.RoutePoint;
+import com.skatenight.skatenightAPI.model.ServerWaypoint;
 import com.skatenight.skatenightAPI.model.Text;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserInfo;
@@ -17,24 +19,25 @@ import com.skatenight.skatenightAPI.model.UserListData;
 import com.skatenight.skatenightAPI.model.UserLocation;
 import com.skatenight.skatenightAPI.model.UserPrimaryData;
 import com.skatenight.skatenightAPI.model.UserProfile;
+import com.skatenight.skatenightAPI.model.UserProfileEdit;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
+import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.Gender;
+import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.model.Visibility;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
-import ws1415.ps1415.controller.UserController;
-import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.util.ImageUtil;
 
 /**
@@ -64,43 +67,43 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
     // Testdaten für das Updaten der Standortinformationen
     public static final double TEST_LONGITUDE = 7.626135;
     public static final double TEST_LATITUDE = 51.960665;
-    public static final Long TEST_CURRENT_EVENT_ID = 5L;
+    public static Long TEST_CURRENT_EVENT_ID = 5L;
 
     // Testdaten für das Updaten des Benutzerprofils
     public static final String TEST_FIRST_NAME = "Martin";
     public static final Gender TEST_GENDER = Gender.MALE;
-    public static final Visibility TEST_GROUP_VISIBILITY = Visibility.FRIENDS;
+    public static final Visibility TEST_SHOW_PRIVATE_GROUPS = Visibility.FRIENDS;
     public static final Boolean TEST_OPT_OUT_SEARCH = true;
 
     public static final String TEST_LAST_NAME = "Müller";
     public static final Visibility TEST_LAST_NAME_VISIBILITY = Visibility.FRIENDS;
     public static final InfoPair TEST_LAST_NAME_PAIR = new InfoPair().
             setValue(TEST_LAST_NAME).
-            setVisibility(TEST_LAST_NAME_VISIBILITY.getId());
+            setVisibility(TEST_LAST_NAME_VISIBILITY.name());
 
     public static final String TEST_CITY = "Münster";
     public static final Visibility TEST_CITY_VISIBILITY = Visibility.ONLY_ME;
     public static final InfoPair TEST_CITY_PAIR = new InfoPair().
             setValue(TEST_CITY).
-            setVisibility(TEST_CITY_VISIBILITY.getId());
+            setVisibility(TEST_CITY_VISIBILITY.name());
 
     public static final String TEST_DATE_OF_BIRTH = "1990/01/01";
     public static final Visibility TEST_DATE_OF_BIRTH_VISIBILITY = Visibility.PUBLIC;
     public static final InfoPair TEST_DATE_OF_BIRTH_PAIR = new InfoPair().
             setValue(TEST_DATE_OF_BIRTH).
-            setVisibility(TEST_DATE_OF_BIRTH_VISIBILITY.getId());
+            setVisibility(TEST_DATE_OF_BIRTH_VISIBILITY.name());
 
     public static final String TEST_DESCRIPTION = "Neue Beschreibung";
     public static final Visibility TEST_DESCRIPTION_VISIBILITY = Visibility.PUBLIC;
     public static final InfoPair TEST_DESCRIPTION_PAIR = new InfoPair().
             setValue(TEST_DESCRIPTION).
-            setVisibility(TEST_DESCRIPTION_VISIBILITY.getId());
+            setVisibility(TEST_DESCRIPTION_VISIBILITY.name());
 
     public static final String TEST_POSTAL_CODE = "48159";
     public static final Visibility TEST_POSTAL_CODE_VISIBILITY = Visibility.PUBLIC;
     public static final InfoPair TEST_POSTAL_CODE_PAIR = new InfoPair().
             setValue(TEST_POSTAL_CODE).
-            setVisibility(TEST_POSTAL_CODE_VISIBILITY.getId());
+            setVisibility(TEST_POSTAL_CODE_VISIBILITY.name());
 
     /**
      * Loggt den Benutzer ein und erstellt zwei Benutzer.
@@ -188,8 +191,6 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
                 assertNotNull(endUser.getUserInfo());
                 assertNotNull(endUser.getUserLocation());
                 assertEquals(TEST_MAIL_1, endUser.getEmail());
-                assertEquals(TEST_MAIL_1, endUser.getUserInfo().getEmail());
-                assertEquals(TEST_MAIL_1, endUser.getUserLocation().getEmail());
                 getSignal.countDown();
             }
         }, TEST_MAIL_1);
@@ -205,7 +206,6 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
     public void testGetUserLocation() throws InterruptedException, IOException {
         UserLocation userLocation = ServiceProvider.getService().userEndpoint().getUserLocation(TEST_MAIL_1).execute();
         assertNotNull(userLocation);
-        assertEquals(TEST_MAIL_1, userLocation.getEmail());
     }
 
     /**
@@ -220,9 +220,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
             @Override
             public void taskDidFinish(ExtendedTask task, UserProfile userProfile) {
                 assertNotNull(userProfile);
-                assertNotNull(userProfile.getUserInfo());
                 assertEquals(TEST_MAIL_1, userProfile.getEmail());
-                assertEquals(TEST_MAIL_1, userProfile.getUserInfo().getEmail());
                 getSignal.countDown();
             }
         }, TEST_MAIL_1);
@@ -281,20 +279,8 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
                 assertEquals(result.get(0), TEST_MAIL_1);
                 searchSignal2.countDown();
             }
-        }, TEST_INITIAL_FIRST_NAME_1);
+        }, TEST_INITIAL_FIRST_NAME_1 + " " + TEST_INITIAL_LAST_NAME_1);
         assertTrue(searchSignal2.await(30, TimeUnit.SECONDS));
-
-        final CountDownLatch searchSignal3 = new CountDownLatch(1);
-        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, List<String> result) {
-                assertNotNull(result);
-                assertTrue(result.size() == 1);
-                assertEquals(result.get(0), TEST_MAIL_1);
-                searchSignal3.countDown();
-            }
-        }, TEST_INITIAL_LAST_NAME_1);
-        assertTrue(searchSignal3.await(30, TimeUnit.SECONDS));
     }
 
     /**
@@ -303,31 +289,30 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
      * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
-    public void testUpdateUserLocation() throws InterruptedException {
-//        changeAccount(TEST_MAIL_1);
-//        final CountDownLatch updateSignal = new CountDownLatch(1);
-//        UserController.updateUserLocation(new ExtendedTaskDelegateAdapter<Void, Void>() {
-//            @Override
-//            public void taskDidFinish(ExtendedTask task, Void avoid) {
-//                updateSignal.countDown();
-//            }
-//        }, TEST_MAIL_1, TEST_LATITUDE, TEST_LONGITUDE, TEST_CURRENT_EVENT_ID);
-//        assertTrue(updateSignal.await(30, TimeUnit.SECONDS));
-//
-//        final CountDownLatch getSignal = new CountDownLatch(1);
-//        UserController.getUserLocation(new ExtendedTaskDelegateAdapter<Void, UserLocation>() {
-//            @Override
-//            public void taskDidFinish(ExtendedTask task, UserLocation userLocation) {
-//                assertNotNull(userLocation);
-//                assertEquals(TEST_MAIL_1, userLocation.getEmail());
-//                assertEquals(new Date().getTime(), userLocation.getUpdatedAt().getValue(), 10000);
-//                assertEquals(TEST_LONGITUDE, userLocation.getLongitude(), 0.001);
-//                assertEquals(TEST_LATITUDE, userLocation.getLatitude(), 0.001);
-//                assertEquals(TEST_CURRENT_EVENT_ID, userLocation.getCurrentEventId());
-//                getSignal.countDown();
-//            }
-//        }, TEST_MAIL_1);
-//        assertTrue(getSignal.await(30, TimeUnit.SECONDS));
+    public void testUpdateUserLocation() throws InterruptedException, IOException {
+        changeAccount(ADMIN_MAIL);
+        Event testEvent = createEvent();
+        TEST_CURRENT_EVENT_ID = testEvent.getId();
+
+        changeAccount(TEST_MAIL_1);
+        final CountDownLatch updateSignal = new CountDownLatch(1);
+        UserController.updateUserLocation(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void avoid) {
+                updateSignal.countDown();
+            }
+        }, TEST_MAIL_1, TEST_LATITUDE, TEST_LONGITUDE, TEST_CURRENT_EVENT_ID);
+        assertTrue(updateSignal.await(30, TimeUnit.SECONDS));
+
+        UserLocation userLocation = ServiceProvider.getService().userEndpoint().getUserLocation(TEST_MAIL_1).execute();
+        assertNotNull(userLocation);
+        assertEquals(new Date().getTime(), userLocation.getUpdatedAt().getValue(), 10000);
+        assertEquals(TEST_LONGITUDE, userLocation.getLongitude(), 0.001);
+        assertEquals(TEST_LATITUDE, userLocation.getLatitude(), 0.001);
+        assertEquals(TEST_CURRENT_EVENT_ID, userLocation.getCurrentEventId());
+
+        changeAccount(ADMIN_MAIL);
+        deleteEvent(testEvent);
     }
 
     /**
@@ -340,24 +325,29 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
     public void testUpdateUserProfile() throws InterruptedException, IOException {
         changeAccount(TEST_MAIL_1);
         // Neue Testdaten initialisieren
+        UserProfileEdit userProfileEdit = new UserProfileEdit();
         UserInfo newUserInfo = new UserInfo();
-        newUserInfo.setEmail(TEST_MAIL_1);
         newUserInfo.setFirstName(TEST_FIRST_NAME);
-        newUserInfo.setGender(TEST_GENDER.getId());
+        newUserInfo.setGender(TEST_GENDER.name());
         newUserInfo.setLastName(TEST_LAST_NAME_PAIR);
         newUserInfo.setCity(TEST_CITY_PAIR);
         newUserInfo.setDateOfBirth(TEST_DATE_OF_BIRTH_PAIR);
         newUserInfo.setDescription(TEST_DESCRIPTION_PAIR);
         newUserInfo.setPostalCode(TEST_POSTAL_CODE_PAIR);
+        userProfileEdit.setEmail(TEST_MAIL_1);
+        userProfileEdit.setUserInfo(newUserInfo);
+        userProfileEdit.setOptOutSearch(TEST_OPT_OUT_SEARCH);
+        userProfileEdit.setShowPrivateGroups(TEST_SHOW_PRIVATE_GROUPS.name());
 
         // Profildaten updaten
         final CountDownLatch updateSignal = new CountDownLatch(1);
-        UserController.updateUserProfile(new ExtendedTaskDelegateAdapter<Void, UserInfo>() {
+        UserController.updateUserProfile(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, UserInfo userInfo) {
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                assertTrue(aBoolean);
                 updateSignal.countDown();
             }
-        }, newUserInfo, TEST_OPT_OUT_SEARCH, TEST_GROUP_VISIBILITY);
+        }, userProfileEdit);
         assertTrue(updateSignal.await(45, TimeUnit.SECONDS));
 
         changeAccount(TEST_MAIL_2);
@@ -365,22 +355,14 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
         UserController.getUserProfile(new ExtendedTaskDelegateAdapter<Void, UserProfile>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserProfile userProfile) {
-                UserInfo userInfo = userProfile.getUserInfo();
-                assertNotNull(userInfo);
-                assertEquals(TEST_MAIL_1, userInfo.getEmail());
-                assertEquals(TEST_FIRST_NAME, userInfo.getFirstName());
-                assertEquals(TEST_GENDER.getId(), userInfo.getGender().intValue());
-                assertEquals(TEST_LAST_NAME_VISIBILITY.getId(), userInfo.getLastName().getVisibility());
-                assertEquals(TEST_CITY_VISIBILITY.getId(), userInfo.getCity().getVisibility());
-                assertEquals(TEST_DATE_OF_BIRTH, userInfo.getDateOfBirth().getValue());
-                assertEquals(TEST_DATE_OF_BIRTH_VISIBILITY.getId(), userInfo.getDateOfBirth().getVisibility());
-                assertEquals(TEST_DESCRIPTION, userInfo.getDescription().getValue());
-                assertEquals(TEST_DESCRIPTION_VISIBILITY.getId(), userInfo.getDescription().getVisibility());
-                assertEquals(TEST_POSTAL_CODE, userInfo.getPostalCode().getValue());
-                assertEquals(TEST_POSTAL_CODE_VISIBILITY.getId(), userInfo.getPostalCode().getVisibility());
-                assertNull(userInfo.getLastName().getValue());
-                assertNull(userInfo.getCity().getValue());
-                assertEquals(TEST_GROUP_VISIBILITY.getId(), userProfile.getShowPrivateGroups());
+                assertEquals(TEST_MAIL_1, userProfile.getEmail());
+                assertEquals(TEST_FIRST_NAME, userProfile.getFirstName());
+                assertEquals(TEST_GENDER.name(), userProfile.getGender());
+                assertEquals(TEST_DATE_OF_BIRTH, userProfile.getDateOfBirth());
+                assertEquals(TEST_DESCRIPTION, userProfile.getDescription());
+                assertEquals(TEST_POSTAL_CODE, userProfile.getPostalCode());
+                assertNull(userProfile.getLastName());
+                assertNull(userProfile.getCity());
                 getSignal.countDown();
             }
         }, TEST_MAIL_1);
@@ -647,10 +629,11 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
     // Erstellt ein Event mit einer Route
     private Event createEvent() throws IOException {
         Route route = new Route();
-        route.setLength("6,8 km");
+        route.setLength("54 m");
         route.setName("Test");
         route.setRouteData(new Text().setValue("cfh|Hy_pm@AJEZMn@CJAJAFAJ?J?L@PF`BFtAJfCF^??JATANChBm@B?nA_@RG\\IFAHA??B@B@@@@BDHDLDHxCdM`BdHv@bDT`AfAfGl@dFVlBLXBFDL@HDLLp@F\\@ZANAJ?L?`@Aj@??Gb@ZATAxAGVAvEIzEUj@A`CG~ACvA?|BGdAEXAT?r@EnAIXC^Ap@C~@E|@C\\Av@CfCEJA|AAl@An@@b@AJ?`A@v@FV@??h@U~@yA|@sAn@_A|@uAXc@^_@fAsAPa@Rc@HUL]DKBGDKLa@HUBKDQFSDOFSFSFOBGHQLSBGFIJIZSHEFE\\OZM\\Kd@O^KZId@KxA[ZEZChAET?N?P?P?XBh@FdARFBhATVBRBf@ANAbAOd@GLAPCNALENIv@G^EJCREFANGRKRMRQTY^e@~AwB`@e@NUPQLKJGb@Sb@O`@KTEXCPHf@LXJD@\\L`@Lx@T\\JJ@RBVBJAJ@HANCREPGPGPEBAdAa@rAUTCt@E\\?\\?t@D\\DZHJBXFXLDB^Lf@VbAr@XP`Ap@vB|ApB|APLd@^jA`Ab@ZTPj@h@LLt@l@ZV~@r@~@p@x@h@~@r@`At@tAfAf@b@B@v@n@b@\\VR`@Zp@h@~@p@dBpA~BjBbBpAXTXR`BnA`@Zv@n@HFjA~@`Ar@lA`Ad@^v@n@f@`@fA|@??RNBMBQTeA??R?HDHDFDFBD@B@D?BAHA@?DCJEJCvAg@NGNENCBAXEPAr@LrA^pBr@??_@|BIZa@lBMh@Wz@M^IRELIPMN??c@y@W_@aAsAi@m@m@k@EEWUw@o@EEcBwAQOy@m@_As@a@Y"));
-        // TODO RoutePoints und Waypoints setzen
+        route.setRoutePoints(Arrays.asList(new RoutePoint().setLongitude(7.61148).setLatitude(51.97001), new RoutePoint().setLongitude(7.61136).setLatitude(51.9701), new RoutePoint().setLongitude(7.61118).setLatitude(51.970220000000005), new RoutePoint().setLongitude(7.61095).setLatitude(51.97039)));
+        route.setWaypoints(Arrays.asList(new ServerWaypoint().setTitle("Wegpunkt 1").setLongitude(7.611478).setLatitude(51.970008), new ServerWaypoint().setTitle("Wegpunkt 2").setLongitude(7.610938999999999).setLatitude(51.970382)));
         route = ServiceProvider.getService().routeEndpoint().addRoute(route).execute();
 
         Event testEvent = new Event();
