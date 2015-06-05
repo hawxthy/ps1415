@@ -11,7 +11,6 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import jdk.nashorn.internal.objects.Global;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.GlobalRole;
