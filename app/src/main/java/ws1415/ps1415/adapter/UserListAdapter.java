@@ -97,11 +97,16 @@ public class UserListAdapter extends BaseAdapter {
             UserController.listUserInfo(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, List<UserListData> userListDatas) {
-                    mData.addAll(userListDatas);
-                    mailData.removeAll(subList);
-                    notifyDataSetChanged();
+                    if(userListDatas == null){
+                        Toast.makeText(mContext, "Liste von Benutzern konnte nicht abgerufen werden", Toast.LENGTH_LONG).show();
+                    } else {
+                        mData.addAll(userListDatas);
+                        mailData.removeAll(subList);
+                        notifyDataSetChanged();
+                    }
                     loadingData = false;
-                    if(mActivity != null) mActivity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                    if (mActivity != null)
+                        mActivity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
                 }
 
                 @Override
@@ -116,6 +121,7 @@ public class UserListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        if(mData == null) return 0;
         return mData.size();
     }
 
