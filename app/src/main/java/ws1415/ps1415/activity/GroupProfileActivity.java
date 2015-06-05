@@ -119,7 +119,8 @@ public class GroupProfileActivity extends BaseFragmentActivity {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
                 GroupProfileActivity.this.group = group;
-                mAdapter.getGroupMembersFragment().setUp(group, GroupProfileActivity.this);
+                //TODO nullpointer
+                //mAdapter.getGroupMembersFragment().setUp(group, GroupProfileActivity.this);
             }
 
             @Override
