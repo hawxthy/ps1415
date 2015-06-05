@@ -4,7 +4,7 @@ apply plugin: 'org.robolectric'
 android {
     // Festlegen, welcher Build Type für die Tests genutzt werden soll. Definiert, welche Signing-
     // Configuration für das Testpaket genutzt wird.
-    testBuildType "release"
+    testBuildType "jenkins"
 
     signingConfigs {
         release {
@@ -92,4 +92,7 @@ dependencies {
         exclude module: 'httpclient'
     }
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
+
+    // Floating Hint above EditText
+    compile 'com.wrapp.floatlabelededittext:library:0.0.6'
 }
