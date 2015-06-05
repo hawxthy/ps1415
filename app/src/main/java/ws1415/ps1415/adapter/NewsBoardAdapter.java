@@ -17,14 +17,14 @@ import java.util.List;
 import ws1415.ps1415.R;
 
 /**
- * @author Bernd Eissing on 05.06.2015.
+ * @author  Bernd Eissing on 05.06.2015.
  */
-public class BlackBoardListAdapter extends BaseAdapter{
+public class NewsBoardAdapter extends BaseAdapter {
     private List<BoardEntry> boardEntries;
     private Context context;
     private LayoutInflater inflater;
 
-    public BlackBoardListAdapter(Context context, List<BoardEntry> boardEntries){
+    public NewsBoardAdapter(Context context, List<BoardEntry> boardEntries){
         this.context = context;
         this.boardEntries = boardEntries;
         if(context != null){
@@ -69,7 +69,6 @@ public class BlackBoardListAdapter extends BaseAdapter{
      */
     private class Holder{
         private TextView dateView;
-        private TextView writerView;
         private TextView contentView;
     }
 
@@ -79,10 +78,9 @@ public class BlackBoardListAdapter extends BaseAdapter{
 
         if(convertView == null){
             holder = new Holder();
-            convertView = inflater.inflate(R.layout.list_view_item_black_board, viewGroup, false);
-            holder.dateView = (TextView) convertView.findViewById(R.id.list_view_item_black_board_date_text_view);
-            holder.writerView = (TextView) convertView.findViewById(R.id.list_view_item_black_board_creator_text_view);
-            holder.contentView = (TextView) convertView.findViewById(R.id.list_view_item_black_board_content_edit_text);
+            convertView = inflater.inflate(R.layout.list_item_news_board, viewGroup, false);
+            holder.dateView = (TextView) convertView.findViewById(R.id.list_view_item_news_board_date_text_view);
+            holder.contentView = (TextView) convertView.findViewById(R.id.list_view_item_news_board_content_edit_text);
             convertView.setTag(holder);
         }else{
             holder = (Holder) convertView.getTag();
@@ -98,8 +96,7 @@ public class BlackBoardListAdapter extends BaseAdapter{
         int minutes = cal.get(Calendar.MINUTE);
 
 
-        holder.dateView.setText("Am "+day+"."+month+" "+year+" um "+hours+":"+minutes+" Uhr");
-        holder.writerView.setText(getItem(position).getWriter());
+        holder.dateView.setText("Am "+month+"."+day+" "+year+" um "+hours+":"+minutes+" Uhr");
         holder.contentView.setText(getItem(position).getMessage());
 
         return convertView;

@@ -280,10 +280,12 @@
     <string name="checkGroupNamePlease">Check Groupname please</string>
 
     <!-- GroupProfileActivity-->
+    <string name="noGroupNameInExtra">Aborted: You have to deliver the Groupname via the Intent Extras</string>
     <string name="title_activity_group_profile">Group Profile</string>
     <string name="title_alert_dialog_join_user_group">Join this Group?</string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
+    <string name="alreadyInGroupString">You are already in this Group</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="title_fragment_group_black_board">Blackboard</string>
@@ -296,4 +298,15 @@
 
     <!-- GroupMembersFragment-->
     <string name="title_fragment_group_members">Member</string>
+
+    <!-- Group Functions -->
+    <string name="groupFunctionsTitle">You can perform the following actions</string>
+    <string name="createUserGroup">Create Group</string>
+    <string name="distributeRights">Distribute Rights</string>
+    <string name="inviteGroup">Invite User</string>
+    <string name="changePrivacy">Change Privacy</string>
+    <string name="changePicture">Change Picture</string>
+    <string name="postGlobalMessage">Global Message</string>
+    <string name="removeMember">Remove Members</string>
+    <string name="abortGroupFunctions">Cancel</string>
 </resources>

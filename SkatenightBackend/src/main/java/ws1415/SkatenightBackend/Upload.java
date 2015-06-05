@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ws1415.SkatenightBackend.model.UserGroupPicture;
+import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserGroupPreviewPictures;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -25,12 +25,12 @@ public class Upload extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
-        String pictureId = request.getParameter("id");
+        String groupId = request.getParameter("id");
         String blobKeyString = request.getParameter("blobKeyString");
         Map<String, List<BlobKey>> blobs = blobstoreService.getUploads(request);
         List<BlobKey> blobKeys = blobs.get("file");
 
-        if (pictureId == null || pictureId.isEmpty()) {
+        if (groupId == null || groupId.isEmpty()) {
             if (!blobKeys.isEmpty()) {
                 BlobKey blobKey = blobKeys.get(0);
                 try {
@@ -57,10 +57,10 @@ public class Upload extends HttpServlet {
             if (!blobKeys.isEmpty()) {
                 BlobKey blobKey = blobKeys.get(0);
                 try {
-                    // Das UserGroupPicture vom Server laden, damit der BlobKey gesetzt werden kann
-                    UserGroupPicture groupPicture = ofy().load().type(UserGroupPicture.class).id(Long.parseLong(pictureId)).safe();
-                    groupPicture.setPictureBlobKey(blobKey);
-                    ofy().save().entities(groupPicture).now();
+                    // Die Gruppe vom Server laden, damit der BlobKey gesetzt werden kann
+                    UserGroup group = ofy().load().type(UserGroup.class).id(groupId).safe();
+                    group.setBlobKey(blobKey);
+                    ofy().save().entities(group).now();
 
                     // Nun den BlobKey für das Bild wieder an den Clienten senden, damit das Bild in der app verwendet werden kann
                     response.setCharacterEncoding("UTF-8");

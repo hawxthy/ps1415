@@ -13,6 +13,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.melnykov.fab.FloatingActionButton;
+import com.skatenight.skatenightAPI.model.Board;
+import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
 
 import ws1415.ps1415.R;
@@ -22,6 +24,8 @@ import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 
 /**
+ * Dieses Fragment dient zum Anzeigen von Blackboard Einträgen.
+ *
  * @author Bernd Eissing
  */
 public class GroupBlackBoardFragment extends Fragment {
@@ -31,12 +35,14 @@ public class GroupBlackBoardFragment extends Fragment {
     String groupName;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_group_black_board, container, false);
 
+        // Die ListView und die Button für das Posten von Einträgen initialisieren
         mBlackBoardListView = (ListView) rootView.findViewById(R.id.group_black_board_list_view);
         mAddMessageButton = (FloatingActionButton) rootView.findViewById(R.id.group_black_board_add_message_button);
 
+        // Clicklistener setzen für das Posten von Einträgen
         mAddMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -53,7 +59,7 @@ public class GroupBlackBoardFragment extends Fragment {
                             GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
                                 @Override
                                 public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                                    mAdapter.notifyDataSetChanged();
+                                    getNewBlackBoard(container.getContext());
                                 }
 
                                 @Override
@@ -80,11 +86,40 @@ public class GroupBlackBoardFragment extends Fragment {
         return rootView;
     }
 
-    public void setUp(UserGroupBlackBoardTransport blackBoard,String groupName, Context contetx) {
+    /**
+     * Falls das Blackboard der Gruppe Einträge hat, so wird diese Liste dem
+     * BlackBoardListAdapter übergeben.
+     *
+     * @param blackBoard Das Blackboard der Gruppe
+     * @param groupName Der Name der Gruppe
+     * @param contetx Die View von der aus diese Methode aufgerufen wird
+     */
+    public void setUp(Board blackBoard, String groupName, Context contetx) {
         this.groupName = groupName;
-        if(blackBoard.getBoardEntries() != null){
-            mAdapter = new BlackBoardListAdapter(contetx, blackBoard.getBoardEntries());
-            if (mBlackBoardListView != null) mBlackBoardListView.setAdapter(mAdapter);
+        if(blackBoard != null){
+            if(blackBoard.getBoardEntries() != null){
+                mAdapter = new BlackBoardListAdapter(contetx, blackBoard.getBoardEntries());
+                if (mBlackBoardListView != null) mBlackBoardListView.setAdapter(mAdapter);
+            }
         }
+    }
+
+    /**
+     * Diese Methode wird aufgerufen, wenn eine neue Nachricht auf dem Blackboard der Gruppe
+     * gepostet wurde. Hier wird nur das Blackboard der Gruppe abgerufen und ein neuer Adapter
+     * dazu gesetzt.
+     *
+     * @param context
+     */
+    private void getNewBlackBoard(final Context context){
+        GroupController.getInstance().getBlackBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupBlackBoardTransport>(){
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserGroupBlackBoardTransport userGroupBlackBoardTransport) {
+                if(userGroupBlackBoardTransport.getBoardEntries() != null){
+                    mAdapter = new BlackBoardListAdapter(context, userGroupBlackBoardTransport.getBoardEntries());
+                    if(mBlackBoardListView !=null) mBlackBoardListView.setAdapter(mAdapter);
+                }
+            }
+        }, groupName);
     }
 }

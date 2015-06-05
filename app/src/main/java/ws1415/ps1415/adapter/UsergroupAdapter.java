@@ -115,7 +115,7 @@ public class UsergroupAdapter extends BaseAdapter {
             holder = (Holder) convertView.getTag();
         }
 
-        GroupImageLoader.getInstance().setGroupImageToImageView(context, getItem(position).getName(), holder.groupImage);
+        GroupImageLoader.getInstance().setGroupImageToImageView(context, getItem(position).getBlobKeyValue(), holder.groupImage);
         holder.groupName.setText(getItem(position).getName());
         holder.groupCount.setText(context.getString(R.string.usergroup_member_count)+Integer.toString(getItem(position).getMemberCount()));
 

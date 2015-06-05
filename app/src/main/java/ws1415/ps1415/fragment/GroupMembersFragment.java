@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
-import com.skatenight.skatenightAPI.model.UserGroupMembers;
 
 import java.util.ArrayList;
 
@@ -30,7 +29,7 @@ public class GroupMembersFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_profile_groups, container, false);
 
-        mMemberListView = (ListView) rootView.findViewById(R.id.group_profile_member_list_view);
+        mMemberListView = (ListView) rootView.findViewById(R.id.group_profile_members_list_view);
         if(mAdapter != null) mMemberListView.setAdapter(mAdapter);
 
         return rootView;

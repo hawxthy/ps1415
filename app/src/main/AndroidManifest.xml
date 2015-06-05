@@ -149,10 +149,6 @@
                 android:value="ws1415.ps1415.activity.MessagingActivity" />
         </activity>
         <activity
-            android:name=".activity.UploadImageActivity"
-            android:label="@string/title_activity_upload_image" >
-        </activity>
-        <activity
             android:name=".activity.ListUserGroupsActivity"
             android:label="@string/title_activity_list_user_groups" >
         </activity>

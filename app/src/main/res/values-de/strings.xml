@@ -256,7 +256,7 @@
 
     <!-- CreateUserGroupActivity -->
     <string name="title_activity_create_user_group">Erstelle eine neue Gruppe</string>
-    <string name="groupName">Grouppenname</string>
+    <string name="groupName">Gruppenname</string>
     <string name="checkGroupNameString">Bitte überprüfe den angegebenen Namen</string>
     <string name="checkGroupNamePositive">Dieser Name ist verfügbar</string>
     <string name="checkGroupNameNegative">Dieser Name ist vergeben</string>

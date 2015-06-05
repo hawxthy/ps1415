@@ -32,7 +32,7 @@ public class ListUserGroupsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        super.setContentView(NavDrawerGroupList.items, R.layout.activity_list_user_groups);
+        setContentView(R.layout.activity_list_user_groups);
 
         mUserGroupListView = (ListView) findViewById(R.id.user_group_list_view);
         createUserGroupButton = (FloatingActionButton) findViewById(R.id.joinUserGroupButton);
@@ -52,7 +52,6 @@ public class ListUserGroupsActivity extends BaseActivity {
             }
 
         });
-        refresh();
     }
 
     @Override
@@ -83,6 +82,7 @@ public class ListUserGroupsActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
+        refresh();
     }
 
     /**

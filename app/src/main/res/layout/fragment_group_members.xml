@@ -1,14 +1,14 @@
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ws1415.ps1415.fragment.GroupMembersFragment">
+    tools:context="ws1415.ps1415.fragment.GroupBlackBoardFragment">
 
     <ListView
-        android:id="@+id/group_profile_member_list_view"
+        android:id="@+id/group_profile_members_list_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </ListView>
-
-</FrameLayout>
+</RelativeLayout>
