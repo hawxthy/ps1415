@@ -91,6 +91,7 @@
     <string name="action_add_user_group">Usergruppe hinzufügen</string>
     <string name="action_refresh_user_groups">Aktualisiere</string>
     <string name="usergroup_adapter_maximum_reached">Maximale Anzahl an sichtbaren Gruppen erreicht</string>
+    <string name="usergroup_member_count">Mitglieder: </string>
 
     <!--Strings zu AddUserGroupActivity-->
     <string name="title_activity_add_user_group">Gruppe hinzufügen</string>
@@ -252,4 +253,39 @@
     <string name="cancel">Abbrechen</string>
     <string name="add">Hinzufügen</string>
     <string name="loading_data">Daten werden geladen</string>
+
+    <!-- CreateUserGroupActivity -->
+    <string name="title_activity_create_user_group">Erstelle eine neue Gruppe</string>
+    <string name="groupName">Grouppenname</string>
+    <string name="checkGroupNameString">Bitte überprüfe den angegebenen Namen</string>
+    <string name="checkGroupNamePositive">Dieser Name ist verfügbar</string>
+    <string name="checkGroupNameNegative">Dieser Name ist vergeben</string>
+    <string name="groupDescription">Beschreibung</string>
+    <string name="groupPrivacy">Öffentlichkeit</string>
+    <string name="groupPrivacyOn">Private Gruppe</string>
+    <string name="groupPrivacyOff">Öffentliche Gruppe</string>
+    <string name="check">Prüfe</string>
+    <string name="groupPassword">Passwort</string>
+    <string name="groupPasswordRetype">Passwort wiederholen</string>
+    <string name="checkPasswordPositive">Passwörter stimmen überein</string>
+    <string name="checkPasswordNegative">Passwörter stimmen nicht überein</string>
+    <string name="submitGroup">Erstellen</string>
+    <string name="abortGroup">Abbrechen</string>
+    <string name="uploadImageTitle">Gruppenbild</string>
+    <string name="uploadImage">Hochladen</string>
+    <string name="previewImage">Ansehen</string>
+    <string name="uploadingImage">Lade Bild hoch...</string>
+    <string name="uploadingImageFailed">Fehlgeschlagen</string>
+    <string name="uploadingDone">Done</string>
+    <string name="previewImageAlertDialogTitle">Bild in der Liste und im Profil</string>
+    <string name="imageInList">Bild in der Liste</string>
+    <string name="imageInProfile">Bild im Profil</string>
+    <string name="creatingGroupError">Gruppe konnte nicht erstellt werden</string>
+    <string name="defaultGroupDestription">Dies ist die Gruppe: </string>
+    <string name="checkGroupNamePlease">Überprüfe den Namen bitte</string>
+
+    <!-- GroupBlackBoardFragment-->
+    <!-- GroupNewsBoardFragment-->
+    <!-- GroupMembersFragment-->
+
 </resources>

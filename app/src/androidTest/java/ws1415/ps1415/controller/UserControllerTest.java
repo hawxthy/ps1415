@@ -397,7 +397,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
         changeAccount(TEST_MAIL_1);
         // An Veranstaltung teilnehmen und Nutzergruppe beitreten
         ServiceProvider.getService().eventEndpoint().joinEvent(testEvent.getId()).execute();
-        ServiceProvider.getService().groupEndpoint().joinUserGroup(testUserGroup.getName(), testUserGroup.getName()).execute();
+        ServiceProvider.getService().groupEndpoint().joinUserGroup(testUserGroup.getName()).execute();
 
         final CountDownLatch getSignal = new CountDownLatch(1);
         UserController.getUserProfile(new ExtendedTaskDelegateAdapter<Void, UserProfile>() {
@@ -657,7 +657,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
 
     // Erstellt eine Nutzergruppe
     private UserGroup createUserGroup() throws IOException {
-        ServiceProvider.getService().groupEndpoint().createUserGroup("Testgruppe", false, UserGroupType.NORMALGROUP.name(), "Testgruppe").execute();
+        ServiceProvider.getService().groupEndpoint().createOpenUserGroup("Testgruppe", "Testbeschreibung").execute();
         return ServiceProvider.getService().groupEndpoint().getUserGroup("Testgruppe").execute();
     }
 

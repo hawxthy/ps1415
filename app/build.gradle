@@ -4,7 +4,7 @@ apply plugin: 'org.robolectric'
 android {
     // Festlegen, welcher Build Type für die Tests genutzt werden soll. Definiert, welche Signing-
     // Configuration für das Testpaket genutzt wird.
-    testBuildType "jenkins"
+    testBuildType "release"
 
     signingConfigs {
         release {
@@ -77,6 +77,9 @@ android {
         exclude 'META-INF/LICENSE'
     }
 }
+repositories {
+    jcenter()
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -92,7 +95,12 @@ dependencies {
         exclude module: 'httpclient'
     }
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5'
+    // Ein floating action button
+    compile 'com.melnykov:floatingactionbutton:1.3.0'
 
-    // Floating Hint above EditText
+    // Floating hint edittext
     compile 'com.wrapp.floatlabelededittext:library:0.0.6'
+
+    // Material Design
+    compile 'com.github.navasmdc:MaterialDesign:1.5@aar'
 }

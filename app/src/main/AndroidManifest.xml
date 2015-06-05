@@ -164,6 +164,18 @@
             android:name=".activity.UploadImageActivity"
             android:label="@string/title_activity_upload_image" >
         </activity>
+        <activity
+            android:name=".activity.ListUserGroupsActivity"
+            android:label="@string/title_activity_list_user_groups" >
+        </activity>
+        <activity
+            android:name=".activity.CreateUserGroupActivity"
+            android:label="@string/title_activity_create_user_group" >
+        </activity>
+        <activity
+            android:name=".activity.GroupProfileActivity"
+            android:label="@string/title_activity_group_profile" >
+        </activity>
     </application>
 
 </manifest>

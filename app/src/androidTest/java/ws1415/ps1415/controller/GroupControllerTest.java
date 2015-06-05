@@ -1,5 +1,6 @@
 package ws1415.ps1415.controller;
 
+import android.graphics.Bitmap;
 import android.test.suitebuilder.annotation.SmallTest;
 
 import com.skatenight.skatenightAPI.model.BoardEntry;
@@ -8,14 +9,17 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 import com.skatenight.skatenightAPI.model.UserGroupNewsBoardTransport;
+import com.skatenight.skatenightAPI.model.UserGroupPicture;
 import com.skatenight.skatenightAPI.model.UserGroupVisibleMembers;
 
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.Right;
 import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.task.ExtendedTask;
@@ -35,6 +39,8 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
     final private UserGroupType TEST_GROUP_TYPE = UserGroupType.NORMALGROUP;
     final private String TEST_GROUP_PASSWORD = "Testgruppe1";
     final private String TEST_GROUP_PASSWORD_2 = "Testgruppe2";
+    final private String TEST_GROUP_DESCRIPTION = "Testbeschreibung "+TEST_GROUP_NAME;
+    final private String TEST_GROUP_DESCRIPTION_2 = "Testbeschreibung "+TEST_GROUP_NAME_2;
     final private String TEST_BLACK_BOARD_MESSAGE = "Das ist eine Blackboard Message";
     final private String TEST_BLACK_BOARD_MESSAGE_2 = "Das ist die zweite Blackboard Message";
     final private String TEST_BLACK_BOARD_MESSAGE_3 = "Das ist die dritte Blackboard Message";
@@ -53,15 +59,19 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
 
         MY_MAIL = getAccountMail(0);
 
+        if(ServiceProvider.getService().groupEndpoint().getUserGroup(TEST_GROUP_NAME).execute() != null){
+            ServiceProvider.getService().groupEndpoint().deleteUserGroup(TEST_GROUP_NAME).execute();
+        }
+
         // Nutzergruppe erstellen, die bei jedem Test benötigt wird.
         final CountDownLatch signal = new CountDownLatch(1);
 
-        GroupController.getInstance().createUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().createOpenUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_BOOLEAN_GROUP_PRIVAT_FALSE, TEST_GROUP_TYPE, TEST_GROUP_PASSWORD);
+        }, TEST_GROUP_NAME, TEST_GROUP_DESCRIPTION);
         try {
             assertTrue("setUp for createUserGroup failed", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -441,10 +451,10 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         GroupController.getInstance().joinUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
             @Override
             public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
-                assertTrue("Der User " +MY_SECOND_MAIL+ " sollte erfolgreich der Nutzergruppe " +TEST_GROUP_NAME+ " beigetreten sein",result.getValue());
+                assertTrue("Der User " + MY_SECOND_MAIL + " sollte erfolgreich der Nutzergruppe " + TEST_GROUP_NAME + " beigetreten sein", result.getValue());
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD);
+        }, TEST_GROUP_NAME);
         try {
             assertTrue("Die joinUserGroup Methode konnte nicht ausgeführt werden", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -505,10 +515,10 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         GroupController.getInstance().joinUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
             @Override
             public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
-                assertTrue("Der user "+ MY_SECOND_MAIL+ " sollte der Nutzergruppe "+TEST_GROUP_NAME+ " erfolgreicht begetreten sein", result.getValue());
+                assertTrue("Der user " + MY_SECOND_MAIL + " sollte der Nutzergruppe " + TEST_GROUP_NAME + " erfolgreicht begetreten sein", result.getValue());
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD);
+        }, TEST_GROUP_NAME);
         try {
             assertTrue("Die joinUserGroup Methode konnte nicht ausgeführt werden", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -636,12 +646,12 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
 
         final CountDownLatch signal3 = new CountDownLatch(1);
 
-        GroupController.getInstance().createUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().createOpenUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal3.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_BOOLEAN_GROUP_PRIVAT_FALSE, TEST_GROUP_TYPE, TEST_GROUP_PASSWORD);
+        }, TEST_GROUP_NAME, TEST_GROUP_DESCRIPTION);
         try {
             assertTrue("createUserGroup failed", signal3.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -650,12 +660,12 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
 
         final CountDownLatch signal4 = new CountDownLatch(1);
 
-        GroupController.getInstance().createUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().createOpenUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal4.countDown();
             }
-        }, TEST_GROUP_NAME_2, TEST_BOOLEAN_GROUP_PRIVAT_FALSE, TEST_GROUP_TYPE, TEST_GROUP_PASSWORD_2);
+        }, TEST_GROUP_NAME_2, TEST_GROUP_DESCRIPTION_2);
         try {
             assertTrue("createUserGroup failed", signal4.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -713,45 +723,76 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
     public void testChangeUserGroupPassword(){
         final CountDownLatch signal = new CountDownLatch(1);
 
-        GroupController.getInstance().changeUserGroupPassword(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>(){
+        GroupController.getInstance().deleteUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, BooleanWrapper result){
-                assertTrue("Das Passwort sollte erfolgreich geändert worden sein", result.getValue());
+            public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD, TEST_GROUP_PASSWORD_2);
-        try{
-            assertTrue("changeUserGroupPassword failed",signal.await(30, TimeUnit.SECONDS));
-        }catch (InterruptedException e){
+        }, TEST_GROUP_NAME);
+        try {
+            assertTrue("deleteUserGroup failed", signal.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         final CountDownLatch signal2 = new CountDownLatch(1);
+        GroupController.getInstance().createPrivateUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                signal2.countDown();
+            }
+        }, TEST_GROUP_NAME, TEST_GROUP_TYPE, TEST_GROUP_DESCRIPTION, TEST_GROUP_PASSWORD);
+        try {
+            assertTrue("createPrivateUserGroup failed", signal2.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        final CountDownLatch signal3 = new CountDownLatch(1);
+
+        GroupController.getInstance().changeUserGroupPassword(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
+                assertTrue("Das Passwort sollte erfolgreich geändert worden sein", result.getValue());
+                signal3.countDown();
+            }
+        }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD, TEST_GROUP_PASSWORD_2);
+        try{
+            assertTrue("changeUserGroupPassword failed",signal3.await(30, TimeUnit.SECONDS));
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal4 = new CountDownLatch(1);
 
         GroupController.getInstance().changeUserGroupPassword(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
             @Override
             public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
                 assertTrue("Das Passwort sollte erfolgreicht zurück geändert worden sein", result.getValue());
-                signal2.countDown();
+                signal4.countDown();
             }
         }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD_2, TEST_GROUP_PASSWORD);
         try{
-            assertTrue("changeUserGroupPassword failed",signal2.await(30, TimeUnit.SECONDS));
+            assertTrue("changeUserGroupPassword failed", signal4.await(30, TimeUnit.SECONDS));
         }catch (InterruptedException e){
             e.printStackTrace();
         }
     }
 
     @SmallTest
-    public void testChangeUserGroupPrivacy(){
+    public void testMakeUserGroupPrivat(){
         final CountDownLatch signal = new CountDownLatch(1);
 
-        GroupController.getInstance().changeUserGroupPrivacy(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        MY_MAIL = getAccountMail(0);
+        MY_SECOND_MAIL = getAccountMail(1);
+
+        GroupController.getInstance().makeUserGroupPrivat(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_BOOLEAN_GROUP_PRIVAT_TRUE);
+        }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD);
         try{
             assertTrue("changeUserGroupPrivacy failed", signal.await(30, TimeUnit.SECONDS));
         }catch (InterruptedException e){
@@ -764,7 +805,6 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
                 assertTrue("Die Nutzergruppe hat den falschen namen", group.getName().equals(TEST_GROUP_NAME));
-                assertTrue("Die Nutzergruppe ist nicht vom Typ " + TEST_GROUP_TYPE.name(), group.getGroupType().equals(TEST_GROUP_TYPE.name()));
                 assertTrue("Die Nutzergruppe ist nicht privat", group.getPrivat());
                 signal2.countDown();
             }
@@ -772,6 +812,36 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         try {
             assertTrue("GetUserGroup failed", signal2.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        changeAccount(1);
+
+        final CountDownLatch signal3 = new CountDownLatch(1);
+        GroupController.getInstance().joinPrivateUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, BooleanWrapper booleanWrapper) {
+                assertFalse("Es war möglich " + TEST_GROUP_NAME + " mit dem Passwort: " + TEST_GROUP_PASSWORD_2 + " beizutreten.", booleanWrapper.getValue());
+                signal3.countDown();
+            }
+        }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD_2);
+        try{
+            assertTrue("joinUserGroup failed", signal3.await(30, TimeUnit.SECONDS));
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal4 = new CountDownLatch(1);
+        GroupController.getInstance().joinPrivateUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, BooleanWrapper booleanWrapper) {
+                assertTrue("Es war nicht möglich " + TEST_GROUP_NAME + " mit dem Passwort: " + TEST_GROUP_PASSWORD + " beizutreten.", booleanWrapper.getValue());
+                signal4.countDown();
+            }
+        }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD);
+        try{
+            assertTrue("joinUserGroup failed", signal3.await(30, TimeUnit.SECONDS));
+        }catch (InterruptedException e){
             e.printStackTrace();
         }
     }
@@ -889,12 +959,12 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         MY_MAIL = getAccountMail(0);
         MY_SECOND_MAIL = getAccountMail(1);
 
-        GroupController.getInstance().changeUserGroupPrivacy(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().makeUserGroupPrivat(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_BOOLEAN_GROUP_PRIVAT_TRUE);
+        }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD);
         try{
             assertTrue("changeUserGroupPrivacy failed", signal.await(30, TimeUnit.SECONDS));
         }catch (InterruptedException e){
@@ -905,7 +975,7 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
 
         changeAccount(1);
 
-        GroupController.getInstance().joinUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
+        GroupController.getInstance().joinPrivateUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
             @Override
             public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
                 assertFalse("Der User " + MY_SECOND_MAIL + " sollte der Nutzergruppe " + TEST_GROUP_NAME + "nicht beigetreten sein", result.getValue());
@@ -920,9 +990,9 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
 
         final CountDownLatch signal3 = new CountDownLatch(1);
 
-        GroupController.getInstance().joinUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>(){
+        GroupController.getInstance().joinPrivateUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, BooleanWrapper result){
+            public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
                 assertTrue("Der User " + MY_SECOND_MAIL + " sollte der Nutzergruppe " + TEST_GROUP_NAME + "erfolgreich beigetreten sein", result.getValue());
                 signal3.countDown();
             }
@@ -934,5 +1004,25 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         }
 
         changeAccount(0);
+    }
+
+    @SmallTest
+    public void testGetUserGroupPicture(){
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        GroupController.getInstance().getUserGroupPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>(){
+            @Override
+            public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
+                if(bitmap !=null){
+                    signal.countDown();
+                }
+                signal.countDown();
+            }
+        },TEST_GROUP_NAME);
+        try{
+            assertTrue("getUserGroupPicture failed", signal.await(30, TimeUnit.SECONDS));
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
     }
 }

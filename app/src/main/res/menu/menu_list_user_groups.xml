@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="ws1415.ps1415.activity.ListUserGroupsActivity">
+    <item
+        android:id="@+id/action_search_group"
+        android:icon="@drawable/ic_action_search"
+        android:title="Search"
+        android:showAsAction="always"
+        android:actionViewClass="android.widget.SearchView"/>
+</menu>

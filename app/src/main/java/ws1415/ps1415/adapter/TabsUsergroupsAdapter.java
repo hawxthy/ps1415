@@ -7,16 +7,13 @@ import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import ws1415.ps1415.fragment.AllUsergroupsFragment;
-import ws1415.ps1415.fragment.MyUsergroupsFragment;
-
 /**
- * Dieser Adapter wird genutzt, um die Fragmente der UsergroupsActivity zu verwalten.
+ * Dieser Adapter wird genutzt, um die Fragmente der GroupProfileActivity zu setzen.
  *
- * @author Martin Wrodarczyk
+ * @author Bernd Eissing
  */
 public class TabsUsergroupsAdapter extends FragmentPagerAdapter {
-    private List<Fragment> myTabs = new ArrayList<Fragment>();
+    private List<Fragment> myTabs = new ArrayList<>();
 
     /**
      * Konstruktor, der die Tabs initialisiert.
@@ -25,8 +22,8 @@ public class TabsUsergroupsAdapter extends FragmentPagerAdapter {
      */
     public TabsUsergroupsAdapter(FragmentManager fm){
         super(fm);
-        myTabs.add(new AllUsergroupsFragment());
-        myTabs.add(new MyUsergroupsFragment());
+        //myTabs.add(new AllUsergroupsFragment());
+        //myTabs.add(new MyUsergroupsFragment());
     }
 
     /**

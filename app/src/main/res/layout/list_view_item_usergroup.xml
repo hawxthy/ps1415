@@ -1,54 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="72dp"
+    android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/list_view_item_usergroup_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp" />
+
+    <ImageView
+        android:id="@+id/user_group_list_view_item_image"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_width="wrap_content"
+        android:layout_height="72dp"
+        android:orientation="vertical"
+        android:paddingTop="16dp"
+        android:paddingRight="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/user_group_list_view_item_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:textSize="16sp"
+            android:text="Two-line item"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/list_view_item_usergroup_creator"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/list_view_item_usergroup_creator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/user_group_list_view_item_count"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/list_view_item_usergroup_membercount"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/list_view_item_usergroup_member"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp" />
-        </LinearLayout>
+            android:textSize="14sp"
+            android:text="Secondary text"
+            />
     </LinearLayout>
 </LinearLayout>

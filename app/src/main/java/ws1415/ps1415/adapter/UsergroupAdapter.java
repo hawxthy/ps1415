@@ -1,19 +1,23 @@
 package ws1415.ps1415.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
+import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.R;
+import ws1415.ps1415.util.GroupImageLoader;
 
 
 /**
@@ -22,7 +26,8 @@ import ws1415.ps1415.R;
  * @author Martin Wrodarczyk
  */
 public class UsergroupAdapter extends BaseAdapter {
-    private List<UserGroup> groupList = new ArrayList<UserGroup>();
+    private List<UserGroupMetaData> groupList;
+    private List<Bitmap> groupPictures;
     private Context context;
     private LayoutInflater inflater;
     private int maximum;
@@ -34,7 +39,7 @@ public class UsergroupAdapter extends BaseAdapter {
      * @param groupList Liste von den Nutzergruppen
      * @param maximum Maximale Anzahl der Einträge, oder -1 für unbegrenzt.
      */
-    public UsergroupAdapter(Context context, List<UserGroup> groupList, int maximum) {
+    public UsergroupAdapter(Context context, List<UserGroupMetaData> groupList, int maximum) {
         if(maximum > -1 && maximum < groupList.size()){
             throw new IllegalArgumentException("Liste zu groß");
         }
@@ -64,7 +69,7 @@ public class UsergroupAdapter extends BaseAdapter {
      * @return Nutzergruppe an Stelle i
      */
     @Override
-    public UserGroup getItem(int i) {
+    public UserGroupMetaData getItem(int i) {
         return groupList.get(i);
     }
 
@@ -82,8 +87,8 @@ public class UsergroupAdapter extends BaseAdapter {
      * Klasse zum Halten der GUI Elemente, damit convertView die alten Objekte übernehmen kann.
      */
     private class Holder {
+        private ImageView groupImage;
         private TextView groupName;
-        private TextView groupCreator;
         private TextView groupCount;
     }
 
@@ -102,18 +107,17 @@ public class UsergroupAdapter extends BaseAdapter {
         if (convertView == null) {
             holder = new Holder();
             convertView = inflater.inflate(R.layout.list_view_item_usergroup, viewGroup, false);
-            holder.groupName = (TextView) convertView.findViewById(R.id.list_view_item_usergroup_name);
-            holder.groupCreator = (TextView) convertView.findViewById(R.id.list_view_item_usergroup_creator);
-            holder.groupCount = (TextView) convertView.findViewById(R.id.list_view_item_usergroup_member);
+            holder.groupImage = (ImageView) convertView.findViewById(R.id.user_group_list_view_item_image);
+            holder.groupName = (TextView) convertView.findViewById(R.id.user_group_list_view_item_title);
+            holder.groupCount = (TextView) convertView.findViewById(R.id.user_group_list_view_item_count);
             convertView.setTag(holder);
         } else {
             holder = (Holder) convertView.getTag();
         }
 
+        GroupImageLoader.getInstance().setGroupImageToImageView(context, getItem(position).getName(), holder.groupImage);
         holder.groupName.setText(getItem(position).getName());
-        //TODO Den Namen des EndUsers holen und nicht die E-Mail
-        holder.groupCreator.setText(getItem(position).getCreator());
-        holder.groupCount.setText(Integer.toString(getItem(position).getMemberCount()));
+        holder.groupCount.setText(context.getString(R.string.usergroup_member_count)+Integer.toString(getItem(position).getMemberCount()));
 
         return convertView;
     }
@@ -133,7 +137,7 @@ public class UsergroupAdapter extends BaseAdapter {
      *
      * @param userGroup
      */
-    public boolean addListItem(UserGroup userGroup){
+    public boolean addListItem(UserGroupMetaData userGroup){
         if(maximum > -1 && groupList.size() >= maximum){
             Toast.makeText(context, R.string.usergroup_adapter_maximum_reached, Toast.LENGTH_LONG).show();
             return false;

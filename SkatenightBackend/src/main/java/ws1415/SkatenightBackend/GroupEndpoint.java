@@ -1,6 +1,7 @@
 package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.Named;
+import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.oauth.OAuthRequestException;
@@ -31,8 +32,11 @@ import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserGroupPicture;
+import ws1415.SkatenightBackend.model.UserGroupPreviewPictures;
 import ws1415.SkatenightBackend.model.UserGroupType;
+import ws1415.SkatenightBackend.transport.StringWrapper;
 import ws1415.SkatenightBackend.transport.UserGroupBlackBoardTransport;
+import ws1415.SkatenightBackend.transport.UserGroupMembers;
 import ws1415.SkatenightBackend.transport.UserGroupMetaData;
 import ws1415.SkatenightBackend.transport.UserGroupNewsBoardTransport;
 import ws1415.SkatenightBackend.transport.UserGroupVisibleMembers;
@@ -47,32 +51,93 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
     private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
     /**
-     * Erstellt eine Gruppe mit dem angegebenen Namen und der angegebenen
-     * Öffentlichkeit.
+     * Prüft ob der angegebene Name schon vergeben ist.
+     *
+     * @param user
+     * @param groupName Name
+     * @return
+     * @throws OAuthRequestException
+     */
+    public BooleanWrapper checkGroupName(User user, @Named("groupName") String groupName)throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        if(ofy().load().type(UserGroup.class).id(groupName).now() !=null){
+            return new BooleanWrapper(false);
+        }
+        return new BooleanWrapper(true);
+    }
+
+    /**
+     * Erstellt eine private Nutzergruppe vom angegebenen Typ mit dem angegebenen
+     * Namen. Dabei muss ein Passwort angegeben sein, denn privaten Nutzergruppen
+     * kann nur mit Angabe eines Passwortes beigetreten werden.
      *
      * @param user      Der Benutzer, der die Gruppe anlegen möchte
-     * @param privat    Die Öffentlichkeitseinstellung der Gruppe
-     * @param groupName Der Name der neuen Gruppe.
+     * @param groupName Der Name der Nutzergrupppe
+     * @param groupType Der Typ der Nutzergruppe entweder NORMALGROUP oder SECURITYGROUP
+     * @param password Das Passwort, kann nicht null oder leer sein
      */
-    public void createUserGroup(User user, @Named("groupName") String groupName, @Named("groupPrivacy") boolean privat, @Named("groupType") UserGroupType groupType, @Named("groupPassword") String password) throws OAuthRequestException {
+    public void createPrivateUserGroupWithPicture(User user, @Named("groupName") String groupName, @Named("groupType") UserGroupType groupType, @Named("groupPassword") String password, @Named("groupDescription") String groupDescription, @Named("blobKeyValue") String blobKeyValue) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         throwIfUserGroupAlreadyExists(groupName);
         EndpointUtil.throwIfEndUserNotExists(user.getEmail());
 
-        if (groupType.equals(UserGroupType.SECURITYGROUP) && privat == false) {
-            throw new IllegalArgumentException("a security user group cannot be open to everyone");
-        }
-        if (privat == true && (password.isEmpty() || password == null )) {
+        if ((password.isEmpty() || password == null )) {
             throw new IllegalArgumentException("password for private user groups has to be submitted");
         }
-        UserGroup ug = new UserGroup(user.getEmail(), groupType.name(), hashPassword(password));
-        ug.setName(groupName);
+        UserGroup ug = new UserGroup(groupName, user.getEmail(), groupType.name(), true, hashPassword(password));
         ug.setMemberRights(new HashMap<String, ArrayList<String>>());
         ug.addGroupMember(user.getEmail(), createFullRightsList());
+        ug.setDescription(groupDescription);
         ug.setMemberCount(1);
-        ug.setPrivat(privat);
 
-        // Der Ersteller der Nutzergruppe ist zu Anfang auch Sichtbar auf der Karte
+        // Der Ersteller der Nutzergruppe ist zu Anfang auch sichtbar auf der Karte
+        UserGroupVisibleMembers visibleMembers = new UserGroupVisibleMembers();
+        visibleMembers.setGroupName(groupName);
+        visibleMembers.addVisibleMember(user.getEmail());
+        ofy().save().entity(visibleMembers).now();
+        ug.setVisibleMembers(visibleMembers);
+
+        if(blobKeyValue == null || blobKeyValue.isEmpty()){
+            throw new IllegalArgumentException("no blobKey submitted");
+        }
+        // Das Bild der Nutzergruppe erstellen und den BlobKey übergeben
+        UserGroupPicture picture = new UserGroupPicture();
+        BlobKey blobKey = new BlobKey(blobKeyValue);
+        picture.setPictureBlobKey(blobKey);
+        ofy().save().entity(picture).now();
+        ug.setPicture(picture);
+
+
+        ofy().save().entity(ug).now();
+        new UserEndpoint().addGroupToUser(user.getEmail(), ug);
+        saveEndUserAndSendNotification(user.getEmail());
+    }
+
+    /**
+     * Erstellt eine private Nutzergruppe vom angegebenen Typ mit dem angegebenen
+     * Namen. Dabei muss ein Passwort angegeben sein, denn privaten Nutzergruppen
+     * kann nur mit Angabe eines Passwortes beigetreten werden.
+     *
+     * @param user      Der Benutzer, der die Gruppe anlegen möchte
+     * @param groupName Der Name der Nutzergrupppe
+     * @param groupType Der Typ der Nutzergruppe entweder NORMALGROUP oder SECURITYGROUP
+     * @param password Das Passwort, kann nicht null oder leer sein
+     */
+    public void createPrivateUserGroup(User user, @Named("groupName") String groupName, @Named("groupType") UserGroupType groupType, @Named("groupDescription") String groupDescription, @Named("groupPassword") String password) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        throwIfUserGroupAlreadyExists(groupName);
+        EndpointUtil.throwIfEndUserNotExists(user.getEmail());
+
+        if ((password.isEmpty() || password == null )) {
+            throw new IllegalArgumentException("password for private user groups has to be submitted");
+        }
+        UserGroup ug = new UserGroup(groupName, user.getEmail(), groupType.name(), true, hashPassword(password));
+        ug.setMemberRights(new HashMap<String, ArrayList<String>>());
+        ug.addGroupMember(user.getEmail(), createFullRightsList());
+        ug.setDescription(groupDescription);
+        ug.setMemberCount(1);
+
+        // Der Ersteller der Nutzergruppe ist zu Anfang auch sichtbar auf der Karte
         UserGroupVisibleMembers visibleMembers = new UserGroupVisibleMembers();
         visibleMembers.setGroupName(groupName);
         visibleMembers.addVisibleMember(user.getEmail());
@@ -81,6 +146,91 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         ofy().save().entity(ug).now();
         new UserEndpoint().addGroupToUser(user.getEmail(), ug);
         saveEndUserAndSendNotification(user.getEmail());
+    }
+
+    /**
+     * Erstellt eine öffentliche Nutzergruppe mit dem angegebenen Namen. Diese Gruppe
+     * hat kein passwort und ist eine NORMALGROUP.
+     *
+     * @param user      Der Benutzer, der die Gruppe anlegen möchte
+     * @param groupName Der Name der neuen Gruppe.
+     */
+    public void createOpenUserGroupWithPicture(User user, @Named("groupName") String groupName, @Named("groupDescription") String groupDescription, @Named("blobKeyValue") String blobKeyValue) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        throwIfUserGroupAlreadyExists(groupName);
+        EndpointUtil.throwIfEndUserNotExists(user.getEmail());
+
+        UserGroup ug = new UserGroup(groupName, user.getEmail(), UserGroupType.NORMALGROUP.name(), false);
+        ug.setMemberRights(new HashMap<String, ArrayList<String>>());
+        ug.addGroupMember(user.getEmail(), createFullRightsList());
+        ug.setDescription(groupDescription);
+        ug.setMemberCount(1);
+
+        // Der Ersteller der Nutzergruppe ist zu Anfang sichtbar auf der Karte
+        UserGroupVisibleMembers visibleMembers = new UserGroupVisibleMembers();
+        visibleMembers.setGroupName(groupName);
+        visibleMembers.addVisibleMember(user.getEmail());
+        ofy().save().entity(visibleMembers).now();
+        ug.setVisibleMembers(visibleMembers);
+
+        if(blobKeyValue == null || blobKeyValue.isEmpty()){
+            throw new IllegalArgumentException("no blobKey submitted");
+        }
+        // Das Bild der Nutzergruppe erstellen und den BlobKey übergeben
+        UserGroupPicture picture = new UserGroupPicture();
+        BlobKey blobKey = new BlobKey(blobKeyValue);
+        picture.setPictureBlobKey(blobKey);
+        ofy().save().entity(picture).now();
+        ug.setPicture(picture);
+
+
+        ofy().save().entity(ug).now();
+        new UserEndpoint().addGroupToUser(user.getEmail(), ug);
+        saveEndUserAndSendNotification(user.getEmail());
+    }
+
+    /**
+     * Erstellt eine öffentliche Nutzergruppe mit dem angegebenen Namen. Diese Gruppe
+     * hat kein passwort und ist eine NORMALGROUP.
+     *
+     * @param user      Der Benutzer, der die Gruppe anlegen möchte
+     * @param groupName Der Name der neuen Gruppe.
+     */
+    public void createOpenUserGroup(User user, @Named("groupName") String groupName, @Named("groupDescription") String groupDescription) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        throwIfUserGroupAlreadyExists(groupName);
+        EndpointUtil.throwIfEndUserNotExists(user.getEmail());
+
+        UserGroup ug = new UserGroup(groupName, user.getEmail(), UserGroupType.NORMALGROUP.name(), false);
+        ug.setMemberRights(new HashMap<String, ArrayList<String>>());
+        ug.addGroupMember(user.getEmail(), createFullRightsList());
+        ug.setDescription(groupDescription);
+        ug.setMemberCount(1);
+
+        // Der Ersteller der Nutzergruppe ist zu Anfang sichtbar auf der Karte
+        UserGroupVisibleMembers visibleMembers = new UserGroupVisibleMembers();
+        visibleMembers.setGroupName(groupName);
+        visibleMembers.addVisibleMember(user.getEmail());
+        ofy().save().entity(visibleMembers).now();
+        ug.setVisibleMembers(visibleMembers);
+        ofy().save().entity(ug).now();
+        new UserEndpoint().addGroupToUser(user.getEmail(), ug);
+        saveEndUserAndSendNotification(user.getEmail());
+    }
+
+    /**
+     * Gibt eine Liste aller Mitglieder einer Nutzergruppe zurück.
+     *
+     * @param user
+     * @param groupName Der Name der Nutzergruppe
+     * @return
+     * @throws OAuthRequestException
+     */
+    public UserGroupMembers getUserGroupMembers(User user, @Named("groupName") String groupName)throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        UserGroup group = ofy().load().type(UserGroup.class).id(groupName).safe();
+        return new UserGroupMembers(groupName, group.getMemberRights());
     }
 
     /**
@@ -168,9 +318,12 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
     public UserGroup getUserGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
-        UserGroup group = ofy().load().type(UserGroup.class).id(groupName).safe();
-        group.setPassword("");
-        return group;
+        UserGroup group = ofy().load().type(UserGroup.class).id(groupName).now();
+        if(group != null){
+            group.setPassword("");
+            return group;
+        }
+        return null;
     }
 
     /**
@@ -197,7 +350,9 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
                 ofy().delete().entity(ug.getNewsBoard()).now();
             }
             if (ug.getPicture() != null) {
-                blobstoreService.delete(ug.getPicture().getPictureBlobKey());
+                if(ug.getPicture().getPictureBlobKey() != null){
+                    blobstoreService.delete(ug.getPicture().getPictureBlobKey());
+                }
                 ofy().delete().entity(ug.getPicture()).now();
             }
             if (ug.getVisibleMembers() != null) {
@@ -262,9 +417,38 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      *
      * @param user          Der aufrufende Benutzer.
      * @param groupName     Der Name der beizutretenden Gruppe
+     */
+    public BooleanWrapper joinUserGroup(User user, @Named("groupName") String groupName) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        UserGroup group = throwIfNoUserGroupExists(groupName);
+        EndpointUtil.throwIfUserAlreadyInGroup(group, user.getEmail());
+        EndUser endUser = throwIfNoEndUserFound(user.getEmail());
+
+        group.addGroupMember(endUser.getEmail(), createNewMemberRightsList());
+        group.getVisibleMembers().addVisibleMember(endUser.getEmail());
+        ofy().save().entity(group.getVisibleMembers()).now();
+
+        // News Message erstellen
+        BoardEntry be = new BoardEntry(user.getEmail()+" ist der Gruppe beigetreten", user.getEmail());
+        ofy().save().entity(be).now();
+        group.getNewsBoard().addBoardMessage(be);
+        ofy().save().entity(group.getNewsBoard()).now();
+        ofy().save().entity(group).now();
+
+        // Dem EndUser die Nutzergruppe hinzufügen
+        new UserEndpoint().addGroupToUser(endUser.getEmail(), group);
+        return new BooleanWrapper(true);
+    }
+
+    /**
+     * Fügt den aufrufenden Benutzer zu der angegebenen Gruppe hinzu.
+     *
+     * @param user          Der aufrufende Benutzer.
+     * @param groupName     Der Name der beizutretenden Gruppe
      * @param groupPassword Das Password der Nutzergruppe, falls diese privat ist
      */
-    public BooleanWrapper joinUserGroup(User user, @Named("groupName") String groupName, @Named("groupPassword") String groupPassword) throws OAuthRequestException {
+    public BooleanWrapper joinPrivateUserGroup(User user, @Named("groupName") String groupName, @Named("groupPassword") String groupPassword) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = throwIfNoUserGroupExists(groupName);
@@ -277,6 +461,12 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         group.addGroupMember(endUser.getEmail(), createNewMemberRightsList());
         group.getVisibleMembers().addVisibleMember(endUser.getEmail());
         ofy().save().entity(group.getVisibleMembers()).now();
+
+        // News Message erstellen
+        BoardEntry be = new BoardEntry(user.getEmail()+" ist der Gruppe beigetreten", user.getEmail());
+        ofy().save().entity(be).now();
+        group.getNewsBoard().addBoardMessage(be);
+        ofy().save().entity(group.getNewsBoard()).now();
         ofy().save().entity(group).now();
 
         // Dem EndUser die Nutzergruppe hinzufügen
@@ -445,7 +635,9 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = ofy().load().group(UserGroupPicture.class).type(UserGroup.class).id(groupName).safe();
         if (group.getPicture() != null) {
-            blobstoreService.delete(group.getPicture().getPictureBlobKey());
+            if(group.getPicture().getPictureBlobKey() != null){
+                blobstoreService.delete(group.getPicture().getPictureBlobKey());
+            }
             ofy().delete().entity(group.getPicture()).now();
         }
 
@@ -537,15 +729,72 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      *
      * @param user
      * @param groupName Der Name der Nutzergruppe
-     * @param isOpen    Die Privacy der Nutzergruppe
      * @throws OAuthRequestException
      */
-    public void changeUserGroupPrivacy(User user, @Named("groupName") String groupName, @Named("groupPrivacy") boolean isOpen) throws OAuthRequestException {
+    public BooleanWrapper makeUserGroupPrivat(User user, @Named("groupName") String groupName, @Named("groupPassword") String groupPassword) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        if(groupPassword == null || groupPassword.isEmpty()){
+            throw new IllegalArgumentException("making a user group private means you have to submit a password");
+        }
+        UserGroup group = throwIfNoUserGroupExists(groupName);
+        if(hasRights(group, user.getEmail(), Right.CHANGEGROUPPRIVACY.name())){
+            group.setPrivat(true);
+            group.setPassword(hashPassword(groupPassword));
+            ofy().save().entity(group).now();
+            return new BooleanWrapper(true);
+        }else{
+            EndpointUtil.throwIfNoRights();
+        }
+        return  new BooleanWrapper(false);
+    }
+
+    /**
+     * Methode zum ändern der Öffentlichkeit einer Nutzergruppe. EndUser können öffentlichen Nutzergruppen
+     * ohne weiteres beitreten. Nicht öffentliche Nutzergruppen sind durch Passwörter geschützt.
+     *
+     * @param user
+     * @param groupName Der Name der Nutzergruppe
+     * @throws OAuthRequestException
+     */
+    public BooleanWrapper makeUserGroupOpen(User user, @Named("groupname") String groupName)throws OAuthRequestException{
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = throwIfNoUserGroupExists(groupName);
-        group.setPrivat(isOpen);
-        ofy().save().entity(group).now();
+        if(hasRights(group, user.getEmail(), Right.CHANGEGROUPPRIVACY.name())){
+            group.setPrivat(false);
+            group.setPassword("");
+            ofy().save().entity(group).now();
+            return new BooleanWrapper(true);
+        }else{
+            EndpointUtil.throwIfNoRights();
+        }
+        return new BooleanWrapper(false);
+    }
+
+    /**
+     * Gibt die UploadUrl des Blobstores zurück. Dient zum Uploaden von Bildern in den Blobstore.
+     * Hier wird in
+     *
+     * @return UploadUrl
+     */
+    public StringWrapper previewImageUploadUrl(User user) throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        return new StringWrapper(blobstoreService.createUploadUrl("/Bernd/images/upload"));
+    }
+
+    /**
+     * Diese Methode existiert nur, damit gespeichert wird welche Bilder von
+     * Nutzern beim erstellen von Gruppen hochgeladen wurden.
+     *
+     */
+    public UserGroupPreviewPictures getUserGroupPreviewPictures(){
+        UserGroupPreviewPictures preview = ofy().load().type(UserGroupPreviewPictures.class).id("007").now();
+        if(preview == null){
+            preview = new UserGroupPreviewPictures("007");
+            ofy().save().entity(preview).now();
+        }
+        return  preview;
     }
 //======================================================================================
 

@@ -7,8 +7,23 @@
     <color name="counter_text_bg">#0084D4</color>
     <color name="list_background_pressed">#D8D8D8</color>
 
+    <!-- create group colors -->
+    <color name="check_group_name">#ffc6c6c6</color>
+    <color name="check_group_name_positive">#ff00ba06</color>
+    <color name="check_group_name_negative">#ffd84123</color>
+    <color name="check_group_name_button">#FFFFFF</color>
+    <color name="black">#000000</color>
+
     <color name="colorProfilePrimary">#FF5722</color>
     <color name="colorProfileScroll">#FFFFFF</color>
 
     <color name="conversationBg">#E3E3E3</color>
+
+    <color name="colorPrimary">#ff3262ff</color>
+    <color name="colorPressed">#ff43ddff</color>
+    <color name="colorPrimaryBlackBoard">#000000</color>
+    <color name="colorPressedBlackBoard">#D8D8D8</color>
+
+    <color name="ColorPrimary">#FF5722</color>
+    <color name="ColorPrimaryDark">#E64A19</color>
 </resources>

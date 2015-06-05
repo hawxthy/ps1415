@@ -24,6 +24,7 @@ public class UserGroup {
     private String name;            // Eindeutiger Name der Gruppe
     private String password;
     private String creator;
+    private String description;
     private boolean privat;
     private int memberCount;
     private String groupType;
@@ -43,13 +44,43 @@ public class UserGroup {
         // Konstruktor für GAE
     }
 
-    public UserGroup(String creator, String groupType, String password) {
+    /**
+     * Konstruktor für nicht öffentliche Nutzergruppen, hier muss noch zusätzlich ein Passwort
+     * angegeben werden.
+     *
+     * @param groupName
+     * @param creator
+     * @param groupType
+     * @param isPrivat
+     * @param password
+     */
+    public UserGroup(String groupName, String creator, String groupType, boolean isPrivat, String password) {
         if (creator == null) {
             throw new IllegalArgumentException("creator can not be null");
         }
+        this.name = groupName;
         this.creator = creator;
         this.groupType = groupType;
+        this.privat = isPrivat;
         this.password = password;
+    }
+
+    /**
+     * Konstruktor für öffentliche Nutzergruppen.
+     *
+     * @param groupName
+     * @param creator
+     * @param groupType
+     * @param isPrivat
+     */
+    public UserGroup(String groupName, String creator, String groupType, boolean isPrivat) {
+        if (creator == null) {
+            throw new IllegalArgumentException("creator can not be null");
+        }
+        this.name = groupName;
+        this.creator = creator;
+        this.groupType = groupType;
+        this.privat = isPrivat;
     }
 
     public String getCreator() {
@@ -78,6 +109,14 @@ public class UserGroup {
 
     public void setPrivat(boolean privat) {
         this.privat = privat;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getMemberCount() {
