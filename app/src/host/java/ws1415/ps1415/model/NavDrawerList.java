@@ -9,13 +9,13 @@ import ws1415.ps1415.activity.PermissionManagementActivity;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.FriendsActivity;
-import ws1415.ps1415.activity.ManageEventsActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
+import ws1415.ps1415.activity.ListUserGroupsActivity;
+import ws1415.ps1415.activity.ManageEventsActivity;
 import ws1415.ps1415.activity.ManageRoutesActivity;
 import ws1415.ps1415.activity.MessagingActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.activity.SearchActivity;
-import ws1415.ps1415.activity.UsergroupActivity;
 
 /**
  * @author Richard Schulze
@@ -104,7 +104,7 @@ public class NavDrawerList {
                 }
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent user_group_intent = new Intent(parent.getContext(), ListUserGroupsActivity.class);
+                    Intent user_group_intent = new Intent(parent.getContext(), UsergroupActivity.class);
                     user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(user_group_intent);
                 }
