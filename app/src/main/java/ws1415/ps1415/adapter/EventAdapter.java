@@ -229,4 +229,15 @@ public class EventAdapter extends BaseAdapter {
     public EventMetaData getEvent(int position) {
         return events.get(position);
     }
+
+    /**
+     * Entfernt das Event mit der angegebenen Position aus dem Adapter.
+     * @param position    Die Position des zu entfernenden Events.
+     */
+    public void removeItem(int position) {
+        if (position < events.size()) {
+            events.remove(position);
+            notifyDataSetChanged();
+        }
+    }
 }

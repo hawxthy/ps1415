@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_create_route"
+        android:title="@string/action_create_route"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_new" />
+
+    <item
+        android:id="@+id/action_refresh_routes"
+        android:title="@string/action_refresh_routes"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_refresh" />
+</menu>

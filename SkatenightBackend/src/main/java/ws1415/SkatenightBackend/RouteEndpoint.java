@@ -326,7 +326,6 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
      * @param route zu speichernde Route
      */
     public Route addRoute(User user, Route route) throws OAuthRequestException {
-        // TODO Prüfen
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
@@ -344,9 +343,7 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
      * @return Liste der Routen.
      */
     public List<Route> getRoutes() {
-        // TODO Prüfen
-
-        return ofy().load().type(Route.class).list();
+        return ofy().load().type(Route.class).order("name").list();
     }
 
     /**
@@ -356,8 +353,7 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
      * @param id   Die ID der zu löschenden Route.
      * @return true, wenn die Route gelöscht wurde, sonst false
      */
-    public BooleanWrapper deleteRoute(User user, @Named("id") long id) throws OAuthRequestException {
-        // TODO Prüfen, Rückegabewert entfernen
+    public void deleteRoute(User user, @Named("id") long id) throws OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
@@ -371,7 +367,6 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
         }
 
         ofy().delete().key(Key.create(Route.class, id)).now();
-        return new BooleanWrapper(true);
     }
 
 }

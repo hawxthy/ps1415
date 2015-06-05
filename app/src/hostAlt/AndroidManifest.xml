@@ -27,34 +27,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.RouteEditorActivity"
-            android:label="@string/title_activity_route_editor"
-            android:parentActivityName=".activity.HoldTabsActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ws1415.veranstalterapp.activity.HoldTabsActivity" />
-        </activity>
+
         <activity
             android:name=".dialog.ChooseRouteDialog"
             android:label="@string/title_activity_choose_route"
             android:theme="@android:style/Theme.Holo.Dialog" />
-        <activity
-            android:name=".activity.ShowRouteActivity"
-            android:label="@string/title_activity_show_route"
-            android:parentActivityName=".activity.HoldTabsActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ws1415.ps1415.HoldTabsActivity" />
-        </activity>
-        <activity
-            android:name=".dialog.AddRouteDialog"
-            android:label="@string/title_activity_add_route_dialog"
-            android:theme="@android:style/Theme.Holo.Dialog" />
-        <activity
-            android:name=".dialog.AddRouteDraftDialog"
-            android:label="@string/title_activity_add_route_dialog"
-            android:theme="@android:style/Theme.Holo.Dialog" />
+
+
         <activity
             android:name=".fragment.ShowInformationActivity"
             android:label="@string/title_activity_show_information"
@@ -77,15 +56,7 @@
             android:label="@string/title_activity_add_host_dialog"
             android:theme="@android:style/Theme.Holo.Dialog" >
         </activity>
-        <activity
-            android:name=".dialog.EditWaypointDialog"
-            android:label="@string/title_activity_edit_waypoint_dialog"
-            android:theme="@android:style/Theme.Holo.Dialog"
-            android:parentActivityName="ws1415.veranstalterapp.activity.RouteEditorActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ws1415.veranstalterapp.activity.RouteEditorActivity" />
-        </activity>
+
 
     </application>
 

@@ -93,6 +93,7 @@ public class BaseFragmentActivity extends FragmentActivity {
     private class SlideMenuClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            mDrawerLayout.closeDrawer(mDrawerList);
             navDrawerItems.get(position).onClick(parent, view, position, id);
         }
     }

@@ -1,0 +1,133 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ws1415.ps1415.activity.EditEventActivity">
+
+    <ProgressBar
+        android:id="@+id/eventLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:indeterminate="true"
+        android:layout_centerInParent="true"/>
+
+    <ScrollView
+        android:id="@+id/eventData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/eventLoading">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:id="@+id/headerImage"
+                android:scaleType="center"
+                android:src="@drawable/template_picture"
+                android:onClick="onHeaderImageClick"/>
+
+            <RelativeLayout
+                android:id="@+id/data"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@id/headerImage"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+
+                <EditText
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="11pt"
+                    android:text="@string/loading" />
+
+                <TextView
+                    android:id="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/title"
+                    android:text="@string/loading"
+                    android:clickable="true"
+                    android:onClick="onEditDateClick" />
+
+                <EditText
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/date"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/loading"
+                    android:inputType="textMultiLine" />
+
+                <EditText
+                    android:id="@+id/meeting_place"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/description"
+                    android:layout_toRightOf="@+id/meeting_place_label"/>
+
+                <TextView
+                    android:id="@id/meeting_place_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/meeting_place_label"
+                    android:layout_below="@id/description"
+                    android:layout_alignBaseline="@id/meeting_place" />
+
+                <EditText
+                    android:id="@+id/fee"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/meeting_place"
+                    android:layout_alignLeft="@id/meeting_place"
+                    android:inputType="number" />
+
+                <TextView
+                    android:id="@+id/fee_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fee_label"
+                    android:layout_alignBaseline="@id/fee" />
+
+                <ListView
+                    android:id="@+id/dynamicFields"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/fee"
+                    android:isScrollContainer="false" >
+
+
+                </ListView>
+
+            </RelativeLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:id="@+id/images"
+                android:background="#d8d8d8"
+                android:layout_below="@id/data" >
+
+            </HorizontalScrollView>
+
+            <Button
+                android:id="@+id/route"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/choose_route"
+                android:layout_below="@id/images"
+                android:onClick="onRouteClick" />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

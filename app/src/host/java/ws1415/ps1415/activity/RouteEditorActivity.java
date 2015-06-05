@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.activity;
+package ws1415.ps1415.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -43,14 +43,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import ws1415.veranstalterapp.fragment.EditorMapFragment;
-import ws1415.veranstalterapp.fragment.EditorWaypointsFragment;
-import ws1415.veranstalterapp.R;
-import ws1415.common.task.ExtendedTask;
-import ws1415.common.task.ExtendedTaskDelegate;
-import ws1415.common.util.LocationUtils;
-import ws1415.common.task.AddRouteTask;
-import ws1415.veranstalterapp.task.RouteLoaderTask;
+import ws1415.ps1415.R;
+import ws1415.ps1415.controller.RouteController;
+import ws1415.ps1415.fragment.EditorMapFragment;
+import ws1415.ps1415.fragment.EditorWaypointsFragment;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegate;
+import ws1415.ps1415.task.RouteLoaderTask;
+import ws1415.ps1415.util.LocationUtils;
 
 
 public class RouteEditorActivity extends Activity implements ActionBar.TabListener, ExtendedTaskDelegate<Void, RouteEditorActivity.Route> {
@@ -282,7 +282,7 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
                     rt.setLength(length);
 
-                    new AddRouteTask(null).execute(rt);
+                    RouteController.addRoute(null, rt);
 
                     if (backButtonPressed) {
                         RouteEditorActivity.super.onBackPressed();

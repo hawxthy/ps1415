@@ -33,16 +33,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".activity.ShowInformationActivity"
-            android:exported="true"
-            android:label="@string/title_activity_showinformation"
-            android:parentActivityName=".activity.ListEventsActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.ListEventsActivity" />
-        </activity>
-        <activity
-            android:name=".activity.ShowRouteActivity"
+            android:name=".activity.OldShowRouteActivity"
             android:label="@string/title_activity_show_route"
             android:parentActivityName=".activity.ShowInformationActivity" >
             <meta-data

@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.activity;
+package ws1415.ps1415.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import ws1415.veranstalterapp.R;
-import ws1415.common.util.LocationUtils;
+import ws1415.ps1415.R;
+import ws1415.ps1415.util.LocationUtils;
 
 /**
  * Activity zum Anzeigen einer Route in einer Map.
@@ -95,7 +95,7 @@ public class ShowRouteActivity extends Activity {
 
                 // Wegpunkte laden, falls vorhanden
                 if (intent.hasExtra(EXTRA_WAYPOINTS)) {
-                    ArrayList<HashMap> waypoints = (ArrayList<HashMap>) intent.getSerializableExtra(EXTRA_WAYPOINTS);
+                    List<HashMap> waypoints = (List<HashMap>) intent.getSerializableExtra(EXTRA_WAYPOINTS);
                     for (HashMap wp : waypoints) {
                         RouteEditorActivity.Waypoint tmp = RouteEditorActivity.Waypoint.create(
                                 new LatLng((Double)wp.get("latitude"), (Double)wp.get("longitude")),

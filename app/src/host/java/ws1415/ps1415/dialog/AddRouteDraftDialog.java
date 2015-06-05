@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.dialog;
+package ws1415.ps1415.dialog;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,8 +12,8 @@ import com.skatenight.skatenightAPI.model.ServerWaypoint;
 
 import java.util.ArrayList;
 
-import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.activity.RouteEditorActivity;
+import ws1415.ps1415.R;
+import ws1415.ps1415.activity.RouteEditorActivity;
 
 /**
  * Dialog für das Erstellen einer neuen Gruppe anhand einer vorher gewählten Route als Vorlage.

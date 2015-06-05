@@ -10,15 +10,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.EventFilter;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.EventAdapter;
+import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.fragment.EventListFragment;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.UniversalUtil;
 
-public class HostEventsActivity extends BaseActivity implements EventListFragment.OnEventClickListener {
+public class ManageEventsActivity extends BaseActivity implements EventListFragment.OnEventClickListener {
     /**
      * Bestimmt die Anzahl Events, die pro Aufruf an den Server herunter geladen werden.
      */
@@ -62,7 +66,7 @@ public class HostEventsActivity extends BaseActivity implements EventListFragmen
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_list_events, menu);
+        getMenuInflater().inflate(R.menu.menu_manage_events, menu);
         return true;
     }
 
@@ -72,12 +76,18 @@ public class HostEventsActivity extends BaseActivity implements EventListFragmen
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        Intent intent;
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
+            intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        } else if (id == R.id.action_create_event) {
+            intent = new Intent(this, EditEventActivity.class);
             startActivity(intent);
             return true;
         } else if (id == R.id.action_refresh_events) {
             refresh();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -90,26 +100,54 @@ public class HostEventsActivity extends BaseActivity implements EventListFragmen
     }
 
     @Override
-    public boolean onEventLongClick(AdapterView<?> parent, View v, int position, final long id) {
+    public boolean onEventLongClick(AdapterView<?> parent, View v, final int position, final long id) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(eventAdapter.getEvent(position).getTitle())
-                .setItems(R.array.host_events_event_actions, new DialogInterface.OnClickListener() {
+                .setItems(R.array.manage_events_event_actions, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        Intent intent;
                         switch (which) {
                             case 0:
                                 // Anzeigen
-                                Intent intent = new Intent(HostEventsActivity.this, ShowEventActivity.class);
+                                intent = new Intent(ManageEventsActivity.this, ShowEventActivity.class);
                                 intent.putExtra(ShowEventActivity.EXTRA_EVENT_ID, id);
                                 startActivity(intent);
                                 break;
                             case 1:
                                 // Bearbeiten
-                                // TODO
+                                intent = new Intent(ManageEventsActivity.this, EditEventActivity.class);
+                                intent.putExtra(EditEventActivity.EXTRA_EVENT_ID, id);
+                                startActivity(intent);
                                 break;
                             case 2:
                                 // Löschen
-                                // TODO
+                                AlertDialog.Builder builder = new AlertDialog.Builder(ManageEventsActivity.this);
+                                builder.setTitle(R.string.delete_event)
+                                        .setMessage(R.string.delete_event_message)
+                                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                EventController.deleteEvent(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                                                    @Override
+                                                    public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                                                        onEventDeleted(position);
+                                                    }
+
+                                                    @Override
+                                                    public void taskFailed(ExtendedTask task, String message) {
+                                                        Toast.makeText(ManageEventsActivity.this, R.string.event_deletion_error, Toast.LENGTH_LONG).show();
+                                                    }
+                                                }, id);
+                                            }
+                                        })
+                                        .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.cancel();
+                                            }
+                                        });
+                                builder.create().show();
                                 break;
                         }
                     }
@@ -117,4 +155,13 @@ public class HostEventsActivity extends BaseActivity implements EventListFragmen
         builder.create().show();
         return true;
     }
+
+    /**
+     * Wird vom EventController aufgerufen, sobald ein Event gelöscht wurde.
+     * @param position    Die Position des Events, das gelöscht wurde.
+     */
+    private void onEventDeleted(int position) {
+        eventAdapter.removeItem(position);
+    }
+
 }

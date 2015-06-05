@@ -122,17 +122,17 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         speedProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ActiveEventActivity.this, ShowRouteActivity.class);
-                intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, encodedWaypoints);
+                Intent intent = new Intent(ActiveEventActivity.this, OldShowRouteActivity.class);
+                intent.putExtra(OldShowRouteActivity.EXTRA_ROUTE, encodedWaypoints);
                 if (saved) {
                     LocalStorageUtil storeLocalData = new LocalStorageUtil(getApplicationContext());
                     LocalAnalysisData localData = storeLocalData.getData(String.valueOf(eventId));
-                    intent.putExtra(ShowRouteActivity.EXTRA_VISITED, localData.getVisited());
-                    intent.putExtra(ShowRouteActivity.EXTRA_TIMESTAMPS, localData.getTimestamps());
+                    intent.putExtra(OldShowRouteActivity.EXTRA_VISITED, localData.getVisited());
+                    intent.putExtra(OldShowRouteActivity.EXTRA_TIMESTAMPS, localData.getTimestamps());
                 }
                 else {
-                    intent.putExtra(ShowRouteActivity.EXTRA_EVENT_ID, eventId);
-                    intent.putExtra(ShowRouteActivity.EXTRA_SPEED_PROFILE, true);
+                    intent.putExtra(OldShowRouteActivity.EXTRA_EVENT_ID, eventId);
+                    intent.putExtra(OldShowRouteActivity.EXTRA_SPEED_PROFILE, true);
                 }
 
                 startActivity(intent);
@@ -143,10 +143,10 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
         mapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ActiveEventActivity.this, ShowRouteActivity.class);
-                intent.putExtra(ShowRouteActivity.EXTRA_USERGROUPS, true);
-                intent.putExtra(ShowRouteActivity.EXTRA_ROUTE, encodedWaypoints);
-                intent.putExtra(ShowRouteActivity.EXTRA_EVENT_ID, eventId);
+                Intent intent = new Intent(ActiveEventActivity.this, OldShowRouteActivity.class);
+                intent.putExtra(OldShowRouteActivity.EXTRA_USERGROUPS, true);
+                intent.putExtra(OldShowRouteActivity.EXTRA_ROUTE, encodedWaypoints);
+                intent.putExtra(OldShowRouteActivity.EXTRA_EVENT_ID, eventId);
                 startActivity(intent);
             }
         });

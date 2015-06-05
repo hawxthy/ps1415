@@ -3,9 +3,58 @@
     package="ws1415.ps1415" >
 
     <application>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
         <activity
-            android:name=".activity.HostEventsActivity"
-            android:label="@string/title_activity_host_events" >
+            android:name=".activity.ManageEventsActivity"
+            android:label="@string/title_activity_manage_events" >
+        </activity>
+        <activity
+            android:name=".activity.EditEventActivity"
+            android:label="@string/edit_event"
+            android:parentActivityName=".activity.ManageEventsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.ManageEventsActivity" />
+        </activity>
+        <activity
+            android:name=".activity.ManageRoutesActivity"
+            android:label="@string/title_activity_manage_routes" >
+        </activity>
+        <activity
+            android:name=".activity.RouteEditorActivity"
+            android:label="@string/title_activity_route_editor"
+            android:parentActivityName=".activity.ManageRoutesActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.activity.ManageRoutesActivity" />
+        </activity>
+        <activity
+            android:name=".activity.ShowRouteActivity"
+            android:label="@string/title_activity_show_route"
+            android:parentActivityName=".activity.ManageRoutesActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.activity.ManageRoutesActivity" />
+        </activity>
+        <activity
+            android:name=".dialog.AddRouteDialog"
+            android:label="@string/title_activity_add_route_dialog"
+            android:theme="@android:style/Theme.Holo.Dialog" />
+        <activity
+            android:name=".dialog.AddRouteDraftDialog"
+            android:label="@string/title_activity_add_route_dialog"
+            android:theme="@android:style/Theme.Holo.Dialog" />
+        <activity
+            android:name=".dialog.EditWaypointDialog"
+            android:label="@string/title_activity_edit_waypoint_dialog"
+            android:parentActivityName=".activity.RouteEditorActivity"
+            android:theme="@android:style/Theme.Holo.Dialog" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.activity.RouteEditorActivity" />
         </activity>
     </application>
 

@@ -1,8 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ws1415.ps1415.activity.HostEventsActivity" >
+    tools:context="ws1415.ps1415.activity.ManageEventsActivity" >
     <item
-        android:id="@+id/action_add_event"
+        android:id="@+id/action_create_event"
         android:title="@string/action_create_event"
         android:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_new" />

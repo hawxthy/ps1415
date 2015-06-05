@@ -62,4 +62,8 @@ public class DynamicFieldsAdapter extends BaseAdapter {
         }
         return view;
     }
+
+    public List<DynamicField> getList() {
+        return dynamicFields;
+    }
 }

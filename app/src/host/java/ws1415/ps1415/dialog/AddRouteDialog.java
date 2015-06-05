@@ -1,4 +1,4 @@
-package ws1415.veranstalterapp.dialog;
+package ws1415.ps1415.dialog;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,8 +8,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.activity.RouteEditorActivity;
+import ws1415.ps1415.R;
+import ws1415.ps1415.activity.RouteEditorActivity;
 
 
 /**

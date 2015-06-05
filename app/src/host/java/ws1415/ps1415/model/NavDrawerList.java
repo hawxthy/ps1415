@@ -7,12 +7,12 @@ import android.widget.AdapterView;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.FriendsActivity;
-import ws1415.ps1415.activity.HostEventsActivity;
+import ws1415.ps1415.activity.ManageEventsActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
+import ws1415.ps1415.activity.ManageRoutesActivity;
 import ws1415.ps1415.activity.MessagingActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.activity.SearchActivity;
-import ws1415.ps1415.activity.UploadImageActivity;
 import ws1415.ps1415.activity.UsergroupActivity;
 
 /**
@@ -142,9 +142,28 @@ public class NavDrawerList {
                 }
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent search_intent = new Intent(parent.getContext(), HostEventsActivity.class);
-                    search_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    parent.getContext().startActivity(search_intent);
+                    Intent intent = new Intent(parent.getContext(), ManageEventsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(intent);
+                }
+            },
+
+            // ---------- Routen erstellen/bearbeiten ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.create_edit_routes;
+                }
+                @Override
+                // TODO Icon ändern
+                public int getIconId() {
+                    return R.drawable.ic_event;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(parent.getContext(), ManageRoutesActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(intent);
                 }
             }
     };

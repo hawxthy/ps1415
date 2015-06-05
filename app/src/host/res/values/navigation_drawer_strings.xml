@@ -12,6 +12,7 @@
     <string name="user_groups">User Groups</string>
     <string name="search">Search</string>
     <string name="create_edit_events">Create/Edit Events</string>
+    <string name="create_edit_routes">Create/Edit Routes</string>
     <string name="upload_group_image">Upload Group Image</string>
 
 </resources>
