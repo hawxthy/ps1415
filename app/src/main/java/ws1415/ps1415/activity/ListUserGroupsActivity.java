@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -43,6 +44,15 @@ public class ListUserGroupsActivity extends BaseActivity {
                 ListUserGroupsActivity.this.startActivity(createGroupIntent);
             }
         });
+
+        mUserGroupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                openGroupProfile(mAdapter.getItem(i));
+            }
+
+        });
+        refresh();
     }
 
     @Override
@@ -73,7 +83,6 @@ public class ListUserGroupsActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        refresh();
     }
 
     /**
@@ -105,5 +114,12 @@ public class ListUserGroupsActivity extends BaseActivity {
         mUserGroupList = results;
         mAdapter = new UsergroupAdapter(this, results, -1);
         if (mUserGroupListView != null) mUserGroupListView.setAdapter(mAdapter);
+    }
+
+    private void openGroupProfile(UserGroupMetaData medaData){
+        Intent open_group_profile_intent = new Intent(this, GroupProfileActivity.class);
+        open_group_profile_intent.putExtra("groupName", medaData.getName());
+        open_group_profile_intent.putExtra("groupCreator", medaData.getCreator());
+        startActivity(open_group_profile_intent);
     }
 }

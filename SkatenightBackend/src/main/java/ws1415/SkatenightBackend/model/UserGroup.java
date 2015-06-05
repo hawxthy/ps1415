@@ -24,6 +24,7 @@ public class UserGroup {
     private String name;            // Eindeutiger Name der Gruppe
     private String password;
     private String creator;
+    private String description;
     private boolean privat;
     private int memberCount;
     private String groupType;
@@ -108,6 +109,14 @@ public class UserGroup {
 
     public void setPrivat(boolean privat) {
         this.privat = privat;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getMemberCount() {

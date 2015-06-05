@@ -7,6 +7,7 @@ import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.BooleanWrapper;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
+import com.skatenight.skatenightAPI.model.UserGroupMembers;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 import com.skatenight.skatenightAPI.model.UserGroupNewsBoardTransport;
 import com.skatenight.skatenightAPI.model.UserGroupPicture;
@@ -17,7 +18,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.InputStreamBody;
@@ -25,7 +25,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -53,22 +52,68 @@ public class GroupController {
     }
 
     /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um den Namen einer
+     * Nutzergruppe zu prüfen.
+     *
+     * @param handler
+     * @param groupName
+     */
+    public void checkGroupName(ExtendedTaskDelegate handler, String groupName){
+        new ExtendedTask<String, Void, BooleanWrapper>(handler){
+            @Override
+            protected BooleanWrapper doInBackground(String... params) {
+                try{
+                    return ServiceProvider.getService().groupEndpoint().checkGroupName(params[0]).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    publishError("Fehler: Der Name konnte nicht geprüft werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
      * Methode, welche mit dem GroupEndpoint kommuniziert um eine neue private
      * Nutzergruppe mit vom angegebenen Typ mit Passwort zu erstellen
      *
      * @param handler   Der Task, der mit dem Server kommuniziert
      * @param groupName Der Name der zu erstellenden UserGroup
      * @param groupType Der Typ der Nutzergruppe
-     * @param password Das Passwort, kann nicht null oder leer sein
+     * @param password  Das Passwort, kann nicht null oder leer sein
      */
-    public void createPrivateUserGroup(ExtendedTaskDelegate handler, String groupName, final UserGroupType groupType, final String password) {
+    public void createPrivateUserGroupWithPicture(ExtendedTaskDelegate handler, String groupName, final UserGroupType groupType, final String password, final String description, final String blobKeyValue) {
         new ExtendedTask<String, Void, Void>(handler) {
             @Override
             protected Void doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().groupEndpoint().createPrivateUserGroup(params[0], groupType.name(), password).execute();
+                    return ServiceProvider.getService().groupEndpoint().createPrivateUserGroupWithPicture(params[0], groupType.name(), password, description, blobKeyValue).execute();
                 } catch (IOException e) {
-                    publishError("Fehler: Es konnte keine Gruppe mit dem Namen "+params[0]+" erstellt werden, versuchen Sie einen anderen");
+                    publishError("Fehler: Es konnte keine Gruppe mit dem Namen " + params[0] + " erstellt werden, versuchen Sie einen anderen");
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um eine neue private
+     * Nutzergruppe mit vom angegebenen Typ mit Passwort zu erstellen
+     *
+     * @param handler   Der Task, der mit dem Server kommuniziert
+     * @param groupName Der Name der zu erstellenden UserGroup
+     * @param groupType Der Typ der Nutzergruppe
+     * @param password  Das Passwort, kann nicht null oder leer sein
+     */
+    public void createPrivateUserGroup(ExtendedTaskDelegate handler, String groupName, final UserGroupType groupType, final String description, final String password) {
+        new ExtendedTask<String, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(String... params) {
+                try {
+                    return ServiceProvider.getService().groupEndpoint().createPrivateUserGroup(params[0], groupType.name(), description, password).execute();
+                } catch (IOException e) {
+                    publishError("Fehler: Es konnte keine Gruppe mit dem Namen " + params[0] + " erstellt werden, versuchen Sie einen anderen");
                     return null;
                 }
             }
@@ -82,15 +127,37 @@ public class GroupController {
      * @param handler   Der Task, der mit dem Server kommuniziert
      * @param groupName Der Name der zu erstellenden UserGroup
      */
-    public void createOpenUserGroup(ExtendedTaskDelegate handler, String groupName) {
+    public void createOpenUserGroupWithPicture(ExtendedTaskDelegate handler, String groupName, final String description, final String blobKeyValue) {
         new ExtendedTask<String, Void, Void>(handler) {
             @Override
             protected Void doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().groupEndpoint().createOpenUserGroup(params[0]).execute();
+                    return ServiceProvider.getService().groupEndpoint().createOpenUserGroupWithPicture(params[0], description, blobKeyValue).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Fehler: Es konnte keine Gruppe mit dem Namen "+params[0]+" erstellt werden, versuchen Sie einen anderen");
+                    publishError("Fehler: Es konnte keine Gruppe mit dem Namen " + params[0] + " erstellt werden, versuchen Sie einen anderen");
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um eine neue öffentliche
+     * Nutzergruppe mit dem angegebenen Namen zu erstellen.
+     *
+     * @param handler   Der Task, der mit dem Server kommuniziert
+     * @param groupName Der Name der zu erstellenden UserGroup
+     */
+    public void createOpenUserGroup(ExtendedTaskDelegate handler, String groupName, final String description) {
+        new ExtendedTask<String, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(String... params) {
+                try {
+                    return ServiceProvider.getService().groupEndpoint().createOpenUserGroup(params[0], description).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Fehler: Es konnte keine Gruppe mit dem Namen " + params[0] + " erstellt werden, versuchen Sie einen anderen");
                     return null;
                 }
             }
@@ -111,9 +178,32 @@ public class GroupController {
                 try {
                     return ServiceProvider.getService().groupEndpoint().getUserGroup(params[0]).execute();
                 } catch (IOException e) {
-                    publishError("Fehler: Die Gruppe "+params[0]+" konnte nicht abgerufen werden");
+                    publishError("Fehler: Die Gruppe " + params[0] + " konnte nicht abgerufen werden");
                     return null;
                 }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um die Mitglieder einer
+     * Nutzergruppe abzurufen.
+     *
+     * @param handler
+     * @param groupName
+     */
+    public void getUserGroupMembers(ExtendedTaskDelegate handler, String groupName){
+        new ExtendedTask<String, Void, UserGroupMembers>(handler){
+            @Override
+            protected UserGroupMembers doInBackground(String... params) {
+                try{
+                    return ServiceProvider.getService().groupEndpoint().getUserGroupMembers(params[0]).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    publishError("Fehler: Konnte die Mitglieder der Gruppe "+params[0]+" nicht abrufen");
+                    return null;
+                }
+
             }
         }.execute(groupName);
     }
@@ -132,7 +222,7 @@ public class GroupController {
                 try {
                     return ServiceProvider.getService().groupEndpoint().getUserGroupMetaData(params[0]).execute();
                 } catch (IOException e) {
-                    publishError("Fehler: Die Metadaten der Gruppe "+params[0]+" konnten nicht abgerufen werden");
+                    publishError("Fehler: Die Metadaten der Gruppe " + params[0] + " konnten nicht abgerufen werden");
                     return null;
                 }
             }
@@ -212,7 +302,7 @@ public class GroupController {
                 try {
                     return ServiceProvider.getService().groupEndpoint().deleteUserGroup(params[0]).execute();
                 } catch (IOException e) {
-                    publishError("Fehler: "+params[0]+" konnte nicht gelöscht werden");
+                    publishError("Fehler: " + params[0] + " konnte nicht gelöscht werden");
                     return null;
                 }
             }
@@ -224,16 +314,36 @@ public class GroupController {
      * einen EndUser einer UserGroup zuzuordnen.
      *
      * @param handler  Der Task, der mit dem Server kommuniziert
-     * @param password Das Password, falls eins beötigt wird kann leer aber nicht null sein
      */
-    public void joinUserGroup(ExtendedTaskDelegate handler, String groupName, final String password) {
+    public void joinUserGroup(ExtendedTaskDelegate handler, String groupName) {
         new ExtendedTask<String, Void, BooleanWrapper>(handler) {
             @Override
             protected BooleanWrapper doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().groupEndpoint().joinUserGroup(params[0], password).execute();
+                    return ServiceProvider.getService().groupEndpoint().joinUserGroup(params[0]).execute();
                 } catch (IOException e) {
-                    publishError("Fehler: "+params[0]+" konnte nicht beigetreten werden");
+                    publishError("Fehler: " + params[0] + " konnte nicht beigetreten werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um
+     * einen EndUser einer UserGroup zuzuordnen.
+     *
+     * @param handler  Der Task, der mit dem Server kommuniziert
+     * @param password Das Password, falls eins beötigt wird kann weder leer noch null sein
+     */
+    public void joinPrivateUserGroup(ExtendedTaskDelegate handler, String groupName, final String password) {
+        new ExtendedTask<String, Void, BooleanWrapper>(handler) {
+            @Override
+            protected BooleanWrapper doInBackground(String... params) {
+                try {
+                    return ServiceProvider.getService().groupEndpoint().joinPrivateUserGroup(params[0], password).execute();
+                } catch (IOException e) {
+                    publishError("Fehler: " + params[0] + " konnte nicht beigetreten werden");
                     return null;
                 }
             }
@@ -255,7 +365,7 @@ public class GroupController {
                 try {
                     return ServiceProvider.getService().groupEndpoint().leaveUserGroup(params[0]).execute();
                 } catch (IOException e) {
-                    publishError("Fehler: "+params[0]+" konnte nicht verlassen werden");
+                    publishError("Fehler: " + params[0] + " konnte nicht verlassen werden");
                     return null;
                 }
             }
@@ -307,7 +417,7 @@ public class GroupController {
                 try {
                     return ServiceProvider.getService().groupEndpoint().removeMember(params[0], user).execute();
                 } catch (IOException e) {
-                    publishError("Fehler: Das Mitglied "+user+" von "+params[0]+" konnte nicht entfernt werden");
+                    publishError("Fehler: Das Mitglied " + user + " von " + params[0] + " konnte nicht entfernt werden");
                     return null;
                 }
             }
@@ -373,7 +483,7 @@ public class GroupController {
                 try {
                     return ServiceProvider.getService().groupEndpoint().getUserGroupBlackBoard(params[0]).execute();
                 } catch (IOException e) {
-                    publishError("Fehler: Das Blackboard von "+params[0]+" konnte nicht abgerufen werden");
+                    publishError("Fehler: Das Blackboard von " + params[0] + " konnte nicht abgerufen werden");
                     return null;
                 }
             }
@@ -440,7 +550,7 @@ public class GroupController {
                     return ServiceProvider.getService().groupEndpoint().getUserGroupNewsBoard(params[0]).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Fehler: Das Newsboard von "+params[0]+" konnte nicht abgerufen werden");
+                    publishError("Fehler: Das Newsboard von " + params[0] + " konnte nicht abgerufen werden");
                     return null;
                 }
             }
@@ -491,7 +601,7 @@ public class GroupController {
                     picture = ServiceProvider.getService().groupEndpoint().changePicture(params[0]).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Fehler: Es konnte kein Bild für "+params[0]+" erstellt werden");
+                    publishError("Fehler: Es konnte kein Bild für " + params[0] + " erstellt werden");
                     return null;
                 }
                 try {
@@ -541,16 +651,17 @@ public class GroupController {
         new ExtendedTask<String, Void, Bitmap>(handler) {
             UserGroupPicture picture;
             ByteArrayInputStream is;
+
             @Override
             protected Bitmap doInBackground(String... params) {
                 try {
                     picture = ServiceProvider.getService().groupEndpoint().getUserGroupPicture(params[0]).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Das Bild konnte nicht abgerufen werden");
+                    publishError("Fehler: Das Bild konnte nicht abgerufen werden");
                     return null;
                 }
-                if(picture != null){
+                if (picture != null) {
                     try {
                         HttpClient client = new DefaultHttpClient();
                         HttpGet get = new HttpGet(Constants.SERVER_URL + "/Bernd/images/serve?key=" + picture.getPictureBlobKey().getKeyString());
@@ -558,9 +669,11 @@ public class GroupController {
                         HttpEntity httpEntity = response.getEntity();
 
                         is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
-                        return BitmapFactory.decodeStream(is);
+                        Bitmap bitmap = BitmapFactory.decodeStream(is);
+                        return bitmap;
                     } catch (Exception e) {
                         e.printStackTrace();
+                        publishError("Fehler: Das bild konnte nicht abgerufen werden");
                     } finally {
                         if (is != null) {
                             try {
@@ -592,7 +705,7 @@ public class GroupController {
                     return ServiceProvider.getService().groupEndpoint().getUserGroupVisibleMembers(params[0]).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Fehler: Die sichtbaren Mitglieder von "+params[0]+ " konnten nicht abgerufen werden");
+                    publishError("Fehler: Die sichtbaren Mitglieder von " + params[0] + " konnten nicht abgerufen werden");
                     return null;
                 }
             }
@@ -640,7 +753,7 @@ public class GroupController {
                     return ServiceProvider.getService().groupEndpoint().changeUserGroupPassword(params[0], currentPw, newPw).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Fehler: Das Passwort für "+params[0]+" konnte nicht geändert werden");
+                    publishError("Fehler: Das Passwort für " + params[0] + " konnte nicht geändert werden");
                     return null;
                 }
             }
@@ -663,7 +776,7 @@ public class GroupController {
                     return ServiceProvider.getService().groupEndpoint().makeUserGroupPrivat(params[0], password).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Fehler: Die Gruppe "+groupName+ "konnte nicht privat gemacht wreden");
+                    publishError("Fehler: Die Gruppe " + groupName + "konnte nicht privat gemacht wreden");
                     return null;
                 }
 
@@ -686,11 +799,98 @@ public class GroupController {
                     return ServiceProvider.getService().groupEndpoint().makeUserGroupOpen(params[0]).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Fehler: Die Gruppe "+groupName+" konnte nicht öffentlich gemacht werden");
+                    publishError("Fehler: Die Gruppe " + groupName + " konnte nicht öffentlich gemacht werden");
                     return null;
                 }
 
             }
         }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um ein Image hochzuladen um es sich in
+     * der app anzuschauen.
+     *
+     * @param handler
+     * @param pictureFile
+     * @param blobKeyString
+     */
+    public void uploadImageForPreview(ExtendedTaskDelegate handler, InputStream pictureFile, final String blobKeyString) {
+        new ExtendedTask<InputStream, Void, BlobKey>(handler) {
+            @Override
+            protected BlobKey doInBackground(InputStream... params) {
+                try {
+                    HttpClient httpclient = new DefaultHttpClient();
+                    HttpPost httppost = new HttpPost(ServiceProvider.getService().groupEndpoint().previewImageUploadUrl().execute().getString());
+
+                    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+                    builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+                    builder.addPart("file", new InputStreamBody(params[0], "file"));
+                    builder.addTextBody("blobKeyString", blobKeyString);
+
+                    HttpEntity entity = builder.build();
+                    httppost.setEntity(entity);
+                    HttpResponse response = httpclient.execute(httppost);
+                    HttpEntity httpEntity = response.getEntity();
+
+                    String encoding;
+                    if (httpEntity.getContentEncoding() == null) {
+                        // UTF-8 verwenden, falls keine Kodierung für die Antwort übertragen wurde
+                        encoding = "UTF-8";
+                    } else {
+                        encoding = httpEntity.getContentEncoding().getValue();
+                    }
+
+                    String keyString = EntityUtils.toString(httpEntity, encoding);
+                    BlobKey blobKey = new BlobKey();
+                    blobKey.setKeyString(keyString);
+                    return blobKey;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Fehler: Das Bild konnte nicht hochgeladen werden");
+                }
+                return null;
+
+            }
+        }.execute(pictureFile);
+    }
+
+    /**
+     * Methode, welche mit der Serve Klasse auf dem Endpoint kommuniziert um
+     * ein Bild für den angegebenen BlobKey zu laden.
+     *
+     * @param handler
+     * @param blobkey
+     */
+    public void loadImageForPreview(ExtendedTaskDelegate handler, final BlobKey blobkey) {
+        new ExtendedTask<Void, Void, Bitmap>(handler) {
+            ByteArrayInputStream is;
+
+            @Override
+            protected Bitmap doInBackground(Void... params) {
+                try {
+                    HttpClient client = new DefaultHttpClient();
+                    HttpGet get = new HttpGet(Constants.SERVER_URL + "/Bernd/images/serve?key=" +blobkey.getKeyString());
+                    HttpResponse response = client.execute(get);
+                    HttpEntity httpEntity = response.getEntity();
+
+                    is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
+                    Bitmap bitmap = BitmapFactory.decodeStream(is);
+                    return bitmap;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    publishError("Fehler: Das Bild konnte nicht abgerufen werden");
+                } finally {
+                    if (is != null) {
+                        try {
+                            is.close();
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+                return null;
+            }
+        }.execute();
     }
 }

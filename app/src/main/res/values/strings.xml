@@ -237,9 +237,48 @@
     <!-- CreateUserGroupActivity -->
     <string name="title_activity_create_user_group">Create a new Group</string>
     <string name="groupName">Groupname</string>
+    <string name="checkGroupNameString">Please check your chosen name</string>
+    <string name="checkGroupNamePositive">This name is available</string>
+    <string name="checkGroupNameNegative">This name is already taken</string>
     <string name="groupDescription">Description</string>
     <string name="groupPrivacy">Group Privacy</string>
     <string name="groupPrivacyOn">Private Group</string>
     <string name="groupPrivacyOff">Open Group</string>
     <string name="check">Check</string>
+    <string name="groupPassword">Password</string>
+    <string name="groupPasswordRetype">Repeat Password</string>
+    <string name="checkPasswordPositive">Passwords match</string>
+    <string name="checkPasswordNegative">Password don\'t match</string>
+    <string name="submitGroup">Create</string>
+    <string name="abortGroup">Cancel</string>
+    <string name="uploadImageTitle">Image</string>
+    <string name="uploadImage">Upload</string>
+    <string name="previewImage">Preview</string>
+    <string name="uploadingImage">Uploading Image...</string>
+    <string name="uploadingImageFailed">Uploading failed</string>
+    <string name="uploadingDone">Done</string>
+    <string name="previewImageAlertDialogTitle">Image in List and Profile</string>
+    <string name="imageInList">Image in List</string>
+    <string name="imageInProfile">Image in Profile</string>
+    <string name="creatingGroupError">Couldn\'t create Group</string>
+    <string name="defaultGroupDestription">This is the Group: </string>
+    <string name="checkGroupNamePlease">Check Groupname please</string>
+
+    <!-- GroupProfileActivity-->
+    <string name="title_activity_group_profile">Group Profile</string>
+    <string name="title_alert_dialog_join_user_group">Join this Group?</string>
+    <string name="dialog_yes">Yes</string>
+    <string name="dialog_no">No</string>
+
+    <!-- GroupBlackBoardFragment-->
+    <string name="title_fragment_group_black_board">Blackboard</string>
+    <string name="postMessageTitle">Post a Blackboard Message</string>
+    <string name="postMessage">Message</string>
+    <string name="commentsBlackBoard">Comments</string>
+
+    <!-- GroupNewsBoardFragment-->
+    <string name="title_fragment_group_news_board">Newsboard</string>
+
+    <!-- GroupMembersFragment-->
+    <string name="title_fragment_group_members">Member</string>
 </resources>

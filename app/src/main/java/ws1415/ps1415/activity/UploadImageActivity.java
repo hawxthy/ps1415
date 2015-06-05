@@ -32,6 +32,7 @@ public class UploadImageActivity extends BaseActivity {
     private String selectedImagePath;
     private Button downloadPictureButton;
     private Button choosePictureButton;
+    private String keyString;
     private ImageView blobStoreImageView;
     final private String TEST_GROUP_NAME = "Testgruppe";
 
@@ -108,7 +109,9 @@ public class UploadImageActivity extends BaseActivity {
                             GroupController.getInstance().changePicture(new ExtendedTaskDelegateAdapter<Void, UserGroupPicture>() {
                                 @Override
                                 public void taskDidFinish(ExtendedTask task, UserGroupPicture picture) {
+                                    keyString = picture.getPictureBlobKey().getKeyString();
                                     doneLoading();
+                                    int i =0;
                                 }
                             }, TEST_GROUP_NAME, ImageUtil.BitmapToInputStream(cropedBitmap));
                         }

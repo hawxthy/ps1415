@@ -64,12 +64,12 @@ public class AddUserGroupActivity extends Activity {
                         }
                     }
                     finish();
-                    GroupController.getInstance().createOpenUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
-                        @Override
-                        public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                           // UsergroupActivity.getUserGroupActivity().refresh();
-                        }
-                    }, groupName);
+//                    GroupController.getInstance().createOpenUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+//                        @Override
+//                        public void taskDidFinish(ExtendedTask task, Void aVoid) {
+//                           // UsergroupActivity.getUserGroupActivity().refresh();
+//                        }
+//                    }, groupName);
                 }
             }).execute();
         } else {

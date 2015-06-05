@@ -71,7 +71,7 @@ public class groupUtils {
                     public void taskDidFinish(ExtendedTask task, Void aVoid) {
                         //((UsergroupActivity) activity).refresh();
                     }
-                }, userGroup.getName(), null);
+                }, userGroup.getName());
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

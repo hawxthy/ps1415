@@ -27,6 +27,7 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
     final private boolean TEST_BOOLEAN_GROUP_PRIVAT = false;
     final private String TEST_GROUP_PASSWORD = "Testgruppe1";
     final private UserGroupType TEST_GROUP_TYPE = UserGroupType.NORMALGROUP;
+    final private String TEST_GROUP_DESCRIPTION = "Testbeschreibung "+TEST_GROUP_NAME;
     final private String TEST_RIGHT_FULLRIGHTS = Right.FULLRIGHTS.name();
     final private String TEST_RIGHT_DELETEGROUP = Right.DELETEGROUP.name();
     final private String TEST_RIGHT_POSTBLACKBOARD = Right.POSTBLACKBOARD.name();
@@ -48,7 +49,7 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME);
+        }, TEST_GROUP_NAME, TEST_GROUP_DESCRIPTION);
         try {
             assertTrue("setUp for createUserGroup failed", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -64,7 +65,7 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
                 assertTrue("Der User " +MY_SECOND_MAIL+ " sollte erfolgreich der Nutzergruppe " +TEST_GROUP_NAME+ " beigetreten sein",result.getValue());
                 signal2.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD);
+        }, TEST_GROUP_NAME);
         try{
             assertTrue("setUp for joinUserGroup failed", signal2.await(30, TimeUnit.SECONDS));
         }catch (InterruptedException e){
