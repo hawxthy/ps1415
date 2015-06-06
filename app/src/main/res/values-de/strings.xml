@@ -119,6 +119,7 @@
     <string name="location_transmitter_button_stop">Stop</string>
 
     <!--Strings zu RegisterActivity-->
+    <string name="title_activity_register">Registrierung</string>
     <string name="first_name_hint">Vorname</string>
     <string name="last_name_hint">Nachname</string>
     <string name="register">Registrieren</string>
@@ -213,6 +214,7 @@
         <item quantity="other">%1$d Freunde ausgewählt</item>
     </plurals>
     <string name="action_refresh_friends">Aktualisieren</string>
+    <string name="friends_hint">Über Profile von Benutzern können neue Freunde hinzugefügt werden</string>
 
     <!-- MessagingActivity -->
     <string name="title_activity_messaging">Nachrichten</string>
@@ -224,16 +226,20 @@
     </string-array>
     <string name="sure_delete_conversation_dialog">Sind Sie sicher, dass Sie diese Konversation entfernen wollen?</string>
     <string name="conversation_deleted">Konversation gelöscht</string>
-    <string name="error_delete_conversation">Fehler beim Löschvorgang</string>
+    <string name="error_delete">Fehler beim Löschvorgang</string>
     <string name="yesterday">Gestern</string>
     <string name="error_update">Aktualisierungsfehler</string>
     <string name="profile_updated">Profildaten aktualisiert</string>
+    <string name="messaging_hint">Über die Profile von Benutzern können neue Konversation eröffnet werden</string>
+    <string name="search_for_users">Suche nach Benutzern</string>
 
     <!-- ConversationActivity -->
     <string name="input_required">Eingabe erforderlich</string>
     <string name="title_activity_conversation">Konversation</string>
     <string name="input_message">Nachricht eingeben</string>
-    <string name="message_could_not_be_sent">Nachricht konnte nicht zugestellt werden</string>
+    <string name="message_could_not_be_sent">Benutzer hat kein registriertes Gerät</string>
+    <string name="sure_delete_message_dialog">Sind Sie sicher, dass Sie die ausgewählte Nachricht entfernen wollen?</string>
+    <string name="message_deleted">Nachricht gelöscht</string>
 
     <!-- EventAdapter -->
     <string name="event_adapter_fetch_error">Es konnten keine weiteren Events abgerufen werden</string>

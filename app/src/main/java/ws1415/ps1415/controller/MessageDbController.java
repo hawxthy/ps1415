@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -235,7 +234,6 @@ public class MessageDbController {
 
         long rowId = db.insert(MessageDbHelper.TABLE_MESSAGE, null, values);
 
-        Log.d("ROWID", String.valueOf(rowId));
 
         values.clear();
         values.put(MessageDbHelper.FOREIGN_KEY_LAST_MESSAGE, rowId);
@@ -308,6 +306,41 @@ public class MessageDbController {
 
         Cursor cursor = db.rawQuery("SELECT * FROM " + MessageDbHelper.TABLE_MESSAGE + " WHERE "
                 + MessageDbHelper.FOREIGN_KEY_CONVERSATION + "=?", new String[]{userMail});
+
+        if (!cursor.moveToFirst()) {
+            cursor.close();
+            return new ArrayList<>();
+        }
+
+        List<Message> messages = new ArrayList<>();
+        Message message;
+        while (!cursor.isAfterLast()) {
+            message = new Message(
+                    cursor.getInt(cursor.getColumnIndex(MessageDbHelper.KEY_ID_MESSAGE)),
+                    getDate(cursor.getLong(cursor.getColumnIndex(MessageDbHelper.KEY_SEND_DATE))),
+                    cursor.getString(cursor.getColumnIndex(MessageDbHelper.KEY_CONTENT)),
+                    LocalMessageType.getValue(cursor.getInt(cursor.getColumnIndex(MessageDbHelper.KEY_TYPE))));
+            messages.add(message);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        return messages;
+    }
+
+    /**
+     * Gibt 100 Nachrichten einer Conversation aus, ausgehend vom {@code offset} * 100.
+     *
+     * @param userMail E-Mail Adresse der Person der Konversation
+     * @return Liste aller Nachrichten in einer Konversation
+     */
+    public List<Message> getAllMessages(String userMail, int offset) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + MessageDbHelper.TABLE_MESSAGE + " WHERE "
+                        + MessageDbHelper.FOREIGN_KEY_CONVERSATION + "=?" + " ORDER BY " +
+                        MessageDbHelper.KEY_ID_MESSAGE + " DESC LIMIT " + (offset * 5) + ",5",
+                new String[]{userMail});
 
         if (!cursor.moveToFirst()) {
             cursor.close();

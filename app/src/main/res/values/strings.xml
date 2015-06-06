@@ -98,8 +98,9 @@
     <string name="title_activity_blobstore_test">ImageStorageTestActivity</string>
 
     <!--Strings zu RegisterActivity-->
-    <string name="first_name_hint">Vorname</string>
-    <string name="last_name_hint">Nachname</string>
+    <string name="title_activity_register">Registration</string>
+    <string name="first_name_hint">First Name</string>
+    <string name="last_name_hint">Last Name</string>
     <string name="register">Register</string>
     <string name="profile_picture">Profile Picture</string>
     <string-array name="image_selection">
@@ -204,6 +205,7 @@
         <item quantity="other">%1$d friends selected</item>
     </plurals>
     <string name="action_refresh_friends">Refresh</string>
+    <string name="friends_hint">Through the profiles of users you can add new friends</string>
 
     <!-- MessagingActivity -->
     <string name="title_activity_messaging">Messaging</string>
@@ -215,16 +217,20 @@
     </string-array>
     <string name="sure_delete_conversation_dialog">Are you sure you want to delete this conversation?</string>
     <string name="conversation_deleted">Conversation deleted</string>
-    <string name="error_delete_conversation">Error while deleting</string>
+    <string name="error_delete">Error while deleting</string>
     <string name="error_update">Update Error</string>
     <string name="profile_updated">Updated Profile Data</string>
     <string name="yesterday">Yesterday</string>
+    <string name="messaging_hint">Through the profiles of users you can create new conversations</string>
+    <string name="search_for_users">Search for users</string>
 
     <!-- ConversationActivity -->
     <string name="title_activity_conversation">Conversation</string>
     <string name="input_required">Input required</string>
     <string name="input_message">Enter your message</string>
-    <string name="message_could_not_be_sent">Message couldn\'t be delivered</string>
+    <string name="message_could_not_be_sent">User does not have a registered device</string>
+    <string name="sure_delete_message_dialog">Are you sure you want to delete the selected message?</string>
+    <string name="message_deleted">Message deleted</string>
 
     <!-- EventAdapter -->
     <string name="event_adapter_fetch_error">No additional events could be fetched</string>

@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.skatenight.skatenightAPI.model.BlobKey;
-import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.StringWrapper;
 import com.skatenight.skatenightAPI.model.UserListData;
 import com.skatenight.skatenightAPI.model.UserPrimaryData;
@@ -25,6 +24,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.Constants;
@@ -79,27 +79,6 @@ public abstract class UserController {
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Serververbindung fehlgeschlagen");
-                    return null;
-                }
-            }
-        }.execute(userMail);
-    }
-
-    /**
-     * Gibt den Benutzer mit allen Informationen zu der angegebenen E-Mail Adresse aus.
-     *
-     * @param handler  Auszuführender Task
-     * @param userMail E-Mail Adresse des Benutzers
-     */
-    public static void getFullUser(ExtendedTaskDelegate<Void, EndUser> handler, String userMail) {
-        new ExtendedTask<String, Void, EndUser>(handler) {
-            @Override
-            protected EndUser doInBackground(String... params) {
-                try {
-                    return ServiceProvider.getService().userEndpoint().getFullUser(params[0]).execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    publishError("Benutzer konnte nicht abgerufen werden");
                     return null;
                 }
             }
@@ -296,7 +275,9 @@ public abstract class UserController {
             @Override
             protected List<UserListData> doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().listUserInfo(userMails).execute().getItems();
+                    List<UserListData> result = ServiceProvider.getService().userEndpoint().listUserInfo(userMails).execute().getItems();
+                    if(result == null) return new ArrayList<UserListData>();
+                    return result;
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Liste von Benutzern konnte nicht abgerufen werden");
@@ -317,7 +298,9 @@ public abstract class UserController {
             @Override
             protected List<String> doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().userEndpoint().listFriends(params[0]).execute().getStringList();
+                    List<String> friends = ServiceProvider.getService().userEndpoint().listFriends(params[0]).execute().getStringList();
+                    if(friends == null) friends = new ArrayList<>();
+                    return friends;
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Freundesliste konnte nicht abgerufen werden");

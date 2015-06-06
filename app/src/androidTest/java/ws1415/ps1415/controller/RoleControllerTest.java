@@ -2,14 +2,14 @@ package ws1415.ps1415.controller;
 
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.skatenight.skatenightAPI.model.EndUser;
-
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.GlobalRole;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
@@ -30,7 +30,7 @@ public class RoleControllerTest extends AuthenticatedAndroidTestCase {
     public static final String TEST_MAIL = "skatenight.user1@gmail.com";
     public static final List<String> TEST_MAILS = Arrays.asList(ADMIN_MAIL, TEST_MAIL);
 
-    public static final GlobalRole TEST_ROLE = GlobalRole.ADMIN;
+    public static final GlobalRole TEST_ADMIN_ROLE = GlobalRole.ADMIN;
 
     /**
      * Loggt den Benutzer ein und erstellt einen Benutzer zum Testen.
@@ -78,7 +78,7 @@ public class RoleControllerTest extends AuthenticatedAndroidTestCase {
      * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
-    public void testAssignGlobalRole() throws InterruptedException {
+    public void testAssignAdminRole() throws InterruptedException, IOException {
         final CountDownLatch assignSignal = new CountDownLatch(1);
         RoleController.assignGlobalRole(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
             @Override
@@ -86,18 +86,11 @@ public class RoleControllerTest extends AuthenticatedAndroidTestCase {
                 assertTrue(aBoolean);
                 assignSignal.countDown();
             }
-        }, TEST_MAIL, TEST_ROLE);
+        }, TEST_MAIL, TEST_ADMIN_ROLE);
         assertTrue(assignSignal.await(30, TimeUnit.SECONDS));
 
-        final CountDownLatch getSignal = new CountDownLatch(1);
-        UserController.getFullUser(new ExtendedTaskDelegateAdapter<Void, EndUser>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, EndUser enduser) {
-                assertEquals(TEST_ROLE.name(), enduser.getGlobalRole());
-                getSignal.countDown();
-            }
-        }, TEST_MAIL);
-        assertTrue(getSignal.await(30, TimeUnit.SECONDS));
+        boolean isAdmin = ServiceProvider.getService().roleEndpoint().isAdmin(TEST_MAIL).execute().getValue();
+        assertTrue(isAdmin);
     }
 
     /**
@@ -114,7 +107,7 @@ public class RoleControllerTest extends AuthenticatedAndroidTestCase {
                 assertTrue(aBoolean);
                 assignSignal.countDown();
             }
-        }, TEST_MAIL, TEST_ROLE);
+        }, TEST_MAIL, TEST_ADMIN_ROLE);
         assertTrue(assignSignal.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch listSignal = new CountDownLatch(1);

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.R;
+import ws1415.ps1415.util.GroupImageLoader;
 
 /**
  * Dieser Adapter wird genutzt, um eine Liste von Gruppen mit Inhalt zu füllen.
@@ -46,6 +48,7 @@ public class ProfileGroupAdapter extends BaseAdapter {
     }
 
     private class Holder {
+        private ImageView groupImage;
         private TextView primaryText;
         private TextView secondaryText;
     }
@@ -57,6 +60,7 @@ public class ProfileGroupAdapter extends BaseAdapter {
         if(convertView == null){
             holder = new Holder();
             convertView = mInflater.inflate(R.layout.list_view_item_profile_group, viewGroup, false);
+            holder.groupImage = (ImageView) convertView.findViewById(R.id.list_item_profile_group_icon);
             holder.primaryText = (TextView) convertView.findViewById(R.id.list_item_profile_group_primary);
             holder.secondaryText = (TextView) convertView.findViewById(R.id.list_item_profile_group_secondary);
             convertView.setTag(holder);
@@ -67,6 +71,7 @@ public class ProfileGroupAdapter extends BaseAdapter {
         UserGroupMetaData item = getItem(i);
         String secondaryText = mContext.getString(R.string.members) + ": " + item.getMemberCount();
 
+        GroupImageLoader.getInstance().setGroupImageToImageView(mContext, item.getName(), holder.groupImage);
         holder.primaryText.setText(item.getName());
         holder.secondaryText.setText(secondaryText);
 

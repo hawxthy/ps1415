@@ -16,5 +16,6 @@
     <string name="upload_group_image">Upload Group Image</string>
     <string name="permission_management">Permission Management</string>
     <string name="create_user_group">Create Group</string>
+    <string name="logout">Logout</string>
 
 </resources>

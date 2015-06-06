@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -25,7 +24,6 @@ import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
-import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserInfo;
 import ws1415.SkatenightBackend.model.UserInfo.InfoPair;
@@ -126,28 +124,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             return new BooleanWrapper(false);
         }
         return new BooleanWrapper(true);
-    }
-
-    /**
-     * Gibt den Benutzer mit allen Informationen zu der angegebenen E-Mail Adresse aus.
-     * TODO: Wirklich nötig?
-     *
-     * @param userMail E-Mail Adresse des zu auszugebenen Benutzers
-     * @return Benutzer mit der angegebenen E-Mail Adresse, falls nicht gefunden: null
-     */
-    @ApiMethod(path = "enduser")
-    public EndUser getFullUser(@Named("userMail") String userMail) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
-            endUser.getUserInfo();
-            endUser.getUserLocation();
-            return endUser;
-        } catch (Exception e) {
-            return null;
-        } finally {
-            pm.close();
-        }
     }
 
     /**
