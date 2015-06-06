@@ -44,6 +44,8 @@ public class Event implements BlobKeyContainer, GalleryContainer {
 
     @Load(unless = {EventMetaData.class})
     private Map<String, EventRole> memberList = new HashMap<>();
+    @Load(unless = {EventMetaData.class})
+    private Map<String, EventParticipationVisibility> memberVisibility = new HashMap<>();
     @Load(unless = {EventMetaData.class, EventParticipationData.class})
     private List<BlobKey> images = new LinkedList<>();
     @Load(unless = {EventMetaData.class, EventParticipationData.class})
@@ -154,6 +156,14 @@ public class Event implements BlobKeyContainer, GalleryContainer {
 
     public void setMemberList(Map<String, EventRole> memberList) {
         this.memberList = memberList;
+    }
+
+    public Map<String, EventParticipationVisibility> getMemberVisibility() {
+        return memberVisibility;
+    }
+
+    public void setMemberVisibility(Map<String, EventParticipationVisibility> memberVisibility) {
+        this.memberVisibility = memberVisibility;
     }
 
     public List<BlobKey> getImages() {

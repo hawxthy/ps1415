@@ -27,8 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:id="@+id/headerImage"
-                android:scaleType="centerCrop"
-                android:src="@drawable/image_placeholder" />
+                android:scaleType="centerCrop" />
 
             <RelativeLayout
                 android:id="@+id/data"
@@ -63,25 +62,78 @@
                     android:layout_marginTop="20dp"
                     android:text="@string/loading" />
 
-                <ListView
+                <TextView
+                    android:id="@+id/meeting_place"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/description"
+                    android:hint="@string/loading"
+                    android:layout_toRightOf="@+id/meeting_place_label"/>
+
+                <TextView
+                    android:id="@id/meeting_place_label"
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/meeting_place_label"
+                    android:textStyle="bold"
+                    android:layout_below="@id/description"
+                    android:layout_alignBaseline="@id/meeting_place" />
+
+                <TextView
+                    android:id="@+id/fee"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/meeting_place"
+                    android:layout_alignLeft="@id/meeting_place"
+                    android:hint="@string/loading" />
+
+                <TextView
+                    android:id="@+id/fee_label"
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fee_label"
+                    android:textStyle="bold"
+                    android:layout_alignBaseline="@id/fee" />
+
+                <ws1415.ps1415.widget.ItemSizedListView
                     android:id="@+id/dynamicFields"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/description">
-
-
-                </ListView>
+                    android:layout_below="@id/fee" />
 
             </RelativeLayout>
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
-                android:id="@+id/images"
+                android:id="@+id/imagesScroller"
                 android:background="#d8d8d8"
                 android:layout_below="@id/data" >
-
+                <LinearLayout
+                    android:id="@+id/images"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal" />
             </HorizontalScrollView>
+
+            <fragment
+                android:id="@+id/routeFragment"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_below="@id/imagesScroller"
+                android:layout_marginTop="20dp"
+                class="com.google.android.gms.maps.MapFragment" />
+
+            <Button
+                android:id="@+id/participants"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_below="@id/routeFragment"
+                android:layout_marginTop="20dp"
+                android:drawableRight="@drawable/row_button_icon"
+                android:background="@drawable/row_button_background"
+                android:text="@string/participants"
+                android:onClick="onParticipantsClick" />
 
         </RelativeLayout>
 

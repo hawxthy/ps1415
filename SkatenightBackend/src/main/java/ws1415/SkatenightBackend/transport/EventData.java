@@ -1,6 +1,7 @@
 package ws1415.SkatenightBackend.transport;
 
 import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.users.User;
 
 import java.util.Date;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import ws1415.SkatenightBackend.model.DynamicField;
 import ws1415.SkatenightBackend.model.Event;
+import ws1415.SkatenightBackend.model.EventParticipationVisibility;
 import ws1415.SkatenightBackend.model.EventRole;
 import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.Route;
@@ -27,12 +29,13 @@ public class EventData {
     private int fee;
 
     private Map<String, EventRole> memberList;
+    private EventParticipationVisibility participationVisibility;
     private List<BlobKey> images;
     private Route route;
     private List<Gallery> galleries;
     private List<DynamicField> dynamicFields;
 
-    public EventData(Event event) {
+    public EventData(User user, Event event) {
         id = event.getId();
         icon = event.getIcon();
         title = event.getTitle();
@@ -44,6 +47,7 @@ public class EventData {
 
         // TODO Nur sichtbare Teilnehmer kopieren
         memberList = event.getMemberList();
+        participationVisibility = event.getMemberVisibility().get(user.getEmail());
         images = event.getImages();
         route = event.getRoute();
         galleries = event.getGalleries();
@@ -120,6 +124,14 @@ public class EventData {
 
     public void setMemberList(Map<String, EventRole> memberList) {
         this.memberList = memberList;
+    }
+
+    public EventParticipationVisibility getParticipationVisibility() {
+        return participationVisibility;
+    }
+
+    public void setParticipationVisibility(EventParticipationVisibility participationVisibility) {
+        this.participationVisibility = participationVisibility;
     }
 
     public List<BlobKey> getImages() {

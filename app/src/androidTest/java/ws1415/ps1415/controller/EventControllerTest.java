@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.model.EventParticipationVisibility;
 import ws1415.ps1415.model.EventRole;
 import ws1415.ps1415.model.Role;
 import ws1415.ps1415.task.ExtendedTask;
@@ -118,7 +119,7 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
     public void testAssignRole() throws IOException, InterruptedException {
         // Zweiten Benutzer dem Testevent beitreten lassen
         changeAccount(1);
-        ServiceProvider.getService().eventEndpoint().joinEvent(testevent1.getId()).execute();
+        ServiceProvider.getService().eventEndpoint().joinEvent(testevent1.getId(), EventParticipationVisibility.PUBLIC.name()).execute();
 
         // Zum Veranstalter-Account wechseln
         changeAccount(0);
@@ -379,7 +380,7 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
             public void taskFailed(ExtendedTask task, String message) {
                 fail(message);
             }
-        }, testevent1.getId());
+        }, testevent1.getId(), EventParticipationVisibility.PUBLIC);
         signal.await(10, TimeUnit.SECONDS);
 
         // Event neu abrufen, damit die Teilnehmerdaten aktualisiert sind
@@ -403,7 +404,7 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
         changeAccount(1);
         // Dem Event zunächst beitreten. Damit dies synchron geschieht, wird direkt die Endpoint-Methode
         // über den ServiceProvider aufgerufen
-        ServiceProvider.getService().eventEndpoint().joinEvent(testevent1.getId()).execute();
+        ServiceProvider.getService().eventEndpoint().joinEvent(testevent1.getId(), EventParticipationVisibility.PUBLIC.name()).execute();
         // Event neu abrufen, damit die Teilnehmerdaten aktualisiert sind und sicherstellen, dass der
         // Benutzer angemeldet ist
         EventData eventData = ServiceProvider.getService().eventEndpoint().getEvent(testevent1.getId()).execute();

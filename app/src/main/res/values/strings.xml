@@ -233,6 +233,20 @@
     <string name="meeting_place_label">Meeting place:</string>
     <string name="fee_label">Fee:</string>
     <string name="event_loading_error">Error loading event</string>
+    <string name="show_route">Show route…</string>
+    <string name="join_event">Participate</string>
+    <string name="leave_event">Leave</string>
+    <string name="error_leaving_event">An error occurred while leaving the event. Please try again.</string>
+    <string name="error_joining_event">An error occurred while joining the event. Please try again.</string>
+    <string name="choose_participation_visibility">Choose participation visibility…</string>
+    <string-array name="event_participation_visibilities">
+        <item>Private (only visible for hosts and admins)</item>
+        <item>Friends (also visible for friends)</item>
+        <item>Public (visible for all users)</item>
+    </string-array>
+    <string name="error_participation_needed">You have to participate in this event to change settings for it.</string>
+    <string name="error_changing_visibility">An error occurred while changing the visibility. Please try again.</string>
+    <string name="participants">Participants</string>
 
     <!-- UploadImageActivity -->
     <string name="title_activity_upload_image">UploadImageActivity</string>
@@ -296,4 +310,51 @@
 
     <!-- GroupMembersFragment-->
     <string name="title_fragment_group_members">Member</string>
+
+    <!-- EventParticipantsActivity -->
+    <string name="title_activity_event_participants">Event participants</string>
+    <string-array name="event_roles">
+        <item>Host</item>
+        <item>Medic</item>
+        <item>Marshall</item>
+        <item>Participant</item>
+    </string-array>
+
+    <!-- PictureListFragment -->
+    <string name="no_visible_pictures">No visible pictures found.</string>
+
+    <!-- PictureMetaDataAdapter -->
+    <string name="picture_adapter_fetch_error">No additional pictures could be fetched</string>
+
+    <!-- MyPicturesActivity -->
+    <string name="title_activity_my_pictures">My Pictures</string>
+    <string name="action_upload_picture">Upload Picture</string>
+    <string name="action_refresh_pictures">Refresh</string>
+
+    <!-- EditPictureActivity -->
+    <string name="upload_picture">Upload picture</string>
+    <string name="edit_picture">Edit picture</string>
+    <string name="title_hint">Please enter a title…</string>
+    <string name="description_hint">Please enter a description…</string>
+    <string name="visibility_label">Visibility</string>
+    <string-array name="picture_visibilities">
+        <item>Private</item>
+        <item>Friends</item>
+        <item>Public</item>
+    </string-array>
+    <string-array name="picture_visibility_hints">
+        <item>Picture will be only visible for you.</item>
+        <item>Picture will be visible for you and your friends.</item>
+        <item>Picture will be visible for everybody.</item>
+    </string-array>
+    <string name="error_uploading_picture">An error occurred while uploading the picture. Please try again.</string>
+    <string name="error_editing_picture">An error occurred while editing the picture. Please try again.</string>
+    <string name="picture_can_not_be_changed">The picture can not be changed after it has been uploaded.</string>
+    <string-array name="picture_actions">
+        <item>Show</item>
+        <item>Edit</item>
+        <item>Delete</item>
+    </string-array>
+    <string name="delete_picture">Delete picture?</string>
+    <string name="delete_picture_message">Do you really want to delete this picture? This can not be undone.</string>
 </resources>

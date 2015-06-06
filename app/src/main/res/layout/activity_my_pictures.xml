@@ -2,16 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="0dp"
-    android:paddingRight="0dp"
-    android:paddingTop="0dp"
-    android:paddingBottom="0dp"
-    tools:context="ws1415.ps1415.activity.OldShowRouteActivity">
+    tools:context="ws1415.ps1415.activity.MyPicturesActivity">
 
     <fragment
+        android:id="@+id/picturesFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/show_route_map_fragment"
-        class="com.google.android.gms.maps.MapFragment"/>
+        android:name="ws1415.ps1415.fragment.PictureListFragment" />
 
 </RelativeLayout>

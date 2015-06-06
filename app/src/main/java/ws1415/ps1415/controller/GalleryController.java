@@ -193,6 +193,30 @@ public abstract class GalleryController {
     }
 
     /**
+     * Ändert die Daten des Bildes mit der angegebenen ID.
+     * @param handler        Der Handler, der über den Status des Tasks informiert wird.
+     * @param pictureId      Die ID des Bildes, das geändert wird.
+     * @param title          Der neue Titel des Bildes.
+     * @param description    Die neue Beschreibung des Bildes.
+     * @param visibility     Die neue Sichtbarkeit des Bildes.
+     */
+    // TODO R: Testen
+    public static void editPicture(ExtendedTaskDelegate<Void, Void> handler, final long pictureId,
+                                   final String title, final String description, final PictureVisibility visibility) {
+        new ExtendedTask<Void, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().galleryEndpoint().editPicture(pictureId, title, description, visibility.name()).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
      * Ruft das Bild mit der angegebenen ID ab und übergibt es dem Handler.
      * @param handler      Der Handler, der das abgerufene Bild übergeben bekommt.
      * @param pictureId    Die ID des abzurufenden Bildes.

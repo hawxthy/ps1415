@@ -14,16 +14,35 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
 
 /**
  * @author Richard Schulze, Martin Wrodarczyk
  */
 public abstract class ImageUtil {
+
+    /**
+     * Lädt eine ggf. verkleinerte Version des Bildes in die View, damit so wenig Speicher wie möglich
+     * genutzt werden muss.
+     * @param imageFile   Das zu ladende Bild.
+     * @param view        Die ImageView, in die das Bild geladen wird.
+     * @param prefWidth   Die bevorzugte Größe für das Bild.
+     */
+    public static void loadSubsampledImageInView(File imageFile, ImageView view, int prefWidth) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(imageFile.getPath(), options);
+        options.inSampleSize = calculateInSampleSize(options, prefWidth);
+        options.inJustDecodeBounds = false;
+        view.setImageBitmap(BitmapFactory.decodeFile(imageFile.getPath(), options));
+    }
 
     /**
      * Berechnet eine passende Sample-Size für Bilder mit der in options angegebenen Auflösung und

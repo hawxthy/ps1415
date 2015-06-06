@@ -242,6 +242,20 @@
     <string name="meeting_place_label">Treffpunkt:</string>
     <string name="fee_label">Gebühr:</string>
     <string name="event_loading_error">Fehler beim Laden des Events</string>
+    <string name="show_route">Route anzeigen…</string>
+    <string name="join_event">Teilnehmen</string>
+    <string name="leave_event">Verlassen</string>
+    <string name="error_joining_event">Beim Beitreten des Events ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="error_leaving_event">Beim Verlassen des Events ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="choose_participation_visibility">Sichtbarkeit der Teilnahme wählen…</string>
+    <string-array name="event_participation_visibilities">
+        <item>Privat (nur für Veranstalter und Administratoren sichtbar)</item>
+        <item>Freunde (auch für Freunde sichtbar)</item>
+        <item>Öffentlich (für alle Benutzer sichtbar)</item>
+    </string-array>
+    <string name="error_participation_needed">Sie müssen an dieser Veranstaltung teilnehmen, um Einstellungen vorzunehmen.</string>
+    <string name="error_changing_visibility">Beim Ändern der Sichtbarkeit ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="participants">Teilnehmer</string>
 
     <!-- PermissionManagementActivity -->
     <string name="sure_take_right_dialog">Sind Sie sicher, dass Sie diesem Benutzer administrative Rechte entziehen möchten?</string>
@@ -283,9 +297,57 @@
     <string name="creatingGroupError">Gruppe konnte nicht erstellt werden</string>
     <string name="defaultGroupDestription">Dies ist die Gruppe: </string>
     <string name="checkGroupNamePlease">Überprüfe den Namen bitte</string>
+    <string name="dialog_no">Nein</string>
+    <string name="dialog_yes">Ja</string>
 
     <!-- GroupBlackBoardFragment-->
     <!-- GroupNewsBoardFragment-->
     <!-- GroupMembersFragment-->
 
+    <!-- EventParticipantsActivity -->
+    <string name="title_activity_event_participants">Event-Teilnehmer</string>
+    <string-array name="event_roles">
+        <item>Veranstalter</item>
+        <item>Sanitäter</item>
+        <item>Ordner</item>
+        <item>Teilnehmer</item>
+    </string-array>
+
+    <!-- PictureListFragment -->
+    <string name="no_visible_pictures">Keine sichtbaren Bilder gefunden.</string>
+
+    <!-- PictureMetaDataAdapter -->
+    <string name="picture_adapter_fetch_error">Es konnten keine weiteren Bilder abgerufen werden</string>
+
+    <!-- MyPicturesActivity -->
+    <string name="title_activity_my_pictures">Meine Bilder</string>
+    <string name="action_upload_picture">Bild hochladen</string>
+    <string name="action_refresh_pictures">Aktualisieren</string>
+
+    <!-- EditPictureActivity -->
+    <string name="upload_picture">Bild hochladen</string>
+    <string name="edit_picture">Bild bearbeiten</string>
+    <string name="title_hint">Bitte geben Sie einen Titel ein…</string>
+    <string name="description_hint">Bitte geben Sie eine Beschreibung ein…</string>
+    <string name="visibility_label">Sichtbarkeit</string>
+    <string-array name="picture_visibilities">
+        <item>Privat</item>
+        <item>Freunde</item>
+        <item>Öffentlich</item>
+    </string-array>
+    <string-array name="picture_visibility_hints">
+        <item>Das Bild wird nur für Sie sichtbar sein.</item>
+        <item>Das Bild wird für Sie und Ihre Freunde sichtbar sein.</item>
+        <item>Das Bild wird für jeden Benutzer sichtbar sein.</item>
+    </string-array>
+    <string name="error_uploading_picture">Beim Hochladen des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="error_editing_picture">Beim Bearbeiten des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="picture_can_not_be_changed">Das Bild kann nicht geändert werden, nachdem es hochgeladen wurde.</string>
+    <string-array name="picture_actions">
+        <item>Anzeigen</item>
+        <item>Bearbeiten</item>
+        <item>Löschen</item>
+    </string-array>
+    <string name="delete_picture">Bild löschen?</string>
+    <string name="delete_picture_message">Wollen Sie das Bild wirklich löschen? Dies kann nicht rückgängig gemacht werden.</string>
 </resources>

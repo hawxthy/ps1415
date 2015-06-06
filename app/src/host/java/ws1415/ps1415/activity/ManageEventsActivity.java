@@ -121,6 +121,12 @@ public class ManageEventsActivity extends BaseActivity implements EventListFragm
                                 startActivity(intent);
                                 break;
                             case 2:
+                                // Teilnehmer bearbeiten
+                                intent = new Intent(ManageEventsActivity.this, ManageEventParticipantsActivity.class);
+                                intent.putExtra(ManageEventParticipantsActivity.EXTRA_EVENT_ID, id);
+                                startActivity(intent);
+                                break;
+                            case 3:
                                 // Löschen
                                 AlertDialog.Builder builder = new AlertDialog.Builder(ManageEventsActivity.this);
                                 builder.setTitle(R.string.delete_event)

@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.test.suitebuilder.annotation.SmallTest;
 
+import com.google.android.gms.games.internal.constants.EventVisibility;
 import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.EndUser;
@@ -33,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import ws1415.AuthenticatedAndroidTestCase;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.model.EventParticipationVisibility;
 import ws1415.ps1415.model.Gender;
 import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.model.Visibility;
@@ -396,7 +398,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
 
         changeAccount(TEST_MAIL_1);
         // An Veranstaltung teilnehmen und Nutzergruppe beitreten
-        ServiceProvider.getService().eventEndpoint().joinEvent(testEvent.getId()).execute();
+        ServiceProvider.getService().eventEndpoint().joinEvent(testEvent.getId(), EventParticipationVisibility.PUBLIC.name()).execute();
         ServiceProvider.getService().groupEndpoint().joinUserGroup(testUserGroup.getName()).execute();
 
         final CountDownLatch getSignal = new CountDownLatch(1);

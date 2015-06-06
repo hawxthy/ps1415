@@ -5,6 +5,7 @@
     <array name="manage_events_event_actions">
         <item>Show</item>
         <item>Edit</item>
+        <item>Manage participants</item>
         <item>Delete</item>
     </array>
     <string name="delete_event">Delete Event?</string>
@@ -24,6 +25,10 @@
     <string name="save_event_message">Do you want to save the event?</string>
     <string name="error_saving_event">An error occurred while saving the event.</string>
     <string name="choose_route">Choose route…</string>
+    <string name="icon_label"><u>Icon</u></string>
+    <string name="event_details"><u>Event details</u></string>
+    <string name="add_dynamic_field">Add data field…</string>
+    <string name="add_image">Add image…</string>
 
     <!-- DateTimeDialog -->
     <string name="choose_datetime">Pick date and time…</string>
@@ -64,4 +69,11 @@
     <string name="activity_edit_waypoint_dialog_apply">Apply</string>
     <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
     <string name="title_activity_edit_waypoint_dialog">Edit Waypoint</string>
+
+    <!-- ManageEventParticipantsActivity -->
+    <string name="title_activity_manage_event_participants">Manage participants</string>
+    <string name="error_loading_participants">An error occurred while loading the participants. Please try again.</string>
+    <string name="choose_role">Choose role…</string>
+    <string name="error_changing_role">An error occurred while changig the role. Please try again.</string>
+
 </resources>

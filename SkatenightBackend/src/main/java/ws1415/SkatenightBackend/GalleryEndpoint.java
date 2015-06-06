@@ -14,9 +14,12 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cmd.Query;
 
+import java.awt.Container;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -24,9 +27,10 @@ import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.GalleryContainer;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.PictureVisibility;
+import ws1415.SkatenightBackend.model.UserGalleryContainer;
 import ws1415.SkatenightBackend.transport.GalleryMetaData;
-import ws1415.SkatenightBackend.transport.PictureFilter;
 import ws1415.SkatenightBackend.transport.PictureData;
+import ws1415.SkatenightBackend.transport.PictureFilter;
 import ws1415.SkatenightBackend.transport.PictureMetaData;
 import ws1415.SkatenightBackend.transport.PictureMetaDataList;
 
@@ -155,6 +159,29 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
+     * Ruft den UserGalleryContainer für den Benutzer mit der in {@code mail} angegebenen E-Mail-Adresse
+     * ab. Falls kein Container existiert, so wird ein leerer Container angelegt.
+     * @param user    Der aufrufende Benutzer.
+     * @param mail    Die E-Mail-Adresse des Benutzers, für den der Container abgerufen wird.
+     * @return Der GalleryContainer für den angegebenen Benutzer.
+     */
+    public UserGalleryContainer getGalleryContainerForMail(User user, @Named("mail") String mail) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        // TODO R: ggf. prüfen, ob der aufrufende Benutzer die Gallerien abrufen darf
+        List<UserGalleryContainer> container = ofy().load().type(UserGalleryContainer.class).filter("user", mail).list();
+        if (container == null || container.isEmpty()) {
+            UserGalleryContainer createdContainer = new UserGalleryContainer();
+            createdContainer.setUser(mail);
+            ofy().save().entity(createdContainer).now();
+            return createdContainer;
+        } else {
+            return container.get(0);
+        }
+    }
+
+    /**
      * Gibt eine Liste von Bild-Metadaten zurück, die anhand der übergebenen ViewOptions ausgewählt
      * werden.
      * Für diese Methode ist explizit angegeben, dass sie die HTTP-Methode POST verwendet, damit der
@@ -272,6 +299,33 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         ofy().save().entity(picture).now();
 
         return picture;
+    }
+
+    /**
+     * Editiert die Eigenschaften eines Bildes. Der BlobKey, also die hinterlegte Bild-Datei kann nicht
+     * nachträglich geändert werden.
+     * @param user           Der aufrufende User.
+     * @param pictureId      Die ID des zu ändernden Bildes.
+     * @param title          Der neue Titel des Bildes.
+     * @param description    Die neue Beschreibung des Bildes.
+     * @param visibility     Die neue Sichtbarkeit des Bildes. Falls die Sichtbarkeit für andere Benutzer,
+     *                       die das Bild in einer Gallery referenziert haben, entzogen wird, wird das Bild
+     *                       aus der entsprechenden Gallery entfernt.
+     */
+    public void editPicture(User user, @Named("pictureId") long pictureId, @Named("title") String title,
+                            @Named("description") String description, @Named("visibility") PictureVisibility visibility)
+            throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        Picture picture = ofy().load().group(PictureMetaData.class).type(Picture.class).id(pictureId).safe();
+        if (!picture.getUploader().equals(user.getEmail()) && !new RoleEndpoint().isAdmin(user.getEmail()).value) {
+            throw new OAuthRequestException("user has to be uploader of the picture or an admin");
+        }
+        picture.setTitle(title);
+        picture.setDescription(new Text(description));
+        picture.setVisibility(visibility);
+        ofy().save().entity(picture).now();
     }
 
     /**

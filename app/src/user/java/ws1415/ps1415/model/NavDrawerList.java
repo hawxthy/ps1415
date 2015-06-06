@@ -10,6 +10,7 @@ import ws1415.ps1415.activity.FriendsActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.ListUserGroupsActivity;
 import ws1415.ps1415.activity.MessagingActivity;
+import ws1415.ps1415.activity.MyPicturesActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.activity.SearchActivity;
 import ws1415.ps1415.activity.UploadImageActivity;
@@ -70,6 +71,23 @@ public class NavDrawerList {
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent messaging_intent = new Intent(parent.getContext(), MessagingActivity.class);
                     parent.getContext().startActivity(messaging_intent);
+                }
+            },
+
+            // ---------- Meine Bilder ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.my_pictures;
+                }
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_action_picture;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(parent.getContext(), MyPicturesActivity.class);
+                    parent.getContext().startActivity(intent);
                 }
             },
 

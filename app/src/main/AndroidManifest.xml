@@ -40,6 +40,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.activity.ShowInformationActivity" />
         </activity>
+        <activity
+            android:name=".activity.ShowRouteActivity"
+            android:label="@string/title_activity_show_route" >
+        </activity>
 
         <service
             android:name=".LocationTransmitterService"
@@ -127,6 +131,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.ShowEventActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.activity.ListEventsActivity" />
         </activity>
         <activity
             android:name=".activity.FriendsActivity"
@@ -163,6 +170,25 @@
         <activity
             android:name=".activity.GroupProfileActivity"
             android:label="@string/title_activity_group_profile" >
+        </activity>
+        <activity
+            android:name=".activity.EventParticipantsActivity"
+            android:label="@string/title_activity_event_participants"
+            android:parentActivityName=".activity.ShowEventActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.activity.ShowEventActivity" />
+        </activity>
+        <activity
+            android:name=".activity.MyPicturesActivity"
+            android:label="@string/title_activity_my_pictures" >
+        </activity>
+        <activity
+            android:name=".activity.EditPictureActivity"
+            android:parentActivityName=".activity.MyPicturesActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.activity.MyPicturesActivity" />
         </activity>
     </application>
 

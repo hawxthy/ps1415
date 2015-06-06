@@ -5,6 +5,7 @@ import com.google.appengine.api.blobstore.BlobKey;
 import java.util.Date;
 
 import ws1415.SkatenightBackend.model.Picture;
+import ws1415.SkatenightBackend.model.PictureVisibility;
 
 /**
  * Repräsentiert die Metadaten eines Bildes.
@@ -15,18 +16,22 @@ public class PictureMetaData {
     private String title;
     private Date date;
     private String uploader;
+    private Double avgRating;
     private BlobKey imageBlobKey;
+    private PictureVisibility visibility;
 
     public PictureMetaData() {
-        
+
     }
 
     public PictureMetaData(Picture picture) {
-        this.id = picture.getId();
-        this.title = picture.getTitle();
-        this.date = picture.getDate();
-        this.uploader = picture.getUploader();
-        this.imageBlobKey = picture.getImageBlobKey();
+        id = picture.getId();
+        title = picture.getTitle();
+        date = picture.getDate();
+        uploader = picture.getUploader();
+        avgRating = picture.getAvgRating();
+        imageBlobKey = picture.getImageBlobKey();
+        visibility = picture.getVisibility();
     }
 
     public Long getId() {
@@ -61,11 +66,27 @@ public class PictureMetaData {
         this.uploader = uploader;
     }
 
+    public Double getAvgRating() {
+        return avgRating;
+    }
+
+    public void setAvgRating(Double avgRating) {
+        this.avgRating = avgRating;
+    }
+
     public BlobKey getImageBlobKey() {
         return imageBlobKey;
     }
 
     public void setImageBlobKey(BlobKey imageBlobKey) {
         this.imageBlobKey = imageBlobKey;
+    }
+
+    public PictureVisibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(PictureVisibility visibility) {
+        this.visibility = visibility;
     }
 }
