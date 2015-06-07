@@ -179,18 +179,6 @@ public class ProfileActivity extends FragmentActivity {
         List<UserGroupMetaData> userGroups = userProfile.getMyUserGroups();
         userGroups = (userGroups == null) ? new ArrayList<UserGroupMetaData>() : userGroups;
 
-//        EventMetaData test = new EventMetaData();
-//        test.setDate(new DateTime(new Date()));
-//        test.setTitle("Primary Title");
-//        events.add(test);
-//        events.add(test);
-
-        UserGroupMetaData testGroup = new UserGroupMetaData();
-        testGroup.setMemberCount(2);
-        testGroup.setName("Martin");
-        userGroups.add(testGroup);
-        userGroups.add(testGroup);
-
         // Namen setzen
         String firstName = userProfile.getFirstName();
         String lastName = userProfile.getLastName();

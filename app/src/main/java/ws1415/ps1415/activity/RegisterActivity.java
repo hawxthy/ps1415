@@ -59,7 +59,7 @@ public class RegisterActivity extends Activity {
 
     // Für das Einloggen mit dem Google Account
     private GoogleAccountCredential credential;
-    private static String accountName;
+    private String accountName;
 
     // Für das Verwalten des Profilbildes
     private Bitmap selectedPicture;

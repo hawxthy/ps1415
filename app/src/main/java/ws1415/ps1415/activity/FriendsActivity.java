@@ -10,9 +10,12 @@ import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.R;
@@ -31,6 +34,8 @@ import ws1415.ps1415.util.UniversalUtil;
 public class FriendsActivity extends BaseActivity {
     private ListView mListViewFriends;
     private UserListAdapter mAdapter;
+    private LinearLayout mLayoutHintFriends;
+    private Button mButtonHint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +51,20 @@ public class FriendsActivity extends BaseActivity {
         setContentView(R.layout.activity_friends);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
+        mLayoutHintFriends = (LinearLayout) findViewById(R.id.friends_hint_message);
+        mButtonHint = (Button) findViewById(R.id.friends_hint_button);
+        mButtonHint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent search_intent = new Intent(FriendsActivity.this, SearchActivity.class);
+                FriendsActivity.this.startActivity(search_intent);
+            }
+        });
+
         mListViewFriends = (ListView) findViewById(R.id.friends_list_view);
+        mAdapter = new UserListAdapter(new ArrayList<String>(), FriendsActivity.this);
+        mListViewFriends.setAdapter(mAdapter);
+
         mListViewFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -63,7 +81,12 @@ public class FriendsActivity extends BaseActivity {
                 return true;
             }
         });
-        if(ServiceProvider.getEmail() != null) getFriendList();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (ServiceProvider.getEmail() != null) getFriendList();
     }
 
     /**
@@ -102,6 +125,9 @@ public class FriendsActivity extends BaseActivity {
                 if (aBoolean) {
                     Toast.makeText(FriendsActivity.this, getString(R.string.friend_delete_succeeded), Toast.LENGTH_LONG).show();
                     mAdapter.removeUser(position);
+                    if (mAdapter.getMailCount() == 0)
+                        mLayoutHintFriends.setVisibility(View.VISIBLE);
+                    else mLayoutHintFriends.setVisibility(View.GONE);
                 } else {
                     Toast.makeText(FriendsActivity.this, getString(R.string.friend_does_not_exist), Toast.LENGTH_LONG).show();
                     getFriendList();
@@ -123,16 +149,12 @@ public class FriendsActivity extends BaseActivity {
         setProgressBarIndeterminateVisibility(Boolean.TRUE);
         UserController.listFriends(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<String> stringList) {
+            public void taskDidFinish(ExtendedTask task, List<String> friendList) {
                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                if (mListViewFriends != null ) {
-                    if (stringList != null && !stringList.isEmpty()) {
-                        mAdapter = new UserListAdapter(stringList, FriendsActivity.this);
-                        mListViewFriends.setAdapter(mAdapter);
-                    } else {
-                        mAdapter = null;
-                        mListViewFriends.setAdapter(null);
-                    }
+                if (mListViewFriends != null  && mAdapter != null) {
+                    mAdapter.swapData(friendList);
+                    if (mAdapter.getMailCount() == 0) mLayoutHintFriends.setVisibility(View.VISIBLE);
+                    else mLayoutHintFriends.setVisibility(View.GONE);
                 }
             }
 
@@ -154,7 +176,7 @@ public class FriendsActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch(id){
+        switch (id) {
             case R.id.action_refresh_friends:
                 getFriendList();
                 break;

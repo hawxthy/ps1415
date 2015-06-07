@@ -97,7 +97,7 @@ public class UserListAdapter extends BaseAdapter {
             UserController.listUserInfo(new ExtendedTaskDelegateAdapter<Void, List<UserListData>>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, List<UserListData> userListDatas) {
-                    if(userListDatas == null){
+                    if(userListDatas.isEmpty()){
                         Toast.makeText(mContext, "Liste von Benutzern konnte nicht abgerufen werden", Toast.LENGTH_LONG).show();
                     } else {
                         mData.addAll(userListDatas);
@@ -119,10 +119,32 @@ public class UserListAdapter extends BaseAdapter {
         }
     }
 
+    /**
+     * Setzt die übergebenen E-Mail Adressen in die Liste.
+     *
+     * @param userMails E-Mail Adressen der neuen Benutzer
+     */
+    public void swapData(List<String> userMails){
+        mData.clear();
+        mailData.clear();
+        mailData.addAll(userMails);
+        if(userMails != null && !userMails.isEmpty()) addNextUserInfo(userMails);
+    }
+
     @Override
     public int getCount() {
         if(mData == null) return 0;
         return mData.size();
+    }
+
+    /**
+     * Gibt die Anzahl der E-Mail Adressen der Benutzer aus, die im Adapter verwaltet werden.
+     *
+     * @return Anzahl der E-Mail Adressen der Benutzer
+     */
+    public int getMailCount() {
+        if(mailData == null) return 0;
+        return mailData.size();
     }
 
     @Override

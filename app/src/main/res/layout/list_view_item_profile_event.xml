@@ -9,7 +9,7 @@
     android:paddingTop="20dp">
 
     <ImageView
-        android:id="@+id/list_item_profile_event_icon"
+        android:id="@+id/list_item_profile_group_icon"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentLeft="true" />
@@ -18,7 +18,7 @@
         android:id="@+id/list_item_profile_event_primary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/list_item_profile_event_icon"
+        android:layout_toRightOf="@id/list_item_profile_group_icon"
         android:paddingLeft="16dp"
         android:text="Primary Text"
         android:textSize="16sp"
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/list_item_profile_event_primary"
         android:layout_marginTop="5dp"
-        android:layout_toRightOf="@id/list_item_profile_event_icon"
+        android:layout_toRightOf="@id/list_item_profile_group_icon"
         android:paddingLeft="16dp"
         android:text="Secondary Text"
         android:fontFamily="sans-serif-light"

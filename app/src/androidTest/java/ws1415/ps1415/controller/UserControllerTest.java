@@ -6,7 +6,6 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.BlobKey;
-import com.skatenight.skatenightAPI.model.EndUser;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.InfoPair;
 import com.skatenight.skatenightAPI.model.Route;
@@ -174,27 +173,6 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
             }
         }, TEST_MAIL_1);
         assertTrue(existsSignal.await(30, TimeUnit.SECONDS));
-    }
-
-    /**
-     * Prüft ob ein Benutzer richtig auf dem Server gespeichert wird.
-     *
-     * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
-     */
-    @SmallTest
-    public void testGetUser() throws InterruptedException {
-        final CountDownLatch getSignal = new CountDownLatch(1);
-        UserController.getFullUser(new ExtendedTaskDelegateAdapter<Void, EndUser>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, EndUser endUser) {
-                assertNotNull(endUser);
-                assertNotNull(endUser.getUserInfo());
-                assertNotNull(endUser.getUserLocation());
-                assertEquals(TEST_MAIL_1, endUser.getEmail());
-                getSignal.countDown();
-            }
-        }, TEST_MAIL_1);
-        assertTrue(getSignal.await(30, TimeUnit.SECONDS));
     }
 
     /**
@@ -562,17 +540,17 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
         }, TEST_MAIL_1, TEST_MAIL_2);
         assertTrue(addFriendSignal.await(30, TimeUnit.SECONDS));
 
-        final CountDownLatch getUserSignal = new CountDownLatch(1);
-        UserController.getFullUser(new ExtendedTaskDelegateAdapter<Void, EndUser>() {
+        final CountDownLatch listSignal = new CountDownLatch(1);
+        UserController.listFriends(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, EndUser endUser) {
-                assertNotNull(endUser.getMyFriends());
-                assertTrue(endUser.getMyFriends().size() == 1);
-                assertTrue(endUser.getMyFriends().get(0).equals(TEST_MAIL_2));
-                getUserSignal.countDown();
+            public void taskDidFinish(ExtendedTask task, List<String> friendList) {
+                assertNotNull(friendList);
+                assertTrue(friendList.size() == 1);
+                assertTrue(friendList.get(0).equals(TEST_MAIL_2));
+                listSignal.countDown();
             }
         }, TEST_MAIL_1);
-        assertTrue(getUserSignal.await(30, TimeUnit.SECONDS));
+        assertTrue(listSignal.await(30, TimeUnit.SECONDS));
 
         final CountDownLatch removeFriendSignal = new CountDownLatch(1);
         UserController.removeFriend(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
@@ -584,16 +562,15 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
         }, TEST_MAIL_1, TEST_MAIL_2);
         assertTrue(removeFriendSignal.await(30, TimeUnit.SECONDS));
 
-        final CountDownLatch getUserRemovedSignal = new CountDownLatch(1);
-        UserController.getFullUser(new ExtendedTaskDelegateAdapter<Void, EndUser>() {
+        final CountDownLatch listSignal2 = new CountDownLatch(1);
+        UserController.listFriends(new ExtendedTaskDelegateAdapter<Void, List<String>>(){
             @Override
-            public void taskDidFinish(ExtendedTask task, EndUser endUser) {
-                assertNull(endUser.getMyFriends());
-                getUserRemovedSignal.countDown();
+            public void taskDidFinish(ExtendedTask task, List<String> friendList) {
+                assertTrue(friendList.size() == 0);
+                listSignal2.countDown();
             }
         }, TEST_MAIL_1);
-
-        assertTrue(getUserRemovedSignal.await(30, TimeUnit.SECONDS));
+        assertTrue(listSignal2.await(30, TimeUnit.SECONDS));
     }
 
     /**

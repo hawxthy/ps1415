@@ -1,6 +1,7 @@
 package ws1415.ps1415.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.ServiceProvider;
@@ -47,7 +48,9 @@ public abstract class RoleController {
             @Override
             protected List<String> doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().roleEndpoint().listGlobalAdmins().execute().getStringList();
+                    List<String> result = ServiceProvider.getService().roleEndpoint().listGlobalAdmins().execute().getStringList();
+                    if(result == null) return new ArrayList<String>();
+                    return result;
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Administratoren konnte nicht abgerufen werden");
