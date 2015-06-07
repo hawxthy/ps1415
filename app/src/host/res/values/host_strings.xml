@@ -46,29 +46,12 @@
     <string name="delete_route_message">Do you really want to delete the selected route? This can not be undone.</string>
     <string name="route_deletion_error">An error occurred while deleting the route. Is the route being used in existing events?</string>
 
-    <!-- RouteEditorActivity -->
-    <string name="title_activity_route_editor">Route Editor</string>
-    <string name="title_fragment_route_editor_map">Map</string>
-    <string name="title_fragment_route_editor_waypoints">Waypoints</string>
-    <string name="route_editor_error_load_route">Unable to load route.</string>
-    <string name="route_editor_waypoint_name_format">Waypoint <xliff:g id="number">%1$d</xliff:g></string>
-    <string name="route_editor_waypoint_deleted"><xliff:g id="waypoint_name">%1$s</xliff:g> deleted.</string>
-    <string name="route_editor_save_dialog">Save route?</string>
-    <string name="route_editor_leave_dialog">No route has been created. Do you want to leave anyway?</string>
-
     <!-- Strings zu activtiy_add_route_dialog -->
     <string name="title_activity_add_route_dialog">Add Route</string>
     <string name="title_activity_add_route_dialog_routename">Routename: </string>
     <string name="activity_add_route_dialog_cancel">Cancel</string>
     <string name="activity_add_route_dialog_apply">Apply</string>
     <string name="activity_add_route_dialog_empty">Routename can not be empty</string>
-
-    <!--Strings zu EditWaypointDialog-->
-    <string name="activity_edit_waypoint_dialog_cancel">Cancel</string>
-    <string name="activity_edit_waypoint_dialog_delete">Delete</string>
-    <string name="activity_edit_waypoint_dialog_apply">Apply</string>
-    <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
-    <string name="title_activity_edit_waypoint_dialog">Edit Waypoint</string>
 
     <!-- ManageEventParticipantsActivity -->
     <string name="title_activity_manage_event_participants">Manage participants</string>
