@@ -332,6 +332,7 @@
     <string name="cantSearchEmptyStrings">Put in something to search please</string>
     <string name="youAreNowVisible">You are now visible</string>
     <string name="youAreNowInvisible">You are now invisible</string>
+    <string name="cantChangeVisibility"></string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="title_fragment_group_black_board">Blackboard</string>
@@ -485,6 +486,10 @@
     <string name="tooManyVisibleGroups">Too many visible Groups</string>
     <string name="title_activity_comment_black_board">CommentBlackBoardActivity</string>
 
-    <string name="hello_world">Hello world!</string>
+    <!--CommentBlackBoard-->
+    <string name="noLongIdSubmitted">You have to deliver the id via the Intent</string>
+    <string name="titleWriteComment">Write a Comment</string>
+    <string name="textTooShort">Message too Short</string>
+
 
 </resources>

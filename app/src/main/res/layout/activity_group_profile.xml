@@ -3,10 +3,7 @@
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+
     tools:context="ws1415.ps1415.activity.GroupProfileActivity">
 
     <RelativeLayout
@@ -14,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/colorProfilePrimary">
+        android:background="@color/colorPrimary">
 
         <ImageView
             android:id="@+id/group_profile_image_view"
@@ -28,6 +25,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/list_item_title"
             android:textSize="20sp"
             android:text="Gruppenname "/>
 
@@ -42,7 +41,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginRight="8dp"
             fab:fab_colorNormal="@color/colorPrimaryJoin"
-            fab:fab_colorPressed="@color/colorPressedJoin"
+            fab:fab_colorPressed="@color/colorPressedBlackBoard"
             >
         </com.melnykov.fab.FloatingActionButton>
 
@@ -56,7 +55,7 @@
             android:layout_alignBottom="@+id/group_profile_image_view"
             android:layout_marginBottom="8dp"
             android:layout_marginRight="8dp"
-            fab:fab_colorNormal="@color/colorPrimaryBlackBoard"
+            fab:fab_colorNormal="@color/colorPrimaryLeave"
             fab:fab_colorPressed="@color/colorPressedBlackBoard"
             >
         </com.melnykov.fab.FloatingActionButton>
@@ -71,7 +70,7 @@
             android:layout_alignBottom="@+id/group_profile_image_view"
             android:layout_marginBottom="8dp"
             android:layout_marginRight="8dp"
-            fab:fab_colorNormal="@color/colorPrimaryBlackBoard"
+            fab:fab_colorNormal="@color/check_group_name_negative"
             fab:fab_colorPressed="@color/colorPressedBlackBoard"
             >
         </com.melnykov.fab.FloatingActionButton>
@@ -80,13 +79,13 @@
             android:id="@+id/group_profile_change_visibility"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:src="@drawable/ic_close_white_24dp"
+            android:src="@drawable/ic_visibility_white_24dp"
             android:layout_alignParentLeft="true"
             android:layout_alignBottom="@+id/group_profile_image_view"
             android:layout_marginBottom="8dp"
             android:layout_marginRight="8dp"
-            fab:fab_colorNormal="@color/colorPrimaryBlackBoard"
+            android:layout_marginLeft="8dp"
+            fab:fab_colorNormal="@color/colorPrimaryJoin"
             fab:fab_colorPressed="@color/colorPressedBlackBoard"
             >
         </com.melnykov.fab.FloatingActionButton>

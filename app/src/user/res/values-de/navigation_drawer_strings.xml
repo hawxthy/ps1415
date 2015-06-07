@@ -10,7 +10,8 @@
     <string name="messages">Nachrichten</string>
     <string name="my_pictures">Meine Bilder</string>
     <string name="events">Veranstaltungen</string>
-    <string name="user_groups">Benutzergruppen</string>
+    <string name="user_groups">Gruppen</string>
+    <string name="my_groups">Meine Gruppen</string>
     <string name="search">Suche</string>
     <string name="create_user_group">Gruppe erstellen</string>
     <string name="logout">Logout</string>

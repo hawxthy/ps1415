@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import ws1415.ps1415.activity.ListUserGroupsActivity;
+import ws1415.ps1415.activity.MyUserGroupsActivity;
 import ws1415.ps1415.activity.PermissionManagementActivity;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
@@ -125,6 +126,26 @@ public class NavDrawerList {
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent user_group_intent = new Intent(parent.getContext(), ListUserGroupsActivity.class);
+                    user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(user_group_intent);
+                }
+            },
+
+            // ---------- Meine Gruppen ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.my_groups;
+                }
+
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_group;
+                }
+
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent user_group_intent = new Intent(parent.getContext(), MyUserGroupsActivity.class);
                     user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(user_group_intent);
                 }

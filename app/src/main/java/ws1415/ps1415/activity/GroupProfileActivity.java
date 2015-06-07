@@ -114,11 +114,11 @@ public class GroupProfileActivity extends BaseFragmentActivity {
         mDeleteButton = (FloatingActionButton) findViewById(R.id.group_profile_delete_group_button);
         mViewPager = (ViewPager) findViewById(R.id.group_profile_view_pager);
         mTabLayout = (SlidingTabLayout) findViewById(R.id.group_profile_tab_layout);
-        mChangeVisibility = (FloatingActionButton)findViewById(R.id.group_profile_change_visibility);
+        mChangeVisibility = (FloatingActionButton) findViewById(R.id.group_profile_change_visibility);
 
         // Gruppennamen aus dem Intent holen, falls nicht vorhanden Activity nicht starten.
         groupName = getIntent().getStringExtra(EXTRA_GROUP_NAME);
-        if(groupName == null){
+        if (groupName == null) {
             Toast.makeText(this, R.string.noGroupNameInExtra, Toast.LENGTH_LONG).show();
             finish();
             return;
@@ -178,7 +178,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      *
      *
      */
-    private void setUpProfile(){
+    private void setUpProfile() {
         GroupController.getInstance().getUserGroup(new ExtendedTaskDelegateAdapter<Void, UserGroup>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
@@ -229,23 +229,30 @@ public class GroupProfileActivity extends BaseFragmentActivity {
     /**
      * überprüft, ob der Aufrufer ein Member ist und falls ja, dass wird überprüft ob
      * diese sicht gegenüber der Gruppe sichtbar geamcht hat oder nicht.
-     *
      */
-    private void checkIfVisible(){
-        if(checkIsMember){
+    private void checkIfVisible() {
+        if (checkIsMember) {
             GroupController.getInstance().getUserGroupVisibleMembers(new ExtendedTaskDelegateAdapter<Void, UserGroupVisibleMembers>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, UserGroupVisibleMembers visibleMembers) {
-                    if (visibleMembers.getList().contains(ServiceProvider.getEmail())) {
-                        mChangeVisibility.setColorNormal(R.color.colorPrimaryBlackBoard);
-                        mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
-                        mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
-                        mChangeVisibility.setVisibility(View.VISIBLE);
-                        checkVisibility = true;
+                    if (visibleMembers.getList() != null) {
+                        if (visibleMembers.getList().contains(ServiceProvider.getEmail())) {
+                            mChangeVisibility.setColorNormal(R.color.check_group_name_negative);
+                            mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
+                            mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
+                            mChangeVisibility.setVisibility(View.VISIBLE);
+                            checkVisibility = true;
+                        } else {
+                            mChangeVisibility.setColorNormal(R.color.colorPrimaryJoin);
+                            mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
+                            mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
+                            mChangeVisibility.setVisibility(View.VISIBLE);
+                            checkVisibility = false;
+                        }
                     } else {
                         mChangeVisibility.setColorNormal(R.color.colorPrimaryJoin);
-                        mChangeVisibility.setColorPressed(R.color.colorPressedJoin);
-                        mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_black_24dp));
+                        mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
+                        mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
                         mChangeVisibility.setVisibility(View.VISIBLE);
                         checkVisibility = false;
                     }
@@ -254,8 +261,8 @@ public class GroupProfileActivity extends BaseFragmentActivity {
         }
     }
 
-    private void setClickOnPicture(){
-        if(checkIsMember && getRights().contains(Right.CHANGEGROUPPICTURE.name())){
+    private void setClickOnPicture() {
+        if (checkIsMember && getRights().contains(Right.CHANGEGROUPPICTURE.name())) {
             mGroupPicture.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -299,9 +306,9 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                         @Override
                         public void taskDidFinish(ExtendedTask task, BlobKey blobKey) {
                             setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                            if(blobKey != null){
+                            if (blobKey != null) {
                                 GroupImageLoader.getInstance().setGroupImageToImageView(GroupProfileActivity.this, blobKey.getKeyString(), mGroupPicture);
-                            }else{
+                            } else {
                                 Toast.makeText(GroupProfileActivity.this, "Das Bild konnte nicht korrekt hochgeladen werden", Toast.LENGTH_LONG).show();
                             }
                         }
@@ -334,35 +341,33 @@ public class GroupProfileActivity extends BaseFragmentActivity {
 
     /**
      * Setzt die Listener für die Buttons.
-     *
      */
     private void setClickListener() {
         mChangeVisibility.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkVisibility){
-                    setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                    GroupController.getInstance().changeMyVisibility(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>(){
-                        @Override
-                        public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
-                            if(result.getValue()){
-                                mChangeVisibility.setColorNormal(R.color.colorPrimaryBlackBoard);
-                                mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
-                                mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
-                                mChangeVisibility.setVisibility(View.VISIBLE);
-                                checkVisibility = true;
-                                Toast.makeText(GroupProfileActivity.this, R.string.youAreNowVisible, Toast.LENGTH_LONG).show();
-                            }else{
-                                mChangeVisibility.setColorNormal(R.color.colorPrimaryJoin);
-                                mChangeVisibility.setColorPressed(R.color.colorPressedJoin);
-                                mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_black_24dp));
-                                mChangeVisibility.setVisibility(View.VISIBLE);
-                                checkVisibility = false;
-                                Toast.makeText(GroupProfileActivity.this, R.string.youAreNowInvisible, Toast.LENGTH_LONG).show();
-                            }
+                setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                GroupController.getInstance().changeMyVisibility(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
+                        if (result.getValue()) {
+                            mChangeVisibility.setColorNormal(R.color.check_group_name_negative);
+                            mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
+                            mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
+                            mChangeVisibility.setVisibility(View.VISIBLE);
+                            checkVisibility = true;
+                            Toast.makeText(GroupProfileActivity.this, R.string.youAreNowVisible, Toast.LENGTH_LONG).show();
+                        } else {
+                            mChangeVisibility.setColorNormal(R.color.colorPrimaryJoin);
+                            mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
+                            mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
+                            mChangeVisibility.setVisibility(View.VISIBLE);
+                            checkVisibility = false;
+                            Toast.makeText(GroupProfileActivity.this, R.string.youAreNowInvisible, Toast.LENGTH_LONG).show();
                         }
-                    },groupName);
-                }
+                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                    }
+                }, groupName);
             }
         });
 
@@ -506,8 +511,8 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                                 if (booleanWrapper.getValue()) {
                                     checkIsMember = true;
                                     setUpProfile();
-                                }else{
-                                    Toast.makeText(GroupProfileActivity.this, R.string.wrongPasswordMessage,Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(GroupProfileActivity.this, R.string.wrongPasswordMessage, Toast.LENGTH_LONG).show();
                                     setProgressBarIndeterminateVisibility(Boolean.FALSE);
                                 }
                             }
@@ -537,10 +542,11 @@ public class GroupProfileActivity extends BaseFragmentActivity {
     /**
      * Gibt die Rechte des Benutzers zurück, die er in dieser Gruppe hat.
      * Falls er kein Mitglied ist, ist das Resultat null
+     *
      * @return Die Rechte innerhalb dieser Gruppe oder null
      */
-    public List<String> getRights(){
-        return  (ArrayList<String>)group.getMemberRights().get(ServiceProvider.getEmail());
+    public List<String> getRights() {
+        return (ArrayList<String>) group.getMemberRights().get(ServiceProvider.getEmail());
     }
 
     /**
@@ -550,8 +556,8 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      * @param email
      * @return
      */
-    public List<String> getRights(String email){
-        return (ArrayList<String>)group.getMemberRights().get(email);
+    public List<String> getRights(String email) {
+        return (ArrayList<String>) group.getMemberRights().get(email);
     }
 
     /**
@@ -560,17 +566,16 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      * ein Dialog angezeigt der als Eingabe ein Passwort verlangt, welches man wiederholen muss.
      * Is die Gruppe nicht öffentlich, so wird man lediglich gefragt ob man sich sicher ist und
      * muss dies bestätigen. Das Passwort bleibt dabei erhalten, wird jedoch nicht mehr beachtet.
-     *
      */
-    public void startChangePrivacyAction(){
-        if(!group.getPrivat()){
+    public void startChangePrivacyAction() {
+        if (!group.getPrivat()) {
             // Zeige Dialog mit Passwort um die Gruppe öffentlich zu machen
             AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
             LayoutInflater factory = LayoutInflater.from(GroupProfileActivity.this);
             final View makeGroupPrivateView = factory.inflate(R.layout.make_group_private, null);
-            final EditText passwordEditText = (EditText)makeGroupPrivateView.findViewById(R.id.make_group_private_password);
-            final EditText passwordEditTextAgain = (EditText)makeGroupPrivateView.findViewById(R.id.make_group_private_password_again);
-            final TextView informView = (TextView)makeGroupPrivateView.findViewById(R.id.make_group_private_password_check_text_view);
+            final EditText passwordEditText = (EditText) makeGroupPrivateView.findViewById(R.id.make_group_private_password);
+            final EditText passwordEditTextAgain = (EditText) makeGroupPrivateView.findViewById(R.id.make_group_private_password_again);
+            final TextView informView = (TextView) makeGroupPrivateView.findViewById(R.id.make_group_private_password_check_text_view);
 
             checkGroupPassword = false;
             //set listener for the EditTextViews
@@ -659,7 +664,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                 }
             });
             altertadd.show();
-        }else{
+        } else {
             AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
             altertadd.setMessage(R.string.makeGroupOpenString);
             altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
@@ -700,18 +705,18 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      * damit eine Anfrage an den Server gesendet wird. Schlägt diese fehlt, so muss man es erneut
      * versuchen. Der Dialog bleibt jedoch bestehen mitsamt Eingabedaten.
      */
-    public void startChangePasswordAction(){
-        if(!group.getPrivat()){
+    public void startChangePasswordAction() {
+        if (!group.getPrivat()) {
             Toast.makeText(this, R.string.groupOpenNoNeedForPw, Toast.LENGTH_LONG).show();
-        }else{
+        } else {
             // Zeige Dialog mit Passwort um die Gruppe öffentlich zu machen
             AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
             LayoutInflater factory = LayoutInflater.from(GroupProfileActivity.this);
             final View changePasswordView = factory.inflate(R.layout.change_password_action, null);
-            final EditText currentPwEditText = (EditText)changePasswordView.findViewById(R.id.change_group_password_current_pw);
-            final EditText passwordEditText = (EditText)changePasswordView.findViewById(R.id.change_group_password_new_pw);
-            final EditText passwordEditTextAgain = (EditText)changePasswordView.findViewById(R.id.change_group_password_new_pw_again);
-            final TextView informView = (TextView)changePasswordView.findViewById(R.id.change_group_password_info);
+            final EditText currentPwEditText = (EditText) changePasswordView.findViewById(R.id.change_group_password_current_pw);
+            final EditText passwordEditText = (EditText) changePasswordView.findViewById(R.id.change_group_password_new_pw);
+            final EditText passwordEditTextAgain = (EditText) changePasswordView.findViewById(R.id.change_group_password_new_pw_again);
+            final TextView informView = (TextView) changePasswordView.findViewById(R.id.change_group_password_info);
 
             checkGroupPassword = false;
             //set listener for the EditTextViews
@@ -809,13 +814,13 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      * wird jedem Mitglied der Gruppe eine Notification gesendet. Dabei darf die Message, die
      * man im Textfeld angibt nicht leer sein. Sie kann jedoch nur ein Zeichen umfassen.
      */
-    public void startGlobalMessageAction(){
+    public void startGlobalMessageAction() {
         AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
         LayoutInflater factory = LayoutInflater.from(GroupProfileActivity.this);
         final View writeMessageView = factory.inflate(R.layout.post_black_board, null);
         altertadd.setView(writeMessageView);
-        final EditText messageEditText = (EditText)writeMessageView.findViewById(R.id.post_black_board_edit_text);
-        final TextView failureTextView = (TextView)writeMessageView.findViewById(R.id.failure_text_view);
+        final EditText messageEditText = (EditText) writeMessageView.findViewById(R.id.post_black_board_edit_text);
+        final TextView failureTextView = (TextView) writeMessageView.findViewById(R.id.failure_text_view);
 
         // Die TextView initialisieren, da die post Blackboard  Funktion diese auch verwendet und kein Text gesetzt ist.
         failureTextView.setText(R.string.globalMessageTooShort);
@@ -887,12 +892,12 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      *
      * @param view Das unsichtbare EditText item im listview item.
      */
-    public void startRemoveMemberAction(View view){
-        EditText hiddenMail = (EditText)view.findViewById(R.id.hidden_user_mail);
+    public void startRemoveMemberAction(View view) {
+        EditText hiddenMail = (EditText) view.findViewById(R.id.hidden_user_mail);
         final String email = hiddenMail.getText().toString();
-        if(getRights(email).contains(Right.FULLRIGHTS.name())){
+        if (getRights(email).contains(Right.FULLRIGHTS.name())) {
             Toast.makeText(GroupProfileActivity.this, R.string.deleteLeaderFailmessage, Toast.LENGTH_LONG).show();
-        }else{
+        } else {
             AlertDialog.Builder altertadd = new AlertDialog.Builder(this);
             altertadd.setTitle(R.string.removeMemberTitle);
             altertadd.setMessage(email);
@@ -929,19 +934,19 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      * Startet die DistributeRightsActivity und übergibt dabei die Mitglieder, sowie
      * den namen der Gruppe.
      */
-    public void startDistributeRightsActoin(){
+    public void startDistributeRightsActoin() {
         Intent start_distribute_rights_intent = new Intent(this, DistributeRightsActivity.class);
         start_distribute_rights_intent.putExtra(EXTRA_GROUP_NAME, groupName);
         ArrayList<String> groupMembers = new ArrayList<>();
-        for(String member : group.getMemberRights().keySet()){
+        for (String member : group.getMemberRights().keySet()) {
             groupMembers.add(member);
         }
         start_distribute_rights_intent.putExtra(EXTRA_GROUP_MEMBERS, groupMembers);
         startActivity(start_distribute_rights_intent);
     }
 
-    public void startDistributeRightsToAction(final String email){
-        if(email == null || email.isEmpty()){
+    public void startDistributeRightsToAction(final String email) {
+        if (email == null || email.isEmpty()) {
             Toast.makeText(this, R.string.dontDistributeRightsToNothing, Toast.LENGTH_LONG).show();
             return;
         }
@@ -950,30 +955,30 @@ public class GroupProfileActivity extends BaseFragmentActivity {
         final View distributeView = factory.inflate(R.layout.distribute_rights_to_one, null);
 
         //Initialisiere die Switches in der View
-        Switch distributeRightsSwitch = (Switch)distributeView.findViewById(R.id.switch_distribute_rights);
-        Switch changeGroupPictureSwitch = (Switch)distributeView.findViewById(R.id.switch_change_group_picture);
-        Switch globalMessageSwitch = (Switch)distributeView.findViewById(R.id.switch_global_message);
-        Switch inviteGroupSwitch = (Switch)distributeView.findViewById(R.id.switch_invite_group);
-        Switch deleteMemberSwitch = (Switch)distributeView.findViewById(R.id.switch_delete_member);
-        Switch editBlacBoardSwitch = (Switch)distributeView.findViewById(R.id.switch_edit_black_board);
+        Switch distributeRightsSwitch = (Switch) distributeView.findViewById(R.id.switch_distribute_rights);
+        Switch changeGroupPictureSwitch = (Switch) distributeView.findViewById(R.id.switch_change_group_picture);
+        Switch globalMessageSwitch = (Switch) distributeView.findViewById(R.id.switch_global_message);
+        Switch inviteGroupSwitch = (Switch) distributeView.findViewById(R.id.switch_invite_group);
+        Switch deleteMemberSwitch = (Switch) distributeView.findViewById(R.id.switch_delete_member);
+        Switch editBlacBoardSwitch = (Switch) distributeView.findViewById(R.id.switch_edit_black_board);
 
-        for(String right : getRights(email)){
-            if(right.equals(Right.DISTRIBUTERIGHTS.name())){
+        for (String right : getRights(email)) {
+            if (right.equals(Right.DISTRIBUTERIGHTS.name())) {
                 distributeRightsSwitch.setChecked(true);
             }
-            if(right.equals(Right.CHANGEGROUPPICTURE.name())){
+            if (right.equals(Right.CHANGEGROUPPICTURE.name())) {
                 changeGroupPictureSwitch.setChecked(true);
             }
-            if(right.equals(Right.INVITEGROUP.name())){
+            if (right.equals(Right.INVITEGROUP.name())) {
                 inviteGroupSwitch.setChecked(true);
             }
-            if(right.equals(Right.DELETEMEMBER.name())){
+            if (right.equals(Right.DELETEMEMBER.name())) {
                 deleteMemberSwitch.setChecked(true);
             }
-            if(right.equals(Right.GLOBALMESSAGE.name())){
+            if (right.equals(Right.GLOBALMESSAGE.name())) {
                 globalMessageSwitch.setChecked(true);
             }
-            if(right.equals(Right.EDITBLACKBOARD.name())){
+            if (right.equals(Right.EDITBLACKBOARD.name())) {
                 editBlacBoardSwitch.setChecked(true);
             }
         }
@@ -981,10 +986,10 @@ public class GroupProfileActivity extends BaseFragmentActivity {
         distributeRightsSwitch.setOncheckListener(new Switch.OnCheckListener() {
             @Override
             public void onCheck(Switch aSwitch, boolean checked) {
-                if(checked){
+                if (checked) {
                     rightsToGive.add(Right.DISTRIBUTERIGHTS.name());
                     rightsToTake.remove(Right.DISTRIBUTERIGHTS.name());
-                }else{
+                } else {
                     rightsToGive.remove(Right.DISTRIBUTERIGHTS.name());
                     rightsToTake.add(Right.DISTRIBUTERIGHTS.name());
                 }
@@ -1007,10 +1012,10 @@ public class GroupProfileActivity extends BaseFragmentActivity {
         inviteGroupSwitch.setOncheckListener(new Switch.OnCheckListener() {
             @Override
             public void onCheck(Switch aSwitch, boolean checked) {
-                if(checked){
+                if (checked) {
                     rightsToGive.add(Right.INVITEGROUP.name());
                     rightsToTake.remove(Right.INVITEGROUP.name());
-                }else{
+                } else {
                     rightsToGive.remove(Right.INVITEGROUP.name());
                     rightsToTake.add(Right.INVITEGROUP.name());
                 }
@@ -1020,10 +1025,10 @@ public class GroupProfileActivity extends BaseFragmentActivity {
         deleteMemberSwitch.setOncheckListener(new Switch.OnCheckListener() {
             @Override
             public void onCheck(Switch aSwitch, boolean checked) {
-                if(checked){
+                if (checked) {
                     rightsToGive.add(Right.DELETEMEMBER.name());
                     rightsToTake.remove(Right.DELETEMEMBER.name());
-                }else{
+                } else {
                     rightsToGive.remove(Right.DELETEMEMBER.name());
                     rightsToTake.add(Right.DELETEMEMBER.name());
                 }
@@ -1110,10 +1115,10 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      *
      * @param id Die id des Boardentries
      */
-    public void startDeleteBoardEntry(final Long id){
-        if(id == 0 ||id == null){
+    public void startDeleteBoardEntry(final Long id) {
+        if (id == 0 || id == null) {
             Toast.makeText(this, R.string.noEntryToDelete, Toast.LENGTH_LONG).show();
-        }else{
+        } else {
             AlertDialog.Builder altertadd = new AlertDialog.Builder(this);
             altertadd.setTitle(R.string.deleteThisEntryQuestion);
             altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
@@ -1149,8 +1154,8 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      * Wird aufgerufen, wenn ein Benutzer eine Einladung erhalten hat und diese Notification
      * berührt hat, also diese geclickt hat.
      */
-    public void checkIfInvitationIntent(){
-        if(getIntent().getStringExtra(EXTRA_INVITE_GROUP) != null){
+    public void checkIfInvitationIntent() {
+        if (getIntent().getStringExtra(EXTRA_INVITE_GROUP) != null) {
             startJoinEvent();
         }
     }
@@ -1158,11 +1163,11 @@ public class GroupProfileActivity extends BaseFragmentActivity {
     /**
      * Startet die InviteUsersActivity um neue Mitglieder für die Gruppe anzuwerben.
      */
-    public void startInviteUsersToGroup(){
+    public void startInviteUsersToGroup() {
         Intent start_invite_users_intent = new Intent(this, InviteUsersToGroupActivity.class);
         start_invite_users_intent.putExtra(EXTRA_GROUP_NAME, groupName);
         ArrayList<String> members = new ArrayList<>();
-        for(String member : group.getMemberRights().keySet()){
+        for (String member : group.getMemberRights().keySet()) {
             members.add(member);
         }
         start_invite_users_intent.putStringArrayListExtra(EXTRA_GROUP_MEMBERS, members);
@@ -1172,11 +1177,12 @@ public class GroupProfileActivity extends BaseFragmentActivity {
     /**
      * Startet die CommentBlackBoardActivity und übergibt als Extra die id des zu
      * kommentierenden BoardEntries.
+     *
      * @param id
      */
-    public void startCommentMessage(Long id){
+    public void startCommentMessage(Long id) {
         Intent comment_board_message_intent = new Intent(this, CommentBlackBoardActivity.class);
-        comment_board_message_intent.putExtra(CommentBlackBoardActivity.EXTRA_BOARD_ID, id);
+        comment_board_message_intent.putExtra(CommentBlackBoardActivity.EXTRA_BOARD_ID, id.toString());
         startActivity(comment_board_message_intent);
     }
 }

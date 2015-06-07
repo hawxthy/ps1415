@@ -159,8 +159,7 @@ public class UsergroupAdapter extends BaseAdapter {
         //Attribute Setzen
         holder.groupName.setText(getItem(position).getName());
         holder.groupCount.setText(context.getString(R.string.usergroup_member_count) + Integer.toString(getItem(position).getMemberCount()));
-        holder.hiddenGroupName.setText(getItem(position).getName());
-
+        
         if (context instanceof ListUserGroupsActivity) {
             holder.hiddenSecurityButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_security_black_24dp));
             holder.hiddenSecurityButton.setOnClickListener(new View.OnClickListener() {
@@ -181,6 +180,7 @@ public class UsergroupAdapter extends BaseAdapter {
                 holder.hiddenSecurityButton.setVisibility(View.VISIBLE);
             }
         } else {
+            holder.hiddenGroupName.setText(getItem(position).getName());
             if (count < 6) {
                 final MyUserGroupsActivity activity = (MyUserGroupsActivity) context;
                 holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));

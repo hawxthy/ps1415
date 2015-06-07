@@ -51,6 +51,10 @@ public class NavDrawerGroupList {
                 public void onClick(final AdapterView<?> parent, View view, int position, long id) {
                     // Die Activity holen, damit Methode auf ihr aufgerufen werden können.
                     final GroupProfileActivity context = (GroupProfileActivity)parent.getContext();
+                    // Wenn man kein Mitglied ist soll nichts passieren
+                    if(context.getRights()==null){
+                        return;
+                    }
 
                     // AlertDialog mit variabler Anzahl an Buttons erstellen
                     final AlertDialog.Builder altertadd = new AlertDialog.Builder(parent.getContext());
