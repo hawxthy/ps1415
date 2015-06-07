@@ -189,6 +189,30 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
+     * Liefert eine Liste von Standortinformationen von Benutzern.
+     *
+     * @param user User-Objekt zur Authentifizierung
+     * @param userMails E-Mail Adressen der Benutzer
+     * @return Standortinformationen von Benutzern
+     *
+     * @throws OAuthRequestException
+     */
+    @ApiMethod(path = "user_location_info")
+    public List<UserLocationInfo> listUserLocationInfo(User user, @Named("userMails") List<String> userMails) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            List<UserLocationInfo> locationInfos = new ArrayList<>();
+            for(String userMail : userMails){
+                locationInfos.add(getUserLocationInfo(user, userMail));
+            }
+            return locationInfos;
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
      * Gibt die Standortinformationen eines Benutzers aus. Wird für die Feldberechnung verwendet.
      *
      * @param userMail E-Mail Adresse des Benutzers
