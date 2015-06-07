@@ -153,12 +153,12 @@
             android:label="@string/title_activity_list_user_groups" >
         </activity>
         <activity
-            android:name=".activity.CreateUserGroupActivity"
-            android:label="@string/title_activity_create_user_group" >
-        </activity>
-        <activity
             android:name=".activity.GroupProfileActivity"
             android:label="@string/title_activity_group_profile" >
+        </activity>
+        <activity
+            android:name=".activity.DistributeRightsActivity"
+            android:label="@string/title_activity_distribute_rights" >
         </activity>
     </application>
 

@@ -64,4 +64,11 @@
     <string name="activity_edit_waypoint_dialog_apply">Übernehmen</string>
     <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
     <string name="title_activity_edit_waypoint_dialog">Editiere Wegpunkt</string>
+
+    <!--Strings zu ActivityCreateUserGroup -->
+    <string name="groupTypeTitle">Gruppentyp</string>
+    <string name="groupTypeSecurity">Secrutity</string>
+    <string name="groupTypeNormal">Normal</string>
+    <string name="typeInfoGroup">Information zum Gruppentyp</string>
+    <string name="infoGroupType">Securitygruppen sind immer privat und die Mitglieder solcher sind immer sichtbar. Das heißt, dass die Teilnehmer von Veranstaltungen zu jedem Zeitpunkt die Mitglieder von Securitygruppen auf ihrer Karte sehen können.</string>
 </resources>

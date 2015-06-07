@@ -21,6 +21,8 @@
 
     <color name="colorPrimary">#ff3262ff</color>
     <color name="colorPressed">#ff43ddff</color>
+    <color name="colorPrimaryJoin">#ff0fd400</color>
+    <color name="colorPressedJoin">#ff57ff0b</color>
     <color name="colorPrimaryBlackBoard">#000000</color>
     <color name="colorPressedBlackBoard">#D8D8D8</color>
 

@@ -14,8 +14,6 @@ import ws1415.ps1415.model.Right;
 import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.controller.GroupController;
-import ws1415.ps1415.controller.RightController;
 
 /**
  * Created by Bernd on 22.05.2015.
@@ -30,7 +28,7 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
     final private String TEST_GROUP_DESCRIPTION = "Testbeschreibung "+TEST_GROUP_NAME;
     final private String TEST_RIGHT_FULLRIGHTS = Right.FULLRIGHTS.name();
     final private String TEST_RIGHT_DELETEGROUP = Right.DELETEGROUP.name();
-    final private String TEST_RIGHT_POSTBLACKBOARD = Right.POSTBLACKBOARD.name();
+    final private String TEST_RIGHT_EDITBLACKBOARD = Right.EDITBLACKBOARD.name();
     final private String TEST_RIGHT_NEWMEMBERRIGHTS = Right.NEWMEMBERRIGHTS.name();
 
 
@@ -168,7 +166,7 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
         ArrayList<String> rights = new ArrayList<String>();
         rights.add(TEST_RIGHT_DELETEGROUP);
         rights.add(TEST_RIGHT_NEWMEMBERRIGHTS);
-        rights.add(TEST_RIGHT_POSTBLACKBOARD);
+        rights.add(TEST_RIGHT_EDITBLACKBOARD);
 
         RightController.getInstance().giveRightsToUser(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
@@ -188,7 +186,7 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
                 ArrayList<String> rights = (ArrayList<String>) group.getMemberRights().get(MY_SECOND_MAIL);
                 assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_DELETEGROUP + " haben!", rights.contains(TEST_RIGHT_DELETEGROUP));
-                assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_POSTBLACKBOARD + " haben!", rights.contains(TEST_RIGHT_POSTBLACKBOARD));
+                assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_EDITBLACKBOARD + " haben!", rights.contains(TEST_RIGHT_EDITBLACKBOARD));
                 assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_NEWMEMBERRIGHTS + " haben!", rights.contains(TEST_RIGHT_NEWMEMBERRIGHTS));
                 signal2.countDown();
             }
@@ -218,7 +216,7 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
                 ArrayList<String> rights = (ArrayList<String>) group.getMemberRights().get(MY_SECOND_MAIL);
                 assertFalse("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_DELETEGROUP + " nicht  haben!", rights.contains(TEST_RIGHT_DELETEGROUP));
-                assertFalse("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_POSTBLACKBOARD + " nicht haben!", rights.contains(TEST_RIGHT_POSTBLACKBOARD));
+                assertFalse("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_EDITBLACKBOARD + " nicht haben!", rights.contains(TEST_RIGHT_EDITBLACKBOARD));
                 assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_NEWMEMBERRIGHTS + " haben!", rights.contains(TEST_RIGHT_NEWMEMBERRIGHTS));
                 signal4.countDown();
             }
@@ -244,7 +242,7 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, users, TEST_RIGHT_POSTBLACKBOARD);
+        }, TEST_GROUP_NAME, users, TEST_RIGHT_EDITBLACKBOARD);
         try{
             assertTrue("giveRightToUsers failed", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e){
@@ -258,9 +256,9 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
                 ArrayList<String> rightsUser0 = (ArrayList<String>) group.getMemberRights().get(MY_MAIL);
                 ArrayList<String> rightsUser1 = (ArrayList<String>) group.getMemberRights().get(MY_SECOND_MAIL);
                 assertTrue("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_FULLRIGHTS + " haben!", rightsUser0.contains(TEST_RIGHT_FULLRIGHTS));
-                assertTrue("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_POSTBLACKBOARD + " haben!", rightsUser0.contains(TEST_RIGHT_POSTBLACKBOARD));
+                assertTrue("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_EDITBLACKBOARD + " haben!", rightsUser0.contains(TEST_RIGHT_EDITBLACKBOARD));
                 assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_NEWMEMBERRIGHTS + " haben!", rightsUser1.contains(TEST_RIGHT_NEWMEMBERRIGHTS));
-                assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_POSTBLACKBOARD + " haben!", rightsUser1.contains(TEST_RIGHT_POSTBLACKBOARD));
+                assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_EDITBLACKBOARD + " haben!", rightsUser1.contains(TEST_RIGHT_EDITBLACKBOARD));
                 signal2.countDown();
             }
         }, TEST_GROUP_NAME);
@@ -276,7 +274,7 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal3.countDown();
             }
-        }, TEST_GROUP_NAME, users, TEST_RIGHT_POSTBLACKBOARD);
+        }, TEST_GROUP_NAME, users, TEST_RIGHT_EDITBLACKBOARD);
         try{
             assertTrue("takeRightFromUsers failed", signal3.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e){
@@ -290,9 +288,9 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
                 ArrayList<String> rightsUser0 = (ArrayList<String>) group.getMemberRights().get(MY_MAIL);
                 ArrayList<String> rightsUser1 = (ArrayList<String>) group.getMemberRights().get(MY_SECOND_MAIL);
                 assertTrue("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_FULLRIGHTS + " haben!", rightsUser0.contains(TEST_RIGHT_FULLRIGHTS));
-                assertFalse("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_POSTBLACKBOARD + " nicht haben!", rightsUser0.contains(TEST_RIGHT_POSTBLACKBOARD));
+                assertFalse("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_EDITBLACKBOARD + " nicht haben!", rightsUser0.contains(TEST_RIGHT_EDITBLACKBOARD));
                 assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_NEWMEMBERRIGHTS + "  haben!", rightsUser1.contains(TEST_RIGHT_NEWMEMBERRIGHTS));
-                assertFalse("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_POSTBLACKBOARD + " nicht haben!", rightsUser1.contains(TEST_RIGHT_POSTBLACKBOARD));
+                assertFalse("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_EDITBLACKBOARD + " nicht haben!", rightsUser1.contains(TEST_RIGHT_EDITBLACKBOARD));
                 signal4.countDown();
             }
         }, TEST_GROUP_NAME);
@@ -316,7 +314,7 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
         ArrayList<String> rights = new ArrayList<>();
         rights.add(TEST_RIGHT_DELETEGROUP);
         rights.add(TEST_RIGHT_NEWMEMBERRIGHTS);
-        rights.add(TEST_RIGHT_POSTBLACKBOARD);
+        rights.add(TEST_RIGHT_EDITBLACKBOARD);
         RightController.getInstance().giveRightsToUsers(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
@@ -336,9 +334,9 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
                 ArrayList<String> rightsUser0 = (ArrayList<String>) group.getMemberRights().get(MY_MAIL);
                 ArrayList<String> rightsUser1 = (ArrayList<String>) group.getMemberRights().get(MY_SECOND_MAIL);
                 assertTrue("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_FULLRIGHTS + " haben!", rightsUser0.contains(TEST_RIGHT_FULLRIGHTS));
-                assertTrue("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_POSTBLACKBOARD + " haben!", rightsUser0.contains(TEST_RIGHT_POSTBLACKBOARD));
+                assertTrue("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_EDITBLACKBOARD + " haben!", rightsUser0.contains(TEST_RIGHT_EDITBLACKBOARD));
                 assertTrue("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_DELETEGROUP + " haben!", rightsUser0.contains(TEST_RIGHT_DELETEGROUP));
-                assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_POSTBLACKBOARD + " haben!", rightsUser1.contains(TEST_RIGHT_POSTBLACKBOARD));
+                assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_EDITBLACKBOARD + " haben!", rightsUser1.contains(TEST_RIGHT_EDITBLACKBOARD));
                 assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_NEWMEMBERRIGHTS + " haben!", rightsUser1.contains(TEST_RIGHT_NEWMEMBERRIGHTS));
                 assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_DELETEGROUP + " haben!", rightsUser1.contains(TEST_RIGHT_DELETEGROUP));
                 signal2.countDown();
@@ -370,10 +368,10 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
                 ArrayList<String> rightsUser0 = (ArrayList<String>) group.getMemberRights().get(MY_MAIL);
                 ArrayList<String> rightsUser1 = (ArrayList<String>) group.getMemberRights().get(MY_SECOND_MAIL);
                 assertTrue("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_FULLRIGHTS + " haben!", rightsUser0.contains(TEST_RIGHT_FULLRIGHTS));
-                assertFalse("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_POSTBLACKBOARD + " nicht haben!", rightsUser0.contains(TEST_RIGHT_POSTBLACKBOARD));
+                assertFalse("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_EDITBLACKBOARD + " nicht haben!", rightsUser0.contains(TEST_RIGHT_EDITBLACKBOARD));
                 assertFalse("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_DELETEGROUP + " nicht haben!", rightsUser0.contains(TEST_RIGHT_DELETEGROUP));
                 assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_NEWMEMBERRIGHTS + " haben!", rightsUser1.contains(TEST_RIGHT_NEWMEMBERRIGHTS));
-                assertFalse("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_POSTBLACKBOARD + " nicht haben!", rightsUser1.contains(TEST_RIGHT_POSTBLACKBOARD));
+                assertFalse("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_EDITBLACKBOARD + " nicht haben!", rightsUser1.contains(TEST_RIGHT_EDITBLACKBOARD));
                 assertFalse("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_DELETEGROUP + " nicht haben!", rightsUser1.contains(TEST_RIGHT_DELETEGROUP));
                 signal4.countDown();
             }

@@ -14,20 +14,26 @@ import java.util.List;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.CreateUserGroupActivity;
+import ws1415.ps1415.activity.DistributeRightsActivity;
 import ws1415.ps1415.activity.FriendsActivity;
 import ws1415.ps1415.activity.GroupProfileActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.ListUserGroupsActivity;
+import ws1415.ps1415.activity.ManageEventsActivity;
+import ws1415.ps1415.activity.ManageRoutesActivity;
 import ws1415.ps1415.activity.MessagingActivity;
+import ws1415.ps1415.activity.PermissionManagementActivity;
 import ws1415.ps1415.activity.ProfileActivity;
+import ws1415.ps1415.activity.RegisterActivity;
 import ws1415.ps1415.activity.SearchActivity;
+import ws1415.ps1415.util.PrefManager;
 
 /**
  * @author Bernd Eissing on 03.06.2015.
  */
 public class NavDrawerGroupList {
     public static final NavDrawerItem[] items = new NavDrawerItem[]{
-            // ---------- Gruppe erstellen ----------
+            // ---------- Gruppenfunktionen ----------
             new NavDrawerItem() {
                 AlertDialog dialog;
                 @Override
@@ -51,23 +57,11 @@ public class NavDrawerGroupList {
                     final View functionsView = factory.inflate(R.layout.group_functions, null);
 
                     // Finde die Buttons und setzt die clicklistener
-                    ButtonFlat createGroupButton = (ButtonFlat) functionsView.findViewById(R.id.group_function_create_user_group);
-                    createGroupButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
-                            dialog.dismiss();
-                        }
-                    });
                     ButtonFlat distributeRightsButton = (ButtonFlat) functionsView.findViewById(R.id.group_function_distribute_rights);
                     distributeRightsButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
+                            context.startDistributeRightsActoin();
                             dialog.dismiss();
                         }
                     });
@@ -75,6 +69,7 @@ public class NavDrawerGroupList {
                     inviteGroupButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+                            // TODO implementieren
                             Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
                             parent.getContext().startActivity(create_group_intent);
                             altertadd.setCancelable(true);
@@ -89,33 +84,11 @@ public class NavDrawerGroupList {
                             dialog.dismiss();
                         }
                     });
-                    ButtonFlat changePictureButton = (ButtonFlat) functionsView.findViewById(R.id.group_function_change_group_picture);
-                    changePictureButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
-                            dialog.dismiss();
-                        }
-                    });
                     ButtonFlat sendGlobalMessageButton = (ButtonFlat) functionsView.findViewById(R.id.group_function_post_global_message);
                     sendGlobalMessageButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
-                            dialog.dismiss();
-                        }
-                    });
-                    ButtonFlat removeMemberButton = (ButtonFlat) functionsView.findViewById(R.id.group_function_remove_member);
-                    removeMemberButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
+                            context.startGlobalMessageAction();
                             dialog.dismiss();
                         }
                     });
@@ -137,20 +110,12 @@ public class NavDrawerGroupList {
                         if(!rights.contains(Right.INVITEGROUP.name())){
                             inviteGroupButton.setVisibility(View.GONE);
                         }
-                        if(!rights.contains(Right.CHANGEGROUPPRIVACY.name())){
-                            changePrivacyButton.setVisibility(View.GONE);
-                        }
-                        if(!rights.contains(Right.CHANGEGROUPPICTURE.name())){
-                            changePictureButton.setVisibility(View.GONE);
-                        }
                         if(!rights.contains(Right.GLOBALMESSAGE.name())){
                             sendGlobalMessageButton.setVisibility(View.GONE);
                         }
-                        if(!rights.contains(Right.DELETEMEMBER.name())){
-                            removeMemberButton.setVisibility(View.GONE);
-                        }
-                        // Nur der Leader kann das Passwort ändern
+                        // Nur der Leader kann das Passwort ändern oder die Gruppe öffentlich machen
                         changePasswordButton.setVisibility(View.GONE);
+                        changePrivacyButton.setVisibility(View.GONE);
                     }
 
 
@@ -164,6 +129,46 @@ public class NavDrawerGroupList {
                     });
                     dialog = altertadd.show();
 
+                }
+            },
+
+            // ---------- Gruppe erstellen ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.create_user_group;
+                }
+
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_group_white_24dp;
+                }
+
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent show_events_intent = new Intent(parent.getContext(), ListEventsActivity.class);
+                    show_events_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(show_events_intent);
+                }
+            },
+
+            // ---------- Gruppen ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.user_groups;
+                }
+
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_group;
+                }
+
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent user_group_intent = new Intent(parent.getContext(), ListUserGroupsActivity.class);
+                    user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(user_group_intent);
                 }
             },
 
@@ -245,26 +250,6 @@ public class NavDrawerGroupList {
                 }
             },
 
-            // ---------- Gruppen ----------
-            new NavDrawerItem() {
-                @Override
-                public int getTitleId() {
-                    return R.string.user_groups;
-                }
-
-                @Override
-                public int getIconId() {
-                    return R.drawable.ic_group;
-                }
-
-                @Override
-                public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent user_group_intent = new Intent(parent.getContext(), ListUserGroupsActivity.class);
-                    user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    parent.getContext().startActivity(user_group_intent);
-                }
-            },
-
             // ---------- Suche ----------
             new NavDrawerItem() {
                 @Override
@@ -284,5 +269,87 @@ public class NavDrawerGroupList {
                     parent.getContext().startActivity(search_intent);
                 }
             },
+
+            // ---------------------------------------------
+            // ---------- Veranstalter-Funktionen ----------
+            // ---------------------------------------------
+
+            // ---------- Veranstaltung erstellen/bearbeiten ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.create_edit_events;
+                }
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_event;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(parent.getContext(), ManageEventsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(intent);
+                }
+            },
+
+            // ---------- Routen erstellen/bearbeiten ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.create_edit_routes;
+                }
+                @Override
+                // TODO Icon ändern
+                public int getIconId() {
+                    return R.drawable.ic_event;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(parent.getContext(), ManageRoutesActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(intent);
+                }
+            },
+
+            // ---------- Rechteverwaltung ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.permission_management;
+                }
+
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_action_accounts;
+                }
+
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent admins_intent = new Intent(parent.getContext(), PermissionManagementActivity.class);
+                    parent.getContext().startActivity(admins_intent);
+                }
+            },
+
+            // ---------- Logout ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.logout;
+                }
+
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_action_accounts;
+                }
+
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    PrefManager.setSelectedUserMail(parent.getContext(), "");
+                    Intent intent = new Intent(parent.getContext(), RegisterActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    parent.getContext().startActivity(intent);
+                }
+            }
+
     };
 }

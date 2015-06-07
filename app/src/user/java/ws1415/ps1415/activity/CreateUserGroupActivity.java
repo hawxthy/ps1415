@@ -13,10 +13,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.Switch;
@@ -25,7 +25,6 @@ import com.skatenight.skatenightAPI.model.BooleanWrapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,14 +39,17 @@ import ws1415.ps1415.util.ImageUtil;
 public class CreateUserGroupActivity extends BaseActivity {
     private static final int SELECT_PHOTO = 1;
     private static final int PICTURE_CROP = 2;
+    // Attribute für das Laden von Bildern
     private File tempFile;
     private Uri pictureUri;
     private Bitmap mBitmap;
     private BlobKey mGroupPictureBlobKey;
+    private String mBlobKeyString = "nothingToDelete";
+
+    // Attribute zum speichern von getesteten Gruppennamen
     String mTestName;
     private List<String> mTestedPositiveNames;
     private List<String> mTestedNegativeNames;
-    private String mBlobKeyString = "nothingToDelete";
 
     // Die EditText Views
     private EditText mGroupNameEditText;
@@ -83,7 +85,9 @@ public class CreateUserGroupActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.setContentView(NavDrawerGroupList.items, R.layout.activity_create_user_group);
+        setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
         mGroupNameEditText = (EditText) findViewById(R.id.create_user_group_group_name);
         mGroupDescriptionEditText = (EditText) findViewById(R.id.create_user_group_group_description);
@@ -120,7 +124,7 @@ public class CreateUserGroupActivity extends BaseActivity {
         checkGroupImage = false;
         checkGroupPassword = false;
         checkGroupName = false;
-        setUpButotnListener();
+        setUpButtonListener();
     }
 
     @Override
@@ -148,7 +152,7 @@ public class CreateUserGroupActivity extends BaseActivity {
     /**
      * Setzt die Listener auf die Buttons und die Views.
      */
-    private void setUpButotnListener() {
+    private void setUpButtonListener() {
         mGroupPrivacySwitch.setOncheckListener(new Switch.OnCheckListener() {
             @Override
             public void onCheck(Switch aSwitch, boolean checked) {
@@ -173,6 +177,7 @@ public class CreateUserGroupActivity extends BaseActivity {
                 mTestName = mGroupNameEditText.getText().toString();
                 if (!mTestName.isEmpty()) {
                     if (!mTestedPositiveNames.contains(mTestName) && !mTestedNegativeNames.contains(mTestName)) {
+                        setProgressBarIndeterminateVisibility(Boolean.TRUE);
                         GroupController.getInstance().checkGroupName(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
                             @Override
                             public void taskDidFinish(ExtendedTask task, BooleanWrapper booleanWrapper) {
@@ -187,6 +192,7 @@ public class CreateUserGroupActivity extends BaseActivity {
                                     mTestedNegativeNames.add(mTestName);
                                     checkGroupName = false;
                                 }
+                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
                             }
                         }, mTestName);
                     } else if (mTestedPositiveNames.contains(mTestName)) {
@@ -294,6 +300,7 @@ public class CreateUserGroupActivity extends BaseActivity {
                 GroupController.getInstance().loadImageForPreview(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
+                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
                         if (bitmap != null) {
                             AlertDialog.Builder alertadd = new AlertDialog.Builder(CreateUserGroupActivity.this);
                             LayoutInflater factory = LayoutInflater.from(CreateUserGroupActivity.this);
@@ -344,56 +351,68 @@ public class CreateUserGroupActivity extends BaseActivity {
                 }
                 if (checkGroupName && !mGroupPrivacySwitch.isCheck()) {
                     if (checkGroupImage) {
+                        setProgressBarIndeterminateVisibility(Boolean.TRUE);
                         GroupController.getInstance().createOpenUserGroupWithPicture(new ExtendedTaskDelegateAdapter<Void, Void>() {
                             @Override
                             public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
                                 startGroupProfile(mTestName);
                             }
 
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
+                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
                                 mInformUserTextView.setText(R.string.creatingGroupError);
                                 mInformUserTextView.setVisibility(View.VISIBLE);
                             }
                         }, mTestName, description, mBlobKeyString);
                     } else {
+                        setProgressBarIndeterminateVisibility(Boolean.TRUE);
                         GroupController.getInstance().createOpenUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
                             @Override
                             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                                 startGroupProfile(mTestName);
+                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
                             }
 
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
                                 mInformUserTextView.setText(R.string.creatingGroupError);
                                 mInformUserTextView.setVisibility(View.VISIBLE);
+                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
                             }
                         }, mTestName, description);
                     }
                 } else if (checkGroupName && mGroupPrivacySwitch.isCheck()) {
                     if (checkGroupPassword) {
                         if (checkGroupImage) {
+                            setProgressBarIndeterminateVisibility(Boolean.TRUE);
                             GroupController.getInstance().createPrivateUserGroupWithPicture(new ExtendedTaskDelegateAdapter<Void, Void>() {
                                 @Override
                                 public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
                                     startGroupProfile(mTestName);
                                 }
 
                                 @Override
                                 public void taskFailed(ExtendedTask task, String message) {
+                                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
                                     mInformUserTextView.setText(R.string.creatingGroupError);
                                     mInformUserTextView.setVisibility(View.VISIBLE);
                                 }
                             }, mTestName, UserGroupType.NORMALGROUP, mGroupPasswordAgainEditText.getText().toString(), description, mBlobKeyString);
                         } else {
+                            setProgressBarIndeterminateVisibility(Boolean.TRUE);
                             GroupController.getInstance().createPrivateUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
                                 @Override
                                 public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
                                     startGroupProfile(mTestName);
                                 }
 
                                 @Override
                                 public void taskFailed(ExtendedTask task, String message) {
+                                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
                                     mInformUserTextView.setText(R.string.creatingGroupError);
                                     mInformUserTextView.setVisibility(View.VISIBLE);
                                 }
@@ -431,12 +450,12 @@ public class CreateUserGroupActivity extends BaseActivity {
                 tempFile.deleteOnExit();
                 if (mBitmap != null) {
                     mCheckImageUploadTextView.setVisibility(View.VISIBLE);
-                    setProgressBarIndeterminateVisibility(Boolean.TRUE);
                     if (mPreviewButton.getVisibility() == View.VISIBLE) {
                         mPreviewButton.setVisibility(View.GONE);
                         mCheckImageUploadTextView.setText(R.string.uploadingImage);
                     }
-
+                    // Bild hochladen
+                    setProgressBarIndeterminateVisibility(Boolean.TRUE);
                     GroupController.getInstance().uploadImageForPreview(new ExtendedTaskDelegateAdapter<Void, BlobKey>() {
                         @Override
                         public void taskDidFinish(ExtendedTask task, BlobKey blobKey) {
@@ -450,6 +469,7 @@ public class CreateUserGroupActivity extends BaseActivity {
 
                         @Override
                         public void taskFailed(ExtendedTask task, String message) {
+                            setProgressBarIndeterminateVisibility(Boolean.FALSE);
                             mCheckImageUploadTextView.setText(R.string.uploadingImageFailed);
                             checkGroupImage = false;
                         }
@@ -475,7 +495,8 @@ public class CreateUserGroupActivity extends BaseActivity {
     }
 
     /**
-     * Startet das Profil zu der angegebenen Gruppe.
+     * Startet das Profil zu der angegebenen Gruppe. Hier muss der Name der Gruppe mit übergeben werden
+     * denn das Gruppenprofil benötigt den Namen um die Gruppe vom Server zu laden.
      *
      * @param groupName Der Name der Gruppe
      */

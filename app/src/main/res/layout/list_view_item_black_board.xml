@@ -5,12 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <EditText
+        android:id="@+id/hidden_board_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
     <TextView
         android:id="@+id/list_view_item_black_board_creator_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
         android:textSize="14sp"
         android:text="Ersteller"/>
@@ -45,5 +50,13 @@
         android:layout_marginBottom="8dp"
         android:textSize="12sp"
         android:text="Date"/>
+
+    <ImageView
+        android:id="@+id/delete_board_message_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_highlight_off_black_24dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"/>
 
 </RelativeLayout>

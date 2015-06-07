@@ -278,6 +278,8 @@
     <string name="creatingGroupError">Couldn\'t create Group</string>
     <string name="defaultGroupDestription">This is the Group: </string>
     <string name="checkGroupNamePlease">Check Groupname please</string>
+    <string name="groupNameTooShort">Lenght of the Name must at least be 3</string>
+    <string name="passwordTooShort">Length of the Password must at least be 5</string>
 
     <!-- GroupProfileActivity-->
     <string name="noGroupNameInExtra">Aborted: You have to deliver the Groupname via the Intent Extras</string>
@@ -290,6 +292,20 @@
     <string name="makeGroupOpenString">Make this Group open to everyone? You will loose your Password</string>
     <string name="groupOpenNoNeedForPw">Open Groups don\'t need Passwords</string>
     <string name="groupChangePasswordTitle">Change Password?</string>
+    <string name="globalMessageTitle">Send a global Message?</string>
+    <string name="globalMessageFailure">You have to type in a global Message</string>
+    <string name="globalMessageTooShort">Message length has to be at least 10</string>
+    <string name="boardMessageTooShort">Message length has to be at least 2</string>
+    <string name="removeMemberTitle">Remove Member?</string>
+    <string name="deleteLeaderFailmessage">You cannot delete the Leader of a group</string>
+    <string name="leaderTriesToLeave">The leader cannot leave the Group</string>
+    <string name="leaveGroupTitle">Leaving Group</string>
+    <string name="leaveGroupMessage">Leave this Group?</string>
+    <string name="wrongPasswordMessage">Wrong Password</string>
+    <string name="distributeRightsToOne">Distribute Rights to</string>
+    <string name="dontDistributeRightsToNothing">No E-Mail submitted</string>
+    <string name="noEntryToDelete">No entry to delete submitted</string>
+    <string name="deleteThisEntryQuestion">Delete this Entry?</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="title_fragment_group_black_board">Blackboard</string>
@@ -315,4 +331,23 @@
     <string name="removeMember">Remove Members</string>
     <string name="abortGroupFunctions">Cancel</string>
     <string name="changePasswod">Change Password</string>
+    <string name="editBlackBoard">Edit Blackboard</string>
+    <string name="globalMessageSend">Message has been send</string>
+
+    <!-- AlerDialog Button Strings -->
+    <string name="sendButton">Send</string>
+    <string name="okButton">OK</string>
+    <string name="inviteButton">Invite</string>
+    <string name="doneButton">Done</string>
+    <string name="cancelButton">Cancel</string>
+    <string name="abortButton">Abort</string>
+    <string name="title_activity_distribute_rights">DistributeRightsActivity</string>
+
+    <!-- DistributeRightsActivity-->
+    <string name="distributeRightsHeader">Rights to Distribute</string>
+    <string name="distributeRightsHeaderList">Distribute to</string>
+    <string name="noGoupNameSubmitted">You need to submit a group name via the Intent</string>
+    <string name="noGroupMembersSubmitted">You need to submit the groupmembers via the Intent</string>
+    <string name="noMembersToGrantRights">You didn\'t select any members</string>
+
 </resources>

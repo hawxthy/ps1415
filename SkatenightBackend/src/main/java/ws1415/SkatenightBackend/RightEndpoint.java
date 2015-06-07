@@ -320,11 +320,10 @@ public class RightEndpoint extends SkatenightServerEndpoint {
      */
     private boolean isRight(String right) {
         if (Right.DISTRIBUTERIGHTS.name().equals(right) ||
-                Right.POSTBLACKBOARD.name().equals(right) ||
+                Right.EDITBLACKBOARD.name().equals(right) ||
                 Right.INVITEGROUP.name().equals(right) ||
                 Right.CHANGEGROUPPICTURE.name().equals(right) ||
                 Right.CHANGEGROUPPRIVACY.name().equals(right) ||
-                Right.COMMENTBOARDMESSAGE.name().equals(right) ||
                 Right.DELETEGROUP.name().equals(right) ||
                 Right.GLOBALMESSAGE.name().equals(right) ||
                 Right.DELETEMEMBER.name().equals(right)) {

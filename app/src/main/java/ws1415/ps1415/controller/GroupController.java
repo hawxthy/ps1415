@@ -541,22 +541,21 @@ public class GroupController {
      * der übergebenen UserGroup zu schicken.
      *
      * @param handler Der Task, der mit dem Server kommuniziert
-     * @param group   Die UserGroup deren Mitglieder benachricht werden sollen
-     * @param message Die Nachricht
+     * @param groupName Der Name der Nutzergruppe
+     * @param globalMessage Die Nachricht, nicht auf message ändern, sonst hat der Task probleme!
      */
-    public void sendGlobalMessage(ExtendedTaskDelegate handler, UserGroup group, String message) {
-        final String messageFinal = message;
-        new ExtendedTask<UserGroup, Void, Void>(handler) {
+    public void sendGlobalMessage(ExtendedTaskDelegate handler, String groupName, final String globalMessage) {
+        new ExtendedTask<String, Void, Void>(handler) {
             @Override
-            protected Void doInBackground(UserGroup... params) {
+            protected Void doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().groupEndpoint().sendGlobalMessage(messageFinal, params[0]).execute();
+                    return ServiceProvider.getService().groupEndpoint().sendGlobalMessage(params[0], globalMessage).execute();
                 } catch (IOException e) {
                     publishError("Fehler: Eine Nachricht an alle Mitglieder konnte nicht versendet werden");
                     return null;
                 }
             }
-        }.execute(group);
+        }.execute(groupName);
     }
 
     /**
