@@ -43,6 +43,7 @@ import ws1415.SkatenightBackend.transport.UserGroupMetaData;
 import ws1415.SkatenightBackend.transport.UserGroupMetaDataList;
 import ws1415.SkatenightBackend.transport.UserGroupNewsBoardTransport;
 import ws1415.SkatenightBackend.transport.UserGroupVisibleMembers;
+import ws1415.SkatenightBackend.transport.UserLocationInfo;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -848,8 +849,10 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * können.
      */
     public void cleanPreviewPictures(){
-        for(String key : getUserGroupPreviewPictures().getBlobKeysValues()){
-            blobstoreService.delete(new BlobKey(key));
+        if(getUserGroupPreviewPictures().getBlobKeysValues() != null){
+            for(String key : getUserGroupPreviewPictures().getBlobKeysValues()){
+                blobstoreService.delete(new BlobKey(key));
+            }
         }
     }
 
@@ -926,7 +929,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
                     .delayWhileIdle(false)
                     .addData("type", MessageType.INVITATION_TO_GROUP_MESSAGE.name())
                     .addData("content", "Sie haben eine Einladung erhalten von " + user.getEmail() + " in die Nutzergruppe " + groupName)
-                    .addData("title", "Einladung")
+                    .addData("title", groupName)
                     .build();
             Sender s = new Sender(Constants.GCM_API_KEY);
             s.send(m, rm.getUserIdByMail(userToInvite), 1);
@@ -936,18 +939,6 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             pm.close();
         }
 
-    }
-
-    /**
-     * Nuzlos
-     *
-     * @param message
-     * @param user
-     * @return
-     */
-    public BooleanWrapper sendMessage(@Named("normalMessage") String message, @Named("userName") String user) {
-        //TODO auf Martin warten
-        return new BooleanWrapper(true);
     }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -24,6 +24,7 @@ import ws1415.ps1415.controller.RightController;
 import ws1415.ps1415.model.NavDrawerGroupList;
 import ws1415.ps1415.model.Right;
 import ws1415.ps1415.util.ImageUtil;
+import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.widget.SlidingTabLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,6 +84,13 @@ public class GroupProfileActivity extends BaseFragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.setContentView(NavDrawerGroupList.items, R.layout.activity_group_profile);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
@@ -167,10 +175,10 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                 if (group.getMemberRights().keySet().contains(ServiceProvider.getEmail())) {
                     checkIsMember = true;
                     mJoinButton.setVisibility(View.GONE);
-                    if(getRights().contains(Right.FULLRIGHTS.name())){
+                    if (getRights().contains(Right.FULLRIGHTS.name())) {
                         mLeaveButton.setVisibility(View.GONE);
                         mDeleteButton.setVisibility(View.VISIBLE);
-                    }else{
+                    } else {
                         if (mLeaveButton.getVisibility() == View.GONE) {
                             mLeaveButton.setVisibility(View.VISIBLE);
                         }
@@ -182,6 +190,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                         mJoinButton.setVisibility(View.VISIBLE);
                     }
                 }
+                checkIfInvitationIntent();
                 if (group.getBlobKey() != null) {
                     GroupImageLoader.getInstance().setGroupImageToImageView(GroupProfileActivity.this, group.getBlobKey().getKeyString(), mGroupPicture);
                 } else {
@@ -1058,6 +1067,14 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                 }
             });
             altertadd.show();
+        }
+    }
+
+    public void checkIfInvitationIntent(){
+        if(getIntent().getStringExtra("") != null){
+            if(group.getPrivat()){
+                GroupController.getInstance()
+            }
         }
     }
 }
