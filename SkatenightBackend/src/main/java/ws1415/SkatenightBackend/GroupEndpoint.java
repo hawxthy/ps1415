@@ -849,8 +849,10 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * können.
      */
     public void cleanPreviewPictures(){
-        for(String key : getUserGroupPreviewPictures().getBlobKeysValues()){
-            blobstoreService.delete(new BlobKey(key));
+        if(getUserGroupPreviewPictures().getBlobKeysValues() != null){
+            for(String key : getUserGroupPreviewPictures().getBlobKeysValues()){
+                blobstoreService.delete(new BlobKey(key));
+            }
         }
     }
 
