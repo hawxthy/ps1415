@@ -73,8 +73,10 @@ public class EventEndpoint extends SkatenightServerEndpoint {
     private boolean hasPrivilege(Event event, String endUser, Privilege privilege) {
         if (event == null || endUser == null || privilege == null
                 || !event.getMemberList().containsKey(endUser)) {
+            log.info("user not participating");
             return false;
         }
+        log.info("role: " + event.getMemberList().get(endUser));
         return event.getMemberList().get(endUser).hasPrivilege(privilege);
     }
 
@@ -106,6 +108,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         }
         if (filter.getUserId() != null) {
             // TODO Die Events abrufen, an denen ein User teilnimmt und prüfen, welche der aufrufende Benutzer davon sehen darf
+            q.filter("memberVisibility." + filter.getUserId() + " !=", null);
         }
         q = q.order("-date");
         QueryResultIterator<Event> iterator = q.iterator();
@@ -213,7 +216,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(id).now();
+        Event event = ofy().load().type(Event.class).id(id).now();
         if (event != null) {
             if (!hasPrivilege(event, user.getEmail(), Privilege.DELETE_EVENT)) {
                 throw new OAuthRequestException("insufficient privileges");

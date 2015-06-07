@@ -44,6 +44,7 @@ public class Event implements BlobKeyContainer, GalleryContainer {
 
     @Load(unless = {EventMetaData.class, EventGalleryData.class})
     private Map<String, EventRole> memberList = new HashMap<>();
+    @Index
     @Load(unless = {EventMetaData.class, EventGalleryData.class})
     private Map<String, EventParticipationVisibility> memberVisibility = new HashMap<>();
     @Load(unless = {EventMetaData.class, EventParticipationData.class, EventGalleryData.class})
