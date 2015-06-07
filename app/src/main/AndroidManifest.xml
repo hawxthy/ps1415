@@ -190,6 +190,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.activity.MyPicturesActivity" />
         </activity>
+        <activity
+            android:name=".activity.ShowPictureActivity" >
+        </activity>
     </application>
 
 </manifest>

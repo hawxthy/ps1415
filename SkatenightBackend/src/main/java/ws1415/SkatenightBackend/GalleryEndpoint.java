@@ -14,20 +14,22 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cmd.Query;
 
-import java.awt.Container;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.GalleryContainer;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.PictureVisibility;
 import ws1415.SkatenightBackend.model.UserGalleryContainer;
+import ws1415.SkatenightBackend.transport.EventFilter;
+import ws1415.SkatenightBackend.transport.EventMetaData;
+import ws1415.SkatenightBackend.transport.EventMetaDataList;
 import ws1415.SkatenightBackend.transport.GalleryMetaData;
 import ws1415.SkatenightBackend.transport.PictureData;
 import ws1415.SkatenightBackend.transport.PictureFilter;
@@ -44,6 +46,31 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
     private Logger log = Logger.getLogger(GalleryEndpoint.class.getName());
 
     private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
+
+    /**
+     * Ruft die Metadaten der Gallerien ab, die im angegebenen Container enthalten sind.
+     * @param user             Der aufrufende Benutzer.
+     * @param containerKind    Der Datastore-Kind des Containers.
+     * @param containerId      Die ID des Containers.
+     * @return Eine Liste der Gallerien, die im Container enthalten sind.
+     */
+    public List<GalleryMetaData> getGalleries(User user, @Named("containerKind") String containerKind,
+                                              @Named("containerId") long containerId)
+            throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        if (containerKind == null || containerKind.isEmpty()) {
+            throw new IllegalArgumentException("no container kind submitted");
+        }
+
+        GalleryContainer container = (GalleryContainer) ofy().load().group(GalleryMetaData.class).kind(containerKind).id(containerId).safe();
+        List<GalleryMetaData> result = new LinkedList<>();
+        for (Gallery gallery : container.getGalleries()) {
+            result.add(new GalleryMetaData(gallery));
+        }
+        return result;
+    }
 
     /**
      * Ruft die Metadaten der Gallery mit der angegebenen ID ab.
@@ -182,6 +209,49 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
+     * Gibt eine Liste der Gallerien zurück, denen der aufrufende Benutzer Bilder hinzufügen kann.
+     * @param user    Der aufrufende Benutzer.
+     * @return Eine Liste der Gallerien, denen der aufrufende Benutzer Bilder hinzufügen kann.
+     */
+    public List<GalleryMetaData> getExpandableGalleries(User user) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        List<GalleryContainer> container = new LinkedList<>();
+        // Gallerien des Benutzers
+        container.add(getGalleryContainerForMail(user, user.getEmail()));
+        // Gallerien von Events, an denen der Benutzer teilnimmt
+        EventFilter filter = new EventFilter();
+        filter.setUserId(user.getEmail());
+        filter.setLimit(50);
+        boolean done;
+        EventEndpoint eventEndpoint = new EventEndpoint();
+        EventMetaDataList eventList;
+        do {
+            eventList = eventEndpoint.listEvents(user, filter);
+            filter.setCursorString(eventList.getCursorString());
+            done = eventList.getList() == null || eventList.getList().isEmpty();
+            if (!done) {
+                List<Long> eventIds = new LinkedList<>();
+                for (EventMetaData emd : eventList.getList()) {
+                    eventIds.add(emd.getId());
+                }
+                container.addAll(ofy().load().group(Event.EventGalleryData.class).type(Event.class).ids(eventIds).values());
+            }
+        } while(!done);
+
+        List<GalleryMetaData> result = new LinkedList<>();
+        for (GalleryContainer c : container) {
+            if (c.getGalleries() != null) {
+                for (Gallery g : c.getGalleries()) {
+                    result.add(new GalleryMetaData(g));
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * Gibt eine Liste von Bild-Metadaten zurück, die anhand der übergebenen ViewOptions ausgewählt
      * werden.
      * Für diese Methode ist explizit angegeben, dass sie die HTTP-Methode POST verwendet, damit der
@@ -221,10 +291,9 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         PictureVisibility minVisibility;
         if (filter.getGalleryId() != null) {
             Gallery gallery = ofy().load().type(Gallery.class).id(filter.getGalleryId()).safe();
-            if (gallery.getContainerClass().equals("User")/* && id == ... */) {
-                // TODO Fall implementieren: Es wird eine Benutzergallery abgerufen
-                // Hier muss wieder geprüft werden, ob der Benutzer, dessen Gallery abgerufen wird,
-                // ein Freund ist
+            if (gallery.getContainerClass().equals(UserGalleryContainer.class.getSimpleName())) {
+                // Der Benutzer ruft eine Benutzergallerie ab. Hier muss für jedes Bild geprüft werden,
+                // in welcher Beziehung der aufrufende Benutzer und der Uploader stehen
                 minVisibility = null;
             } else {
                 // Es wird eine öffentliche Gallery (z.B. von einem Event) abgerufen
@@ -253,9 +322,20 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         int count = 0;
         Picture tmpPicture;
         PictureMetaData tmpMetaData;
+        boolean isVisible;
+        UserEndpoint userEndpoint = new UserEndpoint();
         while (count < filter.getLimit() && iterator.hasNext()) {
             tmpPicture = iterator.next();
-            if (tmpPicture.getVisibility().compareTo(minVisibility) >= 0) {
+
+            if (minVisibility == null) {
+                // Sichtbarkeitseinstellung prüfen, da keine minimale Sichtbarkeit im Voraus bestimmt werden konnte
+                isVisible = tmpPicture.getVisibility() == PictureVisibility.PUBLIC
+                        || tmpPicture.getUploader().equals(user.getEmail())
+                        || (tmpPicture.getVisibility() == PictureVisibility.FRIENDS && userEndpoint.isFriendWith(tmpPicture.getUploader(), user.getEmail()));
+            } else {
+                isVisible = tmpPicture.getVisibility().compareTo(minVisibility) >= 0;
+            }
+            if (isVisible) {
                 tmpMetaData = new PictureMetaData(tmpPicture);
             } else {
                 tmpMetaData = new PictureMetaData();
@@ -339,7 +419,7 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         }
 
         // TODO Sichtbarkeitseinstellungen implementieren
-        return new PictureData(user, ofy().load().type(Picture.class).id(id).safe());
+        return new PictureData(user, ofy().load().group(GalleryMetaData.class).type(Picture.class).id(id).safe());
     }
 
     /**

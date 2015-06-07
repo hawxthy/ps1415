@@ -26,7 +26,6 @@ import ws1415.ps1415.model.EventRole;
 import ws1415.ps1415.model.Role;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.controller.EventController;
 
 /**
  * Testet die Methoden des EventController.

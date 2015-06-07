@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import ws1415.SkatenightBackend.transport.PictureMetaData;
+import ws1415.SkatenightBackend.model.PictureVisibility;
 
 /**
  * Speichert die kompletten Bilddaten inklusive Metadaten, Kommentaren und Bewertungen.
@@ -38,7 +39,7 @@ public class Picture implements BlobKeyContainer {
     @Index
     @Load(unless = {PictureMetaData.class})
     private List<Ref<Gallery>> galleries = new LinkedList<>();
-    // TODO Comments einbinden
+    // TODO R: Comments einbinden
 
     /**
      * Speichert die Upload-URL für den Upload in den Blobstore. Dient nur der Übertragung an die App

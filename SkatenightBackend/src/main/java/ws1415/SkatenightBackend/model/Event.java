@@ -17,8 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import ws1415.SkatenightBackend.RoleEndpoint;
-import ws1415.SkatenightBackend.UserEndpoint;
 import ws1415.SkatenightBackend.transport.EventMetaData;
 import ws1415.SkatenightBackend.transport.EventParticipationData;
 
@@ -28,6 +26,8 @@ import ws1415.SkatenightBackend.transport.EventParticipationData;
  */
 @Entity
 public class Event implements BlobKeyContainer, GalleryContainer {
+    public final class EventGalleryData { }
+
     @Id
     private Long id;
     private BlobKey icon;
@@ -42,13 +42,13 @@ public class Event implements BlobKeyContainer, GalleryContainer {
     private String meetingPlace;
     private int fee;
 
-    @Load(unless = {EventMetaData.class})
+    @Load(unless = {EventMetaData.class, EventGalleryData.class})
     private Map<String, EventRole> memberList = new HashMap<>();
-    @Load(unless = {EventMetaData.class})
+    @Load(unless = {EventMetaData.class, EventGalleryData.class})
     private Map<String, EventParticipationVisibility> memberVisibility = new HashMap<>();
-    @Load(unless = {EventMetaData.class, EventParticipationData.class})
+    @Load(unless = {EventMetaData.class, EventParticipationData.class, EventGalleryData.class})
     private List<BlobKey> images = new LinkedList<>();
-    @Load(unless = {EventMetaData.class, EventParticipationData.class})
+    @Load(unless = {EventMetaData.class, EventParticipationData.class, EventGalleryData.class})
     @Index
     private Ref<Route> route;
     @Load(unless = {EventMetaData.class, EventParticipationData.class})

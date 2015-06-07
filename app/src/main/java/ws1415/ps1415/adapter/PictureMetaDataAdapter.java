@@ -1,6 +1,7 @@
 package ws1415.ps1415.adapter;
 
 import android.content.Context;
+import android.graphics.Picture;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.skatenight.skatenightAPI.model.EventMetaData;
+import com.skatenight.skatenightAPI.model.PictureData;
 import com.skatenight.skatenightAPI.model.PictureFilter;
 import com.skatenight.skatenightAPI.model.PictureMetaData;
 
@@ -120,21 +122,29 @@ public class PictureMetaDataAdapter extends BaseAdapter {
                 view = View.inflate(parent.getContext(), R.layout.listitem_picture_meta_data, null);
             }
 
-
+            // TODO R: Nicht sichtbare BIlder richtig anzeigen
             ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
             TextView title = (TextView) view.findViewById(R.id.title);
             RatingBar rating = (RatingBar) view.findViewById(R.id.rating);
             TextView date = (TextView) view.findViewById(R.id.date);
-
-            DiskCacheImageLoader.getInstance().loadScaledImage(thumbnail, picture.getImageBlobKey(), 200);
-            title.setText(picture.getTitle());
-            if (picture.getAvgRating() != null) {
-                rating.setRating(picture.getAvgRating().floatValue());
+            if (picture.getId() >= 0) {
+                // TODO R: Breite der View nicht fest vorgeben (200)
+                DiskCacheImageLoader.getInstance().loadScaledImage(thumbnail, picture.getImageBlobKey(), 200);
+                title.setText(picture.getTitle());
+                if (picture.getAvgRating() != null) {
+                    rating.setRating(picture.getAvgRating().floatValue());
+                } else {
+                    rating.setRating(0);
+                }
+                Date dateValue = new Date(picture.getDate().getValue());
+                date.setText(DateFormat.getMediumDateFormat(context).format(dateValue) + " " + DateFormat.getTimeFormat(context).format(dateValue));
             } else {
+                // TODO R: Standardbild für nicht sichtbare Bilder angeben
+                thumbnail.setImageBitmap(null);
+                title.setText(parent.getContext().getResources().getString(R.string.picture_not_visible));
                 rating.setRating(0);
+                date.setText(null);
             }
-            Date dateValue = new Date(picture.getDate().getValue());
-            date.setText(DateFormat.getMediumDateFormat(context).format(dateValue) + " " + DateFormat.getTimeFormat(context).format(dateValue));
         }
 
         if (pictures.size() - position < fetchDistance) {
@@ -222,5 +232,24 @@ public class PictureMetaDataAdapter extends BaseAdapter {
      */
     public void removePicture(PictureMetaData picture) {
         pictures.remove(picture);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Lädt das Bild an der angegebenen Position neu herunter.
+     * @param position    Die Position des Bildes, das neu geladen wird.
+     */
+    public void reloadPicture(int position) {
+        final PictureMetaData picture = getPictureMetaData(position);
+        GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, PictureData pictureData) {
+                picture.setTitle(pictureData.getTitle());
+                picture.setDate(pictureData.getDate());
+                picture.setAvgRating(pictureData.getAvgRating());
+                picture.setVisibility(pictureData.getVisibility());
+                PictureMetaDataAdapter.this.notifyDataSetChanged();
+            }
+        }, picture.getId());
     }
 }

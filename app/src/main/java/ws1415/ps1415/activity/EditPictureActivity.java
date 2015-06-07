@@ -32,10 +32,12 @@ import ws1415.ps1415.util.ImageUtil;
 
 public class EditPictureActivity extends Activity {
     public static final String EXTRA_PICTURE_ID = EditPictureActivity.class.getName() + ".PictureId";
+    public static final String EXTRA_POSITION = EditPictureActivity.class.getName() + ".Position";
 
     private static final int CHOOSE_PICTURE_REQUEST_CODE = 1;
 
     private Long pictureId;
+    private int position;
 
     private ImageView picture;
     private TextView title;
@@ -94,6 +96,7 @@ public class EditPictureActivity extends Activity {
                 }
             }, pictureId);
         }
+        position = getIntent().getIntExtra(EXTRA_POSITION, -1);
     }
 
     @Override
@@ -168,6 +171,7 @@ public class EditPictureActivity extends Activity {
             GalleryController.editPicture(new ExtendedTaskDelegateAdapter<Void, Void>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                    setResult(0, new Intent().putExtra("position", position));
                     finishLoading();
                     finish();
                 }

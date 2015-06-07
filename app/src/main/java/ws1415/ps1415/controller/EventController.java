@@ -1,7 +1,5 @@
 package ws1415.ps1415.controller;
 
-import android.app.Service;
-
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventData;
@@ -28,7 +26,6 @@ import ws1415.ps1415.model.EventParticipationVisibility;
 import ws1415.ps1415.model.EventRole;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
-import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 
 /**
  * Stellt Funktionen zur Verarbeitung von Events bereit.

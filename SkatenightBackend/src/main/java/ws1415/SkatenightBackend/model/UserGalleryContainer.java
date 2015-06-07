@@ -2,10 +2,12 @@ package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonIgnore;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.annotation.Load;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,8 +33,10 @@ import ws1415.SkatenightBackend.RoleEndpoint;
  */
 @Entity
 public class UserGalleryContainer implements GalleryContainer {
+
     @Id
     private Long id;
+    @JsonIgnore
     private List<Ref<Gallery>> galleries = new LinkedList<>();
     @Index
     private String user;

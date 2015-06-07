@@ -171,6 +171,9 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         event.setImagesUploadUrl(blobstoreService.createUploadUrl("/images/upload"));
         ofy().save().entity(event).now();
 
+        // Event in der Liste des Benutzers eintragen
+        new UserEndpoint().addEventToUser(user.getEmail(), event);
+
         // TODO GCM-Nachricht an Geräte schicken, damit Event-Liste aktualisiert wird
 
         return event;

@@ -26,7 +26,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.skatenight.skatenightAPI.model.EventData;
-import com.skatenight.skatenightAPI.model.Member;
 import com.skatenight.skatenightAPI.model.UserLocationInfo;
 
 import java.text.ParseException;
@@ -303,28 +302,28 @@ public class OldShowRouteActivity extends Activity {
      * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte.
      * @param m Das neue Event-Objekt.
      */
-    public void drawMembers(Member m) {
-        if (m != null) {
-            // googleMap.clear();
-
-            LatLng pos = new LatLng(m.getLatitude(), m.getLongitude());
-
-            // Markerfarbe
-            float markerColor;
-            markerColor = BitmapDescriptorFactory.HUE_YELLOW;
-
-            // Fügt den aktuellen Membermarker auf die Karte ein
-            googleMap.addMarker(new MarkerOptions()
-                    .position(pos)
-                    .title("Skater " + m.getName())
-                    .snippet("" + m.getUpdatedAt())
-                    .icon(BitmapDescriptorFactory
-                            .defaultMarker(markerColor)));
-
-        } else {
-            location = null;
-        }
-    }
+//    public void drawMembers(Member m) {
+//        if (m != null) {
+//            // googleMap.clear();
+//
+//            LatLng pos = new LatLng(m.getLatitude(), m.getLongitude());
+//
+//            // Markerfarbe
+//            float markerColor;
+//            markerColor = BitmapDescriptorFactory.HUE_YELLOW;
+//
+//            // Fügt den aktuellen Membermarker auf die Karte ein
+//            googleMap.addMarker(new MarkerOptions()
+//                    .position(pos)
+//                    .title("Skater " + m.getName())
+//                    .snippet("" + m.getUpdatedAt())
+//                    .icon(BitmapDescriptorFactory
+//                            .defaultMarker(markerColor)));
+//
+//        } else {
+//            location = null;
+//        }
+//    }
 
     private void createRouteHighlight(int[] visited, long[] timestamps) {
         routeTrack.clear();

@@ -69,12 +69,12 @@ public class PictureListFragment extends Fragment implements AdapterView.OnItemC
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        mListener.onPictureClick(adapter.getPictureMetaData(position));
+        mListener.onPictureClick(adapter.getPictureMetaData(position), position);
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        return mListener.onPictureLongClick(adapter.getPictureMetaData(position));
+        return mListener.onPictureLongClick(adapter.getPictureMetaData(position), position);
     }
 
     /**
@@ -82,8 +82,8 @@ public class PictureListFragment extends Fragment implements AdapterView.OnItemC
      * Es definiert Callback-Methoden für Klicks auf die angezeigten Bilder.
      */
     public interface OnPictureClickListener {
-        void onPictureClick(PictureMetaData picture);
-        boolean onPictureLongClick(PictureMetaData picture);
+        void onPictureClick(PictureMetaData picture, int position);
+        boolean onPictureLongClick(PictureMetaData picture, int position);
     }
 
 }

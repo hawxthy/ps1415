@@ -318,11 +318,30 @@
 
     <!-- PictureMetaDataAdapter -->
     <string name="picture_adapter_fetch_error">Es konnten keine weiteren Bilder abgerufen werden</string>
+    <string name="picture_not_visible">Bild nicht sichtbar</string>
 
     <!-- MyPicturesActivity -->
     <string name="title_activity_my_pictures">Meine Bilder</string>
     <string name="action_upload_picture">Bild hochladen</string>
     <string name="action_refresh_pictures">Aktualisieren</string>
+    <string name="create_gallery">Galerie erstellen</string>
+    <string name="enter_gallery_title">Geben Sie einen Titel für die Galerie ein…</string>
+    <string name="no_title_submitted">Es muss ein Titel angegeben werden</string>
+    <string name="error_creating_gallery">Beim Erstellen der Galerie ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="delete_gallery">Galerie löschen?</string>
+    <string name="delete_gallery_message">Wollen Sie die Galerie wirklich löschen? Die enthaltenen Bilder werden dabei nicht gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.</string>
+    <string name="error_deleting_gallery">Beim Löschen der Galerie ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string-array name="picture_actions">
+        <item>Anzeigen</item>
+        <item>Bearbeiten</item>
+        <item>Löschen</item>
+    </string-array>
+    <string name="action_remove_from_gallery">Aus der Galerie entfernen</string>
+    <string name="delete_picture">Bild löschen?</string>
+    <string name="delete_picture_message">Wollen Sie das Bild wirklich löschen? Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="remove_from_gallery">Aus Galerie entfernen?</string>
+    <string name="remove_from_gallery_message">Möchten Sie das Bild wirklich aus der Galerie entfernen? Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="error_removing_from_gallery">Beim Entfernen aus der Galerie ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
 
     <!-- EditPictureActivity -->
     <string name="upload_picture">Bild hochladen</string>
@@ -343,11 +362,19 @@
     <string name="error_uploading_picture">Beim Hochladen des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
     <string name="error_editing_picture">Beim Bearbeiten des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
     <string name="picture_can_not_be_changed">Das Bild kann nicht geändert werden, nachdem es hochgeladen wurde.</string>
-    <string-array name="picture_actions">
-        <item>Anzeigen</item>
-        <item>Bearbeiten</item>
-        <item>Löschen</item>
-    </string-array>
-    <string name="delete_picture">Bild löschen?</string>
-    <string name="delete_picture_message">Wollen Sie das Bild wirklich löschen? Dies kann nicht rückgängig gemacht werden.</string>
+
+    <!-- PictureFragment -->
+    <string name="comments_label">Kommentare</string>
+    <string name="error_loading_picture">Beim Laden des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="rating_saved">Bewertung gespeichert</string>
+    <string name="error_rating_picture">Beim Bewerten des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="adding_to_gallery_finished">Zur Galerie hinzugefügt</string>
+    <string name="error_adding_to_gallery">Beim Hinzufügen des Bildes zur Galerie ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+
+    <!-- GalleryAdapter -->
+    <string name="galleries_empty_item_title">Alle Bilder</string>
+    <string name="error_loading_galleries">Beim Laden der Galerien ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+
+    <!-- ShowPictureActivity -->
+    <string name="action_add_to_gallery">Zu Galerie hinzufügen</string>
 </resources>

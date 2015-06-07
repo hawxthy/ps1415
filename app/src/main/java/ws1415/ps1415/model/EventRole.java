@@ -1,14 +1,36 @@
 package ws1415.ps1415.model;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
- * Speichert eine Liste der möglichen Rollen, die bei einem Event angenommen werden können. Dies ist
- * ein Duplikat der Enum die auf dem Server existiert, ohne die enthaltenen Privilegien. Dieses
- * Duplikat dient lediglich der zentralen Definition der Rollen innerhalb des app-Moduls.
+ * Enthält die möglichen Event-Rollen, die von Teilnehmern eines Events angenommen werden können.
  * @author Richard Schulze
  */
 public enum EventRole {
-    HOST,
-    MEDIC,
-    MARSHALL,
-    PARTICIPANT
+    HOST(Arrays.asList(
+            Privilege.ASSIGN_ROLE,
+            Privilege.EDIT_EVENT,
+            Privilege.DELETE_EVENT,
+            Privilege.ADD_GALLERY,
+            Privilege.EDIT_GALLERY,
+            Privilege.REMOVE_GALLERY,
+            Privilege.REMOVE_PICTURES
+    )),
+    MEDIC(null),
+    MARSHALL(null),
+    PARTICIPANT(null);
+
+    private List<Privilege> privileges;
+
+    EventRole(List<Privilege> privileges) {
+        this.privileges = privileges;
+    }
+
+    public boolean hasPrivilege(Privilege p) {
+        if (privileges == null) {
+            return false;
+        }
+        return privileges.contains(p);
+    }
 }

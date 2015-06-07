@@ -28,7 +28,6 @@ import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.PictureVisibility;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.controller.GalleryController;
 
 /**
  * Testet die Methoden des Gallery-Controllers.

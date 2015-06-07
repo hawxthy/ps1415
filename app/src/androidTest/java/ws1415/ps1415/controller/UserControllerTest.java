@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.google.android.gms.games.internal.constants.EventVisibility;
 import com.google.api.client.util.DateTime;
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.EndUser;
@@ -36,7 +35,6 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.EventParticipationVisibility;
 import ws1415.ps1415.model.Gender;
-import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.model.Visibility;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;

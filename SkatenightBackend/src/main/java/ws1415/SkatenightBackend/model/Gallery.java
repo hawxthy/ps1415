@@ -3,6 +3,7 @@ package ws1415.SkatenightBackend.model;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 
 import java.util.LinkedList;
@@ -23,7 +24,9 @@ public class Gallery {
     private List<Ref<Picture>> pictures = new LinkedList<>();
 
     // Referenz auf den Container, in dem die Gallery gespeichert ist
+    @Index
     private String containerClass;
+    @Index
     private long containerId;
 
     public Long getId() {

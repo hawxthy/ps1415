@@ -17,7 +17,6 @@ import android.widget.ListView;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.model.Event;
-import com.skatenight.skatenightAPI.model.Member;
 
 
 import ws1415.ps1415.Constants;

@@ -325,11 +325,30 @@
 
     <!-- PictureMetaDataAdapter -->
     <string name="picture_adapter_fetch_error">No additional pictures could be fetched</string>
+    <string name="picture_not_visible">Picture not visible</string>
 
     <!-- MyPicturesActivity -->
     <string name="title_activity_my_pictures">My Pictures</string>
     <string name="action_upload_picture">Upload Picture</string>
     <string name="action_refresh_pictures">Refresh</string>
+    <string name="create_gallery">Create Gallery</string>
+    <string name="enter_gallery_title">Enter a title for the gallery…</string>
+    <string name="no_title_submitted">Title has to be specified</string>
+    <string name="error_creating_gallery">An error occurred while creating the gallery. Please try again.</string>
+    <string name="delete_gallery">Delete Gallery?</string>
+    <string name="delete_gallery_message">Do you really want to delete the gallery. The contained pictures will not be deleted. This can not be undone.</string>
+    <string name="error_deleting_gallery">An error occurred while deleting the gallery. Please try again.</string>
+    <string-array name="picture_actions">
+        <item>Show</item>
+        <item>Edit</item>
+        <item>Delete</item>
+    </string-array>
+    <string name="action_remove_from_gallery">Remove from Gallery</string>
+    <string name="delete_picture">Delete picture?</string>
+    <string name="delete_picture_message">Do you really want to delete this picture? This can not be undone.</string>
+    <string name="remove_from_gallery">Remove from gallery?</string>
+    <string name="remove_from_gallery_message">Do you really want to remove the picture from this gallery? This can not be undone.</string>
+    <string name="error_removing_from_gallery">An error occurred while removing the picture from the gallery. Please try again.</string>
 
     <!-- EditPictureActivity -->
     <string name="upload_picture">Upload picture</string>
@@ -350,11 +369,19 @@
     <string name="error_uploading_picture">An error occurred while uploading the picture. Please try again.</string>
     <string name="error_editing_picture">An error occurred while editing the picture. Please try again.</string>
     <string name="picture_can_not_be_changed">The picture can not be changed after it has been uploaded.</string>
-    <string-array name="picture_actions">
-        <item>Show</item>
-        <item>Edit</item>
-        <item>Delete</item>
-    </string-array>
-    <string name="delete_picture">Delete picture?</string>
-    <string name="delete_picture_message">Do you really want to delete this picture? This can not be undone.</string>
+
+    <!-- PictureFragment -->
+    <string name="comments_label">Comments</string>
+    <string name="error_loading_picture">An error occurred while loading the picture. Please try again.</string>
+    <string name="rating_saved">Rating saved</string>
+    <string name="error_rating_picture">An error occurred while rating the picture. Please try again.</string>
+    <string name="adding_to_gallery_finished">Added to gallery</string>
+    <string name="error_adding_to_gallery">An error occurred while adding the picture to the gallery. Please try again.</string>
+
+    <!-- GalleryAdapter -->
+    <string name="galleries_empty_item_title">All Pictures</string>
+    <string name="error_loading_galleries">An error occurred while loading the galleries. Please try again.</string>
+
+    <!-- ShowPictureActivity -->
+    <string name="action_add_to_gallery">Add to Gallery</string>
 </resources>

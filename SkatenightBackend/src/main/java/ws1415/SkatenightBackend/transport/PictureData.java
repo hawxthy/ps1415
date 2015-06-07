@@ -1,13 +1,10 @@
 package ws1415.SkatenightBackend.transport;
 
 import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.users.User;
-import com.googlecode.objectify.annotation.Index;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.Picture;
@@ -27,7 +24,6 @@ public class PictureData {
     private Double avgRating;
     private BlobKey imageBlobKey;
     private PictureVisibility visibility;
-    private List<Gallery> galleries;
 
     public PictureData(User user, Picture picture) {
         id = picture.getId();
@@ -41,7 +37,6 @@ public class PictureData {
         avgRating = picture.getAvgRating();
         imageBlobKey = picture.getImageBlobKey();
         this.visibility = picture.getVisibility();
-        galleries = picture.getGalleries();
     }
 
     public Long getId() {
@@ -114,13 +109,5 @@ public class PictureData {
 
     public void setVisibility(PictureVisibility visibility) {
         this.visibility = visibility;
-    }
-
-    public List<Gallery> getGalleries() {
-        return galleries;
-    }
-
-    public void setGalleries(List<Gallery> galleries) {
-        this.galleries = galleries;
     }
 }
