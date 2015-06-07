@@ -98,8 +98,9 @@
     <string name="title_activity_blobstore_test">ImageStorageTestActivity</string>
 
     <!--Strings zu RegisterActivity-->
-    <string name="first_name_hint">Vorname</string>
-    <string name="last_name_hint">Nachname</string>
+    <string name="title_activity_register">Registration</string>
+    <string name="first_name_hint">First Name</string>
+    <string name="last_name_hint">Last Name</string>
     <string name="register">Register</string>
     <string name="profile_picture">Profile Picture</string>
     <string-array name="image_selection">
@@ -204,6 +205,7 @@
         <item quantity="other">%1$d friends selected</item>
     </plurals>
     <string name="action_refresh_friends">Refresh</string>
+    <string name="friends_hint">Through the profiles of users you can add new friends</string>
 
     <!-- MessagingActivity -->
     <string name="title_activity_messaging">Messaging</string>
@@ -215,16 +217,20 @@
     </string-array>
     <string name="sure_delete_conversation_dialog">Are you sure you want to delete this conversation?</string>
     <string name="conversation_deleted">Conversation deleted</string>
-    <string name="error_delete_conversation">Error while deleting</string>
+    <string name="error_delete">Error while deleting</string>
     <string name="error_update">Update Error</string>
     <string name="profile_updated">Updated Profile Data</string>
     <string name="yesterday">Yesterday</string>
+    <string name="messaging_hint">Through the profiles of users you can create new conversations</string>
+    <string name="search_for_users">Search for users</string>
 
     <!-- ConversationActivity -->
     <string name="title_activity_conversation">Conversation</string>
     <string name="input_required">Input required</string>
     <string name="input_message">Enter your message</string>
-    <string name="message_could_not_be_sent">Message couldn\'t be delivered</string>
+    <string name="message_could_not_be_sent">User does not have a registered device</string>
+    <string name="sure_delete_message_dialog">Are you sure you want to delete the selected message?</string>
+    <string name="message_deleted">Message deleted</string>
 
     <!-- EventAdapter -->
     <string name="event_adapter_fetch_error">No additional events could be fetched</string>
@@ -233,6 +239,20 @@
     <string name="meeting_place_label">Meeting place:</string>
     <string name="fee_label">Fee:</string>
     <string name="event_loading_error">Error loading event</string>
+    <string name="show_route">Show route…</string>
+    <string name="join_event">Participate</string>
+    <string name="leave_event">Leave</string>
+    <string name="error_leaving_event">An error occurred while leaving the event. Please try again.</string>
+    <string name="error_joining_event">An error occurred while joining the event. Please try again.</string>
+    <string name="choose_participation_visibility">Choose participation visibility…</string>
+    <string-array name="event_participation_visibilities">
+        <item>Private (only visible for hosts and admins)</item>
+        <item>Friends (also visible for friends)</item>
+        <item>Public (visible for all users)</item>
+    </string-array>
+    <string name="error_participation_needed">You have to participate in this event to change settings for it.</string>
+    <string name="error_changing_visibility">An error occurred while changing the visibility. Please try again.</string>
+    <string name="participants">Participants</string>
 
     <!-- UploadImageActivity -->
     <string name="title_activity_upload_image">UploadImageActivity</string>
@@ -320,6 +340,80 @@
 
     <!-- GroupMembersFragment-->
     <string name="title_fragment_group_members">Member</string>
+
+    <!-- EventParticipantsActivity -->
+    <string name="title_activity_event_participants">Event participants</string>
+    <string-array name="event_roles">
+        <item>Host</item>
+        <item>Medic</item>
+        <item>Marshall</item>
+        <item>Participant</item>
+    </string-array>
+
+    <!-- PictureListFragment -->
+    <string name="no_visible_pictures">No visible pictures found.</string>
+
+    <!-- PictureMetaDataAdapter -->
+    <string name="picture_adapter_fetch_error">No additional pictures could be fetched</string>
+    <string name="picture_not_visible">Picture not visible</string>
+
+    <!-- MyPicturesActivity -->
+    <string name="title_activity_my_pictures">My Pictures</string>
+    <string name="action_upload_picture">Upload Picture</string>
+    <string name="action_refresh_pictures">Refresh</string>
+    <string name="create_gallery">Create Gallery</string>
+    <string name="enter_gallery_title">Enter a title for the gallery…</string>
+    <string name="no_title_submitted">Title has to be specified</string>
+    <string name="error_creating_gallery">An error occurred while creating the gallery. Please try again.</string>
+    <string name="delete_gallery">Delete Gallery?</string>
+    <string name="delete_gallery_message">Do you really want to delete the gallery. The contained pictures will not be deleted. This can not be undone.</string>
+    <string name="error_deleting_gallery">An error occurred while deleting the gallery. Please try again.</string>
+    <string-array name="picture_actions">
+        <item>Show</item>
+        <item>Edit</item>
+        <item>Delete</item>
+    </string-array>
+    <string name="action_remove_from_gallery">Remove from Gallery</string>
+    <string name="delete_picture">Delete picture?</string>
+    <string name="delete_picture_message">Do you really want to delete this picture? This can not be undone.</string>
+    <string name="remove_from_gallery">Remove from gallery?</string>
+    <string name="remove_from_gallery_message">Do you really want to remove the picture from this gallery? This can not be undone.</string>
+    <string name="error_removing_from_gallery">An error occurred while removing the picture from the gallery. Please try again.</string>
+
+    <!-- EditPictureActivity -->
+    <string name="upload_picture">Upload picture</string>
+    <string name="edit_picture">Edit picture</string>
+    <string name="title_hint">Please enter a title…</string>
+    <string name="description_hint">Please enter a description…</string>
+    <string name="visibility_label">Visibility</string>
+    <string-array name="picture_visibilities">
+        <item>Private</item>
+        <item>Friends</item>
+        <item>Public</item>
+    </string-array>
+    <string-array name="picture_visibility_hints">
+        <item>Picture will be only visible for you.</item>
+        <item>Picture will be visible for you and your friends.</item>
+        <item>Picture will be visible for everybody.</item>
+    </string-array>
+    <string name="error_uploading_picture">An error occurred while uploading the picture. Please try again.</string>
+    <string name="error_editing_picture">An error occurred while editing the picture. Please try again.</string>
+    <string name="picture_can_not_be_changed">The picture can not be changed after it has been uploaded.</string>
+
+    <!-- PictureFragment -->
+    <string name="comments_label">Comments</string>
+    <string name="error_loading_picture">An error occurred while loading the picture. Please try again.</string>
+    <string name="rating_saved">Rating saved</string>
+    <string name="error_rating_picture">An error occurred while rating the picture. Please try again.</string>
+    <string name="adding_to_gallery_finished">Added to gallery</string>
+    <string name="error_adding_to_gallery">An error occurred while adding the picture to the gallery. Please try again.</string>
+
+    <!-- GalleryAdapter -->
+    <string name="galleries_empty_item_title">All Pictures</string>
+    <string name="error_loading_galleries">An error occurred while loading the galleries. Please try again.</string>
+
+    <!-- ShowPictureActivity -->
+    <string name="action_add_to_gallery">Add to Gallery</string>
 
     <!-- Group Functions -->
     <string name="groupFunctions">Group Functions</string>

@@ -3,6 +3,8 @@ package ws1415.SkatenightBackend.model;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
+import java.util.List;
+
 /**
  * Interface für Klassen, die eine Menge von Gallerien verwalten können.
  * @author Richard Schulze
@@ -21,6 +23,12 @@ public interface GalleryContainer {
      * @param gallery    Die zu entfernende Gallery.
      */
     void removeGallery(User user, Gallery gallery) throws OAuthRequestException;
+
+    /**
+     * Gibt eine Liste der Galleries zurück, die in diesem Container enthalten sind.
+     * @return Eine Liste der enthaltenen Galleries.
+     */
+    List<Gallery> getGalleries();
 
     /**
      * Prüft, ob der angegebene Benutzer diesem Container einer Gallery hinzufügen kann.

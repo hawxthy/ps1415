@@ -11,14 +11,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.format.DateFormat;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -46,22 +49,26 @@ import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.DiskCacheImageLoader;
+import ws1415.ps1415.util.ImageUtil;
 import ws1415.ps1415.util.UniversalUtil;
 
 public class EditEventActivity extends Activity implements ExtendedTaskDelegate<Void,EventData> {
     public static final String EXTRA_EVENT_ID = ShowEventActivity.class.getName() + ".EventId";
     private static final int SELECT_HEADER_IMAGE_REQUEST_CODE = 1;
+    private static final int SELECT_ICON_IMAGE_REQUEST_CODE = 2;
+    private static final int SELECT_IMAGES_REQUEST_CODE = 3;
     /**
      * Enthält die ID des Events, das über diese Activity bearbeitet wird. null, falls ein neues
      * Event erstellt wird.
      */
     private Long eventId;
     private Calendar eventDate = Calendar.getInstance();
-    private File headerImageFile;
     private File iconFile;
-    private List<File> imageFiles;
+    private File headerImageFile;
+    private List<File> imageFiles = new LinkedList<>();
     private Route selectedRoute;
 
+    private ImageView icon;
     private ImageView headerImage;
     private EditText title;
     private TextView date;
@@ -70,8 +77,9 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
     // TODO Textfeld für Gebühr anpassen, damit Cent in € angezeigt und bei Eingabe konvertiert werden
     private EditText fee;
     private Button route;
-
     private DynamicFieldsAdapter dynamicFieldsAdapter;
+    private LinearLayout images;
+    private HorizontalScrollView imagesScroller;
 
     // TODO Schalter aktualisieren, wenn Treffpunkt oder Gebühr geändert wird
     private boolean edited = false;
@@ -107,6 +115,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
         });
 
         setContentView(R.layout.activity_edit_event);
+        icon = (ImageView) findViewById(R.id.icon);
         headerImage = (ImageView) findViewById(R.id.headerImage);
         title = (EditText) findViewById(R.id.title);
         date = (TextView) findViewById(R.id.date);
@@ -114,6 +123,8 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
         meetingPlace = (EditText) findViewById(R.id.meeting_place);
         fee = (EditText) findViewById(R.id.fee);
         route = (Button) findViewById(R.id.route);
+        imagesScroller = (HorizontalScrollView) findViewById(R.id.imagesScroller);
+        images = (LinearLayout) findViewById(R.id.images);
 
         if (getIntent().hasExtra(EXTRA_EVENT_ID)) {
             eventId = getIntent().getLongExtra(EXTRA_EVENT_ID, -1);
@@ -158,6 +169,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
 
     @Override
     public void onBackPressed() {
+        // TODO R: Wird nicht aufgerufen, wenn man in der ActionBar auf "zurück" klickt
         if (edited) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.save_event)
@@ -220,30 +232,43 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
     // -------------------- Callback-Methoden für das Abrufen eines Events --------------------
     @Override
     public void taskDidFinish(ExtendedTask task, EventData eventData) {
+        if (eventData.getIcon() != null) {
+            DiskCacheImageLoader.getInstance().loadImage(icon, eventData.getIcon());
+        }
         if (eventData.getHeaderImage() != null) {
             DiskCacheImageLoader.getInstance().loadImage(headerImage, eventData.getHeaderImage());
             headerImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }
 
-        title.setText(eventData.getTitle());
+        if (task == null) {
+            // Falls es sich um Template-Daten handelt, dann nur den Hint der Textfelder setzen
+            title.setHint(eventData.getTitle());
+            description.setHint(eventData.getDescription());
+            meetingPlace.setHint(eventData.getMeetingPlace());
+            fee.setHint(Integer.toString(eventData.getFee()));
+        } else {
+            title.setText(eventData.getTitle());
+            description.setText(eventData.getDescription());
+            meetingPlace.setText(eventData.getMeetingPlace());
+            fee.setText(Integer.toString(eventData.getFee()));
+        }
         eventDate.setTime(new Date(eventData.getDate().getValue()));
         date.setText(DateFormat.getMediumDateFormat(this).format(eventDate.getTime())
                 + " " + DateFormat.getTimeFormat(this).format(eventDate.getTime()));
-        description.setText(eventData.getDescription());
-        meetingPlace.setText(eventData.getMeetingPlace());
-        fee.setText(Integer.toString(eventData.getFee()));
 
-        dynamicFieldsAdapter = new DynamicFieldsAdapter(eventData.getDynamicFields());
+        dynamicFieldsAdapter = new DynamicFieldsAdapter(eventData.getDynamicFields(), true);
         ListView dynamicFields = (ListView) findViewById(R.id.dynamicFields);
         dynamicFields.setAdapter(dynamicFieldsAdapter);
 
-        HorizontalScrollView images = (HorizontalScrollView) findViewById(R.id.images);
         if (eventData.getImages() != null) {
             ImageView imgView;
             for (BlobKey key : eventData.getImages()) {
                 imgView = new ImageView(this);
-                imgView.setAdjustViewBounds(true);
-                DiskCacheImageLoader.getInstance().loadImage(imgView, key);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.gravity = Gravity.CENTER_VERTICAL;
+                imgView.setLayoutParams(params);
+                imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                DiskCacheImageLoader.getInstance().loadScaledImage(imgView, key, imagesScroller.getWidth() - 20);
                 images.addView(imgView);
             }
         }
@@ -260,7 +285,14 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
         findViewById(R.id.eventLoading).setVisibility(View.GONE);
     }
     // -------------------- Callback-Methoden für das Abrufen eines Events --------------------
-    
+
+    public void onIconImageClick(View view) {
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.choose_picture)), SELECT_ICON_IMAGE_REQUEST_CODE);
+    }
+
     public void onHeaderImageClick(View view) {
         Intent intent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -272,24 +304,45 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        Uri selectedImageUri = null;
+        String tempPath = null;
+        if (requestCode >= 1 && requestCode <= 3 && data != null) {
+            // Falls Bilder abgerufen werden, dann Pfad des gewählten Bildes auslesen
+            selectedImageUri = data.getData();
+            String[] projection = {MediaStore.MediaColumns.DATA};
+            CursorLoader cl = new CursorLoader(this);
+            cl.setUri(selectedImageUri);
+            cl.setProjection(projection);
+            Cursor cursor = cl.loadInBackground();
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            cursor.moveToFirst();
+            tempPath = cursor.getString(column_index);
+            cursor.close();
+        }
+
         switch (requestCode) {
             case SELECT_HEADER_IMAGE_REQUEST_CODE:
-                if (data != null) {
-                    // TODO: Abrufen von Bildern verstehen
-                    Uri selectedImageUri = data.getData();
-                    String[] projection = {MediaStore.MediaColumns.DATA};
-                    CursorLoader cl = new CursorLoader(this);
-                    cl.setUri(selectedImageUri);
-                    cl.setProjection(projection);
-                    Cursor cursor = cl.loadInBackground();
-                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                    cursor.moveToFirst();
-                    final String tempPath = cursor.getString(column_index);
-                    cursor.close();
-
+                if (tempPath != null && selectedImageUri != null) {
                     headerImageFile = new File(tempPath);
-                    headerImage.setImageURI(selectedImageUri);
-                    headerImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    ImageUtil.loadSubsampledImageInView(headerImageFile, headerImage, headerImage.getWidth());
+                    edited = true;
+                }
+                break;
+            case SELECT_ICON_IMAGE_REQUEST_CODE:
+                if (tempPath != null && selectedImageUri != null) {
+                    iconFile = new File(tempPath);
+                    icon.setImageURI(selectedImageUri);
+                    edited = true;
+                }
+                break;
+            case SELECT_IMAGES_REQUEST_CODE:
+                if (tempPath != null && selectedImageUri != null) {
+                    File f = new File(tempPath);
+                    imageFiles.add(f);
+                    ImageView v = new ImageView(this);
+                    v.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    ImageUtil.loadSubsampledImageInView(f, v, imagesScroller.getWidth() - 20);
+                    images.addView(v);
                     edited = true;
                 }
                 break;
@@ -340,5 +393,17 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
                     }
                 });
         builder.create().show();
+    }
+
+    public void onAddDynamicFieldClick(View view) {
+        dynamicFieldsAdapter.addField();
+        edited = true;
+    }
+
+    public void onAddImageClick(View view) {
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.choose_picture)), SELECT_IMAGES_REQUEST_CODE);
     }
 }

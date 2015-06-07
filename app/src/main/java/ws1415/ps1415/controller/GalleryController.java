@@ -8,6 +8,7 @@ import com.skatenight.skatenightAPI.model.PictureData;
 import com.skatenight.skatenightAPI.model.PictureFilter;
 import com.skatenight.skatenightAPI.model.PictureMetaData;
 import com.skatenight.skatenightAPI.model.PictureMetaDataList;
+import com.skatenight.skatenightAPI.model.UserGalleryContainer;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -32,6 +33,25 @@ import ws1415.ps1415.task.ExtendedTaskDelegate;
  * @author Richard Schulze
  */
 public abstract class GalleryController {
+
+    /**
+     * Ruft die Metadaten der Gallerien ab, die im angegebenen Container enthalten sind.
+     * @param handler          Der Handler, der über den Status des Tasks informiert wird.
+     * @param containerKind    Der Datastore-Kind des Containers.
+     * @param containerId      Die ID des Containers.
+     */
+    public static void getGalleries(ExtendedTaskDelegate<Void, List<GalleryMetaData>> handler, final String containerKind, final long containerId) {
+        new ExtendedTask<Void, Void, List<GalleryMetaData>>(handler) {
+            @Override
+            protected List<GalleryMetaData> doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().galleryEndpoint().getGalleries(containerKind, containerId).execute().getItems();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.execute();
+    }
 
     /**
      * Ruft die Metadaten der Gallery mit der angegebenen ID ab und übergibt sie dem Handler.
@@ -102,6 +122,41 @@ public abstract class GalleryController {
                     throw new RuntimeException(e);
                 }
                 return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * Ruft den GalleryContainer für den Benutzer mit der angegebenen E-Mail ab.
+     * @param handler    Der Handler, der über den Status des Tasks informiert wird.
+     * @param mail       Die Mail des Benutzers, für den der Container abgerufen wird.
+     */
+    public static void getGalleryContainerForMail(ExtendedTaskDelegate<Void, UserGalleryContainer> handler, final String mail) {
+        new ExtendedTask<Void, Void, UserGalleryContainer>(handler) {
+            @Override
+            protected UserGalleryContainer doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().galleryEndpoint().getGalleryContainerForMail(mail).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Gibt eine Liste aller Galerien zurück, denen der aufrufende Benutzer Bilder hinzufügen kann.
+     * @param handler    Der Handler, dem die Liste übergeben wird.
+     */
+    public static void getExpandableGalleries(ExtendedTaskDelegate<Void, List<GalleryMetaData>> handler) {
+        new ExtendedTask<Void, Void, List<GalleryMetaData>>(handler) {
+            @Override
+            protected List<GalleryMetaData> doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().galleryEndpoint().getExpandableGalleries().execute().getItems();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }.execute();
     }
@@ -188,6 +243,30 @@ public abstract class GalleryController {
                 }
 
                 return picture;
+            }
+        }.execute();
+    }
+
+    /**
+     * Ändert die Daten des Bildes mit der angegebenen ID.
+     * @param handler        Der Handler, der über den Status des Tasks informiert wird.
+     * @param pictureId      Die ID des Bildes, das geändert wird.
+     * @param title          Der neue Titel des Bildes.
+     * @param description    Die neue Beschreibung des Bildes.
+     * @param visibility     Die neue Sichtbarkeit des Bildes.
+     */
+    // TODO R: Testen
+    public static void editPicture(ExtendedTaskDelegate<Void, Void> handler, final long pictureId,
+                                   final String title, final String description, final PictureVisibility visibility) {
+        new ExtendedTask<Void, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().galleryEndpoint().editPicture(pictureId, title, description, visibility.name()).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
             }
         }.execute();
     }

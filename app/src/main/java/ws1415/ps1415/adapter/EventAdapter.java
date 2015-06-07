@@ -108,7 +108,7 @@ public class EventAdapter extends BaseAdapter {
             TextView titleView = (TextView) view.findViewById(R.id.eventTitle);
             TextView dateView = (TextView) view.findViewById(R.id.eventDate);
 
-            DiskCacheImageLoader.getInstance().loadImage(iconView, event.getIcon(), iconView.getWidth());
+            DiskCacheImageLoader.getInstance().loadCroppedImage(iconView, event.getIcon(), iconView.getWidth());
             titleView.setText(event.getTitle());
             Date date = new Date(event.getDate().getValue());
             dateView.setText(DateFormat.getMediumDateFormat(context).format(date) + " " + DateFormat.getTimeFormat(context).format(date));
@@ -135,8 +135,6 @@ public class EventAdapter extends BaseAdapter {
         }
     }
 
-
-
     /**
      * Ruft weitere Events vom Server ab.
      * @param refresh    Falls true, so wird die Liste der Events aktualisiert, d.h. die Liste wird
@@ -154,8 +152,6 @@ public class EventAdapter extends BaseAdapter {
                 fetching = true;
             }
         }
-
-        Log.d(EventAdapter.class.getName(), "fetching data");
 
         // Lade-Icon anzeigen lassen
         notifyDataSetChanged();
@@ -190,25 +186,6 @@ public class EventAdapter extends BaseAdapter {
                 EventAdapter.this.notifyDataSetChanged();
             }
         }, filter);
-    }
-
-    /**
-     * Gibt die Distanz zurück, die zwischen dem zuletzt gezeichneten Listeneintrag und dem Ende der
-     * Liste liegen muss, damit neue Daten abgerufen werden.
-     * @return Die Distanz, die zwischen dem zuletzt gezeichneten Listeneintrag und dem Ende der Liste
-     * liegen muss, damit neue Daten abgerufen werden.
-     */
-    public int getFetchDistance() {
-        return fetchDistance;
-    }
-
-    /**
-     * Setzt die Distanz, die zwischen dem zuletzt gezeichneten Listeneintrag und dem Ende der Liste
-     * liegen muss, damit neue Daten abgerufen werden.
-     * @param fetchDistance    Die neue Distanz.
-     */
-    public void setFetchDistance(int fetchDistance) {
-        this.fetchDistance = fetchDistance;
     }
 
     /**

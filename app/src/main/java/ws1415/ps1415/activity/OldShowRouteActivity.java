@@ -298,10 +298,10 @@ public class OldShowRouteActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-//    /**
-//     * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte.
-//     * @param m Das neue Event-Objekt.
-//     */
+    /**
+     * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte.
+     * @param m Das neue Event-Objekt.
+     */
 //    public void drawMembers(Member m) {
 //        if (m != null) {
 //            // googleMap.clear();

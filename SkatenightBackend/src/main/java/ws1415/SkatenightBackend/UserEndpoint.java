@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -25,7 +24,6 @@ import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
-import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserInfo;
 import ws1415.SkatenightBackend.model.UserInfo.InfoPair;
@@ -129,28 +127,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Gibt den Benutzer mit allen Informationen zu der angegebenen E-Mail Adresse aus.
-     * TODO: Wirklich nötig?
-     *
-     * @param userMail E-Mail Adresse des zu auszugebenen Benutzers
-     * @return Benutzer mit der angegebenen E-Mail Adresse, falls nicht gefunden: null
-     */
-    @ApiMethod(path = "enduser")
-    public EndUser getFullUser(@Named("userMail") String userMail) {
-        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-        try {
-            EndUser endUser = pm.getObjectById(EndUser.class, userMail);
-            endUser.getUserInfo();
-            endUser.getUserLocation();
-            return endUser;
-        } catch (Exception e) {
-            return null;
-        } finally {
-            pm.close();
-        }
-    }
-
-    /**
      * Gibt die primären Informationen Vorname, Nachname und Key des Profilbildes des Benutzers aus.
      *
      * @param user User-Objekt zur Authentifizierung
@@ -207,6 +183,30 @@ public class UserEndpoint extends SkatenightServerEndpoint {
                     userLocation.getLongitude());
         } catch (Exception e) {
             return null;
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Liefert eine Liste von Standortinformationen von Benutzern.
+     *
+     * @param user User-Objekt zur Authentifizierung
+     * @param userMails E-Mail Adressen der Benutzer
+     * @return Standortinformationen von Benutzern
+     *
+     * @throws OAuthRequestException
+     */
+    @ApiMethod(path = "user_location_info")
+    public List<UserLocationInfo> listUserLocationInfo(User user, @Named("userMails") List<String> userMails) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            List<UserLocationInfo> locationInfos = new ArrayList<>();
+            for(String userMail : userMails){
+                locationInfos.add(getUserLocationInfo(user, userMail));
+            }
+            return locationInfos;
         } finally {
             pm.close();
         }

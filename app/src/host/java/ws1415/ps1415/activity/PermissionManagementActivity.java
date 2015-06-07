@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.R;
@@ -42,6 +43,9 @@ public class PermissionManagementActivity extends BaseActivity {
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
         mListViewPermission = (ListView) findViewById(R.id.permission_management_list_view);
+        mAdapter = new UserListAdapter(new ArrayList<String>(), PermissionManagementActivity.this);
+        mListViewPermission.setAdapter(mAdapter);
+
         mListViewPermission.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -69,16 +73,10 @@ public class PermissionManagementActivity extends BaseActivity {
         setProgressBarIndeterminateVisibility(Boolean.TRUE);
         RoleController.listGlobalAdmins(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, List<String> stringList) {
+            public void taskDidFinish(ExtendedTask task, List<String> adminList) {
                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                if (mListViewPermission != null) {
-                    if (stringList != null && !stringList.isEmpty()) {
-                        mAdapter = new UserListAdapter(stringList, PermissionManagementActivity.this);
-                        mListViewPermission.setAdapter(mAdapter);
-                    } else {
-                        mAdapter = null;
-                        mListViewPermission.setAdapter(null);
-                    }
+                if (mListViewPermission != null && mAdapter != null) {
+                    mAdapter.swapData(adminList);
                 }
             }
 

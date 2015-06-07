@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.model.EventParticipationVisibility;
 import ws1415.ps1415.model.EventRole;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
@@ -117,8 +118,10 @@ public abstract class EventController {
                         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
                         builder.addBinaryBody("files", icon);
                         builder.addBinaryBody("files", headerImage);
-                        for (File f : images) {
-                            builder.addBinaryBody("files", f);
+                        if (images != null) {
+                            for (File f : images) {
+                                builder.addBinaryBody("files", f);
+                            }
                         }
                         builder.addTextBody("id", createdEvent.getId().toString());
                         builder.addTextBody("class", "Event");
@@ -210,13 +213,15 @@ public abstract class EventController {
      * Lässt den eingeloggten Benutzer dem Event mit der angegebenen ID beitreten.
      * @param handler    Der Handler, der über den Status des Task informiert wird.
      * @param eventId    Die ID des Events, dem beigetreten wird.
+     * @param visibility Die Sichtbarkeit für die Teilnahme an dem Event.
      */
-    public static void joinEvent(ExtendedTaskDelegate<Void, Void> handler, final long eventId) {
+    public static void joinEvent(ExtendedTaskDelegate<Void, Void> handler, final long eventId,
+                                 final EventParticipationVisibility visibility) {
         new ExtendedTask<Void, Void, Void>(handler){
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    ServiceProvider.getService().eventEndpoint().joinEvent(eventId).execute();
+                    ServiceProvider.getService().eventEndpoint().joinEvent(eventId, visibility.name()).execute();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -236,6 +241,28 @@ public abstract class EventController {
             protected Void doInBackground(Void... params) {
                 try {
                     ServiceProvider.getService().eventEndpoint().leaveEvent(eventId).execute();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * Ändert die Sichtbarkeit des Teilnehmers für das Event mit der angegebenen ID.
+     * @param handler       Der Handler, der über den Status des Task informiert wird.
+     * @param eventId       Die ID des Events, für das die Sichtbarkeit geändert wird.
+     * @param visibility    Die neue Sichtbarkeit.
+     */
+    // TODO Testen
+    public static void changeParticipationVisibility(ExtendedTaskDelegate<Void, Void> handler, final long eventId,
+                                                     final EventParticipationVisibility visibility) {
+        new ExtendedTask<Void, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().eventEndpoint().changeParticipationVisibility(eventId, visibility.name()).execute();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

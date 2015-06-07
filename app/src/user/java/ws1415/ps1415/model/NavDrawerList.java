@@ -10,9 +10,12 @@ import ws1415.ps1415.activity.FriendsActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.ListUserGroupsActivity;
 import ws1415.ps1415.activity.MessagingActivity;
+import ws1415.ps1415.activity.MyPicturesActivity;
 import ws1415.ps1415.activity.ProfileActivity;
+import ws1415.ps1415.activity.RegisterActivity;
 import ws1415.ps1415.activity.SearchActivity;
 import ws1415.ps1415.activity.UploadImageActivity;
+import ws1415.ps1415.util.PrefManager;
 
 /**
  * @author Richard Schulze
@@ -72,6 +75,23 @@ public class NavDrawerList {
                 }
             },
 
+            // ---------- Meine Bilder ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.my_pictures;
+                }
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_action_picture;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(parent.getContext(), MyPicturesActivity.class);
+                    parent.getContext().startActivity(intent);
+                }
+            },
+
             // ---------- Freunde ----------
             new NavDrawerItem() {
                 @Override
@@ -120,7 +140,6 @@ public class NavDrawerList {
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent search_intent = new Intent(parent.getContext(), SearchActivity.class);
-                    search_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(search_intent);
                 }
             },

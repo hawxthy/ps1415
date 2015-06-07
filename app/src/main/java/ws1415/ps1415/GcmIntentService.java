@@ -17,6 +17,7 @@ import com.skatenight.skatenightAPI.model.UserPrimaryData;
 import java.util.Date;
 
 import de.greenrobot.event.EventBus;
+import ws1415.ps1415.activity.GroupProfileActivity;
 import ws1415.ps1415.controller.TransferController;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.gcm.MessageType;
@@ -66,10 +67,10 @@ public class GcmIntentService extends IntentService {
                 }
                 switch (type) {
                     case NOTIFICATION_MESSAGE:
-                        sendNotificationMessaging(extras);
+                        sendNotificationMessaging(extras, new Intent(this, ListEventsActivity.class));
                         break;
                     case EVENT_NOTIFICATION_MESSAGE:
-                        sendNotificationMessaging(extras);
+                        sendNotificationMessaging(extras, new Intent(this, ListEventsActivity.class));
                         // Event-Liste in der ShowEventsActivity aktualisieren
                         Intent refreshIntent = new Intent(ListEventsActivity.REFRESH_EVENTS_ACTION);
                         LocalBroadcastManager.getInstance(this).sendBroadcast(refreshIntent);
@@ -83,9 +84,10 @@ public class GcmIntentService extends IntentService {
                         }
                         break;
                     case EVENT_START_MESSAGE:
+                        // TODO R: Entfernen
                         break;
                     case GROUP_DELETED_NOTIFICATION_MESSAGE:
-                        sendNotificationMessaging(extras);
+                        sendNotificationMessaging(extras, null);
                         // Einstellung für die Gruppe entfernen, falls vorhanden
                         PrefManager.deleteGroupVisibility(this, extras.getString("content"));
                         break;
@@ -117,11 +119,13 @@ public class GcmIntentService extends IntentService {
                         }
                         break;
                     case GLOBAL_GROUP_MESSAGE:
-                        sendNotificationMessaging(extras);
+                        sendNotificationMessaging(extras, null);
                         break;
                     case INVITATION_TO_GROUP_MESSAGE:
                         //TODO Button zum joinen hinzufügen
-                        sendNotificationMessaging(extras);
+                        Intent group_intent = new Intent(this, GroupProfileActivity.class);
+                        group_intent.putExtra("groupName", extras.getString("title"));
+                        sendNotificationMessaging(extras, group_intent);
                         break;
                 }
             }
@@ -196,14 +200,11 @@ public class GcmIntentService extends IntentService {
     // Put the message into a notification and post it.
     // This is just one simple example of what you might choose to do with
     // a GCM message.
-    private void sendNotificationMessaging(Bundle extras) {
+    private void sendNotificationMessaging(Bundle extras, Intent intent) {
         String title = extras.getString("title");
         String msg = extras.getString("content");
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, ListEventsActivity.class), 0);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -213,7 +214,11 @@ public class GcmIntentService extends IntentService {
                                 .bigText(msg))
                         .setContentText(msg);
 
-        mBuilder.setContentIntent(contentIntent);
+        if (intent != null) {
+            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+            mBuilder.setContentIntent(contentIntent);
+        }
+
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 

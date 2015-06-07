@@ -5,6 +5,7 @@
     <array name="manage_events_event_actions">
         <item>Anzeigen</item>
         <item>Bearbeiten</item>
+        <item>Teilnehmer verwalten</item>
         <item>Löschen</item>
     </array>
     <string name="delete_event">Veranstaltung löschen?</string>
@@ -24,6 +25,10 @@
     <string name="save_event_message">Möchten Sie die Veranstaltung speichern?</string>
     <string name="error_saving_event">Beim Speichern der Veranstaltung ist ein Fehler aufgetreten.</string>
     <string name="choose_route">Route wählen…</string>
+    <string name="icon_label"><u>Icon</u></string>
+    <string name="event_details"><u>Veranstaltungsdetails</u></string>
+    <string name="add_dynamic_field">Datenfeld hinzufügen…</string>
+    <string name="add_image">Bild hinzufügen…</string>
 
     <!-- DateTimeDialog -->
     <string name="choose_datetime">Datum und Uhrzeit wählen…</string>
@@ -64,6 +69,12 @@
     <string name="activity_edit_waypoint_dialog_apply">Übernehmen</string>
     <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
     <string name="title_activity_edit_waypoint_dialog">Editiere Wegpunkt</string>
+
+    <!-- ManageEventParticipantsActivity -->
+    <string name="title_activity_manage_event_participants">Teilnehmer verwalten</string>
+    <string name="error_loading_participants">Beim Laden der Teilnehmer ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="choose_role">Rolle wählen…</string>
+    <string name="error_changing_role">Beim Ändern der Rolle ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
 
     <!--Strings zu ActivityCreateUserGroup -->
     <string name="groupTypeTitle">Gruppentyp</string>

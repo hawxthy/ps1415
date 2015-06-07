@@ -941,6 +941,12 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
 
     }
 
+    public List<UserLocationInfo> listUserGroupVisibleMembersLocationInfo(User user, @Named("groupName") String groupName)throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        return new UserEndpoint().listUserLocationInfo(user, getUserGroupVisibleMembers(user, groupName).getList());
+    }
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     /**
      * Hilfsmethoden damit Code nicht doppelt vorkommt.

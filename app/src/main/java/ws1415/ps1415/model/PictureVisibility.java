@@ -1,7 +1,6 @@
 package ws1415.ps1415.model;
 
 /**
- * Duplikat der Enum auf dem Backend.
  * Enthält die möglichen Sichtbarkeitseinstellungen für Bilder.
  * @author Richard Schulze
  */

@@ -11,4 +11,20 @@
     <style name="Widget.FloatingHintEditText" parent="@android:style/Widget.EditText">
         <item name="android:paddingTop">0dp</item>
     </style>
+
+    <!-- Styles für Events und Galleries -->
+    <integer name="picture_gridview_columns">2</integer>
+    <style name="headlineText">
+        <item name="android:textColor">#DE000000</item>
+        <item name="android:textSize">9pt</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="primaryText">
+        <item name="android:textColor">#DE000000</item>
+        <item name="android:textSize">7pt</item>
+    </style>
+    <style name="secondaryText">
+        <item name="android:textColor">#89000000</item>
+        <item name="android:textSize">6pt</item>
+    </style>
 </resources>

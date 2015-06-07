@@ -26,8 +26,7 @@
         android:layout_toRightOf="@id/eventIcon"
         android:layout_toEndOf="@id/eventIcon"
         android:layout_alignTop="@id/eventIcon"
-        android:textStyle="bold"
-        android:textSize="8pt" />
+        style="@style/primaryText" />
 
     <TextView
         android:layout_width="fill_parent"
@@ -37,7 +36,6 @@
         android:layout_toRightOf="@id/eventIcon"
         android:layout_toEndOf="@id/eventIcon"
         android:layout_below="@id/eventTitle"
-        android:textSize="6pt"
-        android:textColor="#666666" />
+        style="@style/secondaryText" />
 
 </RelativeLayout>

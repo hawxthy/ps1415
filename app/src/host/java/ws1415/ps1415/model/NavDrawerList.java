@@ -13,6 +13,8 @@ import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.ManageEventsActivity;
 import ws1415.ps1415.activity.ManageRoutesActivity;
 import ws1415.ps1415.activity.MessagingActivity;
+import ws1415.ps1415.activity.MyPicturesActivity;
+import ws1415.ps1415.activity.PermissionManagementActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.activity.RegisterActivity;
 import ws1415.ps1415.activity.SearchActivity;
@@ -76,6 +78,23 @@ public class NavDrawerList {
                 }
             },
 
+            // ---------- Meine Bilder ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.my_pictures;
+                }
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_action_picture;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(parent.getContext(), MyPicturesActivity.class);
+                    parent.getContext().startActivity(intent);
+                }
+            },
+
             // ---------- Freunde ----------
             new NavDrawerItem() {
                 @Override
@@ -110,9 +129,7 @@ public class NavDrawerList {
                     parent.getContext().startActivity(user_group_intent);
                 }
             },
-
-
-
+            
             // ---------- Suche ----------
             new NavDrawerItem() {
                 @Override

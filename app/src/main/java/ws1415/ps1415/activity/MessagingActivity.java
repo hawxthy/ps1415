@@ -12,6 +12,8 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -41,6 +43,8 @@ import ws1415.ps1415.util.UniversalUtil;
 public class MessagingActivity extends BaseActivity {
     private ListView mListViewMessaging;
     private MessagingAdapter mAdapter;
+    private LinearLayout mLayoutHintMessaging;
+    private Button mButtonHint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +59,16 @@ public class MessagingActivity extends BaseActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_messaging);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
+
+        mLayoutHintMessaging = (LinearLayout) findViewById(R.id.messaging_hint_message);
+        mButtonHint = (Button) findViewById(R.id.messaging_hint_button);
+        mButtonHint.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent search_intent = new Intent(MessagingActivity.this, SearchActivity.class);
+                MessagingActivity.this.startActivity(search_intent);
+            }
+        });
 
         mListViewMessaging = (ListView) findViewById(R.id.messaging_list_view);
         mAdapter = new MessagingAdapter(new ArrayList<Conversation>(), this);
@@ -81,6 +95,10 @@ public class MessagingActivity extends BaseActivity {
         });
     }
 
+    public void searchButtonClick(View view) {
+
+    }
+
     /**
      * Ruft alle Konversationen aus der Datenbank ab und übergibt diese dem Adapter.
      */
@@ -88,6 +106,8 @@ public class MessagingActivity extends BaseActivity {
         List<Conversation> conversations = MessageDbController.getInstance(this).getAllConversations();
         conversations = sortConversation(conversations);
         mAdapter.setUpData(conversations);
+        if(mAdapter.getCount() == 0) mLayoutHintMessaging.setVisibility(View.VISIBLE);
+        else mLayoutHintMessaging.setVisibility(View.GONE);
     }
 
     @Override
@@ -210,8 +230,10 @@ public class MessagingActivity extends BaseActivity {
                             Toast.makeText(MessagingActivity.this,
                                     getString(R.string.conversation_deleted), Toast.LENGTH_LONG).show();
                             mAdapter.removeItem(item);
+                            if(mAdapter.getCount() == 0) mLayoutHintMessaging.setVisibility(View.VISIBLE);
+                            else mLayoutHintMessaging.setVisibility(View.GONE);
                         } else Toast.makeText(MessagingActivity.this,
-                                getString(R.string.error_delete_conversation), Toast.LENGTH_LONG).show();
+                                getString(R.string.error_delete), Toast.LENGTH_LONG).show();
                     }
                 })
                 .setNegativeButton(android.R.string.no, new OnClickListener() {

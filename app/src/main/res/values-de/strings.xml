@@ -119,6 +119,7 @@
     <string name="location_transmitter_button_stop">Stop</string>
 
     <!--Strings zu RegisterActivity-->
+    <string name="title_activity_register">Registrierung</string>
     <string name="first_name_hint">Vorname</string>
     <string name="last_name_hint">Nachname</string>
     <string name="register">Registrieren</string>
@@ -213,6 +214,7 @@
         <item quantity="other">%1$d Freunde ausgewählt</item>
     </plurals>
     <string name="action_refresh_friends">Aktualisieren</string>
+    <string name="friends_hint">Über Profile von Benutzern können neue Freunde hinzugefügt werden</string>
 
     <!-- MessagingActivity -->
     <string name="title_activity_messaging">Nachrichten</string>
@@ -224,16 +226,20 @@
     </string-array>
     <string name="sure_delete_conversation_dialog">Sind Sie sicher, dass Sie diese Konversation entfernen wollen?</string>
     <string name="conversation_deleted">Konversation gelöscht</string>
-    <string name="error_delete_conversation">Fehler beim Löschvorgang</string>
+    <string name="error_delete">Fehler beim Löschvorgang</string>
     <string name="yesterday">Gestern</string>
     <string name="error_update">Aktualisierungsfehler</string>
     <string name="profile_updated">Profildaten aktualisiert</string>
+    <string name="messaging_hint">Über die Profile von Benutzern können neue Konversation eröffnet werden</string>
+    <string name="search_for_users">Suche nach Benutzern</string>
 
     <!-- ConversationActivity -->
     <string name="input_required">Eingabe erforderlich</string>
     <string name="title_activity_conversation">Konversation</string>
     <string name="input_message">Nachricht eingeben</string>
-    <string name="message_could_not_be_sent">Nachricht konnte nicht zugestellt werden</string>
+    <string name="message_could_not_be_sent">Benutzer hat kein registriertes Gerät</string>
+    <string name="sure_delete_message_dialog">Sind Sie sicher, dass Sie die ausgewählte Nachricht entfernen wollen?</string>
+    <string name="message_deleted">Nachricht gelöscht</string>
 
     <!-- EventAdapter -->
     <string name="event_adapter_fetch_error">Es konnten keine weiteren Events abgerufen werden</string>
@@ -242,6 +248,20 @@
     <string name="meeting_place_label">Treffpunkt:</string>
     <string name="fee_label">Gebühr:</string>
     <string name="event_loading_error">Fehler beim Laden des Events</string>
+    <string name="show_route">Route anzeigen…</string>
+    <string name="join_event">Teilnehmen</string>
+    <string name="leave_event">Verlassen</string>
+    <string name="error_joining_event">Beim Beitreten des Events ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="error_leaving_event">Beim Verlassen des Events ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="choose_participation_visibility">Sichtbarkeit der Teilnahme wählen…</string>
+    <string-array name="event_participation_visibilities">
+        <item>Privat (nur für Veranstalter und Administratoren sichtbar)</item>
+        <item>Freunde (auch für Freunde sichtbar)</item>
+        <item>Öffentlich (für alle Benutzer sichtbar)</item>
+    </string-array>
+    <string name="error_participation_needed">Sie müssen an dieser Veranstaltung teilnehmen, um Einstellungen vorzunehmen.</string>
+    <string name="error_changing_visibility">Beim Ändern der Sichtbarkeit ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="participants">Teilnehmer</string>
 
     <!-- PermissionManagementActivity -->
     <string name="sure_take_right_dialog">Sind Sie sicher, dass Sie diesem Benutzer administrative Rechte entziehen möchten?</string>
@@ -283,9 +303,84 @@
     <string name="creatingGroupError">Gruppe konnte nicht erstellt werden</string>
     <string name="defaultGroupDestription">Dies ist die Gruppe: </string>
     <string name="checkGroupNamePlease">Überprüfe den Namen bitte</string>
+    <string name="dialog_no">Nein</string>
+    <string name="dialog_yes">Ja</string>
 
     <!-- GroupBlackBoardFragment-->
     <!-- GroupNewsBoardFragment-->
     <!-- GroupMembersFragment-->
 
+    <!-- EventParticipantsActivity -->
+    <string name="title_activity_event_participants">Event-Teilnehmer</string>
+    <string-array name="event_roles">
+        <item>Veranstalter</item>
+        <item>Sanitäter</item>
+        <item>Ordner</item>
+        <item>Teilnehmer</item>
+    </string-array>
+
+    <!-- PictureListFragment -->
+    <string name="no_visible_pictures">Keine sichtbaren Bilder gefunden.</string>
+
+    <!-- PictureMetaDataAdapter -->
+    <string name="picture_adapter_fetch_error">Es konnten keine weiteren Bilder abgerufen werden</string>
+    <string name="picture_not_visible">Bild nicht sichtbar</string>
+
+    <!-- MyPicturesActivity -->
+    <string name="title_activity_my_pictures">Meine Bilder</string>
+    <string name="action_upload_picture">Bild hochladen</string>
+    <string name="action_refresh_pictures">Aktualisieren</string>
+    <string name="create_gallery">Galerie erstellen</string>
+    <string name="enter_gallery_title">Geben Sie einen Titel für die Galerie ein…</string>
+    <string name="no_title_submitted">Es muss ein Titel angegeben werden</string>
+    <string name="error_creating_gallery">Beim Erstellen der Galerie ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="delete_gallery">Galerie löschen?</string>
+    <string name="delete_gallery_message">Wollen Sie die Galerie wirklich löschen? Die enthaltenen Bilder werden dabei nicht gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.</string>
+    <string name="error_deleting_gallery">Beim Löschen der Galerie ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string-array name="picture_actions">
+        <item>Anzeigen</item>
+        <item>Bearbeiten</item>
+        <item>Löschen</item>
+    </string-array>
+    <string name="action_remove_from_gallery">Aus der Galerie entfernen</string>
+    <string name="delete_picture">Bild löschen?</string>
+    <string name="delete_picture_message">Wollen Sie das Bild wirklich löschen? Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="remove_from_gallery">Aus Galerie entfernen?</string>
+    <string name="remove_from_gallery_message">Möchten Sie das Bild wirklich aus der Galerie entfernen? Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="error_removing_from_gallery">Beim Entfernen aus der Galerie ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+
+    <!-- EditPictureActivity -->
+    <string name="upload_picture">Bild hochladen</string>
+    <string name="edit_picture">Bild bearbeiten</string>
+    <string name="title_hint">Bitte geben Sie einen Titel ein…</string>
+    <string name="description_hint">Bitte geben Sie eine Beschreibung ein…</string>
+    <string name="visibility_label">Sichtbarkeit</string>
+    <string-array name="picture_visibilities">
+        <item>Privat</item>
+        <item>Freunde</item>
+        <item>Öffentlich</item>
+    </string-array>
+    <string-array name="picture_visibility_hints">
+        <item>Das Bild wird nur für Sie sichtbar sein.</item>
+        <item>Das Bild wird für Sie und Ihre Freunde sichtbar sein.</item>
+        <item>Das Bild wird für jeden Benutzer sichtbar sein.</item>
+    </string-array>
+    <string name="error_uploading_picture">Beim Hochladen des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="error_editing_picture">Beim Bearbeiten des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="picture_can_not_be_changed">Das Bild kann nicht geändert werden, nachdem es hochgeladen wurde.</string>
+
+    <!-- PictureFragment -->
+    <string name="comments_label">Kommentare</string>
+    <string name="error_loading_picture">Beim Laden des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="rating_saved">Bewertung gespeichert</string>
+    <string name="error_rating_picture">Beim Bewerten des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="adding_to_gallery_finished">Zur Galerie hinzugefügt</string>
+    <string name="error_adding_to_gallery">Beim Hinzufügen des Bildes zur Galerie ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+
+    <!-- GalleryAdapter -->
+    <string name="galleries_empty_item_title">Alle Bilder</string>
+    <string name="error_loading_galleries">Beim Laden der Galerien ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+
+    <!-- ShowPictureActivity -->
+    <string name="action_add_to_gallery">Zu Galerie hinzufügen</string>
 </resources>

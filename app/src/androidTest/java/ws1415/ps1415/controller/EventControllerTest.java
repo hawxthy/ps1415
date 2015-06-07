@@ -1,5 +1,7 @@
 package ws1415.ps1415.controller;
 
+import android.util.Log;
+
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.IOUtils;
 import com.skatenight.skatenightAPI.model.DynamicField;
@@ -7,6 +9,7 @@ import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.EventFilter;
 import com.skatenight.skatenightAPI.model.EventMetaData;
+import com.skatenight.skatenightAPI.model.EventMetaDataList;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
@@ -16,16 +19,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.model.EventParticipationVisibility;
 import ws1415.ps1415.model.EventRole;
 import ws1415.ps1415.model.Role;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.controller.EventController;
 
 /**
  * Testet die Methoden des EventController.
@@ -118,7 +122,7 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
     public void testAssignRole() throws IOException, InterruptedException {
         // Zweiten Benutzer dem Testevent beitreten lassen
         changeAccount(1);
-        ServiceProvider.getService().eventEndpoint().joinEvent(testevent1.getId()).execute();
+        ServiceProvider.getService().eventEndpoint().joinEvent(testevent1.getId(), EventParticipationVisibility.PUBLIC.name()).execute();
 
         // Zum Veranstalter-Account wechseln
         changeAccount(0);
@@ -170,6 +174,76 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 fail(message);
+            }
+        }, filter);
+        signal.await(10, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Hilfstest, der alle Events auf dem Server löscht.
+     */
+//    public void testDeleteAllEvents() throws IOException {
+//        Log.d("MAIL", ServiceProvider.getEmail());
+//        EventFilter filter = new EventFilter();
+//        filter.setLimit(20);
+//        boolean done;
+//        do {
+//            EventMetaDataList res = ServiceProvider.getService().eventEndpoint().listEvents(filter).execute();
+//            filter.setCursorString(res.getCursorString());
+//            done = res.getList() == null || res.getList().isEmpty();
+//
+//            if (!done) {
+//                for (EventMetaData e : res.getList()) {
+//                    ServiceProvider.getService().eventEndpoint().deleteEvent(e.getId()).execute();
+//                }
+//            }
+//        } while(!done);
+//    }
+
+    public void testListEvents_ForUserWithVisibility() throws IOException, InterruptedException {
+        // Zweites Testevent erstellen
+        Event testevent2 = new Event();
+        testevent2.setTitle("Testevent #2");
+        testevent2.setDate(new DateTime(1431442649753l));
+        testevent2.setRouteFieldFirst(2);
+        testevent2.setRouteFieldLast(3);
+        testevent2.setDescription(new Text().setValue("Hier steht die Beschreibung des Testevents"));
+        testevent2.setMeetingPlace("Münster, Ludgerikreisel");
+        testevent2.setFee(200);
+        testevent2.setRoute(route1);
+        // Dynamische Felder
+        testevent2.setDynamicFields(new LinkedList<DynamicField>());
+        DynamicField field = new DynamicField();
+        for (int i = 1; i <= 3; i++) {
+            field.setName("Field " + i);
+            field.setContent("Content " + i);
+            testevent1.getDynamicFields().add(field);
+        }
+        testevent2 = ServiceProvider.getService().eventEndpoint().createEvent(testevent2).execute();
+        eventsToDelete.add(testevent2);
+        final Event finalTestevent2 = testevent2;
+
+        // Anderen Benutzer teilnehmen lassen
+        changeAccount(1);
+        ServiceProvider.getService().eventEndpoint().joinEvent(testevent2.getId(), EventParticipationVisibility.PUBLIC.name()).execute();
+
+        // Prüfen, ob Event abgerufen wird
+        changeAccount(0);
+        EventFilter filter = new EventFilter();
+        filter.setLimit(2);
+        filter.setUserId(getAccountMail(1));
+        final CountDownLatch signal = new CountDownLatch(1);
+        EventController.listEvents(new ExtendedTaskDelegateAdapter<Void, List<EventMetaData>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<EventMetaData> eventMetaDatas) {
+                assertNotNull("no events fetched", eventMetaDatas);
+                assertFalse("no events fetched", eventMetaDatas.isEmpty());
+                assertTrue("more than one event fetched", eventMetaDatas.size() == 1);
+                if (eventMetaDatas.get(0).getId().equals(finalTestevent2.getId())) {
+                    signal.countDown();
+                } else {
+                    fail(finalTestevent2.getTitle() + " wurde nicht abgerufen");
+                }
             }
         }, filter);
         signal.await(10, TimeUnit.SECONDS);
@@ -379,7 +453,7 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
             public void taskFailed(ExtendedTask task, String message) {
                 fail(message);
             }
-        }, testevent1.getId());
+        }, testevent1.getId(), EventParticipationVisibility.PUBLIC);
         signal.await(10, TimeUnit.SECONDS);
 
         // Event neu abrufen, damit die Teilnehmerdaten aktualisiert sind
@@ -403,7 +477,7 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
         changeAccount(1);
         // Dem Event zunächst beitreten. Damit dies synchron geschieht, wird direkt die Endpoint-Methode
         // über den ServiceProvider aufgerufen
-        ServiceProvider.getService().eventEndpoint().joinEvent(testevent1.getId()).execute();
+        ServiceProvider.getService().eventEndpoint().joinEvent(testevent1.getId(), EventParticipationVisibility.PUBLIC.name()).execute();
         // Event neu abrufen, damit die Teilnehmerdaten aktualisiert sind und sicherstellen, dass der
         // Benutzer angemeldet ist
         EventData eventData = ServiceProvider.getService().eventEndpoint().getEvent(testevent1.getId()).execute();

@@ -32,14 +32,6 @@
                 android:value="ws1415.ps1415.activity.ManageRoutesActivity" />
         </activity>
         <activity
-            android:name=".activity.ShowRouteActivity"
-            android:label="@string/title_activity_show_route"
-            android:parentActivityName=".activity.ManageRoutesActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ws1415.ps1415.activity.ManageRoutesActivity" />
-        </activity>
-        <activity
             android:name=".dialog.AddRouteDialog"
             android:label="@string/title_activity_add_route_dialog"
             android:theme="@android:style/Theme.Holo.Dialog" />
@@ -60,7 +52,15 @@
             android:name=".activity.PermissionManagementActivity"
             android:label="@string/permission_management"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.ManageEventParticipantsActivity"
+            android:label="@string/title_activity_manage_event_participants"
+            android:parentActivityName=".activity.ManageEventsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ws1415.ps1415.activity.ManageEventsActivity" />
         </activity>
         <activity
             android:name=".activity.CreateUserGroupActivity"

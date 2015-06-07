@@ -102,6 +102,13 @@ public class BlobstoreHandler extends HttpServlet {
             resp.getWriter().print(servingUrl);
             resp.getWriter().flush();
             resp.getWriter().close();
+        } else if (req.getParameter("scale") != null) {
+            int size = Integer.parseInt(req.getParameter("scale"));
+            String servingUrl = imagesService.getServingUrl(ServingUrlOptions.Builder.withBlobKey(key).imageSize(size).crop(false));
+            resp.setCharacterEncoding("UTF-8");
+            resp.getWriter().print(servingUrl);
+            resp.getWriter().flush();
+            resp.getWriter().close();
         } else {
             blobstoreService.serve(key, resp);
         }

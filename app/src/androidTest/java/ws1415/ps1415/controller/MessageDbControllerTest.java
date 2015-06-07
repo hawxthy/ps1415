@@ -48,8 +48,6 @@ public class MessageDbControllerTest extends AuthenticatedAndroidTestCase{
     public static final String TEST_NEW_FIRST_NAME = "Vorname3";
     public static final String TEST_NEW_LAST_NAME = "Nachname3";
 
-    public static final String TEST_MAIL_PICTURE = "test3@gmail.com";
-
     public static final String TEST_MESSAGE_CONTENT_1 = "Hallo!";
     public static final Date TEST_MESSAGE_DATE_SEND_1 = new Date(1430846930789L);
     public static final LocalMessageType TEST_MESSAGE_TYPE_1 = LocalMessageType.INCOMING;
@@ -142,8 +140,8 @@ public class MessageDbControllerTest extends AuthenticatedAndroidTestCase{
     }
 
     /**
-     * Prüft das Aktualisieren einer Konversation. Dabei wird geprüft, ob man die
-     * Profilinformationen zu dem Benutzer geändert werden können.
+     * Prüft das Aktualisieren einer Konversation. Dabei wird geprüft, ob die
+     * Profilinformationen zu einem Benutzer geändert wurden.
      */
     @SmallTest
     public void testUpdateConversation() {
@@ -157,6 +155,10 @@ public class MessageDbControllerTest extends AuthenticatedAndroidTestCase{
         assertEquals(TEST_NEW_LAST_NAME, conversation.getLastName());
     }
 
+    /**
+     * Prüft, ob die Anzahl der neuen Nachrichten beim Hinzufügen einer Nachricht richtig
+     * aktualisiert wird und ob das Zurücksetzen der Anzahl der neuen Nachrichten funktioniert.
+     */
     @SmallTest
     public void testNewMessagesCount() {
         Conversation conversation = dbController.getConversation(TEST_MAIL_1);

@@ -51,13 +51,36 @@ public class DiskCacheImageLoader {
 
     }
 
+    /**
+     * Lädt das Bild mit dem angegebenen BlobKey in der Originalgröße in die ImageView.
+     * @param view       Die View, in der das Bild angeziegt wird.
+     * @param blobKey    Der BlobKey des anzuzeigenden Bildes.
+     */
     public void loadImage(ImageView view, BlobKey blobKey) {
         processRequest(view, blobKey, null);
     }
 
-    public void loadImage(ImageView view, BlobKey blobKey, int cropSize) {
+    /**
+     * Lädt das Bild mit dem angegebenen BlobKey in die ImageView und "cropped" es auf die angegebene Größe.
+     * @param view       Die View, in der das Bild angeziegt wird.
+     * @param blobKey    Der BlobKey des anzuzeigenden Bildes.
+     * @param cropSize   Die Größe des auszuschneidenden Bildes.
+     */
+    public void loadCroppedImage(ImageView view, BlobKey blobKey, int cropSize) {
         Map<String, String> params = new HashMap<>();
         params.put("crop", Integer.toString(cropSize));
+        processRequest(view, blobKey, params);
+    }
+
+    /**
+     * Lädt das Bild mit dem angegebenen BlobKey in einer skalierten Größe in die ImageView.
+     * @param view       Die View, in der das Bild angeziegt wird.
+     * @param blobKey    Der BlobKey des anzuzeigenden Bildes.
+     * @param width      Die skalierte Breite des Bildes.
+     */
+    public void loadScaledImage(ImageView view, BlobKey blobKey, int width) {
+        Map<String, String> params = new HashMap<>();
+        params.put("scale", Integer.toString(width));
         processRequest(view, blobKey, params);
     }
 

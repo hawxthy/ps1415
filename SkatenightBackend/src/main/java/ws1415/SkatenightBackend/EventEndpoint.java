@@ -11,27 +11,16 @@ import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 import com.googlecode.objectify.cmd.Query;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.jdo.PersistenceManager;
-
-import ws1415.SkatenightBackend.gcm.Message;
-import ws1415.SkatenightBackend.gcm.MessageType;
-import ws1415.SkatenightBackend.gcm.RegistrationManager;
-import ws1415.SkatenightBackend.gcm.Sender;
-import ws1415.SkatenightBackend.model.EndUser;
 import ws1415.SkatenightBackend.model.Event;
+import ws1415.SkatenightBackend.model.EventParticipationVisibility;
 import ws1415.SkatenightBackend.model.EventRole;
-import ws1415.SkatenightBackend.model.Member;
 import ws1415.SkatenightBackend.model.Privilege;
-import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.UserLocation;
 import ws1415.SkatenightBackend.transport.EventData;
 import ws1415.SkatenightBackend.transport.EventFilter;
@@ -64,6 +53,10 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
         if (hasPrivilege(event, user.getEmail(), Privilege.ASSIGN_ROLE)) {
             event.getMemberList().put(endUser, role);
+            if (!event.getMemberVisibility().containsKey(endUser)) {
+                // Falls der Benutzer noch keine Sichtbarkeit für die Teilnahme definiert hat, dann PRIVATE vorgeben
+                event.getMemberVisibility().put(endUser, EventParticipationVisibility.PRIVATE);
+            }
             ofy().save().entity(event).now();
         } else {
             throw new OAuthRequestException("insufficient privileges");
@@ -78,11 +71,12 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @return true, wenn der Benutzer das Privileg im angegebenen Event besitzt, sonst false.
      */
     private boolean hasPrivilege(Event event, String endUser, Privilege privilege) {
-        // TODO Methode ggf. mit User-Objekt sichern
         if (event == null || endUser == null || privilege == null
                 || !event.getMemberList().containsKey(endUser)) {
+            log.info("user not participating");
             return false;
         }
+        log.info("role: " + event.getMemberList().get(endUser));
         return event.getMemberList().get(endUser).hasPrivilege(privilege);
     }
 
@@ -114,6 +108,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         }
         if (filter.getUserId() != null) {
             // TODO Die Events abrufen, an denen ein User teilnimmt und prüfen, welche der aufrufende Benutzer davon sehen darf
+            q.filter("memberVisibility." + filter.getUserId() + " !=", null);
         }
         q = q.order("-date");
         QueryResultIterator<Event> iterator = q.iterator();
@@ -133,8 +128,11 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param eventId    Die Id des abzurufenden Events.
      * @return Das Event-Objekt inklusive aller Daten.
      */
-    public EventData getEvent(@Named("eventId") long eventId) {
-        return new EventData(ofy().load().type(Event.class).id(eventId).safe());
+    public EventData getEvent(User user, @Named("eventId") long eventId) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        return new EventData(user, ofy().load().type(Event.class).id(eventId).safe());
     }
 
     /**
@@ -172,8 +170,12 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             event.setMemberList(new HashMap<String, EventRole>());
         }
         event.getMemberList().put(user.getEmail(), EventRole.HOST);
+        event.getMemberVisibility().put(user.getEmail(), EventParticipationVisibility.PUBLIC);
         event.setImagesUploadUrl(blobstoreService.createUploadUrl("/images/upload"));
         ofy().save().entity(event).now();
+
+        // Event in der Liste des Benutzers eintragen
+        new UserEndpoint().addEventToUser(user.getEmail(), event);
 
         // TODO GCM-Nachricht an Geräte schicken, damit Event-Liste aktualisiert wird
 
@@ -214,7 +216,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(id).now();
+        Event event = ofy().load().type(Event.class).id(id).now();
         if (event != null) {
             if (!hasPrivilege(event, user.getEmail(), Privilege.DELETE_EVENT)) {
                 throw new OAuthRequestException("insufficient privileges");
@@ -228,7 +230,11 @@ public class EventEndpoint extends SkatenightServerEndpoint {
                 }
             }
 
-            // TODO Teilnehmer durchgehen und Event entfernen
+            // TODO R: Performance testen
+            UserEndpoint userEndpoint = new UserEndpoint();
+            for (String participant : event.getMemberList().keySet()) {
+                userEndpoint.removeEventFromUser(participant, event);
+            }
 
             // Abhängige Gallerien löschen
             ofy().delete().entities(event.getGalleries()).now();
@@ -240,14 +246,17 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * Fügt den aufrufenden Teilnehmer zum angegebenen Event hinzu.
      * @param user       Der aufrufende Benutzer, der dem Event hinzugefügt werden soll
      * @param eventId    Die ID des Events, dem beigetreten wird.
+     * @param visibility Die Sichtbarkeit, die für die Teilnahme eingetragen wird.
      */
-    public void joinEvent(User user, @Named("eventId") long eventId) throws OAuthRequestException {
+    public void joinEvent(User user, @Named("eventId") long eventId, @Named("visibility") EventParticipationVisibility visibility)
+            throws OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
         Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
         if (!event.getMemberList().containsKey(user.getEmail())) {
             event.getMemberList().put(user.getEmail(), EventRole.PARTICIPANT);
+            event.getMemberVisibility().put(user.getEmail(), visibility);
             ofy().save().entity(event).now();
             new UserEndpoint().addEventToUser(user.getEmail(), event);
         }
@@ -268,12 +277,29 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         if (!event.getMemberList().containsValue(EventRole.HOST)) {
             throw new IllegalStateException("the last host of an event can not leave");
         }
+        event.getMemberVisibility().remove(user.getEmail());
         new UserEndpoint().removeEventFromUser(user.getEmail(), event);
         ofy().save().entity(event).now();
     }
 
-
-
+    /**
+     * Ändert den Sichtbarkeitsstatus einer Teilnahme am betreffenden Event.
+     * @param user
+     * @param eventId
+     * @param visibility
+     */
+    public void changeParticipationVisibility(User user, @Named("eventId") long eventId, @Named("visibility") EventParticipationVisibility visibility)
+            throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
+        if (!event.getMemberList().containsKey(user.getEmail())) {
+            throw new IllegalArgumentException("user has to be participating to change visibility");
+        }
+        event.getMemberVisibility().put(user.getEmail(), visibility);
+        ofy().save().entity(event).now();
+    }
 
 
 
