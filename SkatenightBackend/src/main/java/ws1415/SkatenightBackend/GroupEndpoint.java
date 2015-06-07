@@ -36,6 +36,7 @@ import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserGroupPreviewPictures;
 import ws1415.SkatenightBackend.model.UserGroupType;
+import ws1415.SkatenightBackend.transport.ListWrapper;
 import ws1415.SkatenightBackend.transport.StringWrapper;
 import ws1415.SkatenightBackend.transport.UserGroupBlackBoardTransport;
 import ws1415.SkatenightBackend.transport.UserGroupFilter;
@@ -639,6 +640,34 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
+     * Kommentiert eine Nachricht des Blackboards und speichert diese.
+     *
+     * @param user
+     * @param id Id der Nachricht des Blackboards
+     * @param comment Die Message
+     * @throws OAuthRequestException
+     */
+    public BoardEntry commentBlackBoard(User user, @Named("boardId") Long id, @Named("comment") String comment)throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        BoardEntry entry = ofy().load().type(BoardEntry.class).id(id).safe().addComment(comment);
+        ofy().save().entity(entry).now();
+        return entry;
+    }
+
+    /**
+     * Gibt einen einzelnen BoardEntry eintrag zurück.
+     *
+     * @param user
+     * @param id
+     * @return
+     * @throws OAuthRequestException
+     */
+    public BoardEntry getBoardEntry(User user, @Named("boardId") Long id)throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        return ofy().load().type(BoardEntry.class).id(id).safe();
+    }
+
+    /**
      * Methode zum posten von NewsBoard Nachrichten in einer UserGroup. Momentan wird die Nachricht und
      * der Schreiber in das BoardEntry eingetragen und die Liste in der UserGroup aktualisiert.
      *
@@ -700,7 +729,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param groupName Der Name Der Nutzergruppe
      * @throws OAuthRequestException
      */
-    public void changeMyVisibility(User user, @Named("groupName") String groupName) throws OAuthRequestException {
+    public BooleanWrapper changeMyVisibility(User user, @Named("groupName") String groupName) throws OAuthRequestException {
         //TODO Jeder setzt seine sichtbaren Nutzergruppen lokal und seine Sichtbarkeit gegenüber der Gruppe global
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
@@ -714,8 +743,11 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             group.getVisibleMembers().addVisibleMember(user.getEmail());
         } else {
             group.getVisibleMembers().removeVisibleMember(user.getEmail());
+            ofy().save().entity(group.getVisibleMembers()).now();
+            return new BooleanWrapper(false);
         }
         ofy().save().entity(group.getVisibleMembers()).now();
+        return new BooleanWrapper(true);
     }
 
     /**
@@ -861,9 +893,9 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * der MessageController benutzt und einfache Nachrichten an alle Mitglieder gesendet.
      *
      * @param groupName      die UserGroup deren Mitglieder eine Nachricht erhalten sollen
-     * @param glogbalMessage die Nachricht die gesendet werden soll
+     * @param globalMessage die Nachricht die gesendet werden soll
      */
-    public void sendGlobalMessage(User user, @Named("groupName") String groupName, @Named("globalMessage") String glogbalMessage) throws OAuthRequestException {
+    public void sendGlobalMessage(User user, @Named("groupName") String groupName, @Named("globalMessage") String globalMessage) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = throwIfNoUserGroupExists(groupName);
@@ -890,7 +922,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
                     .collapseKey("group_" + group.getName() + "_deleted")
                             // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
                     .addData("type", MessageType.GLOBAL_GROUP_MESSAGE.name())
-                    .addData("content", glogbalMessage)
+                    .addData("content", globalMessage)
                     .addData("title", group.getName());
             Message m = mb.build();
             try {
@@ -909,36 +941,47 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * übergebenen EndUser mit der Möglichkeit diese anzunehmen oder abzulehnen.
      *
      * @param groupName    die UserGroup in die der EndUser eingeladen werden soll.
-     * @param userToInvite der EndUser, der die Einladung(Notification) erhalten soll
-     * @param message      ein Text beigefügt zu der Einladung.
+     * @param users Die Benutzer, die in die Gruppe eingeladen werden sollen.
      */
-    public void sendInvitation(User user, @Named("groupName") String groupName, @Named("userToInvite") String userToInvite, @Named("invitationMessage") String message) throws OAuthRequestException {
+    public void sendInvitation(User user, @Named("groupName") String groupName, ListWrapper users) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
-        EndpointUtil.throwIfEndUserNotExists(userToInvite);
-        EndpointUtil.throwIfNotBoardMessageSubmitted(message);
+        if(users == null){
+            throw new IllegalArgumentException("no list of users submitted");
+        }
+        if(users.stringList == null || users.stringList.isEmpty()){
+            throw new IllegalArgumentException("no list inside the wrapper");
+        }
         throwIfNoUserGroupExists(groupName);
         // send a message to the endUser asking if he wants to join the group
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-
         try {
+            Set<String> regids = new HashSet<>();
             RegistrationManager rm = getRegistrationManager(pm);
-            Message m = new Message.Builder()
-                    .collapseKey("send invitation")
-                    .timeToLive(6000)
+            for (String userToInvite : users.stringList) {
+                regids.add(rm.getUserIdByMail(userToInvite));
+            }
+
+            // Notification senden
+            Sender sender = new Sender(Constants.GCM_API_KEY);
+            Message.Builder mb = new Message.Builder()
+                    // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
                     .delayWhileIdle(false)
+                    .timeToLive(6000)
+                    .collapseKey("group_" + groupName + "_deleted")
+                            // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
                     .addData("type", MessageType.INVITATION_TO_GROUP_MESSAGE.name())
-                    .addData("content", "Sie haben eine Einladung erhalten von " + user.getEmail() + " in die Nutzergruppe " + groupName)
-                    .addData("title", groupName)
-                    .build();
-            Sender s = new Sender(Constants.GCM_API_KEY);
-            s.send(m, rm.getUserIdByMail(userToInvite), 1);
-        } catch (IOException e) {
-            e.printStackTrace();
+                    .addData("content", "Sie haben eine Einladung von " + user.getEmail() + " in die Nutzergruppe " + groupName+" erhalten.")
+                    .addData("title", groupName);
+            Message m = mb.build();
+            try {
+                sender.send(m, new LinkedList<>(regids), 1);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         } finally {
             pm.close();
         }
-
     }
 
     public List<UserLocationInfo> listUserGroupVisibleMembersLocationInfo(User user, @Named("groupName") String groupName)throws OAuthRequestException{

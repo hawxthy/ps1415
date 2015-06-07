@@ -1,0 +1,81 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context="ws1415.ps1415.activity.InviteUsersToGroupActivity">
+
+    <LinearLayout
+        android:id="@+id/input_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.wrapp.floatlabelededittext.FloatLabeledEditText
+            android:id="@+id/floating_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <EditText
+                android:id="@+id/search_user_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/user"
+                android:maxLength="50"
+                android:singleLine="true"
+                android:textSize="16dp" />
+        </com.wrapp.floatlabelededittext.FloatLabeledEditText>
+
+
+        <com.gc.materialdesign.views.ButtonFlat
+            android:id="@+id/search_user_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="#1E88E5"
+            android:text="@string/search" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_below="@+id/input_view"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+        <ListView
+            android:id="@+id/invite_user_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent">
+        </ListView>
+
+        <RelativeLayout
+            android:id="@+id/management_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/invite_user_list_view">
+
+            <com.gc.materialdesign.views.ButtonFlat
+                android:id="@+id/invite_user_button_abort"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_alignParentBottom="true"
+                android:layout_toLeftOf="@+id/invite_user_button_submit"
+                android:background="#1E88E5"
+                android:paddingRight="8dp"
+                android:text="@string/abortGroup" />
+
+            <com.gc.materialdesign.views.ButtonFlat
+                android:id="@+id/invite_user_button_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:background="#1E88E5"
+                android:text="@string/submitGroup" />
+        </RelativeLayout>
+
+    </LinearLayout>
+</RelativeLayout>

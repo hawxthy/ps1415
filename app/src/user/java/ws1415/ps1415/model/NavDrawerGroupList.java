@@ -14,11 +14,16 @@ import java.util.List;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.CreateUserGroupActivity;
+import ws1415.ps1415.activity.DistributeRightsActivity;
 import ws1415.ps1415.activity.FriendsActivity;
 import ws1415.ps1415.activity.GroupProfileActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.ListUserGroupsActivity;
+import ws1415.ps1415.activity.ManageEventsActivity;
+import ws1415.ps1415.activity.ManageRoutesActivity;
 import ws1415.ps1415.activity.MessagingActivity;
+import ws1415.ps1415.activity.MyUserGroupsActivity;
+import ws1415.ps1415.activity.PermissionManagementActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.activity.RegisterActivity;
 import ws1415.ps1415.activity.SearchActivity;
@@ -57,10 +62,7 @@ public class NavDrawerGroupList {
                     distributeRightsButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            // TODO implementieren
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
+                            context.startDistributeRightsActoin();
                             dialog.dismiss();
                         }
                     });
@@ -68,10 +70,7 @@ public class NavDrawerGroupList {
                     inviteGroupButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            // TODO implementieren
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
+                            context.startInviteUsersToGroup();
                             dialog.dismiss();
                         }
                     });
@@ -87,10 +86,7 @@ public class NavDrawerGroupList {
                     sendGlobalMessageButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            // TODO implementieren
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
+                            context.startGlobalMessageAction();
                             dialog.dismiss();
                         }
                     });
@@ -148,7 +144,7 @@ public class NavDrawerGroupList {
 
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent show_events_intent = new Intent(parent.getContext(), ListEventsActivity.class);
+                    Intent show_events_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
                     show_events_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(show_events_intent);
                 }
@@ -169,6 +165,26 @@ public class NavDrawerGroupList {
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent user_group_intent = new Intent(parent.getContext(), ListUserGroupsActivity.class);
+                    user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(user_group_intent);
+                }
+            },
+
+            // ---------- Meine Gruppen ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.my_groups;
+                }
+
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_group;
+                }
+
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent user_group_intent = new Intent(parent.getContext(), MyUserGroupsActivity.class);
                     user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(user_group_intent);
                 }
@@ -272,6 +288,66 @@ public class NavDrawerGroupList {
                 }
             },
 
+            // ---------------------------------------------
+            // ---------- Veranstalter-Funktionen ----------
+            // ---------------------------------------------
+
+            // ---------- Veranstaltung erstellen/bearbeiten ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.create_edit_events;
+                }
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_event;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(parent.getContext(), ManageEventsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(intent);
+                }
+            },
+
+            // ---------- Routen erstellen/bearbeiten ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.create_edit_routes;
+                }
+                @Override
+                // TODO Icon ändern
+                public int getIconId() {
+                    return R.drawable.ic_event;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(parent.getContext(), ManageRoutesActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(intent);
+                }
+            },
+
+            // ---------- Rechteverwaltung ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.permission_management;
+                }
+
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_action_accounts;
+                }
+
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent admins_intent = new Intent(parent.getContext(), PermissionManagementActivity.class);
+                    parent.getContext().startActivity(admins_intent);
+                }
+            },
+
             // ---------- Logout ----------
             new NavDrawerItem() {
                 @Override
@@ -292,5 +368,6 @@ public class NavDrawerGroupList {
                     parent.getContext().startActivity(intent);
                 }
             }
+
     };
 }

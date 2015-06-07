@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <com.wrapp.floatlabelededittext.FloatLabeledEditText
+        android:id="@+id/floating_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <EditText
+            android:id="@+id/search_user_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/user"
+            android:maxLength="50"
+            android:singleLine="true"
+            android:textSize="16dp" />
+    </com.wrapp.floatlabelededittext.FloatLabeledEditText>
+
+
+    <com.gc.materialdesign.views.ButtonFlat
+        android:id="@+id/search_user_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/floating_edit_text"
+        android:layout_alignBottom="@+id/floating_edit_text"
+        android:layout_marginBottom="16dp"
+        android:background="#1E88E5"
+        android:text="@string/search" />
+
+    <ListView
+        android:id="@+id/invite_user_list_view"
+        android:layout_below="@+id/floating_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></ListView>
+</RelativeLayout>

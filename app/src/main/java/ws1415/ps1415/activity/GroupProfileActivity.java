@@ -16,24 +16,31 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewParent;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.adapter.UserListAdapter;
 import ws1415.ps1415.controller.RightController;
+import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.model.NavDrawerGroupList;
 import ws1415.ps1415.model.Right;
 import ws1415.ps1415.util.ImageUtil;
 import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.widget.SlidingTabLayout;
+
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.Switch;
 import com.melnykov.fab.FloatingActionButton;
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.BooleanWrapper;
 import com.skatenight.skatenightAPI.model.UserGroup;
+import com.skatenight.skatenightAPI.model.UserGroupVisibleMembers;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +57,9 @@ import ws1415.ps1415.util.GroupImageLoader;
 public class GroupProfileActivity extends BaseFragmentActivity {
     private static final int SELECT_PHOTO = 1;
     private static final int PICTURE_CROP = 2;
+    public static final String EXTRA_GROUP_NAME = "groupName";
+    public static final String EXTRA_GROUP_MEMBERS = "groupMembers";
+    public static final String EXTRA_INVITE_GROUP = "invite";
     // Attribute für das Laden von Bildern
     private File tempFile;
     private Uri pictureUri;
@@ -61,6 +71,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
     private FloatingActionButton mJoinButton;
     private FloatingActionButton mLeaveButton;
     private FloatingActionButton mDeleteButton;
+    private FloatingActionButton mChangeVisibility;
     private ViewPager mViewPager;
     private SlidingTabLayout mTabLayout;
     private GroupProfileTabsAdapter mAdapter;
@@ -70,6 +81,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
     private UserGroup group;
     private boolean checkIsMember;
     private boolean checkGroupPassword;
+    private boolean checkVisibility;
 
     // Attribute zum testen von Bedingungen
     private boolean checkGlobalMessageTextChecked = false;
@@ -102,11 +114,13 @@ public class GroupProfileActivity extends BaseFragmentActivity {
         mDeleteButton = (FloatingActionButton) findViewById(R.id.group_profile_delete_group_button);
         mViewPager = (ViewPager) findViewById(R.id.group_profile_view_pager);
         mTabLayout = (SlidingTabLayout) findViewById(R.id.group_profile_tab_layout);
+        mChangeVisibility = (FloatingActionButton)findViewById(R.id.group_profile_change_visibility);
 
         // Gruppennamen aus dem Intent holen, falls nicht vorhanden Activity nicht starten.
-        groupName = getIntent().getStringExtra("groupName");
+        groupName = getIntent().getStringExtra(EXTRA_GROUP_NAME);
         if(groupName == null){
             Toast.makeText(this, R.string.noGroupNameInExtra, Toast.LENGTH_LONG).show();
+            finish();
             return;
         }
 
@@ -190,6 +204,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                         mJoinButton.setVisibility(View.VISIBLE);
                     }
                 }
+                checkIfVisible();
                 checkIfInvitationIntent();
                 if (group.getBlobKey() != null) {
                     GroupImageLoader.getInstance().setGroupImageToImageView(GroupProfileActivity.this, group.getBlobKey().getKeyString(), mGroupPicture);
@@ -209,6 +224,34 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                 Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG);
             }
         }, groupName);
+    }
+
+    /**
+     * überprüft, ob der Aufrufer ein Member ist und falls ja, dass wird überprüft ob
+     * diese sicht gegenüber der Gruppe sichtbar geamcht hat oder nicht.
+     *
+     */
+    private void checkIfVisible(){
+        if(checkIsMember){
+            GroupController.getInstance().getUserGroupVisibleMembers(new ExtendedTaskDelegateAdapter<Void, UserGroupVisibleMembers>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, UserGroupVisibleMembers visibleMembers) {
+                    if (visibleMembers.getList().contains(ServiceProvider.getEmail())) {
+                        mChangeVisibility.setColorNormal(R.color.colorPrimaryBlackBoard);
+                        mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
+                        mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
+                        mChangeVisibility.setVisibility(View.VISIBLE);
+                        checkVisibility = true;
+                    } else {
+                        mChangeVisibility.setColorNormal(R.color.colorPrimaryJoin);
+                        mChangeVisibility.setColorPressed(R.color.colorPressedJoin);
+                        mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_black_24dp));
+                        mChangeVisibility.setVisibility(View.VISIBLE);
+                        checkVisibility = false;
+                    }
+                }
+            }, groupName);
+        }
     }
 
     private void setClickOnPicture(){
@@ -294,6 +337,35 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      *
      */
     private void setClickListener() {
+        mChangeVisibility.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(checkVisibility){
+                    setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                    GroupController.getInstance().changeMyVisibility(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>(){
+                        @Override
+                        public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
+                            if(result.getValue()){
+                                mChangeVisibility.setColorNormal(R.color.colorPrimaryBlackBoard);
+                                mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
+                                mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
+                                mChangeVisibility.setVisibility(View.VISIBLE);
+                                checkVisibility = true;
+                                Toast.makeText(GroupProfileActivity.this, R.string.youAreNowVisible, Toast.LENGTH_LONG).show();
+                            }else{
+                                mChangeVisibility.setColorNormal(R.color.colorPrimaryJoin);
+                                mChangeVisibility.setColorPressed(R.color.colorPressedJoin);
+                                mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_black_24dp));
+                                mChangeVisibility.setVisibility(View.VISIBLE);
+                                checkVisibility = false;
+                                Toast.makeText(GroupProfileActivity.this, R.string.youAreNowInvisible, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    },groupName);
+                }
+            }
+        });
+
         mJoinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -859,12 +931,12 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      */
     public void startDistributeRightsActoin(){
         Intent start_distribute_rights_intent = new Intent(this, DistributeRightsActivity.class);
-        start_distribute_rights_intent.putExtra("groupName", groupName);
+        start_distribute_rights_intent.putExtra(EXTRA_GROUP_NAME, groupName);
         ArrayList<String> groupMembers = new ArrayList<>();
         for(String member : group.getMemberRights().keySet()){
             groupMembers.add(member);
         }
-        start_distribute_rights_intent.putExtra("groupMembers", groupMembers);
+        start_distribute_rights_intent.putExtra(EXTRA_GROUP_MEMBERS, groupMembers);
         startActivity(start_distribute_rights_intent);
     }
 
@@ -1078,8 +1150,33 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      * berührt hat, also diese geclickt hat.
      */
     public void checkIfInvitationIntent(){
-        if(getIntent().getStringExtra("inviteExtra") != null){
+        if(getIntent().getStringExtra(EXTRA_INVITE_GROUP) != null){
             startJoinEvent();
         }
+    }
+
+    /**
+     * Startet die InviteUsersActivity um neue Mitglieder für die Gruppe anzuwerben.
+     */
+    public void startInviteUsersToGroup(){
+        Intent start_invite_users_intent = new Intent(this, InviteUsersToGroupActivity.class);
+        start_invite_users_intent.putExtra(EXTRA_GROUP_NAME, groupName);
+        ArrayList<String> members = new ArrayList<>();
+        for(String member : group.getMemberRights().keySet()){
+            members.add(member);
+        }
+        start_invite_users_intent.putStringArrayListExtra(EXTRA_GROUP_MEMBERS, members);
+        startActivity(start_invite_users_intent);
+    }
+
+    /**
+     * Startet die CommentBlackBoardActivity und übergibt als Extra die id des zu
+     * kommentierenden BoardEntries.
+     * @param id
+     */
+    public void startCommentMessage(Long id){
+        Intent comment_board_message_intent = new Intent(this, CommentBlackBoardActivity.class);
+        comment_board_message_intent.putExtra(CommentBlackBoardActivity.EXTRA_BOARD_ID, id);
+        startActivity(comment_board_message_intent);
     }
 }

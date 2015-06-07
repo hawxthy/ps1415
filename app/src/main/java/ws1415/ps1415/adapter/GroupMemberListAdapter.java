@@ -25,6 +25,7 @@ import java.util.List;
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.DistributeRightsActivity;
 import ws1415.ps1415.activity.GroupProfileActivity;
+import ws1415.ps1415.activity.InviteUsersToGroupActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.model.Right;
@@ -47,6 +48,7 @@ public class GroupMemberListAdapter extends BaseAdapter {
     private Bitmap defaultBitmap;
     private boolean loadingData;
     private List<String> rights;
+    private List<String> members;
 
     /**
      * Erwartet die komplette Liste der E-Mail Adressen der Benutzer die angezeigt werden sollen.
@@ -56,8 +58,9 @@ public class GroupMemberListAdapter extends BaseAdapter {
      * @param userMails Liste der E-Mail Adressen
      * @param context Context
      */
-    public GroupMemberListAdapter(List<String> userMails, Context context, List<String> rights) {
+    public GroupMemberListAdapter(List<String> userMails, Context context, List<String> rights, List<String> members) {
         this.rights = rights;
+        this.members = members;
         this.mailData = userMails;
         mContext = context;
         mData = new ArrayList<>();
@@ -204,7 +207,7 @@ public class GroupMemberListAdapter extends BaseAdapter {
                 holder.buttonRight.setVisibility(View.GONE);
                 holder.buttonLeft.setVisibility(View.GONE);
             }
-        }else{
+        }else if(mContext instanceof DistributeRightsActivity){
             final DistributeRightsActivity activity = (DistributeRightsActivity)mContext;
             holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
             holder.buttonRight.setOnClickListener(new View.OnClickListener() {
@@ -225,6 +228,33 @@ public class GroupMemberListAdapter extends BaseAdapter {
                 }
             });
             holder.buttonLeft.setVisibility(View.GONE);
+        }else{
+            final InviteUsersToGroupActivity activity = (InviteUsersToGroupActivity)mContext;
+            holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
+            holder.buttonRight.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    activity.addMemberToList(holder.hiddenMailView.getText().toString());
+                    holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
+                    holder.buttonLeft.setVisibility(View.VISIBLE);
+                }
+            });
+            holder.buttonLeft.setImageDrawable(activity.getResources().getDrawable(R.drawable.remove_icon_in_red));
+            holder.buttonLeft.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    activity.removeMemberFromList(holder.hiddenMailView.getText().toString());
+                    holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
+                    holder.buttonLeft.setVisibility(View.GONE);
+                }
+            });
+            holder.buttonLeft.setVisibility(View.GONE);
+            if(members.contains(holder.hiddenMailView.getText().toString())){
+                holder.buttonRight.setVisibility(View.GONE);
+            }else{
+                holder.buttonLeft.setVisibility(View.GONE);
+                holder.buttonRight.setVisibility(View.VISIBLE);
+            }
         }
 
         return convertView;

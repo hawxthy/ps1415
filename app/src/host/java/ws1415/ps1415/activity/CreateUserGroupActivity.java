@@ -94,7 +94,7 @@ public class CreateUserGroupActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        super.setContentView(NavDrawerGroupList.items, R.layout.activity_create_user_group);
+        setContentView(R.layout.activity_create_user_group);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
         // Initialisiere die EditTexte

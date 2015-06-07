@@ -328,6 +328,10 @@
     <string name="deleteThisEntryQuestion">Delete this Entry?</string>
     <string name="deleteGroupTitle">Delete your Group</string>
     <string name="areYouSure">Are you sure?</string>
+    <string name="searchForUser">Search for a User</string>
+    <string name="cantSearchEmptyStrings">Put in something to search please</string>
+    <string name="youAreNowVisible">You are now visible</string>
+    <string name="youAreNowInvisible">You are now invisible</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="title_fragment_group_black_board">Blackboard</string>
@@ -451,6 +455,7 @@
     <!-- ListUserGroupsActivity-->
     <string name="loadingString">Loading</string>
     <string name="noMore">Nothing more to load</string>
+    <string name="securityGroupInfo">This is a Secruritygroup</string>
 
     <!-- RouteEditorActivity -->
     <string name="title_activity_route_editor">Route Editor</string>
@@ -468,5 +473,18 @@
     <string name="activity_edit_waypoint_dialog_apply">Apply</string>
     <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
     <string name="title_activity_edit_waypoint_dialog">Edit Waypoint</string>
+    <string name="title_activity_invite_users_to_group">InviteUsersToGroupActivity</string>
+
+    <!-- InviteUsersToGroupActivity-->
+    <string name="nothingFound">Didn\'t find anything</string>
+    <string name="sendDone">Invitations have been send</string>
+    <string name="noUsersToInvite">No users to invite Selected</string>
+    <string name="title_activity_my_user_groups">MyUserGroupsActivity</string>
+
+    <!-- MyUserGroupsActivity-->
+    <string name="tooManyVisibleGroups">Too many visible Groups</string>
+    <string name="title_activity_comment_black_board">CommentBlackBoardActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 
 </resources>

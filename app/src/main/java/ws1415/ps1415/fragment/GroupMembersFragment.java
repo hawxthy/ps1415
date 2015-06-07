@@ -47,7 +47,7 @@ public class GroupMembersFragment extends Fragment {
             members.add(member);
         }
 
-        mAdapter = new GroupMemberListAdapter(members, context, rights);
+        mAdapter = new GroupMemberListAdapter(members, context, rights, null);
         if (mMemberListView != null) mMemberListView.setAdapter(mAdapter);
     }
 }

@@ -4,7 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.skatenight.skatenightAPI.model.BlobKey;
+import com.skatenight.skatenightAPI.model.BoardEntry;
 import com.skatenight.skatenightAPI.model.BooleanWrapper;
+import com.skatenight.skatenightAPI.model.ListWrapper;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
 import com.skatenight.skatenightAPI.model.UserGroupFilter;
@@ -386,16 +388,16 @@ public class GroupController {
      *
      * @param handler   Der Task, der den Server anspricht
      * @param groupName die UserGroup zu der die Einladung verschickt wird
-     * @param user      Der EndUser, der die Nachricht erhalten soll
-     * @param message   Eine Mitteilung die der Nachricht mitgegeben wird
+     * @param users     Die EndUser, die die Einladung erhalten soll
      */
-    public void sendInvitation(ExtendedTaskDelegate handler, String groupName, final String user, final String message) {
+    public void sendInvitation(ExtendedTaskDelegate handler, String groupName, final List<String> users) {
         new ExtendedTask<String, Void, Void>(handler) {
             @Override
             protected Void doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().groupEndpoint().sendInvitation(params[0], user, message).execute();
+                    return ServiceProvider.getService().groupEndpoint().sendInvitation(params[0], new ListWrapper().setStringList(users)).execute();
                 } catch (IOException e) {
+                    e.printStackTrace();
                     publishError("Fehler: Die Einladung konnte nicht versendet werden");
                     return null;
                 }
@@ -471,6 +473,52 @@ public class GroupController {
                 }
             }
         }.execute(group);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert ume eine Blackboardmessage
+     * zu Kommentieren
+     *
+     * @param handler
+     * @param id Die Id der Blackboardmessage
+     * @param boardComment Der Kommentar
+     */
+    public void commentBlackBoard(ExtendedTaskDelegate handler, Long id, final String boardComment){
+        new ExtendedTask<Long, Void, BoardEntry>(handler){
+            @Override
+            protected BoardEntry doInBackground(Long... longs) {
+                try{
+                    return ServiceProvider.getService().groupEndpoint().commentBlackBoard(longs[0], boardComment).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    publishError("Fehler: Konnte die Boardmessage nicht Kommentieren");
+                    return null;
+                }
+            }
+        }.execute(id);
+    }
+
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um einen BoardEntry vom
+     * Server zu laden
+     *
+     * @param handler
+     * @param id Die Id des Boardentries
+     */
+    public void getBoardEntry(ExtendedTaskDelegate handler, Long id){
+        new ExtendedTask<Long, Void, BoardEntry>(handler){
+            @Override
+            protected BoardEntry doInBackground(Long... longs) {
+                try{
+                    return ServiceProvider.getService().groupEndpoint().getBoardEntry(longs[0]).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    publishError("Fehler: Der Boardentry konnte nicht geladern werden");
+                    return null;
+                }
+            }
+        }.execute(id);
     }
 
     /**
@@ -801,9 +849,9 @@ public class GroupController {
      * @param groupName Der Name der Nutzergruppe
      */
     public void changeMyVisibility(ExtendedTaskDelegate handler, String groupName) {
-        new ExtendedTask<String, Void, Void>(handler) {
+        new ExtendedTask<String, Void, BooleanWrapper>(handler) {
             @Override
-            protected Void doInBackground(String... params) {
+            protected BooleanWrapper doInBackground(String... params) {
                 try {
                     return ServiceProvider.getService().groupEndpoint().changeMyVisibility(params[0]).execute();
                 } catch (IOException e) {

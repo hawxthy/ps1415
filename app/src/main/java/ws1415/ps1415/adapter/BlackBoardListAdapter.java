@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gc.materialdesign.views.ButtonFlat;
 import com.skatenight.skatenightAPI.model.BoardEntry;
 
 import java.text.SimpleDateFormat;
@@ -79,6 +80,7 @@ public class BlackBoardListAdapter extends BaseAdapter{
         private TextView dateView;
         private TextView writerView;
         private TextView contentView;
+        private ButtonFlat commentButton;
     }
 
     @Override
@@ -93,6 +95,7 @@ public class BlackBoardListAdapter extends BaseAdapter{
             holder.contentView = (TextView) convertView.findViewById(R.id.list_view_item_black_board_content_edit_text);
             holder.hiddenEntryId = (EditText) convertView.findViewById(R.id.hidden_board_id);
             holder.deleteEntryButton = (ImageView) convertView.findViewById(R.id.delete_board_message_button);
+            holder.commentButton = (ButtonFlat) convertView.findViewById(R.id.list_view_item_black_board_comments_button);
             convertView.setTag(holder);
         }else{
             holder = (Holder) convertView.getTag();
@@ -128,6 +131,12 @@ public class BlackBoardListAdapter extends BaseAdapter{
             }else{
                 holder.deleteEntryButton.setVisibility(View.GONE);
             }
+            holder.commentButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    activity.startCommentMessage(Long.parseLong(holder.hiddenEntryId.getText().toString()));
+                }
+            });
         }
         return convertView;
     }

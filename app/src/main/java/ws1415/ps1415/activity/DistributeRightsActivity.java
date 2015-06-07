@@ -80,7 +80,7 @@ public class DistributeRightsActivity extends Activity {
 
         // ListView initialisieren und Adapter setzen
         memberListView = (ListView)findViewById(R.id.distribute_rights_list_view);
-        mAdapter = new GroupMemberListAdapter(groupMembers, this, null);
+        mAdapter = new GroupMemberListAdapter(groupMembers, this, null, null);
         memberListView.setAdapter(mAdapter);
 
         // Felder initialisieren

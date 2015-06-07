@@ -10,7 +10,8 @@
     <string name="messages">Messages</string>
     <string name="my_pictures">My Pictures</string>
     <string name="events">Events</string>
-    <string name="user_groups">User Groups</string>
+    <string name="user_groups">Groups</string>
+    <string name="my_groups">My Groups</string>
     <string name="search">Search</string>
     <string name="create_edit_events">Create/Edit Events</string>
     <string name="create_edit_routes">Create/Edit Routes</string>

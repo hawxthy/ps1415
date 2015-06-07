@@ -182,12 +182,23 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.activity.MyPicturesActivity" />
         </activity>
-        <activity
-            android:name=".activity.ShowPictureActivity" >
+        <activity android:name=".activity.ShowPictureActivity" >
         </activity>
         <activity
             android:name=".activity.DistributeRightsActivity"
             android:label="@string/title_activity_distribute_rights" >
+        </activity>
+        <activity
+            android:name=".activity.InviteUsersToGroupActivity"
+            android:label="@string/title_activity_invite_users_to_group" >
+        </activity>
+        <activity
+            android:name=".activity.MyUserGroupsActivity"
+            android:label="@string/title_activity_my_user_groups" >
+        </activity>
+        <activity
+            android:name=".activity.CommentBlackBoardActivity"
+            android:label="@string/title_activity_comment_black_board" >
         </activity>
     </application>
 
