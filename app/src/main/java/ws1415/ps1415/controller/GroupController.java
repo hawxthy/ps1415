@@ -7,10 +7,10 @@ import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.BooleanWrapper;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
-import com.skatenight.skatenightAPI.model.UserGroupMembers;
+import com.skatenight.skatenightAPI.model.UserGroupFilter;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
+import com.skatenight.skatenightAPI.model.UserGroupMetaDataList;
 import com.skatenight.skatenightAPI.model.UserGroupNewsBoardTransport;
-import com.skatenight.skatenightAPI.model.UserGroupPicture;
 import com.skatenight.skatenightAPI.model.UserGroupVisibleMembers;
 
 import org.apache.http.HttpEntity;
@@ -58,13 +58,13 @@ public class GroupController {
      * @param handler
      * @param groupName
      */
-    public void checkGroupName(ExtendedTaskDelegate handler, String groupName){
-        new ExtendedTask<String, Void, BooleanWrapper>(handler){
+    public void checkGroupName(ExtendedTaskDelegate handler, String groupName) {
+        new ExtendedTask<String, Void, BooleanWrapper>(handler) {
             @Override
             protected BooleanWrapper doInBackground(String... params) {
-                try{
+                try {
                     return ServiceProvider.getService().groupEndpoint().checkGroupName(params[0]).execute();
-                }catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Fehler: Der Name konnte nicht geprüft werden");
                     return null;
@@ -185,27 +185,8 @@ public class GroupController {
         }.execute(groupName);
     }
 
-    /**
-     * Methode, welche mit dem GroupEndpoint kommuniziert um die Mitglieder einer
-     * Nutzergruppe abzurufen.
-     *
-     * @param handler
-     * @param groupName
-     */
-    public void getUserGroupMembers(ExtendedTaskDelegate handler, String groupName){
-        new ExtendedTask<String, Void, UserGroupMembers>(handler){
-            @Override
-            protected UserGroupMembers doInBackground(String... params) {
-                try{
-                    return ServiceProvider.getService().groupEndpoint().getUserGroupMembers(params[0]).execute();
-                }catch (IOException e){
-                    e.printStackTrace();
-                    publishError("Fehler: Konnte die Mitglieder der Gruppe "+params[0]+" nicht abrufen");
-                    return null;
-                }
-
-            }
-        }.execute(groupName);
+    public void getVisibleUserGroups() {
+        //TODO implementieren
     }
 
     /**
@@ -244,6 +225,29 @@ public class GroupController {
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Fehler: Die Metadaten zu allen Gruppen konnten nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um Metadaten zu Nutzergruppen
+     * herunter zu laden.
+     *
+     * @param handler
+     * @param filter Gibt an wie viele geladen werden sollen und von wo geladen werden soll
+     *               siehe Doku im Backend
+     */
+    public void listUserGroupMetaDatas(ExtendedTaskDelegate handler,final UserGroupFilter filter){
+        new ExtendedTask<Void, Void, UserGroupMetaDataList>(handler){
+            @Override
+            protected UserGroupMetaDataList doInBackground(Void... params) {
+                try{
+                    return ServiceProvider.getService().groupEndpoint().listUserGroups(filter).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    publishError("Fehler: Die Metadatenliste konnte nicht abgerufen werden");
                     return null;
                 }
             }
@@ -313,7 +317,7 @@ public class GroupController {
      * Methode, welche mit dem GroupEndpoint kommuniziert um
      * einen EndUser einer UserGroup zuzuordnen.
      *
-     * @param handler  Der Task, der mit dem Server kommuniziert
+     * @param handler Der Task, der mit dem Server kommuniziert
      */
     public void joinUserGroup(ExtendedTaskDelegate handler, String groupName) {
         new ExtendedTask<String, Void, BooleanWrapper>(handler) {
@@ -562,56 +566,142 @@ public class GroupController {
      * der übergebenen UserGroup zu schicken.
      *
      * @param handler Der Task, der mit dem Server kommuniziert
-     * @param group   Die UserGroup deren Mitglieder benachricht werden sollen
-     * @param message Die Nachricht
+     * @param groupName Der Name der Nutzergruppe
+     * @param globalMessage Die Nachricht, nicht auf message ändern, sonst hat der Task probleme!
      */
-    public void sendGlobalMessage(ExtendedTaskDelegate handler, UserGroup group, String message) {
-        final String messageFinal = message;
-        new ExtendedTask<UserGroup, Void, Void>(handler) {
+    public void sendGlobalMessage(ExtendedTaskDelegate handler, String groupName, final String globalMessage) {
+        new ExtendedTask<String, Void, Void>(handler) {
             @Override
-            protected Void doInBackground(UserGroup... params) {
+            protected Void doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().groupEndpoint().sendGlobalMessage(messageFinal, params[0]).execute();
+                    return ServiceProvider.getService().groupEndpoint().sendGlobalMessage(params[0], globalMessage).execute();
                 } catch (IOException e) {
                     publishError("Fehler: Eine Nachricht an alle Mitglieder konnte nicht versendet werden");
                     return null;
                 }
             }
-        }.execute(group);
+        }.execute(groupName);
     }
 
     /**
-     * Methode, welche mit dem GroupEndpoint kommuniziert um das Bild einer
-     * UserGroup zu ändern.
-     * //TODO Kommentar anpassen
+     * Methode, welche mit dem GroupEndpoint kommuniziert um das Bild einer Nutzergruppe zu ändern.
+     * Dabei wird mit previewImageUploadUrl() eine Uploadurl auf dem Server zum Blobstore erstellt und
+     * zurück gesendet. Diese Url zusammen mit dem InputStream(Der Datei, die hochgeladen werden soll)
+     * und dem Namen der Gruppe werden an den Handler, die Server Klasse gesendet. Dort wird die Datei
+     * hochgeladen und aus dem Resultat "response" kann man den BlobKey auslesen. Diese Key wird dann
+     * in der Upload Klasse in der übergebenen Gruppe mit dem Namen groupName gespeichert und als String
+     * wieder hier hin zurück geschickt. Alternative könnte man einfach erneut die Nutzergruppe groupName
+     * erneut abrufen, man hat dadurch jedoch einen Serveraufruf mehr. Mit dem zurückgesendeten BlobKey
+     * kann man mit der getUserGroupPicture() oder loadImageForPreview() Methode sich das hochgeladene
+     * Bild herunterladen. Existiert keine Gruppe mit dem namen groupName, so schlägt der upload in der
+     * Upload klasse fehl und der hochgeladene Blob, also das Bild wird gelöscht.
      *
      * @param handler   Der Task, der mit dem Server kommuniziert
      * @param groupName Die UserGroup dessen Bild geändert werden soll
-     * @return Nachricht über das Ergebnis des änderns
-     * true = Das Bild wurde erfolgreich gelöscht
-     * false = Das Bild wurde nicht gelöscht, Fehler
      */
     public void changePicture(ExtendedTaskDelegate handler, String groupName, final InputStream pictureFile) {
-        new ExtendedTask<String, Void, UserGroupPicture>(handler) {
-            UserGroupPicture picture;
-
+        new ExtendedTask<String, Void, BlobKey>(handler) {
             @Override
-            protected UserGroupPicture doInBackground(String... params) {
-                try {
-                    picture = ServiceProvider.getService().groupEndpoint().changePicture(params[0]).execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    publishError("Fehler: Es konnte kein Bild für " + params[0] + " erstellt werden");
-                    return null;
-                }
+            protected BlobKey doInBackground(String... params) {
                 try {
                     HttpClient httpclient = new DefaultHttpClient();
-                    HttpPost httppost = new HttpPost(picture.getPictureUrl());
+                    HttpPost httppost = new HttpPost(ServiceProvider.getService().groupEndpoint().previewImageUploadUrl().execute().getString());
 
                     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                     builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
                     builder.addPart("file", new InputStreamBody(pictureFile, "file"));
-                    builder.addTextBody("id", picture.getId().toString());
+                    builder.addTextBody("id", params[0]);
+
+                    HttpEntity entity = builder.build();
+                    httppost.setEntity(entity);
+                    HttpResponse response = httpclient.execute(httppost);
+                    HttpEntity httpEntity = response.getEntity();
+
+                    String encoding;
+                    if (httpEntity.getContentEncoding() == null) {
+                        // UTF-8 verwenden, falls keine Kodierung für die Antwort übertragen wurde
+                        encoding = "UTF-8";
+                    } else {
+                        encoding = httpEntity.getContentEncoding().getValue();
+                    }
+
+                    // Die BlobKeyValue (ein String) aus der httpEntity holen und daraus einen BlobKey erstellen
+                    // und diesen zurück an den Clienten senden.
+                    String keyString = EntityUtils.toString(httpEntity, encoding);
+                    BlobKey blobKey = new BlobKey();
+                    blobKey.setKeyString(keyString);
+                    return blobKey;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Fehler: Das Bild für " + params[0] + " konnte nicht geändert werden");
+                    return null;
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um das Bild einer
+     * Nutzergruppe herunter zu laden.
+     *
+     * @param handler
+     * @param groupName Der Name der Nutzergruppe
+     */
+    public void getUserGroupPicture(ExtendedTaskDelegate handler, String groupName) {
+        new ExtendedTask<String, Void, Bitmap>(handler) {
+            BlobKey blobKey;
+            ByteArrayInputStream is;
+
+            @Override
+            protected Bitmap doInBackground(String... params) {
+                try {
+                    blobKey = ServiceProvider.getService().groupEndpoint().getUserGroupPicture(params[0]).execute();
+                    HttpClient client = new DefaultHttpClient();
+                    HttpGet get = new HttpGet(Constants.SERVER_URL + "/Bernd/images/serve?key=" + blobKey.getKeyString());
+                    HttpResponse response = client.execute(get);
+                    HttpEntity httpEntity = response.getEntity();
+
+                    is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
+                    Bitmap bitmap = BitmapFactory.decodeStream(is);
+                    return bitmap;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Fehler: Das Bild konnte nicht abgerufen werden");
+                    return null;
+                } finally {
+                    if (is != null) {
+                        try {
+                            is.close();
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+
+                }
+            }
+        }.execute(groupName);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um ein Image hochzuladen um es sich in
+     * der app anzuschauen.
+     *
+     * @param handler
+     * @param pictureFile
+     * @param blobKeyString
+     */
+    public void uploadImageForPreview(ExtendedTaskDelegate handler, InputStream pictureFile, final String blobKeyString) {
+        new ExtendedTask<InputStream, Void, BlobKey>(handler) {
+            @Override
+            protected BlobKey doInBackground(InputStream... params) {
+                try {
+                    HttpClient httpclient = new DefaultHttpClient();
+                    HttpPost httppost = new HttpPost(ServiceProvider.getService().groupEndpoint().previewImageUploadUrl().execute().getString());
+
+                    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+                    builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+                    builder.addPart("file", new InputStreamBody(params[0], "file"));
+                    builder.addTextBody("blobKeyString", blobKeyString);
 
                     HttpEntity entity = builder.build();
                     httppost.setEntity(entity);
@@ -629,65 +719,54 @@ public class GroupController {
                     String keyString = EntityUtils.toString(httpEntity, encoding);
                     BlobKey blobKey = new BlobKey();
                     blobKey.setKeyString(keyString);
-                    picture.setPictureBlobKey(blobKey);
+                    return blobKey;
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Fehler: Das Bild konnte nicht hochgeladen werden");
-                    return null;
                 }
-                return picture;
+                return null;
+
             }
-        }.execute(groupName);
+        }.execute(pictureFile);
     }
 
     /**
-     * Methode, welche mit dem GroupEndpoint kommuniziert um das Bild einer
-     * Nutzergruppe herunter zu laden.
+     * Methode, welche mit der Serve Klasse auf dem Endpoint kommuniziert um
+     * ein Bild für den angegebenen BlobKey zu laden.
      *
      * @param handler
-     * @param groupName Der Name der Nutzergruppe
+     * @param blobkey
      */
-    public void getUserGroupPicture(ExtendedTaskDelegate handler, String groupName) {
-        new ExtendedTask<String, Void, Bitmap>(handler) {
-            UserGroupPicture picture;
+    public void loadImageForPreview(ExtendedTaskDelegate handler, final BlobKey blobkey) {
+        new ExtendedTask<Void, Void, Bitmap>(handler) {
             ByteArrayInputStream is;
 
             @Override
-            protected Bitmap doInBackground(String... params) {
+            protected Bitmap doInBackground(Void... params) {
                 try {
-                    picture = ServiceProvider.getService().groupEndpoint().getUserGroupPicture(params[0]).execute();
-                } catch (IOException e) {
+                    HttpClient client = new DefaultHttpClient();
+                    HttpGet get = new HttpGet(Constants.SERVER_URL + "/Bernd/images/serve?key=" + blobkey.getKeyString());
+                    HttpResponse response = client.execute(get);
+                    HttpEntity httpEntity = response.getEntity();
+
+                    is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
+                    Bitmap bitmap = BitmapFactory.decodeStream(is);
+                    return bitmap;
+                } catch (Exception e) {
                     e.printStackTrace();
                     publishError("Fehler: Das Bild konnte nicht abgerufen werden");
-                    return null;
-                }
-                if (picture != null) {
-                    try {
-                        HttpClient client = new DefaultHttpClient();
-                        HttpGet get = new HttpGet(Constants.SERVER_URL + "/Bernd/images/serve?key=" + picture.getPictureBlobKey().getKeyString());
-                        HttpResponse response = client.execute(get);
-                        HttpEntity httpEntity = response.getEntity();
-
-                        is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
-                        Bitmap bitmap = BitmapFactory.decodeStream(is);
-                        return bitmap;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        publishError("Fehler: Das bild konnte nicht abgerufen werden");
-                    } finally {
-                        if (is != null) {
-                            try {
-                                is.close();
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
+                } finally {
+                    if (is != null) {
+                        try {
+                            is.close();
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
                         }
                     }
-                    return null;
                 }
                 return null;
             }
-        }.execute(groupName);
+        }.execute();
     }
 
     /**
@@ -808,88 +887,19 @@ public class GroupController {
     }
 
     /**
-     * Methode, welche mit dem GroupEndpoint kommuniziert um ein Image hochzuladen um es sich in
-     * der app anzuschauen.
-     *
+     * Methode zum aufräumen von unbenutzten blobkeys.
      * @param handler
-     * @param pictureFile
-     * @param blobKeyString
      */
-    public void uploadImageForPreview(ExtendedTaskDelegate handler, InputStream pictureFile, final String blobKeyString) {
-        new ExtendedTask<InputStream, Void, BlobKey>(handler) {
+    public void deleteUnusedBlobKeys(ExtendedTaskDelegate handler){
+        new ExtendedTask<String, Void, Void>(handler){
             @Override
-            protected BlobKey doInBackground(InputStream... params) {
-                try {
-                    HttpClient httpclient = new DefaultHttpClient();
-                    HttpPost httppost = new HttpPost(ServiceProvider.getService().groupEndpoint().previewImageUploadUrl().execute().getString());
-
-                    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-                    builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-                    builder.addPart("file", new InputStreamBody(params[0], "file"));
-                    builder.addTextBody("blobKeyString", blobKeyString);
-
-                    HttpEntity entity = builder.build();
-                    httppost.setEntity(entity);
-                    HttpResponse response = httpclient.execute(httppost);
-                    HttpEntity httpEntity = response.getEntity();
-
-                    String encoding;
-                    if (httpEntity.getContentEncoding() == null) {
-                        // UTF-8 verwenden, falls keine Kodierung für die Antwort übertragen wurde
-                        encoding = "UTF-8";
-                    } else {
-                        encoding = httpEntity.getContentEncoding().getValue();
-                    }
-
-                    String keyString = EntityUtils.toString(httpEntity, encoding);
-                    BlobKey blobKey = new BlobKey();
-                    blobKey.setKeyString(keyString);
-                    return blobKey;
-                } catch (IOException e) {
+            protected Void doInBackground(String... strings) {
+                try{
+                    return ServiceProvider.getService().groupEndpoint().cleanPreviewPictures().execute();
+                }catch(IOException e){
                     e.printStackTrace();
-                    publishError("Fehler: Das Bild konnte nicht hochgeladen werden");
+                    return null;
                 }
-                return null;
-
-            }
-        }.execute(pictureFile);
-    }
-
-    /**
-     * Methode, welche mit der Serve Klasse auf dem Endpoint kommuniziert um
-     * ein Bild für den angegebenen BlobKey zu laden.
-     *
-     * @param handler
-     * @param blobkey
-     */
-    public void loadImageForPreview(ExtendedTaskDelegate handler, final BlobKey blobkey) {
-        new ExtendedTask<Void, Void, Bitmap>(handler) {
-            ByteArrayInputStream is;
-
-            @Override
-            protected Bitmap doInBackground(Void... params) {
-                try {
-                    HttpClient client = new DefaultHttpClient();
-                    HttpGet get = new HttpGet(Constants.SERVER_URL + "/Bernd/images/serve?key=" +blobkey.getKeyString());
-                    HttpResponse response = client.execute(get);
-                    HttpEntity httpEntity = response.getEntity();
-
-                    is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
-                    Bitmap bitmap = BitmapFactory.decodeStream(is);
-                    return bitmap;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    publishError("Fehler: Das Bild konnte nicht abgerufen werden");
-                } finally {
-                    if (is != null) {
-                        try {
-                            is.close();
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-                return null;
             }
         }.execute();
     }

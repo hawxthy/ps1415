@@ -76,4 +76,12 @@
     <string name="choose_role">Choose role…</string>
     <string name="error_changing_role">An error occurred while changig the role. Please try again.</string>
 
+
+    <!--Strings zu ActivityCreateUserGroup -->
+    <string name="groupTypeTitle">Type of Group</string>
+    <string name="groupTypeSecurity">Secrutity</string>
+    <string name="groupTypeNormal">Normal</string>
+    <string name="typeInfoGroup">Info Group Type</string>
+    <string name="infoGroupType">Security groups are always private and members of this group will always be visible. That means participants of an Event will always see the memembers of any Securitygroup on their map.</string>
+
 </resources>

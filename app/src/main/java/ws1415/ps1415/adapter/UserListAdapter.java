@@ -88,7 +88,7 @@ public class UserListAdapter extends BaseAdapter {
      *
      * @param userMails Ergebnis der Suche
      */
-    private void addNextUserInfo(final List<String> userMails) {
+    protected void addNextUserInfo(final List<String> userMails) {
         if (!loadingData) {
             if(mActivity != null) mActivity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
             int dataSize = (userMails.size() < DATA_PER_REQUEST) ? userMails.size() : DATA_PER_REQUEST;
@@ -193,13 +193,13 @@ public class UserListAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private String setUpPrimaryText(UserListData userListData) {
+    protected String setUpPrimaryText(UserListData userListData) {
         String firstName = userListData.getFirstName();
         String lastName = userListData.getLastName();
         return (lastName == null) ? firstName : firstName + " " + lastName;
     }
 
-    private String setUpSecondaryText(UserListData userListData) {
+    protected String setUpSecondaryText(UserListData userListData) {
         String city = userListData.getCity();
         String dateOfBirth = userListData.getDateOfBirth();
         Integer age = null;

@@ -4,11 +4,12 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.AdapterView;
 
+import ws1415.ps1415.activity.ListUserGroupsActivity;
+import ws1415.ps1415.activity.PermissionManagementActivity;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.FriendsActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
-import ws1415.ps1415.activity.ListUserGroupsActivity;
 import ws1415.ps1415.activity.ManageEventsActivity;
 import ws1415.ps1415.activity.ManageRoutesActivity;
 import ws1415.ps1415.activity.MessagingActivity;
@@ -128,7 +129,7 @@ public class NavDrawerList {
                     parent.getContext().startActivity(user_group_intent);
                 }
             },
-
+            
             // ---------- Suche ----------
             new NavDrawerItem() {
                 @Override

@@ -6,11 +6,14 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.melnykov.fab.FloatingActionButton;
+import com.skatenight.skatenightAPI.model.UserGroup;
+import com.skatenight.skatenightAPI.model.UserGroupFilter;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 
 import java.util.List;
@@ -18,11 +21,13 @@ import java.util.List;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.UsergroupAdapter;
 import ws1415.ps1415.controller.GroupController;
-import ws1415.ps1415.model.NavDrawerGroupList;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 
 public class ListUserGroupsActivity extends BaseActivity {
+    // maximal Anzahl an gleichzeitig zu ladenen Nutzergruppen
+    final private int MAX_GROUPS_PER_LOAD = 10;
+
     private ListView mUserGroupListView;
     private List<UserGroupMetaData> mUserGroupList;
     private UsergroupAdapter mAdapter;
@@ -32,7 +37,9 @@ public class ListUserGroupsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        super.setContentView(NavDrawerGroupList.items, R.layout.activity_list_user_groups);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        setContentView(R.layout.activity_list_user_groups);
+        setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
         mUserGroupListView = (ListView) findViewById(R.id.user_group_list_view);
         createUserGroupButton = (FloatingActionButton) findViewById(R.id.joinUserGroupButton);
@@ -52,7 +59,9 @@ public class ListUserGroupsActivity extends BaseActivity {
             }
 
         });
-        refresh();
+
+        GroupController.getInstance().deleteUnusedBlobKeys(new ExtendedTaskDelegateAdapter<Void, Void>(){
+        });
     }
 
     @Override
@@ -83,43 +92,37 @@ public class ListUserGroupsActivity extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
+        setProgressBarIndeterminateVisibility(Boolean.TRUE);
+        refresh();
     }
 
     /**
      * Dient zum Refreshen der Liste der aktuellen UserGroups.
      */
     public void refresh() {
-        GroupController.getInstance().getUserGroupMetaDatas(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> metaDatas) {
-                setMetaDatasToListView(metaDatas);
-            }
-
-            @Override
-            public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(ListUserGroupsActivity.this, message, Toast.LENGTH_LONG).show();
-            }
-
-        });
-
-
+        final UserGroupFilter filter = new UserGroupFilter();
+        filter.setLimit(MAX_GROUPS_PER_LOAD);
+        setMetaDatasToListView(filter);
     }
 
     /**
      * Füllt die ListView mit den UserGroups vom Server.
      *
-     * @param results ArrayList von UserGroups
+     * @param filter Der Filter für die Nutzergruppen die geladen werden sollen
      */
-    public void setMetaDatasToListView(List<UserGroupMetaData> results) {
-        mUserGroupList = results;
-        mAdapter = new UsergroupAdapter(this, results, -1);
+    public void setMetaDatasToListView(UserGroupFilter filter) {
+        mAdapter = new UsergroupAdapter(this, filter,  -1);
         if (mUserGroupListView != null) mUserGroupListView.setAdapter(mAdapter);
     }
 
-    private void openGroupProfile(UserGroupMetaData medaData){
+    /**
+     * Startet das Gruppenprofil. Dabei muss im Intent der Name der Gruppe übergeben werden.
+     *
+     * @param medaData Die Metadaten zu der Gruppe
+     */
+    private void openGroupProfile(UserGroup medaData){
         Intent open_group_profile_intent = new Intent(this, GroupProfileActivity.class);
         open_group_profile_intent.putExtra("groupName", medaData.getName());
-        open_group_profile_intent.putExtra("groupCreator", medaData.getCreator());
         startActivity(open_group_profile_intent);
     }
 }

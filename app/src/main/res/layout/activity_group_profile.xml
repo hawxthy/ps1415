@@ -34,13 +34,44 @@
             android:id="@+id/group_profile_join_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:src="@drawable/ic_action_new"
             android:layout_alignParentRight="true"
             android:layout_alignBottom="@+id/group_profile_image_view"
             android:layout_marginBottom="8dp"
             android:layout_marginRight="8dp"
-            fab:fab_colorNormal="@color/colorPrimary"
-            fab:fab_colorPressed="@color/colorPressed"
+            fab:fab_colorNormal="@color/colorPrimaryJoin"
+            fab:fab_colorPressed="@color/colorPressedJoin"
+            >
+        </com.melnykov.fab.FloatingActionButton>
+
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/group_profile_leave_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:src="@drawable/ic_close_white_24dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@+id/group_profile_image_view"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            fab:fab_colorNormal="@color/ColorPrimaryDark"
+            fab:fab_colorPressed="@color/ColorPrimary"
+            >
+        </com.melnykov.fab.FloatingActionButton>
+
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/group_profile_delete_group_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:src="@drawable/ic_close_white_24dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@+id/group_profile_image_view"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="8dp"
+            fab:fab_colorNormal="@color/ColorPrimaryDark"
+            fab:fab_colorPressed="@color/ColorPrimary"
             >
         </com.melnykov.fab.FloatingActionButton>
     </RelativeLayout>

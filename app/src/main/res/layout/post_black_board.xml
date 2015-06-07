@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <com.wrapp.floatlabelededittext.FloatLabeledEditText
+        android:id="@+id/floating_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp">
+        android:padding="16dp">
 
         <EditText
             android:id="@+id/post_black_board_edit_text"
@@ -24,4 +22,13 @@
             android:textSize="16dp" />
     </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/failure_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="16dp"
+        android:layout_below="@+id/floating_edit_text"
+        android:paddingLeft="16dp"
+        android:textColor="@color/check_group_name_negative"
+        android:textSize="12sp"/>
+
+</RelativeLayout>

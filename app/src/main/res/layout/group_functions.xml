@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerHorizontal="true">
+
+
+    <com.gc.materialdesign.views.ButtonFlat
+        android:id="@+id/group_function_invite_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="#1E88E5"
+        android:text="@string/inviteGroup" />
+
+    <com.gc.materialdesign.views.ButtonFlat
+        android:id="@+id/group_function_post_global_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/group_function_invite_group"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="#1E88E5"
+        android:text="@string/postGlobalMessage" />
+
+
+    <com.gc.materialdesign.views.ButtonFlat
+        android:id="@+id/group_function_distribute_rights"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/group_function_post_global_message"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="#1E88E5"
+        android:text="@string/distributeRights" />
+
+
+
+    <com.gc.materialdesign.views.ButtonFlat
+        android:id="@+id/group_function_change_group_privacy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/group_function_distribute_rights"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="#1E88E5"
+        android:text="@string/changePrivacy" />
+
+    <com.gc.materialdesign.views.ButtonFlat
+        android:id="@+id/group_function_change_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/group_function_change_group_privacy"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="#1E88E5"
+        android:text="@string/changePasswod" />
+
+</RelativeLayout>

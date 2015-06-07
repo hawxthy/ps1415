@@ -163,26 +163,6 @@ public class NavDrawerList {
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     parent.getContext().startActivity(intent);
                 }
-            },
-
-
-
-            // ---------- Testeinträge ----------
-            new NavDrawerItem() {
-                @Override
-                public int getTitleId() {
-                    return R.string.upload_group_image;
-                }
-                @Override
-                public int getIconId() {
-                    return R.drawable.ic_action_new;
-                }
-                @Override
-                public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent upload_group_picture_intent = new Intent(parent.getContext(), UploadImageActivity.class);
-                    upload_group_picture_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    parent.getContext().startActivity(upload_group_picture_intent);
-                }
             }
     };
 }

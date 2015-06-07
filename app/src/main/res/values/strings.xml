@@ -298,12 +298,36 @@
     <string name="creatingGroupError">Couldn\'t create Group</string>
     <string name="defaultGroupDestription">This is the Group: </string>
     <string name="checkGroupNamePlease">Check Groupname please</string>
+    <string name="groupNameTooShort">Lenght of the Name must at least be 3</string>
+    <string name="passwordTooShort">Length of the Password must at least be 5</string>
 
     <!-- GroupProfileActivity-->
+    <string name="noGroupNameInExtra">Aborted: You have to deliver the Groupname via the Intent Extras</string>
     <string name="title_activity_group_profile">Group Profile</string>
     <string name="title_alert_dialog_join_user_group">Join this Group?</string>
     <string name="dialog_yes">Yes</string>
     <string name="dialog_no">No</string>
+    <string name="alreadyInGroupString">You are already in this Group</string>
+    <string name="makeGroupPrivateString">Make this Group private?</string>
+    <string name="makeGroupOpenString">Make this Group open to everyone? You will loose your Password</string>
+    <string name="groupOpenNoNeedForPw">Open Groups don\'t need Passwords</string>
+    <string name="groupChangePasswordTitle">Change Password?</string>
+    <string name="globalMessageTitle">Send a global Message?</string>
+    <string name="globalMessageFailure">You have to type in a global Message</string>
+    <string name="globalMessageTooShort">Message length has to be at least 10</string>
+    <string name="boardMessageTooShort">Message length has to be at least 2</string>
+    <string name="removeMemberTitle">Remove Member?</string>
+    <string name="deleteLeaderFailmessage">You cannot delete the Leader of a group</string>
+    <string name="leaderTriesToLeave">The leader cannot leave the Group</string>
+    <string name="leaveGroupTitle">Leaving Group</string>
+    <string name="leaveGroupMessage">Leave this Group?</string>
+    <string name="wrongPasswordMessage">Wrong Password</string>
+    <string name="distributeRightsToOne">Distribute Rights to</string>
+    <string name="dontDistributeRightsToNothing">No E-Mail submitted</string>
+    <string name="noEntryToDelete">No entry to delete submitted</string>
+    <string name="deleteThisEntryQuestion">Delete this Entry?</string>
+    <string name="deleteGroupTitle">Delete your Group</string>
+    <string name="areYouSure">Are you sure?</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="title_fragment_group_black_board">Blackboard</string>
@@ -390,4 +414,41 @@
 
     <!-- ShowPictureActivity -->
     <string name="action_add_to_gallery">Add to Gallery</string>
+
+    <!-- Group Functions -->
+    <string name="groupFunctions">Group Functions</string>
+    <string name="groupFunctionsTitle">You can perform the following actions</string>
+    <string name="createUserGroup">Create Group</string>
+    <string name="distributeRights">Distribute Rights</string>
+    <string name="inviteGroup">Invite User</string>
+    <string name="changePrivacy">Change Privacy</string>
+    <string name="changePicture">Change Picture</string>
+    <string name="postGlobalMessage">Global Message</string>
+    <string name="removeMember">Remove Members</string>
+    <string name="abortGroupFunctions">Cancel</string>
+    <string name="changePasswod">Change Password</string>
+    <string name="editBlackBoard">Edit Blackboard</string>
+    <string name="globalMessageSend">Message has been send</string>
+
+    <!-- AlerDialog Button Strings -->
+    <string name="sendButton">Send</string>
+    <string name="okButton">OK</string>
+    <string name="inviteButton">Invite</string>
+    <string name="doneButton">Done</string>
+    <string name="cancelButton">Cancel</string>
+    <string name="abortButton">Abort</string>
+    <string name="yesButton">Yes</string>
+    <string name="title_activity_distribute_rights">DistributeRightsActivity</string>
+
+    <!-- DistributeRightsActivity-->
+    <string name="distributeRightsHeader">Rights to Distribute</string>
+    <string name="distributeRightsHeaderList">Distribute to</string>
+    <string name="noGoupNameSubmitted">You need to submit a group name via the Intent</string>
+    <string name="noGroupMembersSubmitted">You need to submit the groupmembers via the Intent</string>
+    <string name="noMembersToGrantRights">You didn\'t select any members</string>
+
+    <!-- ListUserGroupsActivity-->
+    <string name="loadingString">Loading</string>
+    <string name="noMore">Nothing more to load</string>
+
 </resources>

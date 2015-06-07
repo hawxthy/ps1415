@@ -62,6 +62,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ws1415.ps1415.activity.ManageEventsActivity" />
         </activity>
+        <activity
+            android:name=".activity.CreateUserGroupActivity"
+            android:label="@string/title_activity_create_user_group" >
+        </activity>
     </application>
 
 </manifest>

@@ -9,8 +9,7 @@ package ws1415.SkatenightBackend.model;
  */
 public enum Right {
     DELETEGROUP,
-    POSTBLACKBOARD,
-    COMMENTBOARDMESSAGE,
+    EDITBLACKBOARD,
     CHANGEGROUPPICTURE,
     GLOBALMESSAGE,
     INVITEGROUP,

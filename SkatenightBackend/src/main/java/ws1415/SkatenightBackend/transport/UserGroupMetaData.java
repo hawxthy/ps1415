@@ -12,12 +12,14 @@ public class UserGroupMetaData {
     private String creator;
     private boolean isPrivat;
     private int memberCount;
+    private String blobKeyValue;
 
-   public UserGroupMetaData(String name, String creator, boolean isPrivat, int memberCount){
+   public UserGroupMetaData(String name, String creator, boolean isPrivat, int memberCount, String blobKeyValue){
        this.name = name;
        this.creator = creator;
        this.isPrivat = isPrivat;
        this.memberCount = memberCount;
+       this.blobKeyValue = blobKeyValue;
    }
 
     public String getName() {
@@ -50,5 +52,13 @@ public class UserGroupMetaData {
 
     public void setMemberCount(int memberCount) {
         this.memberCount = memberCount;
+    }
+
+    public String getBlobKeyValue() {
+        return blobKeyValue;
+    }
+
+    public void setBlobKeyValue(String blobKeyValue) {
+        this.blobKeyValue = blobKeyValue;
     }
 }

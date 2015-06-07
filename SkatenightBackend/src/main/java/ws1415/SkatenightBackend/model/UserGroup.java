@@ -1,5 +1,6 @@
 package ws1415.SkatenightBackend.model;
 
+import com.google.appengine.api.blobstore.BlobKey;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -28,15 +29,14 @@ public class UserGroup {
     private boolean privat;
     private int memberCount;
     private String groupType;
-    @Load(unless = {UserGroupMetaData.class, UserGroupBlackBoardTransport.class, UserGroupNewsBoardTransport.class, UserGroupPicture.class})
+    private BlobKey blobKey;
+    @Load(unless = {UserGroupMetaData.class, UserGroupBlackBoardTransport.class, UserGroupNewsBoardTransport.class})
     private HashMap<String, ArrayList<String>> memberRights;
-    @Load(unless = {UserGroupMetaData.class, UserGroupBlackBoardTransport.class, UserGroupNewsBoardTransport.class, UserGroupVisibleMembers.class})
-    private Ref<UserGroupPicture> picture;
-    @Load(unless = {UserGroupMetaData.class, UserGroupNewsBoardTransport.class, UserGroupPicture.class, UserGroupVisibleMembers.class})
+    @Load(unless = {UserGroupMetaData.class, UserGroupNewsBoardTransport.class, UserGroupVisibleMembers.class})
     private Ref<Board> blackBoard;
-    @Load(unless = {UserGroupMetaData.class, UserGroupBlackBoardTransport.class, UserGroupPicture.class, UserGroupVisibleMembers.class})
+    @Load(unless = {UserGroupMetaData.class, UserGroupBlackBoardTransport.class, UserGroupVisibleMembers.class})
     private Ref<Board> newsBoard;
-    @Load(unless = {UserGroupMetaData.class, UserGroupBlackBoardTransport.class, UserGroupNewsBoardTransport.class, UserGroupPicture.class})
+    @Load(unless = {UserGroupMetaData.class, UserGroupBlackBoardTransport.class, UserGroupNewsBoardTransport.class})
     private Ref<UserGroupVisibleMembers> visibleMembers;
 
 
@@ -131,22 +131,16 @@ public class UserGroup {
         return groupType;
     }
 
-    public UserGroupPicture getPicture() {
-        if (picture != null) {
-            return picture.get();
-        }
-        return null;
+    public BlobKey getBlobKey() {
+        return blobKey;
     }
 
-    public void setPicture(UserGroupPicture picture) {
-        this.picture = Ref.create(picture);
+    public void setBlobKey(BlobKey blobKey) {
+        this.blobKey = blobKey;
     }
 
     public HashMap<String, ArrayList<String>> getMemberRights() {
-        if (memberRights != null) {
-            return memberRights;
-        }
-        return null;
+        return memberRights;
     }
 
     public void setMemberRights(HashMap<String, ArrayList<String>> memberRights) {

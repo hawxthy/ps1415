@@ -116,6 +116,13 @@ public class GcmIntentService extends IntentService {
                             updateMessageReceived(receiverConf, messageId, sendDate, sender);
                         }
                         break;
+                    case GLOBAL_GROUP_MESSAGE:
+                        sendNotificationMessaging(extras);
+                        break;
+                    case INVITATION_TO_GROUP_MESSAGE:
+                        //TODO Button zum joinen hinzufügen
+                        sendNotificationMessaging(extras);
+                        break;
                 }
             }
         }

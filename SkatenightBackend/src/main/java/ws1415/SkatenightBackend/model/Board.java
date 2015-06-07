@@ -6,12 +6,15 @@ import com.googlecode.objectify.annotation.Id;
 
 import java.util.ArrayList;
 
+import static com.googlecode.objectify.ObjectifyService.ofy;
+
 /**
  * Created by Bernd Eissing on 26.05.2015.
  */
 @Entity
 public class Board {
     @Id
+    private Long id;
     String groupName;
     ArrayList<Ref<BoardEntry>> entries;
 
@@ -22,6 +25,10 @@ public class Board {
     public Board(String groupName, BoardEntry be){
         this.groupName = groupName;
         addBoardMessage(be);
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getGroupName() {
@@ -58,6 +65,10 @@ public class Board {
             entries = new ArrayList<Ref<BoardEntry>>();
         }
         entries.add(Ref.create(be));
+        if(entries.size() > 50){
+            ofy().delete().entity(entries.get(0)).now();
+            entries.remove(0);
+        }
     }
 
     public void removeBoardMessage(Long boardEntryId) {

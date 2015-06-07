@@ -9,7 +9,6 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 import com.skatenight.skatenightAPI.model.UserGroupNewsBoardTransport;
-import com.skatenight.skatenightAPI.model.UserGroupPicture;
 import com.skatenight.skatenightAPI.model.UserGroupVisibleMembers;
 
 import java.security.acl.Group;
