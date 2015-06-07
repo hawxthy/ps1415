@@ -40,6 +40,7 @@ import ws1415.SkatenightBackend.transport.UserGroupMembers;
 import ws1415.SkatenightBackend.transport.UserGroupMetaData;
 import ws1415.SkatenightBackend.transport.UserGroupNewsBoardTransport;
 import ws1415.SkatenightBackend.transport.UserGroupVisibleMembers;
+import ws1415.SkatenightBackend.transport.UserLocationInfo;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -874,6 +875,12 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
     public BooleanWrapper sendMessage(@Named("normalMessage") String message, @Named("userName") String user) {
         //TODO auf Martin warten
         return new BooleanWrapper(true);
+    }
+
+    public List<UserLocationInfo> listUserGroupVisibleMembersLocationInfo(User user, @Named("groupName") String groupName)throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
+        return new UserEndpoint().listUserLocationInfo(user, getUserGroupVisibleMembers(user, groupName).getList());
     }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
