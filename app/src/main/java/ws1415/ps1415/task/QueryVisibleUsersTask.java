@@ -52,12 +52,17 @@ public class QueryVisibleUsersTask extends ExtendedTask<Void, Void, HashMap<User
             for (UserGroup userGroup : tmpGroups) {
                 if (PrefManager.getGroupVisibility(context, userGroup.getName())) {
                     try {
-                        //TODO auf UserLocationInfo umstellen
-                        //groupMembers = ServiceProvider.getService().groupEndpoint().fetchGroupMembers(userGroup.getName()).execute().getItems();
+                        List<String> members = ServiceProvider.getService().groupEndpoint().getUserGroupVisibleMembers(userGroup.getName()).execute().getList();
+                        for(String visibleMember : members){
+                            groupMembers.add(ServiceProvider.getService().userEndpoint().getUserLocationInfo(visibleMember).execute());
+                        }
                         for (UserLocationInfo u : groupMembers) {
                             farbenMap.put(u, userGroup.getName());
                         }
-                    } finally {
+                    }catch (IOException e){
+                        e.printStackTrace();
+                    }
+                    finally {
                         // damit man übersetzen kann
                     }
                 }

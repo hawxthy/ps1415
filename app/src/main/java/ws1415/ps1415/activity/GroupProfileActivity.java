@@ -59,6 +59,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
     private TextView mGroupNameTextView;
     private FloatingActionButton mJoinButton;
     private FloatingActionButton mLeaveButton;
+    private FloatingActionButton mDeleteButton;
     private ViewPager mViewPager;
     private SlidingTabLayout mTabLayout;
     private GroupProfileTabsAdapter mAdapter;
@@ -90,6 +91,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
         mGroupNameTextView = (TextView) findViewById(R.id.group_profile_group_name_text_view);
         mJoinButton = (FloatingActionButton) findViewById(R.id.group_profile_join_button);
         mLeaveButton = (FloatingActionButton) findViewById(R.id.group_profile_leave_button);
+        mDeleteButton = (FloatingActionButton) findViewById(R.id.group_profile_delete_group_button);
         mViewPager = (ViewPager) findViewById(R.id.group_profile_view_pager);
         mTabLayout = (SlidingTabLayout) findViewById(R.id.group_profile_tab_layout);
 
@@ -165,8 +167,13 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                 if (group.getMemberRights().keySet().contains(ServiceProvider.getEmail())) {
                     checkIsMember = true;
                     mJoinButton.setVisibility(View.GONE);
-                    if (mLeaveButton.getVisibility() == View.GONE) {
-                        mLeaveButton.setVisibility(View.VISIBLE);
+                    if(getRights().contains(Right.FULLRIGHTS.name())){
+                        mLeaveButton.setVisibility(View.GONE);
+                        mDeleteButton.setVisibility(View.VISIBLE);
+                    }else{
+                        if (mLeaveButton.getVisibility() == View.GONE) {
+                            mLeaveButton.setVisibility(View.VISIBLE);
+                        }
                     }
                 } else {
                     checkIsMember = false;
@@ -402,6 +409,43 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                     });
                     altertadd.show();
                 }
+            }
+        });
+
+        mDeleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
+                altertadd.setTitle(R.string.deleteGroupTitle);
+                altertadd.setMessage(R.string.areYouSure);
+                altertadd.setPositiveButton(R.string.yesButton, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                        GroupController.getInstance().deleteUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                            @Override
+                            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                                setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                                finish();
+
+                            }
+
+                            @Override
+                            public void taskFailed(ExtendedTask task, String message) {
+                                Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                            }
+                        }, groupName);
+                        dialog.dismiss();
+                    }
+                });
+                altertadd.setNegativeButton(R.string.cancelButton, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                altertadd.show();
             }
         });
     }

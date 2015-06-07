@@ -306,6 +306,8 @@
     <string name="dontDistributeRightsToNothing">No E-Mail submitted</string>
     <string name="noEntryToDelete">No entry to delete submitted</string>
     <string name="deleteThisEntryQuestion">Delete this Entry?</string>
+    <string name="deleteGroupTitle">Delete your Group</string>
+    <string name="areYouSure">Are you sure?</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="title_fragment_group_black_board">Blackboard</string>
@@ -341,6 +343,7 @@
     <string name="doneButton">Done</string>
     <string name="cancelButton">Cancel</string>
     <string name="abortButton">Abort</string>
+    <string name="yesButton">Yes</string>
     <string name="title_activity_distribute_rights">DistributeRightsActivity</string>
 
     <!-- DistributeRightsActivity-->
@@ -349,5 +352,9 @@
     <string name="noGoupNameSubmitted">You need to submit a group name via the Intent</string>
     <string name="noGroupMembersSubmitted">You need to submit the groupmembers via the Intent</string>
     <string name="noMembersToGrantRights">You didn\'t select any members</string>
+
+    <!-- ListUserGroupsActivity-->
+    <string name="loadingString">Loading</string>
+    <string name="noMore">Nothing more to load</string>
 
 </resources>

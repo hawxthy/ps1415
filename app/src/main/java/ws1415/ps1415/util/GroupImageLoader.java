@@ -43,32 +43,32 @@ public class GroupImageLoader {
     public void setGroupImageToImageView(final Context context, final String blobKeyValue, final ImageView imageView){
         if(blobKeyValue == null || blobKeyValue.isEmpty()){
             imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_group));
-        }
-        // Bild im cache?
-        Bitmap cachedImage = MemoryCache.getInstance().get(blobKeyValue);
-        if(cachedImage != null){
-            imageView.setImageBitmap(cachedImage);
-        } else{
-            BlobKey blobKey = new BlobKey();
-            blobKey.setKeyString(blobKeyValue);
-            GroupController.getInstance().loadImageForPreview(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
-                    if (bitmap != null) {
-                        imageView.setImageBitmap(bitmap);
-                        // setze die Bitmap in den Cache fürs nächste mal
-                        MemoryCache.getInstance().put(blobKeyValue, bitmap);
-                    } else {
-                        Toast.makeText(context, "Didn't find any Bitmap", Toast.LENGTH_LONG).show();
-                        imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_group));
+        }else{
+            // Bild im cache?
+            Bitmap cachedImage = MemoryCache.getInstance().get(blobKeyValue);
+            if(cachedImage != null){
+                imageView.setImageBitmap(cachedImage);
+            } else{
+                BlobKey blobKey = new BlobKey();
+                blobKey.setKeyString(blobKeyValue);
+                GroupController.getInstance().loadImageForPreview(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
+                        if (bitmap != null) {
+                            imageView.setImageBitmap(bitmap);
+                            // setze die Bitmap in den Cache fürs nächste mal
+                            MemoryCache.getInstance().put(blobKeyValue, bitmap);
+                        } else {
+                            imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_group));
+                        }
                     }
-                }
-                @Override
-                public void taskFailed(ExtendedTask task, String message) {
-                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                }
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                    }
 
-            }, blobKey);
+                }, blobKey);
+            }
         }
     }
 }

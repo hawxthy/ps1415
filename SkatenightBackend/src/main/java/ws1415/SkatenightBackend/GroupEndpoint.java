@@ -1,9 +1,12 @@
 package ws1415.SkatenightBackend;
 
+import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 import com.googlecode.objectify.cmd.Query;
@@ -35,7 +38,9 @@ import ws1415.SkatenightBackend.model.UserGroupPreviewPictures;
 import ws1415.SkatenightBackend.model.UserGroupType;
 import ws1415.SkatenightBackend.transport.StringWrapper;
 import ws1415.SkatenightBackend.transport.UserGroupBlackBoardTransport;
+import ws1415.SkatenightBackend.transport.UserGroupFilter;
 import ws1415.SkatenightBackend.transport.UserGroupMetaData;
+import ws1415.SkatenightBackend.transport.UserGroupMetaDataList;
 import ws1415.SkatenightBackend.transport.UserGroupNewsBoardTransport;
 import ws1415.SkatenightBackend.transport.UserGroupVisibleMembers;
 
@@ -100,6 +105,9 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         }
         // Den BlobKey übergeben
         BlobKey blobKey = new BlobKey(blobKeyValue);
+        UserGroupPreviewPictures preview = getUserGroupPreviewPictures();
+        preview.removeBlobKeyValue(blobKeyValue);
+        ofy().save().entity(preview);
         ug.setBlobKey(blobKey);
 
         // Die Newsboard Message erstellen
@@ -188,6 +196,9 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         }
         // Den BlobKey übergeben
         BlobKey blobKey = new BlobKey(blobKeyValue);
+        UserGroupPreviewPictures preview = getUserGroupPreviewPictures();
+        preview.removeBlobKeyValue(blobKeyValue);
+        ofy().save().entity(preview);
         ug.setBlobKey(blobKey);
 
         // Die Newsboard Message erstellen
@@ -252,6 +263,50 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = ofy().load().group(UserGroupVisibleMembers.class).type(UserGroup.class).id(groupName).safe();
         return new UserGroupVisibleMembers(groupName, group.getVisibleMembers().getList());
+    }
+
+    public List<UserGroup> searchGroups(User user, @Named("searchName") String searchName) throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        return null;
+    }
+
+    /**
+     * Ruft die Metadaten von Nutzergruppen ab. Dabei wird ein Cursor erstellt der maximal
+     * viele Einträge läd, wie im Filter angegeben. Die Einträge werden nach Grppennamen
+     * sortiert zurück gegeben und der Cursor wird gespeichert und mit zurück gesendet.
+     * Dies ermöglicht, dass beim nächsten Aufruf der Cursor wieder erlangt werden kann
+     * und der Query an der richtigen Stelle beginnt.
+     *
+     * @param user
+     * @param groupFilter Gibt an, wie viele Einträge geladen werden sollen und an welcher
+     *                    Stelle angefangen werden soll zu laden
+     * @return List mit Metadaten zu Nutzergruppen und dem cursortstring
+     * @throws OAuthRequestException
+     */
+    @ApiMethod(httpMethod = "POST")
+    public UserGroupMetaDataList listUserGroups(User user, UserGroupFilter groupFilter) throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        if(groupFilter == null){
+            throw new IllegalArgumentException("no filter submitted");
+        }
+        if(groupFilter.getLimit() <= 0){
+            throw new IllegalArgumentException("limit of the filter has to be greater than zero");
+        }
+
+        Query<UserGroup> query = ofy().load().group(UserGroupMetaData.class).type(UserGroup.class).limit(groupFilter.getLimit());
+        if(groupFilter.getCursorString() != null){
+            query = query.startAt(Cursor.fromWebSafeString(groupFilter.getCursorString()));
+        }
+        query = query.order("__key__");
+        QueryResultIterator<UserGroup> iterator = query.iterator();
+
+        UserGroupMetaDataList list = new UserGroupMetaDataList();
+        list.setMetaDatas(new ArrayList<UserGroup>());
+        while(iterator.hasNext()){
+            list.getMetaDatas().add(iterator.next());
+        }
+        list.setWebCursorString(iterator.getCursor().toWebSafeString());
+        return list;
     }
 
     /**
@@ -786,6 +841,16 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             ofy().save().entity(preview).now();
         }
         return preview;
+    }
+
+    /**
+     * Diese Methode existiert nur, damit hochgeladene aber nicht verwendete blobkeys gelöscht werden
+     * können.
+     */
+    public void cleanPreviewPictures(){
+        for(String key : getUserGroupPreviewPictures().getBlobKeysValues()){
+            blobstoreService.delete(new BlobKey(key));
+        }
     }
 
     /**

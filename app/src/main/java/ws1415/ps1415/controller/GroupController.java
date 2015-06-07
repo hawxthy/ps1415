@@ -7,7 +7,9 @@ import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.BooleanWrapper;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
+import com.skatenight.skatenightAPI.model.UserGroupFilter;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
+import com.skatenight.skatenightAPI.model.UserGroupMetaDataList;
 import com.skatenight.skatenightAPI.model.UserGroupNewsBoardTransport;
 import com.skatenight.skatenightAPI.model.UserGroupVisibleMembers;
 
@@ -223,6 +225,29 @@ public class GroupController {
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Fehler: Die Metadaten zu allen Gruppen konnten nicht abgerufen werden");
+                    return null;
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um Metadaten zu Nutzergruppen
+     * herunter zu laden.
+     *
+     * @param handler
+     * @param filter Gibt an wie viele geladen werden sollen und von wo geladen werden soll
+     *               siehe Doku im Backend
+     */
+    public void listUserGroupMetaDatas(ExtendedTaskDelegate handler,final UserGroupFilter filter){
+        new ExtendedTask<Void, Void, UserGroupMetaDataList>(handler){
+            @Override
+            protected UserGroupMetaDataList doInBackground(Void... params) {
+                try{
+                    return ServiceProvider.getService().groupEndpoint().listUserGroups(filter).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    publishError("Fehler: Die Metadatenliste konnte nicht abgerufen werden");
                     return null;
                 }
             }
@@ -859,5 +884,23 @@ public class GroupController {
 
             }
         }.execute(groupName);
+    }
+
+    /**
+     * Methode zum aufräumen von unbenutzten blobkeys.
+     * @param handler
+     */
+    public void deleteUnusedBlobKeys(ExtendedTaskDelegate handler){
+        new ExtendedTask<String, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(String... strings) {
+                try{
+                    return ServiceProvider.getService().groupEndpoint().cleanPreviewPictures().execute();
+                }catch(IOException e){
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        }.execute();
     }
 }

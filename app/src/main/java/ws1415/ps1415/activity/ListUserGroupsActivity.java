@@ -12,6 +12,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.melnykov.fab.FloatingActionButton;
+import com.skatenight.skatenightAPI.model.UserGroup;
+import com.skatenight.skatenightAPI.model.UserGroupFilter;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 
 import java.util.List;
@@ -23,6 +25,9 @@ import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 
 public class ListUserGroupsActivity extends BaseActivity {
+    // maximal Anzahl an gleichzeitig zu ladenen Nutzergruppen
+    final private int MAX_GROUPS_PER_LOAD = 10;
+
     private ListView mUserGroupListView;
     private List<UserGroupMetaData> mUserGroupList;
     private UsergroupAdapter mAdapter;
@@ -53,6 +58,9 @@ public class ListUserGroupsActivity extends BaseActivity {
                 openGroupProfile(mAdapter.getItem(i));
             }
 
+        });
+
+        GroupController.getInstance().deleteUnusedBlobKeys(new ExtendedTaskDelegateAdapter<Void, Void>(){
         });
     }
 
@@ -92,38 +100,29 @@ public class ListUserGroupsActivity extends BaseActivity {
      * Dient zum Refreshen der Liste der aktuellen UserGroups.
      */
     public void refresh() {
-        GroupController.getInstance().getUserGroupMetaDatas(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> metaDatas) {
-                setMetaDatasToListView(metaDatas);
-                setProgressBarIndeterminateVisibility(Boolean.FALSE);
-            }
-
-            @Override
-            public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(ListUserGroupsActivity.this, message, Toast.LENGTH_LONG).show();
-            }
-
-        });
-
-
+        final UserGroupFilter filter = new UserGroupFilter();
+        filter.setLimit(MAX_GROUPS_PER_LOAD);
+        setMetaDatasToListView(filter);
     }
 
     /**
      * Füllt die ListView mit den UserGroups vom Server.
      *
-     * @param results ArrayList von UserGroups
+     * @param filter Der Filter für die Nutzergruppen die geladen werden sollen
      */
-    public void setMetaDatasToListView(List<UserGroupMetaData> results) {
-        mUserGroupList = results;
-        mAdapter = new UsergroupAdapter(this, results, -1);
+    public void setMetaDatasToListView(UserGroupFilter filter) {
+        mAdapter = new UsergroupAdapter(this, filter,  -1);
         if (mUserGroupListView != null) mUserGroupListView.setAdapter(mAdapter);
     }
 
-    private void openGroupProfile(UserGroupMetaData medaData){
+    /**
+     * Startet das Gruppenprofil. Dabei muss im Intent der Name der Gruppe übergeben werden.
+     *
+     * @param medaData Die Metadaten zu der Gruppe
+     */
+    private void openGroupProfile(UserGroup medaData){
         Intent open_group_profile_intent = new Intent(this, GroupProfileActivity.class);
         open_group_profile_intent.putExtra("groupName", medaData.getName());
-        open_group_profile_intent.putExtra("groupCreator", medaData.getCreator());
         startActivity(open_group_profile_intent);
     }
 }
