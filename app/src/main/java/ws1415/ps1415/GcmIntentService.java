@@ -125,6 +125,7 @@ public class GcmIntentService extends IntentService {
                         //TODO Button zum joinen hinzufügen
                         Intent group_intent = new Intent(this, GroupProfileActivity.class);
                         group_intent.putExtra("groupName", extras.getString("title"));
+                        group_intent.putExtra("inviteExtra", "inviteExtra");
                         sendNotificationMessaging(extras, group_intent);
                         break;
                 }

@@ -297,85 +297,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
         mJoinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!checkIsMember && !group.getPrivat()) {
-                    // Zeige einen Dialog ohne Passwort um eine öffentliche Gruppe zu joinen
-                    AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
-                    altertadd.setMessage(R.string.title_alert_dialog_join_user_group);
-                    altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                            GroupController.getInstance().joinUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
-                                @Override
-                                public void taskDidFinish(ExtendedTask task, BooleanWrapper booleanWrapper) {
-                                    if (booleanWrapper.getValue()) {
-                                        checkIsMember = true;
-                                        setUpProfile();
-                                    }
-                                }
-
-                                @Override
-                                public void taskFailed(ExtendedTask task, String message) {
-                                    Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
-                                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                                }
-                            }, groupName);
-                            dialog.dismiss();
-                        }
-                    });
-                    altertadd.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    altertadd.show();
-                } else if (!checkIsMember && group.getPrivat()) {
-                    // Zeige Dialog mit Passwort um eine private Gruppe zu joinen
-                    AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
-                    LayoutInflater factory = LayoutInflater.from(GroupProfileActivity.this);
-                    final View passwordView = factory.inflate(R.layout.password_view, null);
-                    final EditText passwordEditText = (EditText) passwordView.findViewById(R.id.password_view);
-                    altertadd.setView(passwordView);
-                    altertadd.setMessage(R.string.title_alert_dialog_join_user_group);
-                    altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (!passwordEditText.getText().toString().isEmpty()) {
-                                setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                                GroupController.getInstance().joinPrivateUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
-                                    @Override
-                                    public void taskDidFinish(ExtendedTask task, BooleanWrapper booleanWrapper) {
-                                        if (booleanWrapper.getValue()) {
-                                            checkIsMember = true;
-                                            setUpProfile();
-                                        }else{
-                                            Toast.makeText(GroupProfileActivity.this, R.string.wrongPasswordMessage,Toast.LENGTH_LONG).show();
-                                            setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void taskFailed(ExtendedTask task, String message) {
-                                        Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
-                                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                                    }
-                                }, groupName, passwordEditText.getText().toString());
-                                dialog.dismiss();
-                            }
-                        }
-                    });
-                    altertadd.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    altertadd.show();
-                } else {
-                    Toast.makeText(GroupProfileActivity.this, R.string.alreadyInGroupString, Toast.LENGTH_LONG).show();
-                }
-
+                startJoinEvent();
             }
         });
 
@@ -457,6 +379,87 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                 altertadd.show();
             }
         });
+    }
+
+    private void startJoinEvent() {
+        if (!checkIsMember && !group.getPrivat()) {
+            // Zeige einen Dialog ohne Passwort um eine öffentliche Gruppe zu joinen
+            AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
+            altertadd.setMessage(R.string.title_alert_dialog_join_user_group);
+            altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                    GroupController.getInstance().joinUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
+                        @Override
+                        public void taskDidFinish(ExtendedTask task, BooleanWrapper booleanWrapper) {
+                            if (booleanWrapper.getValue()) {
+                                checkIsMember = true;
+                                setUpProfile();
+                            }
+                        }
+
+                        @Override
+                        public void taskFailed(ExtendedTask task, String message) {
+                            Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                            setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                        }
+                    }, groupName);
+                    dialog.dismiss();
+                }
+            });
+            altertadd.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            altertadd.show();
+        } else if (!checkIsMember && group.getPrivat()) {
+            // Zeige Dialog mit Passwort um eine private Gruppe zu joinen
+            AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
+            LayoutInflater factory = LayoutInflater.from(GroupProfileActivity.this);
+            final View passwordView = factory.inflate(R.layout.password_view, null);
+            final EditText passwordEditText = (EditText) passwordView.findViewById(R.id.password_view);
+            altertadd.setView(passwordView);
+            altertadd.setMessage(R.string.title_alert_dialog_join_user_group);
+            altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (!passwordEditText.getText().toString().isEmpty()) {
+                        setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                        GroupController.getInstance().joinPrivateUserGroup(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
+                            @Override
+                            public void taskDidFinish(ExtendedTask task, BooleanWrapper booleanWrapper) {
+                                if (booleanWrapper.getValue()) {
+                                    checkIsMember = true;
+                                    setUpProfile();
+                                }else{
+                                    Toast.makeText(GroupProfileActivity.this, R.string.wrongPasswordMessage,Toast.LENGTH_LONG).show();
+                                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                                }
+                            }
+
+                            @Override
+                            public void taskFailed(ExtendedTask task, String message) {
+                                Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                            }
+                        }, groupName, passwordEditText.getText().toString());
+                        dialog.dismiss();
+                    }
+                }
+            });
+            altertadd.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            altertadd.show();
+        } else {
+            Toast.makeText(GroupProfileActivity.this, R.string.alreadyInGroupString, Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -1070,11 +1073,13 @@ public class GroupProfileActivity extends BaseFragmentActivity {
         }
     }
 
+    /**
+     * Wird aufgerufen, wenn ein Benutzer eine Einladung erhalten hat und diese Notification
+     * berührt hat, also diese geclickt hat.
+     */
     public void checkIfInvitationIntent(){
-        if(getIntent().getStringExtra("") != null){
-            if(group.getPrivat()){
-                GroupController.getInstance()
-            }
+        if(getIntent().getStringExtra("inviteExtra") != null){
+            startJoinEvent();
         }
     }
 }

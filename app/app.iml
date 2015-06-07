@@ -13,9 +13,6 @@
         <option name="ASSEMBLE_TASK_NAME" value="assembleHostRelease" />
         <option name="COMPILE_JAVA_TASK_NAME" value="compileHostReleaseSources" />
         <option name="SOURCE_GEN_TASK_NAME" value="generateHostReleaseSources" />
-        <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleHostReleaseAndroidTest" />
-        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileHostReleaseAndroidTestSources" />
-        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateHostReleaseAndroidTestSources" />
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="MANIFEST_FILE_RELATIVE_PATH" value="/src/main/AndroidManifest.xml" />
         <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
@@ -42,12 +39,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/hostRelease/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/hostRelease/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/hostRelease/rs" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/host/release" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/host/release" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/host/release" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/host/release" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/host/release" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/androidTest/host/release" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/host/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/host/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/host/assets" type="java-resource" />
@@ -123,8 +114,8 @@
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="gson-2.2.2" level="project" />
     <orderEntry type="library" exported="" name="eventbus-2.4.0" level="project" />
-    <orderEntry type="library" exported="" name="httpclient-android-4.3.5" level="project" />
     <orderEntry type="library" exported="" name="google-http-client-jackson2-1.20.0" level="project" />
+    <orderEntry type="library" exported="" name="httpclient-android-4.3.5" level="project" />
     <orderEntry type="library" exported="" name="google-api-client-android-1.20.0" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="httpmime-4.3.6" level="project" />
