@@ -14,7 +14,6 @@ import ws1415.ps1415.activity.MyPicturesActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.activity.RegisterActivity;
 import ws1415.ps1415.activity.SearchActivity;
-import ws1415.ps1415.activity.UploadImageActivity;
 import ws1415.ps1415.util.PrefManager;
 
 /**

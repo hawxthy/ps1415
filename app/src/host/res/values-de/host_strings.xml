@@ -46,29 +46,12 @@
     <string name="delete_route_message">Möchten Sie die Route wirklich löschen? Dies kann nicht rückgängig gemacht werden.</string>
     <string name="route_deletion_error">Beim Löschen der Route ist ein Fehler aufgetreten. Wird die Route möglicherweise in bestehenden Veranstaltungen verwendet?</string>
 
-    <!-- RouteEditorActivity -->
-    <string name="title_activity_route_editor">Streckeneditor</string>
-    <string name="title_fragment_route_editor_map">Karte</string>
-    <string name="title_fragment_route_editor_waypoints">Wegpunkte</string>
-    <string name="route_editor_error_load_route">Strecke kann nicht geladen werden.</string>
-    <string name="route_editor_waypoint_name_format">Wegpunkt <xliff:g id="number">%1$d</xliff:g></string>
-    <string name="route_editor_waypoint_deleted"><xliff:g id="waypoint_name">%1$s</xliff:g> wurde gelöscht.</string>
-    <string name="route_editor_save_dialog">Strecke speichern?</string>
-    <string name="route_editor_leave_dialog">Es wurde keine Route erstellt. Trotzdem verlassen?</string>
-
     <!--Strings zu activtiy_add_route_dialog-->
     <string name="title_activity_add_route_dialog">Erstelle Route</string>
     <string name="title_activity_add_route_dialog_routename">Routename: </string>
     <string name="activity_add_route_dialog_cancel">Abbrechen</string>
     <string name="activity_add_route_dialog_apply">Ok</string>
     <string name="activity_add_route_dialog_empty">Routenname darf nicht leer sein</string>
-
-    <!--Strings zu EditWaypointDialog-->
-    <string name="activity_edit_waypoint_dialog_cancel">Abbrechen</string>
-    <string name="activity_edit_waypoint_dialog_delete">Löschen</string>
-    <string name="activity_edit_waypoint_dialog_apply">Übernehmen</string>
-    <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
-    <string name="title_activity_edit_waypoint_dialog">Editiere Wegpunkt</string>
 
     <!-- ManageEventParticipantsActivity -->
     <string name="title_activity_manage_event_participants">Teilnehmer verwalten</string>

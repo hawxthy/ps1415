@@ -381,6 +381,7 @@
     <string name="error_removing_from_gallery">An error occurred while removing the picture from the gallery. Please try again.</string>
 
     <!-- EditPictureActivity -->
+    <string name="choose_picture">Choose picture…</string>
     <string name="upload_picture">Upload picture</string>
     <string name="edit_picture">Edit picture</string>
     <string name="title_hint">Please enter a title…</string>
@@ -450,5 +451,22 @@
     <!-- ListUserGroupsActivity-->
     <string name="loadingString">Loading</string>
     <string name="noMore">Nothing more to load</string>
+
+    <!-- RouteEditorActivity -->
+    <string name="title_activity_route_editor">Route Editor</string>
+    <string name="title_fragment_route_editor_map">Map</string>
+    <string name="title_fragment_route_editor_waypoints">Waypoints</string>
+    <string name="route_editor_error_load_route">Unable to load route.</string>
+    <string name="route_editor_waypoint_name_format">Waypoint <xliff:g id="number">%1$d</xliff:g></string>
+    <string name="route_editor_waypoint_deleted"><xliff:g id="waypoint_name">%1$s</xliff:g> deleted.</string>
+    <string name="route_editor_save_dialog">Save route?</string>
+    <string name="route_editor_leave_dialog">No route has been created. Do you want to leave anyway?</string>
+
+    <!--Strings zu EditWaypointDialog-->
+    <string name="activity_edit_waypoint_dialog_cancel">Cancel</string>
+    <string name="activity_edit_waypoint_dialog_delete">Delete</string>
+    <string name="activity_edit_waypoint_dialog_apply">Apply</string>
+    <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
+    <string name="title_activity_edit_waypoint_dialog">Edit Waypoint</string>
 
 </resources>

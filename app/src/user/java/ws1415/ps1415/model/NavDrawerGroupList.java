@@ -94,17 +94,6 @@ public class NavDrawerGroupList {
                             dialog.dismiss();
                         }
                     });
-                    ButtonFlat removeMemberButton = (ButtonFlat) functionsView.findViewById(R.id.group_function_remove_member);
-                    removeMemberButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // TODO implementieren
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
-                            dialog.dismiss();
-                        }
-                    });
                     ButtonFlat changePasswordButton = (ButtonFlat) functionsView.findViewById(R.id.group_function_change_password);
                     changePasswordButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -125,9 +114,6 @@ public class NavDrawerGroupList {
                         }
                         if(!rights.contains(Right.GLOBALMESSAGE.name())){
                             sendGlobalMessageButton.setVisibility(View.GONE);
-                        }
-                        if(!rights.contains(Right.DELETEMEMBER.name())){
-                            removeMemberButton.setVisibility(View.GONE);
                         }
                         // Nur der Leader kann das Passwort ändern oder die Gruppe öffentlich machen
                         changePasswordButton.setVisibility(View.GONE);
