@@ -400,6 +400,8 @@
     <string name="error_uploading_picture">An error occurred while uploading the picture. Please try again.</string>
     <string name="error_editing_picture">An error occurred while editing the picture. Please try again.</string>
     <string name="picture_can_not_be_changed">The picture can not be changed after it has been uploaded.</string>
+    <string name="error_invalid_picture">Invalid Picture</string>
+    <string name="error_invalid_picture_message">The data submitted for the picture is invalid. Please make sure to select an image and specify title, description and visibility.</string>
 
     <!-- PictureFragment -->
     <string name="comments_label">Comments</string>

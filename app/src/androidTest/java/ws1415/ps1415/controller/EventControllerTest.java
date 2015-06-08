@@ -246,7 +246,45 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
                 }
             }
         }, filter);
-        signal.await(10, TimeUnit.SECONDS);
+        signal.await(20, TimeUnit.SECONDS);
+
+        // Sichtbarkeit ändern
+        changeAccount(1);
+        ServiceProvider.getService().eventEndpoint().changeParticipationVisibility(testevent2.getId(), EventParticipationVisibility.FRIENDS.name()).execute();
+
+        // Event sollte nun nicht mehr abgerufen werden
+        changeAccount(0);
+        filter = new EventFilter();
+        filter.setLimit(2);
+        filter.setUserId(getAccountMail(1));
+        final CountDownLatch signal2 = new CountDownLatch(1);
+        EventController.listEvents(new ExtendedTaskDelegateAdapter<Void, List<EventMetaData>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<EventMetaData> eventMetaDatas) {
+                assertNull("events fetched", eventMetaDatas);
+                signal2.countDown();
+            }
+        }, filter);
+        signal2.await(20, TimeUnit.SECONDS);
+
+        // Sichtbarkeit ändern
+        changeAccount(1);
+        ServiceProvider.getService().eventEndpoint().changeParticipationVisibility(testevent2.getId(), EventParticipationVisibility.PRIVATE.name()).execute();
+
+        // Event sollte nun nicht mehr abgerufen werden
+        changeAccount(0);
+        filter = new EventFilter();
+        filter.setLimit(2);
+        filter.setUserId(getAccountMail(1));
+        final CountDownLatch signal3 = new CountDownLatch(1);
+        EventController.listEvents(new ExtendedTaskDelegateAdapter<Void, List<EventMetaData>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<EventMetaData> eventMetaDatas) {
+                assertNull("events fetched", eventMetaDatas);
+                signal3.countDown();
+            }
+        }, filter);
+        signal3.await(20, TimeUnit.SECONDS);
     }
 
     public void testGetEvent() throws InterruptedException {

@@ -61,7 +61,7 @@ public class EventAdapter extends BaseAdapter {
         }
         this.context = context;
         this.filter = filter;
-        fetchDistance = (int) (filter.getLimit() * 0.4);
+        fetchDistance = (int) Math.max(filter.getLimit() * 0.4, 1);
         fetchData(true);
     }
 
@@ -71,7 +71,7 @@ public class EventAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public EventMetaData getItem(int position) {
         if (fetching && position == events.size()) {
             return null;
         }
@@ -98,7 +98,7 @@ public class EventAdapter extends BaseAdapter {
                 view = View.inflate(parent.getContext(), R.layout.listitem_fetching, null);
             }
         } else {
-            EventMetaData event = (EventMetaData) getItem(position);
+            EventMetaData event = getItem(position);
             if (convertView != null && getItemViewType(position) == EVENT_VIEW_TYPE) {
                 view = convertView;
             } else {
@@ -114,7 +114,7 @@ public class EventAdapter extends BaseAdapter {
             dateView.setText(DateFormat.getMediumDateFormat(context).format(date) + " " + DateFormat.getTimeFormat(context).format(date));
         }
 
-        if (events.size() - position < fetchDistance) {
+        if (events.size() - position - 1 < fetchDistance) {
             fetchData(false);
         }
 
@@ -196,15 +196,6 @@ public class EventAdapter extends BaseAdapter {
         events.clear();
         keepFetching = true;
         fetchData(true);
-    }
-
-    /**
-     * Gibt das Event an der angegebenen Position in der Liste zurück.
-     * @param position    Die Position des Events in dem Adapter.
-     * @return Das Event mit der angegebenen Position.
-     */
-    public EventMetaData getEvent(int position) {
-        return events.get(position);
     }
 
     /**

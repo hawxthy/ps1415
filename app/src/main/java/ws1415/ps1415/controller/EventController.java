@@ -95,13 +95,24 @@ public abstract class EventController {
     }
 
     /**
-     * TODO Kommentar
+     * Erstellt das Event mit den angegebenen Daten auf dem Server und lädt die Dateien in den Blobstore hoch.
      * @param handler    Der Handler, der das erstellte Event übergeben bekommt.
      * @param event      Das zu erstellende Event.
+     * @param icon           Die Datei, die das Bild des Icons enthält.
+     * @param headerImage    Die Datei, die das Header-Bild enthält.
+     * @param images         Die Dateien für weitere Bilder.
+     * @throws IllegalArgumentException falls das Event ungültig ist
      */
     public static void createEvent(ExtendedTaskDelegate<Void, Event> handler, final Event event,
-                                   final File icon, final File headerImage, final List<File> images) {
-        // TODO Ggf. Event auf Gültigkeit prüfen
+                                   final File icon, final File headerImage, final List<File> images)
+            throws IllegalArgumentException {
+        if (event == null || event.getId() != null || event.getDate() == null
+                || event.getFee() == null || event.getFee() < 0
+                || event.getMeetingPlace() == null || event.getMeetingPlace().isEmpty()
+                || event.getTitle() == null || event.getTitle().isEmpty()
+                || event.getRoute() == null || icon == null) {
+            throw new IllegalArgumentException("invalid event");
+        }
 
         new ExtendedTask<Void, Void, Event>(handler) {
             @Override
@@ -117,7 +128,9 @@ public abstract class EventController {
                         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
                         builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
                         builder.addBinaryBody("files", icon);
-                        builder.addBinaryBody("files", headerImage);
+                        if (headerImage != null) {
+                            builder.addBinaryBody("files", headerImage);
+                        }
                         if (images != null) {
                             for (File f : images) {
                                 builder.addBinaryBody("files", f);
@@ -144,14 +157,18 @@ public abstract class EventController {
                         BlobKey blobKey = new BlobKey();
                         blobKey.setKeyString(keyStrings[0]);
                         createdEvent.setIcon(blobKey);
-                        blobKey = new BlobKey();
-                        blobKey.setKeyString(keyStrings[1]);
-                        createdEvent.setHeaderImage(blobKey);
-                        createdEvent.setImages(new LinkedList<BlobKey>());
-                        for (int i = 2; i < keyStrings.length; i++) {
+                        if (keyStrings.length > 1) {
                             blobKey = new BlobKey();
-                            blobKey.setKeyString(keyStrings[i]);
-                            createdEvent.getImages().add(blobKey);
+                            blobKey.setKeyString(keyStrings[1]);
+                            createdEvent.setHeaderImage(blobKey);
+                        }
+                        if (keyStrings.length > 2) {
+                            createdEvent.setImages(new LinkedList<BlobKey>());
+                            for (int i = 2; i < keyStrings.length; i++) {
+                                blobKey = new BlobKey();
+                                blobKey.setKeyString(keyStrings[i]);
+                                createdEvent.getImages().add(blobKey);
+                            }
                         }
                     } catch(IOException ex) {
                         // Bei Fehlern versuchen das bereits erstellte Picture-Objekt zu löschen
@@ -176,8 +193,17 @@ public abstract class EventController {
      * existieren.
      * @param handler    Der Handler, der über den Status des Tasks informiert wird.
      * @param event      Das angepasste Event.
+     * @throws IllegalArgumentException falls das Event ungültig ist
      */
-    public static void editEvent(ExtendedTaskDelegate<Void, Event> handler, final Event event) {
+    public static void editEvent(ExtendedTaskDelegate<Void, Event> handler, final Event event) throws IllegalArgumentException {
+        if (event == null || event.getId() == null || event.getDate() == null
+                || event.getFee() == null || event.getFee() < 0
+                || event.getMeetingPlace() == null || event.getMeetingPlace().isEmpty()
+                || event.getTitle() == null || event.getTitle().isEmpty()
+                || event.getRoute() == null) {
+            throw new IllegalArgumentException("invalid event");
+        }
+
         new ExtendedTask<Void, Void, Event>(handler) {
             @Override
             protected Event doInBackground(Void... params) {

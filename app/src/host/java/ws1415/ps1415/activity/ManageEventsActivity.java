@@ -23,6 +23,8 @@ import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.UniversalUtil;
 
 public class ManageEventsActivity extends BaseActivity implements EventListFragment.OnEventClickListener {
+    private static final int CREATE_EVENT_REQUEST_CODE = 0;
+
     /**
      * Bestimmt die Anzahl Events, die pro Aufruf an den Server herunter geladen werden.
      */
@@ -83,7 +85,7 @@ public class ManageEventsActivity extends BaseActivity implements EventListFragm
             return true;
         } else if (id == R.id.action_create_event) {
             intent = new Intent(this, EditEventActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, CREATE_EVENT_REQUEST_CODE);
             return true;
         } else if (id == R.id.action_refresh_events) {
             refresh();
@@ -91,7 +93,18 @@ public class ManageEventsActivity extends BaseActivity implements EventListFragm
         }
         return super.onOptionsItemSelected(item);
     }
-    
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case CREATE_EVENT_REQUEST_CODE:
+                refresh();
+                break;
+            default:
+                super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     @Override
     public void onEventClick(ListView l, View v, int position, long id) {
         Intent intent = new Intent(this, ShowEventActivity.class);
@@ -102,7 +115,7 @@ public class ManageEventsActivity extends BaseActivity implements EventListFragm
     @Override
     public boolean onEventLongClick(AdapterView<?> parent, View v, final int position, final long id) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(eventAdapter.getEvent(position).getTitle())
+        builder.setTitle(eventAdapter.getItem(position).getTitle())
                 .setItems(R.array.manage_events_event_actions, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

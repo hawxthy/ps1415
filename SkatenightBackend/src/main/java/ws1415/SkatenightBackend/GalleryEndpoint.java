@@ -154,7 +154,8 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
             throw new IllegalArgumentException("title can not be empty");
         }
 
-        ofy().save().entity(gallery).now();
+        oldGallery.setTitle(gallery.getTitle());
+        ofy().save().entity(oldGallery).now();
         return gallery;
     }
 

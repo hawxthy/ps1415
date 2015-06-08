@@ -12,11 +12,17 @@ import com.google.appengine.api.users.User;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.jdo.PersistenceManager;
+
+import ws1415.SkatenightBackend.gcm.RegistrationManager;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.EventParticipationVisibility;
 import ws1415.SkatenightBackend.model.EventRole;
@@ -102,23 +108,84 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             throw new IllegalArgumentException("invalid filter parameters: limit has to be positive");
         }
 
-        Query<Event> q = ofy().load().group(EventMetaData.class).type(Event.class).limit(filter.getLimit());
-        if (filter.getCursorString() != null) {
-            q = q.startAt(Cursor.fromWebSafeString(filter.getCursorString()));
-        }
-        if (filter.getUserId() != null) {
-            // TODO Die Events abrufen, an denen ein User teilnimmt und prüfen, welche der aufrufende Benutzer davon sehen darf
-            q.filter("memberVisibility." + filter.getUserId() + " !=", null);
-        }
-        q = q.order("-date");
-        QueryResultIterator<Event> iterator = q.iterator();
-
         EventMetaDataList result = new EventMetaDataList();
         result.setList(new LinkedList<EventMetaData>());
-        while (iterator.hasNext()) {
-            result.getList().add(new EventMetaData(iterator.next()));
+        if (filter.getUserId() != null) {
+            // Events abrufen, an denen ein Benutzer teilnimmt
+            List<Long> eventIDs = new UserEndpoint().listEventsFromUser(filter.getUserId());
+
+            if (eventIDs != null) {
+                List<Event> events = new LinkedList<>(ofy().load().group(EventMetaData.class).type(Event.class).ids(eventIDs).values());
+                Collections.sort(events, new Comparator<Event>() {
+                    @Override
+                    public int compare(Event o1, Event o2) {
+                        int c = o1.getDate().compareTo(o2.getDate());
+                        if (c == 0) {
+                            c = o1.getId().compareTo(o2.getId());
+                        }
+                        return c;
+                    }
+                });
+
+                // Zählt wieiviele Events mit diesem Cursor bereits abgerufen wurden
+                int count = 0;
+                if (filter.getCursorString() != null) {
+                    Long lastId = Long.parseLong(filter.getCursorString().substring(0, filter.getCursorString().indexOf(' ')));
+                    Long lastCount = Long.parseLong(filter.getCursorString().substring(filter.getCursorString().indexOf(' ') + 1));
+
+                    while (lastCount > 0 && !events.isEmpty()) {
+                        if (events.get(0).getId().equals(lastId)) {
+                            events.remove(0);
+                            count++;
+                            break;
+                        }
+                        events.remove(0);
+                        count++;
+                        lastCount--;
+                    }
+
+                }
+
+                // Minimale Sichtbarkeit bestimmen, die gegeben sein muss
+                EventParticipationVisibility minVisibility;
+                if (user.getEmail().equals(filter.getUserId())) {
+                    // Der Benutzer ruft seine eigenen Events ab
+                    minVisibility = EventParticipationVisibility.PRIVATE;
+                } else if (new UserEndpoint().isFriendWith(filter.getUserId(), user.getEmail())) {
+                    // Der Benutzer ruft die Events eines Freundes ab
+                    minVisibility = EventParticipationVisibility.FRIENDS;
+                } else {
+                    // Der Benutzer ruft die Events eines unbekannten ab
+                    minVisibility = EventParticipationVisibility.PUBLIC;
+                }
+
+                long id = -1;
+                Iterator<Event> iterator = events.iterator();
+                while (iterator.hasNext() && result.getList().size() < filter.getLimit()) {
+                    Event e = iterator.next();
+                    if (e.getMemberVisibility().get(filter.getUserId()).compareTo(minVisibility) >= 0) {
+                        result.getList().add(new EventMetaData(e));
+                        id = e.getId();
+                        count++;
+                    }
+                }
+
+                result.setCursorString(id + " " + count);
+            }
+        } else {
+            // Alle Events abrufen
+            QueryResultIterator<Event> iterator;
+            Query<Event> q = ofy().load().group(EventMetaData.class).type(Event.class).limit(filter.getLimit());
+            if (filter.getCursorString() != null) {
+                q = q.startAt(Cursor.fromWebSafeString(filter.getCursorString()));
+            }
+            q = q.order("-date");
+            iterator = q.iterator();
+            while (iterator.hasNext() && result.getList().size() < filter.getLimit()) {
+                result.getList().add(new EventMetaData(iterator.next()));
+            }
+            result.setCursorString(iterator.getCursor().toWebSafeString());
         }
-        result.setCursorString(iterator.getCursor().toWebSafeString());
 
         return result;
     }
@@ -178,6 +245,13 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         new UserEndpoint().addEventToUser(user.getEmail(), event);
 
         // TODO GCM-Nachricht an Geräte schicken, damit Event-Liste aktualisiert wird
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            RegistrationManager rm = getRegistrationManager(pm);
+            // TODO R: Implementieren
+        } finally {
+            pm.close();
+        }
 
         return event;
     }
@@ -196,13 +270,18 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             throw new OAuthRequestException("no user submitted");
         }
 
-        // TODO BlobKeys aktualisieren und alte Blobs löschen
-
         Event oldEvent = ofy().load().type(Event.class).id(event.getId()).safe();
         if (!hasPrivilege(oldEvent, user.getEmail(), Privilege.EDIT_EVENT)) {
             throw new OAuthRequestException("insufficient privileges");
         }
-        ofy().save().entity(event).now();
+        oldEvent.setTitle(event.getTitle());
+        oldEvent.setDate(event.getDate());
+        oldEvent.setDescription(event.getDescription());
+        oldEvent.setMeetingPlace(event.getMeetingPlace());
+        oldEvent.setFee(event.getFee());
+        oldEvent.setDynamicFields(event.getDynamicFields());
+        oldEvent.setRoute(event.getRoute());
+        ofy().save().entity(oldEvent).now();
         return event;
     }
 

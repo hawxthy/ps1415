@@ -29,6 +29,11 @@
     <string name="event_details"><u>Event details</u></string>
     <string name="add_dynamic_field">Add data field…</string>
     <string name="add_image">Add image…</string>
+    <string name="action_save_event">Save</string>
+    <string name="error_can_not_change_picture">Pictures can not be changed for an event.</string>
+    <string name="error_invalid_event">Invalid Event</string>
+    <string name="error_invalid_event_message">The data submitted for the event is invalid. Please make sure to at least specify icon, title, description, meeting place, fee and a route.</string>
+    <string name="error_wrong_currency_format">wrong currency format! for example use: 2,50</string>
 
     <!-- DateTimeDialog -->
     <string name="choose_datetime">Pick date and time…</string>

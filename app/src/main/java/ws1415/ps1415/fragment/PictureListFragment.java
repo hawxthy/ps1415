@@ -69,12 +69,12 @@ public class PictureListFragment extends Fragment implements AdapterView.OnItemC
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        mListener.onPictureClick(adapter.getPictureMetaData(position), position);
+        mListener.onPictureClick(adapter.getItem(position), position);
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        return mListener.onPictureLongClick(adapter.getPictureMetaData(position), position);
+        return mListener.onPictureLongClick(adapter.getItem(position), position);
     }
 
     /**

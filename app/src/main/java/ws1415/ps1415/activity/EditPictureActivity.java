@@ -168,33 +168,51 @@ public class EditPictureActivity extends Activity {
     public void onSaveClick(View view) {
         startLoading();
         if (pictureId != null) {
-            GalleryController.editPicture(new ExtendedTaskDelegateAdapter<Void, Void>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                    setResult(0, new Intent().putExtra("position", position));
-                    finishLoading();
-                    finish();
-                }
-                @Override
-                public void taskFailed(ExtendedTask task, String message) {
-                    Toast.makeText(EditPictureActivity.this, R.string.error_editing_picture, Toast.LENGTH_LONG).show();
-                    finishLoading();
-                }
-            }, pictureId, title.getText().toString(), description.getText().toString(), PictureVisibility.values()[visibility.getSelectedItemPosition()]);
+            try {
+                GalleryController.editPicture(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                        setResult(0, new Intent().putExtra("position", position));
+                        finishLoading();
+                        finish();
+                    }
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        Toast.makeText(EditPictureActivity.this, R.string.error_editing_picture, Toast.LENGTH_LONG).show();
+                        finishLoading();
+                    }
+                }, pictureId, title.getText().toString(), description.getText().toString(), PictureVisibility.values()[visibility.getSelectedItemPosition()]);
+            } catch (IllegalArgumentException ex) {
+                finishLoading();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.error_invalid_picture)
+                        .setMessage(R.string.error_invalid_picture_message)
+                        .setPositiveButton(R.string.ok, null);
+                builder.create().show();
+            }
         } else {
-            GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, Picture picture) {
-                    finishLoading();
-                    finish();
-                }
+            try {
+                GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Picture picture) {
+                        finishLoading();
+                        finish();
+                    }
 
-                @Override
-                public void taskFailed(ExtendedTask task, String message) {
-                    Toast.makeText(EditPictureActivity.this, R.string.error_uploading_picture, Toast.LENGTH_LONG).show();
-                    finishLoading();
-                }
-            }, selectedFile, title.getText().toString(), description.getText().toString(), PictureVisibility.values()[visibility.getSelectedItemPosition()]);
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        Toast.makeText(EditPictureActivity.this, R.string.error_uploading_picture, Toast.LENGTH_LONG).show();
+                        finishLoading();
+                    }
+                }, selectedFile, title.getText().toString(), description.getText().toString(), PictureVisibility.values()[visibility.getSelectedItemPosition()]);
+            } catch (IllegalArgumentException ex) {
+                finishLoading();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.error_invalid_picture)
+                        .setMessage(R.string.error_invalid_picture_message)
+                        .setPositiveButton(R.string.ok, null);
+                builder.create().show();
+            }
         }
     }
 }

@@ -80,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:textSize="11pt"
-                    android:hint="@string/loading" />
+                    android:hint="@string/template_event_title" />
 
                 <TextView
                     android:id="@+id/date"
@@ -97,7 +97,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/date"
                     android:layout_marginTop="20dp"
-                    android:hint="@string/loading"
+                    android:hint="@string/template_event_description"
                     android:inputType="textMultiLine" />
 
                 <EditText
@@ -105,7 +105,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/description"
-                    android:hint="@string/loading"
+                    android:hint="@string/template_event_meeting_place"
                     android:layout_toRightOf="@+id/meeting_place_label"/>
 
                 <TextView
@@ -123,7 +123,7 @@
                     android:layout_below="@id/meeting_place"
                     android:layout_alignLeft="@id/meeting_place"
                     android:hint="@string/loading"
-                    android:inputType="number" />
+                    android:inputType="numberDecimal" />
 
                 <TextView
                     android:id="@+id/fee_label"

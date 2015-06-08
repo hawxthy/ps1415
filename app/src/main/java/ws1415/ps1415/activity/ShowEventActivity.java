@@ -47,6 +47,7 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.DynamicFieldsAdapter;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.DiskCacheImageLoader;
+import ws1415.ps1415.util.FormatterUtil;
 import ws1415.ps1415.util.LocationUtils;
 import ws1415.ps1415.util.UniversalUtil;
 
@@ -188,7 +189,11 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
 
         setTitle(eventData.getTitle());
         ImageView headerImage = (ImageView) findViewById(R.id.headerImage);
-        DiskCacheImageLoader.getInstance().loadScaledImage(headerImage, eventData.getHeaderImage(), headerImage.getWidth());
+        if (eventData.getHeaderImage() != null) {
+            DiskCacheImageLoader.getInstance().loadScaledImage(headerImage, eventData.getHeaderImage(), headerImage.getWidth());
+        } else {
+            headerImage.setVisibility(View.GONE);
+        }
         TextView title = (TextView) findViewById(R.id.title);
         title.setText(eventData.getTitle());
         TextView date = (TextView) findViewById(R.id.date);
@@ -199,14 +204,18 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         TextView meetingPlace = (TextView) findViewById(R.id.meeting_place);
         meetingPlace.setText(eventData.getMeetingPlace());
         TextView fee = (TextView) findViewById(R.id.fee);
-        fee.setText(Integer.toString(eventData.getFee()));
+        if (eventData.getFee() != null) {
+            fee.setText(FormatterUtil.formatCents(eventData.getFee()));
+        } else {
+            fee.setText(FormatterUtil.formatCents(0));
+        }
         ListView dynamicFields = (ListView) findViewById(R.id.dynamicFields);
         dynamicFields.setDivider(null);
         dynamicFields.setAdapter(new DynamicFieldsAdapter(eventData.getDynamicFields(), false));
 
         HorizontalScrollView imagesScroller = (HorizontalScrollView) findViewById(R.id.imagesScroller);
         LinearLayout images = (LinearLayout) findViewById(R.id.images);
-        if (eventData.getImages() != null) {
+        if (eventData.getImages() != null && !eventData.getImages().isEmpty()) {
             ImageView imgView;
             for (BlobKey key : eventData.getImages()) {
                 imgView = new ImageView(this);
@@ -217,6 +226,8 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
                 DiskCacheImageLoader.getInstance().loadScaledImage(imgView, key, imagesScroller.getWidth() - 20);
                 images.addView(imgView);
             }
+        } else {
+            imagesScroller.setVisibility(View.GONE);
         }
 
         // Route laden und anzeigen

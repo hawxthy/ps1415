@@ -45,7 +45,7 @@ public class Event implements BlobKeyContainer, GalleryContainer {
     @Load(unless = {EventMetaData.class, EventGalleryData.class})
     private Map<String, EventRole> memberList = new HashMap<>();
     @Index
-    @Load(unless = {EventMetaData.class, EventGalleryData.class})
+    @Load(unless = {EventGalleryData.class})
     private Map<String, EventParticipationVisibility> memberVisibility = new HashMap<>();
     @Load(unless = {EventMetaData.class, EventParticipationData.class, EventGalleryData.class})
     private List<BlobKey> images = new LinkedList<>();
@@ -226,10 +226,16 @@ public class Event implements BlobKeyContainer, GalleryContainer {
 
     @Override
     public void consumeBlobKeys(List<BlobKey> keys) {
-        if (keys != null && keys.size() >= 2) {
-            icon = keys.get(0);
-            headerImage = keys.get(1);
-            images = new LinkedList<>(keys.subList(2, keys.size()));
+        if (keys != null) {
+            if (keys.size() > 0) {
+                icon = keys.get(0);
+            }
+            if (keys.size() > 1) {
+                headerImage = keys.get(1);
+            }
+            if (keys.size() > 2) {
+                images = new LinkedList<>(keys.subList(2, keys.size()));
+            }
         }
     }
 

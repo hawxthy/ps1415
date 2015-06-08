@@ -798,4 +798,19 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             pm.close();
         }
     }
+
+    /**
+     * Liefert alle Veranstaltungen an denen der Benutzer teilnimmt/teilgenommen hat.
+     *
+     * @param userMail E-Mail Adresse des Benutzers
+     * @return Liste der Veranstaltungen
+     */
+    protected List<Long> listEventsFromUser(String userMail){
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            return pm.getObjectById(EndUser.class, userMail).getMyEvents();
+        } finally {
+            pm.close();
+        }
+    }
 }

@@ -74,7 +74,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public PictureMetaData getItem(int position) {
         if (fetching && position == pictures.size()) {
             return null;
         }
@@ -115,7 +115,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
                 view = View.inflate(parent.getContext(), R.layout.listitem_fetching, null);
             }
         } else {
-            PictureMetaData picture = getPictureMetaData(position);
+            PictureMetaData picture = getItem(position);
             if (convertView != null && getItemViewType(position) == PICTURE_VIEW_TYPE) {
                 view = convertView;
             } else {
@@ -218,15 +218,6 @@ public class PictureMetaDataAdapter extends BaseAdapter {
     }
 
     /**
-     * Gibt das Bild an der angegebenen Position im Adapter zurück.
-     * @param position    Die Position des abzurufenden Bildes.
-     * @return Das Bild mit der angegebenen Position.
-     */
-    public PictureMetaData getPictureMetaData(int position) {
-        return pictures.get(position);
-    }
-
-    /**
      * Entfernt das angegebene Bild aus diesem Adapter.
      * @param picture    Das zu entfernende Bild.
      */
@@ -240,7 +231,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
      * @param position    Die Position des Bildes, das neu geladen wird.
      */
     public void reloadPicture(int position) {
-        final PictureMetaData picture = getPictureMetaData(position);
+        final PictureMetaData picture = getItem(position);
         GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
             @Override
             public void taskDidFinish(ExtendedTask task, PictureData pictureData) {

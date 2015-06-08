@@ -90,7 +90,7 @@ public class GalleryAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public GalleryMetaData getItem(int position) {
         return galleries.get(position);
     }
 
@@ -108,7 +108,7 @@ public class GalleryAdapter extends BaseAdapter {
         } else {
             view = parent.inflate(parent.getContext(), android.R.layout.simple_spinner_dropdown_item, null);
         }
-        GalleryMetaData gallery = galleries.get(position);
+        GalleryMetaData gallery = getItem(position);
         ((TextView) view.findViewById(android.R.id.text1)).setText(gallery.getTitle());
         return view;
     }

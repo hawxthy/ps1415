@@ -29,6 +29,11 @@
     <string name="event_details"><u>Veranstaltungsdetails</u></string>
     <string name="add_dynamic_field">Datenfeld hinzufügen…</string>
     <string name="add_image">Bild hinzufügen…</string>
+    <string name="action_save_event">Speichern</string>
+    <string name="error_can_not_change_picture">Bilder können für eine Veranstaltung nicht nachträglich angepasst werden.</string>
+    <string name="error_invalid_event">Ungültige Veranstaltung</string>
+    <string name="error_invalid_event_message">Die für die Veranstaltung angegebenen Daten sind ungültig. Bitte stellen Sie sicher, dass Sie mindestens die Daten Icon, Titel, Beschreibung, Treffpunkt, Gebühr und Route angegeben haben.</string>
+    <string name="error_wrong_currency_format">Falsches Währungsformat! Nutzen Sie z.B.: 2,50</string>
 
     <!-- DateTimeDialog -->
     <string name="choose_datetime">Datum und Uhrzeit wählen…</string>

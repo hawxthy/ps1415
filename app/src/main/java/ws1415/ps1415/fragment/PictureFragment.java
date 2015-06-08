@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ws1415.ps1415.R;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.GalleryAdapter;
 import ws1415.ps1415.controller.GalleryController;
 import ws1415.ps1415.model.PictureVisibility;
@@ -40,8 +41,6 @@ import ws1415.ps1415.util.DiskCacheImageLoader;
  * Fragment zur vollständigen Anzeige eines Bildes inkl. Kommentaren.
  */
 public class PictureFragment extends Fragment implements RatingBar.OnRatingBarChangeListener {
-    private MenuItem addToGalleryItem;
-
     private ProgressBar pictureLoading;
 
     private ImageView picture;
@@ -80,7 +79,6 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_picture_fragment, menu);
-        addToGalleryItem = menu.findItem(R.id.action_add_to_gallery);
     }
 
     @Override
@@ -126,12 +124,6 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
                     rating.setRating(pictureData.getAvgRating().floatValue());
                 } else {
                     rating.setRating(0);
-                }
-
-                if (PictureVisibility.valueOf(pictureData.getVisibility()) == PictureVisibility.PRIVATE) {
-                    addToGalleryItem.setVisible(false);
-                } else {
-                    addToGalleryItem.setVisible(true);
                 }
 
                 finishLoading();

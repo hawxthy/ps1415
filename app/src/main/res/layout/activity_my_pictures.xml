@@ -14,10 +14,19 @@
         android:onClick="onDeleteGalleryClick" />
 
     <ImageButton
-        android:id="@+id/addGallery"
+        android:id="@+id/editGallery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/removeGallery"
+        android:src="@drawable/ic_action_edit"
+        android:visibility="invisible"
+        android:onClick="onEditGalleryClick" />
+
+    <ImageButton
+        android:id="@+id/addGallery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/editGallery"
         android:src="@drawable/ic_action_new"
         android:onClick="onAddGalleryClick" />
 

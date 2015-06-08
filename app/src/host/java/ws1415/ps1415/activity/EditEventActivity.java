@@ -10,8 +10,12 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +40,7 @@ import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -49,6 +54,7 @@ import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.DiskCacheImageLoader;
+import ws1415.ps1415.util.FormatterUtil;
 import ws1415.ps1415.util.ImageUtil;
 import ws1415.ps1415.util.UniversalUtil;
 
@@ -74,7 +80,6 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
     private TextView date;
     private EditText description;
     private EditText meetingPlace;
-    // TODO Textfeld für Gebühr anpassen, damit Cent in € angezeigt und bei Eingabe konvertiert werden
     private EditText fee;
     private Button route;
     private DynamicFieldsAdapter dynamicFieldsAdapter;
@@ -122,10 +127,19 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
         description = (EditText) findViewById(R.id.description);
         meetingPlace = (EditText) findViewById(R.id.meeting_place);
         fee = (EditText) findViewById(R.id.fee);
+        fee.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus && !FormatterUtil.isCurrencyString(fee.getText().toString())) {
+                    fee.setError(getResources().getString(R.string.error_wrong_currency_format));
+                }
+            }
+        });
         route = (Button) findViewById(R.id.route);
         imagesScroller = (HorizontalScrollView) findViewById(R.id.imagesScroller);
         images = (LinearLayout) findViewById(R.id.images);
 
+        startLoading();
         if (getIntent().hasExtra(EXTRA_EVENT_ID)) {
             eventId = getIntent().getLongExtra(EXTRA_EVENT_ID, -1);
             EventController.getEvent(this, eventId);
@@ -154,22 +168,40 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_save_event) {
+            finish();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Startet die Ladeanimation.
+     */
+    private void startLoading() {
+        findViewById(R.id.eventLoading).setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Beendet die Ladeanimation.
+     */
+    private void finishLoading() {
+        findViewById(R.id.eventLoading).setVisibility(View.GONE);
+    }
+
+    /**
+     * Sorgt dafür, dass beim Schließen der Activity nachgefragt wird, ob Änderungen gespeichert werden sollen.
+     */
     @Override
-    public void onBackPressed() {
-        // TODO R: Wird nicht aufgerufen, wenn man in der ActionBar auf "zurück" klickt
+    public void finish() {
+        if (!FormatterUtil.isCurrencyString(fee.getText().toString())) {
+            Toast.makeText(this, R.string.error_wrong_currency_format, Toast.LENGTH_LONG).show();
+            return;
+        }
+        // TODO R: Wird nicht aufgerufen, wenn man in der ActionBar auf "Zurück" klickt
         if (edited) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.save_event)
@@ -177,7 +209,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
                     .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            findViewById(R.id.eventLoading).setVisibility(View.VISIBLE);
+                            startLoading();
 
                             // Das Event aus den Informationen in der Activity erstellen
                             Event event = new Event();
@@ -186,46 +218,78 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
                             event.setDate(new DateTime(eventDate.getTime()));
                             event.setDescription(new Text().setValue(description.getText().toString()));
                             event.setMeetingPlace(meetingPlace.getText().toString());
-                            event.setFee(Integer.parseInt(fee.getText().toString()));
+                            if (!fee.getText().toString().isEmpty()) {
+                                event.setFee(FormatterUtil.getCentsFromCurrencyString(fee.getText().toString()));
+                            } else {
+                                event.setFee(0);
+                            }
                             event.setRoute(selectedRoute);
                             event.setDynamicFields(dynamicFieldsAdapter.getList());
 
                             if (eventId != null) {
-                                EventController.editEvent(new ExtendedTaskDelegateAdapter<Void, Event>() {
-                                    @Override
-                                    public void taskDidFinish(ExtendedTask task, Event event) {
-                                        finish();
-                                    }
-                                    @Override
-                                    public void taskFailed(ExtendedTask task, String message) {
-                                        Toast.makeText(EditEventActivity.this, R.string.error_saving_event, Toast.LENGTH_LONG).show();
-                                        findViewById(R.id.eventLoading).setVisibility(View.GONE);
-                                    }
-                                }, event);
+                                try {
+                                    EventController.editEvent(new ExtendedTaskDelegateAdapter<Void, Event>() {
+                                        @Override
+                                        public void taskDidFinish(ExtendedTask task, Event event) {
+                                            EditEventActivity.super.finish();
+                                        }
+
+                                        @Override
+                                        public void taskFailed(ExtendedTask task, String message) {
+                                            Toast.makeText(EditEventActivity.this, R.string.error_saving_event, Toast.LENGTH_LONG).show();
+                                            findViewById(R.id.eventLoading).setVisibility(View.GONE);
+                                        }
+                                    }, event);
+                                } catch(IllegalArgumentException e) {
+                                    // Event ist ungültig
+                                    finishLoading();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(EditEventActivity.this);
+                                    builder.setTitle(R.string.error_invalid_event)
+                                            .setMessage(R.string.error_invalid_event_message)
+                                            .setPositiveButton(R.string.ok, null);
+                                    builder.create().show();
+                                }
                             } else {
-                                EventController.createEvent(new ExtendedTaskDelegateAdapter<Void, Event>() {
-                                    @Override
-                                    public void taskDidFinish(ExtendedTask task, Event event) {
-                                        finish();
-                                    }
-                                    @Override
-                                    public void taskFailed(ExtendedTask task, String message) {
-                                        Toast.makeText(EditEventActivity.this, R.string.error_saving_event, Toast.LENGTH_LONG).show();
-                                        findViewById(R.id.eventLoading).setVisibility(View.GONE);
-                                    }
-                                }, event, iconFile, headerImageFile, imageFiles);
+                                try {
+                                    EventController.createEvent(new ExtendedTaskDelegateAdapter<Void, Event>() {
+                                        @Override
+                                        public void taskDidFinish(ExtendedTask task, Event event) {
+                                            EditEventActivity.super.finish();
+                                        }
+
+                                        @Override
+                                        public void taskFailed(ExtendedTask task, String message) {
+                                            Toast.makeText(EditEventActivity.this, R.string.error_saving_event, Toast.LENGTH_LONG).show();
+                                            findViewById(R.id.eventLoading).setVisibility(View.GONE);
+                                        }
+                                    }, event, iconFile, headerImageFile, imageFiles);
+                                } catch(IllegalArgumentException e) {
+                                    // Event ist ungültig
+                                    finishLoading();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(EditEventActivity.this);
+                                    builder.setTitle(R.string.error_invalid_event)
+                                            .setMessage(R.string.error_invalid_event_message)
+                                            .setPositiveButton(R.string.ok, null);
+                                    builder.create().show();
+                                }
                             }
                         }
                     })
                     .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            finish();
+                            EditEventActivity.super.finish();
+                        }
+                    })
+                    .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
                         }
                     });
             builder.create().show();
         } else {
-            super.onBackPressed();
+            super.finish();
         }
     }
 
@@ -245,12 +309,16 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
             title.setHint(eventData.getTitle());
             description.setHint(eventData.getDescription());
             meetingPlace.setHint(eventData.getMeetingPlace());
-            fee.setHint(Integer.toString(eventData.getFee()));
+            fee.setText(FormatterUtil.formatCents(0));
         } else {
             title.setText(eventData.getTitle());
             description.setText(eventData.getDescription());
             meetingPlace.setText(eventData.getMeetingPlace());
-            fee.setText(Integer.toString(eventData.getFee()));
+            if (fee != null) {
+                fee.setText(FormatterUtil.formatCents(eventData.getFee()));
+            } else {
+                fee.setText(FormatterUtil.formatCents(0));
+            }
         }
         eventDate.setTime(new Date(eventData.getDate().getValue()));
         date.setText(DateFormat.getMediumDateFormat(this).format(eventDate.getTime())
@@ -273,7 +341,33 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
             }
         }
 
-        findViewById(R.id.eventLoading).setVisibility(View.GONE);
+        if (eventData.getRoute() != null) {
+            for (Route r : routes) {
+                if (r.getId().equals(eventData.getRoute().getId())) {
+                    selectedRoute = r;
+                }
+            }
+            if (selectedRoute != null) {
+                route.setText(selectedRoute.getName());
+            }
+        }
+
+        TextWatcher editingWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override
+            public void afterTextChanged(Editable s) {
+                edited = true;
+            }
+        };
+        title.addTextChangedListener(editingWatcher);
+        description.addTextChangedListener(editingWatcher);
+        meetingPlace.addTextChangedListener(editingWatcher);
+        fee.addTextChangedListener(editingWatcher);
+
+        finishLoading();
     }
 
     @Override
@@ -282,11 +376,15 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
     @Override
     public void taskFailed(ExtendedTask task, String message) {
         Toast.makeText(this, R.string.event_loading_error, Toast.LENGTH_LONG).show();
-        findViewById(R.id.eventLoading).setVisibility(View.GONE);
+        finishLoading();
     }
     // -------------------- Callback-Methoden für das Abrufen eines Events --------------------
 
     public void onIconImageClick(View view) {
+        if (eventId != null) {
+            Toast.makeText(this, R.string.error_can_not_change_picture, Toast.LENGTH_SHORT).show();
+            return;
+        }
         Intent intent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
@@ -294,6 +392,10 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
     }
 
     public void onHeaderImageClick(View view) {
+        if (eventId != null) {
+            Toast.makeText(this, R.string.error_can_not_change_picture, Toast.LENGTH_SHORT).show();
+            return;
+        }
         Intent intent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
@@ -401,6 +503,10 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
     }
 
     public void onAddImageClick(View view) {
+        if (eventId != null) {
+            Toast.makeText(this, R.string.error_can_not_change_picture, Toast.LENGTH_SHORT).show();
+            return;
+        }
         Intent intent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");

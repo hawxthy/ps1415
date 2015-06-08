@@ -68,9 +68,11 @@ public class MyPicturesActivity extends BaseActivity implements PictureListFragm
                         if (id == GalleryAdapter.EMPTY_ITEM_GALLERY_ID) {
                             filter.setUserId(ServiceProvider.getEmail());
                             findViewById(R.id.removeGallery).setVisibility(View.INVISIBLE);
+                            findViewById(R.id.editGallery).setVisibility(View.INVISIBLE);
                         } else {
                             filter.setGalleryId(id);
                             findViewById(R.id.removeGallery).setVisibility(View.VISIBLE);
+                            findViewById(R.id.editGallery).setVisibility(View.VISIBLE);
                         }
                         filter.setLimit(PICTURES_PER_REQUEST);
                         pictureAdapter = new PictureMetaDataAdapter(MyPicturesActivity.this, filter);
@@ -207,6 +209,7 @@ public class MyPicturesActivity extends BaseActivity implements PictureListFragm
                             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                                 pictureAdapter.removePicture(picture);
                             }
+
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
                                 Toast.makeText(MyPicturesActivity.this, R.string.error_removing_from_gallery, Toast.LENGTH_LONG).show();
@@ -276,20 +279,24 @@ public class MyPicturesActivity extends BaseActivity implements PictureListFragm
                     gallery.setTitle(title);
                     gallery.setContainerClass(UserGalleryContainer.class.getSimpleName());
                     gallery.setContainerId(userGalleryContainerId);
-                    GalleryController.createGallery(new ExtendedTaskDelegateAdapter<Void, Gallery>() {
-                        @Override
-                        public void taskDidFinish(ExtendedTask task, Gallery gallery) {
-                            galleryAdapter.addGallery(new GalleryMetaData()
-                                    .setId(gallery.getId())
-                                    .setTitle(gallery.getTitle()));
-                        }
-
-                        @Override
-                        public void taskFailed(ExtendedTask task, String message) {
-                            Toast.makeText(MyPicturesActivity.this, R.string.error_creating_gallery, Toast.LENGTH_LONG).show();
-                        }
-                    }, gallery);
-                    dialog.dismiss();
+                    try {
+                        GalleryController.createGallery(new ExtendedTaskDelegateAdapter<Void, Gallery>() {
+                            @Override
+                            public void taskDidFinish(ExtendedTask task, Gallery gallery) {
+                                galleryAdapter.addGallery(new GalleryMetaData()
+                                        .setId(gallery.getId())
+                                        .setTitle(gallery.getTitle()));
+                                galleries.setSelection(galleryAdapter.getCount() - 1);
+                            }
+                            @Override
+                            public void taskFailed(ExtendedTask task, String message) {
+                                Toast.makeText(MyPicturesActivity.this, R.string.error_creating_gallery, Toast.LENGTH_LONG).show();
+                            }
+                        }, gallery);
+                        dialog.dismiss();
+                    } catch(IllegalArgumentException ex) {
+                        Toast.makeText(MyPicturesActivity.this, R.string.no_title_submitted, Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -324,5 +331,57 @@ public class MyPicturesActivity extends BaseActivity implements PictureListFragm
                     }
                 });
         builder.create().show();
+    }
+
+    public void onEditGalleryClick(View view) {
+        final GalleryMetaData gallery = galleryAdapter.getItem(galleries.getSelectedItemPosition());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_textinput, null);
+        final EditText input = (EditText) dialogView.findViewById(android.R.id.text1);
+        input.setText(gallery.getTitle());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.create_gallery)
+                .setView(dialogView)
+                .setPositiveButton(R.string.save, null)
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        // Handler für den Ja-Button später setzen, damit das Schließen des Dialogs bei falschen Eingaben verhindert werden kann
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String title = input.getText().toString();
+                if (title.isEmpty()) {
+                    Toast.makeText(MyPicturesActivity.this, R.string.no_title_submitted, Toast.LENGTH_SHORT).show();
+                } else {
+                    Gallery editedGallery = new Gallery();
+                    editedGallery.setId(gallery.getId());
+                    editedGallery.setTitle(title);
+                    editedGallery.setContainerClass(gallery.getContainerClass());
+                    editedGallery.setContainerId(gallery.getContainerId());
+                    gallery.setTitle(title);
+                    try {
+                        GalleryController.editGallery(new ExtendedTaskDelegateAdapter<Void, Gallery>() {
+                            @Override
+                            public void taskDidFinish(ExtendedTask task, Gallery gallery) {
+                                gallery.setTitle(title);
+                                galleryAdapter.notifyDataSetChanged();
+                            }
+                            @Override
+                            public void taskFailed(ExtendedTask task, String message) {
+                                Toast.makeText(MyPicturesActivity.this, R.string.error_creating_gallery, Toast.LENGTH_LONG).show();
+                            }
+                        }, editedGallery);
+                        dialog.dismiss();
+                    } catch(IllegalArgumentException ex) {
+                        Toast.makeText(MyPicturesActivity.this, R.string.no_title_submitted, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
     }
 }

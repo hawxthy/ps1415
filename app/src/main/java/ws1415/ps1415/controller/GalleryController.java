@@ -75,8 +75,16 @@ public abstract class GalleryController {
      * Erstellt die angegebene Gallery auf dem Server.
      * @param handler    Der Handler, der die erstellte Gallery übergeben bekommt.
      * @param gallery    Die zu erstellende Gallery.
+     * @throws IllegalArgumentException falls die Galerie ungültig ist
      */
-    public static void createGallery(ExtendedTaskDelegate<Void, Gallery> handler, final Gallery gallery) {
+    public static void createGallery(ExtendedTaskDelegate<Void, Gallery> handler, final Gallery gallery)
+            throws IllegalArgumentException {
+        if (gallery == null || gallery.getId() != null|| gallery.getContainerId() == null
+                || gallery.getContainerClass() == null || gallery.getContainerClass().isEmpty()
+                || gallery.getTitle() == null || gallery.getTitle().isEmpty()) {
+            throw new IllegalArgumentException("invalid gallery");
+        }
+
         new ExtendedTask<Void, Void, Gallery>(handler) {
             @Override
             protected Gallery doInBackground(Void... params) {
@@ -93,8 +101,15 @@ public abstract class GalleryController {
      * Editiert die angegebene Gallery.
      * @param handler    Der Handler, der die editierte Gallery übergeben bekommt.
      * @param gallery    Die zu editierende Gallery.
+     * @throws IllegalArgumentException falls die Galerie ungültig ist
      */
     public static void editGallery(ExtendedTaskDelegate<Void, Gallery> handler, final Gallery gallery) {
+        if (gallery == null || gallery.getId() == null|| gallery.getContainerId() == null
+                || gallery.getContainerClass() == null || gallery.getContainerClass().isEmpty()
+                || gallery.getTitle() == null || gallery.getTitle().isEmpty()) {
+            throw new IllegalArgumentException("invalid gallery");
+        }
+
         new ExtendedTask<Void, Void, Gallery>(handler) {
             @Override
             protected Gallery doInBackground(Void... params) {
@@ -188,9 +203,19 @@ public abstract class GalleryController {
      * angelegte Picture-Objekt inklusive des BlobKeys zurück.
      * @param handler    Der Handler, der beim Abschluss des Vorgangs aufgerufen werden soll.
      * @param image      Das hochzuladende Bild.
+     * @param title          Der Titel des Bildes.
+     * @param description    Die Beschreibung des Bildes.
+     * @param visibility     Die Sichtbarkeit des Bildes.
+     * @throws IllegalArgumentException falls das Bild ungültig ist
      */
     public static void uploadPicture(ExtendedTaskDelegate<Void, Picture> handler, final File image,
-                                     final String title, final String description, final PictureVisibility visibility) {
+                                     final String title, final String description, final PictureVisibility visibility)
+            throws IllegalArgumentException {
+        if (image == null || visibility == null || title == null || title.isEmpty()
+                || description == null || description.isEmpty()) {
+            throw new IllegalArgumentException("invalid picture");
+        }
+
         new ExtendedTask<Void, Void, Picture>(handler) {
             @Override
             protected Picture doInBackground(Void... params) {
@@ -254,10 +279,15 @@ public abstract class GalleryController {
      * @param title          Der neue Titel des Bildes.
      * @param description    Die neue Beschreibung des Bildes.
      * @param visibility     Die neue Sichtbarkeit des Bildes.
+     * @throws IllegalArgumentException falls das Bild ungültig ist
      */
     // TODO R: Testen
     public static void editPicture(ExtendedTaskDelegate<Void, Void> handler, final long pictureId,
                                    final String title, final String description, final PictureVisibility visibility) {
+        if (visibility == null || title == null || title.isEmpty() || description == null || description.isEmpty()) {
+            throw new IllegalArgumentException("invalid picture");
+        }
+
         new ExtendedTask<Void, Void, Void>(handler) {
             @Override
             protected Void doInBackground(Void... params) {

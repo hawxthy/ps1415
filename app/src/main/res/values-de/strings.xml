@@ -369,6 +369,8 @@
     <string name="error_uploading_picture">Beim Hochladen des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
     <string name="error_editing_picture">Beim Bearbeiten des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
     <string name="picture_can_not_be_changed">Das Bild kann nicht geändert werden, nachdem es hochgeladen wurde.</string>
+    <string name="error_invalid_picture">Ungültiges Bild</string>
+    <string name="error_invalid_picture_message">Die für das Bild angegebenen Daten sind ungültig. Bitte wählen Sie ein Bild aus und geben Sie Titel, Beschreibung und Sichtbarkeit an.</string>
 
     <!-- PictureFragment -->
     <string name="comments_label">Kommentare</string>
