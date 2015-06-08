@@ -159,7 +159,7 @@ public class UsergroupAdapter extends BaseAdapter {
         //Attribute Setzen
         holder.groupName.setText(getItem(position).getName());
         holder.groupCount.setText(context.getString(R.string.usergroup_member_count) + Integer.toString(getItem(position).getMemberCount()));
-        
+
         if (context instanceof ListUserGroupsActivity) {
             holder.hiddenSecurityButton.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_security_black_24dp));
             holder.hiddenSecurityButton.setOnClickListener(new View.OnClickListener() {
@@ -216,7 +216,7 @@ public class UsergroupAdapter extends BaseAdapter {
                         }
                     }
                 });
-            }else{
+            } else {
                 Toast.makeText(context, R.string.tooManyVisibleGroups, Toast.LENGTH_LONG).show();
             }
         }
@@ -231,40 +231,75 @@ public class UsergroupAdapter extends BaseAdapter {
      * abgerufen werden.
      */
     protected void fetchNewGroups() {
-        if (!fetching) {
-            if (context instanceof Activity) {
+        if (context instanceof MyUserGroupsActivity) {
+            if (!fetching) {
                 final Activity activity = (Activity) context;
-                if (activity != null) activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                fetching = true;
-                GroupController.getInstance().listUserGroupMetaDatas(new ExtendedTaskDelegateAdapter<Void, UserGroupMetaDataList>() {
-                    @Override
-                    public void taskDidFinish(ExtendedTask task, UserGroupMetaDataList userGroupMetaDataList) {
-                        if (userGroupMetaDataList.getMetaDatas() == null) {
-                            Toast.makeText(context, R.string.noMore, Toast.LENGTH_LONG).show();
-                            activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                            fetchingDone = true;
-                        } else {
-                            groupList.addAll(userGroupMetaDataList.getMetaDatas());
-                            deliverCursorString(userGroupMetaDataList.getWebCursorString());
-                            notifyDataSetChanged();
-                            if (userGroupMetaDataList.getMetaDatas().size() < filter.getLimit()) {
+                if (activity != null) {
+                    activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                    GroupController.getInstance().getMyUserGroups(new ExtendedTaskDelegateAdapter<Void, UserGroupMetaDataList>() {
+                        @Override
+                        public void taskDidFinish(ExtendedTask task, UserGroupMetaDataList userGroupMetaDataList) {
+                            if (userGroupMetaDataList.getMetaDatas() == null) {
+                                Toast.makeText(context, R.string.noMore, Toast.LENGTH_LONG).show();
+                                activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
                                 fetchingDone = true;
+                            } else {
+                                groupList.addAll(userGroupMetaDataList.getMetaDatas());
+                                deliverCursorString(userGroupMetaDataList.getWebCursorString());
+                                notifyDataSetChanged();
+                                if (userGroupMetaDataList.getMetaDatas().size() < filter.getLimit()) {
+                                    fetchingDone = true;
+                                }
+                                if (activity != null)
+                                    activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
                             }
+                            fetching = false;
+                        }
+
+                        @Override
+                        public void taskFailed(ExtendedTask task, String message) {
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                            activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                        }
+                    }, filter);
+                }
+            }
+        } else {
+            if (!fetching) {
+                if (context instanceof Activity) {
+                    final Activity activity = (Activity) context;
+                    if (activity != null)
+                        activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                    fetching = true;
+                    GroupController.getInstance().listUserGroupMetaDatas(new ExtendedTaskDelegateAdapter<Void, UserGroupMetaDataList>() {
+                        @Override
+                        public void taskDidFinish(ExtendedTask task, UserGroupMetaDataList userGroupMetaDataList) {
+                            if (userGroupMetaDataList.getMetaDatas() == null) {
+                                Toast.makeText(context, R.string.noMore, Toast.LENGTH_LONG).show();
+                                activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                                fetchingDone = true;
+                            } else {
+                                groupList.addAll(userGroupMetaDataList.getMetaDatas());
+                                deliverCursorString(userGroupMetaDataList.getWebCursorString());
+                                notifyDataSetChanged();
+                                if (userGroupMetaDataList.getMetaDatas().size() < filter.getLimit()) {
+                                    fetchingDone = true;
+                                }
+                                if (activity != null)
+                                    activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                            }
+                            fetching = false;
+                        }
+
+                        @Override
+                        public void taskFailed(ExtendedTask task, String message) {
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                             if (activity != null)
                                 activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
                         }
-                        fetching = false;
-                    }
-
-                    @Override
-                    public void taskFailed(ExtendedTask task, String message) {
-                        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                        if (activity != null)
-                            activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                    }
-                }, filter);
+                    }, filter);
+                }
             }
-
         }
     }
 

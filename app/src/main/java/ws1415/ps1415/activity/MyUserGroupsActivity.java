@@ -10,17 +10,21 @@ import android.widget.ListView;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.melnykov.fab.FloatingActionButton;
 import com.skatenight.skatenightAPI.model.UserGroup;
+import com.skatenight.skatenightAPI.model.UserGroupFilter;
 
 import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.GroupMemberListAdapter;
+import ws1415.ps1415.adapter.UsergroupAdapter;
 import ws1415.ps1415.util.PrefManager;
 
 public class MyUserGroupsActivity extends Activity {
+    // maximal Anzahl an gleichzeitig zu ladenen Nutzergruppen
+    final private int MAX_GROUPS_PER_LOAD = 10;
     // Viewelemente
     private ListView mResultListView;
-    private GroupMemberListAdapter mAdapter;
+    private UsergroupAdapter mAdapter;
     private FloatingActionButton mCreateGroupButton;
 
 
@@ -32,6 +36,12 @@ public class MyUserGroupsActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_my_user_groups);
+        mResultListView = (ListView) findViewById(R.id.my_groups_list_view);
+        mCreateGroupButton = (FloatingActionButton) findViewById(R.id.create_user_group_button_my_groups);
+        UserGroupFilter filter = new UserGroupFilter();
+        filter.setLimit(MAX_GROUPS_PER_LOAD);
+        mAdapter = new UsergroupAdapter(this, filter, -1);
+        mResultListView.setAdapter(mAdapter);
     }
 
     @Override

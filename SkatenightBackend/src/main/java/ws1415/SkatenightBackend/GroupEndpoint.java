@@ -461,15 +461,33 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      *
      * @return Eine Liste aller Benutzergruppen.
      */
-    public List<UserGroup> fetchMyUserGroups(User user) throws OAuthRequestException {
-        EndUser endUser;
-        if (user == null || (endUser = throwIfNoEndUserFound(user.getEmail())) == null) {
-            // Falls kein Benutzer angegeben, dann leere Liste zurückgeben.
-            return new ArrayList<>();
+    @ApiMethod(httpMethod = "POST")
+    public UserGroupMetaDataList fetchMyUserGroups(User user, UserGroupFilter groupFilter) throws OAuthRequestException {
+        EndpointUtil.throwIfNoUser(user);
+        if(groupFilter == null){
+            throw new IllegalArgumentException("no filter submitted");
         }
-        // Falls im EndUser noch UserGroups existieren die
-        // nicht mehr da sein sollten, diese löschen
-        return removeMissingUserGroups(endUser);
+        if(groupFilter.getLimit() <= 0){
+            throw new IllegalArgumentException("limit of the filter has to be greater than zero");
+        }
+
+        Query<UserGroup> query = ofy().load().group(UserGroupMetaData.class).type(UserGroup.class).limit(groupFilter.getLimit());
+        if(groupFilter.getCursorString() != null){
+            query = query.startAt(Cursor.fromWebSafeString(groupFilter.getCursorString()));
+        }
+        query = query.order("__key__");
+        QueryResultIterator<UserGroup> iterator = query.iterator();
+
+        UserGroupMetaDataList list = new UserGroupMetaDataList();
+        list.setMetaDatas(new ArrayList<UserGroup>());
+        while(iterator.hasNext()){
+            UserGroup group = iterator.next();
+            if(group.getMemberRights().keySet().contains(user.getEmail())){
+                list.getMetaDatas().add(group);
+            }
+        }
+        list.setWebCursorString(iterator.getCursor().toWebSafeString());
+        return list;
     }
 
     /**

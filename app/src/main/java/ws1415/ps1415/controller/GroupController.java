@@ -282,18 +282,18 @@ public class GroupController {
      *
      * @param handler Der Task, der mit dem Server kommuniziert
      */
-    public void getMyUserGroups(ExtendedTaskDelegate handler) {
-        new ExtendedTask<Void, Void, List<UserGroup>>(handler) {
+    public void getMyUserGroups(ExtendedTaskDelegate handler, UserGroupFilter filter) {
+        new ExtendedTask<UserGroupFilter, Void, UserGroupMetaDataList>(handler) {
             @Override
-            protected List<UserGroup> doInBackground(Void... params) {
+            protected UserGroupMetaDataList doInBackground(UserGroupFilter... params) {
                 try {
-                    return ServiceProvider.getService().groupEndpoint().fetchMyUserGroups().execute().getItems();
+                    return ServiceProvider.getService().groupEndpoint().fetchMyUserGroups(params[0]).execute();
                 } catch (IOException e) {
                     publishError("Fehler: Ihre Gruppen konnten nicht abgerufen werden");
                     return null;
                 }
             }
-        }.execute();
+        }.execute(filter);
     }
 
     /**
