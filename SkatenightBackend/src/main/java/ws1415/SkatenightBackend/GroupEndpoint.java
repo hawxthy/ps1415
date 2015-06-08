@@ -603,17 +603,21 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         EndpointUtil.throwIfNotBoardMessageSubmitted(message);
         UserGroup group = ofy().load().group(UserGroupBlackBoardTransport.class).type(UserGroup.class).id(groupName).safe();
-        BoardEntry be = new BoardEntry(message, user.getEmail());
-        ofy().save().entity(be).now();
-        if (group.getBlackBoard() == null) {
-            Board board = new Board(groupName, be);
-            ofy().save().entity(board).now();
-            group.setBlackBoard(board);
-        } else {
-            group.getBlackBoard().addBoardMessage(be);
-            ofy().save().entity(group.getBlackBoard()).now();
+        if(hasRights(group, user.getEmail(), Right.NEWMEMBERRIGHTS.name())){
+            BoardEntry be = new BoardEntry(message, user.getEmail());
+            ofy().save().entity(be).now();
+            if (group.getBlackBoard() == null) {
+                Board board = new Board(groupName, be);
+                ofy().save().entity(board).now();
+                group.setBlackBoard(board);
+            } else {
+                group.getBlackBoard().addBoardMessage(be);
+                ofy().save().entity(group.getBlackBoard()).now();
+            }
+            ofy().save().entity(group).now();
+        }else{
+            EndpointUtil.throwIfNoRights();
         }
-        ofy().save().entity(group).now();
     }
 
     /**

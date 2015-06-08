@@ -52,7 +52,6 @@ public class GroupBlackBoardFragment extends Fragment {
         mAddMessageButton = (FloatingActionButton) rootView.findViewById(R.id.group_black_board_add_message_button);
 
         checkBoardMesageTextChecked = false;
-
         // Clicklistener setzen für das Posten von Einträgen
         mAddMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,6 +138,9 @@ public class GroupBlackBoardFragment extends Fragment {
     public void setUp(Board blackBoard, UserGroup group, Context contetx) {
         this.group = group;
         if (blackBoard != null) {
+            if(!group.getMemberRights().keySet().contains(ServiceProvider.getEmail())){
+                mAddMessageButton.setVisibility(View.GONE);
+            }
             mAdapter = new BlackBoardListAdapter(contetx, blackBoard.getBoardEntries(), (ArrayList<String>) group.getMemberRights().get(ServiceProvider.getEmail()));
             if (mBlackBoardListView != null) mBlackBoardListView.setAdapter(mAdapter);
         }
