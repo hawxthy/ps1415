@@ -283,6 +283,18 @@ public class EventEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
+     * Hilfsmethode für die Endpoint-Klassen, die einen Benutzer aus der Liste der Teilnehmer eines Events entfernt.
+     * @param mail       Die Mail-Adresse des zu entfernenden Benutzers.
+     * @param eventId    Die ID des Events, aus dem der Benutzer entfernt werden soll.
+     */
+    protected void removeUserFromEvent(String mail, long eventId) {
+        Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
+        event.getMemberList().remove(mail);
+        event.getMemberVisibility().remove(mail);
+        ofy().save().entity(event).now();
+    }
+
+    /**
      * Ändert den Sichtbarkeitsstatus einer Teilnahme am betreffenden Event.
      * @param user
      * @param eventId

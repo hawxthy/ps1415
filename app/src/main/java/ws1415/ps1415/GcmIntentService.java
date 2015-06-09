@@ -190,7 +190,7 @@ public class GcmIntentService extends IntentService {
 
             @Override
             public void taskFailed(ExtendedTask task, String message) {
-                Conversation conversation = new Conversation(sender, null, sender, "");
+                Conversation conversation = new Conversation(sender, null, getString(R.string.unknown_user), "");
                 MessageDbController.getInstance(mContext, receiver).insertConversation(conversation);
                 createNewMessage(receiver, sender, sendDate, content);
             }

@@ -600,6 +600,14 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
 
+            // Lösche aus Teilnehmerlisten
+            for (Long eventId : endUser.getMyEvents())
+                new EventEndpoint().removeUserFromEvent(userMail, eventId);
+
+            // Lösche aus Gruppen
+            for (String groupId : endUser.getMyUserGroups())
+                new GroupEndpoint().removeMember(user, groupId, userMail);
+
             if (endUser.getUserPicture() != null)
                 blobstoreService.delete(endUser.getUserPicture());
             try {
@@ -607,24 +615,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             } finally {
                 pm.close();
             }
-
-            // Lösche aus Teilnehmerlisten
-            //List<Key> eventIds = endUser.getMyEvents();
-            //Event event;
-            //for (Key eventId : eventIds) {
-            //   event = new EventEndpoint().getEvent(eventId.getId());
-            // event.removeMember(userMail)
-            // pm.makePersistent(event);
-            //}
-
-            //List<String> groupIds = endUser.getMyUserGroups();
-            //UserGroup userGroup;
-            //for (String groupId : groupIds) {
-            //   userGroup = new GroupEndpoint().getUserGroup(groupId);
-            // userGroup.removeMember(userMail);
-            // pm.makePersistent(userGroup);
-            //}
-
         }
     }
 
@@ -701,13 +691,17 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         UserGroupMetaData userGroup;
         List<UserGroupMetaData> result = new ArrayList<>();
         for (String userGroupId : userGroupIds) {
-            userGroup = new GroupEndpoint().getUserGroupMetaData(caller, userGroupId);
-            if (userGroup != null) {
-                if (userGroup.getPrivat() && showPrivateGroups) {
-                    result.add(userGroup);
-                } else if (!userGroup.getPrivat()) {
-                    result.add(userGroup);
+            try {
+                userGroup = new GroupEndpoint().getUserGroupMetaData(caller, userGroupId);
+                if (userGroup != null) {
+                    if (userGroup.getPrivat() && showPrivateGroups) {
+                        result.add(userGroup);
+                    } else if (!userGroup.getPrivat()) {
+                        result.add(userGroup);
+                    }
                 }
+            } catch (Exception e){
+                // Füge Gruppe nicht hinzu
             }
         }
         return result;
@@ -762,6 +756,21 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         try {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             endUser.removeUserGroup(userGroup);
+        } finally {
+            pm.close();
+        }
+    }
+
+    /**
+     * Liefert alle Veranstaltungen an denen der Benutzer teilnimmt/teilgenommen hat.
+     *
+     * @param userMail E-Mail Adresse des Benutzers
+     * @return Liste der Veranstaltungen
+     */
+    protected List<Long> listEventsFromUser(String userMail){
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            return pm.getObjectById(EndUser.class, userMail).getMyEvents();
         } finally {
             pm.close();
         }

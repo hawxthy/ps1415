@@ -53,8 +53,10 @@ public class UserImageLoader {
                 UserController.getUserPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
-                        memoryCache.put(blobKey.getKeyString(), bitmap);
-                        imageView.setImageBitmap(ImageUtil.getRoundedBitmap(bitmap));
+                        if(bitmap != null) {
+                            memoryCache.put(blobKey.getKeyString(), bitmap);
+                            imageView.setImageBitmap(ImageUtil.getRoundedBitmap(bitmap));
+                        }
                     }
                 }, blobKey);
             }
@@ -81,8 +83,10 @@ public class UserImageLoader {
                 UserController.getUserPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
-                        memoryCache.put(blobKey.getKeyString(), bitmap);
-                        imageView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bitmap));
+                        if(bitmap != null) {
+                            memoryCache.put(blobKey.getKeyString(), bitmap);
+                            imageView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(bitmap));
+                        }
                     }
                 }, blobKey);
             }

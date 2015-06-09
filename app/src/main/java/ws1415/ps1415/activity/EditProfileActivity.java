@@ -223,7 +223,7 @@ public class EditProfileActivity extends Activity {
                     mImage = extras.getParcelable("data");
                     mImageViewPicture.setImageBitmap(ImageUtil.getRoundedBitmapFramed(mImage));
                     changedPicture = true;
-                    tempFile.deleteOnExit();
+                    tempFile.delete();
                     break;
             }
         }

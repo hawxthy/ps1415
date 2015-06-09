@@ -240,6 +240,7 @@
     <string name="message_could_not_be_sent">Benutzer hat kein registriertes Gerät</string>
     <string name="sure_delete_message_dialog">Sind Sie sicher, dass Sie die ausgewählte Nachricht entfernen wollen?</string>
     <string name="message_deleted">Nachricht gelöscht</string>
+    <string name="unknown_user">Unbekannter Benutzer</string>
 
     <!-- EventAdapter -->
     <string name="event_adapter_fetch_error">Es konnten keine weiteren Events abgerufen werden</string>

@@ -265,7 +265,7 @@ public class RegisterActivity extends Activity {
                     Bundle extras = data.getExtras();
                     selectedPicture = extras.getParcelable("data");
                     mPictureView.setImageBitmap(ImageUtil.getRoundedBitmapFramed(selectedPicture));
-                    tempFile.deleteOnExit();
+                    tempFile.delete();
                     break;
             }
         }
@@ -273,7 +273,7 @@ public class RegisterActivity extends Activity {
 
     private Uri createTempFile(){
         try {
-            tempFile = File.createTempFile("crop", "png", Environment
+            tempFile = File.createTempFile("crop", ".png", Environment
                     .getExternalStorageDirectory());
         } catch (IOException e) {
             e.printStackTrace();
