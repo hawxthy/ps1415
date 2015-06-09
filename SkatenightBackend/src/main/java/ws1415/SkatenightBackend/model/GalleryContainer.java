@@ -54,16 +54,21 @@ public interface GalleryContainer {
     /**
      * Prüft, ob der angegebene Benutzer Gallerien in diesem Container Bilder hinzufügen darf.
      * @param user                  Der Benutzer, der ein Bild hinzufügen möchte.
-     * @param picture               Das Bild, das hinzugefügt werden soll.
      * @return true, wenn der Benutzer Bilder hinzufügen darf, sonst false.
      */
-    boolean canAddPictures(User user, Picture picture);
+    boolean canAddPictures(User user);
 
     /**
      * Prüft, ob der angegebene Benutzer Bilder aus Gallerien dieses Containers entfernen darf.
      * @param user                  Der Benutzer, der ein Bild entfernen möchte.
-     * @param picture               Das Bild, das entfernt werden soll.
      * @return true, wenn der Benutzer das Bild entfernen darf, sonst false.
      */
-    boolean canRemovePictures(User user, Picture picture);
+    boolean canRemovePictures(User user);
+
+    /**
+     * Gibt die minimale Sichtbarkeit zurück, die Bilder mindestens haben müssen um in Gallereien
+     * dieses Containers hochgeladen werden zu können.
+     * @return Die minmal erforderliche Sichtbarkeit.
+     */
+    PictureVisibility getMinPictureVisibility();
 }

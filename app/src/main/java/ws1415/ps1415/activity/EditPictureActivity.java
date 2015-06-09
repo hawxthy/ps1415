@@ -1,5 +1,6 @@
 package ws1415.ps1415.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.CursorLoader;
@@ -9,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,6 +23,7 @@ import com.skatenight.skatenightAPI.model.Picture;
 import com.skatenight.skatenightAPI.model.PictureData;
 
 import java.io.File;
+import java.util.Arrays;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.controller.GalleryController;
@@ -33,11 +36,16 @@ import ws1415.ps1415.util.ImageUtil;
 public class EditPictureActivity extends Activity {
     public static final String EXTRA_PICTURE_ID = EditPictureActivity.class.getName() + ".PictureId";
     public static final String EXTRA_POSITION = EditPictureActivity.class.getName() + ".Position";
+    public static final String EXTRA_GALLERY_ID = EditPictureActivity.class.getSimpleName() + ".GalleryId";
+    public static final String EXTRA_MIN_PICTURE_VISBILITY = EditPictureActivity.class.getSimpleName() + ".MinPictureVsibility";
 
     private static final int CHOOSE_PICTURE_REQUEST_CODE = 1;
 
     private Long pictureId;
     private int position;
+    private Long galleryId;
+    private PictureVisibility initialVisibility;
+    private PictureVisibility minPictureVisibility;
 
     private ImageView picture;
     private TextView title;
@@ -52,6 +60,20 @@ public class EditPictureActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_picture);
 
+        // "Zurück"-Button in der Actionbar anzeigen
+        ActionBar mActionBar = getActionBar();
+        if (mActionBar != null) {
+            mActionBar.setHomeButtonEnabled(false);
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        if (getIntent().hasExtra(EXTRA_GALLERY_ID)) {
+            galleryId = getIntent().getLongExtra(EXTRA_GALLERY_ID, -1);
+        }
+        if (getIntent().hasExtra(EXTRA_MIN_PICTURE_VISBILITY)) {
+            minPictureVisibility = PictureVisibility.valueOf(getIntent().getStringExtra(EXTRA_MIN_PICTURE_VISBILITY));
+        }
+
         picture = (ImageView) findViewById(R.id.picture);
         title = (TextView) findViewById(R.id.title);
         description = (TextView) findViewById(R.id.description);
@@ -60,14 +82,24 @@ public class EditPictureActivity extends Activity {
         visibilityHint.setText(getResources().getStringArray(R.array.picture_visibility_hints)[0]);
 
         visibility = (Spinner) findViewById(R.id.visibility);
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this,
-                R.array.picture_visibilities, android.R.layout.simple_spinner_item);
+        String[] visibilities = getResources().getStringArray(R.array.picture_visibilities);
+        visibilities = Arrays.copyOfRange(visibilities, (minPictureVisibility != null ? minPictureVisibility.ordinal() : 0), visibilities.length);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item,
+                visibilities);
+
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         visibility.setAdapter(spinnerAdapter);
         visibility.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                visibilityHint.setText(getResources().getStringArray(R.array.picture_visibility_hints)[position]);
+                PictureVisibility v = getSelectedVisibility();
+                if (initialVisibility != null && v.compareTo(initialVisibility) < 0) {
+                    findViewById(R.id.changeVisibilityHint).setVisibility(View.VISIBLE);
+                } else {
+                    findViewById(R.id.changeVisibilityHint).setVisibility(View.GONE);
+                }
+                visibilityHint.setText(getResources().getStringArray(R.array.picture_visibility_hints)[v.ordinal()]);
             }
 
             @Override
@@ -87,7 +119,8 @@ public class EditPictureActivity extends Activity {
                     DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), picture.getWidth());
                     title.setText(pictureData.getTitle());
                     description.setText(pictureData.getDescription());
-                    visibility.setSelection(PictureVisibility.valueOf(pictureData.getVisibility()).ordinal());
+                    initialVisibility = PictureVisibility.valueOf(pictureData.getVisibility());
+                    visibility.setSelection(Math.min(initialVisibility.ordinal(), visibility.getAdapter().getCount() - 1));
                     finishLoading();
                 }
                 @Override
@@ -104,6 +137,16 @@ public class EditPictureActivity extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_edit_picture, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -165,6 +208,10 @@ public class EditPictureActivity extends Activity {
         finish();
     }
 
+    private PictureVisibility getSelectedVisibility() {
+        return PictureVisibility.values()[(minPictureVisibility != null ? minPictureVisibility.ordinal() : 0) + visibility.getSelectedItemPosition()];
+    }
+
     public void onSaveClick(View view) {
         startLoading();
         if (pictureId != null) {
@@ -181,7 +228,7 @@ public class EditPictureActivity extends Activity {
                         Toast.makeText(EditPictureActivity.this, R.string.error_editing_picture, Toast.LENGTH_LONG).show();
                         finishLoading();
                     }
-                }, pictureId, title.getText().toString(), description.getText().toString(), PictureVisibility.values()[visibility.getSelectedItemPosition()]);
+                }, pictureId, title.getText().toString(), description.getText().toString(), getSelectedVisibility());
             } catch (IllegalArgumentException ex) {
                 finishLoading();
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -204,7 +251,8 @@ public class EditPictureActivity extends Activity {
                         Toast.makeText(EditPictureActivity.this, R.string.error_uploading_picture, Toast.LENGTH_LONG).show();
                         finishLoading();
                     }
-                }, selectedFile, title.getText().toString(), description.getText().toString(), PictureVisibility.values()[visibility.getSelectedItemPosition()]);
+                }, selectedFile, title.getText().toString(), description.getText().toString(),
+                        getSelectedVisibility(), galleryId);
             } catch (IllegalArgumentException ex) {
                 finishLoading();
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);

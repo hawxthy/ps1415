@@ -66,11 +66,22 @@
         android:layout_alignParentRight="true"
         style="@style/secondaryText" />
 
+    <TextView
+        android:id="@+id/changeVisibilityHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/visibilityHint"
+        android:paddingTop="8dp"
+        android:layout_alignParentRight="true"
+        android:text="@string/change_visibility_hint"
+        android:visibility="gone"
+        style="@style/secondaryText" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@id/visibilityHint"
+        android:layout_below="@id/changeVisibilityHint"
         android:paddingTop="16dp" >
         <Button
             android:layout_width="0dp"

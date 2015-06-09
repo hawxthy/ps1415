@@ -197,11 +197,12 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
      */
     @Override
     public void finish() {
+        // TODO R: Wird nicht aufgerufen, wenn man in der ActionBar auf "Zurück" klickt
         if (!FormatterUtil.isCurrencyString(fee.getText().toString())) {
             Toast.makeText(this, R.string.error_wrong_currency_format, Toast.LENGTH_LONG).show();
             return;
         }
-        // TODO R: Wird nicht aufgerufen, wenn man in der ActionBar auf "Zurück" klickt
+
         if (edited) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.save_event)

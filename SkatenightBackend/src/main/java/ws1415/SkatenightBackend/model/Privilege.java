@@ -6,10 +6,11 @@ package ws1415.SkatenightBackend.model;
  */
 public enum Privilege {
     ASSIGN_ROLE,
-    DELETE_EVENT,
     EDIT_EVENT,
+    DELETE_EVENT,
+    ADD_GALLERY,
     EDIT_GALLERY,
     REMOVE_GALLERY,
-    REMOVE_PICTURES,
-    ADD_GALLERY
+    ADD_PICTURE,
+    REMOVE_PICTURES
 }

@@ -172,15 +172,16 @@
                 android:value="ws1415.ps1415.activity.ShowEventActivity" />
         </activity>
         <activity
-            android:name=".activity.MyPicturesActivity"
-            android:label="@string/title_activity_my_pictures" >
+            android:name=".activity.ListPicturesActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:label="@string/title_activity_list_pictures" >
         </activity>
         <activity
             android:name=".activity.EditPictureActivity"
-            android:parentActivityName=".activity.MyPicturesActivity" >
+            android:parentActivityName=".activity.ListPicturesActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ws1415.ps1415.activity.MyPicturesActivity" />
+                android:value=".activity.ListPicturesActivity" />
         </activity>
         <activity
             android:name=".activity.ShowPictureActivity" >

@@ -32,7 +32,6 @@ public class EventData {
     private EventParticipationVisibility participationVisibility;
     private List<BlobKey> images;
     private Route route;
-    private List<Gallery> galleries;
     private List<DynamicField> dynamicFields;
 
     public EventData(User user, Event event) {
@@ -45,12 +44,10 @@ public class EventData {
         meetingPlace = event.getMeetingPlace();
         fee = event.getFee();
 
-        // TODO Nur sichtbare Teilnehmer kopieren
         memberList = event.getMemberList();
         participationVisibility = event.getMemberVisibility().get(user.getEmail());
         images = event.getImages();
         route = event.getRoute();
-        galleries = event.getGalleries();
         dynamicFields = event.getDynamicFields();
     }
 
@@ -148,14 +145,6 @@ public class EventData {
 
     public void setRoute(Route route) {
         this.route = route;
-    }
-
-    public List<Gallery> getGalleries() {
-        return galleries;
-    }
-
-    public void setGalleries(List<Gallery> galleries) {
-        this.galleries = galleries;
     }
 
     public List<DynamicField> getDynamicFields() {

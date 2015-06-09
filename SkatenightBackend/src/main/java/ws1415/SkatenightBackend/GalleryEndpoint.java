@@ -2,6 +2,7 @@ package ws1415.SkatenightBackend;
 
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
+import com.google.api.server.spi.config.Nullable;
 import com.google.api.server.spi.response.UnauthorizedException;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
@@ -26,10 +27,12 @@ import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.GalleryContainer;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.PictureVisibility;
+import ws1415.SkatenightBackend.model.Privilege;
 import ws1415.SkatenightBackend.model.UserGalleryContainer;
 import ws1415.SkatenightBackend.transport.EventFilter;
 import ws1415.SkatenightBackend.transport.EventMetaData;
 import ws1415.SkatenightBackend.transport.EventMetaDataList;
+import ws1415.SkatenightBackend.transport.GalleryContainerData;
 import ws1415.SkatenightBackend.transport.GalleryMetaData;
 import ws1415.SkatenightBackend.transport.PictureData;
 import ws1415.SkatenightBackend.transport.PictureFilter;
@@ -82,7 +85,6 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        // TODO Rechte des Benutzers prüfen
         return new GalleryMetaData(ofy().load().type(Gallery.class).id(galleryId).safe());
     }
 
@@ -197,7 +199,6 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        // TODO R: ggf. prüfen, ob der aufrufende Benutzer die Gallerien abrufen darf
         List<UserGalleryContainer> container = ofy().load().type(UserGalleryContainer.class).filter("user", mail).list();
         if (container == null || container.isEmpty()) {
             UserGalleryContainer createdContainer = new UserGalleryContainer();
@@ -359,10 +360,13 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
      * @param title          Der Titel des Bildes.
      * @param description    Die Beschreibung des Bildes.
      * @param visibility     Die Sichtbarkeitseinstellung für das Bild.
+     * @param galleryId      Falls ungleich null, wird das Bild der Gallery mit der angegebenen ID hinzugefügt,
+     *                       falls der Benutzer genpgend Rechte dazu besitzt.
      * @return Das auf dem Server erstellte Picture-Objekt.
      */
     public Picture createPicture(User user, @Named("title") String title, @Named("description") String description,
-                                 @Named("visibility") PictureVisibility visibility) throws OAuthRequestException {
+                                 @Named("visibility") PictureVisibility visibility, @Named("galleryId") @Nullable Long galleryId)
+            throws OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
@@ -378,6 +382,10 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         picture.setVisibility(visibility);
         picture.setUploadUrl(blobstoreService.createUploadUrl("/images/upload"));
         ofy().save().entity(picture).now();
+
+        if (galleryId != null) {
+            addPictureToGallery(user, picture.getId(), galleryId);
+        }
 
         return picture;
     }
@@ -407,6 +415,17 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         picture.setDescription(new Text(description));
         picture.setVisibility(visibility);
         ofy().save().entity(picture).now();
+
+        // Bild aus Gallerien entfernen, die eine "größere" Sichtbarkeit voraussetzen
+        for (Gallery g : picture.getGalleries()) {
+            GalleryContainer container = (GalleryContainer) ofy().load().kind(g.getContainerClass()).id(g.getContainerId()).now();
+            if (container.getMinPictureVisibility().compareTo(picture.getVisibility()) > 0) {
+                g.removePicture(picture);
+                picture.removeGallery(g);
+                ofy().save().entity(g).now();
+            }
+        }
+        ofy().save().entity(picture).now();
     }
 
     /**
@@ -418,9 +437,19 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-
-        // TODO Sichtbarkeitseinstellungen implementieren
-        return new PictureData(user, ofy().load().group(GalleryMetaData.class).type(Picture.class).id(id).safe());
+        Picture picture = ofy().load().group(PictureData.class, GalleryMetaData.class).type(Picture.class).id(id).safe();
+        switch (picture.getVisibility()) {
+            case PRIVATE:
+                if (!user.getEmail().equals(picture.getUploader())) {
+                    throw new OAuthRequestException("picture can not be viewed");
+                }
+            case FRIENDS:
+                if (!user.getEmail().equals(picture.getUploader()) && !new UserEndpoint().isFriendWith(picture.getUploader(), user.getEmail())) {
+                    throw new OAuthRequestException("picture can not be viewed");
+                }
+                break;
+        }
+        return new PictureData(user, picture);
     }
 
     /**
@@ -444,6 +473,8 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
                 gallery.removePicture(picture);
             }
             ofy().save().entities(picture.getGalleries()).now();
+
+            // TODO R: Kommentare löschen
 
             // Blob aus dem Blobstore löschen
             if (picture.getImageBlobKey() != null) {
@@ -500,11 +531,10 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        // TODO Sichtbarkeitseinstellungen von Bildern beachten
         Gallery gallery = ofy().load().type(Gallery.class).id(galleryId).safe();
         GalleryContainer container = (GalleryContainer) ofy().load().kind(gallery.getContainerClass()).id(gallery.getContainerId()).safe();
         Picture picture = ofy().load().type(Picture.class).id(pictureId).safe();
-        if (!container.canAddPictures(user, picture)) {
+        if (picture.getVisibility().compareTo(container.getMinPictureVisibility()) < 0 || !container.canAddPictures(user)) {
             throw new OAuthRequestException("insufficient privileges");
         }
         gallery.addPicture(picture);
@@ -522,11 +552,10 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        // TODO Sichtbarkeitseinstellungen von Bildern beachten
         Gallery gallery = ofy().load().type(Gallery.class).id(galleryId).safe();
         GalleryContainer container = (GalleryContainer) ofy().load().kind(gallery.getContainerClass()).id(gallery.getContainerId()).safe();
         Picture picture = ofy().load().type(Picture.class).id(pictureId).safe();
-        if (!container.canRemovePictures(user, picture)) {
+        if (!picture.getUploader().equals(user.getEmail()) && !container.canRemovePictures(user)) {
             throw new OAuthRequestException("insufficient privileges");
         }
         gallery.removePicture(picture);
@@ -535,25 +564,21 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Ändert die Sichtbarkeitseinstellung für das Bild mit der angegebenen ID.
-     * @param user          Der Benutzer, der die Scihtbarkeitseinstellung ändert.
-     * @param pictureId     Die ID des Bildes, dessen Sichtbarkeitseinstellung geändert wird.
-     * @param visibility    Die neue Sichtbarkeitseinstellung für das Bild.
+     * Gibt die Metadaten des GalleryContainer mit der angegebenen Klasse und ID zurück. Es wird außerdem eine
+     * Liste der Rechte übertragen, die der aufrufende Benutzer in dem Container besitzt.
+     * @param user              Der aufrufende Benutzer.
+     * @param containerClass    Die Klasse des abzurufenden Containers.
+     * @param containerId       Die ID des abzurufenden Containers.
+     * @return Der Container inkl. der Rechts für den Benutzer.
      */
-    public void changeVisibility(User user, @Named("pictureId") long pictureId, @Named("visibility") PictureVisibility visibility) throws OAuthRequestException {
+    public GalleryContainerData getGalleryContainer(User user, @Named("containerClass") String containerClass,
+                                                @Named("containerId") long containerId)
+            throws OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        if (visibility == null) {
-            throw new IllegalArgumentException("null is not a valid visibility");
-        }
-        Picture picture = ofy().load().type(Picture.class).id(pictureId).safe();
-        // TODO Eventuell anders bestimmen, wer zum Ändern der Sichtbarkeit berechtigt ist
-        if (!user.getEmail().equals(picture.getUploader())) {
-            throw new OAuthRequestException("insufficient privileges");
-        }
-        picture.setVisibility(visibility);
-        ofy().save().entity(picture).now();
+        return new GalleryContainerData(user, containerId, containerClass,
+                (GalleryContainer) ofy().load().kind(containerClass).id(containerId).safe());
     }
 
 }

@@ -127,12 +127,17 @@ public class UserGalleryContainer implements GalleryContainer {
     }
 
     @Override
-    public boolean canAddPictures(User user, Picture picture) {
+    public boolean canAddPictures(User user) {
         return user.getEmail().equals(this.user);
     }
 
     @Override
-    public boolean canRemovePictures(User user, Picture picture) {
+    public boolean canRemovePictures(User user) {
         return user.getEmail().equals(this.user) || new RoleEndpoint().isAdmin(user.getEmail()).value;
+    }
+
+    @Override
+    public PictureVisibility getMinPictureVisibility() {
+        return PictureVisibility.PRIVATE;
     }
 }

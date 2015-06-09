@@ -262,6 +262,7 @@
     <string name="error_participation_needed">Sie müssen an dieser Veranstaltung teilnehmen, um Einstellungen vorzunehmen.</string>
     <string name="error_changing_visibility">Beim Ändern der Sichtbarkeit ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
     <string name="participants">Teilnehmer</string>
+    <string name="galleries">Galerien</string>
 
     <!-- PermissionManagementActivity -->
     <string name="sure_take_right_dialog">Sind Sie sicher, dass Sie diesem Benutzer administrative Rechte entziehen möchten?</string>
@@ -326,8 +327,8 @@
     <string name="picture_adapter_fetch_error">Es konnten keine weiteren Bilder abgerufen werden</string>
     <string name="picture_not_visible">Bild nicht sichtbar</string>
 
-    <!-- MyPicturesActivity -->
-    <string name="title_activity_my_pictures">Meine Bilder</string>
+    <!-- ListPicturesActivity -->
+    <string name="title_activity_list_pictures">Bilder</string>
     <string name="action_upload_picture">Bild hochladen</string>
     <string name="action_refresh_pictures">Aktualisieren</string>
     <string name="create_gallery">Galerie erstellen</string>
@@ -337,17 +338,17 @@
     <string name="delete_gallery">Galerie löschen?</string>
     <string name="delete_gallery_message">Wollen Sie die Galerie wirklich löschen? Die enthaltenen Bilder werden dabei nicht gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.</string>
     <string name="error_deleting_gallery">Beim Löschen der Galerie ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
-    <string-array name="picture_actions">
-        <item>Anzeigen</item>
-        <item>Bearbeiten</item>
-        <item>Löschen</item>
-    </string-array>
-    <string name="action_remove_from_gallery">Aus der Galerie entfernen</string>
+    <string name="action_show_picture">Bild anzeigen</string>
+    <string name="action_edit_picture">Bild editieren</string>
+    <string name="action_delete_picture">Bild löschen</string>
+    <string name="action_remove_from_gallery">Bild aus der Galerie entfernen</string>
     <string name="delete_picture">Bild löschen?</string>
     <string name="delete_picture_message">Wollen Sie das Bild wirklich löschen? Dies kann nicht rückgängig gemacht werden.</string>
     <string name="remove_from_gallery">Aus Galerie entfernen?</string>
     <string name="remove_from_gallery_message">Möchten Sie das Bild wirklich aus der Galerie entfernen? Dies kann nicht rückgängig gemacht werden.</string>
     <string name="error_removing_from_gallery">Beim Entfernen aus der Galerie ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="gallery">Galerie</string>
+    <string name="error_deleting_picture">Beim Versuch das Bild zu löschen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
 
     <!-- EditPictureActivity -->
     <string name="choose_picture">Bild wählen…</string>
@@ -371,6 +372,7 @@
     <string name="picture_can_not_be_changed">Das Bild kann nicht geändert werden, nachdem es hochgeladen wurde.</string>
     <string name="error_invalid_picture">Ungültiges Bild</string>
     <string name="error_invalid_picture_message">Die für das Bild angegebenen Daten sind ungültig. Bitte wählen Sie ein Bild aus und geben Sie Titel, Beschreibung und Sichtbarkeit an.</string>
+    <string name="change_visibility_hint">Falls Sie die Sichtbarkeit für ein Bild verringern, wird es aus allen Galerien entfernt, die eine höhere Bildsichtbarkeit benötigen.</string>
 
     <!-- PictureFragment -->
     <string name="comments_label">Kommentare</string>
@@ -379,6 +381,11 @@
     <string name="error_rating_picture">Beim Bewerten des Bildes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
     <string name="adding_to_gallery_finished">Zur Galerie hinzugefügt</string>
     <string name="error_adding_to_gallery">Beim Hinzufügen des Bildes zur Galerie ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="enter_comment">Geben Sie einen Kommentar ein…</string>
+    <string name="error_adding_comment">Beim Hinzufügen des Kommentars ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="delete_comment">Kommentar löschen?</string>
+    <string name="delete_comment_message">Möchten Sie den Kommentar wirklich löschen? Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="error_deleting_comment">Beim Versuch den Kommentar zu löschen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
 
     <!-- GalleryAdapter -->
     <string name="galleries_empty_item_title">Alle Bilder</string>
@@ -403,4 +410,8 @@
     <string name="activity_edit_waypoint_dialog_apply">Übernehmen</string>
     <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
     <string name="title_activity_edit_waypoint_dialog">Editiere Wegpunkt</string>
+
+    <!-- CommentAdapter -->
+    <string name="comment_adapter_fetch_error">Beim Abrufen weiterer Kommentare ist ein Fehler aufgetreten.</string>
+    <string name="error_editing_comment">Beim Editieren des Kommentars ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
 </resources>

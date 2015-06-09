@@ -291,12 +291,17 @@ public class Event implements BlobKeyContainer, GalleryContainer {
     }
 
     @Override
-    public boolean canAddPictures(User user, Picture picture) {
-        return memberList.get(user.getEmail()) != null && picture.getVisibility() == PictureVisibility.PUBLIC;
+    public boolean canAddPictures(User user) {
+        return memberList.get(user.getEmail()) != null;
     }
 
     @Override
-    public boolean canRemovePictures(User user, Picture picture) {
-        return picture.getUploader().equals(user.getEmail()) || (memberList.get(user.getEmail()) != null && memberList.get(user.getEmail()).hasPrivilege(Privilege.REMOVE_PICTURES));
+    public boolean canRemovePictures(User user) {
+        return memberList.get(user.getEmail()) != null && memberList.get(user.getEmail()).hasPrivilege(Privilege.REMOVE_PICTURES);
+    }
+
+    @Override
+    public PictureVisibility getMinPictureVisibility() {
+        return PictureVisibility.PUBLIC;
     }
 }

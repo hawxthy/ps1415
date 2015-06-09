@@ -2,6 +2,8 @@ package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.datastore.Text;
+import com.google.appengine.api.users.User;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonIgnore;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -22,7 +24,7 @@ import ws1415.SkatenightBackend.model.PictureVisibility;
  * @author Richard Schulze
  */
 @Entity
-public class Picture implements BlobKeyContainer {
+public class Picture implements BlobKeyContainer, CommentContainer {
     @Id
     private Long id;
     private String title;
@@ -38,8 +40,10 @@ public class Picture implements BlobKeyContainer {
 
     @Index
     @Load(unless = {PictureMetaData.class})
+    @JsonIgnore
     private List<Ref<Gallery>> galleries = new LinkedList<>();
-    // TODO R: Comments einbinden
+    @Load(unless = {PictureMetaData.class})
+    private List<Ref<Comment>> comments = new LinkedList<>();
 
     /**
      * Speichert die Upload-URL für den Upload in den Blobstore. Dient nur der Übertragung an die App
@@ -170,5 +174,31 @@ public class Picture implements BlobKeyContainer {
             throw new NullPointerException("null, as a gallery, can not be removed");
         }
         galleries.remove(Ref.create(gallery));
+    }
+
+    @Override
+    public void addComment(Comment comment) {
+        if (comment == null) {
+            throw new NullPointerException("null, as a comment, can not be added");
+        }
+        comments.add(Ref.create(comment));
+    }
+
+    @Override
+    public void removeComment(Comment comment) {
+        if (comment == null) {
+            throw new NullPointerException("null, as a comment, can not be removed");
+        }
+        comments.remove(Ref.create(comment));
+    }
+
+    @Override
+    public boolean canAddComment(User user) {
+        return true;
+    }
+
+    @Override
+    public boolean canDeleteComment(User user) {
+        return false;
     }
 }

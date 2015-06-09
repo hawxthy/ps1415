@@ -12,6 +12,7 @@ import javax.servlet.ServletResponse;
 
 import ws1415.SkatenightBackend.model.Board;
 import ws1415.SkatenightBackend.model.BoardEntry;
+import ws1415.SkatenightBackend.model.Comment;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.Picture;
@@ -38,6 +39,7 @@ public class ObjectifyStartupServlet implements Servlet {
         ObjectifyService.register(UserGroupVisibleMembers.class);
         ObjectifyService.register(UserGroupPreviewPictures.class);
         ObjectifyService.register(UserGalleryContainer.class);
+        ObjectifyService.register(Comment.class);
     }
 
     @Override

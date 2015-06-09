@@ -15,11 +15,21 @@ public enum EventRole {
             Privilege.ADD_GALLERY,
             Privilege.EDIT_GALLERY,
             Privilege.REMOVE_GALLERY,
+            Privilege.ADD_PICTURE,
             Privilege.REMOVE_PICTURES
     )),
-    MEDIC(null),
-    MARSHALL(null),
-    PARTICIPANT(null);
+    MEDIC(Arrays.asList(
+            Privilege.ADD_PICTURE,
+            Privilege.REMOVE_PICTURES
+    )),
+    MARSHALL(Arrays.asList(
+            Privilege.ADD_PICTURE,
+            Privilege.REMOVE_PICTURES
+    )),
+    PARTICIPANT(Arrays.asList(
+            Privilege.ADD_PICTURE,
+            Privilege.REMOVE_PICTURES
+    ));
 
     private List<Privilege> privileges;
 

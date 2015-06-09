@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:indeterminate="true"
+        android:visibility="gone"
         android:layout_centerInParent="true"/>
 
     <ScrollView
@@ -123,18 +124,37 @@
                 android:layout_below="@id/imagesScroller"
                 android:layout_marginTop="20dp"
                 class="com.google.android.gms.maps.MapFragment" />
+            <TextView
+                android:id="@+id/routeTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/routeFragment"
+                style="@style/primaryText" />
+            <TextView
+                android:id="@+id/routeLength"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/routeTitle"
+                style="@style/secondaryText" />
 
             <Button
                 android:id="@+id/participants"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_below="@id/routeFragment"
+                android:layout_below="@id/routeLength"
                 android:layout_marginTop="20dp"
-                android:drawableRight="@drawable/row_button_icon"
-                android:background="@drawable/row_button_background"
+                android:drawableLeft="@drawable/ic_group"
                 android:text="@string/participants"
-                android:onClick="onParticipantsClick" />
+                android:onClick="onParticipantsClick"
+                style="@style/row_button" />
 
+            <Button
+                android:id="@+id/galleries"
+                android:layout_width="match_parent"
+                android:layout_below="@id/participants"
+                android:drawableLeft="@drawable/ic_group"
+                android:text="@string/galleries"
+                android:onClick="onGalleriesClick"
+                style="@style/row_button" />
         </RelativeLayout>
 
     </ScrollView>

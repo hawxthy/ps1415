@@ -1,8 +1,12 @@
 package ws1415.ps1415.controller;
 
+import android.util.Log;
+
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.Gallery;
+import com.skatenight.skatenightAPI.model.GalleryContainerData;
 import com.skatenight.skatenightAPI.model.GalleryMetaData;
+import com.skatenight.skatenightAPI.model.JsonMap;
 import com.skatenight.skatenightAPI.model.Picture;
 import com.skatenight.skatenightAPI.model.PictureData;
 import com.skatenight.skatenightAPI.model.PictureFilter;
@@ -21,10 +25,13 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.PictureVisibility;
+import ws1415.ps1415.model.Privilege;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
 
@@ -206,10 +213,13 @@ public abstract class GalleryController {
      * @param title          Der Titel des Bildes.
      * @param description    Die Beschreibung des Bildes.
      * @param visibility     Die Sichtbarkeit des Bildes.
+     * @param galleryId      Die ID der Gallery, der das Bild hinzugefügt werden soll oder null,
+     *                       falls das Bild keiner Galerie hinzugefügt werden soll.
      * @throws IllegalArgumentException falls das Bild ungültig ist
      */
     public static void uploadPicture(ExtendedTaskDelegate<Void, Picture> handler, final File image,
-                                     final String title, final String description, final PictureVisibility visibility)
+                                     final String title, final String description,
+                                     final PictureVisibility visibility, final Long galleryId)
             throws IllegalArgumentException {
         if (image == null || visibility == null || title == null || title.isEmpty()
                 || description == null || description.isEmpty()) {
@@ -223,7 +233,7 @@ public abstract class GalleryController {
                 Picture picture = null;
                 try {
                     picture = ServiceProvider.getService().galleryEndpoint().createPicture(
-                            title, description, visibility.name()).execute();
+                            title, description, visibility.name()).set("galleryId", galleryId).execute();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -400,24 +410,22 @@ public abstract class GalleryController {
     }
 
     /**
-     * Ändert die Sichtbarkeitseinstellungen für das Bild mit der angegebenen ID.
-     * @param handler       Der Handler, der über den Status des Tasks informiert wird.
-     * @param pictureId     Die ID des Bildes, dessen Sichtbarkeit geändert wird.
-     * @param visibility    Die neue Sichtbarkeit des Bildes.
+     * Gibt eine Liste der Rechte zurück, die der eingeloggte Benutzer in dem angegebenen GalleryContainer hat.
+     * @param handler           Der Handler, dem die Liste übergeben wird.
+     * @param containerClass    Der Datastore-Kind des Containers.
+     * @param containerId       Die ID des Containers.
      */
-    public static void changeVisibility(ExtendedTaskDelegate<Void, Void> handler, final long pictureId, final PictureVisibility visibility) {
-        if (visibility == null) {
-            throw new IllegalArgumentException("null is not a valid visibility");
-        }
-        new ExtendedTask<Void, Void, Void>(handler) {
+    // TODO R: Testen
+    public static void getGalleryContainer(ExtendedTaskDelegate<Void, GalleryContainerData> handler,
+                                                        final String containerClass, final long containerId) {
+        new ExtendedTask<Void, Void, GalleryContainerData>(handler) {
             @Override
-            protected Void doInBackground(Void... params) {
+            protected GalleryContainerData doInBackground(Void... params) {
                 try {
-                    ServiceProvider.getService().galleryEndpoint().changeVisibility(pictureId, visibility.name()).execute();
+                    return ServiceProvider.getService().galleryEndpoint().getGalleryContainer(containerClass, containerId).execute();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                return null;
             }
         }.execute();
     }

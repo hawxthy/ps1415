@@ -14,14 +14,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.skatenight.skatenightAPI.model.Comment;
+import com.skatenight.skatenightAPI.model.CommentContainerData;
+import com.skatenight.skatenightAPI.model.CommentData;
+import com.skatenight.skatenightAPI.model.CommentFilter;
 import com.skatenight.skatenightAPI.model.Gallery;
 import com.skatenight.skatenightAPI.model.GalleryMetaData;
+import com.skatenight.skatenightAPI.model.Picture;
 import com.skatenight.skatenightAPI.model.PictureData;
 
 import java.util.Date;
@@ -30,7 +37,9 @@ import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.adapter.CommentAdapter;
 import ws1415.ps1415.adapter.GalleryAdapter;
+import ws1415.ps1415.controller.CommentController;
 import ws1415.ps1415.controller.GalleryController;
 import ws1415.ps1415.model.PictureVisibility;
 import ws1415.ps1415.task.ExtendedTask;
@@ -41,14 +50,21 @@ import ws1415.ps1415.util.DiskCacheImageLoader;
  * Fragment zur vollständigen Anzeige eines Bildes inkl. Kommentaren.
  */
 public class PictureFragment extends Fragment implements RatingBar.OnRatingBarChangeListener {
+    private static final Integer COMMENTS_PER_REQUEST = 20;
     private ProgressBar pictureLoading;
+    private ListView comments;
 
+    private View headerView;
     private ImageView picture;
     private TextView title;
     private TextView date;
     private TextView uploader;
     private TextView description;
     private RatingBar rating;
+    private ProgressBar addingCommentLoading;
+    private EditText newComment;
+
+    private CommentAdapter commentAdapter;
 
     private Long pictureId;
     private boolean initializing = true;
@@ -65,14 +81,27 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_picture, container, false);
         pictureLoading = (ProgressBar) view.findViewById(R.id.pictureLoading);
-        picture = (ImageView) view.findViewById(R.id.picture);
-        title = (TextView) view.findViewById(R.id.title);
-        date = (TextView) view.findViewById(R.id.date);
-        uploader = (TextView) view.findViewById(R.id.uploader);
-        description = (TextView) view.findViewById(R.id.description);
-        rating = (RatingBar) view.findViewById(R.id.rating);
+        comments = (ListView) view.findViewById(R.id.comments);
+
+        headerView = inflater.inflate(R.layout.fragment_picture_header, container, false);
+        picture = (ImageView) headerView.findViewById(R.id.picture);
+        title = (TextView) headerView.findViewById(R.id.title);
+        date = (TextView) headerView.findViewById(R.id.date);
+        uploader = (TextView) headerView.findViewById(R.id.uploader);
+        description = (TextView) headerView.findViewById(R.id.description);
+        rating = (RatingBar) headerView.findViewById(R.id.rating);
         rating.setOnRatingBarChangeListener(this);
         rating.setStepSize(1);
+        headerView.findViewById(R.id.addComment).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAddCommentClick(v);
+            }
+        });
+        addingCommentLoading = (ProgressBar) headerView.findViewById(R.id.addingCommentLoading);
+        newComment = (EditText) headerView.findViewById(R.id.newComment);
+        comments.addHeaderView(headerView);
+
         return view;
     }
 
@@ -99,10 +128,27 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
      * @param position     Die Position des Bildes im Adapter. Wird über den Intent zurückgegeben,
      *                     falls Änderungen am Bild gemacht wurden.
      */
-    public void loadPicture(long pictureId, int position) {
+    public void loadPicture(final long pictureId, int position) {
         this.pictureId = pictureId;
         this.position = position;
         startLoading();
+        CommentController.getCommentContainer(new ExtendedTaskDelegateAdapter<Void, CommentContainerData>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, CommentContainerData commentContainerData) {
+                commentAdapter = new CommentAdapter(getActivity(), new CommentFilter()
+                        .setContainerClass(Picture.class.getSimpleName())
+                        .setContainerId(pictureId)
+                        .setLimit(COMMENTS_PER_REQUEST),
+                        commentContainerData.getCanDeleteComment());
+                comments.setAdapter(commentAdapter);
+
+                if (commentContainerData.getCanAddComment()) {
+                    headerView.findViewById(R.id.newCommentControls).setVisibility(View.VISIBLE);
+                } else {
+                    headerView.findViewById(R.id.newCommentControls).setVisibility(View.GONE);
+                }
+            }
+        }, Picture.class.getSimpleName(), pictureId);
         GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
             @Override
             public void taskDidFinish(ExtendedTask task, PictureData pictureData) {
@@ -129,7 +175,6 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
                 finishLoading();
                 initializing = false;
             }
-
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 Toast.makeText(PictureFragment.this.getActivity(), R.string.error_loading_picture, Toast.LENGTH_LONG).show();
@@ -189,5 +234,28 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
                     }
                 });
         builder.create().show();
+    }
+
+    public void onAddCommentClick(View view) {
+        if (!newComment.getText().toString().isEmpty()) {
+            addingCommentLoading.setVisibility(View.VISIBLE);
+            CommentController.addComment(new ExtendedTaskDelegateAdapter<Void, Comment>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, Comment comment) {
+                    commentAdapter.addComment(new CommentData()
+                            .setAuthor(comment.getAuthor())
+                            .setComment(comment.getComment())
+                            .setDate(comment.getDate())
+                            .setId(comment.getId()));
+                    newComment.setText(null);
+                    addingCommentLoading.setVisibility(View.GONE);
+                }
+                @Override
+                public void taskFailed(ExtendedTask task, String message) {
+                    Toast.makeText(PictureFragment.this.getActivity(), R.string.error_adding_comment, Toast.LENGTH_LONG).show();
+                    addingCommentLoading.setVisibility(View.GONE);
+                }
+            }, Picture.class.getSimpleName(), pictureId, newComment.getText().toString());
+        }
     }
 }

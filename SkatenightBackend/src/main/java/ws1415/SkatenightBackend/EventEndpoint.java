@@ -9,6 +9,7 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -199,7 +201,23 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        return new EventData(user, ofy().load().type(Event.class).id(eventId).safe());
+        Event event = ofy().load().type(Event.class).id(eventId).safe();
+        EventData data = new EventData(user, event);
+        for (String participant : event.getMemberVisibility().keySet()) {
+            switch (event.getMemberVisibility().get(participant)) {
+                case PRIVATE:
+                    if (!user.getEmail().equals(participant)) {
+                        data.getMemberList().remove(participant);
+                    }
+                    break;
+                case FRIENDS:
+                    if (!user.getEmail().equals(participant) && new UserEndpoint().isFriendWith(participant, user.getEmail())) {
+                        data.getMemberList().remove(participant);
+                    }
+                    break;
+            }
+        }
+        return data;
     }
 
     /**
@@ -244,7 +262,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         // Event in der Liste des Benutzers eintragen
         new UserEndpoint().addEventToUser(user.getEmail(), event);
 
-        // TODO GCM-Nachricht an Geräte schicken, damit Event-Liste aktualisiert wird
+        // TODO R: GCM-Nachricht an Geräte schicken, damit Event-Liste aktualisiert wird
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             RegistrationManager rm = getRegistrationManager(pm);
@@ -362,10 +380,22 @@ public class EventEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
+     * Hilfsmethode für die Endpoint-Klassen, die einen Benutzer aus der Liste der Teilnehmer eines Events entfernt.
+     * @param mail       Die Mail-Adresse des zu entfernenden Benutzers.
+     * @param eventId    Die ID des Events, aus dem der Benutzer entfernt werden soll.
+     */
+    protected void removeUserFromEvent(String mail, long eventId) {
+        Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
+        event.getMemberList().remove(mail);
+        event.getMemberVisibility().remove(mail);
+        ofy().save().entity(event).now();
+    }
+
+    /**
      * Ändert den Sichtbarkeitsstatus einer Teilnahme am betreffenden Event.
-     * @param user
-     * @param eventId
-     * @param visibility
+     * @param user          Der Benutzer, für den die Teilnahme-Sichtbarkeit geändert wird.
+     * @param eventId       Die ID des Events.
+     * @param visibility    Die neue Sichtbarkeit.
      */
     public void changeParticipationVisibility(User user, @Named("eventId") long eventId, @Named("visibility") EventParticipationVisibility visibility)
             throws OAuthRequestException {

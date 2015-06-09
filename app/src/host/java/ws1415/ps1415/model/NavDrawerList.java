@@ -13,8 +13,7 @@ import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.ManageEventsActivity;
 import ws1415.ps1415.activity.ManageRoutesActivity;
 import ws1415.ps1415.activity.MessagingActivity;
-import ws1415.ps1415.activity.MyPicturesActivity;
-import ws1415.ps1415.activity.PermissionManagementActivity;
+import ws1415.ps1415.activity.ListPicturesActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.activity.RegisterActivity;
 import ws1415.ps1415.activity.SearchActivity;
@@ -90,7 +89,8 @@ public class NavDrawerList {
                 }
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent intent = new Intent(parent.getContext(), MyPicturesActivity.class);
+                    Intent intent = new Intent(parent.getContext(), ListPicturesActivity.class);
+                    intent.putExtra(ListPicturesActivity.EXTRA_MAIL, ServiceProvider.getEmail());
                     parent.getContext().startActivity(intent);
                 }
             },

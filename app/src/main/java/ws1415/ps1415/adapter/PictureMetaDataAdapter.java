@@ -122,7 +122,6 @@ public class PictureMetaDataAdapter extends BaseAdapter {
                 view = View.inflate(parent.getContext(), R.layout.listitem_picture_meta_data, null);
             }
 
-            // TODO R: Nicht sichtbare BIlder richtig anzeigen
             ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
             TextView title = (TextView) view.findViewById(R.id.title);
             RatingBar rating = (RatingBar) view.findViewById(R.id.rating);
@@ -137,7 +136,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
                     rating.setRating(0);
                 }
                 Date dateValue = new Date(picture.getDate().getValue());
-                date.setText(DateFormat.getMediumDateFormat(context).format(dateValue) + " " + DateFormat.getTimeFormat(context).format(dateValue));
+                date.setText(DateFormat.getMediumDateFormat(context).format(dateValue));
             } else {
                 // TODO R: Standardbild für nicht sichtbare Bilder angeben
                 thumbnail.setImageBitmap(null);

@@ -1,0 +1,67 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="ws1415.ps1415.activity.ListPicturesActivity">
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:layout_gravity="center" />
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/data"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="ws1415.ps1415.activity.ListPicturesActivity">
+
+        <Button
+            android:id="@+id/addGallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_action_new"
+            android:visibility="gone"
+            android:onClick="onAddGalleryClick"
+            android:text="@string/gallery" />
+
+        <Button
+            android:id="@+id/editGallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/addGallery"
+            android:drawableLeft="@drawable/ic_action_edit"
+            android:visibility="gone"
+            android:onClick="onEditGalleryClick"
+            android:text="@string/gallery" />
+
+        <Button
+            android:id="@+id/removeGallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/editGallery"
+            android:drawableLeft="@drawable/ic_action_discard"
+            android:visibility="gone"
+            android:onClick="onDeleteGalleryClick"
+            android:text="@string/gallery" />
+
+        <Spinner
+            android:id="@+id/galleries"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/addGallery"
+            android:padding="16dp"/>
+
+        <fragment
+            android:id="@+id/picturesFragment"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@id/galleries"
+            android:name="ws1415.ps1415.fragment.PictureListFragment" />
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -91,7 +91,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
             public void taskFailed(ExtendedTask task, String message) {
                 fail(message);
             }
-        }, testImage, "Picture 1", "Das erste Testbild", PictureVisibility.PUBLIC);
+        }, testImage, "Picture 1", "Das erste Testbild", PictureVisibility.PUBLIC, null);
         assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
 
         // Testroute für das Testevent erstellen
@@ -251,7 +251,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
                 public void taskFailed(ExtendedTask task, String message) {
                     fail(message);
                 }
-            }, testImage, "Picture " + i, "Das " + i + ". Testbild", PictureVisibility.PRIVATE);
+            }, testImage, "Picture " + i, "Das " + i + ". Testbild", PictureVisibility.PRIVATE, null);
             assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
         }
         picturesToDelete.addAll(testPictures);
@@ -311,7 +311,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
             public void taskFailed(ExtendedTask task, String message) {
                 fail(message);
             }
-        }, testImage, "Picture 2", "Das zweite Testbild (von einem anderen Account hochgeladen).", PictureVisibility.PUBLIC);
+        }, testImage, "Picture 2", "Das zweite Testbild (von einem anderen Account hochgeladen).", PictureVisibility.PUBLIC, null);
         assertTrue("timeout reached", signal1.await(10, TimeUnit.SECONDS));
 
         // Beim Abrufen der Bilder für den eingeloggten Benutzer sollte das in setUp erstellte
@@ -375,7 +375,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
                 public void taskFailed(ExtendedTask task, String message) {
                     fail(message);
                 }
-            }, testImage, "Testbild", "Testbild.", visibility);
+            }, testImage, "Testbild", "Testbild.", visibility, null);
             assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
         }
         pictures[2] = picture1;
@@ -472,7 +472,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
             public void taskFailed(ExtendedTask task, String message) {
                 fail(message);
             }
-        }, testImage, TEST_TITEL, TEST_BESCHREIBUNG, PictureVisibility.PRIVATE);
+        }, testImage, TEST_TITEL, TEST_BESCHREIBUNG, PictureVisibility.PRIVATE, null);
         assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
     }
 
@@ -580,7 +580,7 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
             public void taskFailed(ExtendedTask task, String message) {
                 fail(message);
             }
-        }, testImage, "Picture 2", "Das zweite Testbild (von einem anderen Account hochgeladen).", PictureVisibility.PUBLIC);
+        }, testImage, "Picture 2", "Das zweite Testbild (von einem anderen Account hochgeladen).", PictureVisibility.PUBLIC, null);
         assertTrue("timeout reached", signal1.await(10, TimeUnit.SECONDS));
 
         // Beim Abrufen der Bilder für die Testgallery sollte nun nur das erste Testbild zurückgegeben werden
@@ -610,20 +610,6 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         data = ServiceProvider.getService().galleryEndpoint().listPictures(filter).execute();
         assertNotNull("no data fetched", data);
         assertNull("pictures fetched", data.getList());
-    }
-
-    public void testChangeVisibility() throws InterruptedException, IOException {
-        final CountDownLatch signal = new CountDownLatch(1);
-        GalleryController.changeVisibility(new ExtendedTaskDelegateAdapter<Void, Void>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                signal.countDown();
-            }
-        }, picture1.getId(), PictureVisibility.PRIVATE);
-        assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
-
-        PictureData pictureAfterChange = ServiceProvider.getService().galleryEndpoint().getPicture(picture1.getId()).execute();
-        assertEquals("visibility after change", PictureVisibility.PRIVATE.name(), pictureAfterChange.getVisibility());
     }
 
     public void tearDown() throws Exception {

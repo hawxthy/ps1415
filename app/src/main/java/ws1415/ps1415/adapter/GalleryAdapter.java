@@ -1,6 +1,7 @@
 package ws1415.ps1415.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -42,6 +43,7 @@ public class GalleryAdapter extends BaseAdapter {
      *                         {@code EMPTY_ITEM_GALLERY_ID} angegeben.
      */
     public GalleryAdapter(final Context context, String containerKind, long containerId, boolean addEmptyItem) {
+
         if (addEmptyItem) {
             GalleryMetaData emptyItem = new GalleryMetaData();
             emptyItem.setId(EMPTY_ITEM_GALLERY_ID);
@@ -51,9 +53,12 @@ public class GalleryAdapter extends BaseAdapter {
         GalleryController.getGalleries(new ExtendedTaskDelegateAdapter<Void, List<GalleryMetaData>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<GalleryMetaData> galleryMetaDatas) {
-                if (galleryMetaDatas != null) {
+                if (galleryMetaDatas != null && !galleryMetaDatas.isEmpty()) {
                     galleries.addAll(galleryMetaDatas);
                     GalleryAdapter.this.notifyDataSetChanged();
+                } else {
+                    // DataSetListener aufrufen, damit ggf. eine Ladeanimation beendet werden kann
+                    notifyDataSetChanged();
                 }
             }
             @Override

@@ -1,5 +1,6 @@
 package ws1415.SkatenightBackend.model;
 
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonIgnore;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -21,6 +22,7 @@ public class Gallery {
     private Long id;
     private String title;
     @Load(unless = {GalleryMetaData.class})
+    @JsonIgnore
     private List<Ref<Picture>> pictures = new LinkedList<>();
 
     // Referenz auf den Container, in dem die Gallery gespeichert ist

@@ -1,10 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ws1415.ps1415.activity.MyPicturesActivity">
+    tools:context="ws1415.ps1415.activity.ListPicturesActivity">
 
     <item
         android:id="@+id/action_upload_picture"
         android:title="@string/action_upload_picture"
+        android:visible="false"
         android:icon="@drawable/ic_action_new_picture"
         android:showAsAction="ifRoom" />
 

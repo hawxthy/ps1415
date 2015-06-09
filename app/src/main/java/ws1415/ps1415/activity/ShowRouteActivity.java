@@ -1,5 +1,6 @@
 package ws1415.ps1415.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -47,6 +48,13 @@ public class ShowRouteActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_route);
+
+        // "Zurück"-Button in der Actionbar anzeigen
+        ActionBar mActionBar = getActionBar();
+        if (mActionBar != null) {
+            mActionBar.setHomeButtonEnabled(false);
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         setTitle(getIntent().getStringExtra("routeName"));
 
@@ -128,6 +136,9 @@ public class ShowRouteActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            return true;
+        } else if (id == android.R.id.home) {
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);

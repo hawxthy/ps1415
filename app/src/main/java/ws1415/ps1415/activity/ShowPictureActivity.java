@@ -1,5 +1,6 @@
 package ws1415.ps1415.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -28,6 +29,13 @@ public class ShowPictureActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_picture);
 
+        // "Zurück"-Button in der Actionbar anzeigen
+        ActionBar mActionBar = getActionBar();
+        if (mActionBar != null) {
+            mActionBar.setHomeButtonEnabled(false);
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         position = getIntent().getIntExtra(EXTRA_POSITION, -1);
         if (getIntent().hasExtra(EXTRA_PICTURE_ID)) {
             PictureFragment fragment = (PictureFragment) getFragmentManager().findFragmentById(R.id.pictureFragment);
@@ -35,5 +43,17 @@ public class ShowPictureActivity extends Activity {
         } else {
             throw new RuntimeException("intent has to have extra " + EXTRA_PICTURE_ID);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            finish();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

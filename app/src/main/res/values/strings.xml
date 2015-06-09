@@ -253,6 +253,7 @@
     <string name="error_participation_needed">You have to participate in this event to change settings for it.</string>
     <string name="error_changing_visibility">An error occurred while changing the visibility. Please try again.</string>
     <string name="participants">Participants</string>
+    <string name="galleries">Galleries</string>
 
     <!-- UploadImageActivity -->
     <string name="title_activity_upload_image">UploadImageActivity</string>
@@ -357,8 +358,8 @@
     <string name="picture_adapter_fetch_error">No additional pictures could be fetched</string>
     <string name="picture_not_visible">Picture not visible</string>
 
-    <!-- MyPicturesActivity -->
-    <string name="title_activity_my_pictures">My Pictures</string>
+    <!-- ListPicturesActivity -->
+    <string name="title_activity_list_pictures">Pictures</string>
     <string name="action_upload_picture">Upload Picture</string>
     <string name="action_refresh_pictures">Refresh</string>
     <string name="create_gallery">Create Gallery</string>
@@ -368,17 +369,17 @@
     <string name="delete_gallery">Delete Gallery?</string>
     <string name="delete_gallery_message">Do you really want to delete the gallery. The contained pictures will not be deleted. This can not be undone.</string>
     <string name="error_deleting_gallery">An error occurred while deleting the gallery. Please try again.</string>
-    <string-array name="picture_actions">
-        <item>Show</item>
-        <item>Edit</item>
-        <item>Delete</item>
-    </string-array>
-    <string name="action_remove_from_gallery">Remove from Gallery</string>
+    <string name="action_show_picture">Show Picture</string>
+    <string name="action_edit_picture">Edit Picture</string>
+    <string name="action_delete_picture">Delete Picture</string>
+    <string name="action_remove_from_gallery">Remove Picture from Gallery</string>
     <string name="delete_picture">Delete picture?</string>
     <string name="delete_picture_message">Do you really want to delete this picture? This can not be undone.</string>
     <string name="remove_from_gallery">Remove from gallery?</string>
     <string name="remove_from_gallery_message">Do you really want to remove the picture from this gallery? This can not be undone.</string>
     <string name="error_removing_from_gallery">An error occurred while removing the picture from the gallery. Please try again.</string>
+    <string name="gallery">Gallery</string>
+    <string name="error_deleting_picture">An error occurred while trying to delete the picture. Please try again.</string>
 
     <!-- EditPictureActivity -->
     <string name="choose_picture">Choose picture…</string>
@@ -402,6 +403,7 @@
     <string name="picture_can_not_be_changed">The picture can not be changed after it has been uploaded.</string>
     <string name="error_invalid_picture">Invalid Picture</string>
     <string name="error_invalid_picture_message">The data submitted for the picture is invalid. Please make sure to select an image and specify title, description and visibility.</string>
+    <string name="change_visibility_hint">If you lower the visibility of the picture it will be removed out of all galleries that require a higher visibility setting.</string>
 
     <!-- PictureFragment -->
     <string name="comments_label">Comments</string>
@@ -410,6 +412,11 @@
     <string name="error_rating_picture">An error occurred while rating the picture. Please try again.</string>
     <string name="adding_to_gallery_finished">Added to gallery</string>
     <string name="error_adding_to_gallery">An error occurred while adding the picture to the gallery. Please try again.</string>
+    <string name="enter_comment">Enter a comment…</string>
+    <string name="error_adding_comment">An error occurred while adding the comment. Please try again.</string>
+    <string name="delete_comment">Delete comment?</string>
+    <string name="delete_comment_message">Do you really want to delete this comment? This can not be undone.</string>
+    <string name="error_deleting_comment">An error occurred while trying to delete the comment. Please try again.</string>
 
     <!-- GalleryAdapter -->
     <string name="galleries_empty_item_title">All Pictures</string>
@@ -471,4 +478,7 @@
     <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
     <string name="title_activity_edit_waypoint_dialog">Edit Waypoint</string>
 
+    <!-- CommentAdapter -->
+    <string name="comment_adapter_fetch_error">An error oddurred while fetching more comments.</string>
+    <string name="error_editing_comment">An error occurred while trying to edit the comment. Please try again.</string>
 </resources>

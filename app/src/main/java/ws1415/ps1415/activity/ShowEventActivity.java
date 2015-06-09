@@ -1,5 +1,6 @@
 package ws1415.ps1415.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -27,9 +28,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.skatenight.skatenightAPI.model.BlobKey;
+import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.ServerWaypoint;
+
+import org.w3c.dom.Text;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -72,6 +76,14 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_show_event);
 
+        // "Zurück"-Button in der Actionbar anzeigen
+        ActionBar mActionBar = getActionBar();
+        if (mActionBar != null) {
+            mActionBar.setHomeButtonEnabled(false);
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        startLoading();
         Long eventId = getIntent().getLongExtra(EXTRA_EVENT_ID, -1);
         EventController.getEvent(this, eventId);
     }
@@ -83,6 +95,20 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         joinLeaveEventItem = menu.findItem(R.id.action_join_leave_event);
         settingsItem = menu.findItem(R.id.action_settings);
         return true;
+    }
+
+    /**
+     * Startet die Ladeanimation.
+     */
+    private void startLoading() {
+        findViewById(R.id.eventLoading).setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Beendet die Ladeanimation.
+     */
+    private void finishLoading() {
+        findViewById(R.id.eventLoading).setVisibility(View.GONE);
     }
 
     @Override
@@ -170,6 +196,9 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
                         });
                 builder.create().show();
             }
+        } else if (id == android.R.id.home) {
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -261,8 +290,12 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
                     }
                 }
             });
-        }
-        catch (ParseException e) {
+
+            TextView routeTitle = (TextView) findViewById(R.id.routeTitle);
+            routeTitle.setText(route.getName());
+            TextView routeLength = (TextView) findViewById(R.id.routeLength);
+            routeLength.setText(route.getLength());
+        } catch (ParseException e) {
             Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
@@ -275,7 +308,7 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
             googleMap.addMarker(tmp.getMarkerOptions());
         }
 
-        findViewById(R.id.eventLoading).setVisibility(View.GONE);
+        finishLoading();
     }
 
     @Override
@@ -284,7 +317,7 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
     @Override
     public void taskFailed(ExtendedTask task, String message) {
         Toast.makeText(this, R.string.event_loading_error, Toast.LENGTH_LONG).show();
-        findViewById(R.id.eventLoading).setVisibility(View.GONE);
+        finishLoading();
     }
     // -------------------- Callback-Methoden für das Abrufen eines Events --------------------
 
@@ -346,6 +379,14 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         Intent intent = new Intent(this, EventParticipantsActivity.class);
         List<String> mails = new LinkedList<>(event.getMemberList().keySet());
         intent.putExtra(EventParticipantsActivity.EXTRA_MAILS, (Serializable) mails);
+        startActivity(intent);
+    }
+
+    public void onGalleriesClick(View view) {
+        Intent intent = new Intent(this, ListPicturesActivity.class);
+        intent.putExtra(ListPicturesActivity.EXTRA_CONTAINER_CLASS, Event.class.getSimpleName());
+        intent.putExtra(ListPicturesActivity.EXTRA_CONTAINER_ID, event.getId());
+        intent.putExtra(ListPicturesActivity.EXTRA_TITLE, event.getTitle());
         startActivity(intent);
     }
 }
