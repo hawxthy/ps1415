@@ -1,11 +1,16 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="ws1415.ps1415.activity.ListUserGroupsActivity">
     <item
         android:id="@+id/action_search_group"
         android:icon="@drawable/ic_action_search"
         android:title="Search"
-        android:showAsAction="always"
+        android:showAsAction="collapseActionView|ifRoom"
         android:actionViewClass="android.widget.SearchView"/>
+    <item
+        android:id="@+id/action_list_groups"
+        android:icon="@drawable/ic_list_white_24dp"
+        android:title="@string/list"
+        android:showAsAction="ifRoom"/>
 </menu>

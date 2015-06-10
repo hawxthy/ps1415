@@ -1,5 +1,6 @@
 package ws1415.ps1415.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -32,6 +33,7 @@ public class InviteUsersToGroupActivity extends Activity {
     private GroupMemberListAdapter mAdapter;
     private ButtonFlat mAcceptButton;
     private ButtonFlat mCancelButton;
+    private ActionBar mActionBar;
 
     // Attribute für das Einladen
     List<String> usersToInvite;
@@ -48,6 +50,11 @@ public class InviteUsersToGroupActivity extends Activity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_invite_users_to_group);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
+
+        mActionBar = getActionBar();
+
+        mActionBar.setHomeButtonEnabled(false);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
 
         groupName = getIntent().getStringExtra(GroupProfileActivity.EXTRA_GROUP_NAME);
         if(groupName == null){
@@ -177,13 +184,10 @@ public class InviteUsersToGroupActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == android.R.id.home) {
+            finish();
             return true;
         }
 

@@ -191,9 +191,12 @@ public abstract class ImageUtil {
      * @return InputStream der Bitmap
      */
     public static InputStream BitmapToInputStream(Bitmap bitmap) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
-        byte[] bitmapdata = bos.toByteArray();
-        return new ByteArrayInputStream(bitmapdata);
+        if(bitmap != null){
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
+            byte[] bitmapdata = bos.toByteArray();
+            return new ByteArrayInputStream(bitmapdata);
+        }
+        return null;
     }
 }

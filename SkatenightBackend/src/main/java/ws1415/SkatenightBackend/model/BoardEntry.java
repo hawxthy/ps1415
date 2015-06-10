@@ -1,7 +1,9 @@
 package ws1415.SkatenightBackend.model;
 
+import com.google.appengine.api.blobstore.BlobKey;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 
@@ -20,6 +22,9 @@ public class BoardEntry {
     private Date date;
     @Load
     private ArrayList<Comment> comments;
+    private BlobKey blobKey;
+    @Ignore
+    private String uploadUrl;
 
     public BoardEntry() {
         // Konstruktor für GAE
@@ -67,26 +72,44 @@ public class BoardEntry {
         this.comments = comments;
     }
 
-    public BoardEntry addComment(String comment){
+    public BlobKey getBlobKey() {
+        return blobKey;
+    }
+
+    public void setBlobKey(BlobKey blobKey) {
+        this.blobKey = blobKey;
+    }
+
+    public String getUploadUrl() {
+        return uploadUrl;
+    }
+
+    public void setUploadUrl(String uploadUrl) {
+        this.uploadUrl = uploadUrl;
+    }
+
+    public BoardEntry addComment(String comment, String writer){
         if(comments == null){
             comments = new ArrayList<>();
         }
-        comments.add(new Comment(comment));
+        comments.add(new Comment(comment, writer));
         return this;
     }
 
     @Index
     public static class Comment{
         private Date date;
+        private String writer;
         private String message;
 
         public Comment(){
             // Konstruktor für GAE
         }
 
-        public Comment(String message){
+        public Comment(String message, String writer){
             date = new Date();
             this.message = message;
+            this.writer = writer;
         }
 
         public Date getDate(){
@@ -103,6 +126,14 @@ public class BoardEntry {
 
         public void setMessage(String message) {
             this.message = message;
+        }
+
+        public String getWriter() {
+            return writer;
+        }
+
+        public void setWriter(String writer) {
+            this.writer = writer;
         }
     }
 }

@@ -33,7 +33,7 @@
             <y:MethodLabel>+addDynamicField(title: String, type: FieldType, event: Event, pos: int)
 +deleteDynamicField(event: Event, pos: int)
 +setStandardFields(event: Event)
-+setEventInfo(event: Event, list: ListView)
++setEventInfo(event: Event, visibleMembers: ListView)
 +getUniqueFieldId(type: FieldType, event: Event) : int
 +getFusedDate(event: Event) : Date
 +getUniqueField(type: int, event: Event) : Field</y:MethodLabel>

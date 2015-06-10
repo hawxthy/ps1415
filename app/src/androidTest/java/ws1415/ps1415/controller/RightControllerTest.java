@@ -22,7 +22,8 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
     private String MY_MAIL = "";
     private String MY_SECOND_MAIL = "";
     final private String TEST_GROUP_NAME = "Testgruppe1";
-    final private boolean TEST_BOOLEAN_GROUP_PRIVAT = false;
+    final private boolean TEST_BOOLEAN_GROUP_PRIVATE_TRUE = true;
+    final private boolean TEST_BOOLEAN_GROUP_PRIVATE_FALSE = false;
     final private String TEST_GROUP_PASSWORD = "Testgruppe1";
     final private UserGroupType TEST_GROUP_TYPE = UserGroupType.NORMALGROUP;
     final private String TEST_GROUP_DESCRIPTION = "Testbeschreibung "+TEST_GROUP_NAME;
@@ -42,12 +43,12 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
         // Nutzergruppe erstellen, die bei jedem Test benötigt wird.
         final CountDownLatch signal = new CountDownLatch(1);
 
-        GroupController.getInstance().createOpenUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().createUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_GROUP_DESCRIPTION);
+        }, TEST_GROUP_NAME, TEST_GROUP_TYPE, null, TEST_BOOLEAN_GROUP_PRIVATE_FALSE, null, null);
         try {
             assertTrue("setUp for createUserGroup failed", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {

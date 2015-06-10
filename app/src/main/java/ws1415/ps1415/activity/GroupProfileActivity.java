@@ -26,6 +26,7 @@ import ws1415.ps1415.controller.RightController;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.model.NavDrawerGroupList;
 import ws1415.ps1415.model.Right;
+import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.util.ImageUtil;
 import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.widget.SlidingTabLayout;
@@ -189,6 +190,8 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                 if (group.getMemberRights().keySet().contains(ServiceProvider.getEmail())) {
                     checkIsMember = true;
                     mJoinButton.setVisibility(View.GONE);
+                    mChangeVisibility.setVisibility(View.VISIBLE);
+                    checkIfVisible();
                     if (getRights().contains(Right.FULLRIGHTS.name())) {
                         mLeaveButton.setVisibility(View.GONE);
                         mDeleteButton.setVisibility(View.VISIBLE);
@@ -204,13 +207,9 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                         mJoinButton.setVisibility(View.VISIBLE);
                     }
                 }
-                checkIfVisible();
                 checkIfInvitationIntent();
-                if (group.getBlobKey() != null) {
-                    GroupImageLoader.getInstance().setGroupImageToImageView(GroupProfileActivity.this, group.getBlobKey().getKeyString(), mGroupPicture);
-                } else {
-                    GroupImageLoader.getInstance().setGroupImageToImageView(GroupProfileActivity.this, null, mGroupPicture);
-                }
+                GroupImageLoader.getInstance().setGroupImageToImageView(GroupProfileActivity.this, group.getBlobKey(), mGroupPicture);
+
                 mGroupNameTextView.setText(group.getName());
                 mAdapter.getGroupMembersFragment().setUp(group, getRights(), GroupProfileActivity.this);
                 mAdapter.getGroupBlackBoardFragment().setUp(group.getBlackBoard(), group, GroupProfileActivity.this);
@@ -232,37 +231,34 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      */
     private void checkIfVisible() {
         if (checkIsMember) {
-            GroupController.getInstance().getUserGroupVisibleMembers(new ExtendedTaskDelegateAdapter<Void, UserGroupVisibleMembers>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, UserGroupVisibleMembers visibleMembers) {
-                    if (visibleMembers.getList() != null) {
-                        if (visibleMembers.getList().contains(ServiceProvider.getEmail())) {
-                            mChangeVisibility.setColorNormal(R.color.check_group_name_negative);
-                            mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
-                            mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
-                            mChangeVisibility.setVisibility(View.VISIBLE);
-                            checkVisibility = true;
+            if(!group.getGroupType().equals(UserGroupType.SECURITYGROUP.name())){
+                GroupController.getInstance().getUserGroupVisibleMembers(new ExtendedTaskDelegateAdapter<Void, UserGroupVisibleMembers>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, UserGroupVisibleMembers visibleMembers) {
+                        if (visibleMembers.getVisibleMembers() != null) {
+                            if (visibleMembers.getVisibleMembers().contains(ServiceProvider.getEmail())) {
+                                mChangeVisibility.setColorNormalResId(R.color.colorPrimaryLeave);
+                                mChangeVisibility.setColorPressedResId(R.color.colorPressedBlackBoard);
+                                checkVisibility = true;
+                            } else {
+                                mChangeVisibility.setColorNormalResId(R.color.colorPrimaryJoin);
+                                mChangeVisibility.setColorPressedResId(R.color.colorPressedBlackBoard);
+                                checkVisibility = false;
+                            }
                         } else {
-                            mChangeVisibility.setColorNormal(R.color.colorPrimaryJoin);
-                            mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
-                            mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
-                            mChangeVisibility.setVisibility(View.VISIBLE);
+                            mChangeVisibility.setColorNormalResId(R.color.colorPrimaryJoin);
+                            mChangeVisibility.setColorPressedResId(R.color.colorPressedBlackBoard);
                             checkVisibility = false;
                         }
-                    } else {
-                        mChangeVisibility.setColorNormal(R.color.colorPrimaryJoin);
-                        mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
-                        mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
                         mChangeVisibility.setVisibility(View.VISIBLE);
-                        checkVisibility = false;
                     }
-                }
-            }, groupName);
+                }, groupName);
+            }
         }
     }
 
     private void setClickOnPicture() {
-        if (checkIsMember && getRights().contains(Right.CHANGEGROUPPICTURE.name())) {
+        if (checkIsMember && (getRights().contains(Right.CHANGEGROUPPICTURE.name()) || getRights().contains(Right.FULLRIGHTS.name()))) {
             mGroupPicture.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -306,11 +302,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                         @Override
                         public void taskDidFinish(ExtendedTask task, BlobKey blobKey) {
                             setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                            if (blobKey != null) {
-                                GroupImageLoader.getInstance().setGroupImageToImageView(GroupProfileActivity.this, blobKey.getKeyString(), mGroupPicture);
-                            } else {
-                                Toast.makeText(GroupProfileActivity.this, "Das Bild konnte nicht korrekt hochgeladen werden", Toast.LENGTH_LONG).show();
-                            }
+                            GroupImageLoader.getInstance().setGroupImageToImageView(GroupProfileActivity.this, blobKey, mGroupPicture);
                         }
 
                         @Override
@@ -343,33 +335,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      * Setzt die Listener für die Buttons.
      */
     private void setClickListener() {
-        mChangeVisibility.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                GroupController.getInstance().changeMyVisibility(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
-                    @Override
-                    public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
-                        if (result.getValue()) {
-                            mChangeVisibility.setColorNormal(R.color.check_group_name_negative);
-                            mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
-                            mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
-                            mChangeVisibility.setVisibility(View.VISIBLE);
-                            checkVisibility = true;
-                            Toast.makeText(GroupProfileActivity.this, R.string.youAreNowVisible, Toast.LENGTH_LONG).show();
-                        } else {
-                            mChangeVisibility.setColorNormal(R.color.colorPrimaryJoin);
-                            mChangeVisibility.setColorPressed(R.color.colorPressedBlackBoard);
-                            mChangeVisibility.setImageDrawable(GroupProfileActivity.this.getResources().getDrawable(R.drawable.ic_visibility_white_24dp));
-                            mChangeVisibility.setVisibility(View.VISIBLE);
-                            checkVisibility = false;
-                            Toast.makeText(GroupProfileActivity.this, R.string.youAreNowInvisible, Toast.LENGTH_LONG).show();
-                        }
-                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                    }
-                }, groupName);
-            }
-        });
+        setVisibilityListener();
 
         mJoinButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -454,6 +420,40 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                     }
                 });
                 altertadd.show();
+            }
+        });
+    }
+
+    private void setVisibilityListener() {
+        mChangeVisibility.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                GroupController.getInstance().changeMyVisibility(new ExtendedTaskDelegateAdapter<Void, UserGroupVisibleMembers>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, UserGroupVisibleMembers result) {
+                        if (result.getVisibleMembers() != null) {
+                            if (result.getVisibleMembers().contains(ServiceProvider.getEmail())) {
+                                mChangeVisibility.setColorNormalResId(R.color.colorPrimaryLeave);
+                                mChangeVisibility.setColorPressedResId(R.color.colorPressedBlackBoard);
+                                checkVisibility = true;
+                                Toast.makeText(GroupProfileActivity.this, R.string.youAreNowVisible, Toast.LENGTH_LONG).show();
+                            }
+                        }else {
+                            mChangeVisibility.setColorNormalResId(R.color.colorPrimaryJoin);
+                            mChangeVisibility.setColorPressedResId(R.color.colorPressedBlackBoard);
+                            checkVisibility = false;
+                            Toast.makeText(GroupProfileActivity.this, R.string.youAreNowInvisible, Toast.LENGTH_LONG).show();
+                        }
+                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                    }
+
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                    }
+                }, groupName);
             }
         });
     }
@@ -817,7 +817,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
     public void startGlobalMessageAction() {
         AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
         LayoutInflater factory = LayoutInflater.from(GroupProfileActivity.this);
-        final View writeMessageView = factory.inflate(R.layout.post_black_board, null);
+        final View writeMessageView = factory.inflate(R.layout.post_message, null);
         altertadd.setView(writeMessageView);
         final EditText messageEditText = (EditText) writeMessageView.findViewById(R.id.post_black_board_edit_text);
         final TextView failureTextView = (TextView) writeMessageView.findViewById(R.id.failure_text_view);
@@ -890,11 +890,9 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      * wird über den GroupController das ausgewählte Mitglied entfernt. Ja man kann sich selber
      * auch entfernen, das ist das selbe als wenn man eine Gruppe verlässt.
      *
-     * @param view Das unsichtbare EditText item im listview item.
+     * @param email Die E-Mail des Endusers
      */
-    public void startRemoveMemberAction(View view) {
-        EditText hiddenMail = (EditText) view.findViewById(R.id.hidden_user_mail);
-        final String email = hiddenMail.getText().toString();
+    public void startRemoveMemberAction(final String email) {
         if (getRights(email).contains(Right.FULLRIGHTS.name())) {
             Toast.makeText(GroupProfileActivity.this, R.string.deleteLeaderFailmessage, Toast.LENGTH_LONG).show();
         } else {

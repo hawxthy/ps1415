@@ -14,20 +14,14 @@ import java.util.List;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.CreateUserGroupActivity;
-import ws1415.ps1415.activity.DistributeRightsActivity;
 import ws1415.ps1415.activity.FriendsActivity;
 import ws1415.ps1415.activity.GroupProfileActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.ListUserGroupsActivity;
-import ws1415.ps1415.activity.ManageEventsActivity;
-import ws1415.ps1415.activity.ManageRoutesActivity;
 import ws1415.ps1415.activity.MessagingActivity;
 import ws1415.ps1415.activity.MyUserGroupsActivity;
-import ws1415.ps1415.activity.PermissionManagementActivity;
 import ws1415.ps1415.activity.ProfileActivity;
-import ws1415.ps1415.activity.RegisterActivity;
 import ws1415.ps1415.activity.SearchActivity;
-import ws1415.ps1415.util.PrefManager;
 
 /**
  * @author Bernd Eissing on 03.06.2015.
@@ -51,6 +45,10 @@ public class NavDrawerGroupList {
                 public void onClick(final AdapterView<?> parent, View view, int position, long id) {
                     // Die Activity holen, damit Methode auf ihr aufgerufen werden können.
                     final GroupProfileActivity context = (GroupProfileActivity)parent.getContext();
+                    // Wenn man kein Mitglied ist soll nichts passieren
+                    if(context.getRights()==null){
+                        return;
+                    }
 
                     // AlertDialog mit variabler Anzahl an Buttons erstellen
                     final AlertDialog.Builder altertadd = new AlertDialog.Builder(parent.getContext());
@@ -285,87 +283,6 @@ public class NavDrawerGroupList {
                     Intent search_intent = new Intent(parent.getContext(), SearchActivity.class);
                     search_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(search_intent);
-                }
-            },
-
-            // ---------------------------------------------
-            // ---------- Veranstalter-Funktionen ----------
-            // ---------------------------------------------
-
-            // ---------- Veranstaltung erstellen/bearbeiten ----------
-            new NavDrawerItem() {
-                @Override
-                public int getTitleId() {
-                    return R.string.create_edit_events;
-                }
-                @Override
-                public int getIconId() {
-                    return R.drawable.ic_event;
-                }
-                @Override
-                public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent intent = new Intent(parent.getContext(), ManageEventsActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    parent.getContext().startActivity(intent);
-                }
-            },
-
-            // ---------- Routen erstellen/bearbeiten ----------
-            new NavDrawerItem() {
-                @Override
-                public int getTitleId() {
-                    return R.string.create_edit_routes;
-                }
-                @Override
-                // TODO Icon ändern
-                public int getIconId() {
-                    return R.drawable.ic_event;
-                }
-                @Override
-                public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent intent = new Intent(parent.getContext(), ManageRoutesActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    parent.getContext().startActivity(intent);
-                }
-            },
-
-            // ---------- Rechteverwaltung ----------
-            new NavDrawerItem() {
-                @Override
-                public int getTitleId() {
-                    return R.string.permission_management;
-                }
-
-                @Override
-                public int getIconId() {
-                    return R.drawable.ic_action_accounts;
-                }
-
-                @Override
-                public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent admins_intent = new Intent(parent.getContext(), PermissionManagementActivity.class);
-                    parent.getContext().startActivity(admins_intent);
-                }
-            },
-
-            // ---------- Logout ----------
-            new NavDrawerItem() {
-                @Override
-                public int getTitleId() {
-                    return R.string.logout;
-                }
-
-                @Override
-                public int getIconId() {
-                    return R.drawable.ic_action_accounts;
-                }
-
-                @Override
-                public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    PrefManager.setSelectedUserMail(parent.getContext(), "");
-                    Intent intent = new Intent(parent.getContext(), RegisterActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    parent.getContext().startActivity(intent);
                 }
             }
 

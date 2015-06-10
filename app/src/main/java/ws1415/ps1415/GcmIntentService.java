@@ -28,7 +28,6 @@ import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.activity.ConversationActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
-import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.controller.MessageDbController;
 import ws1415.ps1415.event.NewMessageEvent;
 import ws1415.ps1415.util.PrefManager;
@@ -90,11 +89,6 @@ public class GcmIntentService extends IntentService {
                         sendNotificationMessaging(extras, null);
                         // Einstellung für die Gruppe entfernen, falls vorhanden
                         PrefManager.deleteGroupVisibility(this, extras.getString("content"));
-                        break;
-                    case GROUP_CREATED_NOTIFICATION_MESSAGE:
-                        // Gruppen-Listen in den Fragmenten von UserGroupActivity aktualisieren
-                        Intent refreshGroupsIntent = new Intent(UsergroupActivity.REFRESH_GROUPS_ACTION);
-                        LocalBroadcastManager.getInstance(this).sendBroadcast(refreshGroupsIntent);
                         break;
                     case USER_NEW_MESSAGE:
                         String receiver = extras.getString("receiver");

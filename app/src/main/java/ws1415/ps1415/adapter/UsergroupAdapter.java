@@ -4,18 +4,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.skatenight.skatenightAPI.model.EventMetaData;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupFilter;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
@@ -25,10 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.R;
-import ws1415.ps1415.activity.InviteUsersToGroupActivity;
 import ws1415.ps1415.activity.ListUserGroupsActivity;
 import ws1415.ps1415.activity.MyUserGroupsActivity;
-import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.controller.GroupController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
@@ -42,30 +36,56 @@ import ws1415.ps1415.util.PrefManager;
  * @author Bernd Eissing
  */
 public class UsergroupAdapter extends BaseAdapter {
-    private List<UserGroup> groupList;
+    private final int LOAD_BUFFER = 10;
+    private List<UserGroupMetaData> groupList;
     private Context context;
     private LayoutInflater inflater;
-    private int maximum;
     // Attribut zum speichern, ob gerade Gruppen geladen werden
     private boolean fetching = false;
-    private boolean fetchingDone = false;
+    private boolean moreToFetch = true;
     private UserGroupFilter filter;
     private int count = 0;
+    // String zum Suchen von Nutzergruppen
+    private String mSearchString;
+    private List<String> mSearchGroups;
 
     /**
-     * Konstruktor, der den Inhalt der Liste festlegt;
+     * Konstruktor, der benutzt werden kann, falls man nach einem String
+     * suchen möchte. Der Unterschied hier ist, dass nach Gruppennamen gesucht
+     * wird, die mit dem searchString anfangen.
      *
-     * @param context Context, von dem aus der Adapter aufgerufen wird.
-     * @param maximum Maximale Anzahl der Einträge, oder -1 für unbegrenzt.
+     * @param context      Context, von dem aus der Adapter aufgerufen wird.
+     * @param searchString String nach dem gesucht werden soll kann null sein
      */
-    public UsergroupAdapter(Context context, UserGroupFilter filter, int maximum) {
-        if (maximum > -1 && maximum < groupList.size()) {
-            throw new IllegalArgumentException("Liste zu groß");
-        }
+    public UsergroupAdapter(Context context, String searchString, UserGroupFilter filter) {
         if (filter == null) {
             throw new IllegalArgumentException("no filter submitted");
         }
-        this.maximum = maximum;
+        this.mSearchString = searchString;
+        this.mSearchGroups = new ArrayList<>();
+        this.context = context;
+        this.filter = filter;
+        this.groupList = new ArrayList<>();
+        if (context != null) {
+            inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+        fetchNewGroups();
+    }
+
+    /**
+     * Konstruktor, der benutzt werden kann falls man genau nach Gruppen suchen will.
+     * Der Unterschied ist hier, dass in searchGroups Gruppennamen enthalten sein müssen.
+     * Ist dies nicht der Fall, so wird auch keine Gruppe dazu geladen.
+     *
+     * @param context      Context, von dem aus der Adapter aufgerufen wird.
+     * @param searchGroups Strings nach denen gesucht werden soll kann null sein
+     */
+    public UsergroupAdapter(Context context, UserGroupFilter filter, List<String> searchGroups) {
+        if (filter == null) {
+            throw new IllegalArgumentException("no filter submitted");
+        }
+        this.mSearchString = null;
+        this.mSearchGroups = searchGroups;
         this.context = context;
         this.filter = filter;
         this.groupList = new ArrayList<>();
@@ -93,7 +113,7 @@ public class UsergroupAdapter extends BaseAdapter {
      * @return Nutzergruppe an Stelle i
      */
     @Override
-    public UserGroup getItem(int i) {
+    public UserGroupMetaData getItem(int i) {
         if (fetching && i == groupList.size()) {
             return null;
         }
@@ -120,7 +140,6 @@ public class UsergroupAdapter extends BaseAdapter {
         private TextView groupCount;
         private ImageView hiddenSecurityButton;
         private ImageView hiddenCancelButton;
-        private EditText hiddenGroupName;
     }
 
     /**
@@ -134,7 +153,8 @@ public class UsergroupAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup viewGroup) {
         final Holder holder;
-        if (position + 1 == groupList.size() && !fetchingDone) fetchNewGroups();
+        if (position == groupList.size() - LOAD_BUFFER && !fetching && moreToFetch)
+            fetchNewGroups();
 
         if (convertView == null) {
             holder = new Holder();
@@ -144,18 +164,15 @@ public class UsergroupAdapter extends BaseAdapter {
             holder.groupCount = (TextView) convertView.findViewById(R.id.user_group_list_view_item_count);
             holder.hiddenSecurityButton = (ImageView) convertView.findViewById(R.id.hidden_security_group_button);
             holder.hiddenCancelButton = (ImageView) convertView.findViewById(R.id.hidden_cancel_button);
-            holder.hiddenGroupName = (EditText) convertView.findViewById(R.id.hidden_group_name);
             convertView.setTag(holder);
         } else {
             holder = (Holder) convertView.getTag();
         }
 
         // Image Laden
-        if (getItem(position).getBlobKey() != null) {
-            GroupImageLoader.getInstance().setGroupImageToImageView(context, getItem(position).getBlobKey().getKeyString(), holder.groupImage);
-        } else {
-            GroupImageLoader.getInstance().setGroupImageToImageView(context, null, holder.groupImage);
-        }
+
+        GroupImageLoader.getInstance().setGroupImageToImageView(context, getItem(position).getBlobKey(), holder.groupImage);
+
         //Attribute Setzen
         holder.groupName.setText(getItem(position).getName());
         holder.groupCount.setText(context.getString(R.string.usergroup_member_count) + Integer.toString(getItem(position).getMemberCount()));
@@ -178,40 +195,50 @@ public class UsergroupAdapter extends BaseAdapter {
             });
             if (getItem(position).getPrivat()) {
                 holder.hiddenSecurityButton.setVisibility(View.VISIBLE);
+            } else {
+                holder.hiddenSecurityButton.setVisibility(View.GONE);
             }
-        } else {
-            holder.hiddenGroupName.setText(getItem(position).getName());
+        } else if(context instanceof MyUserGroupsActivity){
             if (count < 6) {
                 final MyUserGroupsActivity activity = (MyUserGroupsActivity) context;
-                holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
+
+                // Prüfe auf Sichtbarkeit und mache die Buttons dementsprechend sichtbar
                 if (PrefManager.getGroupVisibility(context, getItem(position).getName())) {
                     holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_visibility_black_24dp));
                     holder.hiddenCancelButton.setVisibility(View.VISIBLE);
                     count++;
-                }
-                holder.hiddenSecurityButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (!PrefManager.getGroupVisibility(context, holder.hiddenGroupName.getText().toString()) && count < 5) {
-                            holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_visibility_black_24dp));
-                            holder.hiddenCancelButton.setVisibility(View.VISIBLE);
-                            PrefManager.setGroupVisibility(context, holder.hiddenGroupName.getText().toString(), true);
-                            count++;
-                        }
-                    }
-                });
-                holder.hiddenCancelButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.remove_icon_in_red));
-                if (!PrefManager.getGroupVisibility(context, getItem(position).getName())) {
+                }else{
                     holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
                     holder.hiddenCancelButton.setVisibility(View.GONE);
                 }
-                holder.hiddenCancelButton.setOnClickListener(new View.OnClickListener() {
+                holder.hiddenCancelButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.remove_icon_in_red));
+                holder.hiddenSecurityButton.setVisibility(View.VISIBLE);
+
+                // Setze die Listener
+                holder.hiddenSecurityButton.setOnClickListener(new View.OnClickListener() {
+                    String groupName = getItem(position).getName();
+
                     @Override
                     public void onClick(View view) {
-                        if (PrefManager.getGroupVisibility(context, holder.hiddenGroupName.getText().toString())) {
+                        if (!PrefManager.getGroupVisibility(context, groupName) && count < 5) {
+                            holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_visibility_black_24dp));
+                            holder.hiddenCancelButton.setVisibility(View.VISIBLE);
+                            PrefManager.setGroupVisibility(context, groupName, true);
+                            count++;
+                        }else{
+                            Toast.makeText(context, R.string.too_many_visible_groups, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                holder.hiddenCancelButton.setOnClickListener(new View.OnClickListener() {
+                    String groupName = getItem(position).getName();
+
+                    @Override
+                    public void onClick(View view) {
+                        if (PrefManager.getGroupVisibility(context, groupName)) {
                             holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
                             holder.hiddenCancelButton.setVisibility(View.GONE);
-                            PrefManager.setGroupVisibility(context, holder.hiddenGroupName.getText().toString(), false);
+                            PrefManager.setGroupVisibility(context, groupName, false);
                             count--;
                         }
                     }
@@ -219,6 +246,9 @@ public class UsergroupAdapter extends BaseAdapter {
             } else {
                 Toast.makeText(context, R.string.tooManyVisibleGroups, Toast.LENGTH_LONG).show();
             }
+        }else{
+            // Setze keine hidden Buttons. Dies passiert, wenn eine andere Activity oder Fragment
+            // als die MyUserGroupsActivity und ListUserGroupsActivity diesen Adapter benutzen
         }
 
 
@@ -234,26 +264,102 @@ public class UsergroupAdapter extends BaseAdapter {
         if (context instanceof MyUserGroupsActivity) {
             if (!fetching) {
                 final Activity activity = (Activity) context;
-                if (activity != null) {
-                    activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                    GroupController.getInstance().getMyUserGroups(new ExtendedTaskDelegateAdapter<Void, UserGroupMetaDataList>() {
+                activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                GroupController.getInstance().getMyUserGroups(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> metaDatas) {
+                        if (metaDatas == null) {
+                            Toast.makeText(context, R.string.noMore, Toast.LENGTH_LONG).show();
+                        } else {
+                            groupList.addAll(metaDatas);
+                            notifyDataSetChanged();
+
+                            // Falls das Ende erreicht is, muss der Adapter bescheid bekommen
+                            if (metaDatas.size() < filter.getLimit()) {
+                                moreToFetch = false;
+                            }
+                        }
+                        fetching = false;
+                        activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                    }
+
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                        activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                    }
+                }, filter);
+            }
+        } else {
+            if (!fetching) {
+                final Activity activity = (Activity) context;
+                activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                fetching = true;
+                if (mSearchString != null) {
+                    GroupController.getInstance().searchUserGroups(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>() {
                         @Override
-                        public void taskDidFinish(ExtendedTask task, UserGroupMetaDataList userGroupMetaDataList) {
-                            if (userGroupMetaDataList.getMetaDatas() == null) {
+                        public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> metaDatas) {
+                            if (metaDatas == null) {
                                 Toast.makeText(context, R.string.noMore, Toast.LENGTH_LONG).show();
-                                activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                                fetchingDone = true;
                             } else {
-                                groupList.addAll(userGroupMetaDataList.getMetaDatas());
-                                deliverCursorString(userGroupMetaDataList.getWebCursorString());
+                                groupList.addAll(metaDatas);
                                 notifyDataSetChanged();
-                                if (userGroupMetaDataList.getMetaDatas().size() < filter.getLimit()) {
-                                    fetchingDone = true;
+
+                                //Falls das Ende erreicht ist, muss der Adapter bescheid bekommen
+                                if (metaDatas.size() < filter.getLimit()) {
+                                    moreToFetch = false;
                                 }
-                                if (activity != null)
-                                    activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
                             }
                             fetching = false;
+                            activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                        }
+
+                        @Override
+                        public void taskFailed(ExtendedTask task, String message) {
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                        }
+                    }, mSearchString, filter);
+                }else if(mSearchGroups != null && mSearchGroups.size() > 0){
+                    GroupController.getInstance().fetchSpecificGroupDatas(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>(){
+                        @Override
+                        public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> metaDatas) {
+                            if(metaDatas == null){
+                                Toast.makeText(context, R.string.noMore, Toast.LENGTH_LONG).show();
+                            }else{
+                                mSearchGroups.removeAll(metaDatas);
+                                groupList.addAll(metaDatas);
+                                notifyDataSetChanged();
+                            }
+                            //Falls das Ende erreicht ist, muss der Adapter bescheid bekommen
+                            if (metaDatas.size() < filter.getLimit()) {
+                                moreToFetch = false;
+                            }
+                            fetching = false;
+                            activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                        }
+
+                        @Override
+                        public void taskFailed(ExtendedTask task, String message) {
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                        }
+                    }, mSearchGroups);
+                } else {
+                    GroupController.getInstance().listAllUserGroupMetaDatas(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>() {
+                        @Override
+                        public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> metaDatas) {
+                            if (metaDatas == null) {
+                                Toast.makeText(context, R.string.noMore, Toast.LENGTH_LONG).show();
+                            } else {
+                                groupList.addAll(metaDatas);
+                                notifyDataSetChanged();
+
+                                //Falls das Ende erreicht ist, muss der Adapter bescheid bekommen
+                                if (metaDatas.size() < filter.getLimit()) {
+                                    moreToFetch = false;
+                                }
+                            }
+                            fetching = false;
+                            activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
                         }
 
                         @Override
@@ -264,48 +370,12 @@ public class UsergroupAdapter extends BaseAdapter {
                     }, filter);
                 }
             }
-        } else {
-            if (!fetching) {
-                if (context instanceof Activity) {
-                    final Activity activity = (Activity) context;
-                    if (activity != null)
-                        activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                    fetching = true;
-                    GroupController.getInstance().listUserGroupMetaDatas(new ExtendedTaskDelegateAdapter<Void, UserGroupMetaDataList>() {
-                        @Override
-                        public void taskDidFinish(ExtendedTask task, UserGroupMetaDataList userGroupMetaDataList) {
-                            if (userGroupMetaDataList.getMetaDatas() == null) {
-                                Toast.makeText(context, R.string.noMore, Toast.LENGTH_LONG).show();
-                                activity.setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                                fetchingDone = true;
-                            } else {
-                                groupList.addAll(userGroupMetaDataList.getMetaDatas());
-                                deliverCursorString(userGroupMetaDataList.getWebCursorString());
-                                notifyDataSetChanged();
-                                if (userGroupMetaDataList.getMetaDatas().size() < filter.getLimit()) {
-                                    fetchingDone = true;
-                                }
-                                if (activity != null)
-                                    activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                            }
-                            fetching = false;
-                        }
-
-                        @Override
-                        public void taskFailed(ExtendedTask task, String message) {
-                            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                            if (activity != null)
-                                activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                        }
-                    }, filter);
-                }
-            }
         }
     }
 
     /**
      * Übergibt dem Filter den cursorstring, damit beim nächsten Aufruf von
-     * listUserGroupMetaDatas der alte Cursor verwendet wird.
+     * listAllUserGroupMetaDatas der alte Cursor verwendet wird.
      *
      * @param cursorString
      */
@@ -321,20 +391,5 @@ public class UsergroupAdapter extends BaseAdapter {
     public void removeListItem(UserGroup userGroup) {
         groupList.remove(userGroup);
         notifyDataSetChanged();
-    }
-
-    /**
-     * Fügt die übergebene UserGroup der Liste von UserGroups hinzu.
-     *
-     * @param userGroup
-     */
-    public boolean addListItem(UserGroup userGroup) {
-        if (maximum > -1 && groupList.size() >= maximum) {
-            Toast.makeText(context, R.string.usergroup_adapter_maximum_reached, Toast.LENGTH_LONG).show();
-            return false;
-        }
-        groupList.add(userGroup);
-        notifyDataSetChanged();
-        return true;
     }
 }

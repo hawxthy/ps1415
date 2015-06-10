@@ -11,6 +11,7 @@ import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.ListUserGroupsActivity;
 import ws1415.ps1415.activity.MessagingActivity;
 import ws1415.ps1415.activity.MyPicturesActivity;
+import ws1415.ps1415.activity.MyUserGroupsActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.activity.RegisterActivity;
 import ws1415.ps1415.activity.SearchActivity;

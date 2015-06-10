@@ -55,39 +55,6 @@
     <!-- Strings zu activity settings -->
     <string name="title_activity_settings">Settings</string>
 
-    <!-- Strings zu activity UsergroupActivity -->
-    <string name="title_activity_base">BaseActivity</string>
-    <string name="title_activity_user_group_activity">Manage Groups</string>
-    <string name="title_fragment_all_user_groups">Groups</string>
-    <string name="title_fragment_my_user_groups">My Groups</string>
-    <string name="action_add_user_group">Add Usergroup</string>
-    <string name="action_refresh_user_groups">Refresh</string>
-    <string name="list_view_item_usergroup_creator">Creator: </string>
-    <string name="list_view_item_usergroup_membercount">Member: </string>
-    <string name="usergroup_adapter_maximum_reached">Maximum number of visible groups reached</string>
-    <string name="usergroup_member_count">Members</string>
-
-    <!-- Strings zu AddUserGroupActivity -->
-    <string name="title_activity_add_user_group">Gruppe hinzufügen</string>
-    <string name="title_activity_add_user_group_title">Groupname</string>
-    <string name="activity_add_user_group_cancel_text">Cancel</string>
-    <string name="activity_add_user_group_apply_text">Apply</string>
-    <string name="dialog_join_group">Do you want to join the group?</string>
-    <string name="dialog_leave_group">Do you want to leave the group?</string>
-    <string name="dialog_delete_group">Are you sure, that you want to delete the group?</string>
-    <string name="dialog_delete_failed_group">You can\'t delete the group, because you are not the creator of the group.</string>
-    <string name="dialog_group_owner">You are the creator of the group, therefore you can\'t leave the group.</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
-    <string name="ok">OK</string>
-    <string name="context_menu_leave_usergroup">Leave Usergroup</string>
-    <string name="context_menu_delete">Delete</string>
-    <string name="context_menu_visible">Show on Map</string>
-    <string name="context_menu_not_visible">Don\'t show on Map</string>
-    <string name="title_fragment_my_user_groups_visible">Visible Groups</string>
-    <string name="title_fragment_my_user_groups_not_visible">Invisible Groups</string>
-
-
     <!--Strings zu OldShowRouteActivity-->
     <string name="group">"Group: "</string>
 
@@ -254,9 +221,6 @@
     <string name="error_changing_visibility">An error occurred while changing the visibility. Please try again.</string>
     <string name="participants">Participants</string>
 
-    <!-- UploadImageActivity -->
-    <string name="title_activity_upload_image">UploadImageActivity</string>
-
     <!-- PermissionManagementActivity -->
     <string name="sure_take_right_dialog">Are you sure you want to take administrative right of this user?</string>
     <string name="took_rights">Successfully took rights</string>
@@ -267,84 +231,6 @@
     <string name="cancel">Cancel</string>
     <string name="add">Add</string>
     <string name="loading_data">Loading data</string>
-    <string name="title_activity_list_user_groups">ListUserGroupsActivity</string>
-
-    <!-- CreateUserGroupActivity -->
-    <string name="title_activity_create_user_group">Create a new Group</string>
-    <string name="groupName">Groupname</string>
-    <string name="checkGroupNameString">Please check your chosen name</string>
-    <string name="checkGroupNamePositive">This name is available</string>
-    <string name="checkGroupNameNegative">This name is already taken</string>
-    <string name="groupDescription">Description</string>
-    <string name="groupPrivacy">Group Privacy</string>
-    <string name="groupPrivacyOn">Private Group</string>
-    <string name="groupPrivacyOff">Open Group</string>
-    <string name="check">Check</string>
-    <string name="groupPassword">Password</string>
-    <string name="groupPasswordRetype">Repeat Password</string>
-    <string name="checkPasswordPositive">Passwords match</string>
-    <string name="checkPasswordNegative">Password don\'t match</string>
-    <string name="submitGroup">Create</string>
-    <string name="abortGroup">Cancel</string>
-    <string name="uploadImageTitle">Image</string>
-    <string name="uploadImage">Upload</string>
-    <string name="previewImage">Preview</string>
-    <string name="uploadingImage">Uploading Image...</string>
-    <string name="uploadingImageFailed">Uploading failed</string>
-    <string name="uploadingDone">Done</string>
-    <string name="previewImageAlertDialogTitle">Image in List and Profile</string>
-    <string name="imageInList">Image in List</string>
-    <string name="imageInProfile">Image in Profile</string>
-    <string name="creatingGroupError">Couldn\'t create Group</string>
-    <string name="defaultGroupDestription">This is the Group: </string>
-    <string name="checkGroupNamePlease">Check Groupname please</string>
-    <string name="groupNameTooShort">Lenght of the Name must at least be 3</string>
-    <string name="passwordTooShort">Length of the Password must at least be 5</string>
-
-    <!-- GroupProfileActivity-->
-    <string name="noGroupNameInExtra">Aborted: You have to deliver the Groupname via the Intent Extras</string>
-    <string name="title_activity_group_profile">Group Profile</string>
-    <string name="title_alert_dialog_join_user_group">Join this Group?</string>
-    <string name="dialog_yes">Yes</string>
-    <string name="dialog_no">No</string>
-    <string name="alreadyInGroupString">You are already in this Group</string>
-    <string name="makeGroupPrivateString">Make this Group private?</string>
-    <string name="makeGroupOpenString">Make this Group open to everyone? You will loose your Password</string>
-    <string name="groupOpenNoNeedForPw">Open Groups don\'t need Passwords</string>
-    <string name="groupChangePasswordTitle">Change Password?</string>
-    <string name="globalMessageTitle">Send a global Message?</string>
-    <string name="globalMessageFailure">You have to type in a global Message</string>
-    <string name="globalMessageTooShort">Message length has to be at least 10</string>
-    <string name="boardMessageTooShort">Message length has to be at least 2</string>
-    <string name="removeMemberTitle">Remove Member?</string>
-    <string name="deleteLeaderFailmessage">You cannot delete the Leader of a group</string>
-    <string name="leaderTriesToLeave">The leader cannot leave the Group</string>
-    <string name="leaveGroupTitle">Leaving Group</string>
-    <string name="leaveGroupMessage">Leave this Group?</string>
-    <string name="wrongPasswordMessage">Wrong Password</string>
-    <string name="distributeRightsToOne">Distribute Rights to</string>
-    <string name="dontDistributeRightsToNothing">No E-Mail submitted</string>
-    <string name="noEntryToDelete">No entry to delete submitted</string>
-    <string name="deleteThisEntryQuestion">Delete this Entry?</string>
-    <string name="deleteGroupTitle">Delete your Group</string>
-    <string name="areYouSure">Are you sure?</string>
-    <string name="searchForUser">Search for a User</string>
-    <string name="cantSearchEmptyStrings">Put in something to search please</string>
-    <string name="youAreNowVisible">You are now visible</string>
-    <string name="youAreNowInvisible">You are now invisible</string>
-    <string name="cantChangeVisibility"></string>
-
-    <!-- GroupBlackBoardFragment-->
-    <string name="title_fragment_group_black_board">Blackboard</string>
-    <string name="postMessageTitle">Post a Blackboard Message</string>
-    <string name="postMessage">Message</string>
-    <string name="commentsBlackBoard">Comments</string>
-
-    <!-- GroupNewsBoardFragment-->
-    <string name="title_fragment_group_news_board">Newsboard</string>
-
-    <!-- GroupMembersFragment-->
-    <string name="title_fragment_group_members">Member</string>
 
     <!-- EventParticipantsActivity -->
     <string name="title_activity_event_participants">Event participants</string>
@@ -421,6 +307,26 @@
     <!-- ShowPictureActivity -->
     <string name="action_add_to_gallery">Add to Gallery</string>
 
+    <!-- RouteEditorActivity -->
+    <string name="title_activity_route_editor">Route Editor</string>
+    <string name="title_fragment_route_editor_map">Map</string>
+    <string name="title_fragment_route_editor_waypoints">Waypoints</string>
+    <string name="route_editor_error_load_route">Unable to load route.</string>
+    <string name="route_editor_waypoint_name_format">Waypoint <xliff:g id="number">%1$d</xliff:g></string>
+    <string name="route_editor_waypoint_deleted"><xliff:g id="waypoint_name">%1$s</xliff:g> deleted.</string>
+    <string name="route_editor_save_dialog">Save route?</string>
+    <string name="route_editor_leave_dialog">No route has been created. Do you want to leave anyway?</string>
+
+    <!--Strings zu EditWaypointDialog-->
+    <string name="activity_edit_waypoint_dialog_cancel">Cancel</string>
+    <string name="activity_edit_waypoint_dialog_delete">Delete</string>
+    <string name="activity_edit_waypoint_dialog_apply">Apply</string>
+    <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
+    <string name="title_activity_edit_waypoint_dialog">Edit Waypoint</string>
+    <string name="title_activity_invite_users_to_group">InviteUsersToGroupActivity</string>
+
+
+    <!-- Bernd's Strings, nicht anfassen isso-->
     <!-- Group Functions -->
     <string name="groupFunctions">Group Functions</string>
     <string name="groupFunctionsTitle">You can perform the following actions</string>
@@ -454,42 +360,111 @@
     <string name="noMembersToGrantRights">You didn\'t select any members</string>
 
     <!-- ListUserGroupsActivity-->
+    <string name="title_activity_list_user_groups">Group List</string>
     <string name="loadingString">Loading</string>
     <string name="noMore">Nothing more to load</string>
     <string name="securityGroupInfo">This is a Secruritygroup</string>
-
-    <!-- RouteEditorActivity -->
-    <string name="title_activity_route_editor">Route Editor</string>
-    <string name="title_fragment_route_editor_map">Map</string>
-    <string name="title_fragment_route_editor_waypoints">Waypoints</string>
-    <string name="route_editor_error_load_route">Unable to load route.</string>
-    <string name="route_editor_waypoint_name_format">Waypoint <xliff:g id="number">%1$d</xliff:g></string>
-    <string name="route_editor_waypoint_deleted"><xliff:g id="waypoint_name">%1$s</xliff:g> deleted.</string>
-    <string name="route_editor_save_dialog">Save route?</string>
-    <string name="route_editor_leave_dialog">No route has been created. Do you want to leave anyway?</string>
-
-    <!--Strings zu EditWaypointDialog-->
-    <string name="activity_edit_waypoint_dialog_cancel">Cancel</string>
-    <string name="activity_edit_waypoint_dialog_delete">Delete</string>
-    <string name="activity_edit_waypoint_dialog_apply">Apply</string>
-    <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
-    <string name="title_activity_edit_waypoint_dialog">Edit Waypoint</string>
-    <string name="title_activity_invite_users_to_group">InviteUsersToGroupActivity</string>
+    <string name="nothing_found_string">No Group found matching your Search</string>
+    <string name="search_hint_groups">Group name</string>
+    <string name="list">Group List</string>
 
     <!-- InviteUsersToGroupActivity-->
     <string name="nothingFound">Didn\'t find anything</string>
     <string name="sendDone">Invitations have been send</string>
     <string name="noUsersToInvite">No users to invite Selected</string>
-    <string name="title_activity_my_user_groups">MyUserGroupsActivity</string>
 
     <!-- MyUserGroupsActivity-->
     <string name="tooManyVisibleGroups">Too many visible Groups</string>
-    <string name="title_activity_comment_black_board">CommentBlackBoardActivity</string>
+    <string name="too_many_visible_groups">You can only make 5 Groups visible</string>
+    <string name="title_activity_my_user_groups">MyUserGroupsActivity</string>
 
     <!--CommentBlackBoard-->
     <string name="noLongIdSubmitted">You have to deliver the id via the Intent</string>
     <string name="titleWriteComment">Write a Comment</string>
     <string name="textTooShort">Message too Short</string>
+    <string name="no_board_entry_found">Didn\'t find any Entry on the Server</string>
+    <string name="title_activity_post_black_board">PostBlackBoardActivity</string>
 
+    <!--PostBlackBoardActivity-->
+    <string name="postMessageTitle">Post a Blackboard Message</string>
+    <string name="post_black_board_info_string">Post a Picture aswell?</string>
+    <string name="choose_image_error">There was an error choosing your Image</string>
+    <string name="title_activity_comment_black_board">Post a Comment here</string>
 
+    <!-- CreateUserGroupActivity -->
+    <string name="title_activity_create_user_group">Create a new Group</string>
+    <string name="groupName">Groupname</string>
+    <string name="checkGroupNameString">Please check your chosen name</string>
+    <string name="checkGroupNamePositive">This name is available</string>
+    <string name="checkGroupNameNegative">This name is already taken</string>
+    <string name="groupDescription">Description</string>
+    <string name="groupPrivacy">Group Privacy</string>
+    <string name="groupPrivacyOn">Private Group</string>
+    <string name="groupPrivacyOff">Open Group</string>
+    <string name="check">Check</string>
+    <string name="groupPassword">Password</string>
+    <string name="groupPasswordRetype">Repeat Password</string>
+    <string name="checkPasswordPositive">Passwords match</string>
+    <string name="checkPasswordNegative">Password don\'t match</string>
+    <string name="check_your_password">Check your Password</string>
+    <string name="submitGroup">Create</string>
+    <string name="abortGroup">Cancel</string>
+    <string name="uploadImageTitle">Image</string>
+    <string name="uploadImage">Upload</string>
+    <string name="previewImage">Preview</string>
+    <string name="uploadingImage">Uploading Image...</string>
+    <string name="uploadingImageFailed">Uploading failed</string>
+    <string name="uploadingDone">Done</string>
+    <string name="previewImageAlertDialogTitle">Image in List and Profile</string>
+    <string name="imageInList">Image in List</string>
+    <string name="imageInProfile">Image in Profile</string>
+    <string name="creatingGroupError">Couldn\'t create Group</string>
+    <string name="defaultGroupDestription">This is the Group: </string>
+    <string name="checkGroupNamePlease">Check Groupname please</string>
+    <string name="groupNameTooShort">Lenght of the Name must at least be 3</string>
+    <string name="passwordTooShort">Length of the Password must at least be 5</string>
+
+    <!-- GroupProfileActivity-->
+    <string name="noGroupNameInExtra">Aborted: You have to deliver the Groupname via the Intent Extras</string>
+    <string name="title_activity_group_profile">Group Profile</string>
+    <string name="title_alert_dialog_join_user_group">Join this Group?</string>
+    <string name="dialog_yes">Yes</string>
+    <string name="dialog_no">No</string>
+    <string name="alreadyInGroupString">You are already in this Group</string>
+    <string name="makeGroupPrivateString">Make this Group private?</string>
+    <string name="makeGroupOpenString">Make this Group open to everyone? You will loose your Password</string>
+    <string name="groupOpenNoNeedForPw">Open Groups don\'t need Passwords</string>
+    <string name="groupChangePasswordTitle">Change Password?</string>
+    <string name="globalMessageTitle">Send a global Message?</string>
+    <string name="globalMessageFailure">You have to type in a global Message</string>
+    <string name="globalMessageTooShort">Message length has to be at least 10</string>
+    <string name="boardMessageTooShort">Message length has to be at least 2</string>
+    <string name="removeMemberTitle">Remove Member?</string>
+    <string name="deleteLeaderFailmessage">You cannot delete the Leader of a group</string>
+    <string name="leaderTriesToLeave">The leader cannot leave the Group</string>
+    <string name="leaveGroupTitle">Leaving Group</string>
+    <string name="leaveGroupMessage">Leave this Group?</string>
+    <string name="wrongPasswordMessage">Wrong Password</string>
+    <string name="distributeRightsToOne">Distribute Rights to</string>
+    <string name="dontDistributeRightsToNothing">No E-Mail submitted</string>
+    <string name="noEntryToDelete">No entry to delete submitted</string>
+    <string name="deleteGroupTitle">Delete your Group</string>
+    <string name="areYouSure">Are you sure?</string>
+    <string name="searchForUser">Search for a User</string>
+    <string name="cantSearchEmptyStrings">Put in something to search please</string>
+    <string name="youAreNowVisible">You are now visible</string>
+    <string name="youAreNowInvisible">You are now invisible</string>
+
+    <!-- GroupBlackBoardFragment-->
+    <string name="deleteThisEntryQuestion">Delete this Entry?</string>
+    <string name="title_fragment_group_black_board">Blackboard</string>
+
+    <string name="postMessage">Message</string>
+    <string name="commentsBlackBoard">Comments</string>
+
+    <!-- GroupNewsBoardFragment-->
+    <string name="title_fragment_group_news_board">Newsboard</string>
+
+    <!-- GroupMembersFragment-->
+    <string name="title_fragment_group_members">Member</string>
 </resources>

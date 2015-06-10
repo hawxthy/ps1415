@@ -55,7 +55,7 @@ public class QueryVisibleUsersTask extends ExtendedTask<Void, Void, HashMap<User
             for (UserGroup userGroup : tmpGroups) {
                 if (PrefManager.getGroupVisibility(context, userGroup.getName())) {
                     try {
-                        List<String> members = ServiceProvider.getService().groupEndpoint().getUserGroupVisibleMembers(userGroup.getName()).execute().getList();
+                        List<String> members = ServiceProvider.getService().groupEndpoint().getUserGroupVisibleMembers(userGroup.getName()).execute().getVisibleMembers();
                         for(String visibleMember : members){
                             groupMembers.add(ServiceProvider.getService().userEndpoint().getUserLocationInfo(visibleMember).execute());
                         }

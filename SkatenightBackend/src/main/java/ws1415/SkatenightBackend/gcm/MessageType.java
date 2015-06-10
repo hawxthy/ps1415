@@ -24,10 +24,6 @@ public enum MessageType {
      */
     GROUP_DELETED_NOTIFICATION_MESSAGE,
     /**
-     * Wird an alle Mitglieder einer Gruppe gesendet, wenn eine Gruppe erstellt wird.
-     */
-    GROUP_CREATED_NOTIFICATION_MESSAGE,
-    /**
      * Wird an den Enduser gesendet, der zu einer Gruppe eingeladen wurde.
      */
     INVITATION_TO_GROUP_MESSAGE,

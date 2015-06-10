@@ -65,12 +65,12 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         // Nutzergruppe erstellen, die bei jedem Test benötigt wird.
         final CountDownLatch signal = new CountDownLatch(1);
 
-        GroupController.getInstance().createOpenUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().createUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_GROUP_DESCRIPTION);
+        }, TEST_GROUP_NAME, TEST_GROUP_TYPE, null, TEST_BOOLEAN_GROUP_PRIVAT_FALSE, null, null);
         try {
             assertTrue("setUp for createUserGroup failed", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -153,7 +153,7 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE);
+        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE, null);
         try {
             assertTrue("testPostBlackBoard message 1 failed", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -189,7 +189,7 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal3.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE_2);
+        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE_2, null);
         try {
             assertTrue("testPostBlackBoard messgage 2 failed", signal3.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -226,7 +226,7 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE);
+        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE, null);
         try {
             assertTrue("postBlackBoard failed", signal.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -292,153 +292,154 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         }
     }
 
-    @SmallTest
-    public void testPostNewsBoard() {
-        final CountDownLatch signal = new CountDownLatch(1);
-
-        GroupController.getInstance().postNewsBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                signal.countDown();
-            }
-        }, TEST_GROUP_NAME, TEST_NEWS_BOARD_MESSAGE);
-        try {
-            assertTrue("testPostNewsBoard message 1 failed", signal.await(30, TimeUnit.SECONDS));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        final CountDownLatch signal2 = new CountDownLatch(1);
-        GroupController.getInstance().getNewsBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupNewsBoardTransport>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, UserGroupNewsBoardTransport newsBoard) {
-                assertFalse("Es sollte mindestens ein BoardEntry enthalten sein", newsBoard.getBoardEntries() == null);
-                found = false;
-                for (BoardEntry be : newsBoard.getBoardEntries()) {
-                    assertFalse("Message_3 sollte nicht enthalten sein", be.getMessage().equals(TEST_NEWS_BOARD_MESSAGE_3));
-                    assertFalse("Message_2 sollte nicht enthalten sein", be.getMessage().equals(TEST_NEWS_BOARD_MESSAGE_2));
-                    if (be.getMessage().toString().equals(TEST_NEWS_BOARD_MESSAGE)) {
-                        found = true;
-                    }
-                }
-                assertTrue("Die erste Newsboard Message ist nicht enthalten", found);
-                signal2.countDown();
-            }
-        }, TEST_GROUP_NAME);
-        try {
-            assertTrue("testNewsBoardMessage check value failed", signal2.await(30, TimeUnit.SECONDS));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        final CountDownLatch signal3 = new CountDownLatch(1);
-        GroupController.getInstance().postNewsBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                signal3.countDown();
-            }
-        }, TEST_GROUP_NAME, TEST_NEWS_BOARD_MESSAGE_2);
-        try {
-            assertTrue("testPostNewsBoard messgage 2 failed", signal3.await(30, TimeUnit.SECONDS));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        final CountDownLatch signal4 = new CountDownLatch(1);
-        GroupController.getInstance().getNewsBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupNewsBoardTransport>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, UserGroupNewsBoardTransport newsBoard) {
-                assertFalse("Es sollte mindestens ein BoardEntry enthalten sein", newsBoard.getBoardEntries() == null);
-                found = false;
-                for (BoardEntry be : newsBoard.getBoardEntries()) {
-                    if (be.getMessage().equals(TEST_NEWS_BOARD_MESSAGE_2)) {
-                        found = true;
-                    }
-                }
-                assertTrue("Die zweite Newsboard Message sollte enthalten sein", found);
-                signal4.countDown();
-            }
-        }, TEST_GROUP_NAME);
-        try {
-            assertTrue("testNewsBoardMessageValue2 failed", signal4.await(30, TimeUnit.SECONDS));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @SmallTest
-    public void testRemoveNewsBoardMessage() {
-        final CountDownLatch signal = new CountDownLatch(1);
-        GroupController.getInstance().postNewsBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                signal.countDown();
-            }
-        }, TEST_GROUP_NAME, TEST_NEWS_BOARD_MESSAGE);
-        try {
-            assertTrue("postNewsBoard failed", signal.await(30, TimeUnit.SECONDS));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        final CountDownLatch signal2 = new CountDownLatch(1);
-        GroupController.getInstance().getNewsBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupNewsBoardTransport>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, UserGroupNewsBoardTransport newsBoard) {
-                found = false;
-                for (BoardEntry be : newsBoard.getBoardEntries()) {
-                    assertFalse("Message_3 sollte nicht enthalten sein", be.getMessage().equals(TEST_NEWS_BOARD_MESSAGE_3));
-                    assertFalse("Message_2 sollte nicht enthalten sein", be.getMessage().equals(TEST_NEWS_BOARD_MESSAGE_2));
-                    if (be.getMessage().toString().equals(TEST_NEWS_BOARD_MESSAGE)) {
-                        boardEntryId = be.getId();
-                        found = true;
-                    }
-                }
-                assertTrue("Die erste Newsboard Message ist nicht enthalten", found);
-                signal2.countDown();
-            }
-        }, TEST_GROUP_NAME);
-        try {
-            assertTrue("testRemoveNewsBoardMessage failed to get the BoardEntry", signal2.await(30, TimeUnit.SECONDS));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        final CountDownLatch signal3 = new CountDownLatch(1);
-        GroupController.getInstance().deleteNewsMessage(new ExtendedTaskDelegateAdapter<Void, Void>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                signal3.countDown();
-            }
-        }, TEST_GROUP_NAME, boardEntryId);
-        try {
-            assertTrue("deleteNewsMessage failed", signal3.await(30, TimeUnit.SECONDS));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        final CountDownLatch signal4 = new CountDownLatch(1);
-        GroupController.getInstance().getNewsBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupNewsBoardTransport>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, UserGroupNewsBoardTransport newsBoard) {
-                found = false;
-                if (newsBoard.getBoardEntries() != null) {
-                    for (BoardEntry be : newsBoard.getBoardEntries()) {
-                        if (be.getMessage().equals(TEST_NEWS_BOARD_MESSAGE)) {
-                            found = true;
-                        }
-                    }
-                }
-                assertFalse("Die Newsboard Message 1 sollte nicht mehr enthalten sein", found);
-                signal4.countDown();
-            }
-        }, TEST_GROUP_NAME);
-        try {
-            assertTrue("testRemoveNewsBoardMessage failed to check the removed BoardEntry", signal4.await(30, TimeUnit.SECONDS));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+    // Wird nicht mehr gebraucht, bleibt jedoch falls sich etwas ändert
+//    @SmallTest
+//    public void testPostNewsBoard() {
+//        final CountDownLatch signal = new CountDownLatch(1);
+//
+//        GroupController.getInstance().postNewsBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
+//            @Override
+//            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+//                signal.countDown();
+//            }
+//        }, TEST_GROUP_NAME, TEST_NEWS_BOARD_MESSAGE);
+//        try {
+//            assertTrue("testPostNewsBoard message 1 failed", signal.await(30, TimeUnit.SECONDS));
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        final CountDownLatch signal2 = new CountDownLatch(1);
+//        GroupController.getInstance().getNewsBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupNewsBoardTransport>() {
+//            @Override
+//            public void taskDidFinish(ExtendedTask task, UserGroupNewsBoardTransport newsBoard) {
+//                assertFalse("Es sollte mindestens ein BoardEntry enthalten sein", newsBoard.getBoardEntries() == null);
+//                found = false;
+//                for (BoardEntry be : newsBoard.getBoardEntries()) {
+//                    assertFalse("Message_3 sollte nicht enthalten sein", be.getMessage().equals(TEST_NEWS_BOARD_MESSAGE_3));
+//                    assertFalse("Message_2 sollte nicht enthalten sein", be.getMessage().equals(TEST_NEWS_BOARD_MESSAGE_2));
+//                    if (be.getMessage().toString().equals(TEST_NEWS_BOARD_MESSAGE)) {
+//                        found = true;
+//                    }
+//                }
+//                assertTrue("Die erste Newsboard Message ist nicht enthalten", found);
+//                signal2.countDown();
+//            }
+//        }, TEST_GROUP_NAME);
+//        try {
+//            assertTrue("testNewsBoardMessage check value failed", signal2.await(30, TimeUnit.SECONDS));
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        final CountDownLatch signal3 = new CountDownLatch(1);
+//        GroupController.getInstance().postNewsBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
+//            @Override
+//            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+//                signal3.countDown();
+//            }
+//        }, TEST_GROUP_NAME, TEST_NEWS_BOARD_MESSAGE_2);
+//        try {
+//            assertTrue("testPostNewsBoard messgage 2 failed", signal3.await(30, TimeUnit.SECONDS));
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        final CountDownLatch signal4 = new CountDownLatch(1);
+//        GroupController.getInstance().getNewsBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupNewsBoardTransport>() {
+//            @Override
+//            public void taskDidFinish(ExtendedTask task, UserGroupNewsBoardTransport newsBoard) {
+//                assertFalse("Es sollte mindestens ein BoardEntry enthalten sein", newsBoard.getBoardEntries() == null);
+//                found = false;
+//                for (BoardEntry be : newsBoard.getBoardEntries()) {
+//                    if (be.getMessage().equals(TEST_NEWS_BOARD_MESSAGE_2)) {
+//                        found = true;
+//                    }
+//                }
+//                assertTrue("Die zweite Newsboard Message sollte enthalten sein", found);
+//                signal4.countDown();
+//            }
+//        }, TEST_GROUP_NAME);
+//        try {
+//            assertTrue("testNewsBoardMessageValue2 failed", signal4.await(30, TimeUnit.SECONDS));
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    @SmallTest
+//    public void testRemoveNewsBoardMessage() {
+//        final CountDownLatch signal = new CountDownLatch(1);
+//        GroupController.getInstance().postNewsBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
+//            @Override
+//            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+//                signal.countDown();
+//            }
+//        }, TEST_GROUP_NAME, TEST_NEWS_BOARD_MESSAGE);
+//        try {
+//            assertTrue("postNewsBoard failed", signal.await(30, TimeUnit.SECONDS));
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        final CountDownLatch signal2 = new CountDownLatch(1);
+//        GroupController.getInstance().getNewsBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupNewsBoardTransport>() {
+//            @Override
+//            public void taskDidFinish(ExtendedTask task, UserGroupNewsBoardTransport newsBoard) {
+//                found = false;
+//                for (BoardEntry be : newsBoard.getBoardEntries()) {
+//                    assertFalse("Message_3 sollte nicht enthalten sein", be.getMessage().equals(TEST_NEWS_BOARD_MESSAGE_3));
+//                    assertFalse("Message_2 sollte nicht enthalten sein", be.getMessage().equals(TEST_NEWS_BOARD_MESSAGE_2));
+//                    if (be.getMessage().toString().equals(TEST_NEWS_BOARD_MESSAGE)) {
+//                        boardEntryId = be.getId();
+//                        found = true;
+//                    }
+//                }
+//                assertTrue("Die erste Newsboard Message ist nicht enthalten", found);
+//                signal2.countDown();
+//            }
+//        }, TEST_GROUP_NAME);
+//        try {
+//            assertTrue("testRemoveNewsBoardMessage failed to get the BoardEntry", signal2.await(30, TimeUnit.SECONDS));
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        final CountDownLatch signal3 = new CountDownLatch(1);
+//        GroupController.getInstance().deleteNewsMessage(new ExtendedTaskDelegateAdapter<Void, Void>() {
+//            @Override
+//            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+//                signal3.countDown();
+//            }
+//        }, TEST_GROUP_NAME, boardEntryId);
+//        try {
+//            assertTrue("deleteNewsMessage failed", signal3.await(30, TimeUnit.SECONDS));
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        final CountDownLatch signal4 = new CountDownLatch(1);
+//        GroupController.getInstance().getNewsBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupNewsBoardTransport>() {
+//            @Override
+//            public void taskDidFinish(ExtendedTask task, UserGroupNewsBoardTransport newsBoard) {
+//                found = false;
+//                if (newsBoard.getBoardEntries() != null) {
+//                    for (BoardEntry be : newsBoard.getBoardEntries()) {
+//                        if (be.getMessage().equals(TEST_NEWS_BOARD_MESSAGE)) {
+//                            found = true;
+//                        }
+//                    }
+//                }
+//                assertFalse("Die Newsboard Message 1 sollte nicht mehr enthalten sein", found);
+//                signal4.countDown();
+//            }
+//        }, TEST_GROUP_NAME);
+//        try {
+//            assertTrue("testRemoveNewsBoardMessage failed to check the removed BoardEntry", signal4.await(30, TimeUnit.SECONDS));
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @SmallTest
     public void testJoinAndLeaveUserGroup() {
@@ -645,12 +646,12 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
 
         final CountDownLatch signal3 = new CountDownLatch(1);
 
-        GroupController.getInstance().createOpenUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().createUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal3.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_GROUP_DESCRIPTION);
+        }, TEST_GROUP_NAME, TEST_GROUP_TYPE, null, TEST_BOOLEAN_GROUP_PRIVAT_FALSE, null, null);
         try {
             assertTrue("createUserGroup failed", signal3.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -659,12 +660,12 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
 
         final CountDownLatch signal4 = new CountDownLatch(1);
 
-        GroupController.getInstance().createOpenUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().createUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal4.countDown();
             }
-        }, TEST_GROUP_NAME_2, TEST_GROUP_DESCRIPTION_2);
+        }, TEST_GROUP_NAME_2, TEST_GROUP_TYPE, null, TEST_BOOLEAN_GROUP_PRIVAT_FALSE, null, null);
         try {
             assertTrue("createUserGroup failed", signal4.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -735,12 +736,12 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         }
 
         final CountDownLatch signal2 = new CountDownLatch(1);
-        GroupController.getInstance().createPrivateUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().createUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Void aVoid) {
                 signal2.countDown();
             }
-        }, TEST_GROUP_NAME, TEST_GROUP_TYPE, TEST_GROUP_DESCRIPTION, TEST_GROUP_PASSWORD);
+        }, TEST_GROUP_NAME, TEST_GROUP_TYPE, TEST_GROUP_PASSWORD, TEST_BOOLEAN_GROUP_PRIVAT_TRUE, null, null);
         try {
             assertTrue("createPrivateUserGroup failed", signal2.await(30, TimeUnit.SECONDS));
         } catch (InterruptedException e) {
@@ -854,9 +855,9 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         GroupController.getInstance().getUserGroupVisibleMembers(new ExtendedTaskDelegateAdapter<Void, UserGroupVisibleMembers>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroupVisibleMembers visibleMembers) {
-                assertTrue("Es sollte mindestens einen sichtbares Mitglied geben", visibleMembers.getList().size() > 0);
+                assertTrue("Es sollte mindestens einen sichtbares Mitglied geben", visibleMembers.getVisibleMembers().size() > 0);
                 found = false;
-                for (String visibleMember : visibleMembers.getList()) {
+                for (String visibleMember : visibleMembers.getVisibleMembers()) {
                     if (visibleMember.equals(MY_MAIL)) {
                         found = true;
                     }
@@ -896,8 +897,8 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroupVisibleMembers visibleMembers) {
                 found = false;
-                if (visibleMembers.getList() != null) {
-                    for (String visibleMember : visibleMembers.getList()) {
+                if (visibleMembers.getVisibleMembers() != null) {
+                    for (String visibleMember : visibleMembers.getVisibleMembers()) {
                         if (visibleMember.equals(MY_MAIL)) {
                             found = true;
                         }
@@ -933,8 +934,8 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroupVisibleMembers visibleMembers) {
                 found = false;
-                if (visibleMembers.getList() != null) {
-                    for (String visibleMember : visibleMembers.getList()) {
+                if (visibleMembers.getVisibleMembers() != null) {
+                    for (String visibleMember : visibleMembers.getVisibleMembers()) {
                         if (visibleMember.equals(MY_MAIL)) {
                             found = true;
                         }
@@ -1007,6 +1008,7 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
 
     @SmallTest
     public void testGetUserGroupPicture(){
+        //TODO testen
         final CountDownLatch signal = new CountDownLatch(1);
 
         GroupController.getInstance().getUserGroupPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>(){

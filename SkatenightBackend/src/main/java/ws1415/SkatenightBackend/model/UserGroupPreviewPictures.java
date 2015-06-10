@@ -1,5 +1,6 @@
 package ws1415.SkatenightBackend.model;
 
+import com.google.appengine.api.blobstore.BlobKey;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Load;
@@ -35,9 +36,9 @@ public class UserGroupPreviewPictures {
         blobKeysValues.add(value);
     }
 
-    public void removeBlobKeyValue(String value){
+    public void removeBlobKeyValue(BlobKey blobKey){
         if(blobKeysValues != null){
-            blobKeysValues.remove(value);
+            blobKeysValues.remove(blobKey.getKeyString());
         }
     }
 

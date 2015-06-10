@@ -274,42 +274,6 @@
     <string name="add">Hinzufügen</string>
     <string name="loading_data">Daten werden geladen</string>
 
-    <!-- CreateUserGroupActivity -->
-    <string name="title_activity_create_user_group">Erstelle eine neue Gruppe</string>
-    <string name="groupName">Gruppenname</string>
-    <string name="checkGroupNameString">Bitte überprüfe den angegebenen Namen</string>
-    <string name="checkGroupNamePositive">Dieser Name ist verfügbar</string>
-    <string name="checkGroupNameNegative">Dieser Name ist vergeben</string>
-    <string name="groupDescription">Beschreibung</string>
-    <string name="groupPrivacy">Öffentlichkeit</string>
-    <string name="groupPrivacyOn">Private Gruppe</string>
-    <string name="groupPrivacyOff">Öffentliche Gruppe</string>
-    <string name="check">Prüfe</string>
-    <string name="groupPassword">Passwort</string>
-    <string name="groupPasswordRetype">Passwort wiederholen</string>
-    <string name="checkPasswordPositive">Passwörter stimmen überein</string>
-    <string name="checkPasswordNegative">Passwörter stimmen nicht überein</string>
-    <string name="submitGroup">Erstellen</string>
-    <string name="abortGroup">Abbrechen</string>
-    <string name="uploadImageTitle">Gruppenbild</string>
-    <string name="uploadImage">Hochladen</string>
-    <string name="previewImage">Ansehen</string>
-    <string name="uploadingImage">Lade Bild hoch...</string>
-    <string name="uploadingImageFailed">Fehlgeschlagen</string>
-    <string name="uploadingDone">Done</string>
-    <string name="previewImageAlertDialogTitle">Bild in der Liste und im Profil</string>
-    <string name="imageInList">Bild in der Liste</string>
-    <string name="imageInProfile">Bild im Profil</string>
-    <string name="creatingGroupError">Gruppe konnte nicht erstellt werden</string>
-    <string name="defaultGroupDestription">Dies ist die Gruppe: </string>
-    <string name="checkGroupNamePlease">Überprüfe den Namen bitte</string>
-    <string name="dialog_no">Nein</string>
-    <string name="dialog_yes">Ja</string>
-
-    <!-- GroupBlackBoardFragment-->
-    <!-- GroupNewsBoardFragment-->
-    <!-- GroupMembersFragment-->
-
     <!-- EventParticipantsActivity -->
     <string name="title_activity_event_participants">Event-Teilnehmer</string>
     <string-array name="event_roles">
@@ -401,4 +365,147 @@
     <string name="activity_edit_waypoint_dialog_apply">Übernehmen</string>
     <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
     <string name="title_activity_edit_waypoint_dialog">Editiere Wegpunkt</string>
+
+
+    <!-- Bernd's Strings, nicht anfassen isso-->
+    <!-- Group Functions -->
+    <string name="groupFunctions">Gruppen Funktionen</string>
+    <string name="groupFunctionsTitle">Sie können folgende Aktionen ausführen</string>
+    <string name="createUserGroup">Gruppe erstellen</string>
+    <string name="distributeRights">Rechte verteilen</string>
+    <string name="inviteGroup">Einladungen versenden</string>
+    <string name="changePrivacy">Öffentlichkeit einstellen</string>
+    <string name="changePicture">Bild ändern</string>
+    <string name="postGlobalMessage">Globale Nachricht</string>
+    <string name="removeMember">Mitglied entfernen</string>
+    <string name="abortGroupFunctions">Abbrechen</string>
+    <string name="changePasswod">Passwort ändern</string>
+    <string name="editBlackBoard">Schwarzes Brett editieren</string>
+    <string name="globalMessageSend">Nachricht wurde versand</string>
+
+    <!-- AlerDialog Button Strings -->
+    <string name="sendButton">Senden</string>
+    <string name="okButton">OK</string>
+    <string name="inviteButton">Einladen</string>
+    <string name="doneButton">Fertig</string>
+    <string name="cancelButton">Abbrechen</string>
+    <string name="abortButton">Abbrechen</string>
+    <string name="yesButton">Ja</string>
+
+    <!-- DistributeRightsActivity-->
+    <string name="title_activity_distribute_rights">Rechtevergabe </string>
+    <string name="distributeRightsHeader">Verteilbare Rechte</string>
+    <string name="distributeRightsHeaderList">Vergeben an</string>
+    <string name="noGoupNameSubmitted">Der Gruppenname muss im Intent mit übergeben werden</string>
+    <string name="noGroupMembersSubmitted">Die Mitglieder der Gruppe müssen im Intent mit übergeben werden</string>
+    <string name="noMembersToGrantRights">Sie haben kein Mitglied ausgewählt</string>
+
+    <!-- ListUserGroupsActivity-->
+    <string name="title_activity_list_user_groups">Gruppenliste</string>
+    <string name="loadingString">Laden...</string>
+    <string name="noMore">Nichts mehr zum Laden gefunden</string>
+    <string name="securityGroupInfo">Dies ist eine gesonderte Gruppe</string>
+    <string name="nothing_found_string">Es wurden keine Gruppen gefunden</string>
+    <string name="search_hint_groups">Gruppenname</string>
+    <string name="list">Gruppenliste</string>
+
+    <!-- InviteUsersToGroupActivity-->
+    <string name="nothingFound">Es wurde nichts gefunden</string>
+    <string name="sendDone">Einladungen wurden versand</string>
+    <string name="noUsersToInvite">Sie haben niemanden zum Einladen ausgewählt</string>
+
+    <!-- MyUserGroupsActivity-->
+    <string name="tooManyVisibleGroups">Sie haben zu viele sichtbare Gruppe</string>
+    <string name="too_many_visible_groups">Sie können maximal fünf Gruppen sichtbar machen</string>
+    <string name="title_activity_my_user_groups">Meine Gruppen</string>
+
+    <!--CommentBlackBoard-->
+    <string name="noLongIdSubmitted">Sie müssen die id vom Eintrag im Intent mitliefern</string>
+    <string name="titleWriteComment">Schreibe einen Kommentar</string>
+    <string name="textTooShort">Nachricht zu kurz</string>
+    <string name="no_board_entry_found">Es wurde kein Eintrag auf dem Server gefunden</string>
+    <string name="title_activity_comment_black_board">Schreibe einen Kommentar</string>
+
+    <!--PostBlackBoardActivity-->
+    <string name="postMessageTitle">Neue Nachricht anheften</string>
+    <string name="post_black_board_info_string">Schicken Sie ein Bild mit?</string>
+    <string name="choose_image_error">Ein Fehler beim Auswählen des Bildes ist aufgetreten</string>
+    <string name="title_activity_post_black_board">Neue Nachricht anheften</string>
+
+
+    <!-- CreateUserGroupActivity -->
+    <string name="title_activity_create_user_group">Neue Gruppe erstellen</string>
+    <string name="groupName">Gruppenname</string>
+    <string name="checkGroupNameString">Bitte überprüfen Sie den Namen</string>
+    <string name="checkGroupNamePositive">Der Name ist verfügbar</string>
+    <string name="checkGroupNameNegative">Der Name ist vergeben</string>
+    <string name="groupDescription">Beschreibung</string>
+    <string name="groupPrivacy">Öffentlichkeitseinstellungen</string>
+    <string name="groupPrivacyOn">Privat</string>
+    <string name="groupPrivacyOff">Offen</string>
+    <string name="check">Prüfe</string>
+    <string name="groupPassword">Passwort</string>
+    <string name="groupPasswordRetype">Passwort wiederholen</string>
+    <string name="checkPasswordPositive">Passwörter stimmen überein</string>
+    <string name="checkPasswordNegative">Passworter stimmen nicht überein</string>
+    <string name="check_your_password">Überprüfen Sie ihr Passwort</string>
+    <string name="submitGroup">Erstellen</string>
+    <string name="abortGroup">Abbrechen</string>
+    <string name="uploadImageTitle">Gruppenbild</string>
+    <string name="uploadImage">Hochladen</string>
+    <string name="previewImage">Vorschau</string>
+    <string name="uploadingImage">Hochladen...</string>
+    <string name="uploadingImageFailed">Das Hochladen ist fehlgeschlagen</string>
+    <string name="uploadingDone">Fertig</string>
+    <string name="previewImageAlertDialogTitle">Bild in der Liste und im Profil</string>
+    <string name="imageInList">Bild in der Liste</string>
+    <string name="imageInProfile">Bild im Profil</string>
+    <string name="creatingGroupError">Gruppe konnte nicht erstellt werden</string>
+    <string name="defaultGroupDestription">Dies ist die Gruppe: </string>
+    <string name="checkGroupNamePlease">Überprüfen Sie den Gruppennamen</string>
+    <string name="groupNameTooShort">Der Name der Gruppe muss mindestens drei Zeichen lang sein</string>
+    <string name="passwordTooShort">Das Passwort muss mindestens fünf Zeichen lang sein</string>
+
+    <!-- GroupProfileActivity-->
+    <string name="noGroupNameInExtra">Der Gruppenname muss im Intent mit übergeben werden</string>
+    <string name="title_activity_group_profile">Gruppenprofil</string>
+    <string name="title_alert_dialog_join_user_group">Dieser Gruppe beitreten?</string>
+    <string name="dialog_yes">Ja</string>
+    <string name="dialog_no">Nein</string>
+    <string name="alreadyInGroupString">Sie sind bereits Mitglied</string>
+    <string name="makeGroupPrivateString">Diese Gruppe Privat machen?</string>
+    <string name="makeGroupOpenString">Diese Gruppe öffentlich machen? Dabei geht ihr Passwort verloren</string>
+    <string name="groupOpenNoNeedForPw">Öffentliche Gruppen brauchen kein Passwort</string>
+    <string name="groupChangePasswordTitle">Passwort ändern?</string>
+    <string name="globalMessageTitle">Eine Globale Nachricht senden?</string>
+    <string name="globalMessageFailure">Sie müssen eine Nachricht angeben</string>
+    <string name="globalMessageTooShort">Die Nachricht muss mindestens 10 Zeichen lang sein</string>
+    <string name="boardMessageTooShort">Die Nachricht muss mindestens zwei Zeichen lang sein</string>
+    <string name="removeMemberTitle">Mitglied entfernen?</string>
+    <string name="deleteLeaderFailmessage">Der Inhaber der Gruppe kann nicht gelöscht werden</string>
+    <string name="leaderTriesToLeave">Der Inhaber der Gruppe kann diese nicht verlassen</string>
+    <string name="leaveGroupTitle">Gruppe verlassen</string>
+    <string name="leaveGroupMessage">Wollen Sie diese Gruppe verlassen?</string>
+    <string name="wrongPasswordMessage">Falsches Passwort</string>
+    <string name="distributeRightsToOne">Rechte verteilen an</string>
+    <string name="dontDistributeRightsToNothing">Keine E-Mail angegeben</string>
+    <string name="noEntryToDelete">Kein Eintrag zum löschen angegeben</string>
+    <string name="deleteGroupTitle">Wollen Sie ihre Gruppe löschen?</string>
+    <string name="areYouSure">Sind Sie sicher?</string>
+    <string name="searchForUser">Nach einem Benutzer suchen</string>
+    <string name="cantSearchEmptyStrings">Geben Sie etwas zum Suchen an</string>
+    <string name="youAreNowVisible">Sie sind nun für alle Mitglieder sichtbar</string>
+    <string name="youAreNowInvisible">Sie können nun nicht mehr von Mitgliedern gesehen werden</string>
+
+    <!-- GroupBlackBoardFragment-->
+    <string name="deleteThisEntryQuestion">Diesen Eintrag löschen?</string>
+    <string name="title_fragment_group_black_board">Schwarzes Brett</string>
+    <string name="postMessage">Nachricht</string>
+    <string name="commentsBlackBoard">Kommentare</string>
+
+    <!-- GroupNewsBoardFragment-->
+    <string name="title_fragment_group_news_board">Aktivitäten</string>
+
+    <!-- GroupMembersFragment-->
+    <string name="title_fragment_group_members">Mitglieder</string>
 </resources>

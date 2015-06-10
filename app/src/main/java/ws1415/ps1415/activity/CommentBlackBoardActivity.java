@@ -1,5 +1,6 @@
 package ws1415.ps1415.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,11 +22,15 @@ import com.melnykov.fab.FloatingActionButton;
 import com.skatenight.skatenightAPI.model.BoardEntry;
 import com.skatenight.skatenightAPI.model.BooleanWrapper;
 
+import org.w3c.dom.Text;
+
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.CommentBoardAdapter;
 import ws1415.ps1415.controller.GroupController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.util.DateUtil;
+import ws1415.ps1415.util.GroupImageLoader;
 
 public class CommentBlackBoardActivity extends Activity {
     public static final String EXTRA_BOARD_ID = "entryId";
@@ -32,12 +38,18 @@ public class CommentBlackBoardActivity extends Activity {
     private Long id;
 
     //Viewelemente
+    private TextView mWriterView;
+    private TextView mContentView;
+    private TextView mDateView;
     private ListView mComments;
+    private ImageView mMessageImage;
     private CommentBoardAdapter mAdapter;
     private FloatingActionButton commentButton;
+    private ActionBar  mActionBar;
 
     // Bedingungsvariable
     private boolean textOkay = false;
+    private boolean textSet = false;
 
 
     @Override
@@ -48,16 +60,24 @@ public class CommentBlackBoardActivity extends Activity {
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
         id = Long.parseLong(getIntent().getStringExtra(EXTRA_BOARD_ID));
-        if(id== null){
+        if (id == null) {
             Toast.makeText(this, R.string.noLongIdSubmitted, Toast.LENGTH_LONG).show();
             finish();
             return;
         }
 
-        // Initialisiere die View Elemente
-        mComments = (ListView)findViewById(R.id.comments_list_view);
-        commentButton = (FloatingActionButton)findViewById(R.id.add_comment_button);
+        mActionBar = getActionBar();
 
+        mActionBar.setHomeButtonEnabled(false);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+
+        // Initialisiere die View Elemente
+        mComments = (ListView) findViewById(R.id.comments_list_view);
+        commentButton = (FloatingActionButton) findViewById(R.id.add_comment_button);
+        mWriterView = (TextView) findViewById(R.id.list_view_item_black_board_creator_text_view);
+        mContentView = (TextView) findViewById(R.id.list_view_item_black_board_content_edit_text);
+        mDateView = (TextView) findViewById(R.id.list_view_item_black_board_date_text_view);
+        mMessageImage = (ImageView) findViewById(R.id.black_board_message_image);
     }
 
     @Override
@@ -69,30 +89,29 @@ public class CommentBlackBoardActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == android.R.id.home) {
+            finish();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Ruft die setUp() Methode auf umd die Kommentare neu zu laden
+     */
     @Override
     protected void onResume() {
         super.onResume();
-
         setUp();
     }
 
     /**
      * Ruft den Boardentry vom Server ab und setzt die Kommentare als Items in die Listview
      */
-    private void setUp(){
+    private void setUp() {
         setProgressBarIndeterminateVisibility(Boolean.TRUE);
         GroupController.getInstance().getBoardEntry(new ExtendedTaskDelegateAdapter<Void, BoardEntry>() {
             @Override
@@ -100,6 +119,18 @@ public class CommentBlackBoardActivity extends Activity {
                 if (boardEntry != null) {
                     mAdapter = new CommentBoardAdapter(CommentBlackBoardActivity.this, boardEntry.getId(), boardEntry.getComments());
                     mComments.setAdapter(mAdapter);
+                    if (!textSet) {
+                        mWriterView.setText(boardEntry.getWriter());
+                        mContentView.setText(boardEntry.getMessage());
+                        mDateView.setText(DateUtil.getInstance().formatMyDate(boardEntry.getDate().getValue()));
+                        if (boardEntry.getBlobKey() != null) {
+                            GroupImageLoader.getInstance().setBoardImageToImageView(CommentBlackBoardActivity.this, boardEntry.getBlobKey(), mMessageImage);
+                            mMessageImage.setVisibility(View.VISIBLE);
+                        }
+                        textSet = true;
+                    }
+                } else {
+                    Toast.makeText(CommentBlackBoardActivity.this, R.string.no_board_entry_found, Toast.LENGTH_SHORT).show();
                 }
                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
             }
@@ -111,12 +142,19 @@ public class CommentBlackBoardActivity extends Activity {
             }
         }, id);
 
+        /**
+         * Startet einen AlertDialog mit einem Textfeld. Dort kann man seine Nachricht eingeben
+         * und beim eingeben wird überprüft, ob die Nachricht mindestens 3 Zeichen lang ist.
+         * Ist dies der Fall so kann die Nachricht gesendet werden. Dabei wird über den
+         * GroupController die commentBlackBoard Methode aufgerufen, welche den BoardEntry Kommentiert
+         * den Kommentar speichert und diesen wieder zurück an die App sendet.
+         */
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder altertadd = new AlertDialog.Builder(CommentBlackBoardActivity.this);
                 LayoutInflater factory = LayoutInflater.from(CommentBlackBoardActivity.this);
-                final View commentView = factory.inflate(R.layout.post_black_board, null);
+                final View commentView = factory.inflate(R.layout.post_message, null);
                 final EditText messageEditText = (EditText) commentView.findViewById(R.id.post_black_board_edit_text);
                 final TextView failureTextView = (TextView) commentView.findViewById(R.id.failure_text_view);
 
@@ -132,11 +170,11 @@ public class CommentBlackBoardActivity extends Activity {
 
                     @Override
                     public void afterTextChanged(Editable editable) {
-                        if(messageEditText.getText().length() < 3){
+                        if (messageEditText.getText().length() < 3) {
                             failureTextView.setText(R.string.textTooShort);
                             failureTextView.setVisibility(View.VISIBLE);
                             textOkay = false;
-                        }else{
+                        } else {
                             failureTextView.setVisibility(View.GONE);
                             textOkay = true;
                         }
@@ -153,7 +191,7 @@ public class CommentBlackBoardActivity extends Activity {
                                 @Override
                                 public void taskDidFinish(ExtendedTask task, BoardEntry entry) {
                                     if (entry != null) {
-                                        be= entry;
+                                        be = entry;
                                         setUp();
                                     }
                                     setProgressBarIndeterminateVisibility(Boolean.FALSE);
@@ -164,8 +202,10 @@ public class CommentBlackBoardActivity extends Activity {
                                     Toast.makeText(CommentBlackBoardActivity.this, message, Toast.LENGTH_LONG).show();
                                     setProgressBarIndeterminateVisibility(Boolean.FALSE);
                                 }
-                            },id, messageEditText.getText().toString());
+                            }, id, messageEditText.getText().toString());
                             dialog.dismiss();
+                        } else {
+                            Toast.makeText(CommentBlackBoardActivity.this, R.string.textTooShort, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
