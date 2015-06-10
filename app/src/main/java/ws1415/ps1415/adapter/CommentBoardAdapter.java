@@ -96,7 +96,7 @@ public class CommentBoardAdapter  extends BaseAdapter{
         }
 
         holder.dateView.setText(DateUtil.getInstance().formatMyDate(getItem(position).getDate().getValue()));
-        holder.writerView.setText(ServiceProvider.getEmail());
+        holder.writerView.setText(getItem(position).getWriter());
         holder.contentView.setText(getItem(position).getMessage());
 
         return convertView;
