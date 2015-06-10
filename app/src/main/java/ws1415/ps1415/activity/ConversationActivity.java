@@ -41,6 +41,8 @@ import ws1415.ps1415.util.UniversalUtil;
  * @author Martin Wrodarczyk
  */
 public class ConversationActivity extends Activity {
+    public static final String EXTRA_MAIL = "email";
+
     // Für das Wiederherstellen einer Activity
     private static final String STATE_EMAIL = "email";
 
@@ -78,7 +80,7 @@ public class ConversationActivity extends Activity {
 
         // Email vom Intent speichern
         Intent intent = getIntent();
-        String email = intent.getStringExtra("email");
+        String email = intent.getStringExtra(EXTRA_MAIL);
         if (email != null) mEmail = email;
 
         if (!MessageDbController.getInstance(this).existsConversation(mEmail)) {

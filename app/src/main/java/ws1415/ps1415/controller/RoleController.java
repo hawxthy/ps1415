@@ -49,7 +49,7 @@ public abstract class RoleController {
             protected List<String> doInBackground(Void... params) {
                 try {
                     List<String> result = ServiceProvider.getService().roleEndpoint().listGlobalAdmins().execute().getStringList();
-                    if(result == null) return new ArrayList<String>();
+                    if(result == null) return new ArrayList<>();
                     return result;
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -59,6 +59,8 @@ public abstract class RoleController {
             }
         }.execute();
     }
+
+
 
 
 }

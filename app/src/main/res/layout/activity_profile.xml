@@ -19,7 +19,8 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/default_picture" />
+            android:src="@drawable/default_picture"
+            android:contentDescription="@string/profile_picture" />
 
         <TextView
             android:id="@+id/profile_name"

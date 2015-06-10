@@ -50,6 +50,7 @@ import ws1415.ps1415.widget.SlidingTabLayout;
  * @author Martin Wrodarczyk
  */
 public class ProfileActivity extends FragmentActivity {
+    public static final String EXTRA_MAIL = "email";
     public static final SimpleDateFormat DATE_OF_BIRTH_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
 
     // Für das Wiederherstellen einer Activity
@@ -95,7 +96,7 @@ public class ProfileActivity extends FragmentActivity {
 
         // Intent
         Intent intent = getIntent();
-        if (intent.getStringExtra("email") != null) email = intent.getStringExtra("email");
+        if (intent.getStringExtra(EXTRA_MAIL) != null) email = intent.getStringExtra(EXTRA_MAIL);
 
         // Header initialisieren
         mPicture = (ImageView) findViewById(R.id.profile_picture);
@@ -291,7 +292,7 @@ public class ProfileActivity extends FragmentActivity {
             case R.id.action_edit_profile:
                 if (email != null) {
                     Intent editIntent = new Intent(ProfileActivity.this, EditProfileActivity.class);
-                    editIntent.putExtra("email", email);
+                    editIntent.putExtra(EditProfileActivity.EXTRA_MAIL, email);
                     startActivity(editIntent);
                 } else {
                     UniversalUtil.showToast(this, getString(R.string.loading_data));
@@ -309,7 +310,7 @@ public class ProfileActivity extends FragmentActivity {
                 if (mUserProfile != null && email != null) {
                     if (MessageDbController.getInstance(ProfileActivity.this).existsConversation(email)) {
                         Intent conversation_intent = new Intent(ProfileActivity.this, ConversationActivity.class);
-                        prepareConversationIntent(conversation_intent);
+                        conversation_intent.putExtra(ConversationActivity.EXTRA_MAIL, mUserProfile.getEmail());
                         startActivity(conversation_intent);
                     } else {
                         createConversationDialog(mUserProfile);
@@ -319,16 +320,6 @@ public class ProfileActivity extends FragmentActivity {
                 }
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void prepareConversationIntent(Intent conversation_intent) {
-        String firstName = mUserProfile.getFirstName();
-        if (firstName == null) firstName = "";
-        String lastName = mUserProfile.getLastName();
-        if (lastName == null) lastName = "";
-        conversation_intent.putExtra("email", mUserProfile.getEmail());
-        conversation_intent.putExtra("firstName", firstName);
-        conversation_intent.putExtra("lastName", lastName);
     }
 
     private void createConversationDialog(final UserProfile userProfile) {
@@ -347,7 +338,7 @@ public class ProfileActivity extends FragmentActivity {
                         MessageDbController.getInstance(ProfileActivity.this).insertConversation(conversation);
 
                         Intent conversation_intent = new Intent(ProfileActivity.this, ConversationActivity.class);
-                        prepareConversationIntent(conversation_intent);
+                        conversation_intent.putExtra(ConversationActivity.EXTRA_MAIL, mUserProfile.getEmail());
                         startActivity(conversation_intent);
                     }
                 })

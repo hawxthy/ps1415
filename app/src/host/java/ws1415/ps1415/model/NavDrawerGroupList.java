@@ -207,7 +207,7 @@ public class NavDrawerGroupList {
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent profile_intent = new Intent(parent.getContext(), ProfileActivity.class);
-                    profile_intent.putExtra("email", ServiceProvider.getEmail());
+                    profile_intent.putExtra(ProfileActivity.EXTRA_MAIL, ServiceProvider.getEmail());
                     parent.getContext().startActivity(profile_intent);
                 }
             },

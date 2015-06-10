@@ -50,6 +50,8 @@ import ws1415.ps1415.util.UserImageLoader;
  * @author Martin Wrodarczyk
  */
 public class EditProfileActivity extends Activity {
+    public static final String EXTRA_MAIL = "email";
+
     // RequestCodes für die ActivityOnResult-Methode
     private static final int REQUEST_CAMERA_CAPTURE = 101;
     private static final int REQUEST_PICTURE_CROP = 102;
@@ -102,7 +104,7 @@ public class EditProfileActivity extends Activity {
 
         // Intent verarbeiten
         Intent intent = getIntent();
-        mEmail = intent.getStringExtra("email");
+        mEmail = intent.getStringExtra(EXTRA_MAIL);
 
         // UI-Komponenten initialisieren
         mImageViewPicture = (ImageView) findViewById(R.id.activity_edit_profile_picture);
@@ -399,7 +401,7 @@ public class EditProfileActivity extends Activity {
         Toast.makeText(EditProfileActivity.this, "Profilinformationen wurden geändert", Toast.LENGTH_LONG).show();
         Intent profile_intent = new Intent(EditProfileActivity.this, ProfileActivity.class);
         profile_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        profile_intent.putExtra("email", mUserProfile.getEmail());
+        profile_intent.putExtra(ProfileActivity.EXTRA_MAIL, mUserProfile.getEmail());
         startActivity(profile_intent);
         finish();
     }
