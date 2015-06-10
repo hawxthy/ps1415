@@ -21,6 +21,8 @@ public class BoardEntry {
     private String message;
     private Date date;
     @Load
+    private static long offset;
+    @Load
     private ArrayList<Comment> comments;
     private BlobKey blobKey;
     @Ignore
@@ -31,6 +33,7 @@ public class BoardEntry {
     }
 
     public BoardEntry(String message, String writer) {
+        offset = 0;
         date = new Date();
         this.writer = writer;
         this.message = message;
@@ -92,12 +95,24 @@ public class BoardEntry {
         if(comments == null){
             comments = new ArrayList<>();
         }
-        comments.add(new Comment(comment, writer));
+        comments.add(new Comment(comment, writer, getId()));
+        return this;
+    }
+
+    public BoardEntry removeComment(long id){
+        if(comments != null){
+            for(int i = 0; i < comments.size(); i++){
+                if(comments.get(i).getId() == id){
+                    comments.remove(i);
+                }
+            }
+        }
         return this;
     }
 
     @Index
     public static class Comment{
+        private long id;
         private Date date;
         private String writer;
         private String message;
@@ -106,7 +121,9 @@ public class BoardEntry {
             // Konstruktor für GAE
         }
 
-        public Comment(String message, String writer){
+        public Comment(String message, String writer, long id){
+            offset += 1;
+            this.id = id +offset;
             date = new Date();
             this.message = message;
             this.writer = writer;
@@ -134,6 +151,10 @@ public class BoardEntry {
 
         public void setWriter(String writer) {
             this.writer = writer;
+        }
+
+        public long getId() {
+            return id;
         }
     }
 }

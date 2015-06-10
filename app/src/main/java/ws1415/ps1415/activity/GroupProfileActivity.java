@@ -1191,7 +1191,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      *
      * @param id
      */
-    public void startEditMessage(final Long id) {
+    public void startEditMessage(final Long id, String message) {
         AlertDialog.Builder altertadd = new AlertDialog.Builder(this);
         LayoutInflater factory = LayoutInflater.from(GroupProfileActivity.this);
         final View editView = factory.inflate(R.layout.post_message, null);
@@ -1211,13 +1211,14 @@ public class GroupProfileActivity extends BaseFragmentActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(newMessage.getText().length() < 2){
+                if (newMessage.getText().length() < 2) {
                     errorMessage.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     errorMessage.setVisibility(View.GONE);
                 }
             }
         });
+        newMessage.setText(message);
         altertadd.setView(editView);
         altertadd.setTitle(R.string.edit_this_entry);
         altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {

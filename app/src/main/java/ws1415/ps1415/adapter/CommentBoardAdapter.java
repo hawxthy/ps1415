@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.skatenight.skatenightAPI.model.Comment;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.activity.CommentBlackBoardActivity;
 import ws1415.ps1415.util.DateUtil;
 
 /**
@@ -75,18 +77,20 @@ public class CommentBoardAdapter  extends BaseAdapter{
      * Klasse zum halten der GUI Elemente, damit die convertView die alten Objekte übernehmen kann.
      */
     private class Holder{
+        private ImageView deleteEntryButton;
         private TextView contentView;
         private TextView writerView;
         private TextView dateView;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup viewGroup){
+    public View getView(final int position, View convertView, ViewGroup viewGroup){
         final Holder holder;
 
         if(convertView == null){
             holder = new Holder();
             convertView = inflater.inflate(R.layout.list_view_item_comment_board, viewGroup, false);
+            holder.deleteEntryButton = (ImageView) convertView.findViewById(R.id.delete_comment_button);
             holder.dateView = (TextView) convertView.findViewById(R.id.date_text_view);
             holder.contentView = (TextView) convertView.findViewById(R.id.content_text_view);
             holder.writerView = (TextView) convertView.findViewById(R.id.writer_text_view);
@@ -98,6 +102,15 @@ public class CommentBoardAdapter  extends BaseAdapter{
         holder.dateView.setText(DateUtil.getInstance().formatMyDate(getItem(position).getDate().getValue()));
         holder.writerView.setText(getItem(position).getWriter());
         holder.contentView.setText(getItem(position).getMessage());
+
+        final CommentBlackBoardActivity activity = (CommentBlackBoardActivity)context;
+        holder.deleteEntryButton.setOnClickListener(new View.OnClickListener() {
+            long commentId = getItem(position).getId();
+            @Override
+            public void onClick(View view) {
+                activity.startDeleteComment(commentId, id);
+            }
+        });
 
         return convertView;
     }

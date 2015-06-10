@@ -644,6 +644,25 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
+     * Entfernt einen Kommentar aus einer Blackboard Nachricht, falls dieser gefunden wird.
+     *
+     * @param user
+     * @param groupName Der Name der Nutzergruppe, damit auf Rechte überprüft werden kann
+     * @param boardId Die ist der BoardEntrys und des
+     * @param commentId  Die id des Kommentars
+     * @throws OAuthRequestException
+     */
+    public void removeComment(User user, @Named("groupName") String groupName, @Named("boardId") Long boardId, @Named("commentId") long commentId) throws  OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        UserGroup group = throwIfNoUserGroupExists(groupName);
+        if (hasRights(group, user.getEmail(), Right.EDITBLACKBOARD.name())) {
+            ofy().save().entity(ofy().load().type(BoardEntry.class).id(boardId).safe().removeComment(commentId)).now();
+        }else{
+            EndpointUtil.throwIfNoRights();
+        }
+    }
+
+    /**
      * Editiert einen BlackBoard Eintrag mit der angegebenen Nachricht, insofern ein
      * Eintrag zu der angegebenen id existiert
      *

@@ -167,9 +167,10 @@ public class BlackBoardListAdapter extends BaseAdapter{
             });
             holder.editEntryButton.setOnClickListener(new View.OnClickListener() {
                 Long entryId = getItem(position).getId();
+                String message = getItem(position).getMessage();
                 @Override
                 public void onClick(View view) {
-                    activity.startEditMessage(entryId);
+                    activity.startEditMessage(entryId, message);
                 }
             });
         }

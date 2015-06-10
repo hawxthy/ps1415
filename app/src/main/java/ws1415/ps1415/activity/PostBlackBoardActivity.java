@@ -132,7 +132,6 @@ public class PostBlackBoardActivity extends Activity {
                         public void taskDidFinish(ExtendedTask task, BoardEntry boardEntry) {
                             setProgressBarIndeterminateVisibility(Boolean.FALSE);
                             //TODO wenn Zeit bessere Lösung finden
-                            finish();
                         }
 
                         @Override
@@ -140,6 +139,7 @@ public class PostBlackBoardActivity extends Activity {
                             Toast.makeText(PostBlackBoardActivity.this, message, Toast.LENGTH_LONG).show();
                         }
                     }, groupName, mMessage.getText().toString(), ImageUtil.BitmapToInputStream(mBitmap));
+                    finish();
                 }else{
                     Toast.makeText(PostBlackBoardActivity.this, R.string.textTooShort, Toast.LENGTH_LONG).show();
                 }

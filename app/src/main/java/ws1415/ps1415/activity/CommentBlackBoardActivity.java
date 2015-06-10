@@ -226,4 +226,26 @@ public class CommentBlackBoardActivity extends Activity {
             }
         });
     }
+
+    /**
+     * Methode zum löschen eines Kommentars.
+     *
+     * @param commentId die id des Kommentars
+     * @param entryId die id des BoardEntry
+     */
+    public void startDeleteComment(long commentId, Long entryId){
+        setProgressBarIndeterminateVisibility(Boolean.TRUE);
+        GroupController.getInstance().deleteComment(new ExtendedTaskDelegateAdapter<Void, Void>(){
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                setUp();
+                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+            }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                Toast.makeText(CommentBlackBoardActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        }, groupName, entryId, commentId);
+    }
 }

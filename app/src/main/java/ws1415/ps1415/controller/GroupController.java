@@ -567,6 +567,29 @@ public class GroupController {
     }
 
     /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um einen Kommentar eines BoardEntry zu löschen
+     *
+     * @param handler
+     * @param groupName Der Name der Nutzergruppe
+     * @param boardId Die id des BoardEntry
+     * @param commentId Die id des Kommentars
+     */
+    public void deleteComment(ExtendedTaskDelegate handler, final String groupName, final Long boardId, final long commentId){
+        new ExtendedTask<Void, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(Void... voids) {
+                try{
+                    return ServiceProvider.getService().groupEndpoint().removeComment(groupName, boardId, commentId).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    publishError("Fehler: Der Kommentar konne nicht gelöscht werden");
+                    return null;
+                }
+            }
+        }.execute();
+    }
+
+    /**
      * Methode, welche mit dem GroupEndpoint kommuniziert um eine Boackboardmessage zu
      * editieren
      *
