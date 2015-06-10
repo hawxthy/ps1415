@@ -13,7 +13,6 @@ import ws1415.ps1415.task.ExtendedTaskDelegate;
  * Enthält Funktionen zur Verwaltung der Routen auf dem Server.
  * @author Richard Schulze
  */
-// TODO Controller testen
 public abstract class RouteController {
 
     /**
@@ -56,7 +55,6 @@ public abstract class RouteController {
      * @param handler    Der Handler, der über den Status des Tasks informiert wird.
      * @param routeId    Die ID der zu löschenden Route.
      */
-    // TODO Löschen von Routen testen, wenn abhängige Events existieren
     public static void deleteRoute(ExtendedTaskDelegate<Void, Void> handler, final long routeId) {
         new ExtendedTask<Void, Void, Void>(handler) {
             @Override

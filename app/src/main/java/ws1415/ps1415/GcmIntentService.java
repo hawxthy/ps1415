@@ -83,9 +83,6 @@ public class GcmIntentService extends IntentService {
                             LocationTransmitterService.ScheduleService(this, eventId, new Date(newDate));
                         }
                         break;
-                    case EVENT_START_MESSAGE:
-                        // TODO R: Entfernen
-                        break;
                     case GROUP_DELETED_NOTIFICATION_MESSAGE:
                         sendNotificationMessaging(extras, null);
                         // Einstellung für die Gruppe entfernen, falls vorhanden

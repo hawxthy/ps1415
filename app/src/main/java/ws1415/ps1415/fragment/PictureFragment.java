@@ -38,6 +38,7 @@ import java.util.List;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.CommentAdapter;
+import ws1415.ps1415.adapter.ExpandableGalleryAdapter;
 import ws1415.ps1415.adapter.GalleryAdapter;
 import ws1415.ps1415.controller.CommentController;
 import ws1415.ps1415.controller.GalleryController;
@@ -159,15 +160,11 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
                 date.setText(DateFormat.getMediumDateFormat(PictureFragment.this.getActivity()).format(dateValue)
                         + " " + DateFormat.getTimeFormat(PictureFragment.this.getActivity()).format(dateValue));
 
-                // TODO R: Nicht die Mail-Adresse des Uploaders anzeigen
-                uploader.setText(pictureData.getUploader());
+                uploader.setText(pictureData.getVisibleUploader());
                 description.setText(pictureData.getDescription());
 
-                // TODO R: Eigene und durchschnittliche Bewertung getrennt anzeigen
                 if (pictureData.getMyRating() != null) {
                     rating.setRating(pictureData.getMyRating());
-                } else if (pictureData.getAvgRating() != null) {
-                    rating.setRating(pictureData.getAvgRating().floatValue());
                 } else {
                     rating.setRating(0);
                 }
@@ -215,7 +212,7 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
     }
 
     private void addPictureToGallery() {
-        final GalleryAdapter galleryAdapter = new GalleryAdapter(getActivity());
+        final ExpandableGalleryAdapter galleryAdapter = new ExpandableGalleryAdapter(getActivity(), pictureId);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.action_add_to_gallery)
                 .setAdapter(galleryAdapter, new DialogInterface.OnClickListener() {
@@ -239,14 +236,10 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
     public void onAddCommentClick(View view) {
         if (!newComment.getText().toString().isEmpty()) {
             addingCommentLoading.setVisibility(View.VISIBLE);
-            CommentController.addComment(new ExtendedTaskDelegateAdapter<Void, Comment>() {
+            CommentController.addComment(new ExtendedTaskDelegateAdapter<Void, CommentData>() {
                 @Override
-                public void taskDidFinish(ExtendedTask task, Comment comment) {
-                    commentAdapter.addComment(new CommentData()
-                            .setAuthor(comment.getAuthor())
-                            .setComment(comment.getComment())
-                            .setDate(comment.getDate())
-                            .setId(comment.getId()));
+                public void taskDidFinish(ExtendedTask task, CommentData comment) {
+                    commentAdapter.addComment(comment);
                     newComment.setText(null);
                     addingCommentLoading.setVisibility(View.GONE);
                 }

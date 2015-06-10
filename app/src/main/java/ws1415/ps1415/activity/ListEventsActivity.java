@@ -65,6 +65,7 @@ public class ListEventsActivity extends BaseActivity implements EventListFragmen
         // Listener für REFRESH_EVENTS_ACTION-Intents erstellen
         LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
+
                 refresh();
             }
         }, new IntentFilter(REFRESH_EVENTS_ACTION));

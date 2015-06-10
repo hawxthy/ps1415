@@ -34,6 +34,7 @@
     <string name="error_invalid_event">Invalid Event</string>
     <string name="error_invalid_event_message">The data submitted for the event is invalid. Please make sure to at least specify icon, title, description, meeting place, fee and a route.</string>
     <string name="error_wrong_currency_format">wrong currency format! for example use: 2,50</string>
+    <string name="fee">fee</string>
 
     <!-- DateTimeDialog -->
     <string name="choose_datetime">Pick date and time…</string>

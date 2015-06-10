@@ -15,10 +15,13 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cmd.Query;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -27,11 +30,11 @@ import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.GalleryContainer;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.PictureVisibility;
-import ws1415.SkatenightBackend.model.Privilege;
 import ws1415.SkatenightBackend.model.UserGalleryContainer;
 import ws1415.SkatenightBackend.transport.EventFilter;
 import ws1415.SkatenightBackend.transport.EventMetaData;
 import ws1415.SkatenightBackend.transport.EventMetaDataList;
+import ws1415.SkatenightBackend.transport.ExpandableGalleriesWrapper;
 import ws1415.SkatenightBackend.transport.GalleryContainerData;
 import ws1415.SkatenightBackend.transport.GalleryMetaData;
 import ws1415.SkatenightBackend.transport.PictureData;
@@ -211,17 +214,31 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Gibt eine Liste der Gallerien zurück, denen der aufrufende Benutzer Bilder hinzufügen kann.
-     * @param user    Der aufrufende Benutzer.
-     * @return Eine Liste der Gallerien, denen der aufrufende Benutzer Bilder hinzufügen kann.
+     * Gibt eine Map der Gallerien zurück, denen der aufrufende Benutzer das angegebene Bild hinzufügen kann.
+     * Als Wert ist in dieser Map jeder Galerie noch ein zusätzlicher Titel zugeordnet, um Galerien mit gleichen Namen
+     * aus verschiedenen Containern in der Anwendung unterscheiden zu können, oder null, falls kein zusätzlicher Titel
+     * angezeigt werden soll.
+     * @param user         Der aufrufende Benutzer.
+     * @param pictureId    Die ID des Bildes, das der Benutzer einer Galerie hinzufügen möchte.
+     * @return Eine Map der Galerien, denen der aufrufende Benutzer das angegebene Bild hinzufügen kann.
      */
-    public List<GalleryMetaData> getExpandableGalleries(User user) throws OAuthRequestException {
+    public ExpandableGalleriesWrapper getExpandableGalleries(User user, @Named("pictureId") long pictureId) throws OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
         }
-        List<GalleryContainer> container = new LinkedList<>();
+        Picture picture = ofy().load().group(PictureMetaData.class).type(Picture.class).id(pictureId).safe();
+
+        List<GalleryMetaData> galleries = new LinkedList<>();
+        List<String> additionalTitles = new LinkedList<>();
+        DateFormat dateFormat = SimpleDateFormat.getDateInstance(DateFormat.SHORT, Locale.GERMANY);
         // Gallerien des Benutzers
-        container.add(getGalleryContainerForMail(user, user.getEmail()));
+        UserGalleryContainer userGalleryContainer = getGalleryContainerForMail(user, user.getEmail());
+        if (userGalleryContainer.getGalleries() != null) {
+            for (Gallery g : userGalleryContainer.getGalleries()) {
+                galleries.add(new GalleryMetaData(g));
+                additionalTitles.add(null);
+            }
+        }
         // Gallerien von Events, an denen der Benutzer teilnimmt
         EventFilter filter = new EventFilter();
         filter.setUserId(user.getEmail());
@@ -234,23 +251,19 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
             filter.setCursorString(eventList.getCursorString());
             done = eventList.getList() == null || eventList.getList().isEmpty();
             if (!done) {
-                List<Long> eventIds = new LinkedList<>();
                 for (EventMetaData emd : eventList.getList()) {
-                    eventIds.add(emd.getId());
+                    Event event = ofy().load().type(Event.class).id(emd.getId()).safe();
+                    if (event.getGalleries() != null && event.getMinPictureVisibility().compareTo(picture.getVisibility()) <= 0) {
+                        for (Gallery g : event.getGalleries()) {
+                            galleries.add(new GalleryMetaData(g));
+                            additionalTitles.add(dateFormat.format(event.getDate()) + ": " + event.getTitle());
+                        }
+                    }
                 }
-                container.addAll(ofy().load().group(Event.EventGalleryData.class).type(Event.class).ids(eventIds).values());
             }
         } while(!done);
 
-        List<GalleryMetaData> result = new LinkedList<>();
-        for (GalleryContainer c : container) {
-            if (c.getGalleries() != null) {
-                for (Gallery g : c.getGalleries()) {
-                    result.add(new GalleryMetaData(g));
-                }
-            }
-        }
-        return result;
+        return new ExpandableGalleriesWrapper(galleries, additionalTitles);
     }
 
     /**
@@ -474,7 +487,8 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
             }
             ofy().save().entities(picture.getGalleries()).now();
 
-            // TODO R: Kommentare löschen
+            // Kommentare löschen
+            ofy().delete().entities(picture.getComments()).now();
 
             // Blob aus dem Blobstore löschen
             if (picture.getImageBlobKey() != null) {

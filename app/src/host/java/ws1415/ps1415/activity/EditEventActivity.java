@@ -1,5 +1,6 @@
 package ws1415.ps1415.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -86,7 +87,6 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
     private LinearLayout images;
     private HorizontalScrollView imagesScroller;
 
-    // TODO Schalter aktualisieren, wenn Treffpunkt oder Gebühr geändert wird
     private boolean edited = false;
 
     private Route[] routes;
@@ -120,6 +120,14 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
         });
 
         setContentView(R.layout.activity_edit_event);
+
+        // "Zurück"-Button in der Actionbar anzeigen
+//        ActionBar mActionBar = getActionBar();
+//        if (mActionBar != null) {
+//            mActionBar.setHomeButtonEnabled(false);
+//            mActionBar.setDisplayHomeAsUpEnabled(true);
+//        }
+
         icon = (ImageView) findViewById(R.id.icon);
         headerImage = (ImageView) findViewById(R.id.headerImage);
         title = (EditText) findViewById(R.id.title);
@@ -173,6 +181,9 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
         if (id == R.id.action_save_event) {
             finish();
             return true;
+        } else if (id == android.R.id.home) {
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -197,13 +208,12 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
      */
     @Override
     public void finish() {
-        // TODO R: Wird nicht aufgerufen, wenn man in der ActionBar auf "Zurück" klickt
-        if (!FormatterUtil.isCurrencyString(fee.getText().toString())) {
-            Toast.makeText(this, R.string.error_wrong_currency_format, Toast.LENGTH_LONG).show();
-            return;
-        }
+        if (edited || dynamicFieldsAdapter.isEdited()) {
+            if (!FormatterUtil.isCurrencyString(fee.getText().toString())) {
+                Toast.makeText(this, R.string.error_wrong_currency_format, Toast.LENGTH_LONG).show();
+                return;
+            }
 
-        if (edited) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.save_event)
                     .setMessage(R.string.save_event_message)
@@ -376,7 +386,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
 
     @Override
     public void taskFailed(ExtendedTask task, String message) {
-        Toast.makeText(this, R.string.event_loading_error, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         finishLoading();
     }
     // -------------------- Callback-Methoden für das Abrufen eines Events --------------------

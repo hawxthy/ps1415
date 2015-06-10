@@ -17,7 +17,7 @@ import ws1415.SkatenightBackend.model.UserLocation;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
- * TODO
+ * Bietet Methoden zur Verwaltung von Routen und zur Durchführung von Events.
  * @author Richard Schulze
  */
 public class RouteEndpoint extends SkatenightServerEndpoint {
@@ -25,90 +25,6 @@ public class RouteEndpoint extends SkatenightServerEndpoint {
 
     public static final int FIELD_UPDATE_INTERVAL = 30000;
     public long lastFieldUpdateTime = 0;
-
-    /**
-     * Hilfsmethode, die für den normalen Betireb nicht benötigt wird. Stellt eine Schnittstelle für
-     * Simulationen her, die eine große Anzahl an Positionen auf dem Server aktualisieren ohne, dass
-     * dabei pro Akutalisierung ein Serveraufruf notwendig ist.
-     * Die Mails, Latituden und Logituden werden als Strings mit = als Trennzeichen kodiert, da ein
-     * Aufruf mit Arrays nicht funktioniert hat.
-     *
-     * TODO: Auf neue EndUser anpassen
-     *
-     * @param mailParam Die Mail-Adressen der zu Aktualisierenden Member-Objekte als String, durch = getrennt.
-     * @param latitudeParam Die neuen Latituden als String, durch = getrennt
-     * @param longitudeParam Die neuen Longituden, durch = getrennt
-     * @param currentEventId Die Event-ID, die für die Member gesetzt werden soll.
-     */
-    public void simulateMemberLocations(@Named("mails") String mailParam,
-                                        @Named("latitudes") String latitudeParam,
-                                        @Named("longitudes") String longitudeParam,
-                                        @Named("currentEventId") long currentEventId) {
-//        StringTokenizer st = new StringTokenizer(mailParam, "=");
-//        String[] mail = new String[st.countTokens()];
-//        for (int i = 0; i < mail.length; i++) {
-//            mail[i] = st.nextToken();
-//        }
-//        st = new StringTokenizer(latitudeParam, "=");
-//        double[] latitude = new double[st.countTokens()];
-//        for (int i = 0; i < mail.length; i++) {
-//            latitude[i] = Double.parseDouble(st.nextToken());
-//        }
-//        st = new StringTokenizer(longitudeParam, "=");
-//        double[] longitude = new double[st.countTokens()];
-//        for (int i = 0; i < mail.length; i++) {
-//            longitude[i] = Double.parseDouble(st.nextToken());
-//        }
-//
-//        if (mail != null && latitude != null && longitude != null) {
-//            Event event = new EventEndpoint().getEvent(currentEventId);
-//            int count = Math.min(mail.length, Math.min(latitude.length, longitude.length));
-//
-//            EndUser admin = new UserEndpoint().getFullUser("richard-schulze@online.de");
-//
-//            PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
-//            UserGroup group = new GroupEndpoint().getUserGroup("Simulationsgruppe");
-//            if (group == null) {
-//                UserGroup ug = new UserGroup(admin.getEmail());
-//                ug.setName("Simulationsgruppe");
-//                admin.addUserGroup(ug);
-//                pm.makePersistent(admin);
-//                pm.makePersistent(ug);
-//            }
-//            try {
-//                // Member-Objekte laden. Falls für eine angegebene Mail-Adresse kein Objekt besteht,
-//                // so wird es angelegt
-//                Member member;
-//                for (int i = 0; i < count; i++) {
-//                    try {
-//                        member = pm.getObjectById(Member.class, mail[i]);
-//                    } catch (Exception ex) {
-//                        // Skater nicht gefunden
-//                        member = new Member();
-//                        member.setEmail(mail[i]);
-//                        member.setName(mail[i]);
-//                    }
-//                    // Member zum Event hinzufügen, falls noch nicht geschehen
-//                    if (!event.getMemberList().containsKey(member.getEmail())) {
-//                        event.getMemberList().put(member.getEmail(), EventRole.PARTICIPANT);
-//                    }
-//                    // Member in die Testgruppe aufnehmen, falls noch nicht geschehen
-//                    if (!member.getGroups().contains(group.getName())) {
-//                        member.addGroup(group);
-//                    }
-//                    pm.makePersistent(member);
-//                }
-//                pm.makePersistent(event);
-//                pm.makePersistent(group);
-//            } finally {
-//                pm.close();
-//            }
-//
-//            for (int i = 0; i < count; i++) {
-//                //updateMemberLocation(mail[i], latitude[i], longitude[i], currentEventId);
-//            }
-//        }
-    }
 
     protected void calculateCurrentWaypoint(UserLocation userLocation) {
         Long eventId = userLocation.getCurrentEventId();

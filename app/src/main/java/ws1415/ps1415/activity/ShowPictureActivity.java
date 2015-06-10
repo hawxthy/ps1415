@@ -3,12 +3,7 @@ package ws1415.ps1415.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
-
-import com.skatenight.skatenightAPI.model.GalleryMetaData;
-
-import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.fragment.PictureFragment;

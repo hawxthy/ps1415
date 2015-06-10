@@ -2,7 +2,9 @@ package ws1415.ps1415.adapter;
 
 import android.content.Context;
 import android.graphics.Picture;
+import android.text.Html;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -124,12 +126,16 @@ public class PictureMetaDataAdapter extends BaseAdapter {
 
             ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
             TextView title = (TextView) view.findViewById(R.id.title);
-            RatingBar rating = (RatingBar) view.findViewById(R.id.rating);
+            RatingBar rating = (RatingBar) view.findViewById(R.id.avgRating);
             TextView date = (TextView) view.findViewById(R.id.date);
             if (picture.getId() >= 0) {
-                // TODO R: Breite der View nicht fest vorgeben (200)
-                DiskCacheImageLoader.getInstance().loadScaledImage(thumbnail, picture.getImageBlobKey(), 200);
+                view.findViewById(R.id.notVisibleText).setVisibility(View.INVISIBLE);
+                if (thumbnail.getHeight() > 0 && thumbnail.getWidth() > 0) {
+                    // Bild nur abrufen, wenn der Thumbnail-View Größen zugeordnet wurden
+                    DiskCacheImageLoader.getInstance().loadScaledImage(thumbnail, picture.getImageBlobKey(), Math.min(thumbnail.getHeight(), thumbnail.getWidth()));
+                }
                 title.setText(picture.getTitle());
+                ((TextView) view.findViewById(R.id.avgSymbol)).setText(Html.fromHtml(view.getResources().getString(R.string.average)));
                 if (picture.getAvgRating() != null) {
                     rating.setRating(picture.getAvgRating().floatValue());
                 } else {
@@ -138,7 +144,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
                 Date dateValue = new Date(picture.getDate().getValue());
                 date.setText(DateFormat.getMediumDateFormat(context).format(dateValue));
             } else {
-                // TODO R: Standardbild für nicht sichtbare Bilder angeben
+                view.findViewById(R.id.notVisibleText).setVisibility(View.VISIBLE);
                 thumbnail.setImageBitmap(null);
                 title.setText(parent.getContext().getResources().getString(R.string.picture_not_visible));
                 rating.setRating(0);
@@ -159,7 +165,6 @@ public class PictureMetaDataAdapter extends BaseAdapter {
      *                   neu vom Server abgerufen und nicht erweitert.
      */
     private void fetchData(boolean refresh) {
-        // TODO Geht der synchronized-Block besser?
         if (!keepFetching || fetching) {
             return;
         }

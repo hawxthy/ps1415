@@ -34,6 +34,7 @@
     <string name="error_invalid_event">Ungültige Veranstaltung</string>
     <string name="error_invalid_event_message">Die für die Veranstaltung angegebenen Daten sind ungültig. Bitte stellen Sie sicher, dass Sie mindestens die Daten Icon, Titel, Beschreibung, Treffpunkt, Gebühr und Route angegeben haben.</string>
     <string name="error_wrong_currency_format">Falsches Währungsformat! Nutzen Sie z.B.: 2,50</string>
+    <string name="fee">Gebühr</string>
 
     <!-- DateTimeDialog -->
     <string name="choose_datetime">Datum und Uhrzeit wählen…</string>

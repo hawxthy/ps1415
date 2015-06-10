@@ -11,6 +11,15 @@
         android:layout_height="170dp"/>
 
     <TextView
+        android:id="@+id/notVisibleText"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:text="@string/picture_not_visible"
+        android:gravity="center"
+        android:visibility="invisible"
+        style="@style/primaryText" />
+
+    <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,13 +35,22 @@
         style="@style/secondaryText"
         android:text="date" />
 
-    <RatingBar
-        android:id="@+id/rating"
+    <TextView
+        android:id="@+id/avgSymbol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@id/date"
+        android:paddingLeft="3dp"
+        style="@style/secondaryText"/>
+
+    <RatingBar
+        android:id="@+id/avgRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/avgSymbol"
         android:layout_alignBottom="@id/date"
         style="?android:attr/ratingBarStyleSmall"
-        android:rating="3"/>
+        android:rating="3" />
 
 </RelativeLayout>

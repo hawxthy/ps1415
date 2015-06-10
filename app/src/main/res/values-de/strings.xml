@@ -414,4 +414,5 @@
     <!-- CommentAdapter -->
     <string name="comment_adapter_fetch_error">Beim Abrufen weiterer Kommentare ist ein Fehler aufgetreten.</string>
     <string name="error_editing_comment">Beim Editieren des Kommentars ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="error_no_content">Bitte geben Sie einen Kommentar ein</string>
 </resources>

@@ -28,11 +28,11 @@ public class CommentController {
      * @param containerId       Die ID des Containers.
      * @param comment           Der hinzuzufügende Kommentar.
      */
-    public static void addComment(ExtendedTaskDelegate<Void, Comment> handler, final String containerClass,
+    public static void addComment(ExtendedTaskDelegate<Void, CommentData> handler, final String containerClass,
                                   final long containerId, final String comment) {
-        new ExtendedTask<Void, Void, Comment>(handler) {
+        new ExtendedTask<Void, Void, CommentData>(handler) {
             @Override
-            protected Comment doInBackground(Void... params) {
+            protected CommentData doInBackground(Void... params) {
                 try {
                     return ServiceProvider.getService().commentEndpoint().addComment(containerClass, containerId, comment).execute();
                 } catch (IOException e) {

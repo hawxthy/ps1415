@@ -33,8 +33,6 @@ import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.ServerWaypoint;
 
-import org.w3c.dom.Text;
-
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Date;
@@ -326,13 +324,12 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
     private void joinEvent(final EventParticipationVisibility visibility) {
         joinLeaveEventItem.setVisible(false);
         setProgressBarIndeterminateVisibility(true);
-        EventController.joinEvent(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        EventController.joinEvent(new ExtendedTaskDelegateAdapter<Void, EventRole>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+            public void taskDidFinish(ExtendedTask task, EventRole role) {
                 joinLeaveEventItem.setIcon(R.drawable.ic_action_leave_event);
                 joinLeaveEventItem.setTitle(R.string.leave_event);
-                // TODO R: Bessere Lösung überlegen, da davon ausgegangen wird, dass PARTICIPANT die Standardrole ist
-                event.getMemberList().put(ServiceProvider.getEmail(), EventRole.PARTICIPANT.name());
+                event.getMemberList().put(ServiceProvider.getEmail(), role.name());
                 event.setParticipationVisibility(visibility.name());
                 finish();
             }

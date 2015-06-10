@@ -9,29 +9,22 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.skatenight.skatenightAPI.model.Comment;
 import com.skatenight.skatenightAPI.model.CommentData;
 import com.skatenight.skatenightAPI.model.CommentFilter;
-import com.skatenight.skatenightAPI.model.EventFilter;
-import com.skatenight.skatenightAPI.model.EventMetaData;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.controller.CommentController;
-import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.util.DiskCacheImageLoader;
 
 /**
  * Adapter für Kommentare. Erwartet einen CommentFilter als Parameter und fragt anschließend die
@@ -54,10 +47,6 @@ public class CommentAdapter extends BaseAdapter {
     private CommentFilter filter;
     private boolean canDelete;
     private List<CommentData> comments = new LinkedList<>();
-    /**
-     * Speichert zu jedem Eintrag der Liste, ob es gerade editiert wird.
-     */
-    private Map<CommentData, Boolean> isEditing = new HashMap<>();
     private int fetchDistance;
     private boolean keepFetching = true;
 
@@ -124,78 +113,42 @@ public class CommentAdapter extends BaseAdapter {
 
             }
         } else {
-            final CommentData comment = getItem(position);
-            if (isEditing.get(comment)) {
-                view = View.inflate(parent.getContext(), R.layout.listitem_comment_editing, null);
-
-                final EditText commentView = (EditText) view.findViewById(R.id.comment);
-                commentView.setText(comment.getComment());
-
-                ImageButton save = (ImageButton) view.findViewById(R.id.save_comment);
-                final View finalView = view;
-                save.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        final String content = commentView.getText().toString();
-                        finalView.findViewById(R.id.commentLoading).setVisibility(View.VISIBLE);
-                        CommentController.editComment(new ExtendedTaskDelegateAdapter<Void, Void>() {
-                            @Override
-                            public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                                comment.setComment(content);
-                                isEditing.put(comment, false);
-                                notifyDataSetChanged();
-                            }
-
-                            @Override
-                            public void taskFailed(ExtendedTask task, String message) {
-                                Toast.makeText(context, R.string.error_editing_comment, Toast.LENGTH_LONG).show();
-                                finalView.findViewById(R.id.commentLoading).setVisibility(View.GONE);
-                            }
-                        }, comment.getId(), content);
-                    }
-                });
-                ImageButton cancel = (ImageButton) view.findViewById(R.id.cancel);
-                cancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        isEditing.put(comment, false);
-                        notifyDataSetChanged();
-                    }
-                });
+            CommentData comment = getItem(position);
+            if (convertView != null && getItemViewType(position) == COMMENT_VIEW_TYPE) {
+                view = convertView;
             } else {
                 view = View.inflate(parent.getContext(), R.layout.listitem_comment, null);
+            }
+            TextView commentView = (TextView) view.findViewById(R.id.comment);
+            commentView.setText(comment.getComment());
 
-                TextView commentView = (TextView) view.findViewById(R.id.comment);
-                commentView.setText(comment.getComment());
-
-                final View finalView = view;
-                ImageButton editComment = (ImageButton) view.findViewById(R.id.edit_comment);
-                editComment.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        editComment(finalView, position);
-                    }
-                });
-                ImageButton deleteComment = (ImageButton) view.findViewById(R.id.delete_comment);
-                deleteComment.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        deleteComment(finalView, position);
-                    }
-                });
-                if (comment.getAuthor().equals(ServiceProvider.getEmail())) {
-                    editComment.setVisibility(View.VISIBLE);
-                } else {
-                    editComment.setVisibility(View.GONE);
+            final View finalView = view;
+            ImageButton editComment = (ImageButton) view.findViewById(R.id.edit_comment);
+            editComment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    editComment(getItem(position));
                 }
-                if (comment.getAuthor().equals(ServiceProvider.getEmail()) || canDelete) {
-                    deleteComment.setVisibility(View.VISIBLE);
-                } else {
-                    deleteComment.setVisibility(View.GONE);
+            });
+            ImageButton deleteComment = (ImageButton) view.findViewById(R.id.delete_comment);
+            deleteComment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteComment(finalView, position);
                 }
+            });
+            if (comment.getAuthor().equals(ServiceProvider.getEmail())) {
+                editComment.setVisibility(View.VISIBLE);
+            } else {
+                editComment.setVisibility(View.GONE);
+            }
+            if (comment.getAuthor().equals(ServiceProvider.getEmail()) || canDelete) {
+                deleteComment.setVisibility(View.VISIBLE);
+            } else {
+                deleteComment.setVisibility(View.GONE);
             }
             TextView author = (TextView) view.findViewById(R.id.author);
-            author.setText(comment.getAuthor());
+            author.setText(comment.getVisibleAuthor());
             TextView date = (TextView) view.findViewById(R.id.date);
             Date dateValue = new Date(comment.getDate().getValue());
             date.setText(DateFormat.getMediumDateFormat(context).format(dateValue) + " " + DateFormat.getTimeFormat(context).format(dateValue));
@@ -208,9 +161,51 @@ public class CommentAdapter extends BaseAdapter {
         return view;
     }
 
-    private void editComment(final View view, int position) {
-        isEditing.put(getItem(position), true);
-        notifyDataSetChanged();
+    private void editComment(final CommentData comment) {
+        View editView = View.inflate(context, R.layout.dialog_comment_editing, null);
+        TextView author = (TextView) editView.findViewById(R.id.author);
+        author.setText(comment.getVisibleAuthor());
+        TextView date = (TextView) editView.findViewById(R.id.date);
+        Date dateValue = new Date(comment.getDate().getValue());
+        date.setText(DateFormat.getMediumDateFormat(context).format(dateValue) + " " + DateFormat.getTimeFormat(context).format(dateValue));
+        final EditText newComment = (EditText) editView.findViewById(R.id.comment);
+        newComment.setText(comment.getComment());
+        final ProgressBar progressBar = (ProgressBar) editView.findViewById(R.id.commentLoading);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(editView)
+                .setPositiveButton(R.string.save, null)
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (newComment.getText().toString().isEmpty()) {
+                    Toast.makeText(context, R.string.error_no_content, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                progressBar.setVisibility(View.VISIBLE);
+                CommentController.editComment(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                        comment.setComment(newComment.getText().toString());
+                        dialog.dismiss();
+                        notifyDataSetChanged();
+                    }
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        Toast.makeText(context, R.string.error_editing_comment, Toast.LENGTH_LONG).show();
+                        progressBar.setVisibility(View.GONE);
+                    }
+                }, comment.getId(), newComment.getText().toString());
+            }
+        });
     }
 
     /**
@@ -225,18 +220,10 @@ public class CommentAdapter extends BaseAdapter {
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        view.findViewById(R.id.commentLoading).setVisibility(View.VISIBLE);
-                        view.requestLayout();
                         CommentController.deleteComment(new ExtendedTaskDelegateAdapter<Void, Void>() {
                             @Override
                             public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                                try {
-                                    Thread.sleep(5000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
                                 comments.remove(position);
-                                isEditing.remove(getItem(position));
                                 notifyDataSetChanged();
                             }
                             @Override
@@ -297,10 +284,7 @@ public class CommentAdapter extends BaseAdapter {
             @Override
             public void taskDidFinish(ExtendedTask task, List<CommentData> newComments) {
                 if (newComments != null) {
-                    for (CommentData cd : newComments) {
-                        comments.add(cd);
-                        isEditing.put(cd, false);
-                    }
+                    comments.addAll(newComments);
                 } else {
                     keepFetching = false;
                 }
@@ -328,7 +312,6 @@ public class CommentAdapter extends BaseAdapter {
      */
     public void refresh() {
         comments.clear();
-        isEditing.clear();
         keepFetching = true;
         fetchData(true);
     }
@@ -340,7 +323,6 @@ public class CommentAdapter extends BaseAdapter {
     public void addComment(CommentData comment) {
         if (comment != null) {
             comments.add(0, comment);
-            isEditing.put(comment, false);
             notifyDataSetChanged();
         }
     }

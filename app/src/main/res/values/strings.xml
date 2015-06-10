@@ -357,6 +357,7 @@
     <!-- PictureMetaDataAdapter -->
     <string name="picture_adapter_fetch_error">No additional pictures could be fetched</string>
     <string name="picture_not_visible">Picture not visible</string>
+    <string name="average"><![CDATA[&Oslash;]]></string>
 
     <!-- ListPicturesActivity -->
     <string name="title_activity_list_pictures">Pictures</string>
@@ -481,4 +482,5 @@
     <!-- CommentAdapter -->
     <string name="comment_adapter_fetch_error">An error oddurred while fetching more comments.</string>
     <string name="error_editing_comment">An error occurred while trying to edit the comment. Please try again.</string>
+    <string name="error_no_content">Please enter a comment</string>
 </resources>

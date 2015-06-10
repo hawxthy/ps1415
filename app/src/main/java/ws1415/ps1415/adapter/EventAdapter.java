@@ -141,7 +141,6 @@ public class EventAdapter extends BaseAdapter {
      *                   neu vom Server abgerufen und nicht erweitert.
      */
     private void fetchData(boolean refresh) {
-        // TODO Geht der synchronized-Block besser?
         if (!keepFetching || fetching) {
             return;
         }
@@ -170,13 +169,11 @@ public class EventAdapter extends BaseAdapter {
                 }
                 finish();
             }
-
             @Override
             public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(context, R.string.event_adapter_fetch_error, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                 finish();
             }
-
             /**
              * Beendet das Abrufen der Daten unabhängig davon, ob das Abrufen erfolgreich war oder
              * fehlgeschlagen ist.

@@ -9,7 +9,10 @@ import com.google.appengine.api.users.User;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import ws1415.SkatenightBackend.model.Comment;
@@ -18,6 +21,8 @@ import ws1415.SkatenightBackend.transport.CommentContainerData;
 import ws1415.SkatenightBackend.transport.CommentData;
 import ws1415.SkatenightBackend.transport.CommentDataList;
 import ws1415.SkatenightBackend.transport.CommentFilter;
+import ws1415.SkatenightBackend.transport.UserListData;
+import ws1415.SkatenightBackend.transport.UserPrimaryData;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -37,7 +42,7 @@ public class CommentEndpoint extends SkatenightServerEndpoint {
      * @param commentString     Der Kommentar als String.
      * @return Gibt den erstellten Kommentar inkl. ID zurück.
      */
-    public Comment addComment(User user, @Named("containerClass") String containerClass,@Named("containerId") long containerId,
+    public CommentData addComment(User user, @Named("containerClass") String containerClass,@Named("containerId") long containerId,
                                   @Named("commentString") String commentString) throws OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
@@ -58,7 +63,11 @@ public class CommentEndpoint extends SkatenightServerEndpoint {
         ofy().save().entity(comment).now();
         container.addComment(comment);
         ofy().save().entity(container).now();
-        return comment;
+
+        CommentData data = new CommentData(comment);
+        UserPrimaryData userData = new UserEndpoint().getPrimaryData(user, user.getEmail());
+        data.setVisibleAuthor(userData.getFirstName() + " " + userData.getLastName());
+        return data;
     }
 
     /**
@@ -98,6 +107,8 @@ public class CommentEndpoint extends SkatenightServerEndpoint {
             if (!user.getEmail().equals(comment.getAuthor()) && !container.canDeleteComment(user)) {
                 throw new OAuthRequestException("insufficient privileges");
             }
+            container.removeComment(comment);
+            ofy().save().entity(container).now();
             ofy().delete().entity(comment).now();
         }
     }
@@ -127,14 +138,37 @@ public class CommentEndpoint extends SkatenightServerEndpoint {
             q = q.startAt(Cursor.fromWebSafeString(filter.getCursorString()));
         }
 
+        // Daten werden zunächst zusätzlich in einer Map mit der Mail des Authors gespeichert,
+        // um anschließend in einem Schritt die sichtbaren Benutzernamen für den aufrufenden
+        // Benutzer abzurufen.
+        Map<String, List<CommentData>> data = new HashMap<>();
         QueryResultIterator<Comment> commentIterator = q.iterator();
         CommentDataList result = new CommentDataList();
         result.setComments(new LinkedList<CommentData>());
+        List<CommentData> comments;
         while (commentIterator.hasNext() && result.getComments().size() < filter.getLimit()) {
-            result.getComments().add(new CommentData(commentIterator.next()));
+            CommentData comment = new CommentData(commentIterator.next());
+            comments = data.get(comment.getAuthor());
+            if (comments == null) {
+                comments = new LinkedList<>();
+                data.put(comment.getAuthor(), comments);
+            }
+            comments.add(comment);
+            result.getComments().add(comment);
         }
         result.setCursorString(commentIterator.getCursor().toWebSafeString());
 
+        List<UserListData> userData = new UserEndpoint().listUserInfo(user, new LinkedList<>(data.keySet()));
+        String visibleName;
+        for (UserListData u : userData) {
+            visibleName = u.getFirstName();
+            if (u.getLastName() != null && !u.getLastName().isEmpty()) {
+                visibleName += " " + u.getLastName();
+            }
+            for (CommentData c : data.get(u.getEmail())) {
+                c.setVisibleAuthor(visibleName);
+            }
+        }
         return result;
     }
 

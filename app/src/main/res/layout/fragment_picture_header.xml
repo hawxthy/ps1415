@@ -41,13 +41,13 @@
             style="@style/primaryText"
             android:text="description" />
 
-        <RatingBar
-            android:id="@+id/rating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/description"
-            android:paddingTop="16dp"
-            android:rating="3" />
+    <RatingBar
+        android:id="@+id/rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/description"
+        android:paddingTop="16dp"
+        android:rating="3" />
 
         <TextView
             android:id="@+id/commentsLabel"

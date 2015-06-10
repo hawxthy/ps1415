@@ -98,7 +98,6 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         route = new Route();
         route.setLength("5 km");
         route.setName("Route 1");
-        // TODO Routenpunkte, Wegpunkte und Routendaten
         route = ServiceProvider.getService().routeEndpoint().addRoute(route).execute();
 
         // Testevent erstellen, das als Container für die Gallery dient
@@ -140,7 +139,6 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         Route route = new Route();
         route.setLength("5 km");
         route.setName("Route 1");
-        // TODO Routenpunkte, Wegpunkte und Routendaten
         route = ServiceProvider.getService().routeEndpoint().addRoute(route).execute();
 
         // Testevent erstellen, das als Container für die Gallery dient

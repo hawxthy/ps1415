@@ -30,6 +30,7 @@ import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.GalleryAdapter;
 import ws1415.ps1415.adapter.PictureMetaDataAdapter;
 import ws1415.ps1415.controller.GalleryController;
+import ws1415.ps1415.controller.RoleController;
 import ws1415.ps1415.fragment.PictureListFragment;
 import ws1415.ps1415.model.ContextMenu;
 import ws1415.ps1415.model.PictureVisibility;
@@ -57,6 +58,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
     private Spinner galleries;
     private GalleryAdapter galleryAdapter;
 
+    private boolean isAdmin;
     private boolean canAddGallery;
     private boolean canEditGallery;
     private boolean canRemoveGallery;
@@ -81,6 +83,13 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
         }
 
         startLoading();
+
+        RoleController.isAdmin(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                isAdmin = aBoolean;
+            }
+        }, ServiceProvider.getEmail());
 
         pictureFragment = (PictureListFragment) getFragmentManager().findFragmentById(R.id.picturesFragment);
         galleries = (Spinner) findViewById(R.id.galleries);
@@ -184,7 +193,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                 findViewById(R.id.removeGallery).setVisibility(View.GONE);
             }
         }
-        menuItemAddPicture.setVisible(canAddPicturesToGallery);
+        menuItemAddPicture.setVisible(canAddPicturesToGallery && galleryAdapter != null && galleryAdapter.getCount() > 0);
         // Layout neu zeichnen, damit die Buttons richtig angezeigt werden
         runOnUiThread(new Runnable() {
             @Override
@@ -223,7 +232,9 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
             startActivityForResult(intent, UPLOAD_PICTURE_REQUEST_CODE);
             return true;
         } else if (id == R.id.action_refresh_pictures) {
-            pictureAdapter.refresh();
+            if (pictureAdapter != null) {
+                pictureAdapter.refresh();
+            }
             return true;
         } else if (id == android.R.id.home) {
             finish();
@@ -237,7 +248,9 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case UPLOAD_PICTURE_REQUEST_CODE:
-                pictureAdapter.refresh();
+                if (pictureAdapter != null) {
+                    pictureAdapter.refresh();
+                }
                 break;
             case EDIT_PICTURE_REQUEST_CODE:
                 if (data != null && data.getIntExtra("position", -1) >= 0) {
@@ -281,8 +294,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                 }
             });
             // Bearbeiten
-            // TODO R: Kann auch von einem Admin gemacht werden
-            if (picture.getUploader().equals(ServiceProvider.getEmail())) {
+            if (isAdmin || picture.getUploader().equals(ServiceProvider.getEmail())) {
                 menuItems.add(new ContextMenu.ContextMenuItem() {
                     @Override
                     public String getText() {
@@ -299,8 +311,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                 });
             }
             // Löschen
-            // TODO R: Kann auch von einem Admin gemacht werden
-            if (picture.getUploader().equals(ServiceProvider.getEmail())) {
+            if (isAdmin || picture.getUploader().equals(ServiceProvider.getEmail())) {
                 menuItems.add(new ContextMenu.ContextMenuItem() {
                     @Override
                     public String getText() {

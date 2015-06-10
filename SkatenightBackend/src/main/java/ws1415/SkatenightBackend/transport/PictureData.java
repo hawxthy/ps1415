@@ -1,11 +1,13 @@
 package ws1415.SkatenightBackend.transport;
 
 import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
 import java.util.Date;
 import java.util.List;
 
+import ws1415.SkatenightBackend.UserEndpoint;
 import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.PictureVisibility;
@@ -19,17 +21,20 @@ public class PictureData {
     private String title;
     private Date date;
     private String uploader;
+    private String visibleUploader;
     private String description;
     private Integer myRating;
     private Double avgRating;
     private BlobKey imageBlobKey;
     private PictureVisibility visibility;
 
-    public PictureData(User user, Picture picture) {
+    public PictureData(User user, Picture picture) throws OAuthRequestException {
         id = picture.getId();
         title = picture.getTitle();
         date = picture.getDate();
         uploader = picture.getUploader();
+        UserPrimaryData userData = new UserEndpoint().getPrimaryData(user, uploader);
+        visibleUploader = userData.getFirstName() + (!userData.getLastName().isEmpty() ? " " : "") + userData.getLastName();
         description = picture.getDescription().getValue();
         if (picture.getRatings() != null) {
             myRating = picture.getRatings().get(user.getEmail());
@@ -69,6 +74,14 @@ public class PictureData {
 
     public void setUploader(String uploader) {
         this.uploader = uploader;
+    }
+
+    public String getVisibleUploader() {
+        return visibleUploader;
+    }
+
+    public void setVisibleUploader(String visibleUploader) {
+        this.visibleUploader = visibleUploader;
     }
 
     public String getDescription() {

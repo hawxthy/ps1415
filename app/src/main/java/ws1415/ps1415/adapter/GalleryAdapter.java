@@ -13,6 +13,7 @@ import com.skatenight.skatenightAPI.model.GalleryMetaData;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.GroupProfileActivity;
@@ -68,27 +69,6 @@ public class GalleryAdapter extends BaseAdapter {
         }, containerKind, containerId);
     }
 
-    /**
-     * Erstellt einen Adapter mit allen Galleries, denen der eingeloggte Benutzer Bilder hinzufügen
-     * kann. Der Adapter ruft dazu einen entsprechende Methode auf dem Backend auf.
-     * @param context    Der Kontext, in dem der Adapter erstellt wird.
-     */
-    public GalleryAdapter(final Context context) {
-        GalleryController.getExpandableGalleries(new ExtendedTaskDelegateAdapter<Void, List<GalleryMetaData>>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, List<GalleryMetaData> galleryMetaDatas) {
-                if (galleryMetaDatas != null) {
-                    galleries.addAll(galleryMetaDatas);
-                    GalleryAdapter.this.notifyDataSetChanged();
-                }
-            }
-            @Override
-            public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(context, R.string.error_loading_galleries, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
     @Override
     public int getCount() {
         return galleries.size();
@@ -106,15 +86,29 @@ public class GalleryAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // TODO R: Layout der Spinneritems anpassen
         View view;
         if (convertView != null) {
             view = convertView;
         } else {
-            view = parent.inflate(parent.getContext(), android.R.layout.simple_spinner_dropdown_item, null);
+            view = View.inflate(parent.getContext(), android.R.layout.simple_spinner_item, null);
         }
         GalleryMetaData gallery = getItem(position);
         ((TextView) view.findViewById(android.R.id.text1)).setText(gallery.getTitle());
+        return view;
+    }
+
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        View view;
+        if (convertView != null) {
+            view = convertView;
+        } else {
+            view = View.inflate(parent.getContext(), R.layout.large_spinner_dropdown_item, null);
+        }
+        GalleryMetaData gallery = getItem(position);
+        TextView textView = (TextView) view.findViewById(android.R.id.text1);
+
+        textView.setText(gallery.getTitle());
         return view;
     }
 

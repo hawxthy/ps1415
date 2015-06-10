@@ -85,10 +85,16 @@ public class BlobstoreHandler extends HttpServlet {
     }
 
     /**
-     * TODO Kommentieren
-     * @param req
-     * @param resp
-     * @throws IOException
+     * Nimmt GET-Anfragen für das Bereitsstellen von Bildern entgegen. Neben dem vorausgesetzten BlobKey,
+     * kann der Request folgende Parameter haben:
+     * <ul>
+     *     <li><b>crop:</b> Das Bild wird auf die Größe, die als Wert von crop angegeben ist, zugeschnitten</li>
+     *     <li><b>scale:</b> Das Bild wird auf die Größe, die als Wert von scale angegeben ist, skaliert</li>
+     * </ul>
+     * Wenn keine weiteren Parameter angegeben sind, wird direkt das Bild zurück gegeben. Andernfalls
+     * wird eine URL zurückgegeben, über die das manipulierte Bild abgerufen werden kann.
+     * @param req     Die Anfrage.
+     * @param resp    Die Anwort, die entweder das Bild oder die URL zum Abrufen des manipulierten Bildes enthält.
      */
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

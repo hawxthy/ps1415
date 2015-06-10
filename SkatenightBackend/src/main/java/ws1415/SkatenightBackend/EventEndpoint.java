@@ -12,9 +12,11 @@ import com.google.appengine.api.users.User;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.cmd.Query;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -24,7 +26,10 @@ import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 
+import ws1415.SkatenightBackend.gcm.Message;
+import ws1415.SkatenightBackend.gcm.MessageType;
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
+import ws1415.SkatenightBackend.gcm.Sender;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.EventParticipationVisibility;
 import ws1415.SkatenightBackend.model.EventRole;
@@ -35,6 +40,7 @@ import ws1415.SkatenightBackend.transport.EventFilter;
 import ws1415.SkatenightBackend.transport.EventMetaData;
 import ws1415.SkatenightBackend.transport.EventMetaDataList;
 import ws1415.SkatenightBackend.transport.EventParticipationData;
+import ws1415.SkatenightBackend.transport.StringWrapper;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -262,11 +268,26 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         // Event in der Liste des Benutzers eintragen
         new UserEndpoint().addEventToUser(user.getEmail(), event);
 
-        // TODO R: GCM-Nachricht an Geräte schicken, damit Event-Liste aktualisiert wird
+        // GCM-Nachricht an Geräte schicken, damit Event-Liste aktualisiert wird
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             RegistrationManager rm = getRegistrationManager(pm);
-            // TODO R: Implementieren
+            if (rm.getRegisteredUser() != null) {
+                Sender sender = new Sender(Constants.GCM_API_KEY);
+                Message.Builder mb = new Message.Builder()
+                        // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
+                        .delayWhileIdle(false)
+                        .collapseKey("new_event")
+                        .addData("type", MessageType.EVENT_NOTIFICATION_MESSAGE.name())
+                        .addData("content", event.getTitle())
+                        .addData("title", "Neue Veranstaltung!");
+                Message m = mb.build();
+                try {
+                    sender.send(m, new LinkedList<>(rm.getRegisteredUser()), 1);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
         } finally {
             pm.close();
         }
@@ -292,6 +313,8 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         if (!hasPrivilege(oldEvent, user.getEmail(), Privilege.EDIT_EVENT)) {
             throw new OAuthRequestException("insufficient privileges");
         }
+
+        boolean date_changed = event.getDate().equals(oldEvent.getDate());
         oldEvent.setTitle(event.getTitle());
         oldEvent.setDate(event.getDate());
         oldEvent.setDescription(event.getDescription());
@@ -300,6 +323,34 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         oldEvent.setDynamicFields(event.getDynamicFields());
         oldEvent.setRoute(event.getRoute());
         ofy().save().entity(oldEvent).now();
+
+        // Nachricht an Teilnehmer des Events schicken
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            RegistrationManager rm = getRegistrationManager(pm);
+            if (rm.getRegisteredUser() != null) {
+                Sender sender = new Sender(Constants.GCM_API_KEY);
+                Message.Builder mb = new Message.Builder()
+                        // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
+                        .delayWhileIdle(false)
+                        .collapseKey("new_event")
+                        .addData("type", MessageType.EVENT_NOTIFICATION_MESSAGE.name())
+                        .addData("content", event.getTitle())
+                        .addData("date_changed", Boolean.toString(date_changed))
+                        .addData("new_date", String.valueOf(event.getDate().getTime()))
+                        .addData("event_id", String.valueOf(event.getId()))
+                        .addData("title", "Veranstaltungsdaten aktualisiert!");
+                Message m = mb.build();
+                try {
+                    sender.send(m, new LinkedList<>(rm.getRegisteredUser()), 1);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } finally {
+            pm.close();
+        }
+
         return event;
     }
 
@@ -327,7 +378,6 @@ public class EventEndpoint extends SkatenightServerEndpoint {
                 }
             }
 
-            // TODO R: Performance testen
             UserEndpoint userEndpoint = new UserEndpoint();
             for (String participant : event.getMemberList().keySet()) {
                 userEndpoint.removeEventFromUser(participant, event);
@@ -345,7 +395,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param eventId    Die ID des Events, dem beigetreten wird.
      * @param visibility Die Sichtbarkeit, die für die Teilnahme eingetragen wird.
      */
-    public void joinEvent(User user, @Named("eventId") long eventId, @Named("visibility") EventParticipationVisibility visibility)
+    public StringWrapper joinEvent(User user, @Named("eventId") long eventId, @Named("visibility") EventParticipationVisibility visibility)
             throws OAuthRequestException {
         if (user == null) {
             throw new OAuthRequestException("no user submitted");
@@ -357,6 +407,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
             ofy().save().entity(event).now();
             new UserEndpoint().addEventToUser(user.getEmail(), event);
         }
+        return new StringWrapper(event.getMemberList().get(user.getEmail()).name());
     }
 
     /**

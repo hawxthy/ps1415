@@ -299,9 +299,8 @@ public class NavDrawerGroupList {
                     return R.string.create_edit_routes;
                 }
                 @Override
-                // TODO Icon ändern
                 public int getIconId() {
-                    return R.drawable.ic_event;
+                    return R.drawable.ic_action_directions;
                 }
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {

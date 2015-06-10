@@ -23,7 +23,7 @@ import ws1415.SkatenightBackend.model.UserGroupPreviewPictures;
 import ws1415.SkatenightBackend.transport.UserGroupVisibleMembers;
 
 /**
- * TODO JavaDoc + von anderem Interface oder Klasse erben, damit nicht alle Methoden implementiert werden müssen
+ * Registriert die Klassen, die per Objectify persistiert werden.
  * @author Richard Schulze
  */
 public class ObjectifyStartupServlet implements Servlet {

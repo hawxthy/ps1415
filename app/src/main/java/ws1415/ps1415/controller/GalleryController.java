@@ -2,7 +2,13 @@ package ws1415.ps1415.controller;
 
 import android.util.Log;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.google.api.client.json.Json;
+import com.google.gson.Gson;
+import com.google.gson.JsonDeserializer;
 import com.skatenight.skatenightAPI.model.BlobKey;
+import com.skatenight.skatenightAPI.model.ExpandableGalleriesWrapper;
 import com.skatenight.skatenightAPI.model.Gallery;
 import com.skatenight.skatenightAPI.model.GalleryContainerData;
 import com.skatenight.skatenightAPI.model.GalleryMetaData;
@@ -25,6 +31,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -167,15 +174,21 @@ public abstract class GalleryController {
     }
 
     /**
-     * Gibt eine Liste aller Galerien zurück, denen der aufrufende Benutzer Bilder hinzufügen kann.
+     * Gibt eine Liste aller Galerien zurück, denen der aufrufende Benutzer das angegebene Bild hinzufügen kann.
      * @param handler    Der Handler, dem die Liste übergeben wird.
+     *
      */
-    public static void getExpandableGalleries(ExtendedTaskDelegate<Void, List<GalleryMetaData>> handler) {
-        new ExtendedTask<Void, Void, List<GalleryMetaData>>(handler) {
+    public static void getExpandableGalleries(ExtendedTaskDelegate<Void, Map<GalleryMetaData, String>> handler, final long pictureId) {
+        new ExtendedTask<Void, Void, Map<GalleryMetaData, String>>(handler) {
             @Override
-            protected List<GalleryMetaData> doInBackground(Void... params) {
+            protected Map<GalleryMetaData, String> doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().galleryEndpoint().getExpandableGalleries().execute().getItems();
+                    Map<GalleryMetaData, String> result = new HashMap<>();
+                    ExpandableGalleriesWrapper wrapper = ServiceProvider.getService().galleryEndpoint().getExpandableGalleries(pictureId).execute();
+                    for (int i = 0; i < wrapper.getGalleries().size(); i++) {
+                        result.put(wrapper.getGalleries().get(i), wrapper.getAdditionalTitles().get(i));
+                    }
+                    return result;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

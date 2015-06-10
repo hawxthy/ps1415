@@ -48,7 +48,8 @@ public abstract class EventController {
                 try {
                     ServiceProvider.getService().eventEndpoint().assignRole(eventId, userMail, role.name()).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Rolle konnte nicht zugewiesen werden. Zu wenig Rechte?");
                 }
                 return null;
             }
@@ -70,8 +71,10 @@ public abstract class EventController {
                     filter.setCursorString(result.getCursorString());
                     return result.getList();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
+                return null;
             }
         }.execute();
     }
@@ -88,8 +91,10 @@ public abstract class EventController {
                 try {
                     return ServiceProvider.getService().eventEndpoint().getEvent(eventId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
+                return null;
             }
         }.execute();
     }
@@ -237,21 +242,21 @@ public abstract class EventController {
 
     /**
      * Lässt den eingeloggten Benutzer dem Event mit der angegebenen ID beitreten.
-     * @param handler    Der Handler, der über den Status des Task informiert wird.
+     * @param handler    Der Handler, der über den Status des Task informiert wird. Ihm wird die
+     *                   Rolle übergeben, die dem Teilnehmer zugeordnet wurde.
      * @param eventId    Die ID des Events, dem beigetreten wird.
      * @param visibility Die Sichtbarkeit für die Teilnahme an dem Event.
      */
-    public static void joinEvent(ExtendedTaskDelegate<Void, Void> handler, final long eventId,
+    public static void joinEvent(ExtendedTaskDelegate<Void, EventRole> handler, final long eventId,
                                  final EventParticipationVisibility visibility) {
-        new ExtendedTask<Void, Void, Void>(handler){
+        new ExtendedTask<Void, Void, EventRole>(handler){
             @Override
-            protected Void doInBackground(Void... params) {
+            protected EventRole doInBackground(Void... params) {
                 try {
-                    ServiceProvider.getService().eventEndpoint().joinEvent(eventId, visibility.name()).execute();
+                    return EventRole.valueOf(ServiceProvider.getService().eventEndpoint().joinEvent(eventId, visibility.name()).execute().getString());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                return null;
             }
         }.execute();
     }
@@ -281,7 +286,6 @@ public abstract class EventController {
      * @param eventId       Die ID des Events, für das die Sichtbarkeit geändert wird.
      * @param visibility    Die neue Sichtbarkeit.
      */
-    // TODO Testen
     public static void changeParticipationVisibility(ExtendedTaskDelegate<Void, Void> handler, final long eventId,
                                                      final EventParticipationVisibility visibility) {
         new ExtendedTask<Void, Void, Void>(handler) {

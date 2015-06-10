@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<cronentries>
-    <cron>
-        <url>/cron/sendEventStartNotifications</url>
-        <description>Check for starting events</description>
-        <schedule>every 2 minutes</schedule>
-    </cron>
-</cronentries>

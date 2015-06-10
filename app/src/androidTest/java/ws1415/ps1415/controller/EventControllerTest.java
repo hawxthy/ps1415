@@ -86,16 +86,16 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
         route1 = new Route();
         route1.setLength("5 km");
         route1.setName("Route 1");
-        // TODO Routenpunkte, Wegpunkte und Routendaten
+        // TODO R: Routenpunkte, Wegpunkte und Routendaten
         route1 = ServiceProvider.getService().routeEndpoint().addRoute(route1).execute();
 
         route2 = new Route();
         route2.setLength("10 km");
         route2.setName("Route 2");
-        // TODO Routenpunkte, Wegpunkte und Routendaten
+        // TODO R: Routenpunkte, Wegpunkte und Routendaten
         route2 = ServiceProvider.getService().routeEndpoint().addRoute(route2).execute();
 
-        // TODO Testevent um Bilder erweitern
+        // TODO R: Testevent um Bilder erweitern
         testevent1 = new Event();
         testevent1.setTitle("Testevent #1");
         // 12.05.2015 17:00 Uhr
@@ -319,7 +319,7 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
                 assertEquals("route id", testevent1.getRoute().getId(), event.getRoute().getId());
                 assertEquals("route name", testevent1.getRoute().getName(), event.getRoute().getName());
                 assertEquals("route length", testevent1.getRoute().getLength(), event.getRoute().getLength());
-                // TODO
+                // TODO R
 //                assertEquals("route data", testevent1.getRoute().getRouteData().getValue(), event.getRoute().getRouteData().getValue());
 //                assertEquals("route points", testevent1.getRoute().getRoutePoints(), event.getRoute().getRoutePoints());
 //                assertEquals("route waypoints", testevent1.getRoute().getWaypoints(), event.getRoute().getWaypoints());
@@ -387,7 +387,7 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
                 assertEquals("route id", neuesEvent.getRoute().getId(), event.getRoute().getId());
                 assertEquals("route name", neuesEvent.getRoute().getName(), event.getRoute().getName());
                 assertEquals("route length", neuesEvent.getRoute().getLength(), event.getRoute().getLength());
-                // TODO
+                // TODO R
 //                assertEquals("route data", neuesEvent.getRoute().getRouteData().getValue(), event.getRoute().getRouteData().getValue());
 //                assertEquals("route points", neuesEvent.getRoute().getRoutePoints(), event.getRoute().getRoutePoints());
 //                assertEquals("route waypoints", neuesEvent.getRoute().getWaypoints(), event.getRoute().getWaypoints());
@@ -418,7 +418,7 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
 
     public void testEditEvent() throws InterruptedException {
         // Event editieren
-        // TODO Testevent um Bilder erweitern
+        // TODO R: Testevent um Bilder erweitern
         testevent1.setTitle("Editierter Titel");
         // 12.05.2015 17:00 Uhr
         testevent1.setDate(new DateTime(1441242800000l));
@@ -452,7 +452,7 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
     }
 
     public void testDeleteEvent() throws InterruptedException {
-        // TODO Prüfen, ob auch abhängige Galleries gelöscht werden
+        // TODO R: Prüfen, ob auch abhängige Galleries gelöscht werden
 
         final CountDownLatch signal = new CountDownLatch(1);
         EventController.deleteEvent(new ExtendedTaskDelegateAdapter<Void, Void>() {
@@ -481,9 +481,9 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
         final CountDownLatch signal = new CountDownLatch(1);
         // Account wechseln, damit ein zweiter Benutzer dem Event beitritt
         changeAccount(1);
-        EventController.joinEvent(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        EventController.joinEvent(new ExtendedTaskDelegateAdapter<Void, EventRole>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+            public void taskDidFinish(ExtendedTask task, EventRole role) {
                 signal.countDown();
             }
 

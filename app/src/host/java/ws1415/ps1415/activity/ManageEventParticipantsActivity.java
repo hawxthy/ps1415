@@ -61,7 +61,7 @@ public class ManageEventParticipantsActivity extends Activity {
                 }
                 @Override
                 public void taskFailed(ExtendedTask task, String message) {
-                    Toast.makeText(ManageEventParticipantsActivity.this, R.string.error_loading_participants, Toast.LENGTH_LONG).show();
+                    Toast.makeText(ManageEventParticipantsActivity.this, message, Toast.LENGTH_LONG).show();
                     finalizeLoading();
                 }
             }, eventId);
@@ -117,7 +117,7 @@ public class ManageEventParticipantsActivity extends Activity {
             }
             @Override
             public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(ManageEventParticipantsActivity.this, R.string.error_changing_role, Toast.LENGTH_LONG).show();
+                Toast.makeText(ManageEventParticipantsActivity.this, message, Toast.LENGTH_LONG).show();
                 finalizeLoading();
             }
         }, eventId, mail, eventRole);

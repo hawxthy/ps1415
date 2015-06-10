@@ -18,6 +18,7 @@ import ws1415.ps1415.R;
  * @author Richard Schulze
  */
 public class DynamicFieldsAdapter extends BaseAdapter {
+    private boolean edited;
     private int itemLayoutId;
     private List<DynamicField> dynamicFields;
 
@@ -71,6 +72,9 @@ public class DynamicFieldsAdapter extends BaseAdapter {
                     @Override
                     public void onFocusChange(View v, boolean hasFocus) {
                         if (!hasFocus) {
+                            if (!edited) {
+                                edited = !label.getText().toString().equals(field.getName());
+                            }
                             field.setName(label.getText().toString());
                         }
                     }
@@ -81,6 +85,9 @@ public class DynamicFieldsAdapter extends BaseAdapter {
                     @Override
                     public void onFocusChange(View v, boolean hasFocus) {
                         if (!hasFocus) {
+                            if (!edited) {
+                                edited = !content.getText().toString().equals(field.getContent());
+                            }
                             field.setContent(content.getText().toString());
                         }
                     }
@@ -104,6 +111,14 @@ public class DynamicFieldsAdapter extends BaseAdapter {
      */
     public void addField() {
         dynamicFields.add(new DynamicField());
+        edited = true;
         notifyDataSetChanged();
+    }
+
+    /**
+     * @return true, wenn die Daten im Adapter editiert wurden.
+     */
+    public boolean isEdited() {
+        return edited;
     }
 }

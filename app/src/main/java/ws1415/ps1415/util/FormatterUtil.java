@@ -1,5 +1,6 @@
 package ws1415.ps1415.util;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -7,7 +8,7 @@ import java.util.regex.Pattern;
  * @author Richard Schulze
  */
 public abstract class FormatterUtil {
-    private static final Pattern currencyPattern = Pattern.compile("^(0|[1-9]\\d*)(,\\d{2})? ?€?$");
+    private static final Pattern currencyPattern = Pattern.compile("(0|[1-9]\\d*)(,\\d{2})? ?€?");
 
     /**
      * Prüft, ob der übergebene String null, leer oder im Datumsformat ist.
@@ -43,13 +44,19 @@ public abstract class FormatterUtil {
             return 0;
         }
         try {
-            String euro = currencyPattern.matcher(s).group(1);
-            String cent = currencyPattern.matcher(s).group(2);
-            if (cent != null && !cent.isEmpty()) {
-                // Komma abschneiden
-                cent = cent.substring(0, cent.length() - 1);
+            Matcher matcher = currencyPattern.matcher(s);
+            if (matcher.find()) {
+                String euro = matcher.group(1);
+                String cent = matcher.group(2);
+                if (cent != null && !cent.isEmpty()) {
+                    // Komma abschneiden
+                    cent = cent.substring(1);
+                } else {
+                    cent = "0";
+                }
+                return Integer.parseInt(euro) * 100 + Integer.parseInt(cent);
             }
-            return Integer.parseInt(euro) * 100 + Integer.parseInt(cent);
+            return 0;
         } catch(IllegalStateException ex) {
             throw new IllegalArgumentException("string does not match currency format");
         }

@@ -176,6 +176,21 @@ public class Picture implements BlobKeyContainer, CommentContainer {
         galleries.remove(Ref.create(gallery));
     }
 
+    public List<Comment> getComments() {
+        if (comments == null) {
+            return null;
+        } else {
+            List<Comment> comments = new LinkedList<>();
+            for (Ref<Comment> ref : this.comments) {
+                Comment c = ref.get();
+                if (c != null) {
+                    comments.add(c);
+                }
+            }
+            return comments;
+        }
+    }
+
     @Override
     public void addComment(Comment comment) {
         if (comment == null) {

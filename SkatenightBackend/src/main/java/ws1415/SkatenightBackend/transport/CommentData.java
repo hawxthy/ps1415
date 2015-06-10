@@ -1,5 +1,6 @@
 package ws1415.SkatenightBackend.transport;
 
+import com.google.appengine.api.users.User;
 import com.googlecode.objectify.annotation.Index;
 
 import java.util.Date;
@@ -13,6 +14,7 @@ import ws1415.SkatenightBackend.model.Comment;
 public class CommentData {
     private Long id;
     private String author;
+    private String visibleAuthor;
     private Date date;
     private String comment;
 
@@ -37,6 +39,14 @@ public class CommentData {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public String getVisibleAuthor() {
+        return visibleAuthor;
+    }
+
+    public void setVisibleAuthor(String visibleAuthor) {
+        this.visibleAuthor = visibleAuthor;
     }
 
     public Date getDate() {

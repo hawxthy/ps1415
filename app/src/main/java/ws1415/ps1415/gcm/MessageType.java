@@ -16,10 +16,6 @@ public enum MessageType {
      */
     EVENT_NOTIFICATION_MESSAGE,
     /**
-     * Wird an alle Teilnehmer eines Events gesendet, wenn das Event beginnt.
-     */
-    EVENT_START_MESSAGE,
-    /**
      * Wird an alle Mitglieder einer Gruppe gesendet, wenn die Gruppe gelöscht wird.
      */
     GROUP_DELETED_NOTIFICATION_MESSAGE,

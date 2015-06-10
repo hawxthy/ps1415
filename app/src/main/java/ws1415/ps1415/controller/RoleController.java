@@ -8,6 +8,7 @@ import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.GlobalRole;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 
 /**
  * Der RoleController steuert die Verwaltung der Rollen der Benutzer auf dem Server.
@@ -60,5 +61,23 @@ public abstract class RoleController {
         }.execute();
     }
 
-
+    /**
+     * Prüft, ob der Benutzer mit der angegebenen E-Mail ein globaler Administrator ist.
+     * @param handler    Der Handler, dem der Boolean-Wert übergeben wird.
+     * @param email      Die zu prüfende E-Mail.
+     */
+    public static void isAdmin(ExtendedTaskDelegateAdapter<Void, Boolean> handler, final String email) {
+        new ExtendedTask<Void, Void, Boolean>(handler) {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    return ServiceProvider.getService().roleEndpoint().isAdmin(email).execute().getValue();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Administrator-Status konnte nicht geprüft werden");
+                }
+                return false;
+            }
+        }.execute();
+    }
 }
