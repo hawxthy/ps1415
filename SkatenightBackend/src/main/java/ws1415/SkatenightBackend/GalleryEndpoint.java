@@ -79,19 +79,6 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
     }
 
     /**
-     * Ruft die Metadaten der Gallery mit der angegebenen ID ab.
-     * @param user         Der Benutzer, der die Gallery abrufen möchte.
-     * @param galleryId    Die ID der abzurufenden Gallery.
-     * @return Die Gallery mit der angegebenen ID.
-     */
-    public GalleryMetaData getGalleryMetaData(User user, @Named("galleryId") long galleryId) throws OAuthRequestException {
-        if (user == null) {
-            throw new OAuthRequestException("no user submitted");
-        }
-        return new GalleryMetaData(ofy().load().type(Gallery.class).id(galleryId).safe());
-    }
-
-    /**
      * Erstellt eine Gallery und fügt sie dem Container hinzu, der im Gallery-Objekt angegeben ist.
      * @param user           Der Benutzer, der die Gallery erstellt.
      * @param gallery        Die zu erstellende Gallery.

@@ -57,7 +57,7 @@ public class DiskCacheImageLoader {
      * @param blobKey    Der BlobKey des anzuzeigenden Bildes.
      */
     public void loadImage(ImageView view, BlobKey blobKey) {
-        processRequest(view, blobKey, null);
+        processRequest(view, DiskCache.DiskKey.createDiskKey(blobKey.getKeyString()), null);
     }
 
     /**
@@ -69,7 +69,7 @@ public class DiskCacheImageLoader {
     public void loadCroppedImage(ImageView view, BlobKey blobKey, int cropSize) {
         Map<String, String> params = new HashMap<>();
         params.put("crop", Integer.toString(cropSize));
-        processRequest(view, blobKey, params);
+        processRequest(view, DiskCache.DiskKey.createCropKey(blobKey.getKeyString(), cropSize), params);
     }
 
     /**
@@ -81,78 +81,91 @@ public class DiskCacheImageLoader {
     public void loadScaledImage(ImageView view, BlobKey blobKey, int width) {
         Map<String, String> params = new HashMap<>();
         params.put("scale", Integer.toString(width));
-        processRequest(view, blobKey, params);
+        processRequest(view, DiskCache.DiskKey.createScaleKey(blobKey.getKeyString(), width), params);
     }
 
-    private void processRequest(final ImageView view, final BlobKey blobKey, final Map<String, String> params) {
-        if (blobKey == null) {
+    /**
+     * Versucht die Bitmap mit dem angegebenen Key aus dem DiskCache zu laden. Falls es dort nicht vorhanden
+     * ist, wird das Bild vom Backend abgerufen.
+     * @param view      Die View, in die das Bild geladen wird.
+     * @param key       Der Key des abzurufenden Bildes.
+     * @param params    Die Parameter, die bei einem Cache-Miss für den Aufruf an den Server verwendet werden.
+     */
+    private void processRequest(final ImageView view, final DiskCache.DiskKey key, final Map<String, String> params) {
+        if (key == null) {
             view.setImageBitmap(null);
             return;
         }
 
-        new ExtendedTask<Void, Void, Drawable>(new ExtendedTaskDelegateAdapter<Void, Drawable>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Drawable drawable) {
-                view.setImageDrawable(drawable);
-            }
-        }) {
-            @Override
-            protected Drawable doInBackground(Void... par) {
-                String url = Constants.SERVER_URL + "/images/serve?key=" + blobKey.getKeyString();
-                if (params != null) {
-                    for (String key : params.keySet()) {
-                        url += "&" + key + "=" + params.get(key);
-                    }
+        Bitmap bitmap = DiskCache.getInstance(view.getContext()).getBitmapFromDiskCache(key);
+        if (bitmap != null) {
+            view.setImageBitmap(bitmap);
+        } else {
+            new ExtendedTask<Void, Void, Bitmap>(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
+                    DiskCache.getInstance(view.getContext()).addBitmapToCache(key, bitmap);
+                    view.setImageBitmap(bitmap);
                 }
+            }) {
+                @Override
+                protected Bitmap doInBackground(Void... par) {
+                    String url = Constants.SERVER_URL + "/images/serve?key=" + key.getBlobKey();
+                    if (params != null) {
+                        for (String key : params.keySet()) {
+                            url += "&" + key + "=" + params.get(key);
+                        }
+                    }
 
-                HttpClient client = new DefaultHttpClient();
-                HttpGet get = new HttpGet(url);
-                HttpResponse response;
-                try {
-                    response = client.execute(get);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                HttpEntity httpEntity = response.getEntity();
-                if (httpEntity.getContentType().getValue().equals("text/html")) {
-                    String encoding;
-                    if (httpEntity.getContentEncoding() == null) {
-                        // UTF-8 verwenden, falls keine Kodierung für die Antwort übertragen wurde
-                        encoding = "UTF-8";
-                    } else {
-                        encoding = httpEntity.getContentEncoding().getValue();
-                    }
-                    Bitmap bmp;
-                    InputStream is;
+                    HttpClient client = new DefaultHttpClient();
+                    HttpGet get = new HttpGet(url);
+                    HttpResponse response;
                     try {
-                        String imageUrl = EntityUtils.toString(httpEntity, encoding);
-                        HttpURLConnection conn = (HttpURLConnection) new URL(imageUrl).openConnection();
-                        conn.connect();
-                        is = conn.getInputStream();
-                    } catch(IOException e) {
+                        response = client.execute(get);
+                    } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                    HttpEntity httpEntity = response.getEntity();
+                    if (httpEntity.getContentType().getValue().equals("text/html")) {
+                        String encoding;
+                        if (httpEntity.getContentEncoding() == null) {
+                            // UTF-8 verwenden, falls keine Kodierung für die Antwort übertragen wurde
+                            encoding = "UTF-8";
+                        } else {
+                            encoding = httpEntity.getContentEncoding().getValue();
+                        }
+                        Bitmap bmp;
+                        InputStream is;
+                        try {
+                            String imageUrl = EntityUtils.toString(httpEntity, encoding);
+                            HttpURLConnection conn = (HttpURLConnection) new URL(imageUrl).openConnection();
+                            conn.connect();
+                            is = conn.getInputStream();
+                        } catch(IOException e) {
+                            throw new RuntimeException(e);
+                        }
 
-                    bmp = BitmapFactory.decodeStream(is);
-                    return new BitmapDrawable(Resources.getSystem(), bmp);
-                } else {
-                    ByteArrayInputStream is = null;
-                    try {
-                        is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
-                        return Drawable.createFromStream(is, "Blobstore");
-                    } catch(Exception ex) {
-                        throw new RuntimeException(ex);
-                    } finally {
-                        if (is != null) {
-                            try {
-                                is.close();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
+                        bmp = BitmapFactory.decodeStream(is);
+                        return bmp;
+                    } else {
+                        ByteArrayInputStream is = null;
+                        try {
+                            is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
+                            return BitmapFactory.decodeStream(is);
+                        } catch(Exception ex) {
+                            throw new RuntimeException(ex);
+                        } finally {
+                            if (is != null) {
+                                try {
+                                    is.close();
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
                             }
                         }
                     }
                 }
-            }
-        }.execute();
+            }.execute();
+        }
     }
 }

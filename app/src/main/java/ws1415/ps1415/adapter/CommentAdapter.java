@@ -200,7 +200,7 @@ public class CommentAdapter extends BaseAdapter {
                     }
                     @Override
                     public void taskFailed(ExtendedTask task, String message) {
-                        Toast.makeText(context, R.string.error_editing_comment, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                         progressBar.setVisibility(View.GONE);
                     }
                 }, comment.getId(), newComment.getText().toString());
@@ -228,7 +228,7 @@ public class CommentAdapter extends BaseAdapter {
                             }
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
-                                Toast.makeText(context, R.string.error_deleting_comment, Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                             }
                         }, getItemId(position));
                     }
@@ -292,7 +292,7 @@ public class CommentAdapter extends BaseAdapter {
             }
             @Override
             public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(context, R.string.comment_adapter_fetch_error, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                 finish();
             }
             /**

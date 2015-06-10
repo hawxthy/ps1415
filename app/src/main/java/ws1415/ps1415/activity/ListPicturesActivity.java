@@ -107,10 +107,9 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                     galleryAdapter = new GalleryAdapter(ListPicturesActivity.this, containerClass, containerId, true);
                     setUpGallerySpinner();
                 }
-
                 @Override
                 public void taskFailed(ExtendedTask task, String message) {
-                    Toast.makeText(ListPicturesActivity.this, R.string.error_loading_galleries, Toast.LENGTH_LONG).show();
+                    Toast.makeText(ListPicturesActivity.this, message, Toast.LENGTH_LONG).show();
                 }
             }, userMail);
         } else if (getIntent().hasExtra(EXTRA_CONTAINER_CLASS) && getIntent().hasExtra(EXTRA_CONTAINER_ID)) {
@@ -140,6 +139,10 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                 }
                 minPictureVisibility = PictureVisibility.valueOf(containerData.getMinPictureVisbility());
                 setUpButtons();
+            }
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                Toast.makeText(ListPicturesActivity.this, message, Toast.LENGTH_LONG).show();
             }
         }, containerClass, containerId);
 
@@ -363,7 +366,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
 
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
-                                Toast.makeText(ListPicturesActivity.this, R.string.error_removing_from_gallery, Toast.LENGTH_LONG).show();
+                                Toast.makeText(ListPicturesActivity.this, message, Toast.LENGTH_LONG).show();
                             }
                         }, picture.getId(), galleries.getSelectedItemId());
                     }
@@ -393,7 +396,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                             }
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
-                                Toast.makeText(ListPicturesActivity.this, R.string.error_deleting_picture, Toast.LENGTH_LONG).show();
+                                Toast.makeText(ListPicturesActivity.this, message, Toast.LENGTH_LONG).show();
                                 finishLoading();
                             }
                         }, picture.getId());
@@ -447,7 +450,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                             }
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
-                                Toast.makeText(ListPicturesActivity.this, R.string.error_creating_gallery, Toast.LENGTH_LONG).show();
+                                Toast.makeText(ListPicturesActivity.this, message, Toast.LENGTH_LONG).show();
                             }
                         }, gallery);
                         dialog.dismiss();
@@ -476,7 +479,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                             }
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
-                                Toast.makeText(ListPicturesActivity.this, R.string.error_deleting_gallery, Toast.LENGTH_LONG).show();
+                                Toast.makeText(ListPicturesActivity.this, message, Toast.LENGTH_LONG).show();
                             }
                         }, galleryId);
                     }
@@ -530,7 +533,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                             }
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
-                                Toast.makeText(ListPicturesActivity.this, R.string.error_creating_gallery, Toast.LENGTH_LONG).show();
+                                Toast.makeText(ListPicturesActivity.this, message, Toast.LENGTH_LONG).show();
                             }
                         }, editedGallery);
                         dialog.dismiss();

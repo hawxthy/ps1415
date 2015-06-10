@@ -34,10 +34,12 @@ public class CommentController {
             @Override
             protected CommentData doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().commentEndpoint().addComment(containerClass, containerId, comment).execute();
+                    ServiceProvider.getService().commentEndpoint().addComment(containerClass, containerId, comment).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Kommentar konnte nicht erstellt werden. Zu wenig Rechte?");
                 }
+                return null;
             }
         }.execute();
     }
@@ -53,10 +55,12 @@ public class CommentController {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    return ServiceProvider.getService().commentEndpoint().editComment(commentId, comment).execute();
+                    ServiceProvider.getService().commentEndpoint().editComment(commentId, comment).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Kommentar konnte nicht bearbeitet werden. Zu wenig Rechte?");
                 }
+                return null;
             }
         }.execute();
     }
@@ -73,7 +77,8 @@ public class CommentController {
                 try {
                     ServiceProvider.getService().commentEndpoint().deleteComment(commentId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Kommentar konnte nicht gelöscht werden. Zu wenig Rechte?");
                 }
                 return null;
             }
@@ -96,8 +101,10 @@ public class CommentController {
                     filter.setCursorString(list.getCursorString());
                     return list.getComments();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
+                return null;
             }
         }.execute();
     }
@@ -116,8 +123,10 @@ public class CommentController {
                 try {
                     return ServiceProvider.getService().commentEndpoint().getCommentContainer(containerClass, containerId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
+                return null;
             }
         }.execute();
     }

@@ -64,7 +64,7 @@ public class GalleryAdapter extends BaseAdapter {
             }
             @Override
             public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(context, R.string.error_loading_galleries, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             }
         }, containerKind, containerId);
     }

@@ -187,8 +187,10 @@ public abstract class EventController {
 
                     return createdEvent;
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Veranstaltung konnte nicht erstellt werden. Zu wenig Rechte?");
                 }
+                return null;
             }
         }.execute();
     }
@@ -215,8 +217,10 @@ public abstract class EventController {
                 try {
                     return ServiceProvider.getService().eventEndpoint().editEvent(event).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Veranstaltung konnte nicht bearbeitet werden. Zu wenig Rechte?");
                 }
+                return null;
             }
         }.execute();
     }
@@ -233,7 +237,8 @@ public abstract class EventController {
                 try {
                     ServiceProvider.getService().eventEndpoint().deleteEvent(eventId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Veranstaltung konnte nicht gelöscht werden. Zu wenig Rechte?");
                 }
                 return null;
             }
@@ -255,8 +260,10 @@ public abstract class EventController {
                 try {
                     return EventRole.valueOf(ServiceProvider.getService().eventEndpoint().joinEvent(eventId, visibility.name()).execute().getString());
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
+                return null;
             }
         }.execute();
     }
@@ -273,7 +280,8 @@ public abstract class EventController {
                 try {
                     ServiceProvider.getService().eventEndpoint().leaveEvent(eventId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
                 return null;
             }
@@ -294,7 +302,8 @@ public abstract class EventController {
                 try {
                     ServiceProvider.getService().eventEndpoint().changeParticipationVisibility(eventId, visibility.name()).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
                 return null;
             }

@@ -161,7 +161,7 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
                     }
                     @Override
                     public void taskFailed(ExtendedTask task, String message) {
-                        Toast.makeText(ShowEventActivity.this, R.string.error_leaving_event, Toast.LENGTH_LONG).show();
+                        Toast.makeText(ShowEventActivity.this, message, Toast.LENGTH_LONG).show();
                         finish();
                     }
                     private void finish() {
@@ -314,7 +314,7 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
 
     @Override
     public void taskFailed(ExtendedTask task, String message) {
-        Toast.makeText(this, R.string.event_loading_error, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         finishLoading();
     }
     // -------------------- Callback-Methoden für das Abrufen eines Events --------------------
@@ -333,13 +333,11 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
                 event.setParticipationVisibility(visibility.name());
                 finish();
             }
-
             @Override
             public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(ShowEventActivity.this, R.string.error_joining_event, Toast.LENGTH_LONG).show();
+                Toast.makeText(ShowEventActivity.this, message, Toast.LENGTH_LONG).show();
                 finish();
             }
-
             private void finish() {
                 joinLeaveEventItem.setVisible(true);
                 setProgressBarIndeterminateVisibility(false);
@@ -359,7 +357,7 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
             }
             @Override
             public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(ShowEventActivity.this, R.string.error_changing_visibility, Toast.LENGTH_LONG).show();
+                Toast.makeText(ShowEventActivity.this, message, Toast.LENGTH_LONG).show();
                 finish();
             }
             private void finish() {

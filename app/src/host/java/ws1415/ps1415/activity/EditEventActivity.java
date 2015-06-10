@@ -117,6 +117,11 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
                     }
                 }
             }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                Toast.makeText(EditEventActivity.this, message, Toast.LENGTH_LONG).show();
+            }
         });
 
         setContentView(R.layout.activity_edit_event);
@@ -247,7 +252,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
 
                                         @Override
                                         public void taskFailed(ExtendedTask task, String message) {
-                                            Toast.makeText(EditEventActivity.this, R.string.error_saving_event, Toast.LENGTH_LONG).show();
+                                            Toast.makeText(EditEventActivity.this, message, Toast.LENGTH_LONG).show();
                                             findViewById(R.id.eventLoading).setVisibility(View.GONE);
                                         }
                                     }, event);
@@ -270,7 +275,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
 
                                         @Override
                                         public void taskFailed(ExtendedTask task, String message) {
-                                            Toast.makeText(EditEventActivity.this, R.string.error_saving_event, Toast.LENGTH_LONG).show();
+                                            Toast.makeText(EditEventActivity.this, message, Toast.LENGTH_LONG).show();
                                             findViewById(R.id.eventLoading).setVisibility(View.GONE);
                                         }
                                     }, event, iconFile, headerImageFile, imageFiles);

@@ -49,6 +49,7 @@ import ws1415.ps1415.fragment.EditorMapFragment;
 import ws1415.ps1415.fragment.EditorWaypointsFragment;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.task.RouteLoaderTask;
 import ws1415.ps1415.util.LocationUtils;
 
@@ -282,7 +283,12 @@ public class RouteEditorActivity extends Activity implements ActionBar.TabListen
 
                     rt.setLength(length);
 
-                    RouteController.addRoute(null, rt);
+                    RouteController.addRoute(new ExtendedTaskDelegateAdapter<Void, com.skatenight.skatenightAPI.model.Route>() {
+                        @Override
+                        public void taskFailed(ExtendedTask task, String message) {
+                            Toast.makeText(RouteEditorActivity.this, message, Toast.LENGTH_LONG).show();
+                        }
+                    }, rt);
 
                     if (backButtonPressed) {
                         RouteEditorActivity.super.onBackPressed();

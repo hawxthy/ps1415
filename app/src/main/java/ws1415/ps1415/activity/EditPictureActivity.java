@@ -248,7 +248,7 @@ public class EditPictureActivity extends Activity {
 
                     @Override
                     public void taskFailed(ExtendedTask task, String message) {
-                        Toast.makeText(EditPictureActivity.this, R.string.error_uploading_picture, Toast.LENGTH_LONG).show();
+                        Toast.makeText(EditPictureActivity.this, message, Toast.LENGTH_LONG).show();
                         finishLoading();
                     }
                 }, selectedFile, title.getText().toString(), description.getText().toString(),

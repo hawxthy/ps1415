@@ -196,7 +196,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
 
             @Override
             public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(context, R.string.picture_adapter_fetch_error, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                 finish();
             }
 

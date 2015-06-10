@@ -152,10 +152,9 @@ public class ManageEventsActivity extends BaseActivity implements EventListFragm
                                                     public void taskDidFinish(ExtendedTask task, Void aVoid) {
                                                         onEventDeleted(position);
                                                     }
-
                                                     @Override
                                                     public void taskFailed(ExtendedTask task, String message) {
-                                                        Toast.makeText(ManageEventsActivity.this, R.string.event_deletion_error, Toast.LENGTH_LONG).show();
+                                                        Toast.makeText(ManageEventsActivity.this, message, Toast.LENGTH_LONG).show();
                                                     }
                                                 }, id);
                                             }

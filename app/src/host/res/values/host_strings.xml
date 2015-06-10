@@ -50,7 +50,7 @@
     </array>
     <string name="delete_route">Delete Route?</string>
     <string name="delete_route_message">Do you really want to delete the selected route? This can not be undone.</string>
-    <string name="route_deletion_error">An error occurred while deleting the route. Is the route being used in existing events?</string>
+    <string name="route_deletion_error">The route could not be deleted. Is the route being used in existing events?</string>
 
     <!-- Strings zu activtiy_add_route_dialog -->
     <string name="title_activity_add_route_dialog">Add Route</string>

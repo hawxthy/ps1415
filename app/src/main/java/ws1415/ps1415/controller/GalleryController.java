@@ -61,26 +61,10 @@ public abstract class GalleryController {
                 try {
                     return ServiceProvider.getService().galleryEndpoint().getGalleries(containerKind, containerId).execute().getItems();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
-            }
-        }.execute();
-    }
-
-    /**
-     * Ruft die Metadaten der Gallery mit der angegebenen ID ab und übergibt sie dem Handler.
-     * @param handler      Der Handler, der die Gallery übergeben bekommt.
-     * @param galleryId    Die ID der abzurufenden Gallery.
-     */
-    public static void getGalleryMetaData(ExtendedTaskDelegate<Void, GalleryMetaData> handler, final long galleryId) {
-        new ExtendedTask<Void, Void, GalleryMetaData>(handler) {
-            @Override
-            protected GalleryMetaData doInBackground(Void... params) {
-                try {
-                    return ServiceProvider.getService().galleryEndpoint().getGalleryMetaData(galleryId).execute();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                return null;
             }
         }.execute();
     }
@@ -105,8 +89,10 @@ public abstract class GalleryController {
                 try {
                     return ServiceProvider.getService().galleryEndpoint().createGallery(gallery).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Galerie konnte nicht erstellt werden. Zu wenig Rechte?");
                 }
+                return null;
             }
         }.execute();
     }
@@ -130,8 +116,10 @@ public abstract class GalleryController {
                 try {
                     return ServiceProvider.getService().galleryEndpoint().editGallery(gallery).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Galerie konnte nicht bearbeitet werden. Zu wenig Rechte?");
                 }
+                return null;
             }
         }.execute();
     }
@@ -148,7 +136,8 @@ public abstract class GalleryController {
                 try {
                     ServiceProvider.getService().galleryEndpoint().deleteGallery(galleryId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Galerie konnte nicht gelöscht werden. Zu wenig Rechte?");
                 }
                 return null;
             }
@@ -167,8 +156,10 @@ public abstract class GalleryController {
                 try {
                     return ServiceProvider.getService().galleryEndpoint().getGalleryContainerForMail(mail).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
+                return null;
             }
         }.execute();
     }
@@ -190,8 +181,10 @@ public abstract class GalleryController {
                     }
                     return result;
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
+                return null;
             }
         }.execute();
     }
@@ -212,8 +205,10 @@ public abstract class GalleryController {
                     filter.setCursorString(result.getCursorString());
                     return result.getList();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
+                return null;
             }
         }.execute();
     }
@@ -248,7 +243,8 @@ public abstract class GalleryController {
                     picture = ServiceProvider.getService().galleryEndpoint().createPicture(
                             title, description, visibility.name()).set("galleryId", galleryId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Bild konnte nicht erstellt werden. Zu wenig Rechte?");
                 }
 
                 // POST-Anfrage für den Upload erstellen
@@ -285,9 +281,10 @@ public abstract class GalleryController {
                     try {
                         ServiceProvider.getService().galleryEndpoint().deletePicture(picture.getId()).execute();
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        // Hier keine Fehlerbehandlung, da bereits im Fehlerfall
                     }
-                    throw new RuntimeException(ex);
+                    ex.printStackTrace();
+                    publishError("Bild konnte nicht hochgeladen werden. Bitte prüfen Sie Ihre Netzwerkverbindung.");
                 }
 
                 return picture;
@@ -304,7 +301,6 @@ public abstract class GalleryController {
      * @param visibility     Die neue Sichtbarkeit des Bildes.
      * @throws IllegalArgumentException falls das Bild ungültig ist
      */
-    // TODO R: Testen
     public static void editPicture(ExtendedTaskDelegate<Void, Void> handler, final long pictureId,
                                    final String title, final String description, final PictureVisibility visibility) {
         if (visibility == null || title == null || title.isEmpty() || description == null || description.isEmpty()) {
@@ -317,7 +313,8 @@ public abstract class GalleryController {
                 try {
                     ServiceProvider.getService().galleryEndpoint().editPicture(pictureId, title, description, visibility.name()).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Bild konnte nicht bearbeitet werden. Zu wenig Rechte?");
                 }
                 return null;
             }
@@ -336,8 +333,10 @@ public abstract class GalleryController {
                 try {
                     return ServiceProvider.getService().galleryEndpoint().getPicture(pictureId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
+                return null;
             }
         }.execute();
     }
@@ -354,7 +353,8 @@ public abstract class GalleryController {
                 try {
                     ServiceProvider.getService().galleryEndpoint().deletePicture(pictureId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Bild konnte nicht gelöscht werden. Zu wenig Rechte?");
                 }
                 return null;
             }
@@ -375,7 +375,8 @@ public abstract class GalleryController {
                 try {
                     ServiceProvider.getService().galleryEndpoint().ratePicture(pictureId, rating).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
                 }
                 return null;
             }
@@ -395,7 +396,8 @@ public abstract class GalleryController {
                 try {
                     ServiceProvider.getService().galleryEndpoint().addPictureToGallery(pictureId, galleryId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Bild konnte nicht zur Galerie hinzugefügt werden. Zu wenig Rechte?");
                 }
                 return null;
             }
@@ -415,7 +417,8 @@ public abstract class GalleryController {
                 try {
                     ServiceProvider.getService().galleryEndpoint().removePictureFromGallery(pictureId, galleryId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Bild konnte nicht aus der Galerie entfernt werden. Zu wenig Rechte?");
                 }
                 return null;
             }
@@ -428,7 +431,6 @@ public abstract class GalleryController {
      * @param containerClass    Der Datastore-Kind des Containers.
      * @param containerId       Die ID des Containers.
      */
-    // TODO R: Testen
     public static void getGalleryContainer(ExtendedTaskDelegate<Void, GalleryContainerData> handler,
                                                         final String containerClass, final long containerId) {
         new ExtendedTask<Void, Void, GalleryContainerData>(handler) {
@@ -437,8 +439,10 @@ public abstract class GalleryController {
                 try {
                     return ServiceProvider.getService().galleryEndpoint().getGalleryContainer(containerClass, containerId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Serververbindung konnte nicht hergestellt werden");
                 }
+                return null;
             }
         }.execute();
     }

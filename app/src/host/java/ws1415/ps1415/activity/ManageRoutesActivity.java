@@ -66,6 +66,7 @@ public class ManageRoutesActivity extends BaseActivity implements RouteListFragm
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 setProgressBarIndeterminateVisibility(false);
+                Toast.makeText(ManageRoutesActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
         routeFragment.setListAdapter(routeAdapter);
@@ -112,6 +113,7 @@ public class ManageRoutesActivity extends BaseActivity implements RouteListFragm
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 setProgressBarIndeterminateVisibility(false);
+                Toast.makeText(ManageRoutesActivity.this, message, Toast.LENGTH_LONG).show();
             }
         });
     }

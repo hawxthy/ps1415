@@ -26,8 +26,10 @@ public abstract class RouteController {
                 try {
                     return ServiceProvider.getService().routeEndpoint().getRoutes().execute().getItems();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Serververbindung konnte nicht hergestellt werden");
                 }
+                return null;
             }
         }.execute();
     }
@@ -44,8 +46,10 @@ public abstract class RouteController {
                 try {
                     return ServiceProvider.getService().routeEndpoint().addRoute(route).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError("Route konnte nicht erstellt werden. Zu wenig Rechte?");
                 }
+                return null;
             }
         }.execute();
     }
@@ -62,7 +66,8 @@ public abstract class RouteController {
                 try {
                     ServiceProvider.getService().routeEndpoint().deleteRoute(routeId).execute();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
+                    publishError(null);
                 }
                 return null;
             }

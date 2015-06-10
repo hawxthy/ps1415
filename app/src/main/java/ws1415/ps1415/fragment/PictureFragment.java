@@ -149,6 +149,10 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
                     headerView.findViewById(R.id.newCommentControls).setVisibility(View.GONE);
                 }
             }
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+            }
         }, Picture.class.getSimpleName(), pictureId);
         GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
             @Override
@@ -174,7 +178,7 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
             }
             @Override
             public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(PictureFragment.this.getActivity(), R.string.error_loading_picture, Toast.LENGTH_LONG).show();
+                Toast.makeText(PictureFragment.this.getActivity(), message, Toast.LENGTH_LONG).show();
                 finishLoading();
             }
         }, pictureId);
@@ -205,7 +209,7 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
                 }
                 @Override
                 public void taskFailed(ExtendedTask task, String message) {
-                    Toast.makeText(PictureFragment.this.getActivity(), R.string.error_rating_picture, Toast.LENGTH_LONG).show();
+                    Toast.makeText(PictureFragment.this.getActivity(), message, Toast.LENGTH_LONG).show();
                 }
             }, pictureId, (int) rating);
         }
@@ -225,7 +229,7 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
                             }
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
-                                Toast.makeText(getActivity(), R.string.error_adding_to_gallery, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
                             }
                         }, pictureId, galleryAdapter.getItemId(which));
                     }
@@ -245,7 +249,7 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
                 }
                 @Override
                 public void taskFailed(ExtendedTask task, String message) {
-                    Toast.makeText(PictureFragment.this.getActivity(), R.string.error_adding_comment, Toast.LENGTH_LONG).show();
+                    Toast.makeText(PictureFragment.this.getActivity(), message, Toast.LENGTH_LONG).show();
                     addingCommentLoading.setVisibility(View.GONE);
                 }
             }, Picture.class.getSimpleName(), pictureId, newComment.getText().toString());

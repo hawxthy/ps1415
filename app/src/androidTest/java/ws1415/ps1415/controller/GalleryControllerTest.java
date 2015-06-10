@@ -119,21 +119,6 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         testGallery = ServiceProvider.getService().galleryEndpoint().createGallery(testGallery).execute();
     }
 
-    public void testGetGalleryMetaData() throws InterruptedException {
-        final CountDownLatch signal = new CountDownLatch(1);
-        GalleryController.getGalleryMetaData(new ExtendedTaskDelegateAdapter<Void, GalleryMetaData>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, GalleryMetaData galleryMetaData) {
-                assertNotNull("GalleryMetaData", galleryMetaData);
-                assertEquals("id", testGallery.getId(), galleryMetaData.getId());
-                assertEquals("title", testGallery.getTitle(), galleryMetaData.getTitle());
-
-                signal.countDown();
-            }
-        }, testGallery.getId());
-        signal.await(10, TimeUnit.SECONDS);
-    }
-
     public void testCreateGallery() throws InterruptedException, IOException {
         // Testroute für das Testevent erstellen
         Route route = new Route();
@@ -214,17 +199,6 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
             }
         }, testGallery.getId());
         signal.await(10, TimeUnit.SECONDS);
-
-        // Beim Abrufen der Testgallery sollte nun ein Fehler auftreten
-        try {
-            ServiceProvider.getService().galleryEndpoint().getGalleryMetaData(testGallery.getId()).execute();
-        } catch (IOException e) {
-            // Testgallery wurde erfolgreich gelöscht: auf null setzen, damit in der tearDown-Methode()
-            // nicht erneut gelöscht wird
-            testGallery = null;
-            return;
-        }
-        fail("gallery was not deleted");
     }
 
     /**

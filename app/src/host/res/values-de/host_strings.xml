@@ -50,7 +50,7 @@
     </array>
     <string name="delete_route">Route löschen?</string>
     <string name="delete_route_message">Möchten Sie die Route wirklich löschen? Dies kann nicht rückgängig gemacht werden.</string>
-    <string name="route_deletion_error">Beim Löschen der Route ist ein Fehler aufgetreten. Wird die Route möglicherweise in bestehenden Veranstaltungen verwendet?</string>
+    <string name="route_deletion_error">Die Route konnte nicht gelöscht werden. Wird die Route möglicherweise in bestehenden Veranstaltungen verwendet?</string>
 
     <!--Strings zu activtiy_add_route_dialog-->
     <string name="title_activity_add_route_dialog">Erstelle Route</string>
