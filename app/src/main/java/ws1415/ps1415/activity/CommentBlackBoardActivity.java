@@ -36,6 +36,7 @@ public class CommentBlackBoardActivity extends Activity {
     public static final String EXTRA_BOARD_ID = "entryId";
     private BoardEntry be;
     private Long id;
+    private String groupName;
 
     //Viewelemente
     private TextView mWriterView;
@@ -62,6 +63,12 @@ public class CommentBlackBoardActivity extends Activity {
         id = Long.parseLong(getIntent().getStringExtra(EXTRA_BOARD_ID));
         if (id == null) {
             Toast.makeText(this, R.string.noLongIdSubmitted, Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+        groupName = getIntent().getStringExtra(GroupProfileActivity.EXTRA_GROUP_NAME);
+        if(groupName == null){
+            Toast.makeText(this, R.string.noGoupNameSubmitted, Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -202,7 +209,7 @@ public class CommentBlackBoardActivity extends Activity {
                                     Toast.makeText(CommentBlackBoardActivity.this, message, Toast.LENGTH_LONG).show();
                                     setProgressBarIndeterminateVisibility(Boolean.FALSE);
                                 }
-                            }, id, messageEditText.getText().toString());
+                            }, id, groupName, messageEditText.getText().toString());
                             dialog.dismiss();
                         } else {
                             Toast.makeText(CommentBlackBoardActivity.this, R.string.textTooShort, Toast.LENGTH_SHORT).show();

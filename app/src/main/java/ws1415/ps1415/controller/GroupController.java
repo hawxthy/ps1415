@@ -149,20 +149,20 @@ public class GroupController {
         UserGroupFilter filter = new UserGroupFilter();
         filter.setLimit(1000);
         final List<UserGroupMetaData> visibleGroups = new ArrayList<>();
-        getMyUserGroups(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>(){
+        getMyUserGroups(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> metaDatas) {
-                if(metaDatas == null){
+                if (metaDatas == null) {
                     Toast.makeText(context, "Es existieren keine Gruppen, denen Sie beigetreten sind", Toast.LENGTH_LONG).show();
-                }else{
-                    for(UserGroupMetaData metaData : metaDatas){
-                        if(PrefManager.getGroupVisibility(context, metaData.getName())){
+                } else {
+                    for (UserGroupMetaData metaData : metaDatas) {
+                        if (PrefManager.getGroupVisibility(context, metaData.getName())) {
                             visibleGroups.add(metaData);
                         }
                     }
                 }
             }
-        },filter);
+        }, filter);
         return visibleGroups;
     }
 
@@ -547,15 +547,16 @@ public class GroupController {
      * zu Kommentieren
      *
      * @param handler
+     * @param groupName    Der Name der Nutzergruppe
      * @param id           Die Id der Blackboardmessage
      * @param boardComment Der Kommentar
      */
-    public void commentBlackBoard(ExtendedTaskDelegate handler, Long id, final String boardComment) {
+    public void commentBlackBoard(ExtendedTaskDelegate handler, Long id, final String groupName, final String boardComment) {
         new ExtendedTask<Long, Void, BoardEntry>(handler) {
             @Override
             protected BoardEntry doInBackground(Long... longs) {
                 try {
-                    return ServiceProvider.getService().groupEndpoint().commentBlackBoard(longs[0], boardComment).execute();
+                    return ServiceProvider.getService().groupEndpoint().commentBlackBoard(groupName, longs[0], boardComment).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Fehler: Konnte die Boardmessage nicht Kommentieren");
@@ -563,6 +564,30 @@ public class GroupController {
                 }
             }
         }.execute(id);
+    }
+
+    /**
+     * Methode, welche mit dem GroupEndpoint kommuniziert um eine Boackboardmessage zu
+     * editieren
+     *
+     * @param handler
+     * @param groupName Der Name der Nutzergruppe
+     * @param id Die Id der BoardEntry
+     * @param newMessage Die neue Nachricht
+     */
+    public void editBoardEntry(ExtendedTaskDelegate handler, final Long id, final String groupName, final String newMessage){
+        new ExtendedTask<Long, Void, Void>(handler){
+            @Override
+            protected Void doInBackground(Long... longs) {
+                try{
+                    return ServiceProvider.getService().groupEndpoint().editBoardEntry(groupName, id, newMessage).execute();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    publishError("Fehler: Die Message konnte nicht editiert werden");
+                    return null;
+                }
+            }
+        }.execute();
     }
 
 

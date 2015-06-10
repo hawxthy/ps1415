@@ -496,6 +496,7 @@
     <string name="cantSearchEmptyStrings">Geben Sie etwas zum Suchen an</string>
     <string name="youAreNowVisible">Sie sind nun für alle Mitglieder sichtbar</string>
     <string name="youAreNowInvisible">Sie können nun nicht mehr von Mitgliedern gesehen werden</string>
+    <string name="edit_this_entry">Wollen Sie diese Nachricht editieren?</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="deleteThisEntryQuestion">Diesen Eintrag löschen?</string>

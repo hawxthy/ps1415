@@ -541,7 +541,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = throwIfNoUserGroupExists(groupName);
-        if (hasRights(group, user.getEmail(), Right.DELETEMEMBER.name()) && group.getMemberRights().keySet().contains(userName)) {
+        if (hasRights(group, user.getEmail(), Right.FULLRIGHTS.name()) && group.getMemberRights().keySet().contains(userName)) {
 
             group.removeGroupMember(userName);
 
@@ -630,11 +630,38 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param comment Die Message
      * @throws OAuthRequestException Wird geschmissen, falls der Aufrufer nicht registriert ist
      */
-    public BoardEntry commentBlackBoard(User user, @Named("boardId") Long id, @Named("comment") String comment) throws OAuthRequestException {
+    public BoardEntry commentBlackBoard(User user, @Named("groupName") String groupName, @Named("boardId") Long id, @Named("comment") String comment) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
-        BoardEntry entry = ofy().load().type(BoardEntry.class).id(id).safe().addComment(comment, new UserEndpoint().getPrimaryData(user, user.getEmail()).getFirstName());
-        ofy().save().entity(entry).now();
-        return entry;
+        UserGroup group = throwIfNoUserGroupExists(groupName);
+        if (hasRights(group, user.getEmail(), Right.EDITBLACKBOARD.name())) {
+            BoardEntry entry = ofy().load().type(BoardEntry.class).id(id).safe().addComment(comment, new UserEndpoint().getPrimaryData(user, user.getEmail()).getFirstName());
+            ofy().save().entity(entry).now();
+            return entry;
+        }else{
+            EndpointUtil.throwIfNoRights();
+        }
+        return null;
+    }
+
+    /**
+     * Editiert einen BlackBoard Eintrag mit der angegebenen Nachricht, insofern ein
+     * Eintrag zu der angegebenen id existiert
+     *
+     * @param user
+     * @param id Die is des BoardEntry
+     * @param newMessage Die neue Nachricht
+     * @throws OAuthRequestException Wird geschmissen, falls der Aufrufer nicht registriert ist
+     */
+    public void editBoardEntry(User user, @Named("groupName") String groupName, @Named("boardId") Long id, @Named("newMessage") String newMessage) throws OAuthRequestException{
+        EndpointUtil.throwIfNoUser(user);
+        UserGroup group = throwIfNoUserGroupExists(groupName);
+        if (hasRights(group, user.getEmail(), Right.EDITBLACKBOARD.name())) {
+            BoardEntry be = ofy().load().type(BoardEntry.class).id(id).safe();
+            be.setMessage(newMessage);
+            ofy().save().entity(be).now();
+        }else{
+            EndpointUtil.throwIfNoRights();
+        }
     }
 
     /**
@@ -783,7 +810,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             throw new IllegalArgumentException("making a user group private means you have to submit a password");
         }
         UserGroup group = throwIfNoUserGroupExists(groupName);
-        if (hasRights(group, user.getEmail(), Right.CHANGEGROUPPRIVACY.name())) {
+        if (hasRights(group, user.getEmail(), Right.FULLRIGHTS.name())) {
             group.setPrivat(true);
             group.setPassword(hashPassword(groupPassword));
             ofy().save().entity(group).now();
@@ -806,7 +833,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = throwIfNoUserGroupExists(groupName);
-        if (hasRights(group, user.getEmail(), Right.CHANGEGROUPPRIVACY.name())) {
+        if (hasRights(group, user.getEmail(), Right.FULLRIGHTS.name())) {
             group.setPrivat(false);
             group.setPassword("");
             ofy().save().entity(group).now();

@@ -85,6 +85,7 @@ public class BlackBoardListAdapter extends BaseAdapter{
     private class Holder{
         private ImageView messageImage;
         private ImageView deleteEntryButton;
+        private ImageView editEntryButton;
         private TextView dateView;
         private TextView writerView;
         private TextView contentView;
@@ -102,6 +103,7 @@ public class BlackBoardListAdapter extends BaseAdapter{
             holder.writerView = (TextView) convertView.findViewById(R.id.list_view_item_black_board_creator_text_view);
             holder.contentView = (TextView) convertView.findViewById(R.id.list_view_item_black_board_content_edit_text);
             holder.deleteEntryButton = (ImageView) convertView.findViewById(R.id.delete_board_message_button);
+            holder.editEntryButton = (ImageView) convertView.findViewById(R.id.edit_board_message_button);
             holder.commentButton = (ButtonFlat) convertView.findViewById(R.id.list_view_item_black_board_comments_button);
             holder.messageImage = (ImageView) convertView.findViewById(R.id.black_board_message_image);
             convertView.setTag(holder);
@@ -150,15 +152,24 @@ public class BlackBoardListAdapter extends BaseAdapter{
             if(rights != null){
                 if(!rights.contains(Right.EDITBLACKBOARD.name()) && !rights.contains(Right.FULLRIGHTS.name())){
                     holder.deleteEntryButton.setVisibility(View.GONE);
+                    holder.editEntryButton.setVisibility(View.GONE);
                 }
             }else{
                 holder.deleteEntryButton.setVisibility(View.GONE);
+                holder.editEntryButton.setVisibility(View.GONE);
             }
             holder.commentButton.setOnClickListener(new View.OnClickListener() {
                 Long entryId = getItem(position).getId();
                 @Override
                 public void onClick(View view) {
                     activity.startCommentMessage(entryId);
+                }
+            });
+            holder.editEntryButton.setOnClickListener(new View.OnClickListener() {
+                Long entryId = getItem(position).getId();
+                @Override
+                public void onClick(View view) {
+                    activity.startEditMessage(entryId);
                 }
             });
         }

@@ -439,7 +439,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                                 checkVisibility = true;
                                 Toast.makeText(GroupProfileActivity.this, R.string.youAreNowVisible, Toast.LENGTH_LONG).show();
                             }
-                        }else {
+                        } else {
                             mChangeVisibility.setColorNormalResId(R.color.colorPrimaryJoin);
                             mChangeVisibility.setColorPressedResId(R.color.colorPressedBlackBoard);
                             checkVisibility = false;
@@ -1181,6 +1181,72 @@ public class GroupProfileActivity extends BaseFragmentActivity {
     public void startCommentMessage(Long id) {
         Intent comment_board_message_intent = new Intent(this, CommentBlackBoardActivity.class);
         comment_board_message_intent.putExtra(CommentBlackBoardActivity.EXTRA_BOARD_ID, id.toString());
+        comment_board_message_intent.putExtra(EXTRA_GROUP_NAME, groupName);
         startActivity(comment_board_message_intent);
+    }
+
+    /**
+     * Startet die CommentBlackBoardActivity und übergibt als Extra die id des zu
+     * kommentierenden BoardEntries.
+     *
+     * @param id
+     */
+    public void startEditMessage(final Long id) {
+        AlertDialog.Builder altertadd = new AlertDialog.Builder(this);
+        LayoutInflater factory = LayoutInflater.from(GroupProfileActivity.this);
+        final View editView = factory.inflate(R.layout.post_message, null);
+        final EditText newMessage = (EditText)editView.findViewById(R.id.post_black_board_edit_text);
+        final TextView errorMessage= (TextView)editView.findViewById(R.id.failure_text_view);
+        errorMessage.setText(R.string.textTooShort);
+        newMessage.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(newMessage.getText().length() < 2){
+                    errorMessage.setVisibility(View.VISIBLE);
+                }else{
+                    errorMessage.setVisibility(View.GONE);
+                }
+            }
+        });
+        altertadd.setView(editView);
+        altertadd.setTitle(R.string.edit_this_entry);
+        altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (newMessage.getText().length() > 1) {
+                    setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                    GroupController.getInstance().editBoardEntry(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                        @Override
+                        public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                            setUpProfile();
+                        }
+
+                        @Override
+                        public void taskFailed(ExtendedTask task, String message) {
+                            Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                            setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                        }
+                    }, id, groupName, newMessage.getText().toString());
+                    dialog.dismiss();
+                }
+            }
+        });
+        altertadd.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        altertadd.show();
     }
 }

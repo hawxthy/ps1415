@@ -454,6 +454,7 @@
     <string name="cantSearchEmptyStrings">Put in something to search please</string>
     <string name="youAreNowVisible">You are now visible</string>
     <string name="youAreNowInvisible">You are now invisible</string>
+    <string name="edit_this_entry">Edit this message?</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="deleteThisEntryQuestion">Delete this Entry?</string>

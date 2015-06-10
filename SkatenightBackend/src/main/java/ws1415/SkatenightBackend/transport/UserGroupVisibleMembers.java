@@ -19,7 +19,8 @@ public class UserGroupVisibleMembers {
     }
 
     /**
-     * Konstruktor für das erstellen.
+     * Konstruktor für das erstellen bei der Gruppenerstellung. Damit dort
+     * nicht extra eine ArrayList erstellt werden muss.
      *
      * @param groupName
      * @param visibleMember

@@ -38,7 +38,7 @@
             android:layout_below="@+id/list_view_item_black_board_creator_text_view"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:layout_toRightOf="@+id/black_board_message_image"
             android:text="Contentsdfsdfsdfsdfdsfsdsdfsdfsdfsdfdssfdsfsdfdsfsdsdfsdfdsfdsfsdfsdfdsfdsfds"
             android:textSize="16sp" />
@@ -75,5 +75,14 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:src="@drawable/ic_highlight_off_black_24dp" />
+
+    <ImageView
+        android:id="@+id/edit_board_message_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginRight="8dp"
+        android:layout_toLeftOf="@+id/delete_board_message_button"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/ic_build_black_24dp" />
 
 </RelativeLayout>
