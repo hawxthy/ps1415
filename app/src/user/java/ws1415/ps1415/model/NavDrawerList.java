@@ -6,6 +6,7 @@ import android.widget.AdapterView;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.activity.CreateUserGroupActivity;
 import ws1415.ps1415.activity.FriendsActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.ListUserGroupsActivity;
@@ -144,6 +145,26 @@ public class NavDrawerList {
                     Intent user_group_intent = new Intent(parent.getContext(), MyUserGroupsActivity.class);
                     user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(user_group_intent);
+                }
+            },
+
+            // ---------- Gruppe erstellen ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.create_user_group;
+                }
+
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_group_white_24dp;
+                }
+
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent show_events_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
+                    show_events_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(show_events_intent);
                 }
             },
 

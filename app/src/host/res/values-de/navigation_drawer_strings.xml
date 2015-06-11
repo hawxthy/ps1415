@@ -12,6 +12,7 @@
     <string name="events">Veranstaltungen</string>
     <string name="user_groups">Gruppen</string>
     <string name="my_groups">Meine Gruppen</string>
+    <string name="create_user_group">Gruppe erstellen</string>
     <string name="search">Suche</string>
     <string name="create_edit_events">Veranstaltungen erstellen/bearbeiten</string>
     <string name="create_edit_routes">Routen erstellen/bearbeiten</string>
