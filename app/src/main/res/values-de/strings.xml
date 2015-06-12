@@ -69,7 +69,7 @@
     <string name="active_event_header_elevation_gain">Höhenmeter</string>
     <string name="active_event_button_speed_profile">Geschwindigkeitsprofil</string>
     <string name="active_event_button_map">Karte</string>
-    <string name="active_event_button_end">Teilnahme beenden</string>
+    <string name="active_event_button_end">Auswertung beenden</string>
     <string name="active_event_no_email_message">Bitte erst an einem Event teilnehmen.</string>
 
     <string name="active_event_timer_format"><xliff:g id="sign">%1$s</xliff:g><xliff:g id="hours">%2$02d</xliff:g>:<xliff:g id="minutes">%3$02d</xliff:g>:<xliff:g id="seconds">%4$02d</xliff:g></string>
