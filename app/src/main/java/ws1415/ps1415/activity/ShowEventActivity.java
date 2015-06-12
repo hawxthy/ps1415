@@ -189,7 +189,6 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
                 EventController.leaveEvent(new ExtendedTaskDelegateAdapter<Void, Void>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                        joinLeaveEventItem.setIcon(R.drawable.ic_action_join_event);
                         joinLeaveEventItem.setTitle(R.string.join_event);
                         event.getMemberList().remove(ServiceProvider.getEmail());
                         event.setParticipationVisibility(null);
@@ -247,7 +246,6 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
 
         // Falls der eingeloggte Benutzer am Event teilnimmt, dann Icon zum Verlassen anzeigen
         if (event.getMemberList().containsKey(ServiceProvider.getEmail())) {
-            joinLeaveEventItem.setIcon(R.drawable.ic_action_leave_event);
             joinLeaveEventItem.setTitle(R.string.leave_event);
         }
 
@@ -376,7 +374,6 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         EventController.joinEvent(new ExtendedTaskDelegateAdapter<Void, EventRole>() {
             @Override
             public void taskDidFinish(ExtendedTask task, EventRole role) {
-                joinLeaveEventItem.setIcon(R.drawable.ic_action_leave_event);
                 joinLeaveEventItem.setTitle(R.string.leave_event);
                 event.getMemberList().put(ServiceProvider.getEmail(), role.name());
                 event.setParticipationVisibility(visibility.name());

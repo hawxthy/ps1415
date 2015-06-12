@@ -200,18 +200,17 @@ public class UsergroupAdapter extends BaseAdapter {
         } else if(context instanceof MyUserGroupsActivity){
             if (count < 6) {
                 final MyUserGroupsActivity activity = (MyUserGroupsActivity) context;
-
+                holder.hiddenCancelButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.remove_icon_in_red));
+                holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_visibility_black_24dp));
                 // Prüfe auf Sichtbarkeit und mache die Buttons dementsprechend sichtbar
                 if (PrefManager.getGroupVisibility(context, getItem(position).getName())) {
-                    holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_visibility_black_24dp));
                     holder.hiddenCancelButton.setVisibility(View.VISIBLE);
+                    holder.hiddenSecurityButton.setVisibility(View.GONE);
                     count++;
                 }else{
-                    holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
+                    holder.hiddenSecurityButton.setVisibility(View.VISIBLE);
                     holder.hiddenCancelButton.setVisibility(View.GONE);
                 }
-                holder.hiddenCancelButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.remove_icon_in_red));
-                holder.hiddenSecurityButton.setVisibility(View.VISIBLE);
 
                 // Setze die Listener
                 holder.hiddenSecurityButton.setOnClickListener(new View.OnClickListener() {
@@ -220,8 +219,8 @@ public class UsergroupAdapter extends BaseAdapter {
                     @Override
                     public void onClick(View view) {
                         if (!PrefManager.getGroupVisibility(context, groupName) && count < 5) {
-                            holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_visibility_black_24dp));
                             holder.hiddenCancelButton.setVisibility(View.VISIBLE);
+                            holder.hiddenSecurityButton.setVisibility(View.GONE);
                             PrefManager.setGroupVisibility(context, groupName, true);
                             count++;
                         }else{
@@ -235,8 +234,8 @@ public class UsergroupAdapter extends BaseAdapter {
                     @Override
                     public void onClick(View view) {
                         if (PrefManager.getGroupVisibility(context, groupName)) {
-                            holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
                             holder.hiddenCancelButton.setVisibility(View.GONE);
+                            holder.hiddenSecurityButton.setVisibility(View.VISIBLE);
                             PrefManager.setGroupVisibility(context, groupName, false);
                             count--;
                         }
