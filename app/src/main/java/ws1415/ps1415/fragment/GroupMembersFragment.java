@@ -51,14 +51,16 @@ public class GroupMembersFragment extends Fragment {
             members.add(member);
         }
 
-        mMemberListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent start_profile_intent = new Intent(context, ProfileActivity.class);
-                start_profile_intent.putExtra("email", mAdapter.getItem(i).getEmail());
-                context.startActivity(start_profile_intent);
-            }
-        });
+        if(mMemberListView != null){
+            mMemberListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Intent start_profile_intent = new Intent(context, ProfileActivity.class);
+                    start_profile_intent.putExtra("email", mAdapter.getItem(i).getEmail());
+                    context.startActivity(start_profile_intent);
+                }
+            });
+        }
 
         mAdapter = new GroupMemberListAdapter(members, context, rights, null);
         if (mMemberListView != null) mMemberListView.setAdapter(mAdapter);
