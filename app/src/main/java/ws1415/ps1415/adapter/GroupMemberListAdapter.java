@@ -259,6 +259,7 @@ public class GroupMemberListAdapter extends BaseAdapter {
             }else {
                 if (members.contains(getItem(i).getEmail())) {
                     holder.buttonRight.setVisibility(View.GONE);
+                    holder.buttonLeft.setVisibility(View.GONE);
                 }else{
                     holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
                     holder.buttonLeft.setVisibility(View.GONE);

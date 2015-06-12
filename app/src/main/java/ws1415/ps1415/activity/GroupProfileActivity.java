@@ -362,6 +362,8 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                                 @Override
                                 public void taskDidFinish(ExtendedTask task, Void aVoid) {
                                     checkIsMember = false;
+                                    mChangeVisibility.setVisibility(View.GONE);
+                                    mAdapter.getGroupBlackBoardFragment().changeButtonVisibility(true);
                                     setUpProfile();
 
                                 }
@@ -438,6 +440,11 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                                 mChangeVisibility.setColorPressedResId(R.color.colorPressedBlackBoard);
                                 checkVisibility = true;
                                 Toast.makeText(GroupProfileActivity.this, R.string.youAreNowVisible, Toast.LENGTH_LONG).show();
+                            }else {
+                                mChangeVisibility.setColorNormalResId(R.color.colorPrimaryJoin);
+                                mChangeVisibility.setColorPressedResId(R.color.colorPressedBlackBoard);
+                                checkVisibility = false;
+                                Toast.makeText(GroupProfileActivity.this, R.string.youAreNowInvisible, Toast.LENGTH_LONG).show();
                             }
                         } else {
                             mChangeVisibility.setColorNormalResId(R.color.colorPrimaryJoin);
@@ -472,6 +479,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                         public void taskDidFinish(ExtendedTask task, BooleanWrapper booleanWrapper) {
                             if (booleanWrapper.getValue()) {
                                 checkIsMember = true;
+                                mAdapter.getGroupBlackBoardFragment().changeButtonVisibility(true);
                                 setUpProfile();
                             }
                         }
@@ -510,6 +518,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                             public void taskDidFinish(ExtendedTask task, BooleanWrapper booleanWrapper) {
                                 if (booleanWrapper.getValue()) {
                                     checkIsMember = true;
+                                    mAdapter.getGroupBlackBoardFragment().changeButtonVisibility(true);
                                     setUpProfile();
                                 } else {
                                     Toast.makeText(GroupProfileActivity.this, R.string.wrongPasswordMessage, Toast.LENGTH_LONG).show();
