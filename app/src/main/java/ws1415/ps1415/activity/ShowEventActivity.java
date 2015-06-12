@@ -47,6 +47,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.model.EventParticipationVisibility;
@@ -261,7 +262,7 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         title.setText(eventData.getTitle());
         TextView date = (TextView) findViewById(R.id.date);
         Date tmpDate = new Date(eventData.getDate().getValue());
-        if (tmpDate.getTime() >= System.currentTimeMillis()) {
+        if (tmpDate.getTime() < System.currentTimeMillis()) {
             showActiveEvent.setVisibility(View.VISIBLE);
         } else {
             showActiveEvent.setVisibility(View.GONE);
@@ -377,7 +378,8 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
                 joinLeaveEventItem.setTitle(R.string.leave_event);
                 event.getMemberList().put(ServiceProvider.getEmail(), role.name());
                 event.setParticipationVisibility(visibility.name());
-                if (event.getDate().getValue() >= System.currentTimeMillis()) {
+                LocationTransmitterService.ScheduleService(ShowEventActivity.this, event.getId(), new Date(event.getDate().getValue()));
+                if (event.getDate().getValue() < System.currentTimeMillis()) {
                     showActiveEvent.setVisibility(View.VISIBLE);
                 }
                 finish();

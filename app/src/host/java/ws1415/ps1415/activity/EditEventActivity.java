@@ -43,6 +43,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.DynamicFieldsAdapter;
 import ws1415.ps1415.controller.EventController;
@@ -275,6 +276,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
                                     EventController.createEvent(new ExtendedTaskDelegateAdapter<Void, Event>() {
                                         @Override
                                         public void taskDidFinish(ExtendedTask task, Event event) {
+                                            LocationTransmitterService.ScheduleService(EditEventActivity.this, event.getId(), new Date(event.getDate().getValue()));
                                             EditEventActivity.super.finish();
                                         }
 

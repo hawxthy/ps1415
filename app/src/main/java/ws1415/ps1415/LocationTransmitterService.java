@@ -115,6 +115,11 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            // Beim Aufruf der Map trat hier ein Fehler auf, weil der Intent null war.
+            return super.onStartCommand(intent, flags, startId);
+        }
+
         // Starten des GoogleApiClients
         gac = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
@@ -229,7 +234,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
         // Holt sich die Google Mail Adresse aus den SharedPreferences, die beim Einloggen angegeben werden mussten
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String email = prefs.getString("accountName", null);
+        String email = ServiceProvider.getEmail();
 
         boolean sendLocation = prefs.getBoolean("prefSendLocation", false);
 

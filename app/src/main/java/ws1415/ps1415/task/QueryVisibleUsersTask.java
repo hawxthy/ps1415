@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupFilter;
+import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 import com.skatenight.skatenightAPI.model.UserLocationInfo;
 
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class QueryVisibleUsersTask extends ExtendedTask<Void, Void, HashMap<User
      */
     @Override
     protected HashMap<UserLocationInfo, String> doInBackground(Void... params) {
-        List<UserGroup> tmpGroups = null;
+        List<UserGroupMetaData> tmpGroups = null;
         List<UserLocationInfo> groupMembers = new ArrayList<UserLocationInfo>();
         HashMap<UserLocationInfo, String> farbenMap = new HashMap<UserLocationInfo, String>();
         UserGroupFilter filter = new UserGroupFilter();
@@ -52,7 +53,7 @@ public class QueryVisibleUsersTask extends ExtendedTask<Void, Void, HashMap<User
             e.printStackTrace();
         }
         if (tmpGroups != null) {
-            for (UserGroup userGroup : tmpGroups) {
+            for (UserGroupMetaData userGroup : tmpGroups) {
                 if (PrefManager.getGroupVisibility(context, userGroup.getName())) {
                     try {
                         List<String> members = ServiceProvider.getService().groupEndpoint().getUserGroupVisibleMembers(userGroup.getName()).execute().getVisibleMembers();
