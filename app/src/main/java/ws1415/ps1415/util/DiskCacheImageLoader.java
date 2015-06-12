@@ -57,7 +57,9 @@ public class DiskCacheImageLoader {
      * @param blobKey    Der BlobKey des anzuzeigenden Bildes.
      */
     public void loadImage(ImageView view, BlobKey blobKey) {
-        processRequest(view, DiskCache.DiskKey.createDiskKey(blobKey.getKeyString()), null);
+        if (blobKey != null) {
+            processRequest(view, DiskCache.DiskKey.createDiskKey(blobKey.getKeyString()), null);
+        }
     }
 
     /**
@@ -67,9 +69,11 @@ public class DiskCacheImageLoader {
      * @param cropSize   Die Größe des auszuschneidenden Bildes.
      */
     public void loadCroppedImage(ImageView view, BlobKey blobKey, int cropSize) {
-        Map<String, String> params = new HashMap<>();
-        params.put("crop", Integer.toString(cropSize));
-        processRequest(view, DiskCache.DiskKey.createCropKey(blobKey.getKeyString(), cropSize), params);
+        if (blobKey != null && cropSize > 0) {
+            Map<String, String> params = new HashMap<>();
+            params.put("crop", Integer.toString(cropSize));
+            processRequest(view, DiskCache.DiskKey.createCropKey(blobKey.getKeyString(), cropSize), params);
+        }
     }
 
     /**
@@ -79,9 +83,11 @@ public class DiskCacheImageLoader {
      * @param width      Die skalierte Breite des Bildes.
      */
     public void loadScaledImage(ImageView view, BlobKey blobKey, int width) {
-        Map<String, String> params = new HashMap<>();
-        params.put("scale", Integer.toString(width));
-        processRequest(view, DiskCache.DiskKey.createScaleKey(blobKey.getKeyString(), width), params);
+        if (blobKey != null && width > 0) {
+            Map<String, String> params = new HashMap<>();
+            params.put("scale", Integer.toString(width));
+            processRequest(view, DiskCache.DiskKey.createScaleKey(blobKey.getKeyString(), width), params);
+        }
     }
 
     /**
@@ -104,8 +110,10 @@ public class DiskCacheImageLoader {
             new ExtendedTask<Void, Void, Bitmap>(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
-                    DiskCache.getInstance(view.getContext()).addBitmapToCache(key, bitmap);
-                    view.setImageBitmap(bitmap);
+                    if (view != null) {
+                        DiskCache.getInstance(view.getContext()).addBitmapToCache(key, bitmap);
+                        view.setImageBitmap(bitmap);
+                    }
                 }
             }) {
                 @Override
