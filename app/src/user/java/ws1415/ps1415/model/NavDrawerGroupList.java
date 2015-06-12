@@ -247,6 +247,24 @@ public class NavDrawerGroupList {
                 }
             },
 
+            // ---------- Meine Bilder ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.my_pictures;
+                }
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_action_picture;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(parent.getContext(), ListPicturesActivity.class);
+                    intent.putExtra(ListPicturesActivity.EXTRA_MAIL, ServiceProvider.getEmail());
+                    parent.getContext().startActivity(intent);
+                }
+            },
+
             // ---------- Freunde ----------
             new NavDrawerItem() {
                 @Override

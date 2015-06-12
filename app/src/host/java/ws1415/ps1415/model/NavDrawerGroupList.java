@@ -18,6 +18,7 @@ import ws1415.ps1415.activity.DistributeRightsActivity;
 import ws1415.ps1415.activity.FriendsActivity;
 import ws1415.ps1415.activity.GroupProfileActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
+import ws1415.ps1415.activity.ListPicturesActivity;
 import ws1415.ps1415.activity.ListUserGroupsActivity;
 import ws1415.ps1415.activity.ManageEventsActivity;
 import ws1415.ps1415.activity.ManageRoutesActivity;
@@ -250,6 +251,24 @@ public class NavDrawerGroupList {
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent messaging_intent = new Intent(parent.getContext(), MessagingActivity.class);
                     parent.getContext().startActivity(messaging_intent);
+                }
+            },
+
+            // ---------- Meine Bilder ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.my_pictures;
+                }
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_action_picture;
+                }
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(parent.getContext(), ListPicturesActivity.class);
+                    intent.putExtra(ListPicturesActivity.EXTRA_MAIL, ServiceProvider.getEmail());
+                    parent.getContext().startActivity(intent);
                 }
             },
 
