@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <com.wrapp.floatlabelededittext.FloatLabeledEditText
+        android:id="@+id/floating_edit_text"
+        android:layout_below="@+id/black_board_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <EditText
+            android:id="@+id/post_black_board_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/postMessage"
+            android:maxLength="100"
+            android:textSize="16dp" />
+    </com.wrapp.floatlabelededittext.FloatLabeledEditText>
+
+    <TextView
+        android:id="@+id/failure_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="16dp"
+        android:layout_below="@+id/floating_edit_text"
+        android:paddingLeft="16dp"
+        android:textColor="@color/check_group_name_negative"
+        android:textSize="12sp"/>
+
+</RelativeLayout>

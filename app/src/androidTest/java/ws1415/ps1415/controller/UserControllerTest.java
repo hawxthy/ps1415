@@ -34,6 +34,7 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.EventParticipationVisibility;
 import ws1415.ps1415.model.Gender;
+import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.model.Visibility;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
@@ -634,7 +635,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
 
     // Erstellt eine Nutzergruppe
     private UserGroup createUserGroup() throws IOException {
-        ServiceProvider.getService().groupEndpoint().createOpenUserGroup("Testgruppe", "Testbeschreibung").execute();
+        ServiceProvider.getService().groupEndpoint().createUserGroup("Testgruppe", UserGroupType.NORMALGROUP.name(), false).execute();
         return ServiceProvider.getService().groupEndpoint().getUserGroup("Testgruppe").execute();
     }
 

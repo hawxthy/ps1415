@@ -60,7 +60,7 @@ public class GroupNewsBoardFragment extends Fragment {
     }
 
     /**
-     * Diese Methode dient als refresh Option, da Aktivitäten in Gruppen häufig passieren wäre es nicht
+     * Diese Methode dient als listAllGroups Option, da Aktivitäten in Gruppen häufig passieren wäre es nicht
      * klug bei jeder Aktivität die Liste zu aktualisieren. Aus diesem Grund soll die Aktualisierungs-
      * funktion manuel betätigt werden. Hier wird die Liste alles Newsboardentries geladen und ein
      * neuer Adapter erstellt.

@@ -8,14 +8,12 @@ package ws1415.SkatenightBackend.model;
  * Created by Bernd Eissing on 02.05.2015.
  */
 public enum Right {
-    DELETEGROUP,
     EDITBLACKBOARD,
     CHANGEGROUPPICTURE,
     GLOBALMESSAGE,
     INVITEGROUP,
     DISTRIBUTERIGHTS,
     DELETEMEMBER,
-    CHANGEGROUPPRIVACY,
     NEWMEMBERRIGHTS,
     FULLRIGHTS;
 }

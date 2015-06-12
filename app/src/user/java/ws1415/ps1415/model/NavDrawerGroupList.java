@@ -19,10 +19,9 @@ import ws1415.ps1415.activity.GroupProfileActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
 import ws1415.ps1415.activity.ListUserGroupsActivity;
 import ws1415.ps1415.activity.MessagingActivity;
+import ws1415.ps1415.activity.MyUserGroupsActivity;
 import ws1415.ps1415.activity.ProfileActivity;
-import ws1415.ps1415.activity.RegisterActivity;
 import ws1415.ps1415.activity.SearchActivity;
-import ws1415.ps1415.util.PrefManager;
 
 /**
  * @author Bernd Eissing on 03.06.2015.
@@ -46,6 +45,10 @@ public class NavDrawerGroupList {
                 public void onClick(final AdapterView<?> parent, View view, int position, long id) {
                     // Die Activity holen, damit Methode auf ihr aufgerufen werden können.
                     final GroupProfileActivity context = (GroupProfileActivity)parent.getContext();
+                    // Wenn man kein Mitglied ist soll nichts passieren
+                    if(context.getRights()==null){
+                        return;
+                    }
 
                     // AlertDialog mit variabler Anzahl an Buttons erstellen
                     final AlertDialog.Builder altertadd = new AlertDialog.Builder(parent.getContext());
@@ -57,10 +60,7 @@ public class NavDrawerGroupList {
                     distributeRightsButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            // TODO implementieren
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
+                            context.startDistributeRightsActoin();
                             dialog.dismiss();
                         }
                     });
@@ -68,10 +68,7 @@ public class NavDrawerGroupList {
                     inviteGroupButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            // TODO implementieren
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
+                            context.startInviteUsersToGroup();
                             dialog.dismiss();
                         }
                     });
@@ -87,10 +84,7 @@ public class NavDrawerGroupList {
                     sendGlobalMessageButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            // TODO implementieren
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
+                            context.startGlobalMessageAction();
                             dialog.dismiss();
                         }
                     });
@@ -148,7 +142,7 @@ public class NavDrawerGroupList {
 
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent show_events_intent = new Intent(parent.getContext(), ListEventsActivity.class);
+                    Intent show_events_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
                     show_events_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(show_events_intent);
                 }
@@ -169,6 +163,26 @@ public class NavDrawerGroupList {
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent user_group_intent = new Intent(parent.getContext(), ListUserGroupsActivity.class);
+                    user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(user_group_intent);
+                }
+            },
+
+            // ---------- Meine Gruppen ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.my_groups;
+                }
+
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_group;
+                }
+
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent user_group_intent = new Intent(parent.getContext(), MyUserGroupsActivity.class);
                     user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(user_group_intent);
                 }
@@ -270,27 +284,7 @@ public class NavDrawerGroupList {
                     search_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(search_intent);
                 }
-            },
-
-            // ---------- Logout ----------
-            new NavDrawerItem() {
-                @Override
-                public int getTitleId() {
-                    return R.string.logout;
-                }
-
-                @Override
-                public int getIconId() {
-                    return R.drawable.ic_action_accounts;
-                }
-
-                @Override
-                public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    PrefManager.setSelectedUserMail(parent.getContext(), "");
-                    Intent intent = new Intent(parent.getContext(), RegisterActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    parent.getContext().startActivity(intent);
-                }
             }
+
     };
 }

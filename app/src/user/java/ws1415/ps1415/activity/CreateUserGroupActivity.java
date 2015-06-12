@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import ws1415.ps1415.R;
 import ws1415.ps1415.controller.GroupController;
 import ws1415.ps1415.model.NavDrawerGroupList;
@@ -57,13 +58,14 @@ public class CreateUserGroupActivity extends BaseActivity {
     private EditText mGroupPasswordEditText;
     private EditText mGroupPasswordAgainEditText;
 
+
     // Die TextViews
     private TextView mCheckGroupNameTextView;
     private TextView mCheckPasswordTextView;
     private TextView mCheckImageUploadTextView;
     private TextView mInformUserTextView;
 
-
+    // Die Buttons
     private ButtonFlat mCheckNameButton;
     private ButtonFlat mUploadButton;
     private ButtonFlat mPreviewButton;
@@ -72,6 +74,8 @@ public class CreateUserGroupActivity extends BaseActivity {
 
     // Die View zum Anzeigen von Passwörtern
     private View mViewGroup;
+    // Die View zum Anzeigen der Öffentlichekitseinstellung
+    private View mViewGroupPrivacy;
     // Der Switch zum Anzeigen von der Passwortview
     private Switch mGroupPrivacySwitch;
 
@@ -86,20 +90,22 @@ public class CreateUserGroupActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        super.setContentView(NavDrawerGroupList.items, R.layout.activity_create_user_group);
+        setContentView(R.layout.activity_create_user_group);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
+        // Initialisiere die EditTexte
         mGroupNameEditText = (EditText) findViewById(R.id.create_user_group_group_name);
         mGroupDescriptionEditText = (EditText) findViewById(R.id.create_user_group_group_description);
         mGroupPasswordEditText = (EditText) findViewById(R.id.create_user_group_group_password);
         mGroupPasswordAgainEditText = (EditText) findViewById(R.id.create_user_group_group_password_again);
 
+        // Initialisiere die TextViews
         mCheckGroupNameTextView = (TextView) findViewById(R.id.create_user_group_check_name_text_view);
         mCheckPasswordTextView = (TextView) findViewById(R.id.create_user_group_check_password_text_view);
         mCheckImageUploadTextView = (TextView) findViewById(R.id.create_user_group_upload_text_view);
         mInformUserTextView = (TextView) findViewById(R.id.crea_user_group_inform_user_text_view);
 
-
+        // Initialisiere die Buttons
         mCheckNameButton = (ButtonFlat) findViewById(R.id.create_user_group_button_check_name);
         mUploadButton = (ButtonFlat) findViewById(R.id.create_user_group_button_upload);
         mPreviewButton = (ButtonFlat) findViewById(R.id.create_user_group_button_preview);
@@ -107,6 +113,7 @@ public class CreateUserGroupActivity extends BaseActivity {
         mAcceptButton = (ButtonFlat) findViewById(R.id.create_user_group_button_submit);
 
         mViewGroup = findViewById(R.id.create_user_group_password_view);
+        mViewGroupPrivacy = findViewById(R.id.privacy_switch_part);
         mGroupPrivacySwitch = (Switch) findViewById(R.id.create_user_group_switchView);
 
 
@@ -121,7 +128,6 @@ public class CreateUserGroupActivity extends BaseActivity {
 
         // Beschreibung muss nicht angegeben werden.
         checkGroupDescription = false;
-        checkGroupImage = false;
         checkGroupPassword = false;
         checkGroupName = false;
         setUpButtonListener();
@@ -160,6 +166,7 @@ public class CreateUserGroupActivity extends BaseActivity {
                     mViewGroup.setVisibility(View.VISIBLE);
                 } else {
                     mViewGroup.setVisibility(View.GONE);
+                    checkGroupPassword = false;
                 }
             }
         });
@@ -217,8 +224,13 @@ public class CreateUserGroupActivity extends BaseActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                mCheckGroupNameTextView.setText(R.string.checkGroupNameString);
-                mCheckGroupNameTextView.setTextColor(CreateUserGroupActivity.this.getResources().getColor(R.color.check_group_name));
+                if (mGroupNameEditText.getText().toString().length() > 2) {
+                    mCheckGroupNameTextView.setText(R.string.checkGroupNameString);
+                    mCheckGroupNameTextView.setTextColor(CreateUserGroupActivity.this.getResources().getColor(R.color.check_group_name));
+                } else {
+                    mCheckGroupNameTextView.setText(R.string.groupNameTooShort);
+                    mCheckGroupNameTextView.setTextColor(CreateUserGroupActivity.this.getResources().getColor(R.color.check_group_name_negative));
+                }
                 checkGroupName = false;
             }
 
@@ -241,15 +253,22 @@ public class CreateUserGroupActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (mGroupPasswordEditText.getText().toString().equals(mGroupPasswordAgainEditText.getText().toString())) {
-                    mCheckPasswordTextView.setText(R.string.checkPasswordPositive);
-                    mCheckPasswordTextView.setTextColor(CreateUserGroupActivity.this.getResources().getColor(R.color.check_group_name_positive));
-                    checkGroupPassword = true;
+                if (mGroupPasswordEditText.getText().toString().length() > 4) {
+                    if (mGroupPasswordEditText.getText().toString().equals(mGroupPasswordAgainEditText.getText().toString())) {
+                        mCheckPasswordTextView.setText(R.string.checkPasswordPositive);
+                        mCheckPasswordTextView.setTextColor(CreateUserGroupActivity.this.getResources().getColor(R.color.check_group_name_positive));
+                        checkGroupPassword = true;
+                    } else {
+                        mCheckPasswordTextView.setText(R.string.checkPasswordNegative);
+                        mCheckPasswordTextView.setTextColor(CreateUserGroupActivity.this.getResources().getColor(R.color.check_group_name_negative));
+                        checkGroupPassword = false;
+                    }
                 } else {
-                    mCheckPasswordTextView.setText(R.string.checkPasswordNegative);
+                    mCheckPasswordTextView.setText(R.string.passwordTooShort);
                     mCheckPasswordTextView.setTextColor(CreateUserGroupActivity.this.getResources().getColor(R.color.check_group_name_negative));
                     checkGroupPassword = false;
                 }
+
                 mCheckPasswordTextView.setVisibility(View.VISIBLE);
             }
         });
@@ -268,15 +287,22 @@ public class CreateUserGroupActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (mGroupPasswordEditText.getText().toString().equals(mGroupPasswordAgainEditText.getText().toString())) {
-                    mCheckPasswordTextView.setText(R.string.checkPasswordPositive);
-                    mCheckPasswordTextView.setTextColor(CreateUserGroupActivity.this.getResources().getColor(R.color.check_group_name_positive));
-                    checkGroupPassword = true;
+                if (mGroupPasswordEditText.getText().toString().length() > 4) {
+                    if (mGroupPasswordEditText.getText().toString().equals(mGroupPasswordAgainEditText.getText().toString())) {
+                        mCheckPasswordTextView.setText(R.string.checkPasswordPositive);
+                        mCheckPasswordTextView.setTextColor(CreateUserGroupActivity.this.getResources().getColor(R.color.check_group_name_positive));
+                        checkGroupPassword = true;
+                    } else {
+                        mCheckPasswordTextView.setText(R.string.checkPasswordNegative);
+                        mCheckPasswordTextView.setTextColor(CreateUserGroupActivity.this.getResources().getColor(R.color.check_group_name_negative));
+                        checkGroupPassword = false;
+                    }
                 } else {
-                    mCheckPasswordTextView.setText(R.string.checkPasswordNegative);
+                    mCheckPasswordTextView.setText(R.string.passwordTooShort);
                     mCheckPasswordTextView.setTextColor(CreateUserGroupActivity.this.getResources().getColor(R.color.check_group_name_negative));
                     checkGroupPassword = false;
                 }
+
                 mCheckPasswordTextView.setVisibility(View.VISIBLE);
             }
         });
@@ -307,8 +333,8 @@ public class CreateUserGroupActivity extends BaseActivity {
                             final View view = factory.inflate(R.layout.preview_image, null);
                             ImageView previewList = (ImageView) view.findViewById(R.id.preview_image_list);
                             ImageView previewProfile = (ImageView) view.findViewById(R.id.preview_image_profile);
-                            previewList.setImageBitmap(bitmap);
-                            previewProfile.setImageBitmap(bitmap);
+                            previewList.setImageBitmap(ImageUtil.getRoundedBitmap(bitmap));
+                            previewProfile.setImageBitmap(ImageUtil.getRoundedBitmap(bitmap));
                             alertadd.setView(view);
                             alertadd.setMessage(R.string.previewImageAlertDialogTitle);
                             alertadd.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -336,91 +362,67 @@ public class CreateUserGroupActivity extends BaseActivity {
         mAcceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Prüft den namen
                 mInformUserTextView.setVisibility(View.GONE);
                 if (!checkGroupName) {
                     mInformUserTextView.setText(R.string.checkGroupNamePlease);
                     mInformUserTextView.setVisibility(View.VISIBLE);
                     return;
                 }
-                String password = mGroupPasswordAgainEditText.getText().toString();
+
+                // Setze den Gruppentyp
+                UserGroupType type = UserGroupType.NORMALGROUP;
+
+                // Setze die Öffentlichkeit
+                boolean privacy;
+                if (type == UserGroupType.SECURITYGROUP) {
+                    privacy = true;
+                } else if (type == UserGroupType.NORMALGROUP && checkGroupPassword) {
+                    privacy = true;
+                } else {
+                    privacy = false;
+                }
+
+                if(privacy){
+                    if(!checkGroupPassword){
+                        mInformUserTextView.setText(R.string.check_your_password);
+                        mInformUserTextView.setVisibility(View.VISIBLE);
+                        return;
+                    }
+                    // Weitere Bedingungen testen, falls sich welche ergeben
+                }
+
+                // Setze die Beschreibung
                 String description;
                 if (checkGroupDescription) {
                     description = mGroupDescriptionEditText.getText().toString();
                 } else {
                     description = getString(R.string.defaultGroupDestription) + mTestName;
                 }
-                if (checkGroupName && !mGroupPrivacySwitch.isCheck()) {
-                    if (checkGroupImage) {
-                        setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                        GroupController.getInstance().createOpenUserGroupWithPicture(new ExtendedTaskDelegateAdapter<Void, Void>() {
-                            @Override
-                            public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                                startGroupProfile(mTestName);
-                            }
 
-                            @Override
-                            public void taskFailed(ExtendedTask task, String message) {
-                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                                mInformUserTextView.setText(R.string.creatingGroupError);
-                                mInformUserTextView.setVisibility(View.VISIBLE);
-                            }
-                        }, mTestName, description, mBlobKeyString);
-                    } else {
-                        setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                        GroupController.getInstance().createOpenUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
-                            @Override
-                            public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                                startGroupProfile(mTestName);
-                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                            }
-
-                            @Override
-                            public void taskFailed(ExtendedTask task, String message) {
-                                mInformUserTextView.setText(R.string.creatingGroupError);
-                                mInformUserTextView.setVisibility(View.VISIBLE);
-                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                            }
-                        }, mTestName, description);
-                    }
-                } else if (checkGroupName && mGroupPrivacySwitch.isCheck()) {
-                    if (checkGroupPassword) {
-                        if (checkGroupImage) {
-                            setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                            GroupController.getInstance().createPrivateUserGroupWithPicture(new ExtendedTaskDelegateAdapter<Void, Void>() {
-                                @Override
-                                public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                                    startGroupProfile(mTestName);
-                                }
-
-                                @Override
-                                public void taskFailed(ExtendedTask task, String message) {
-                                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                                    mInformUserTextView.setText(R.string.creatingGroupError);
-                                    mInformUserTextView.setVisibility(View.VISIBLE);
-                                }
-                            }, mTestName, UserGroupType.NORMALGROUP, mGroupPasswordAgainEditText.getText().toString(), description, mBlobKeyString);
-                        } else {
-                            setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                            GroupController.getInstance().createPrivateUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
-                                @Override
-                                public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                                    startGroupProfile(mTestName);
-                                }
-
-                                @Override
-                                public void taskFailed(ExtendedTask task, String message) {
-                                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                                    mInformUserTextView.setText(R.string.creatingGroupError);
-                                    mInformUserTextView.setVisibility(View.VISIBLE);
-                                }
-                            }, mTestName, UserGroupType.NORMALGROUP, description, mGroupPasswordAgainEditText.getText().toString());
-                        }
-                    }
+                // Setze das Passwort
+                String password = null;
+                if (checkGroupPassword) {
+                    password = mGroupPasswordAgainEditText.getText().toString();
                 }
+
+                // Prüft ob eine Securitygruppe erstellt werden soll
+                setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                GroupController.getInstance().createUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                        startGroupProfile(mTestName);
+                    }
+
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
+
+                    }
+                }, mTestName, type, password, privacy, description, mBlobKeyString);
             }
+
         });
     }
 

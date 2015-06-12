@@ -12,15 +12,33 @@ import java.util.ArrayList;
 public class UserGroupVisibleMembers {
     @Id
     private String groupName;
-    private ArrayList<String> list;
+    private ArrayList<String> visibleMembers;
 
     public UserGroupVisibleMembers(){
         // Konstruktor für GAE
     }
 
-    public UserGroupVisibleMembers(String groupName, ArrayList<String> list){
+    /**
+     * Konstruktor für das erstellen bei der Gruppenerstellung. Damit dort
+     * nicht extra eine ArrayList erstellt werden muss.
+     *
+     * @param groupName
+     * @param visibleMember
+     */
+    public UserGroupVisibleMembers(String groupName, String visibleMember){
         this.groupName = groupName;
-        this.list = list;
+        addVisibleMember(visibleMember);
+    }
+
+    /**
+     * Konstruktor für den Transport.
+     *
+     * @param groupName
+     * @param visibleMembers
+     */
+    public UserGroupVisibleMembers(String groupName, ArrayList<String> visibleMembers){
+        this.groupName = groupName;
+        this.visibleMembers = visibleMembers;
     }
 
     public String getGroupName() {
@@ -31,24 +49,24 @@ public class UserGroupVisibleMembers {
         this.groupName = groupName;
     }
 
-    public ArrayList<String> getList() {
-        return list;
+    public ArrayList<String> getVisibleMembers() {
+        return visibleMembers;
     }
 
-    public void setList(ArrayList<String> list) {
-        this.list = list;
+    public void setVisibleMembers(ArrayList<String> visibleMembers) {
+        this.visibleMembers = visibleMembers;
     }
 
     public void addVisibleMember(String member){
-        if(list == null){
-            list = new ArrayList<>();
+        if(visibleMembers == null){
+            visibleMembers = new ArrayList<>();
         }
-        list.add(member);
+        visibleMembers.add(member);
     }
 
     public void removeVisibleMember(String member){
-        if(list != null && list.contains(member)){
-            list.remove(member);
+        if(visibleMembers != null && visibleMembers.contains(member)){
+            visibleMembers.remove(member);
         }
     }
 }

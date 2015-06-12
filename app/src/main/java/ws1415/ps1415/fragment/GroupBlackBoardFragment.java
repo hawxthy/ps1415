@@ -3,6 +3,7 @@ package ws1415.ps1415.fragment;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +26,8 @@ import java.util.ArrayList;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.activity.GroupProfileActivity;
+import ws1415.ps1415.activity.PostBlackBoardActivity;
 import ws1415.ps1415.adapter.BlackBoardListAdapter;
 import ws1415.ps1415.controller.GroupController;
 import ws1415.ps1415.task.ExtendedTask;
@@ -35,9 +39,12 @@ import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
  * @author Bernd Eissing
  */
 public class GroupBlackBoardFragment extends Fragment {
+    private static final int SELECT_PHOTO = 1;
+    private static final int PICTURE_CROP = 2;
     private ListView mBlackBoardListView;
     private BlackBoardListAdapter mAdapter;
     private FloatingActionButton mAddMessageButton;
+    private Context context;
     private UserGroup group;
 
     // Attribute zum Testen von Bedingungen
@@ -52,78 +59,15 @@ public class GroupBlackBoardFragment extends Fragment {
         mAddMessageButton = (FloatingActionButton) rootView.findViewById(R.id.group_black_board_add_message_button);
 
         checkBoardMesageTextChecked = false;
-
         // Clicklistener setzen für das Posten von Einträgen
         mAddMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder altertadd = new AlertDialog.Builder(rootView.getContext());
-                LayoutInflater factory = LayoutInflater.from(rootView.getContext());
-                final View postView = factory.inflate(R.layout.post_black_board, null);
-                final EditText messageEditText = (EditText) postView.findViewById(R.id.post_black_board_edit_text);
-                final TextView failureTextView = (TextView) postView.findViewById(R.id.failure_text_view);
-
-                // Die TextView initialisieren, da die send global messge Funktion diese auch verwendet und kein Text gesetzt ist.
-                failureTextView.setText(R.string.boardMessageTooShort);
-                failureTextView.setTextColor(rootView.getContext().getResources().getColor(R.color.check_group_name_negative));
-
-                // EditText für die Blackboard Message
-                messageEditText.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        if (messageEditText.getText().toString().length() > 1) {
-                            failureTextView.setVisibility(View.GONE);
-                            checkBoardMesageTextChecked = true;
-                        } else {
-                            if (failureTextView.getVisibility() == View.GONE) {
-                                failureTextView.setVisibility(View.VISIBLE);
-                            }
-                            checkBoardMesageTextChecked = false;
-                        }
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable editable) {
-                    }
-                });
-
-                altertadd.setView(postView);
-                altertadd.setMessage(R.string.postMessageTitle);
-                altertadd.setPositiveButton(R.string.sendButton, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (messageEditText.getText().toString().length() > 1) {
-                            GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
-                                @Override
-                                public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                                    getNewBlackBoard(container.getContext());
-                                }
-
-                                @Override
-                                public void taskFailed(ExtendedTask task, String message) {
-                                    Toast.makeText(rootView.getContext(), message, Toast.LENGTH_LONG).show();
-                                }
-                            }, group.getName(), messageEditText.getText().toString());
-                            dialog.dismiss();
-                        }
-                        dialog.dismiss();
-                    }
-                });
-                altertadd.setNegativeButton(R.string.cancelButton, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                altertadd.show();
+                Intent post_black_board_intent = new Intent(context, PostBlackBoardActivity.class);
+                post_black_board_intent.putExtra(GroupProfileActivity.EXTRA_GROUP_NAME, group.getName());
+                context.startActivity(post_black_board_intent);
             }
         });
-        if (mAdapter != null) mBlackBoardListView.setAdapter(mAdapter);
 
         return rootView;
     }
@@ -137,8 +81,12 @@ public class GroupBlackBoardFragment extends Fragment {
      * @param contetx    Die View von der aus diese Methode aufgerufen wird
      */
     public void setUp(Board blackBoard, UserGroup group, Context contetx) {
+        this.context = contetx;
         this.group = group;
         if (blackBoard != null) {
+            if (!group.getMemberRights().keySet().contains(ServiceProvider.getEmail())) {
+                mAddMessageButton.setVisibility(View.GONE);
+            }
             mAdapter = new BlackBoardListAdapter(contetx, blackBoard.getBoardEntries(), (ArrayList<String>) group.getMemberRights().get(ServiceProvider.getEmail()));
             if (mBlackBoardListView != null) mBlackBoardListView.setAdapter(mAdapter);
         }

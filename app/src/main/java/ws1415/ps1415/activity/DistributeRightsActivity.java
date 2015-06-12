@@ -1,5 +1,6 @@
 package ws1415.ps1415.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -41,8 +42,9 @@ public class DistributeRightsActivity extends Activity {
     private ButtonFlat acceptButton;
     private ButtonFlat cancelButton;
 
-    ListView memberListView;
-    GroupMemberListAdapter mAdapter;
+    private ListView memberListView;
+    private GroupMemberListAdapter mAdapter;
+    private ActionBar mActionBar;
 
 
     @Override
@@ -54,6 +56,11 @@ public class DistributeRightsActivity extends Activity {
 
         groupName = getIntent().getStringExtra("groupName");
         groupMembers = getIntent().getStringArrayListExtra("groupMembers");
+
+        mActionBar = getActionBar();
+
+        mActionBar.setHomeButtonEnabled(false);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
 
         if(groupName == null){
             Toast.makeText(this, R.string.noGoupNameSubmitted, Toast.LENGTH_LONG).show();
@@ -80,7 +87,7 @@ public class DistributeRightsActivity extends Activity {
 
         // ListView initialisieren und Adapter setzen
         memberListView = (ListView)findViewById(R.id.distribute_rights_list_view);
-        mAdapter = new GroupMemberListAdapter(groupMembers, this, null);
+        mAdapter = new GroupMemberListAdapter(groupMembers, this, null, null);
         memberListView.setAdapter(mAdapter);
 
         // Felder initialisieren
@@ -111,13 +118,10 @@ public class DistributeRightsActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == android.R.id.home) {
+            finish();
             return true;
         }
 

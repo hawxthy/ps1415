@@ -3,6 +3,7 @@ package ws1415.ps1415.controller;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.skatenight.skatenightAPI.SkatenightAPI;
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.StringWrapper;
 import com.skatenight.skatenightAPI.model.UserListData;

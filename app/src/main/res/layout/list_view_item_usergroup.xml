@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
+    android:layout_height="wrap_content"
+    android:minHeight="72dp"
     android:orientation="horizontal">
 
 
     <ImageView
         android:id="@+id/user_group_list_view_item_image"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
@@ -21,7 +21,8 @@
         android:layout_width="wrap_content"
         android:layout_height="72dp"
         android:orientation="vertical"
-        android:paddingTop="16dp"
+        android:layout_toRightOf="@+id/user_group_list_view_item_image"
+        android:paddingTop="21dp"
         android:paddingRight="16dp">
 
         <TextView
@@ -39,4 +40,20 @@
             android:text="Secondary text"
             />
     </LinearLayout>
-</LinearLayout>
+
+    <ImageView
+        android:id="@+id/hidden_security_group_button"
+        android:visibility="gone"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignBottom="@+id/user_group_list_view_item_image"/>
+    <ImageView
+        android:id="@+id/hidden_cancel_button"
+        android:visibility="gone"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_toLeftOf="@+id/hidden_security_group_button"
+        android:layout_alignBottom="@+id/user_group_list_view_item_image"/>
+
+</RelativeLayout>

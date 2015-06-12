@@ -22,6 +22,7 @@ import ws1415.ps1415.activity.ListUserGroupsActivity;
 import ws1415.ps1415.activity.ManageEventsActivity;
 import ws1415.ps1415.activity.ManageRoutesActivity;
 import ws1415.ps1415.activity.MessagingActivity;
+import ws1415.ps1415.activity.MyUserGroupsActivity;
 import ws1415.ps1415.activity.PermissionManagementActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.activity.RegisterActivity;
@@ -50,6 +51,10 @@ public class NavDrawerGroupList {
                 public void onClick(final AdapterView<?> parent, View view, int position, long id) {
                     // Die Activity holen, damit Methode auf ihr aufgerufen werden können.
                     final GroupProfileActivity context = (GroupProfileActivity)parent.getContext();
+                    // Wenn man kein Mitglied ist soll nichts passieren
+                    if(context.getRights()==null){
+                        return;
+                    }
 
                     // AlertDialog mit variabler Anzahl an Buttons erstellen
                     final AlertDialog.Builder altertadd = new AlertDialog.Builder(parent.getContext());
@@ -69,10 +74,7 @@ public class NavDrawerGroupList {
                     inviteGroupButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            // TODO implementieren
-                            Intent create_group_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
-                            parent.getContext().startActivity(create_group_intent);
-                            altertadd.setCancelable(true);
+                            context.startInviteUsersToGroup();
                             dialog.dismiss();
                         }
                     });
@@ -146,7 +148,7 @@ public class NavDrawerGroupList {
 
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent show_events_intent = new Intent(parent.getContext(), ListEventsActivity.class);
+                    Intent show_events_intent = new Intent(parent.getContext(), CreateUserGroupActivity.class);
                     show_events_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(show_events_intent);
                 }
@@ -167,6 +169,26 @@ public class NavDrawerGroupList {
                 @Override
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent user_group_intent = new Intent(parent.getContext(), ListUserGroupsActivity.class);
+                    user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    parent.getContext().startActivity(user_group_intent);
+                }
+            },
+
+            // ---------- Meine Gruppen ----------
+            new NavDrawerItem() {
+                @Override
+                public int getTitleId() {
+                    return R.string.my_groups;
+                }
+
+                @Override
+                public int getIconId() {
+                    return R.drawable.ic_group;
+                }
+
+                @Override
+                public void onClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent user_group_intent = new Intent(parent.getContext(), MyUserGroupsActivity.class);
                     user_group_intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     parent.getContext().startActivity(user_group_intent);
                 }

@@ -76,15 +76,6 @@
             android:name=".activity.SettingsActivity"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_settings" />
-        <activity
-            android:name=".activity.UsergroupActivity"
-            android:label="@string/title_activity_user_group_activity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activity.AddUserGroupActivity"
-            android:label="@string/title_activity_add_user_group"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Dialog" />
 
         <receiver
             android:name=".GcmBroadcastReceiver"
@@ -165,11 +156,21 @@
         </activity>
         <activity
             android:name=".activity.ListUserGroupsActivity"
-            android:label="@string/title_activity_list_user_groups" >
+            android:label="@string/title_activity_list_user_groups"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable_groups" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".activity.GroupProfileActivity"
-            android:label="@string/title_activity_group_profile" >
+            android:label="@string/title_activity_group_profile"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".activity.EventParticipantsActivity"
@@ -192,12 +193,46 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.ListPicturesActivity" />
         </activity>
-        <activity
-            android:name=".activity.ShowPictureActivity" >
+        <activity android:name=".activity.ShowPictureActivity" >
         </activity>
         <activity
             android:name=".activity.DistributeRightsActivity"
-            android:label="@string/title_activity_distribute_rights" >
+            android:label="@string/title_activity_distribute_rights"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.GroupProfileActivity" />
+        </activity>
+        <activity
+            android:name=".activity.InviteUsersToGroupActivity"
+            android:label="@string/title_activity_invite_users_to_group"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.GroupProfileActivity" />
+        </activity>
+        <activity
+            android:name=".activity.MyUserGroupsActivity"
+            android:label="@string/title_activity_my_user_groups"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activity.CommentBlackBoardActivity"
+            android:label="@string/title_activity_comment_black_board"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.GroupProfileActivity" />
+        </activity>
+        <activity
+            android:name=".activity.PostBlackBoardActivity"
+            android:label="@string/title_activity_post_black_board"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar">
         </activity>
     </application>
 

@@ -8,14 +8,14 @@ import ws1415.SkatenightBackend.model.UserGroup;
  * @author  Bernd Eissing on 07.06.2015.
  */
 public class UserGroupMetaDataList {
-    List<UserGroup> metaDatas;
+    List<UserGroupMetaData> metaDatas;
     String webCursorString;
 
-    public List<UserGroup> getMetaDatas() {
+    public List<UserGroupMetaData> getMetaDatas() {
         return metaDatas;
     }
 
-    public void setMetaDatas(List<UserGroup> metaDatas) {
+    public void setMetaDatas(List<UserGroupMetaData> metaDatas) {
         this.metaDatas = metaDatas;
     }
 

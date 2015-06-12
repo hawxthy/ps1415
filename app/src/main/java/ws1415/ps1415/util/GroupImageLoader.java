@@ -22,10 +22,11 @@ import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 public class GroupImageLoader {
     private static GroupImageLoader instance;
 
-    private GroupImageLoader(){}
+    private GroupImageLoader() {
+    }
 
-    public static GroupImageLoader getInstance(){
-        if(instance== null){
+    public static GroupImageLoader getInstance() {
+        if (instance == null) {
             instance = new GroupImageLoader();
         }
         return instance;
@@ -36,32 +37,69 @@ public class GroupImageLoader {
      * Key angegeben, so wird überprüft ob sich die Bitmap dazu bereits im Cache befindet. Falls ja so wird diese
      * aus dem Cache geladen, falls nein wird das Bild also die Bitmap erneut runtergeladen.
      *
-     * @param context Die View
-     * @param blobKeyValue Der Wert des BlobKeys
-     * @param imageView Die ImageView in die die Bitmp gesetzt werden soll.
+     * @param context      Die View
+     * @param blobKey Der Wert des BlobKeys
+     * @param imageView    Die ImageView in die die Bitmp gesetzt werden soll.
      */
-    public void setGroupImageToImageView(final Context context, final String blobKeyValue, final ImageView imageView){
-        if(blobKeyValue == null || blobKeyValue.isEmpty()){
-            imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_group));
-        }else{
+    public void setGroupImageToImageView(final Context context, final BlobKey blobKey, final ImageView imageView) {
+        if (blobKey == null) {
+            imageView.setImageBitmap(ImageUtil.getRoundedBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_group)));
+        } else {
             // Bild im cache?
-            Bitmap cachedImage = MemoryCache.getInstance().get(blobKeyValue);
-            if(cachedImage != null){
+            Bitmap cachedImage = MemoryCache.getInstance().get(blobKey.getKeyString());
+            if (cachedImage != null) {
+                imageView.setImageBitmap(ImageUtil.getRoundedBitmap(cachedImage));
+            } else {
+                GroupController.getInstance().loadImageForPreview(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
+                        if (bitmap != null) {
+                            imageView.setImageBitmap(ImageUtil.getRoundedBitmap(bitmap));
+                            // setze die Bitmap in den Cache fürs nächste mal
+                            MemoryCache.getInstance().put(blobKey.getKeyString(), bitmap);
+                        } else {
+                            imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_group));
+                        }
+                    }
+
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                    }
+
+                }, blobKey);
+            }
+        }
+    }
+
+    /**
+     * Prüft, ob die übergebene blobKeyValue angegeben ist, falls nicht wird ein default Bild gesetzt. Ist ein
+     * Key angegeben, so wird überprüft ob sich die Bitmap dazu bereits im Cache befindet. Falls ja so wird diese
+     * aus dem Cache geladen, falls nein wird das Bild also die Bitmap erneut runtergeladen.
+     *
+     * @param context      Die View
+     * @param blobKey      Der Wert des BlobKeys
+     * @param imageView    Die ImageView in die die Bitmp gesetzt werden soll.
+     */
+    public void setBoardImageToImageView(final Context context, final BlobKey blobKey, final ImageView imageView) {
+        if(blobKey != null){
+            // Bild im cache?
+            Bitmap cachedImage = MemoryCache.getInstance().get(blobKey.getKeyString());
+            if (cachedImage != null) {
                 imageView.setImageBitmap(cachedImage);
-            } else{
-                BlobKey blobKey = new BlobKey();
-                blobKey.setKeyString(blobKeyValue);
+            } else {
                 GroupController.getInstance().loadImageForPreview(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
                         if (bitmap != null) {
                             imageView.setImageBitmap(bitmap);
                             // setze die Bitmap in den Cache fürs nächste mal
-                            MemoryCache.getInstance().put(blobKeyValue, bitmap);
+                            MemoryCache.getInstance().put(blobKey.getKeyString(), bitmap);
                         } else {
                             imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_group));
                         }
                     }
+
                     @Override
                     public void taskFailed(ExtendedTask task, String message) {
                         Toast.makeText(context, message, Toast.LENGTH_LONG).show();

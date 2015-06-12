@@ -26,6 +26,8 @@
     <color name="colorPrimaryBlackBoard">#000000</color>
     <color name="colorPressedBlackBoard">#D8D8D8</color>
 
+    <color name="colorPrimaryLeave">#ffd5d510</color>
+
     <color name="ColorPrimary">#FF5722</color>
     <color name="ColorPrimaryDark">#E64A19</color>
 

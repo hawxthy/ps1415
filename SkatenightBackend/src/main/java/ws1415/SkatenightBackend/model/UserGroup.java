@@ -4,6 +4,7 @@ import com.google.appengine.api.blobstore.BlobKey;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Load;
 
 import java.util.ArrayList;
@@ -23,14 +24,18 @@ import ws1415.SkatenightBackend.transport.UserGroupVisibleMembers;
 public class UserGroup {
     @Id
     private String name;            // Eindeutiger Name der Gruppe
+    @Index
+    @Load
+    private String searchName;
     private String password;
     private String creator;
     private String description;
     private boolean privat;
     private int memberCount;
-    private String groupType;
+    private UserGroupType groupType;
     private BlobKey blobKey;
-    @Load(unless = {UserGroupMetaData.class, UserGroupBlackBoardTransport.class, UserGroupNewsBoardTransport.class})
+    @Index
+    @Load//(unless = {UserGroupBlackBoardTransport.class, UserGroupNewsBoardTransport.class})
     private HashMap<String, ArrayList<String>> memberRights;
     @Load(unless = {UserGroupMetaData.class, UserGroupNewsBoardTransport.class, UserGroupVisibleMembers.class})
     private Ref<Board> blackBoard;
@@ -44,17 +49,20 @@ public class UserGroup {
         // Konstruktor für GAE
     }
 
+
     /**
-     * Konstruktor für nicht öffentliche Nutzergruppen, hier muss noch zusätzlich ein Passwort
+     * Konstruktor für Nutzergruppen
      * angegeben werden.
      *
-     * @param groupName
-     * @param creator
-     * @param groupType
-     * @param isPrivat
-     * @param password
+     * @param groupName Der Name der Gruppe
+     * @param creator Der Ersteller der Gruppe
+     * @param groupType Der Type der Grupp
+     * @param isPrivat Die Öffentlichkeit der Gruppe
+     * @param password Das Passwort der Gruppe
+     * @param description Die Beschreibung der Gruppe
+     * @param blobKey Das Bild der Gruppe
      */
-    public UserGroup(String groupName, String creator, String groupType, boolean isPrivat, String password) {
+    public UserGroup(String groupName, String creator, UserGroupType groupType, boolean isPrivat, String password, String description, BlobKey blobKey) {
         if (creator == null) {
             throw new IllegalArgumentException("creator can not be null");
         }
@@ -63,24 +71,10 @@ public class UserGroup {
         this.groupType = groupType;
         this.privat = isPrivat;
         this.password = password;
-    }
-
-    /**
-     * Konstruktor für öffentliche Nutzergruppen.
-     *
-     * @param groupName
-     * @param creator
-     * @param groupType
-     * @param isPrivat
-     */
-    public UserGroup(String groupName, String creator, String groupType, boolean isPrivat) {
-        if (creator == null) {
-            throw new IllegalArgumentException("creator can not be null");
-        }
-        this.name = groupName;
-        this.creator = creator;
-        this.groupType = groupType;
-        this.privat = isPrivat;
+        this.description = description;
+        this.memberCount = 0;
+        this.blobKey = blobKey;
+        this.searchName = groupName.toLowerCase();
     }
 
     public String getCreator() {
@@ -127,7 +121,7 @@ public class UserGroup {
         this.memberCount = memberCount;
     }
 
-    public String getGroupType() {
+    public UserGroupType getGroupType() {
         return groupType;
     }
 
@@ -147,7 +141,14 @@ public class UserGroup {
         this.memberRights = memberRights;
     }
 
+    public String getSearchName() {
+        return searchName;
+    }
+
     public void addGroupMember(String member, ArrayList<String> rights) {
+        if(memberRights == null){
+            memberRights = new HashMap<>();
+        }
         memberRights.put(member, rights);
         memberCount++;
     }

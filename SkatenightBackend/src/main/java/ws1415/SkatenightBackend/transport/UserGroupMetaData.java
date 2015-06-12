@@ -1,5 +1,7 @@
 package ws1415.SkatenightBackend.transport;
 
+import com.google.appengine.api.blobstore.BlobKey;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,14 +14,14 @@ public class UserGroupMetaData {
     private String creator;
     private boolean isPrivat;
     private int memberCount;
-    private String blobKeyValue;
+    private BlobKey blobKey;
 
-   public UserGroupMetaData(String name, String creator, boolean isPrivat, int memberCount, String blobKeyValue){
+   public UserGroupMetaData(String name, String creator, boolean isPrivat, int memberCount, BlobKey blobKey){
        this.name = name;
        this.creator = creator;
        this.isPrivat = isPrivat;
        this.memberCount = memberCount;
-       this.blobKeyValue = blobKeyValue;
+       this.blobKey = blobKey;
    }
 
     public String getName() {
@@ -54,11 +56,11 @@ public class UserGroupMetaData {
         this.memberCount = memberCount;
     }
 
-    public String getBlobKeyValue() {
-        return blobKeyValue;
+    public BlobKey getBlobKey() {
+        return blobKey;
     }
 
-    public void setBlobKeyValue(String blobKeyValue) {
-        this.blobKeyValue = blobKeyValue;
+    public void setBlobKeyValue(BlobKey blobKeye) {
+        this.blobKey = blobKey;
     }
 }

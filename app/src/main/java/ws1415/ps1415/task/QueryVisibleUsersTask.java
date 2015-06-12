@@ -3,6 +3,7 @@ package ws1415.ps1415.task;
 import android.content.Context;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
+import com.skatenight.skatenightAPI.model.UserGroupFilter;
 import com.skatenight.skatenightAPI.model.UserLocationInfo;
 
 import java.io.IOException;
@@ -43,8 +44,10 @@ public class QueryVisibleUsersTask extends ExtendedTask<Void, Void, HashMap<User
         List<UserGroup> tmpGroups = null;
         List<UserLocationInfo> groupMembers = new ArrayList<UserLocationInfo>();
         HashMap<UserLocationInfo, String> farbenMap = new HashMap<UserLocationInfo, String>();
+        UserGroupFilter filter = new UserGroupFilter();
+        filter.setLimit(10);
         try {
-            tmpGroups = (ArrayList) ServiceProvider.getService().groupEndpoint().fetchMyUserGroups().execute().getItems();
+            tmpGroups = (ArrayList) ServiceProvider.getService().groupEndpoint().fetchMyUserGroups(filter).execute().getMetaDatas();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -52,7 +55,7 @@ public class QueryVisibleUsersTask extends ExtendedTask<Void, Void, HashMap<User
             for (UserGroup userGroup : tmpGroups) {
                 if (PrefManager.getGroupVisibility(context, userGroup.getName())) {
                     try {
-                        List<String> members = ServiceProvider.getService().groupEndpoint().getUserGroupVisibleMembers(userGroup.getName()).execute().getList();
+                        List<String> members = ServiceProvider.getService().groupEndpoint().getUserGroupVisibleMembers(userGroup.getName()).execute().getVisibleMembers();
                         for(String visibleMember : members){
                             groupMembers.add(ServiceProvider.getService().userEndpoint().getUserLocationInfo(visibleMember).execute());
                         }

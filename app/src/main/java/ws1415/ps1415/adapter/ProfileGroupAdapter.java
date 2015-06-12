@@ -71,7 +71,8 @@ public class ProfileGroupAdapter extends BaseAdapter {
         UserGroupMetaData item = getItem(i);
         String secondaryText = mContext.getString(R.string.members) + ": " + item.getMemberCount();
 
-        GroupImageLoader.getInstance().setGroupImageToImageView(mContext, item.getBlobKeyValue(), holder.groupImage);
+        GroupImageLoader.getInstance().setGroupImageToImageView(mContext, item.getBlobKey(), holder.groupImage);
+
         holder.primaryText.setText(item.getName());
         holder.secondaryText.setText(secondaryText);
 

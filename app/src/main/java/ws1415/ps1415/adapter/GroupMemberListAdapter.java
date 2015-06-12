@@ -25,6 +25,7 @@ import java.util.List;
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.DistributeRightsActivity;
 import ws1415.ps1415.activity.GroupProfileActivity;
+import ws1415.ps1415.activity.InviteUsersToGroupActivity;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.model.Right;
@@ -47,6 +48,10 @@ public class GroupMemberListAdapter extends BaseAdapter {
     private Bitmap defaultBitmap;
     private boolean loadingData;
     private List<String> rights;
+    private List<String> members;
+
+    // Liste zum Prüfen, wer Reche erhält
+    private List<String> listOfMembersWhoGetRights;
 
     /**
      * Erwartet die komplette Liste der E-Mail Adressen der Benutzer die angezeigt werden sollen.
@@ -56,9 +61,11 @@ public class GroupMemberListAdapter extends BaseAdapter {
      * @param userMails Liste der E-Mail Adressen
      * @param context Context
      */
-    public GroupMemberListAdapter(List<String> userMails, Context context, List<String> rights) {
+    public GroupMemberListAdapter(List<String> userMails, Context context, List<String> rights, List<String> members) {
         this.rights = rights;
+        this.members = members;
         this.mailData = userMails;
+        listOfMembersWhoGetRights = new ArrayList<>();
         mContext = context;
         mData = new ArrayList<>();
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -141,7 +148,6 @@ public class GroupMemberListAdapter extends BaseAdapter {
     }
 
     private class Holder {
-        private EditText hiddenMailView;
         private ImageView buttonRight;
         private ImageView buttonLeft;
         private ImageView picture;
@@ -150,7 +156,7 @@ public class GroupMemberListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View convertView, ViewGroup viewGroup) {
+    public View getView(final int i, View convertView, ViewGroup viewGroup) {
         final Holder holder;
 
         if(i == getCount()-1 && !mailData.isEmpty()) addNextUserInfo(mailData);
@@ -163,7 +169,6 @@ public class GroupMemberListAdapter extends BaseAdapter {
             holder.picture = (ImageView) convertView.findViewById(R.id.list_item_user_picture);
             holder.primaryText = (TextView) convertView.findViewById(R.id.list_item_user_primary);
             holder.secondaryText = (TextView) convertView.findViewById(R.id.list_item_user_secondary);
-            holder.hiddenMailView = (EditText) convertView.findViewById(R.id.hidden_user_mail);
             convertView.setTag(holder);
         } else {
             holder = (Holder) convertView.getTag();
@@ -178,21 +183,10 @@ public class GroupMemberListAdapter extends BaseAdapter {
         UserImageLoader.getInstance(mContext).displayImage(userPicture, holder.picture);
         holder.primaryText.setText(primaryText);
         holder.secondaryText.setText(secondaryText);
-        holder.hiddenMailView.setText(getItem(i).getEmail());
         if(mContext instanceof GroupProfileActivity){
             final GroupProfileActivity activity = (GroupProfileActivity)mContext;
-            holder.buttonRight.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    activity.startRemoveMemberAction(holder.hiddenMailView);
-                }
-            });
-            holder.buttonLeft.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    activity.startDistributeRightsToAction(holder.hiddenMailView.getText().toString());
-                }
-            });
+
+            // Prüfe, welche Buttons angezeigt werden sollen
             if(rights != null){
                 if(!rights.contains(Right.DELETEMEMBER.name()) && !rights.contains(Right.FULLRIGHTS.name())){
                     holder.buttonRight.setVisibility(View.GONE);
@@ -204,29 +198,98 @@ public class GroupMemberListAdapter extends BaseAdapter {
                 holder.buttonRight.setVisibility(View.GONE);
                 holder.buttonLeft.setVisibility(View.GONE);
             }
-        }else{
-            final DistributeRightsActivity activity = (DistributeRightsActivity)mContext;
-            holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
+
+            // Setze die Listener
             holder.buttonRight.setOnClickListener(new View.OnClickListener() {
+                String email = getItem(i).getEmail();
                 @Override
                 public void onClick(View view) {
-                    activity.addMemberToList(holder.hiddenMailView.getText().toString());
-                    holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
-                    holder.buttonLeft.setVisibility(View.VISIBLE);
+                    activity.startRemoveMemberAction(email);
                 }
             });
-            holder.buttonLeft.setImageDrawable(activity.getResources().getDrawable(R.drawable.remove_icon_in_red));
             holder.buttonLeft.setOnClickListener(new View.OnClickListener() {
+                String email = getItem(i).getEmail();
                 @Override
                 public void onClick(View view) {
-                    activity.removeMemberFromList(holder.hiddenMailView.getText().toString());
+                    activity.startDistributeRightsToAction(email);
+                }
+            });
+        }else if(mContext instanceof DistributeRightsActivity){
+            final DistributeRightsActivity activity = (DistributeRightsActivity)mContext;
+
+            // Prüfe, welche Buttons sichtbar sein müssen und welche icons diese haben müssen;
+            if(listOfMembersWhoGetRights.contains(getItem(i).getEmail())){
+                holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
+                holder.buttonLeft.setVisibility(View.VISIBLE);
+            }else{
+                holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
+                holder.buttonLeft.setVisibility(View.GONE);
+            }
+            holder.buttonLeft.setImageDrawable(activity.getResources().getDrawable(R.drawable.remove_icon_in_red));
+
+            // Setze die Listener
+            holder.buttonRight.setOnClickListener(new View.OnClickListener() {
+                String email = getItem(i).getEmail();
+                @Override
+                public void onClick(View view) {
+                    activity.addMemberToList(email);
+                    holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
+                    holder.buttonLeft.setVisibility(View.VISIBLE);
+                    listOfMembersWhoGetRights.add(getItem(i).getEmail());
+                }
+            });
+            holder.buttonLeft.setOnClickListener(new View.OnClickListener() {
+                String email = getItem(i).getEmail();
+
+                @Override
+                public void onClick(View view) {
+                    activity.removeMemberFromList(email);
+                    holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
+                    holder.buttonLeft.setVisibility(View.GONE);
+                    listOfMembersWhoGetRights.remove(getItem(i).getEmail());
+                }
+            });
+        }else{
+            final InviteUsersToGroupActivity activity = (InviteUsersToGroupActivity)mContext;
+
+            // Prüfe, welche Buttons sichtbar sein müssen und welche icons diese haben müssen;
+            if(listOfMembersWhoGetRights.contains(getItem(i).getEmail())){
+                holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
+                holder.buttonLeft.setVisibility(View.VISIBLE);
+            }else {
+                if (members.contains(getItem(i).getEmail())) {
+                    holder.buttonRight.setVisibility(View.GONE);
+                }else{
                     holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
                     holder.buttonLeft.setVisibility(View.GONE);
                 }
-            });
-            holder.buttonLeft.setVisibility(View.GONE);
-        }
+            }
+            holder.buttonLeft.setImageDrawable(activity.getResources().getDrawable(R.drawable.remove_icon_in_red));
 
+            // Setze die Listener
+            holder.buttonRight.setOnClickListener(new View.OnClickListener() {
+                String email = getItem(i).getEmail();
+
+                @Override
+                public void onClick(View view) {
+                    activity.addMemberToList(email);
+                    holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
+                    holder.buttonLeft.setVisibility(View.VISIBLE);
+                    listOfMembersWhoGetRights.add(getItem(i).getEmail());
+                }
+            });
+            holder.buttonLeft.setOnClickListener(new View.OnClickListener() {
+                String email = getItem(i).getEmail();
+
+                @Override
+                public void onClick(View view) {
+                    activity.removeMemberFromList(email);
+                    holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
+                    holder.buttonLeft.setVisibility(View.GONE);
+                    listOfMembersWhoGetRights.remove(getItem(i).getEmail());
+                }
+            });
+        }
         return convertView;
     }
 

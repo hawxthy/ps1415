@@ -28,7 +28,6 @@ import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.activity.ConversationActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
-import ws1415.ps1415.activity.UsergroupActivity;
 import ws1415.ps1415.controller.MessageDbController;
 import ws1415.ps1415.event.NewMessageEvent;
 import ws1415.ps1415.util.PrefManager;
@@ -88,11 +87,6 @@ public class GcmIntentService extends IntentService {
                         // Einstellung für die Gruppe entfernen, falls vorhanden
                         PrefManager.deleteGroupVisibility(this, extras.getString("content"));
                         break;
-                    case GROUP_CREATED_NOTIFICATION_MESSAGE:
-                        // Gruppen-Listen in den Fragmenten von UserGroupActivity aktualisieren
-                        Intent refreshGroupsIntent = new Intent(UsergroupActivity.REFRESH_GROUPS_ACTION);
-                        LocalBroadcastManager.getInstance(this).sendBroadcast(refreshGroupsIntent);
-                        break;
                     case USER_NEW_MESSAGE:
                         String receiver = extras.getString("receiver");
                         if (PrefManager.getSelectedUserMail(this).equals(receiver)) {
@@ -121,7 +115,8 @@ public class GcmIntentService extends IntentService {
                     case INVITATION_TO_GROUP_MESSAGE:
                         //TODO Button zum joinen hinzufügen
                         Intent group_intent = new Intent(this, GroupProfileActivity.class);
-                        group_intent.putExtra("groupName", extras.getString("title"));
+                        group_intent.putExtra(GroupProfileActivity.EXTRA_GROUP_NAME, extras.getString("title"));
+                        group_intent.putExtra(GroupProfileActivity.EXTRA_INVITE_GROUP, GroupProfileActivity.EXTRA_INVITE_GROUP);
                         sendNotificationMessaging(extras, group_intent);
                         break;
                 }
