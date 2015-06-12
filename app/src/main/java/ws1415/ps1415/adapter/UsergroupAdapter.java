@@ -320,13 +320,12 @@ public class UsergroupAdapter extends BaseAdapter {
                         }
                     }, mSearchString, filter);
                 }else if(mSearchGroups != null && mSearchGroups.size() > 0){
+                    final List<String> subList = mSearchGroups.subList(0, Math.min(mSearchGroups.size(), filter.getLimit()));
                     GroupController.getInstance().fetchSpecificGroupDatas(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>(){
                         @Override
                         public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> metaDatas) {
-                            if(metaDatas == null){
-                                Toast.makeText(context, R.string.noMore, Toast.LENGTH_LONG).show();
-                            }else{
-                                mSearchGroups.removeAll(metaDatas);
+                            if (metaDatas != null) {
+                                mSearchGroups.removeAll(subList);
                                 groupList.addAll(metaDatas);
                                 notifyDataSetChanged();
 
@@ -344,7 +343,7 @@ public class UsergroupAdapter extends BaseAdapter {
                         public void taskFailed(ExtendedTask task, String message) {
                             Toast.makeText(context, message, Toast.LENGTH_LONG).show();
                         }
-                    }, mSearchGroups);
+                    }, subList);
                 } else {
                     GroupController.getInstance().listAllUserGroupMetaDatas(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>() {
                         @Override
