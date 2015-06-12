@@ -329,11 +329,13 @@ public class UsergroupAdapter extends BaseAdapter {
                                 mSearchGroups.removeAll(metaDatas);
                                 groupList.addAll(metaDatas);
                                 notifyDataSetChanged();
+
+                                //Falls das Ende erreicht ist, muss der Adapter bescheid bekommen
+                                if (metaDatas.size() < filter.getLimit()) {
+                                    moreToFetch = false;
+                                }
                             }
-                            //Falls das Ende erreicht ist, muss der Adapter bescheid bekommen
-                            if (metaDatas.size() < filter.getLimit()) {
-                                moreToFetch = false;
-                            }
+
                             fetching = false;
                             activity.setProgressBarIndeterminateVisibility(Boolean.FALSE);
                         }

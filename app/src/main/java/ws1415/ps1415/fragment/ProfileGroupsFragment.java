@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.skatenight.skatenightAPI.model.UserGroupFilter;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.GroupProfileActivity;
 import ws1415.ps1415.adapter.ProfileGroupAdapter;
+import ws1415.ps1415.adapter.UsergroupAdapter;
 
 /**
  * Das ProfileGroupsFragment wird zur Anzeige der Gruppen eines Benutzers verwendet.
@@ -24,7 +26,7 @@ import ws1415.ps1415.adapter.ProfileGroupAdapter;
  */
 public class ProfileGroupsFragment extends Fragment {
     private ListView mGroupListView;
-    private ProfileGroupAdapter mAdapter;
+    private UsergroupAdapter mAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,8 +53,10 @@ public class ProfileGroupsFragment extends Fragment {
      *
      * @param data Informationen
      */
-    public void setUpData(List<UserGroupMetaData> data){
-        if(this.getActivity() != null) mAdapter = new ProfileGroupAdapter(data, this.getActivity());
+    public void setUpData(List<String> data){
+        UserGroupFilter filter = new UserGroupFilter();
+        filter.setLimit(15);
+        if(this.getActivity() != null) mAdapter = new UsergroupAdapter(this.getActivity(), filter, data);
         if(mGroupListView != null) mGroupListView.setAdapter(mAdapter);
     }
 }

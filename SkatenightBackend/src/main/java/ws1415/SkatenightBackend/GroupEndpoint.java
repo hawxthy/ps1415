@@ -10,7 +10,9 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.cmd.Query;
+import com.googlecode.objectify.cmd.QueryKeys;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -419,8 +421,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
     public List<UserGroupMetaData> fetchSpecificGroupDatas(User user, ListWrapper groupNames) throws  OAuthRequestException{
         EndpointUtil.throwIfNoUser(user);
 
-        Query<UserGroup> query = ofy().load().type(UserGroup.class).filter("searchName IN", groupNames.stringList);
-        query = query.order("searchName");
+        Query<UserGroup> query = ofy().load().type(UserGroup.class).filter("searchNameNormal IN", groupNames.stringList);
+        query = query.order("searchNameNormal");
         QueryResultIterator<UserGroup> iterator = query.iterator();
 
         List<UserGroupMetaData> list = new ArrayList<>();
@@ -1024,6 +1026,22 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         return new UserEndpoint().listUserLocationInfo(user, getUserGroupVisibleMembers(user, groupName).getVisibleMembers());
     }
+
+    /**
+     * Filtert die privaten Gruppen aus den übergebenen Gruppen.
+     * @return Die Gruppen ohne private Gruppen.
+     */
+    protected List<String> getPublicGroups(List<String> groups) {
+        QueryKeys<UserGroup> query = ofy().load().type(UserGroup.class).filter("searchNameNormal IN", groups).filter("privat =", false).keys();
+
+        QueryResultIterator<Key<UserGroup>> iterator = query.iterator();
+        List<String> list = new ArrayList<>();
+        while(iterator.hasNext()){
+            list.add(iterator.next().getName());
+        }
+        return list;
+    }
+
 //======================================================================================
     /**
      * Hilfsmethoden damit Code nicht doppelt vorkommt.

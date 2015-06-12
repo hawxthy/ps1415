@@ -179,8 +179,8 @@ public class ProfileActivity extends FragmentActivity {
      */
     private void setUpProfile(UserProfile userProfile) {
         mUserProfile = userProfile;
-        List<UserGroupMetaData> userGroups = userProfile.getMyUserGroups();
-        userGroups = (userGroups == null) ? new ArrayList<UserGroupMetaData>() : userGroups;
+        List<String> userGroups = userProfile.getMyUserGroups();
+        userGroups = (userGroups == null) ? new ArrayList<String>() : userGroups;
 
         // Namen setzen
         String firstName = userProfile.getFirstName();
