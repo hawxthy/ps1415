@@ -43,7 +43,7 @@ public class QueryVisibleUsersTask extends ExtendedTask<Void, Void, HashMap<User
     @Override
     protected HashMap<UserLocationInfo, String> doInBackground(Void... params) {
         List<UserGroupMetaData> tmpGroups = null;
-        List<UserLocationInfo> groupMembers = new ArrayList<UserLocationInfo>();
+        List<UserLocationInfo> groupMembers;
         HashMap<UserLocationInfo, String> farbenMap = new HashMap<UserLocationInfo, String>();
         UserGroupFilter filter = new UserGroupFilter();
         filter.setLimit(10);
@@ -56,10 +56,7 @@ public class QueryVisibleUsersTask extends ExtendedTask<Void, Void, HashMap<User
             for (UserGroupMetaData userGroup : tmpGroups) {
                 if (PrefManager.getGroupVisibility(context, userGroup.getName())) {
                     try {
-                        List<String> members = ServiceProvider.getService().groupEndpoint().getUserGroupVisibleMembers(userGroup.getName()).execute().getVisibleMembers();
-                        for(String visibleMember : members){
-                            groupMembers.add(ServiceProvider.getService().userEndpoint().getUserLocationInfo(visibleMember).execute());
-                        }
+                        groupMembers = ServiceProvider.getService().groupEndpoint().listUserGroupVisibleMembersLocationInfo(userGroup.getName()).execute().getItems();
                         for (UserLocationInfo u : groupMembers) {
                             farbenMap.put(u, userGroup.getName());
                         }
