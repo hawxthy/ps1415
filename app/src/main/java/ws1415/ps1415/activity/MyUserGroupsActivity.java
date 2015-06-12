@@ -61,6 +61,13 @@ public class MyUserGroupsActivity extends BaseFragmentActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        setUp();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
