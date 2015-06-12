@@ -29,7 +29,9 @@
     <color name="colorPrimaryLeave">#ffd5d510</color>
 
     <color name="ColorPrimary">#FF5722</color>
-    <color name="ColorPrimaryDark">#E64A19</color>
+    <color name="ColorPrimaryDark">#E64A19</color>#
+    <color name="accent">#607D8B</color>
+    <color name="pressed">#B6B6B6</color>
 
     <color name="colorHint">#90909090</color>
 </resources>

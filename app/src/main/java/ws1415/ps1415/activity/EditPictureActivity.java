@@ -128,24 +128,26 @@ public class EditPictureActivity extends Activity {
             }
         });
 
-        startLoading();
-        GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, PictureData pictureData) {
-                picture.setImageBitmap(null);
-                picture.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), picture.getWidth());
-                title.setText(pictureData.getTitle());
-                description.setText(pictureData.getDescription());
-                initialVisibility = PictureVisibility.valueOf(pictureData.getVisibility());
-                visibility.setSelection(Math.min(initialVisibility.ordinal(), visibility.getAdapter().getCount() - 1));
-                finishLoading();
-            }
-            @Override
-            public void taskFailed(ExtendedTask task, String message) {
-                finishLoading();
-            }
-        }, pictureId);
+        if (pictureId != null) {
+            startLoading();
+            GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, PictureData pictureData) {
+                    picture.setImageBitmap(null);
+                    picture.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), picture.getWidth());
+                    title.setText(pictureData.getTitle());
+                    description.setText(pictureData.getDescription());
+                    initialVisibility = PictureVisibility.valueOf(pictureData.getVisibility());
+                    visibility.setSelection(Math.min(initialVisibility.ordinal(), visibility.getAdapter().getCount() - 1));
+                    finishLoading();
+                }
+                @Override
+                public void taskFailed(ExtendedTask task, String message) {
+                    finishLoading();
+                }
+            }, pictureId);
+        }
     }
 
     @Override
