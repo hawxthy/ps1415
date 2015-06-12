@@ -31,7 +31,6 @@ import ws1415.SkatenightBackend.model.UserLocation;
 import ws1415.SkatenightBackend.model.Visibility;
 import ws1415.SkatenightBackend.transport.ListWrapper;
 import ws1415.SkatenightBackend.transport.StringWrapper;
-import ws1415.SkatenightBackend.transport.UserGroupMetaData;
 import ws1415.SkatenightBackend.transport.UserListData;
 import ws1415.SkatenightBackend.transport.UserLocationInfo;
 import ws1415.SkatenightBackend.transport.UserPrimaryData;
@@ -98,6 +97,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
                 pm.makePersistent(user);
                 return new BooleanWrapper(true);
             } finally {
+                pm.evictAll();
                 pm.close();
             }
         }
@@ -118,6 +118,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         } catch (Exception e) {
             user = null;
         } finally {
+            pm.evictAll();
             pm.close();
         }
         if (user == null) {
@@ -152,6 +153,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
                         endUser.getUserInfo().getFirstName(), lastName);
             }
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }
@@ -184,6 +186,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         } catch (Exception e) {
             return null;
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }
@@ -208,6 +211,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             }
             return locationInfos;
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }
@@ -226,6 +230,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         } catch (Exception e) {
             return null;
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }
@@ -264,6 +269,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
                     userGroups,
                     endUser.getMyEvents().size());
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }
@@ -292,6 +298,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
                     endUser.getUserPicture(),
                     endUser.getUserInfo());
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }
@@ -323,6 +330,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         } catch (Exception e) {
             return null;
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }
@@ -363,6 +371,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         try {
             return new ListWrapper(pm.getObjectById(EndUser.class, userMail).getMyFriends());
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }
@@ -406,6 +415,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
 
             return new ListWrapper(new ArrayList<>(resultMails));
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }
@@ -448,6 +458,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         } catch (Exception e) {
             return new BooleanWrapper(false);
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }
@@ -525,6 +536,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             endUser.setUserLocation(userLocationDet);
             pm.makePersistent(endUser);
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }
@@ -559,6 +571,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             myFriends.add(friendMail);
             return new BooleanWrapper(true);
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }
@@ -583,6 +596,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             return new BooleanWrapper(endUser.getMyFriends().remove(friendMail));
         } finally {
+            pm.evictAll();
             pm.close();
         }
     }

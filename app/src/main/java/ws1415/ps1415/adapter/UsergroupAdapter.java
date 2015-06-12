@@ -15,7 +15,6 @@ import android.widget.Toast;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupFilter;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
-import com.skatenight.skatenightAPI.model.UserGroupMetaDataList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -320,7 +319,7 @@ public class UsergroupAdapter extends BaseAdapter {
                         }
                     }, mSearchString, filter);
                 }else if(mSearchGroups != null && mSearchGroups.size() > 0){
-                    final List<String> subList = mSearchGroups.subList(0, Math.min(mSearchGroups.size(), filter.getLimit()));
+                    final List<String> subList = new ArrayList<>(mSearchGroups.subList(0, Math.min(mSearchGroups.size(), filter.getLimit())));
                     GroupController.getInstance().fetchSpecificGroupDatas(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>(){
                         @Override
                         public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> metaDatas) {
@@ -349,7 +348,7 @@ public class UsergroupAdapter extends BaseAdapter {
                         @Override
                         public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> metaDatas) {
                             if (metaDatas == null) {
-                                Toast.makeText(context, R.string.noMore, Toast.LENGTH_LONG).show();
+                                //Toast.makeText(context, R.string.noMore, Toast.LENGTH_LONG).show();
                             } else {
                                 groupList.addAll(metaDatas);
                                 notifyDataSetChanged();
