@@ -1,6 +1,8 @@
 package ws1415.ps1415.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -10,9 +12,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +41,8 @@ import ws1415.ps1415.util.UniversalUtil;
  * @author Martin Wrodarczyk
  */
 public class ConversationActivity extends Activity {
+    public static final String EXTRA_MAIL = "email";
+
     // Für das Wiederherstellen einer Activity
     private static final String STATE_EMAIL = "email";
 
@@ -74,7 +80,7 @@ public class ConversationActivity extends Activity {
 
         // Email vom Intent speichern
         Intent intent = getIntent();
-        String email = intent.getStringExtra("email");
+        String email = intent.getStringExtra(EXTRA_MAIL);
         if (email != null) mEmail = email;
 
         if (!MessageDbController.getInstance(this).existsConversation(mEmail)) {
@@ -105,6 +111,14 @@ public class ConversationActivity extends Activity {
         mListViewMessages.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
         mAdapter = new MessageAdapter(new ArrayList<Message>(), this);
         mListViewMessages.setAdapter(mAdapter);
+
+        mListViewMessages.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
+                deleteMessageDialog(position);
+                return false;
+            }
+        });
 
         // Listener für das Senden einer Nachricht
         mImageViewSend.setOnClickListener(new OnClickListener() {
@@ -182,7 +196,8 @@ public class ConversationActivity extends Activity {
             @Override
             public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
                 if (aBoolean) {
-                    if((mAdapter.getCount()-1 >= 0) && mAdapter.getItem(mAdapter.getCount()-1) != localMessage)
+                    if (((mAdapter.getCount() - 1 >= 0) && mAdapter.getItem(mAdapter.getCount() - 1) != localMessage) ||
+                            mAdapter.getCount() == 0)
                         mAdapter.addMessage(localMessage);
                     mEditTextInput.getText().clear();
                 } else {
@@ -203,6 +218,28 @@ public class ConversationActivity extends Activity {
         }, mEmail, localMessage);
     }
 
+    // Dialog zum Löschen einer Nachricht
+    private void deleteMessageDialog(final int position) {
+        new AlertDialog.Builder(ConversationActivity.this)
+                .setMessage(getString(R.string.sure_delete_message_dialog))
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        boolean succeeded = MessageDbController.getInstance(ConversationActivity.this).
+                                deleteMessage(mEmail, mAdapter.getItem(position).get_id());
+                        if (succeeded) {
+                            Toast.makeText(ConversationActivity.this,
+                                    getString(R.string.message_deleted), Toast.LENGTH_LONG).show();
+                            mAdapter.removeMessage(mAdapter.getItem(position));
+                        } else Toast.makeText(ConversationActivity.this,
+                                getString(R.string.error_delete), Toast.LENGTH_LONG).show();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

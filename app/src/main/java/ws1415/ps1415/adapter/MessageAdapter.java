@@ -113,6 +113,16 @@ public class MessageAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    /**
+     * Entfernt eine Nachricht und aktualisiert die Liste.
+     *
+     * @param message Nachricht
+     */
+    public void removeMessage(Message message){
+        mData.remove(message);
+        notifyDataSetChanged();
+    }
+
     private String convertDate(Date date){
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy, HH:mm");
         return sdf.format(date);

@@ -29,7 +29,7 @@ import ws1415.ps1415.util.UniversalUtil;
  * @author Martin Wrodarczyk
  */
 public class BaseActivity extends Activity {
-    private static boolean GCM_INITIALIZED = false;
+    public static boolean GCM_INITIALIZED = false;
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;

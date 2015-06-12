@@ -20,6 +20,7 @@ import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.adapter.UserListAdapter;
 import ws1415.ps1415.controller.RoleController;
 import ws1415.ps1415.model.GlobalRole;
@@ -51,7 +52,7 @@ public class PermissionManagementActivity extends BaseActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String userMail = mAdapter.getItem(i).getEmail();
                 Intent profile_intent = new Intent(PermissionManagementActivity.this, ProfileActivity.class);
-                profile_intent.putExtra("email", userMail);
+                profile_intent.putExtra(ProfileActivity.EXTRA_MAIL, userMail);
                 startActivity(profile_intent);
             }
         });

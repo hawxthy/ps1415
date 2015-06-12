@@ -182,7 +182,7 @@ public class GcmIntentService extends IntentService {
 
             @Override
             public void taskFailed(ExtendedTask task, String message) {
-                Conversation conversation = new Conversation(sender, null, sender, "");
+                Conversation conversation = new Conversation(sender, null, getString(R.string.unknown_user), "");
                 MessageDbController.getInstance(mContext, receiver).insertConversation(conversation);
                 createNewMessage(receiver, sender, sendDate, content);
             }
@@ -220,7 +220,7 @@ public class GcmIntentService extends IntentService {
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         Intent intent = new Intent(this, ConversationActivity.class);
-        intent.putExtra("email", sender);
+        intent.putExtra(ConversationActivity.EXTRA_MAIL, sender);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         NotificationCompat.Builder mBuilder =

@@ -193,6 +193,10 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         UserGroup group = ofy().load().group(UserGroupMetaData.class).type(UserGroup.class).id(groupName).safe();
         return new UserGroupMetaData(group.getName(), group.getCreator(), group.isPrivat(), group.getMemberCount(), group.getBlobKey());
 
+        if (group.getBlobKey() == null) {
+            return new UserGroupMetaData(group.getName(), group.getCreator(), group.isPrivat(), group.getMemberCount(), null);
+        }
+        return new UserGroupMetaData(group.getName(), group.getCreator(), group.isPrivat(), group.getMemberCount(), group.getBlobKey().getKeyString());
     }
 
     /**
@@ -541,7 +545,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         UserGroup group = throwIfNoUserGroupExists(groupName);
-        if (hasRights(group, user.getEmail(), Right.FULLRIGHTS.name()) && group.getMemberRights().keySet().contains(userName)) {
+        if ((hasRights(group, user.getEmail(), Right.DELETEMEMBER.name()) && group.getMemberRights().keySet().contains(userName)) ||
+                new RoleEndpoint().isAdmin(user.getEmail()).value) {
 
             group.removeGroupMember(userName);
 

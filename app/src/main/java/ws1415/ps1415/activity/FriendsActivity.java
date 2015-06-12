@@ -70,7 +70,7 @@ public class FriendsActivity extends BaseActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String userMail = mAdapter.getItem(i).getEmail();
                 Intent profile_intent = new Intent(FriendsActivity.this, ProfileActivity.class);
-                profile_intent.putExtra("email", userMail);
+                profile_intent.putExtra(ProfileActivity.EXTRA_MAIL, userMail);
                 startActivity(profile_intent);
             }
         });

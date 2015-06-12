@@ -29,8 +29,6 @@ import ws1415.ps1415.util.UniversalUtil;
  * @author Martin Wrodarczyk
  */
 public class BaseFragmentActivity extends FragmentActivity {
-    private static boolean GCM_INITIALIZED = false;
-
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -44,9 +42,9 @@ public class BaseFragmentActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        if(!GCM_INITIALIZED && ServiceProvider.getEmail() != null) {
+        if(!BaseActivity.GCM_INITIALIZED && ServiceProvider.getEmail() != null) {
             UniversalUtil.initGCM(this);
-            GCM_INITIALIZED = true;
+            BaseActivity.GCM_INITIALIZED = true;
         }
     }
 

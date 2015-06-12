@@ -5,11 +5,10 @@ import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
 import javax.jdo.JDOObjectNotFoundException;
-import javax.jdo.PersistenceManager;
 
+import ws1415.SkatenightBackend.model.BoardEntry;
 import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
-import ws1415.SkatenightBackend.model.BoardEntry;
 
 /**
  * Created by Martin on 13.05.2015.
@@ -40,10 +39,13 @@ public class EndpointUtil {
     }
 
     /**
-     * Exception wird geworfen, falls Rechte fehlen um Benutzerdaten zu ändern/abzurufen.
+     * Exception wird geworfen, falls Rechte fehlen um Benutzerdaten zu ändern/abzurufen/löschen.
+     *
+     * @param mailLoggedIn eingeloggter Benutzer
+     * @param mailUserToCheck Benutzer der abgerufen/geändert/gelöscht wird
      */
-    public static void throwIfNoRights(String mailLoggedIn, String mailUserToChange) throws UnauthorizedException {
-        if (!mailLoggedIn.equals(mailUserToChange) && !new RoleEndpoint().isAdmin(mailLoggedIn).value) {
+    public static void throwIfNoRights(String mailLoggedIn, String mailUserToCheck) throws UnauthorizedException {
+        if (!mailLoggedIn.equals(mailUserToCheck) && !new RoleEndpoint().isAdmin(mailLoggedIn).value) {
             throw new UnauthorizedException("rights missing to perform the action");
         }
     }

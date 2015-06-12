@@ -78,10 +78,7 @@ public class MessagingActivity extends BaseActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Conversation conversation = mAdapter.getItem(i);
                 Intent conversation_intent = new Intent(MessagingActivity.this, ConversationActivity.class);
-                conversation_intent.putExtra("email", conversation.getEmail());
-                conversation_intent.putExtra("firstName", conversation.getFirstName());
-                conversation_intent.putExtra("lastName", conversation.getLastName());
-                conversation_intent.putExtra("newMessagesCount", conversation.getCountNewMessages());
+                conversation_intent.putExtra(ConversationActivity.EXTRA_MAIL, conversation.getEmail());
                 startActivity(conversation_intent);
             }
         });
@@ -158,7 +155,7 @@ public class MessagingActivity extends BaseActivity {
                         switch (which) {
                             case 0:
                                 Intent profile_intent = new Intent(MessagingActivity.this, ProfileActivity.class);
-                                profile_intent.putExtra("email", item.getEmail());
+                                profile_intent.putExtra(ProfileActivity.EXTRA_MAIL, item.getEmail());
                                 startActivity(profile_intent);
                                 break;
                             case 1:
