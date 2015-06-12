@@ -183,44 +183,50 @@ public class GroupProfileActivity extends BaseFragmentActivity {
         GroupController.getInstance().getUserGroup(new ExtendedTaskDelegateAdapter<Void, UserGroup>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
-                // group nuss nicht abgefragt werden, denn der Server gibt bereist einen Fehler wenn eine
-                // Gruppe mit dem Namen nicht existiert
-                GroupProfileActivity.this.group = group;
-                mAdapter.getGroupMembersFragment().setUp(group, getRights(), GroupProfileActivity.this);
-                if (group.getMemberRights().keySet().contains(ServiceProvider.getEmail())) {
-                    checkIsMember = true;
-                    mJoinButton.setVisibility(View.GONE);
-                    mChangeVisibility.setVisibility(View.VISIBLE);
-                    checkIfVisible();
-                    if (getRights().contains(Right.FULLRIGHTS.name())) {
-                        mLeaveButton.setVisibility(View.GONE);
-                        mDeleteButton.setVisibility(View.VISIBLE);
+                if(group != null){
+                    // group nuss nicht abgefragt werden, denn der Server gibt bereist einen Fehler wenn eine
+                    // Gruppe mit dem Namen nicht existiert
+                    GroupProfileActivity.this.group = group;
+                    mAdapter.getGroupMembersFragment().setUp(group, getRights(), GroupProfileActivity.this);
+                    if (group.getMemberRights().keySet().contains(ServiceProvider.getEmail())) {
+                        checkIsMember = true;
+                        mJoinButton.setVisibility(View.GONE);
+                        mChangeVisibility.setVisibility(View.VISIBLE);
+                        checkIfVisible();
+                        if (getRights().contains(Right.FULLRIGHTS.name())) {
+                            mLeaveButton.setVisibility(View.GONE);
+                            mDeleteButton.setVisibility(View.VISIBLE);
+                        } else {
+                            if (mLeaveButton.getVisibility() == View.GONE) {
+                                mLeaveButton.setVisibility(View.VISIBLE);
+                            }
+                        }
                     } else {
-                        if (mLeaveButton.getVisibility() == View.GONE) {
-                            mLeaveButton.setVisibility(View.VISIBLE);
+                        checkIsMember = false;
+                        mLeaveButton.setVisibility(View.GONE);
+                        if (mJoinButton.getVisibility() == View.GONE) {
+                            mJoinButton.setVisibility(View.VISIBLE);
                         }
                     }
-                } else {
-                    checkIsMember = false;
-                    mLeaveButton.setVisibility(View.GONE);
-                    if (mJoinButton.getVisibility() == View.GONE) {
-                        mJoinButton.setVisibility(View.VISIBLE);
-                    }
-                }
-                checkIfInvitationIntent();
-                GroupImageLoader.getInstance().setGroupImageToImageView(GroupProfileActivity.this, group.getBlobKey(), mGroupPicture);
+                    checkIfInvitationIntent();
+                    GroupImageLoader.getInstance().setGroupImageToImageView(GroupProfileActivity.this, group.getBlobKey(), mGroupPicture);
 
-                mGroupNameTextView.setText(group.getName());
-                mAdapter.getGroupMembersFragment().setUp(group, getRights(), GroupProfileActivity.this);
-                mAdapter.getGroupBlackBoardFragment().setUp(group.getBlackBoard(), group, GroupProfileActivity.this);
-                mAdapter.getGroupNewsBoardFragment().setUp(group.getNewsBoard(), groupName, GroupProfileActivity.this);
-                setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                setClickOnPicture();
+                    mGroupNameTextView.setText(group.getName());
+                    mAdapter.getGroupMembersFragment().setUp(group, getRights(), GroupProfileActivity.this);
+                    mAdapter.getGroupBlackBoardFragment().setUp(group.getBlackBoard(), group, GroupProfileActivity.this);
+                    mAdapter.getGroupNewsBoardFragment().setUp(group.getNewsBoard(), groupName, GroupProfileActivity.this);
+                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                    setClickOnPicture();
+                }else{
+                    Toast.makeText(GroupProfileActivity.this, R.string.group_already_gone, Toast.LENGTH_LONG).show();
+                    finish();
+                    return;
+                }
             }
 
             @Override
             public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG);
+                Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
             }
         }, groupName);
     }

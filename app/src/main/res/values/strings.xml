@@ -335,7 +335,6 @@
     <string name="activity_edit_waypoint_dialog_apply">Apply</string>
     <string name="title_activity_edit_waypoint_dialog_waypointname">Name:</string>
     <string name="title_activity_edit_waypoint_dialog">Edit Waypoint</string>
-    <string name="title_activity_invite_users_to_group">InviteUsersToGroupActivity</string>
     
     <!-- CommentAdapter -->
     <string name="comment_adapter_fetch_error">An error oddurred while fetching more comments.</string>
@@ -389,6 +388,7 @@
     <string name="nothingFound">Didn\'t find anything</string>
     <string name="sendDone">Invitations have been send</string>
     <string name="noUsersToInvite">No users to invite Selected</string>
+    <string name="title_activity_invite_users_to_group">Invite Users</string>
 
     <!-- MyUserGroupsActivity-->
     <string name="tooManyVisibleGroups">Too many visible Groups</string>
@@ -472,6 +472,7 @@
     <string name="youAreNowVisible">You are now visible</string>
     <string name="youAreNowInvisible">You are now invisible</string>
     <string name="edit_this_entry">Edit this message?</string>
+    <string name="group_already_gone">The Group no longer exists</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="deleteThisEntryQuestion">Delete this Entry?</string>
