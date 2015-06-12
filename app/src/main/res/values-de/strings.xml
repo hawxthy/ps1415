@@ -429,6 +429,7 @@
     <string name="nothingFound">Es wurde nichts gefunden</string>
     <string name="sendDone">Einladungen wurden versand</string>
     <string name="noUsersToInvite">Sie haben niemanden zum Einladen ausgewählt</string>
+    <string name="title_activity_invite_users_to_group">Neue Benutzer einladen</string>
 
     <!-- MyUserGroupsActivity-->
     <string name="tooManyVisibleGroups">Sie haben zu viele sichtbare Gruppe</string>
@@ -513,6 +514,7 @@
     <string name="youAreNowVisible">Sie sind nun für alle Mitglieder sichtbar</string>
     <string name="youAreNowInvisible">Sie können nun nicht mehr von Mitgliedern gesehen werden</string>
     <string name="edit_this_entry">Wollen Sie diese Nachricht editieren?</string>
+    <string name="group_already_gone">The Group no longer exists</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="deleteThisEntryQuestion">Diesen Eintrag löschen?</string>
