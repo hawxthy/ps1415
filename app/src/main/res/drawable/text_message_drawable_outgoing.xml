@@ -1,4 +1,4 @@
-<layer-visibleMembers xmlns:android="http://schemas.android.com/apk/res/android" >
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
     <item>
         <shape xmlns:android="http://schemas.android.com/apk/res/android"
             android:shape="rectangle">
@@ -11,4 +11,4 @@
                 android:color="#FFB74D" />
         </shape>
     </item>
-</layer-visibleMembers>
+</layer-list>

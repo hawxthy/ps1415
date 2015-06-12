@@ -374,9 +374,11 @@ public class ProfileActivity extends FragmentActivity {
     }
 
     public void onPicturesClick(View view) {
-        Intent intent = new Intent(this, ListPicturesActivity.class);
-        intent.putExtra(ListPicturesActivity.EXTRA_TITLE, "Bilder von " + mUserProfile.getFirstName());
-        intent.putExtra(ListPicturesActivity.EXTRA_MAIL, email);
-        startActivity(intent);
+        if (mUserProfile != null) {
+            Intent intent = new Intent(this, ListPicturesActivity.class);
+            intent.putExtra(ListPicturesActivity.EXTRA_TITLE, "Bilder von " + mUserProfile.getFirstName());
+            intent.putExtra(ListPicturesActivity.EXTRA_MAIL, email);
+            startActivity(intent);
+        }
     }
 }

@@ -17,6 +17,7 @@ import ws1415.ps1415.activity.CreateUserGroupActivity;
 import ws1415.ps1415.activity.FriendsActivity;
 import ws1415.ps1415.activity.GroupProfileActivity;
 import ws1415.ps1415.activity.ListEventsActivity;
+import ws1415.ps1415.activity.ListPicturesActivity;
 import ws1415.ps1415.activity.ListUserGroupsActivity;
 import ws1415.ps1415.activity.MessagingActivity;
 import ws1415.ps1415.activity.MyUserGroupsActivity;

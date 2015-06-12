@@ -128,32 +128,40 @@ public class EditPictureActivity extends Activity {
             }
         });
 
-        startLoading();
-        GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, PictureData pictureData) {
-                picture.setImageBitmap(null);
-                picture.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), picture.getWidth());
-                title.setText(pictureData.getTitle());
-                description.setText(pictureData.getDescription());
-                initialVisibility = PictureVisibility.valueOf(pictureData.getVisibility());
-                visibility.setSelection(Math.min(initialVisibility.ordinal(), visibility.getAdapter().getCount() - 1));
-                finishLoading();
-            }
-            @Override
-            public void taskFailed(ExtendedTask task, String message) {
-                finishLoading();
-            }
-        }, pictureId);
+        if (pictureId != null) {
+            startLoading();
+            GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, PictureData pictureData) {
+                    picture.setImageBitmap(null);
+                    picture.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), picture.getWidth());
+                    title.setText(pictureData.getTitle());
+                    description.setText(pictureData.getDescription());
+                    initialVisibility = PictureVisibility.valueOf(pictureData.getVisibility());
+                    visibility.setSelection(Math.min(initialVisibility.ordinal(), visibility.getAdapter().getCount() - 1));
+                    finishLoading();
+                }
+                @Override
+                public void taskFailed(ExtendedTask task, String message) {
+                    finishLoading();
+                }
+            }, pictureId);
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(MEMBER_PICTURE_ID, pictureId);
-        outState.putLong(MEMBER_GALLERY_ID, galleryId);
-        outState.putString(MEMBER_MIN_PICTURE_VISBILITY, minPictureVisibility.name());
+        if (pictureId != null) {
+            outState.putLong(MEMBER_PICTURE_ID, pictureId);
+        }
+        if (galleryId != null) {
+            outState.putLong(MEMBER_GALLERY_ID, galleryId);
+        }
+        if (minPictureVisibility != null) {
+            outState.putString(MEMBER_MIN_PICTURE_VISBILITY, minPictureVisibility.name());
+        }
     }
 
     @Override

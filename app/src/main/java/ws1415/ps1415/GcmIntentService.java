@@ -62,7 +62,7 @@ public class GcmIntentService extends IntentService {
                 try {
                     type = MessageType.valueOf(extras.getString("type"));
                 } catch (Exception e) {
-                    type = null;
+                    return;
                 }
                 switch (type) {
                     case NOTIFICATION_MESSAGE:

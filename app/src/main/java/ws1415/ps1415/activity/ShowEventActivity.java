@@ -262,7 +262,7 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         title.setText(eventData.getTitle());
         TextView date = (TextView) findViewById(R.id.date);
         Date tmpDate = new Date(eventData.getDate().getValue());
-        if (tmpDate.getTime() < System.currentTimeMillis()) {
+        if (tmpDate.getTime() < System.currentTimeMillis() && eventData.getMemberList().containsKey(ServiceProvider.getEmail())) {
             showActiveEvent.setVisibility(View.VISIBLE);
         } else {
             showActiveEvent.setVisibility(View.GONE);
