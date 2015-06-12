@@ -7,8 +7,10 @@
 
     <!-- Dummy item to prevent AutoCompleteTextView from receiving focus -->
     <LinearLayout
-        android:focusable="true" android:focusableInTouchMode="true"
-        android:layout_width="0px" android:layout_height="0px"/>
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:focusable="true"
+        android:focusableInTouchMode="true" />
 
     <LinearLayout
         android:id="@+id/input_view"
@@ -43,44 +45,33 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_below="@+id/input_view"
-        android:orientation="vertical"
+
+    <ListView
+        android:id="@+id/invite_user_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/invite_user_button_abort"
+        android:layout_below="@+id/input_view"></ListView>
+
+
+    <com.gc.materialdesign.views.ButtonFlat
+        android:id="@+id/invite_user_button_abort"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="36dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/invite_user_button_submit"
+        android:background="#1E88E5"
+        android:paddingRight="8dp"
+        android:text="@string/abortGroup" />
+
+    <com.gc.materialdesign.views.ButtonFlat
+        android:id="@+id/invite_user_button_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:background="#1E88E5"
+        android:text="@string/submitGroup" />
 
 
-        <ListView
-            android:id="@+id/invite_user_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="fill_parent">
-        </ListView>
-
-        <RelativeLayout
-            android:id="@+id/management_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/invite_user_list_view">
-
-            <com.gc.materialdesign.views.ButtonFlat
-                android:id="@+id/invite_user_button_abort"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_alignParentBottom="true"
-                android:layout_toLeftOf="@+id/invite_user_button_submit"
-                android:background="#1E88E5"
-                android:paddingRight="8dp"
-                android:text="@string/abortGroup" />
-
-            <com.gc.materialdesign.views.ButtonFlat
-                android:id="@+id/invite_user_button_submit"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:background="#1E88E5"
-                android:text="@string/submitGroup" />
-        </RelativeLayout>
-
-    </LinearLayout>
 </RelativeLayout>

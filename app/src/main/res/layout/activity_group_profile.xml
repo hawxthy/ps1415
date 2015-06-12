@@ -16,7 +16,6 @@
         <ImageView
             android:id="@+id/group_profile_image_view"
             android:layout_centerHorizontal="true"
-            android:layout_below="@+id/group_profile_group_name_text_view"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_marginBottom="8dp"/>
@@ -25,10 +24,13 @@
             android:id="@+id/group_profile_group_name_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/group_profile_image_view"
             android:gravity="center"
             android:layout_marginBottom="8dp"
             android:textColor="@color/list_item_title"
             android:textSize="20sp"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:text="Gruppenname "/>
 
         <com.melnykov.fab.FloatingActionButton

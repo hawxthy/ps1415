@@ -110,4 +110,17 @@ public class GroupBlackBoardFragment extends Fragment {
             }
         }, group.getName());
     }
+
+    /**
+     * Ändert die Sichtbarkeit des Buttons vür das Schreiben von Nachrichten auf dem BlackBoard
+     *
+     * @param visibility
+     */
+    public void changeButtonVisibility(boolean visibility){
+        if(visibility){
+            mAddMessageButton.setVisibility(View.VISIBLE);
+        }else{
+            mAddMessageButton.setVisibility(View.GONE);
+        }
+    }
 }

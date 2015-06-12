@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -56,6 +57,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * @author Bernd Eissing
  */
 public class GroupEndpoint extends SkatenightServerEndpoint {
+    private static final Logger log = Logger.getLogger(EventEndpoint.class.getName());
     private static final BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
     /**
@@ -94,6 +96,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
                                 @Named("groupPrivacy") boolean groupPrivacyValue,
                                 @Nullable @Named("groupDescription") String groupDescription,
                                 @Nullable @Named("blobKeyValue") String blobKeyValue) throws OAuthRequestException {
+
         // Bedingungen prüfen
         EndpointUtil.throwIfNoUser(user);
         throwIfUserGroupAlreadyExists(groupName);
@@ -123,7 +126,6 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         UserEndpoint userEndpoint = new UserEndpoint();
         // Die Newsboard Message erstellen
         postNewsBoard(group, "Die Gruppe wurde erstellt von " + userEndpoint.getPrimaryData(user, user.getEmail()).getFirstName());
-
         // Die Gruppe  muss NICHT gespeichert werden, dies passiert in postNewsBoard
         userEndpoint.addGroupToUser(user.getEmail(), group);
     }
@@ -449,11 +451,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         ofy().save().entity(group.getVisibleMembers()).now();
 
         // News Message erstellen
-        BoardEntry be = new BoardEntry(user.getEmail() + " ist der Gruppe beigetreten", user.getEmail());
-        ofy().save().entity(be).now();
-        group.getNewsBoard().addBoardMessage(be);
-        ofy().save().entity(group.getNewsBoard()).now();
-        ofy().save().entity(group).now();
+        postNewsBoard(group, new UserEndpoint().getPrimaryData(user, user.getEmail()).getFirstName() + " ist der Gruppe beigetreten");
+        // Grupe muss nicht gespeichert werden, die wird in der postNewsBoard Methode getan
 
         // Dem EndUser die Nutzergruppe hinzufügen
         new UserEndpoint().addGroupToUser(endUser.getEmail(), group);
@@ -485,11 +484,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         ofy().save().entity(group.getVisibleMembers()).now();
 
         // News Message erstellen
-        BoardEntry be = new BoardEntry(user.getEmail() + " ist der Gruppe beigetreten", user.getEmail());
-        ofy().save().entity(be).now();
-        group.getNewsBoard().addBoardMessage(be);
-        ofy().save().entity(group.getNewsBoard()).now();
-        ofy().save().entity(group).now();
+        postNewsBoard(group, new UserEndpoint().getPrimaryData(user, user.getEmail()).getFirstName() + " ist der Gruppe beigetreten");
+        // Grupe muss nicht gespeichert werden, die wird in der postNewsBoard Methode getan
 
         // Dem EndUser die Nutzergruppe hinzufügen
         new UserEndpoint().addGroupToUser(endUser.getEmail(), group);
@@ -515,10 +511,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
         ofy().save().entity(group.getVisibleMembers()).now();
 
         // News Message erstellen
-        BoardEntry be = new BoardEntry(user.getEmail() + " hat die Gruppe verlassen", user.getEmail());
-        ofy().save().entity(be).now();
-        group.getNewsBoard().addBoardMessage(be);
-        ofy().save().entity(group.getNewsBoard()).now();
+        postNewsBoard(group, new UserEndpoint().getPrimaryData(user, user.getEmail()).getFirstName() + " hat die Gruppe veralssen");
+        // Grupe muss nicht gespeichert werden, die wird in der postNewsBoard Methode getan
 
         ofy().save().entity(group).now();
 
@@ -546,10 +540,8 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             group.removeGroupMember(userName);
 
             // News Message erstellen
-            BoardEntry be = new BoardEntry(user.getEmail() + " ist aus der Gruppe geworfen worden", user.getEmail());
-            ofy().save().entity(be).now();
-            group.getNewsBoard().addBoardMessage(be);
-            ofy().save().entity(group.getNewsBoard()).now();
+            postNewsBoard(group, new UserEndpoint().getPrimaryData(user, user.getEmail()).getFirstName() + " ist aus der Gruppe geworfen worden");
+            // Grupe muss nicht gespeichert werden, die wird in der postNewsBoard Methode getan
 
             ofy().save().entity(group).now();
 
