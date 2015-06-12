@@ -250,7 +250,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             UserInfo userInfo = pm.detachCopy(endUser.getUserInfo());
             setUpVisibility(userInfo, user.getEmail(), userMail, friends);
 
-            List<UserGroupMetaData> userGroups = listUserGroupMetaData(user, endUser);
+            List<String> userGroups = listUserGroupMetaData(user, endUser);
 
             return new UserProfile(userMail,
                     endUser.getUserPicture(),
@@ -682,29 +682,18 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param endUser Benutzer dessen Gruppen abgerufen werden
      * @return Liste von beigetretenen oder erstellten Nutzergruppen
      */
-    private List<UserGroupMetaData> listUserGroupMetaData(User caller, EndUser endUser) throws OAuthRequestException {
+    private List<String> listUserGroupMetaData(User caller, EndUser endUser) throws OAuthRequestException {
         Visibility showPrivateGroupsVisibility = endUser.getShowPrivateGroups();
         List<String> friends = endUser.getMyFriends();
         Boolean showPrivateGroups = isVisible(caller.getEmail(), endUser.getEmail(),
                 showPrivateGroupsVisibility, friends);
         List<String> userGroupIds = endUser.getMyUserGroups();
-        UserGroupMetaData userGroup;
-        List<UserGroupMetaData> result = new ArrayList<>();
-        for (String userGroupId : userGroupIds) {
-            try {
-                userGroup = new GroupEndpoint().getUserGroupMetaData(caller, userGroupId);
-                if (userGroup != null) {
-                    if (userGroup.getPrivat() && showPrivateGroups) {
-                        result.add(userGroup);
-                    } else if (!userGroup.getPrivat()) {
-                        result.add(userGroup);
-                    }
-                }
-            } catch (Exception e){
-                // Füge Gruppe nicht hinzu
-            }
+
+        if (showPrivateGroups) {
+            return userGroupIds;
+        } else {
+            return new GroupEndpoint().getPublicGroups(userGroupIds);
         }
-        return result;
     }
 
     /**

@@ -25,11 +25,13 @@ public class UserGroup {
     @Id
     private String name;            // Eindeutiger Name der Gruppe
     @Index
-    @Load
     private String searchName;
+    @Index
+    private String searchNameNormal;
     private String password;
     private String creator;
     private String description;
+    @Index
     private boolean privat;
     private int memberCount;
     private UserGroupType groupType;
@@ -75,6 +77,7 @@ public class UserGroup {
         this.memberCount = 0;
         this.blobKey = blobKey;
         this.searchName = groupName.toLowerCase();
+        this.searchNameNormal = groupName;
     }
 
     public String getCreator() {

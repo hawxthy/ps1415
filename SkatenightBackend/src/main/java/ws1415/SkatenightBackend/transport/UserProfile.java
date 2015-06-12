@@ -21,7 +21,7 @@ public class UserProfile {
     private String city;
     private String postalCode;
     private String description;
-    private List<UserGroupMetaData> myUserGroups;
+    private List<String> myUserGroups;
     private int eventCount;
 
     public UserProfile(){
@@ -29,7 +29,7 @@ public class UserProfile {
 
     public UserProfile(String email, BlobKey userPicture, String firstName, String lastName,
                        Gender gender, String dateOfBirth, String city, String postalCode,
-                       String description, List<UserGroupMetaData> myUserGroups, int eventCount) {
+                       String description, List<String> myUserGroups, int eventCount) {
         this.email = email;
         this.userPicture = userPicture;
         this.firstName = firstName;
@@ -115,11 +115,11 @@ public class UserProfile {
         this.description = description;
     }
 
-    public List<UserGroupMetaData> getMyUserGroups() {
+    public List<String> getMyUserGroups() {
         return myUserGroups;
     }
 
-    public void setMyUserGroups(List<UserGroupMetaData> myUserGroups) {
+    public void setMyUserGroups(List<String> myUserGroups) {
         this.myUserGroups = myUserGroups;
     }
 

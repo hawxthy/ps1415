@@ -3,15 +3,19 @@ package ws1415.ps1415.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -133,9 +137,13 @@ public class EditPictureActivity extends Activity {
             GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, PictureData pictureData) {
+                    Display display = getWindowManager().getDefaultDisplay();
+                    Point size = new Point();
+                    display.getSize(size);
+                    int width = size.x;
                     picture.setImageBitmap(null);
                     picture.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                    DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), picture.getWidth());
+                    DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), width);
                     title.setText(pictureData.getTitle());
                     description.setText(pictureData.getDescription());
                     initialVisibility = PictureVisibility.valueOf(pictureData.getVisibility());
