@@ -39,6 +39,10 @@ public class EditPictureActivity extends Activity {
     public static final String EXTRA_GALLERY_ID = EditPictureActivity.class.getSimpleName() + ".GalleryId";
     public static final String EXTRA_MIN_PICTURE_VISBILITY = EditPictureActivity.class.getSimpleName() + ".MinPictureVsibility";
 
+    private static final String MEMBER_PICTURE_ID = EditPictureActivity.class.getName() + ".PictureId";
+    private static final String MEMBER_GALLERY_ID = EditPictureActivity.class.getSimpleName() + ".GalleryId";
+    private static final String MEMBER_MIN_PICTURE_VISBILITY = EditPictureActivity.class.getSimpleName() + ".MinPictureVsibility";
+
     private static final int CHOOSE_PICTURE_REQUEST_CODE = 1;
 
     private Long pictureId;
@@ -67,11 +71,27 @@ public class EditPictureActivity extends Activity {
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        if (getIntent().hasExtra(EXTRA_GALLERY_ID)) {
-            galleryId = getIntent().getLongExtra(EXTRA_GALLERY_ID, -1);
-        }
-        if (getIntent().hasExtra(EXTRA_MIN_PICTURE_VISBILITY)) {
-            minPictureVisibility = PictureVisibility.valueOf(getIntent().getStringExtra(EXTRA_MIN_PICTURE_VISBILITY));
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(MEMBER_GALLERY_ID)) {
+                galleryId = savedInstanceState.getLong(MEMBER_GALLERY_ID);
+            }
+            if (savedInstanceState.containsKey(MEMBER_MIN_PICTURE_VISBILITY)) {
+                minPictureVisibility = PictureVisibility.valueOf(savedInstanceState.getString(MEMBER_MIN_PICTURE_VISBILITY));
+            }
+            if (savedInstanceState.containsKey(MEMBER_PICTURE_ID)) {
+                pictureId = savedInstanceState.getLong(MEMBER_PICTURE_ID);
+            }
+        } else {
+            if (getIntent().hasExtra(EXTRA_GALLERY_ID)) {
+                galleryId = getIntent().getLongExtra(EXTRA_GALLERY_ID, -1);
+            }
+            if (getIntent().hasExtra(EXTRA_MIN_PICTURE_VISBILITY)) {
+                minPictureVisibility = PictureVisibility.valueOf(getIntent().getStringExtra(EXTRA_MIN_PICTURE_VISBILITY));
+            }
+            if (getIntent().hasExtra(EXTRA_PICTURE_ID)) {
+                pictureId = getIntent().getLongExtra(EXTRA_PICTURE_ID, -1);
+            }
+            position = getIntent().getIntExtra(EXTRA_POSITION, -1);
         }
 
         picture = (ImageView) findViewById(R.id.picture);
@@ -108,28 +128,32 @@ public class EditPictureActivity extends Activity {
             }
         });
 
-        if (getIntent().hasExtra(EXTRA_PICTURE_ID)) {
-            pictureId = getIntent().getLongExtra(EXTRA_PICTURE_ID, -1);
-            startLoading();
-            GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, PictureData pictureData) {
-                    picture.setImageBitmap(null);
-                    picture.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                    DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), picture.getWidth());
-                    title.setText(pictureData.getTitle());
-                    description.setText(pictureData.getDescription());
-                    initialVisibility = PictureVisibility.valueOf(pictureData.getVisibility());
-                    visibility.setSelection(Math.min(initialVisibility.ordinal(), visibility.getAdapter().getCount() - 1));
-                    finishLoading();
-                }
-                @Override
-                public void taskFailed(ExtendedTask task, String message) {
-                    finishLoading();
-                }
-            }, pictureId);
-        }
-        position = getIntent().getIntExtra(EXTRA_POSITION, -1);
+        startLoading();
+        GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, PictureData pictureData) {
+                picture.setImageBitmap(null);
+                picture.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), picture.getWidth());
+                title.setText(pictureData.getTitle());
+                description.setText(pictureData.getDescription());
+                initialVisibility = PictureVisibility.valueOf(pictureData.getVisibility());
+                visibility.setSelection(Math.min(initialVisibility.ordinal(), visibility.getAdapter().getCount() - 1));
+                finishLoading();
+            }
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                finishLoading();
+            }
+        }, pictureId);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(MEMBER_PICTURE_ID, pictureId);
+        outState.putLong(MEMBER_GALLERY_ID, galleryId);
+        outState.putString(MEMBER_MIN_PICTURE_VISBILITY, minPictureVisibility.name());
     }
 
     @Override

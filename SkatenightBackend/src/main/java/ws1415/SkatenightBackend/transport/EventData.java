@@ -23,6 +23,8 @@ public class EventData {
     private BlobKey icon;
     private String title;
     private Date date;
+    private int routeFieldFirst;
+    private int routeFieldLast;
     private BlobKey headerImage;
     private String description;
     private String meetingPlace;
@@ -39,6 +41,8 @@ public class EventData {
         icon = event.getIcon();
         title = event.getTitle();
         date = event.getDate();
+        routeFieldFirst = event.getRouteFieldFirst();
+        routeFieldLast = event.getRouteFieldLast();
         headerImage = event.getHeaderImage();
         description = event.getDescription().getValue();
         meetingPlace = event.getMeetingPlace();
@@ -81,6 +85,14 @@ public class EventData {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public int getRouteFieldLast() {
+        return routeFieldLast;
+    }
+
+    public void setRouteFieldLast(int routeFieldLast) {
+        this.routeFieldLast = routeFieldLast;
     }
 
     public BlobKey getHeaderImage() {
@@ -153,5 +165,13 @@ public class EventData {
 
     public void setDynamicFields(List<DynamicField> dynamicFields) {
         this.dynamicFields = dynamicFields;
+    }
+
+    public int getRouteFieldFirst() {
+        return routeFieldFirst;
+    }
+
+    public void setRouteFieldFirst(int routeFieldFirst) {
+        this.routeFieldFirst = routeFieldFirst;
     }
 }

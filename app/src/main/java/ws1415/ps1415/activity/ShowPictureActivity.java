@@ -17,6 +17,9 @@ public class ShowPictureActivity extends Activity {
      */
     public static final String EXTRA_POSITION = ShowPictureActivity.class.getName() + ".Position";
 
+    private static final String MEMBER_PICTURE_ID = ShowPictureActivity.class.getName() + ".PictureId";
+
+    private long pictureId;
     private int position;
 
     @Override
@@ -32,12 +35,21 @@ public class ShowPictureActivity extends Activity {
         }
 
         position = getIntent().getIntExtra(EXTRA_POSITION, -1);
-        if (getIntent().hasExtra(EXTRA_PICTURE_ID)) {
-            PictureFragment fragment = (PictureFragment) getFragmentManager().findFragmentById(R.id.pictureFragment);
-            fragment.loadPicture(getIntent().getLongExtra(EXTRA_PICTURE_ID, -1), position);
+        if (savedInstanceState != null && savedInstanceState.containsKey(MEMBER_PICTURE_ID)) {
+            pictureId = savedInstanceState.getLong(MEMBER_PICTURE_ID);
+        } else if (getIntent().hasExtra(EXTRA_PICTURE_ID)) {
+            pictureId = getIntent().getLongExtra(EXTRA_PICTURE_ID, -1);
         } else {
             throw new RuntimeException("intent has to have extra " + EXTRA_PICTURE_ID);
         }
+        PictureFragment fragment = (PictureFragment) getFragmentManager().findFragmentById(R.id.pictureFragment);
+        fragment.loadPicture(pictureId, position);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.getLong(MEMBER_PICTURE_ID, pictureId);
     }
 
     @Override

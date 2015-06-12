@@ -75,6 +75,9 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:textSize="11pt"
+                    android:maxLength="40"
+                    android:maxLines="1"
+                    android:singleLine="true"
                     android:hint="@string/template_event_title" />
 
                 <TextView
@@ -92,6 +95,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/date"
                     android:layout_marginTop="20dp"
+                    android:maxLength="500"
                     android:hint="@string/template_event_description"
                     android:inputType="textMultiLine" />
 
@@ -108,6 +112,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/meeting_place_label"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:maxLength="40"
                     android:layout_below="@id/description"
                     android:layout_alignBaseline="@id/meeting_place" />
 
@@ -118,6 +125,7 @@
                     android:layout_below="@id/meeting_place"
                     android:layout_alignLeft="@id/meeting_place"
                     android:hint="@string/fee"
+                    android:maxLength="8"
                     android:digits="0123456789,"
                     android:inputType="numberDecimal" />
 

@@ -28,11 +28,11 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.util.LocalAnalysisData;
 import ws1415.ps1415.util.LocalStorageUtil;
 
@@ -101,7 +101,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 
             clockTimer = new Timer(true);
 
-            new GetEventTask(this).execute(eventId);
+            EventController.getEvent(this, eventId);
 
             Button endParticipationButton = (Button) findViewById(R.id.active_event_cancel_button);
             endParticipationButton.setOnClickListener(new View.OnClickListener() {

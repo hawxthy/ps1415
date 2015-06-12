@@ -29,6 +29,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/picture"
         android:paddingTop="16dp"
+        android:maxLength="40"
+        android:maxLines="1"
+        android:singleLine="true"
         android:hint="@string/title_hint"
         style="@style/primaryText" />
 
@@ -37,6 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/title"
+        android:maxLength="500"
         android:hint="@string/description_hint"
         style="@style/primaryText" />
 

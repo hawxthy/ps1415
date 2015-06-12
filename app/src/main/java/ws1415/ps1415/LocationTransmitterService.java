@@ -30,10 +30,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.task.ExtendedTask;
-import ws1415.ps1415.task.ExtendedTaskDelegate;
-import ws1415.ps1415.task.GetEventTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.LocalAnalysisData;
 import ws1415.ps1415.util.LocalStorageUtil;
 import ws1415.ps1415.util.LocationUtils;
@@ -439,7 +439,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
             Log.v(LOG_TAG, "Received alarm: " + keyId + " " + alarmId + " " + responsible + " " + started);
 
             if (keyId != 0 && alarmId != 0 && responsible && !started) {
-                new GetEventTask(new ExtendedTaskDelegate<Void, EventData>() {
+                EventController.getEvent(new ExtendedTaskDelegateAdapter<Void, EventData>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, EventData e) {
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
@@ -450,8 +450,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
                         List<LatLng> waypoints;
                         try {
                             waypoints = LocationUtils.decodePolyline(e.getRoute().getRouteData().getValue());
-                        }
-                        catch (ParseException ex) {
+                        } catch (ParseException ex) {
                             Log.e(LOG_TAG, "Unable to start service.", ex);
                             return;
                         }
@@ -466,17 +465,11 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
                         context.startService(serviceIntent);
                     }
-
-                    @Override
-                    public void taskDidProgress(ExtendedTask task, Void[] progress) {
-
-                    }
-
                     @Override
                     public void taskFailed(ExtendedTask task, String message) {
                         Log.e(LOG_TAG, "Unable to start service " + keyId + ": " + message);
                     }
-                }).execute(keyId);
+                }, keyId);
             }
             else {
                 Log.v(LOG_TAG, "Ignore alarm.");

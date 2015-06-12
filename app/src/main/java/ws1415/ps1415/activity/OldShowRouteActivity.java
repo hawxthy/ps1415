@@ -33,11 +33,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
-import ws1415.ps1415.task.GetEventTask;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.task.QueryVisibleUsersTask;
 import ws1415.ps1415.util.LocationUtils;
 
@@ -298,10 +299,10 @@ public class OldShowRouteActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte.
-     * @param m Das neue Event-Objekt.
-     */
+//    /**
+//     * Übernimmt die Informationen aus dem übergebenen Member-Objekt auf die Karte.
+//     * @param m Das neue Event-Objekt.
+//     */
 //    public void drawMembers(Member m) {
 //        if (m != null) {
 //            // googleMap.clear();
@@ -483,24 +484,17 @@ public class OldShowRouteActivity extends Activity {
     * Aktualisiert die Anzeige des aktuellen Felds.
     */
     private void refreshField() {
-        new GetEventTask(new ExtendedTaskDelegate<Void, EventData>() {
+        EventController.getEvent(new ExtendedTaskDelegateAdapter<Void, EventData>() {
             @Override
             public void taskDidFinish(ExtendedTask task, EventData event) {
-                // TODO Feld auslesen
-//                fieldFirst = event.getRouteFieldFirst();
-//                fieldLast = event.getRouteFieldLast();
+                fieldFirst = event.getRouteFieldFirst();
+                fieldLast = event.getRouteFieldLast();
                 highlightRoute(fieldFirst, fieldLast);
             }
-
-            @Override
-            public void taskDidProgress(ExtendedTask task, Void[] progress) {
-
-            }
-
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 Log.e(LOG_TAG, message);
             }
-        }).execute(eventId);
+        }, eventId);
     }
 }

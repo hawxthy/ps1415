@@ -67,6 +67,9 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
         if (hasPrivilege(event, user.getEmail(), Privilege.ASSIGN_ROLE)) {
             event.getMemberList().put(endUser, role);
+            if (!event.getMemberList().values().contains(EventRole.HOST)) {
+                throw new IllegalStateException("the last host of an event can not be deleted");
+            }
             if (!event.getMemberVisibility().containsKey(endUser)) {
                 // Falls der Benutzer noch keine Sichtbarkeit für die Teilnahme definiert hat, dann PRIVATE vorgeben
                 event.getMemberVisibility().put(endUser, EventParticipationVisibility.PRIVATE);

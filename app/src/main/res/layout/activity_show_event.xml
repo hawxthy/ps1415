@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ws1415.ps1415.activity.ShowEventActivity">
+    tools:context="ws1415.ps1415.activity.ShowEventActivity"
+    android:padding="16dp">
 
     <ProgressBar
         android:id="@+id/eventLoading"
@@ -24,9 +25,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <Button
+                android:id="@+id/show_active_event"
+                android:layout_width="match_parent"
+                android:text="@string/show_active_event"
+                android:visibility="gone"
+                style="@style/row_button" />
+
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
+                android:layout_below="@id/show_active_event"
                 android:id="@+id/headerImage"
                 android:scaleType="centerCrop" />
 
@@ -36,9 +45,7 @@
                 android:layout_height="fill_parent"
                 android:layout_below="@id/headerImage"
                 android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp">
+                android:paddingBottom="10dp">
 
                 <TextView
                     android:id="@+id/title"

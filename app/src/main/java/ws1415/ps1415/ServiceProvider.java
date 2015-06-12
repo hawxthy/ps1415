@@ -4,6 +4,9 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.skatenight.skatenightAPI.SkatenightAPI;
+import com.skatenight.skatenightAPI.SkatenightAPIRequest;
+
+import java.io.IOException;
 
 /**
  * Singleton-Klasse, die den Zweck eines zentralen Zugriffspunkts auf das Backend erfüllt.

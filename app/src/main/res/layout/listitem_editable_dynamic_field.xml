@@ -3,15 +3,23 @@
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageButton
+        android:id="@+id/deleteField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_action_discard" />
+
     <EditText
         android:id="@+id/fieldLabel"
         android:layout_width="130dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:maxLength="20"
+        android:maxLines="1"
         android:textStyle="bold" />
 
     <EditText
         android:id="@+id/fieldContent"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
-
+        android:maxLength="500"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </LinearLayout>

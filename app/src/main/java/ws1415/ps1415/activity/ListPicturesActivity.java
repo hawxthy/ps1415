@@ -37,12 +37,19 @@ import ws1415.ps1415.model.PictureVisibility;
 import ws1415.ps1415.model.Privilege;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.util.DiskCache;
+import ws1415.ps1415.util.DiskCacheImageLoader;
 
 public class ListPicturesActivity extends Activity implements PictureListFragment.OnPictureClickListener {
     public static final String EXTRA_MAIL = ListPicturesActivity.class.getSimpleName() + ".Mail";
     public static final String EXTRA_CONTAINER_CLASS = ListPicturesActivity.class.getSimpleName() + ".ContainerClass";
     public static final String EXTRA_CONTAINER_ID = ListPicturesActivity.class.getSimpleName() + ".ContainerId";
     public static final String EXTRA_TITLE = ListPicturesActivity.class.getSimpleName() + ".Title";
+
+    private static final String MEMBER_MAIL = ListPicturesActivity.class.getSimpleName() + ".Mail";
+    private static final String MEMBER_CONTAINER_CLASS = ListPicturesActivity.class.getSimpleName() + ".ContainerClass";
+    private static final String MEMBER_CONTAINER_ID = ListPicturesActivity.class.getSimpleName() + ".ContainerId";
+    private static final String MEMBER_TITLE = ListPicturesActivity.class.getSimpleName() + ".Title";
 
     private static final int UPLOAD_PICTURE_REQUEST_CODE = 1;
     private static final int EDIT_PICTURE_REQUEST_CODE = 2;
@@ -55,6 +62,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
     private String userMail;
     private Long containerId;
     private String containerClass;
+    private String title;
     private Spinner galleries;
     private GalleryAdapter galleryAdapter;
 
@@ -94,11 +102,26 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
         pictureFragment = (PictureListFragment) getFragmentManager().findFragmentById(R.id.picturesFragment);
         galleries = (Spinner) findViewById(R.id.galleries);
 
-        if (getIntent().hasExtra(EXTRA_TITLE)) {
-            setTitle(getIntent().getStringExtra(EXTRA_TITLE));
+        if (savedInstanceState != null) {
+            title = savedInstanceState.getString(MEMBER_TITLE);
+            if (savedInstanceState.containsKey(MEMBER_CONTAINER_CLASS) && savedInstanceState.containsKey(MEMBER_CONTAINER_ID)) {
+                containerId = savedInstanceState.getLong(MEMBER_CONTAINER_ID);
+                containerClass = savedInstanceState.getString(MEMBER_CONTAINER_ID);
+            } else if (savedInstanceState.containsKey(MEMBER_MAIL)) {
+                userMail = savedInstanceState.getString(MEMBER_MAIL);
+            }
+        } else {
+            title = getIntent().getStringExtra(EXTRA_TITLE);
+            if (getIntent().hasExtra(EXTRA_MAIL)) {
+                userMail = getIntent().getStringExtra(EXTRA_MAIL);
+            } else if (getIntent().hasExtra(EXTRA_CONTAINER_CLASS) && getIntent().hasExtra(EXTRA_CONTAINER_ID)) {
+                containerId = getIntent().getLongExtra(EXTRA_CONTAINER_ID, -1);
+                containerClass = getIntent().getStringExtra(EXTRA_CONTAINER_CLASS);
+            }
         }
-        if (getIntent().hasExtra(EXTRA_MAIL)) {
-            userMail = getIntent().getStringExtra(EXTRA_MAIL);
+
+        setTitle(title);
+        if (userMail != null) {
             GalleryController.getGalleryContainerForMail(new ExtendedTaskDelegateAdapter<Void, UserGalleryContainer>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, UserGalleryContainer userGalleryContainer) {
@@ -112,11 +135,21 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                     Toast.makeText(ListPicturesActivity.this, message, Toast.LENGTH_LONG).show();
                 }
             }, userMail);
-        } else if (getIntent().hasExtra(EXTRA_CONTAINER_CLASS) && getIntent().hasExtra(EXTRA_CONTAINER_ID)) {
-            containerId = getIntent().getLongExtra(EXTRA_CONTAINER_ID, -1);
-            containerClass = getIntent().getStringExtra(EXTRA_CONTAINER_CLASS);
+        } else if (containerClass != null && containerId != null) {
             galleryAdapter = new GalleryAdapter(ListPicturesActivity.this, containerClass, containerId, false);
             setUpGallerySpinner();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(MEMBER_TITLE, title);
+        if (containerClass != null && containerId != null) {
+            outState.putString(MEMBER_CONTAINER_CLASS, containerClass);
+            outState.putLong(MEMBER_CONTAINER_ID, containerId);
+        } else {
+            outState.putString(MEMBER_MAIL, userMail);
         }
     }
 
@@ -414,6 +447,8 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
     public void onAddGalleryClick(View view) {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_textinput, null);
         final EditText input = (EditText) dialogView.findViewById(android.R.id.text1);
+        input.setMaxLines(1);
+        input.setSingleLine(true);
         input.setHint(R.string.enter_gallery_title);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.create_gallery)

@@ -1,6 +1,5 @@
 package ws1415.ps1415.activity;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,9 +13,7 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,7 +38,6 @@ import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.File;
-import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -61,6 +57,9 @@ import ws1415.ps1415.util.UniversalUtil;
 
 public class EditEventActivity extends Activity implements ExtendedTaskDelegate<Void,EventData> {
     public static final String EXTRA_EVENT_ID = ShowEventActivity.class.getName() + ".EventId";
+
+    private static final String MEMBER_EVENT_ID = ShowEventActivity.class.getName() + ".EventId";
+
     private static final int SELECT_HEADER_IMAGE_REQUEST_CODE = 1;
     private static final int SELECT_ICON_IMAGE_REQUEST_CODE = 2;
     private static final int SELECT_IMAGES_REQUEST_CODE = 3;
@@ -126,13 +125,6 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
 
         setContentView(R.layout.activity_edit_event);
 
-        // "Zurück"-Button in der Actionbar anzeigen
-//        ActionBar mActionBar = getActionBar();
-//        if (mActionBar != null) {
-//            mActionBar.setHomeButtonEnabled(false);
-//            mActionBar.setDisplayHomeAsUpEnabled(true);
-//        }
-
         icon = (ImageView) findViewById(R.id.icon);
         headerImage = (ImageView) findViewById(R.id.headerImage);
         title = (EditText) findViewById(R.id.title);
@@ -153,11 +145,8 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
         images = (LinearLayout) findViewById(R.id.images);
 
         startLoading();
-        if (getIntent().hasExtra(EXTRA_EVENT_ID)) {
-            eventId = getIntent().getLongExtra(EXTRA_EVENT_ID, -1);
-            EventController.getEvent(this, eventId);
-            setTitle(R.string.edit_event);
-        } else {
+
+        if (savedInstanceState == null && !getIntent().hasExtra(EXTRA_EVENT_ID)) {
             // Ein neues Event wird erstellt
             EventData templateData = new EventData();
             templateData.setTitle(getString(R.string.template_event_title));
@@ -169,6 +158,22 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
             templateData.setImages(new LinkedList<BlobKey>());
             taskDidFinish(null, templateData);
             setTitle(R.string.create_event);
+        } else {
+            if (savedInstanceState != null && savedInstanceState.containsKey(MEMBER_EVENT_ID)) {
+                eventId = savedInstanceState.getLong(MEMBER_EVENT_ID);
+            } else if (getIntent().hasExtra(EXTRA_EVENT_ID)) {
+                eventId = getIntent().getLongExtra(EXTRA_EVENT_ID, -1);
+            }
+            EventController.getEvent(this, eventId);
+            setTitle(R.string.edit_event);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (eventId != null) {
+            outState.putLong(MEMBER_EVENT_ID, eventId);
         }
     }
 
@@ -213,7 +218,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
      */
     @Override
     public void finish() {
-        if (edited || dynamicFieldsAdapter.isEdited()) {
+        if (edited || (dynamicFieldsAdapter != null && dynamicFieldsAdapter.isEdited())) {
             if (!FormatterUtil.isCurrencyString(fee.getText().toString())) {
                 Toast.makeText(this, R.string.error_wrong_currency_format, Toast.LENGTH_LONG).show();
                 return;
@@ -348,7 +353,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
             ImageView imgView;
             for (BlobKey key : eventData.getImages()) {
                 imgView = new ImageView(this);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
                 params.gravity = Gravity.CENTER_VERTICAL;
                 imgView.setLayoutParams(params);
                 imgView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -455,11 +460,37 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
                 break;
             case SELECT_IMAGES_REQUEST_CODE:
                 if (tempPath != null && selectedImageUri != null) {
-                    File f = new File(tempPath);
+                    final File f = new File(tempPath);
                     imageFiles.add(f);
                     ImageView v = new ImageView(this);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    params.gravity = Gravity.CENTER_VERTICAL;
+                    v.setLayoutParams(params);
                     v.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     ImageUtil.loadSubsampledImageInView(f, v, imagesScroller.getWidth() - 20);
+                    v.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(final View v) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(EditEventActivity.this);
+                            builder.setTitle(R.string.delete_picture)
+                                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            images.removeView(v);
+                                            imageFiles.remove(f);
+                                            images.requestLayout();
+                                        }
+                                    })
+                                    .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                            builder.create().show();
+                            return false;
+                        }
+                    });
                     images.addView(v);
                     edited = true;
                 }

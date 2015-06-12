@@ -49,7 +49,7 @@ public abstract class EventController {
                     ServiceProvider.getService().eventEndpoint().assignRole(eventId, userMail, role.name()).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Rolle konnte nicht zugewiesen werden. Zu wenig Rechte?");
+                    publishError("Rolle konnte nicht zugewiesen werden. Zu wenig Rechte oder letzter Veranstalter?");
                 }
                 return null;
             }

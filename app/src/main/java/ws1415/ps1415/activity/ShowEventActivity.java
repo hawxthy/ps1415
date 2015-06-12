@@ -3,17 +3,23 @@ package ws1415.ps1415.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,8 +42,10 @@ import com.skatenight.skatenightAPI.model.ServerWaypoint;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.controller.EventController;
@@ -56,10 +64,15 @@ import ws1415.ps1415.util.UniversalUtil;
 public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<Void,EventData> {
     public static final String EXTRA_EVENT_ID = ShowEventActivity.class.getName() + ".EventId";
 
+    private static final String MEMBER_EVENT_ID = ShowEventActivity.class.getName() + ".EventId";
+
     private MenuItem joinLeaveEventItem;
     private MenuItem settingsItem;
+    private Button showActiveEvent;
 
+    private long eventId;
     private EventData event;
+    private Map<String, EventRole> eventRoles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +87,16 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_show_event);
 
+        showActiveEvent = (Button) findViewById(R.id.show_active_event);
+        showActiveEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ShowEventActivity.this, ActiveEventActivity.class);
+                intent.putExtra(ActiveEventActivity.EXTRA_KEY_ID, eventId);
+                startActivity(intent);
+            }
+        });
+
         // "Zurück"-Button in der Actionbar anzeigen
         ActionBar mActionBar = getActionBar();
         if (mActionBar != null) {
@@ -82,8 +105,20 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         }
 
         startLoading();
-        Long eventId = getIntent().getLongExtra(EXTRA_EVENT_ID, -1);
+        if (savedInstanceState != null && savedInstanceState.containsKey(MEMBER_EVENT_ID)) {
+            eventId = savedInstanceState.getLong(MEMBER_EVENT_ID);
+        } else if (getIntent().hasExtra(EXTRA_EVENT_ID)) {
+            eventId = getIntent().getLongExtra(EXTRA_EVENT_ID, -1);
+        } else {
+            throw new RuntimeException("intent has to have extra " + EXTRA_EVENT_ID);
+        }
         EventController.getEvent(this, eventId);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(MEMBER_EVENT_ID, eventId);
     }
 
     @Override
@@ -157,6 +192,7 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
                         joinLeaveEventItem.setTitle(R.string.join_event);
                         event.getMemberList().remove(ServiceProvider.getEmail());
                         event.setParticipationVisibility(null);
+                        showActiveEvent.setVisibility(View.GONE);
                         finish();
                     }
                     @Override
@@ -225,6 +261,11 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         title.setText(eventData.getTitle());
         TextView date = (TextView) findViewById(R.id.date);
         Date tmpDate = new Date(eventData.getDate().getValue());
+        if (tmpDate.getTime() >= System.currentTimeMillis()) {
+            showActiveEvent.setVisibility(View.VISIBLE);
+        } else {
+            showActiveEvent.setVisibility(View.GONE);
+        }
         date.setText(DateFormat.getMediumDateFormat(this).format(tmpDate) + " " + DateFormat.getTimeFormat(this).format(tmpDate));
         TextView description = (TextView) findViewById(R.id.description);
         description.setText(eventData.getDescription());
@@ -260,9 +301,6 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         // Route laden und anzeigen
         final GoogleMap googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.routeFragment)).getMap();
         googleMap.setMyLocationEnabled(true);
-        googleMap.getUiSettings().setAllGesturesEnabled(false);
-        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        googleMap.getUiSettings().setZoomControlsEnabled(false);
         Route route = eventData.getRoute();
         String encodedPath = route.getRouteData().getValue();
         try {
@@ -306,6 +344,14 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
             googleMap.addMarker(tmp.getMarkerOptions());
         }
 
+        // Teilnehmer-Map mit Rollen dekodieren
+        eventRoles = new HashMap<>();
+        for (String key : event.getMemberList().keySet()) {
+            if (!key.equals("etag") && !key.equals("kind")) {
+                eventRoles.put(key, EventRole.valueOf((String) event.getMemberList().get(key)));
+            }
+        }
+
         finishLoading();
     }
 
@@ -331,6 +377,9 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
                 joinLeaveEventItem.setTitle(R.string.leave_event);
                 event.getMemberList().put(ServiceProvider.getEmail(), role.name());
                 event.setParticipationVisibility(visibility.name());
+                if (event.getDate().getValue() >= System.currentTimeMillis()) {
+                    showActiveEvent.setVisibility(View.VISIBLE);
+                }
                 finish();
             }
             @Override
@@ -372,8 +421,7 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
 
     public void onParticipantsClick(View view) {
         Intent intent = new Intent(this, EventParticipantsActivity.class);
-        List<String> mails = new LinkedList<>(event.getMemberList().keySet());
-        intent.putExtra(EventParticipantsActivity.EXTRA_MAILS, (Serializable) mails);
+        intent.putExtra(EventParticipantsActivity.EXTRA_PARTICIPANTS, (Serializable) eventRoles);
         startActivity(intent);
     }
 
@@ -383,5 +431,27 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         intent.putExtra(ListPicturesActivity.EXTRA_CONTAINER_ID, event.getId());
         intent.putExtra(ListPicturesActivity.EXTRA_TITLE, event.getTitle());
         startActivity(intent);
+    }
+
+    /**
+     * Broadcast-Receiver, der Broadcast bezüglich dem Start eines Events empfängt. Falls der Alarm
+     * für das aktuell angezeigt Event zuständig ist, wird der Button für die lokale Auswertung angezeigt.
+     */
+    public class StartServiceReceiver extends BroadcastReceiver {
+        public static final String EXTRA_EVENT_ID = "start_service_receiver_extra_event_id";
+        public static final String EXTRA_ALARM_ID = "start_service_receiver_extra_alarm_id";
+
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            final long keyId = intent.getLongExtra(EXTRA_EVENT_ID, 0);
+            final int alarmId = intent.getIntExtra(EXTRA_ALARM_ID, 0);
+
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+            final boolean responsible = (prefs.getInt(keyId + "-alarm", 0) == alarmId);
+            final boolean started = prefs.getBoolean(keyId + "-started", false);
+            if (keyId != 0 && alarmId != 0 && responsible && !started) {
+                showActiveEvent.setVisibility(View.VISIBLE);
+            }
+        }
     }
 }

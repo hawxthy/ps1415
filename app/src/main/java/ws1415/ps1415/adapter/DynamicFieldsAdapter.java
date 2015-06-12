@@ -4,6 +4,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.skatenight.skatenightAPI.model.DynamicField;
@@ -54,7 +55,7 @@ public class DynamicFieldsAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         View view = null;
         final DynamicField field = (DynamicField) getItem(position);
         if (field != null) {
@@ -90,6 +91,15 @@ public class DynamicFieldsAdapter extends BaseAdapter {
                             }
                             field.setContent(content.getText().toString());
                         }
+                    }
+                });
+                ImageButton delete = (ImageButton) view.findViewById(R.id.deleteField);
+                delete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dynamicFields.remove(position);
+                        edited = true;
+                        notifyDataSetChanged();
                     }
                 });
             } else {

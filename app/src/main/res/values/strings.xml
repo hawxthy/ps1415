@@ -254,6 +254,7 @@
     <string name="error_changing_visibility">An error occurred while changing the visibility. Please try again.</string>
     <string name="participants">Participants</string>
     <string name="galleries">Galleries</string>
+    <string name="show_active_event">Event is currently taking place!\nGo to map…</string>
 
     <!-- UploadImageActivity -->
     <string name="title_activity_upload_image">UploadImageActivity</string>

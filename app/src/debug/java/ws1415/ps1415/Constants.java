@@ -15,7 +15,7 @@ public abstract class Constants {
     /**
      * Die Web-Client ID zur Authentifizierung am Backend.
      */
-    public static final String WEB_CLIENT_ID = "644721617929-unb9em0kl73b9evdv2h52ufn26fao20p.apps.googleusercontent.com";
+    public static final String WEB_CLIENT_ID = "644721617929-asqioscun7ejlghnfrj7rpuashjb0tb4.apps.googleusercontent.com";
 
     /**
      * Die Project-ID zur Kommunikation per GCM.

@@ -1,6 +1,5 @@
 package ws1415.ps1415.activity;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,29 +9,47 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import ws1415.ps1415.R;
+import ws1415.ps1415.adapter.EventParticipantsAdapter;
 import ws1415.ps1415.adapter.UserListAdapter;
+import ws1415.ps1415.model.EventRole;
 
 public class EventParticipantsActivity extends Activity {
-    public static final String EXTRA_MAILS = EventParticipantsActivity.class.getName() + ".Mails";
-    private UserListAdapter userAdapter;
+    public static final String EXTRA_PARTICIPANTS = EventParticipantsActivity.class.getName() + ".Participants";
+
+    private static final String MEMBER_PARTICIPANTS = EventParticipantsActivity.class.getName() + ".Participants";
+
+    private Map<String, EventRole> roles;
+    private EventParticipantsAdapter userAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_participants);
 
-        // "Zurück"-Button in der Actionbar anzeigen
-        ActionBar mActionBar = getActionBar();
-        if (mActionBar != null) {
-            mActionBar.setHomeButtonEnabled(false);
-            mActionBar.setDisplayHomeAsUpEnabled(true);
+        if (savedInstanceState != null && savedInstanceState.containsKey(MEMBER_PARTICIPANTS)) {
+            roles = (Map<String, EventRole>) savedInstanceState.getSerializable(MEMBER_PARTICIPANTS);
+        } else if (getIntent().hasExtra(EXTRA_PARTICIPANTS)) {
+            roles = (Map<String, EventRole>) getIntent().getSerializableExtra(EXTRA_PARTICIPANTS);
+        } else {
+            throw new RuntimeException("intent has to have extra " + EXTRA_PARTICIPANTS);
         }
 
-        List<String> mails = (List<String>) getIntent().getSerializableExtra(EXTRA_MAILS);
-        userAdapter = new UserListAdapter(mails, this);
+        List<String> mails = new LinkedList<>(roles.keySet());
+        Collections.sort(mails, new Comparator<String>() {
+            @Override
+            public int compare(String lhs, String rhs) {
+                return roles.get(lhs).compareTo(roles.get(rhs));
+            }
+        });
+        userAdapter = new EventParticipantsAdapter(mails, roles, this);
         ListView participantsList = (ListView) findViewById(R.id.participantsList);
         participantsList.setAdapter(userAdapter);
         participantsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -43,6 +60,12 @@ public class EventParticipantsActivity extends Activity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(MEMBER_PARTICIPANTS, (Serializable) roles);
     }
 
     @Override

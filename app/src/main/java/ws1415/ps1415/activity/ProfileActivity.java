@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -378,5 +379,12 @@ public class ProfileActivity extends FragmentActivity {
                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
             }
         }, ServiceProvider.getEmail(), email);
+    }
+
+    public void onPicturesClick(View view) {
+        Intent intent = new Intent(this, ListPicturesActivity.class);
+        intent.putExtra(ListPicturesActivity.EXTRA_TITLE, "Bilder von " + mUserProfile.getFirstName());
+        intent.putExtra(ListPicturesActivity.EXTRA_MAIL, email);
+        startActivity(intent);
     }
 }
