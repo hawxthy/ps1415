@@ -383,7 +383,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
             @Override
             public void taskDidFinish(ExtendedTask task, UserProfile userProfile) {
                 // TODO: Veranstaltungen abfragen
-                assertEquals(testUserGroup.getName(), userProfile.getMyUserGroups().get(0).getName());
+                assertEquals(testUserGroup.getName(), userProfile.getMyUserGroups().get(0));
                 getSignal.countDown();
             }
         }, TEST_MAIL_1);

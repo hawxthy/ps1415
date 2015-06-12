@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -39,7 +40,10 @@ public class MyUserGroupsActivity extends BaseFragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.setContentView(NavDrawerGroupList.items, R.layout.activity_my_user_groups);
+        setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
         //TODO refresh Button machen
         mResultListView = (ListView) findViewById(R.id.my_groups_list_view);
