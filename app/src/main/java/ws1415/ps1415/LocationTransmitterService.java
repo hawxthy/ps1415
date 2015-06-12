@@ -240,6 +240,7 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
         // Sendet die Nutzerdaten an den Server, wenn dies in den Einstellungen vorgesehen ist
         if (email != null && sendLocation && System.currentTimeMillis() - updateTime >= UPDATE_INTERVAL) {
+            Log.d(LOG_TAG, "Position übertragen: " + location.getLatitude() + ", " + location.getLongitude());
             UserController.updateUserLocation(null, email, location.getLatitude(), location.getLongitude(), eventId);
             updateTime = System.currentTimeMillis();
         }

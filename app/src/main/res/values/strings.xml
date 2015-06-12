@@ -222,7 +222,8 @@
     <string name="error_changing_visibility">An error occurred while changing the visibility. Please try again.</string>
     <string name="participants">Participants</string>
     <string name="galleries">Galleries</string>
-    <string name="show_active_event">Event is currently taking place!\nGo to map…</string>
+    <string name="show_active_event">Event is currently taking place!\nGo to analysis…</string>
+    <string name="show_passed_event">Event finished!\nGo to analysis…</string>
 
     <!-- PermissionManagementActivity -->
     <string name="sure_take_right_dialog">Are you sure you want to take administrative right of this user?</string>

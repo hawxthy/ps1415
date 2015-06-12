@@ -301,48 +301,50 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
 
         // Route laden und anzeigen
         final GoogleMap googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.routeFragment)).getMap();
-        googleMap.setMyLocationEnabled(true);
-        Route route = eventData.getRoute();
-        String encodedPath = route.getRouteData().getValue();
-        try {
-            List<LatLng> line = LocationUtils.decodePolyline(encodedPath);
+        if (googleMap != null) {
+            googleMap.setMyLocationEnabled(false);
+            Route route = eventData.getRoute();
+            String encodedPath = route.getRouteData().getValue();
+            try {
+                List<LatLng> line = LocationUtils.decodePolyline(encodedPath);
 
-            final PolylineOptions routePoly = new PolylineOptions()
-                    .addAll(line)
-                    .color(Color.BLUE);
+                final PolylineOptions routePoly = new PolylineOptions()
+                        .addAll(line)
+                        .color(Color.BLUE);
 
-            googleMap.clear();
-            googleMap.addPolyline(routePoly);
+                googleMap.clear();
+                googleMap.addPolyline(routePoly);
 
-            googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-                @Override
-                public void onMapLoaded() {
-                    if (routePoly != null) {
-                        // Grenzwerte der Strecke berechnen und Karte zentrieren
-                        LatLngBounds.Builder builder = LatLngBounds.builder();
-                        for (LatLng point : routePoly.getPoints()) {
-                            builder.include(point);
+                googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                    @Override
+                    public void onMapLoaded() {
+                        if (routePoly != null) {
+                            // Grenzwerte der Strecke berechnen und Karte zentrieren
+                            LatLngBounds.Builder builder = LatLngBounds.builder();
+                            for (LatLng point : routePoly.getPoints()) {
+                                builder.include(point);
+                            }
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 50));
                         }
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 50));
                     }
-                }
-            });
+                });
 
-            TextView routeTitle = (TextView) findViewById(R.id.routeTitle);
-            routeTitle.setText(route.getName());
-            TextView routeLength = (TextView) findViewById(R.id.routeLength);
-            routeLength.setText(route.getLength());
-        } catch (ParseException e) {
-            Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
+                TextView routeTitle = (TextView) findViewById(R.id.routeTitle);
+                routeTitle.setText(route.getName());
+                TextView routeLength = (TextView) findViewById(R.id.routeLength);
+                routeLength.setText(route.getLength());
+            } catch (ParseException e) {
+                Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
 
-        // Wegpunkte laden, falls vorhanden
-        List<ServerWaypoint> waypoints = route.getWaypoints();
-        for (ServerWaypoint wp : waypoints) {
-            RouteEditorActivity.Waypoint tmp = RouteEditorActivity.Waypoint.create(
-                    new LatLng(wp.getLatitude(), wp.getLongitude()), wp.getTitle());
-            googleMap.addMarker(tmp.getMarkerOptions());
+            // Wegpunkte laden, falls vorhanden
+            List<ServerWaypoint> waypoints = route.getWaypoints();
+            for (ServerWaypoint wp : waypoints) {
+                RouteEditorActivity.Waypoint tmp = RouteEditorActivity.Waypoint.create(
+                        new LatLng(wp.getLatitude(), wp.getLongitude()), wp.getTitle());
+                googleMap.addMarker(tmp.getMarkerOptions());
+            }
         }
 
         // Teilnehmer-Map mit Rollen dekodieren

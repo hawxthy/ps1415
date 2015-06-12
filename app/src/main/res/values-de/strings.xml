@@ -264,7 +264,8 @@
     <string name="error_changing_visibility">Beim Ändern der Sichtbarkeit ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
     <string name="participants">Teilnehmer</string>
     <string name="galleries">Galerien</string>
-    <string name="show_active_event">Veranstaltung läuft zurzeit!\nZur Karte…</string>
+    <string name="show_active_event">Veranstaltung läuft zurzeit!\nZur Auswertung…</string>
+    <string name="show_passed_event">Veranstaltung abgeschlossen!\nZur Auswertung…</string>
 
     <!-- PermissionManagementActivity -->
     <string name="sure_take_right_dialog">Sind Sie sicher, dass Sie diesem Benutzer administrative Rechte entziehen möchten?</string>

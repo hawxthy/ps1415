@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:indeterminate="true"
         android:visibility="gone"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true" />
 
     <ScrollView
         android:id="@+id/eventData"
