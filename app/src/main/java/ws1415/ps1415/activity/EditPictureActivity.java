@@ -153,9 +153,15 @@ public class EditPictureActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(MEMBER_PICTURE_ID, pictureId);
-        outState.putLong(MEMBER_GALLERY_ID, galleryId);
-        outState.putString(MEMBER_MIN_PICTURE_VISBILITY, minPictureVisibility.name());
+        if (pictureId != null) {
+            outState.putLong(MEMBER_PICTURE_ID, pictureId);
+        }
+        if (galleryId != null) {
+            outState.putLong(MEMBER_GALLERY_ID, galleryId);
+        }
+        if (minPictureVisibility != null) {
+            outState.putString(MEMBER_MIN_PICTURE_VISBILITY, minPictureVisibility.name());
+        }
     }
 
     @Override
