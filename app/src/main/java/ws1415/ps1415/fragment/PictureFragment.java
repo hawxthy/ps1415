@@ -2,18 +2,22 @@ package ws1415.ps1415.fragment;
 
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Point;
 import android.media.Image;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.text.format.DateFormat;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -157,7 +161,13 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
         GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
             @Override
             public void taskDidFinish(ExtendedTask task, PictureData pictureData) {
-                DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), picture.getWidth());
+                WindowManager wm = (WindowManager) PictureFragment.this.getActivity().getSystemService(Context.WINDOW_SERVICE);
+                Display display = wm.getDefaultDisplay();
+                Point size = new Point();
+                display.getSize(size);
+                int width = size.x;
+
+                DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), width);
                 title.setText(pictureData.getTitle());
 
                 Date dateValue = new Date(pictureData.getDate().getValue());
