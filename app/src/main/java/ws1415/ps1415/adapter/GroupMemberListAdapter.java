@@ -36,7 +36,7 @@ import ws1415.ps1415.util.UniversalUtil;
 import ws1415.ps1415.util.UserImageLoader;
 
 /**
- * Created by Bernd Eissing on 06.06.2015.
+ * @author Bernd Eissing on 06.06.2015.
  */
 public class GroupMemberListAdapter extends BaseAdapter {
     private static final int DATA_PER_REQUEST = 15;
@@ -52,6 +52,9 @@ public class GroupMemberListAdapter extends BaseAdapter {
 
     // Liste zum Prüfen, wer Reche erhält
     private List<String> listOfMembersWhoGetRights;
+
+    // Liste der Benutzer die schon hinzugefügt aber noch nicht eingeladen wurden
+    private List<String> alradyChosenMembers;
 
     /**
      * Erwartet die komplette Liste der E-Mail Adressen der Benutzer die angezeigt werden sollen.
@@ -91,6 +94,27 @@ public class GroupMemberListAdapter extends BaseAdapter {
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         defaultBitmap = ImageUtil.getRoundedBitmap(BitmapFactory.
                 decodeResource(mContext.getResources(), R.drawable.default_picture));
+        if(userMails != null && !userMails.isEmpty()) addNextUserInfo(userMails);
+    }
+
+    /**
+     * Erwartet die komplette Liste der E-Mail Adressen der Benutzer die angezeigt werden sollen.
+     * Dabei werden zu Beginn nur die ersten {@code DATA_PER_REQUEST} Benutzer angezeigt und beim Scrollen
+     * werden die nächsten {@code DATA_PER_REQUEST} Benutzer geladen.
+     *
+     * @param userMails Liste der E-Mail Adressen
+     * @param context Context
+     */
+    public GroupMemberListAdapter(Context context,List<String> userMails, List<String> members , List<String> alreadyInvitedMembers) {
+        this.mailData = userMails;
+        this.members = members;
+        mContext = context;
+        mData = new ArrayList<>();
+        listOfMembersWhoGetRights = new ArrayList<>();
+        alradyChosenMembers = alreadyInvitedMembers;
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        defaultBitmap = ImageUtil.getRoundedBitmap(BitmapFactory.
+                decodeResource(context.getResources(), R.drawable.default_picture));
         if(userMails != null && !userMails.isEmpty()) addNextUserInfo(userMails);
     }
 
@@ -254,7 +278,7 @@ public class GroupMemberListAdapter extends BaseAdapter {
             final InviteUsersToGroupActivity activity = (InviteUsersToGroupActivity)mContext;
 
             // Prüfe, welche Buttons sichtbar sein müssen und welche icons diese haben müssen;
-            if(listOfMembersWhoGetRights.contains(getItem(i).getEmail())){
+            if(listOfMembersWhoGetRights.contains(getItem(i).getEmail()) || alradyChosenMembers.contains(getItem(i).getEmail())){
                 holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
                 holder.buttonLeft.setVisibility(View.VISIBLE);
             }else {

@@ -185,7 +185,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
         GroupController.getInstance().getUserGroup(new ExtendedTaskDelegateAdapter<Void, UserGroup>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
-                if(group != null){
+                if (group != null) {
                     // group nuss nicht abgefragt werden, denn der Server gibt bereist einen Fehler wenn eine
                     // Gruppe mit dem Namen nicht existiert
                     GroupProfileActivity.this.group = group;
@@ -220,7 +220,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                     mAdapter.getGroupNewsBoardFragment().setUp(group.getNewsBoard(), groupName, GroupProfileActivity.this);
                     setProgressBarIndeterminateVisibility(Boolean.FALSE);
                     setClickOnPicture();
-                }else{
+                } else {
                     Toast.makeText(GroupProfileActivity.this, R.string.group_already_gone, Toast.LENGTH_LONG).show();
                     finish();
                     return;
@@ -463,7 +463,7 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                                 mChangeVisibility.setImageResource(R.drawable.ic_eye_white_24dp);
                                 checkVisibility = true;
                                 Toast.makeText(GroupProfileActivity.this, R.string.youAreNowVisible, Toast.LENGTH_LONG).show();
-                            }else {
+                            } else {
                                 mChangeVisibility.setColorNormalResId(R.color.colorPrimaryJoin);
                                 mChangeVisibility.setColorPressedResId(R.color.colorPressedBlackBoard);
                                 mChangeVisibility.setImageResource(R.drawable.ic_eye_off_white_24dp);
@@ -580,7 +580,10 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      * @return Die Rechte innerhalb dieser Gruppe oder null
      */
     public List<String> getRights() {
-        return (ArrayList<String>) group.getMemberRights().get(ServiceProvider.getEmail());
+        if(group != null){
+            return (ArrayList<String>) group.getMemberRights().get(ServiceProvider.getEmail());
+        }
+        return null;
     }
 
     /**

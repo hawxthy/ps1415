@@ -442,6 +442,7 @@
     <string name="noLongIdSubmitted">Sie müssen die id vom Eintrag im Intent mitliefern</string>
     <string name="titleWriteComment">Schreibe einen Kommentar</string>
     <string name="textTooShort">Nachricht zu kurz</string>
+    <string name="delte_comment_question">Wollen Sie diesen Kommentar entfernen?</string>
     <string name="no_board_entry_found">Es wurde kein Eintrag auf dem Server gefunden</string>
     <string name="title_activity_comment_black_board">Schreibe einen Kommentar</string>
 

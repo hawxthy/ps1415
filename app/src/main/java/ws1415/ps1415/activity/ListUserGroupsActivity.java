@@ -20,6 +20,7 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.UsergroupAdapter;
 import ws1415.ps1415.controller.GroupController;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.util.UniversalUtil;
 
 /**
  *
@@ -46,6 +47,13 @@ public class ListUserGroupsActivity extends BaseActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_list_user_groups);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
 
         mUserGroupListView = (ListView) findViewById(R.id.user_group_list_view);
         createUserGroupButton = (FloatingActionButton) findViewById(R.id.joinUserGroupButton);

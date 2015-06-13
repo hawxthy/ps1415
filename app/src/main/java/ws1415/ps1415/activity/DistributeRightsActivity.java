@@ -22,6 +22,7 @@ import ws1415.ps1415.controller.RightController;
 import ws1415.ps1415.model.Right;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.util.UniversalUtil;
 
 public class DistributeRightsActivity extends Activity {
     private String groupName;
@@ -53,6 +54,13 @@ public class DistributeRightsActivity extends Activity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_distribute_rights);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
 
         groupName = getIntent().getStringExtra("groupName");
         groupMembers = getIntent().getStringArrayListExtra("groupMembers");

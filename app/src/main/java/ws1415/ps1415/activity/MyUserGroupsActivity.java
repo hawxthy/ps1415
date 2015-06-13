@@ -24,6 +24,7 @@ import ws1415.ps1415.adapter.GroupMemberListAdapter;
 import ws1415.ps1415.adapter.UsergroupAdapter;
 import ws1415.ps1415.model.NavDrawerGroupList;
 import ws1415.ps1415.util.PrefManager;
+import ws1415.ps1415.util.UniversalUtil;
 
 public class MyUserGroupsActivity extends BaseFragmentActivity {
     // maximal Anzahl an gleichzeitig zu ladenen Nutzergruppen
@@ -44,6 +45,13 @@ public class MyUserGroupsActivity extends BaseFragmentActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.setContentView(NavDrawerGroupList.items, R.layout.activity_my_user_groups);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
 
         //TODO refresh Button machen
         mResultListView = (ListView) findViewById(R.id.my_groups_list_view);

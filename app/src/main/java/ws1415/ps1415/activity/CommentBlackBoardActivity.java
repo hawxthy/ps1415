@@ -31,6 +31,7 @@ import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.DateUtil;
 import ws1415.ps1415.util.GroupImageLoader;
+import ws1415.ps1415.util.UniversalUtil;
 
 public class CommentBlackBoardActivity extends Activity {
     public static final String EXTRA_BOARD_ID = "entryId";
@@ -59,6 +60,13 @@ public class CommentBlackBoardActivity extends Activity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_comment_black_board);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
 
         id = Long.parseLong(getIntent().getStringExtra(EXTRA_BOARD_ID));
         if (id == null) {
@@ -233,19 +241,34 @@ public class CommentBlackBoardActivity extends Activity {
      * @param commentId die id des Kommentars
      * @param entryId die id des BoardEntry
      */
-    public void startDeleteComment(long commentId, Long entryId){
-        setProgressBarIndeterminateVisibility(Boolean.TRUE);
-        GroupController.getInstance().deleteComment(new ExtendedTaskDelegateAdapter<Void, Void>(){
+    public void startDeleteComment(final long commentId, final Long entryId){
+        AlertDialog.Builder altertadd = new AlertDialog.Builder(CommentBlackBoardActivity.this);
+        altertadd.setMessage(R.string.delte_comment_question);
+        altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                setUp();
-                setProgressBarIndeterminateVisibility(Boolean.FALSE);
-            }
+            public void onClick(DialogInterface dialog, int which) {
+                setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                GroupController.getInstance().deleteComment(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                        setUp();
+                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                    }
 
-            @Override
-            public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(CommentBlackBoardActivity.this, message, Toast.LENGTH_LONG).show();
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        Toast.makeText(CommentBlackBoardActivity.this, message, Toast.LENGTH_LONG).show();
+                    }
+                }, groupName, entryId, commentId);
             }
-        }, groupName, entryId, commentId);
+        });
+        altertadd.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        altertadd.show();
+
     }
 }
