@@ -395,6 +395,7 @@
     <string name="tooManyVisibleGroups">Too many visible Groups</string>
     <string name="too_many_visible_groups">You can only make 5 Groups visible</string>
     <string name="title_activity_my_user_groups">MyUserGroupsActivity</string>
+    <string name="info_about_visibility">You can change the visibility of your Groups. Visible groups will be shown on the map.</string>
 
     <!--CommentBlackBoard-->
     <string name="noLongIdSubmitted">You have to deliver the id via the Intent</string>
