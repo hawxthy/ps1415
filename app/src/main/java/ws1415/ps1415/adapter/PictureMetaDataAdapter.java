@@ -1,10 +1,10 @@
 package ws1415.ps1415.adapter;
 
 import android.content.Context;
-import android.graphics.Picture;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.text.Html;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -13,11 +13,11 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.skatenight.skatenightAPI.model.EventMetaData;
 import com.skatenight.skatenightAPI.model.PictureData;
 import com.skatenight.skatenightAPI.model.PictureFilter;
 import com.skatenight.skatenightAPI.model.PictureMetaData;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,10 +47,29 @@ public class PictureMetaDataAdapter extends BaseAdapter {
     private Context context;
     private PictureFilter filter;
     private List<PictureMetaData> pictures = new LinkedList<>();
+    // Speichert die Bitmaps zu den abgerufenen Bildern, damit diese bei einem
+    // Konfigurationswechseln mit gesichert werden können
+    private ArrayList<Bitmap> bitmaps = new ArrayList<>();
 
     private int fetchDistance;
     private Boolean fetching = false;
     private boolean keepFetching = true;
+
+    /**
+     * Erstellt einen PictureMetaDataAdapter, der die angegebenen Items enthält.
+     * @param context             Der aufrufende Context.
+     * @param pictureMetaDatas    Die Items, die in den Adapter eingefügt werden sollen.
+     *
+     * @param filter              Der Filter, der zum Abrufen weiterer Daten benutzt wird.
+     */
+    public PictureMetaDataAdapter(Context context, List<PictureMetaData> pictureMetaDatas, List<Bitmap> bitmaps, PictureFilter filter) {
+        this.context = context;
+        this.pictures.addAll(pictureMetaDatas);
+        this.bitmaps.addAll(bitmaps);
+        this.filter = filter;
+        fetchDistance = (int) (filter.getLimit() * 0.4);
+        notifyDataSetChanged();
+    }
 
     /**
      * Erstellt einen neuen PictureMetaDataAdapter, der die auf den Filter passenden Bilder abruft.
@@ -107,7 +126,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         View view;
         if (position == pictures.size()) {
             // Ladeanzeige
@@ -124,7 +143,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
                 view = View.inflate(parent.getContext(), R.layout.listitem_picture_meta_data, null);
             }
 
-            ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
+            final ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
             TextView title = (TextView) view.findViewById(R.id.title);
             RatingBar rating = (RatingBar) view.findViewById(R.id.avgRating);
             TextView date = (TextView) view.findViewById(R.id.date);
@@ -132,7 +151,25 @@ public class PictureMetaDataAdapter extends BaseAdapter {
                 view.findViewById(R.id.notVisibleText).setVisibility(View.INVISIBLE);
                 if (thumbnail.getHeight() > 0 && thumbnail.getWidth() > 0) {
                     // Bild nur abrufen, wenn der Thumbnail-View Größen zugeordnet wurden
-                    DiskCacheImageLoader.getInstance().loadScaledImage(thumbnail, picture.getImageBlobKey(), Math.min(thumbnail.getHeight(), thumbnail.getWidth()));
+                    if (position < bitmaps.size() && bitmaps.get(position) != null) {
+                        thumbnail.setImageBitmap(bitmaps.get(position));
+                    } else {
+                        DiskCacheImageLoader.getInstance().loadScaledImage(thumbnail, picture.getImageBlobKey(), Math.min(thumbnail.getHeight(), thumbnail.getWidth()));
+                        final View finalView = view;
+                        thumbnail.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                            @Override
+                            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                                if (thumbnail.getDrawable() != null) {
+                                    bitmaps.ensureCapacity(position + 1);
+                                    while (position > bitmaps.size()) {
+                                        bitmaps.add(null);
+                                    }
+                                    bitmaps.add(position, ((BitmapDrawable) thumbnail.getDrawable()).getBitmap());
+                                    finalView.removeOnLayoutChangeListener(this);
+                                }
+                            }
+                        });
+                    }
                 }
                 title.setText(picture.getTitle());
                 ((TextView) view.findViewById(R.id.avgSymbol)).setText(Html.fromHtml(view.getResources().getString(R.string.average)));
@@ -177,6 +214,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
         }
 
         // Lade-Icon anzeigen lassen
+        fetching = true;
         notifyDataSetChanged();
 
         if (refresh) {
@@ -246,5 +284,17 @@ public class PictureMetaDataAdapter extends BaseAdapter {
                 PictureMetaDataAdapter.this.notifyDataSetChanged();
             }
         }, picture.getId());
+    }
+
+    public PictureFilter getFilter() {
+        return filter;
+    }
+
+    public List<PictureMetaData> getPictures() {
+        return pictures;
+    }
+
+    public ArrayList<Bitmap> getBitmaps() {
+        return bitmaps;
     }
 }

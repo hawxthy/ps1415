@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,10 +36,11 @@ import ws1415.ps1415.fragment.PictureListFragment;
 import ws1415.ps1415.model.ContextMenu;
 import ws1415.ps1415.model.PictureVisibility;
 import ws1415.ps1415.model.Privilege;
+import ws1415.ps1415.model.SerializableGalleryMetaData;
+import ws1415.ps1415.model.SerializablePictureFilter;
+import ws1415.ps1415.model.SerializablePictureMetaData;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.util.DiskCache;
-import ws1415.ps1415.util.DiskCacheImageLoader;
 
 public class ListPicturesActivity extends Activity implements PictureListFragment.OnPictureClickListener {
     public static final String EXTRA_MAIL = ListPicturesActivity.class.getSimpleName() + ".Mail";
@@ -50,6 +52,18 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
     private static final String MEMBER_CONTAINER_CLASS = ListPicturesActivity.class.getSimpleName() + ".ContainerClass";
     private static final String MEMBER_CONTAINER_ID = ListPicturesActivity.class.getSimpleName() + ".ContainerId";
     private static final String MEMBER_TITLE = ListPicturesActivity.class.getSimpleName() + ".Title";
+    private static final String MEMBER_ADMIN = ListPicturesActivity.class.getSimpleName() + ".IsAdmin";
+    private static final String MEMBER_ADD_GALLERY = ListPicturesActivity.class.getSimpleName() + ".CanAddGallery";
+    private static final String MEMBER_EDIT_GALLERY = ListPicturesActivity.class.getSimpleName() + ".CanEditGallery";
+    private static final String MEMBER_REMOVE_GALLERY = ListPicturesActivity.class.getSimpleName() + ".CanRemoveGallery";
+    private static final String MEMBER_ADD_PICTURES = ListPicturesActivity.class.getSimpleName() + ".CanAddPictures";
+    private static final String MEMBER_REMOVE_PICTURES = ListPicturesActivity.class.getSimpleName() + ".CanRemovePictures";
+    private static final String MEMBER_MIN_VISIBILITY = ListPicturesActivity.class.getSimpleName() + ".MinVisibility";
+    private static final String MEMBER_GALLERIES = ListPicturesActivity.class.getSimpleName() + ".Galleries";
+    private static final String MEMBER_GALLERY_POSITION = ListPicturesActivity.class.getSimpleName() + ".GalleryPosition";
+    private static final String MEMBER_PICTURE_FILTER = ListPicturesActivity.class.getSimpleName() + ".PictureFilter";
+    private static final String MEMBER_PICTURES = ListPicturesActivity.class.getSimpleName() + ".Pictures";
+    private static final String MEMBER_BITMAPS = ListPicturesActivity.class.getSimpleName() + ".Drawables";
 
     private static final int UPLOAD_PICTURE_REQUEST_CODE = 1;
     private static final int EDIT_PICTURE_REQUEST_CODE = 2;
@@ -63,8 +77,6 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
     private Long containerId;
     private String containerClass;
     private String title;
-    private Spinner galleries;
-    private GalleryAdapter galleryAdapter;
 
     private boolean isAdmin;
     private boolean canAddGallery;
@@ -74,9 +86,20 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
     private boolean canRemovePicturesFromGallery;
     private PictureVisibility minPictureVisibility;
 
-    private PictureListFragment pictureFragment;
+    private GalleryAdapter galleryAdapter;
     private PictureMetaDataAdapter pictureAdapter;
+
+    private PictureListFragment pictureFragment;
+    private Spinner galleries;
     private MenuItem menuItemAddPicture;
+
+    /**
+     * true, wenn die Activity gerade aus einem Bundle wiederhergestellt wurde. In diesem Fall werden
+     * im ItemSelectedListener des Gallery-Spinner die Bilder nicht vom Server abgerufen, da sie aus
+     * dem Bundle wiederhergestellt wurden.
+     */
+    private boolean firstFetchAfterRestoring;
+    private long restoredGalleryPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,27 +113,58 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        startLoading();
-
-        RoleController.isAdmin(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
-                isAdmin = aBoolean;
-            }
-        }, ServiceProvider.getEmail());
-
         pictureFragment = (PictureListFragment) getFragmentManager().findFragmentById(R.id.picturesFragment);
         galleries = (Spinner) findViewById(R.id.galleries);
 
         if (savedInstanceState != null) {
             title = savedInstanceState.getString(MEMBER_TITLE);
-            if (savedInstanceState.containsKey(MEMBER_CONTAINER_CLASS) && savedInstanceState.containsKey(MEMBER_CONTAINER_ID)) {
-                containerId = savedInstanceState.getLong(MEMBER_CONTAINER_ID);
-                containerClass = savedInstanceState.getString(MEMBER_CONTAINER_ID);
-            } else if (savedInstanceState.containsKey(MEMBER_MAIL)) {
+
+            isAdmin = savedInstanceState.getBoolean(MEMBER_ADMIN);
+            canAddGallery = savedInstanceState.getBoolean(MEMBER_ADD_GALLERY);
+            canEditGallery = savedInstanceState.getBoolean(MEMBER_EDIT_GALLERY);
+            canRemoveGallery = savedInstanceState.getBoolean(MEMBER_REMOVE_GALLERY);
+            canAddPicturesToGallery = savedInstanceState.getBoolean(MEMBER_ADD_PICTURES);
+            canRemovePicturesFromGallery = savedInstanceState.getBoolean(MEMBER_REMOVE_PICTURES);
+            minPictureVisibility = PictureVisibility.valueOf(savedInstanceState.getString(MEMBER_MIN_VISIBILITY));
+
+            // GalleryAdapter wiederherstellen
+            List<GalleryMetaData> galleryMetaDatas = new LinkedList<>();
+            for (SerializableGalleryMetaData g : (LinkedList<SerializableGalleryMetaData>) savedInstanceState.getSerializable(MEMBER_GALLERIES)) {
+                galleryMetaDatas.add(g.getGalleryMetaData());
+            }
+            galleryAdapter = new GalleryAdapter(galleryMetaDatas);
+            galleries.setAdapter(galleryAdapter);
+            firstFetchAfterRestoring = true;
+            restoredGalleryPosition = savedInstanceState.getLong(MEMBER_GALLERY_POSITION);
+
+            // PictureAdapter wiederherstellen
+            PictureFilter filter = ((SerializablePictureFilter) savedInstanceState.getSerializable(MEMBER_PICTURE_FILTER)).getPictureFilter();
+            List<PictureMetaData> pictureMetaDatas = new LinkedList<>();
+            for (SerializablePictureMetaData p : (LinkedList<SerializablePictureMetaData>) savedInstanceState.getSerializable(MEMBER_PICTURES)) {
+                pictureMetaDatas.add(p.getPictureMetaData());
+            }
+            List<Bitmap> bitmaps = savedInstanceState.getParcelableArrayList(MEMBER_BITMAPS);
+            pictureAdapter = new PictureMetaDataAdapter(this, pictureMetaDatas, bitmaps, filter);
+            pictureFragment.setAdapter(pictureAdapter);
+
+            if (savedInstanceState.containsKey(MEMBER_MAIL)) {
                 userMail = savedInstanceState.getString(MEMBER_MAIL);
             }
+            if (savedInstanceState.containsKey(MEMBER_CONTAINER_CLASS) && savedInstanceState.containsKey(MEMBER_CONTAINER_ID)) {
+                containerId = savedInstanceState.getLong(MEMBER_CONTAINER_ID);
+                containerClass = savedInstanceState.getString(MEMBER_CONTAINER_CLASS);
+            } else {
+                getGalleriesForUser();
+            }
+            setUpButtons();
         } else {
+            RoleController.isAdmin(new ExtendedTaskDelegateAdapter<Void, Boolean>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, Boolean aBoolean) {
+                    isAdmin = aBoolean;
+                }
+            }, ServiceProvider.getEmail());
+
             title = getIntent().getStringExtra(EXTRA_TITLE);
             if (getIntent().hasExtra(EXTRA_MAIL)) {
                 userMail = getIntent().getStringExtra(EXTRA_MAIL);
@@ -118,27 +172,62 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                 containerId = getIntent().getLongExtra(EXTRA_CONTAINER_ID, -1);
                 containerClass = getIntent().getStringExtra(EXTRA_CONTAINER_CLASS);
             }
+
+            startLoading();
+            if (userMail != null) {
+                getGalleriesForUser();
+            } else if (containerClass != null && containerId != null) {
+                galleryAdapter = new GalleryAdapter(ListPicturesActivity.this, containerClass, containerId, false);
+                setUpGallerySpinner();
+            }
         }
 
         setTitle(title);
-        if (userMail != null) {
-            GalleryController.getGalleryContainerForMail(new ExtendedTaskDelegateAdapter<Void, UserGalleryContainer>() {
-                @Override
-                public void taskDidFinish(ExtendedTask task, UserGalleryContainer userGalleryContainer) {
-                    containerId = userGalleryContainer.getId();
-                    containerClass = UserGalleryContainer.class.getSimpleName();
-                    galleryAdapter = new GalleryAdapter(ListPicturesActivity.this, containerClass, containerId, true);
-                    setUpGallerySpinner();
+        galleries.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == restoredGalleryPosition) {
+                    restoredGalleryPosition = -1;
+                    return;
                 }
-                @Override
-                public void taskFailed(ExtendedTask task, String message) {
-                    Toast.makeText(ListPicturesActivity.this, message, Toast.LENGTH_LONG).show();
+                if (!firstFetchAfterRestoring) {
+                    PictureFilter filter = new PictureFilter();
+                    if (id == GalleryAdapter.EMPTY_ITEM_GALLERY_ID) {
+                        filter.setUserId(userMail);
+                    } else {
+                        filter.setGalleryId(id);
+                    }
+                    filter.setLimit(PICTURES_PER_REQUEST);
+                    pictureAdapter = new PictureMetaDataAdapter(ListPicturesActivity.this, filter);
+                    pictureFragment.setAdapter(pictureAdapter);
+                    setUpButtons();
+                } else {
+                    firstFetchAfterRestoring = false;
                 }
-            }, userMail);
-        } else if (containerClass != null && containerId != null) {
-            galleryAdapter = new GalleryAdapter(ListPicturesActivity.this, containerClass, containerId, false);
-            setUpGallerySpinner();
-        }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Sollte nicht vorkommen
+            }
+        });
+    }
+
+    private void getGalleriesForUser() {
+        GalleryController.getGalleryContainerForMail(new ExtendedTaskDelegateAdapter<Void, UserGalleryContainer>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserGalleryContainer userGalleryContainer) {
+                containerId = userGalleryContainer.getId();
+                containerClass = UserGalleryContainer.class.getSimpleName();
+                galleryAdapter = new GalleryAdapter(ListPicturesActivity.this, containerClass, containerId, true);
+                setUpGallerySpinner();
+            }
+
+            @Override
+            public void taskFailed(ExtendedTask task, String message) {
+                Toast.makeText(ListPicturesActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        }, userMail);
     }
 
     @Override
@@ -148,8 +237,35 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
         if (containerClass != null && containerId != null) {
             outState.putString(MEMBER_CONTAINER_CLASS, containerClass);
             outState.putLong(MEMBER_CONTAINER_ID, containerId);
-        } else {
-            outState.putString(MEMBER_MAIL, userMail);
+        }
+        outState.putString(MEMBER_MAIL, userMail);
+
+        outState.putBoolean(MEMBER_ADMIN, isAdmin);
+        outState.putBoolean(MEMBER_ADD_GALLERY, canAddGallery);
+        outState.putBoolean(MEMBER_EDIT_GALLERY, canEditGallery);
+        outState.putBoolean(MEMBER_REMOVE_GALLERY, canRemoveGallery);
+        outState.putBoolean(MEMBER_ADD_PICTURES, canAddPicturesToGallery);
+        outState.putBoolean(MEMBER_REMOVE_PICTURES, canRemovePicturesFromGallery);
+        if (minPictureVisibility != null) {
+            outState.putString(MEMBER_MIN_VISIBILITY, minPictureVisibility.name());
+        }
+
+        if (galleryAdapter != null) {
+            LinkedList<SerializableGalleryMetaData> serializableGalleries = new LinkedList<>();
+            for (GalleryMetaData g : galleryAdapter.getGalleries()) {
+                serializableGalleries.add(new SerializableGalleryMetaData(g));
+            }
+            outState.putSerializable(MEMBER_GALLERIES, serializableGalleries);
+            outState.putLong(MEMBER_GALLERY_POSITION, galleries.getSelectedItemPosition());
+        }
+        if (pictureAdapter != null) {
+            outState.putSerializable(MEMBER_PICTURE_FILTER, new SerializablePictureFilter(pictureAdapter.getFilter()));
+            LinkedList<SerializablePictureMetaData> serializablePictures = new LinkedList<>();
+            for (PictureMetaData p : pictureAdapter.getPictures()) {
+                serializablePictures.add(new SerializablePictureMetaData(p));
+            }
+            outState.putSerializable(MEMBER_PICTURES, serializablePictures);
+            outState.putParcelableArrayList(MEMBER_BITMAPS, pictureAdapter.getBitmaps());
         }
     }
 
@@ -173,6 +289,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                 minPictureVisibility = PictureVisibility.valueOf(containerData.getMinPictureVisbility());
                 setUpButtons();
             }
+
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 Toast.makeText(ListPicturesActivity.this, message, Toast.LENGTH_LONG).show();
@@ -183,26 +300,6 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
             @Override
             public void onChanged() {
                 finishLoading();
-            }
-        });
-        galleries.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                PictureFilter filter = new PictureFilter();
-                if (id == GalleryAdapter.EMPTY_ITEM_GALLERY_ID) {
-                    filter.setUserId(userMail);
-                } else {
-                    filter.setGalleryId(id);
-                }
-                filter.setLimit(PICTURES_PER_REQUEST);
-                pictureAdapter = new PictureMetaDataAdapter(ListPicturesActivity.this, filter);
-                pictureFragment.setAdapter(pictureAdapter);
-                setUpButtons();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Sollte nicht vorkommen
             }
         });
         galleries.setAdapter(galleryAdapter);
@@ -229,7 +326,9 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                 findViewById(R.id.removeGallery).setVisibility(View.GONE);
             }
         }
-        menuItemAddPicture.setVisible(canAddPicturesToGallery && galleryAdapter != null && galleryAdapter.getCount() > 0);
+        if (menuItemAddPicture != null) {
+            menuItemAddPicture.setVisible(canAddPicturesToGallery && galleryAdapter != null && galleryAdapter.getCount() > 0);
+        }
         // Layout neu zeichnen, damit die Buttons richtig angezeigt werden
         runOnUiThread(new Runnable() {
             @Override
@@ -252,6 +351,9 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_list_pictures, menu);
         menuItemAddPicture = menu.findItem(R.id.action_upload_picture);
+        if (menuItemAddPicture != null) {
+            menuItemAddPicture.setVisible(canAddPicturesToGallery && galleryAdapter != null && galleryAdapter.getCount() > 0);
+        }
         return true;
     }
 

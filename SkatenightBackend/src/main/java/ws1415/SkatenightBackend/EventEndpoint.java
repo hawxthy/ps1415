@@ -271,7 +271,6 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         // Event in der Liste des Benutzers eintragen
         new UserEndpoint().addEventToUser(user.getEmail(), event);
 
-        // TODO R: Erst schicken, wenn BlobKeys gespeichert sind
         // GCM-Nachricht an Geräte schicken, damit Event-Liste aktualisiert wird
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {

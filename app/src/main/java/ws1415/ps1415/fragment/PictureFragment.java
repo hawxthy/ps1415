@@ -2,11 +2,11 @@ package ws1415.ps1415.fragment;
 
 
 import android.app.AlertDialog;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
-import android.media.Image;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.text.format.DateFormat;
@@ -17,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -26,26 +25,21 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.skatenight.skatenightAPI.model.Comment;
+import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.CommentContainerData;
 import com.skatenight.skatenightAPI.model.CommentData;
 import com.skatenight.skatenightAPI.model.CommentFilter;
-import com.skatenight.skatenightAPI.model.Gallery;
-import com.skatenight.skatenightAPI.model.GalleryMetaData;
 import com.skatenight.skatenightAPI.model.Picture;
 import com.skatenight.skatenightAPI.model.PictureData;
 
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.CommentAdapter;
 import ws1415.ps1415.adapter.ExpandableGalleryAdapter;
-import ws1415.ps1415.adapter.GalleryAdapter;
 import ws1415.ps1415.controller.CommentController;
 import ws1415.ps1415.controller.GalleryController;
+import ws1415.ps1415.dialog.FullscreenPictureViewer;
 import ws1415.ps1415.model.PictureVisibility;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
@@ -64,6 +58,7 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
     private TextView title;
     private TextView date;
     private TextView uploader;
+    private TextView visibility;
     private TextView description;
     private RatingBar rating;
     private ProgressBar addingCommentLoading;
@@ -72,6 +67,7 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
     private CommentAdapter commentAdapter;
 
     private Long pictureId;
+    private BlobKey blobKey;
     private boolean initializing = true;
     private int position;
 
@@ -90,9 +86,16 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
 
         headerView = inflater.inflate(R.layout.fragment_picture_header, container, false);
         picture = (ImageView) headerView.findViewById(R.id.picture);
+        picture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPictureClick(v);
+            }
+        });
         title = (TextView) headerView.findViewById(R.id.title);
         date = (TextView) headerView.findViewById(R.id.date);
         uploader = (TextView) headerView.findViewById(R.id.uploader);
+        visibility = (TextView) headerView.findViewById(R.id.visibility);
         description = (TextView) headerView.findViewById(R.id.description);
         rating = (RatingBar) headerView.findViewById(R.id.rating);
         rating.setOnRatingBarChangeListener(this);
@@ -161,26 +164,33 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
         GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
             @Override
             public void taskDidFinish(ExtendedTask task, PictureData pictureData) {
-                WindowManager wm = (WindowManager) PictureFragment.this.getActivity().getSystemService(Context.WINDOW_SERVICE);
-                Display display = wm.getDefaultDisplay();
-                Point size = new Point();
-                display.getSize(size);
-                int width = size.x;
+                blobKey = pictureData.getImageBlobKey();
 
-                DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), width);
-                title.setText(pictureData.getTitle());
+                if (getActivity() != null) {
+                    Display display = getActivity().getWindowManager().getDefaultDisplay();
+                    Point p = new Point();
+                    display.getSize(p);
+                    int height = p.y;
+                    DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), height);
+                    title.setText(pictureData.getTitle());
 
-                Date dateValue = new Date(pictureData.getDate().getValue());
-                date.setText(DateFormat.getMediumDateFormat(PictureFragment.this.getActivity()).format(dateValue)
-                        + " " + DateFormat.getTimeFormat(PictureFragment.this.getActivity()).format(dateValue));
+                    Context context = PictureFragment.this.getActivity();
+                    if (context != null) {
+                        Date dateValue = new Date(pictureData.getDate().getValue());
+                        date.setText(DateFormat.getMediumDateFormat(context).format(dateValue)
+                                + " " + DateFormat.getTimeFormat(context).format(dateValue));
+                    }
 
-                uploader.setText(pictureData.getVisibleUploader());
-                description.setText(pictureData.getDescription());
+                    uploader.setText(pictureData.getVisibleUploader());
+                    visibility.setText(getResources().getString(R.string.visibility_label) + ": "
+                            + getResources().getStringArray(R.array.picture_visibilities)[PictureVisibility.valueOf(pictureData.getVisibility()).ordinal()]);
+                    description.setText(pictureData.getDescription());
 
-                if (pictureData.getMyRating() != null) {
-                    rating.setRating(pictureData.getMyRating());
-                } else {
-                    rating.setRating(0);
+                    if (pictureData.getMyRating() != null) {
+                        rating.setRating(pictureData.getMyRating());
+                    } else {
+                        rating.setRating(0);
+                    }
                 }
 
                 finishLoading();
@@ -264,5 +274,11 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
                 }
             }, Picture.class.getSimpleName(), pictureId, newComment.getText().toString());
         }
+    }
+
+    public void onPictureClick(View view) {
+        Intent intent = new Intent(getActivity(), FullscreenPictureViewer.class);
+        intent.putExtra(FullscreenPictureViewer.EXTRA_BLOB_KEY, blobKey.getKeyString());
+        startActivity(intent);
     }
 }

@@ -181,6 +181,8 @@ public class DiskCache {
         final String keyString = key.getHashForDisk();
         Bitmap bitmap = null;
 
+        Log.d("DISK_CACHE_KEY", key.getManipulation() + " " + key.getBlobKey());
+
         synchronized (mDiskCacheLock) {
             while (mDiskCacheStarting) {
                 try {

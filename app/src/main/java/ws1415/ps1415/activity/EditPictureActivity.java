@@ -137,13 +137,13 @@ public class EditPictureActivity extends Activity {
             GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
                 @Override
                 public void taskDidFinish(ExtendedTask task, PictureData pictureData) {
-                    Display display = getWindowManager().getDefaultDisplay();
-                    Point size = new Point();
-                    display.getSize(size);
-                    int width = size.x;
                     picture.setImageBitmap(null);
                     picture.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                    DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), width);
+                    Display display = getWindowManager().getDefaultDisplay();
+                    Point p = new Point();
+                    display.getSize(p);
+                    int height = p.y;
+                    DiskCacheImageLoader.getInstance().loadScaledImage(picture, pictureData.getImageBlobKey(), height);
                     title.setText(pictureData.getTitle());
                     description.setText(pictureData.getDescription());
                     initialVisibility = PictureVisibility.valueOf(pictureData.getVisibility());

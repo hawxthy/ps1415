@@ -104,7 +104,7 @@ public class CommentEndpoint extends SkatenightServerEndpoint {
                     .kind(comment.getContainerClass())
                     .id(comment.getContainerId())
                     .safe();
-            if (!user.getEmail().equals(comment.getAuthor()) && !container.canDeleteComment(user)) {
+            if (!user.getEmail().equals(comment.getAuthor()) && !container.canDeleteComment(user) && !new RoleEndpoint().isAdmin(user.getEmail()).value) {
                 throw new OAuthRequestException("insufficient privileges");
             }
             container.removeComment(comment);

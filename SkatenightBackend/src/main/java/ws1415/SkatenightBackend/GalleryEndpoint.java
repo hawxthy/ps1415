@@ -161,21 +161,23 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
             throw new OAuthRequestException("no user submitted");
         }
 
-        Gallery gallery = ofy().load().type(Gallery.class).id(galleryId).safe();
-        GalleryContainer container = (GalleryContainer) ofy().load().kind(gallery.getContainerClass()).id(gallery.getContainerId()).safe();
-        if (!container.canRemoveGallery(user)) {
-            throw new OAuthRequestException("insufficient privileges");
-        }
-        container.removeGallery(user, gallery);
-        ofy().save().entity(container).now();
+        Gallery gallery = ofy().load().type(Gallery.class).id(galleryId).now();
+        if (gallery != null) {
+            GalleryContainer container = (GalleryContainer) ofy().load().kind(gallery.getContainerClass()).id(gallery.getContainerId()).safe();
+            if (!container.canRemoveGallery(user)) {
+                throw new OAuthRequestException("insufficient privileges");
+            }
+            container.removeGallery(user, gallery);
+            ofy().save().entity(container).now();
 
-        // Die Gallery aus allen Bildern entfernen, die die Gallery referenzieren
-        for (Picture p : gallery.getPictures()) {
-            p.removeGallery(gallery);
-        }
-        ofy().save().entities(gallery.getPictures()).now();
+            // Die Gallery aus allen Bildern entfernen, die die Gallery referenzieren
+            for (Picture p : gallery.getPictures()) {
+                p.removeGallery(gallery);
+            }
+            ofy().save().entities(gallery.getPictures()).now();
 
-        ofy().delete().entity(gallery).now();
+            ofy().delete().entity(gallery).now();
+        }
     }
 
     /**

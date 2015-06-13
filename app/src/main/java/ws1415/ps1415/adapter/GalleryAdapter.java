@@ -32,6 +32,14 @@ public class GalleryAdapter extends BaseAdapter {
     private List<GalleryMetaData> galleries = new LinkedList<>();
 
     /**
+     * Erstellt einen Adapter für Galerien, der die angegebenen Galerien enthält.
+     * @param galleries    Die Galerien, die in dem Adapter angezeigt werden.
+     */
+    public GalleryAdapter(List<GalleryMetaData> galleries) {
+        this.galleries.addAll(galleries);
+    }
+
+    /**
      * Erstellt einen neuen GalleryAdapter mit den angegebenen Daten. Der Adapter ruft die Gallerien
      * für den angegebenen Container selbstständig vom Server ab.
      * @param context          Der Context, der zum Auflösen der Strings für den leeren Eintrag
@@ -127,5 +135,9 @@ public class GalleryAdapter extends BaseAdapter {
     public void removeGallery(int position) {
         galleries.remove(position);
         notifyDataSetChanged();
+    }
+
+    public List<GalleryMetaData> getGalleries() {
+        return galleries;
     }
 }

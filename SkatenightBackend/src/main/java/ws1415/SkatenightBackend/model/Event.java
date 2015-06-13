@@ -26,6 +26,7 @@ import ws1415.SkatenightBackend.transport.EventParticipationData;
  */
 @Entity
 public class Event implements BlobKeyContainer, GalleryContainer {
+    // Dient lediglich der Angabe als Ladegruppe
     public final class EventGalleryData { }
 
     @Id
@@ -36,7 +37,6 @@ public class Event implements BlobKeyContainer, GalleryContainer {
     private Date date;
     private int routeFieldFirst;
     private int routeFieldLast;
-    private boolean notificationSend = false;
     private BlobKey headerImage;
     private Text description;
     private String meetingPlace;
@@ -109,14 +109,6 @@ public class Event implements BlobKeyContainer, GalleryContainer {
 
     public void setRouteFieldLast(int routeFieldLast) {
         this.routeFieldLast = routeFieldLast;
-    }
-
-    public boolean isNotificationSend() {
-        return notificationSend;
-    }
-
-    public void setNotificationSend(boolean notificationSend) {
-        this.notificationSend = notificationSend;
     }
 
     public BlobKey getHeaderImage() {

@@ -105,6 +105,20 @@ public class ManageEventsActivity extends BaseActivity implements EventListFragm
         }
     }
 
+    /**
+     * Startet die Ladeanimation.
+     */
+    private void startLoading() {
+        findViewById(R.id.loading).setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Beendet die Ladeanimation.
+     */
+    private void finishLoading() {
+        findViewById(R.id.loading).setVisibility(View.GONE);
+    }
+
     @Override
     public void onEventClick(ListView l, View v, int position, long id) {
         Intent intent = new Intent(this, ShowEventActivity.class);
@@ -147,14 +161,17 @@ public class ManageEventsActivity extends BaseActivity implements EventListFragm
                                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
+                                                startLoading();
                                                 EventController.deleteEvent(new ExtendedTaskDelegateAdapter<Void, Void>() {
                                                     @Override
                                                     public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                                                        onEventDeleted(position);
+                                                        eventAdapter.removeItem(position);
+                                                        finishLoading();
                                                     }
                                                     @Override
                                                     public void taskFailed(ExtendedTask task, String message) {
                                                         Toast.makeText(ManageEventsActivity.this, message, Toast.LENGTH_LONG).show();
+                                                        finishLoading();
                                                     }
                                                 }, id);
                                             }
@@ -172,14 +189,6 @@ public class ManageEventsActivity extends BaseActivity implements EventListFragm
                 });
         builder.create().show();
         return true;
-    }
-
-    /**
-     * Wird vom EventController aufgerufen, sobald ein Event gelöscht wurde.
-     * @param position    Die Position des Events, das gelöscht wurde.
-     */
-    private void onEventDeleted(int position) {
-        eventAdapter.removeItem(position);
     }
 
 }

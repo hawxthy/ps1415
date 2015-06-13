@@ -93,6 +93,7 @@ public class NavDrawerList {
                 public void onClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(parent.getContext(), ListPicturesActivity.class);
                     intent.putExtra(ListPicturesActivity.EXTRA_MAIL, ServiceProvider.getEmail());
+                    intent.putExtra(ListPicturesActivity.EXTRA_TITLE, parent.getResources().getString(R.string.my_pictures));
                     parent.getContext().startActivity(intent);
                 }
             },

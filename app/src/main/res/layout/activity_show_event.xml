@@ -53,6 +53,7 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:textSize="11pt"
+                    style="@style/primaryText"
                     android:text="@string/loading" />
 
                 <TextView
@@ -60,6 +61,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/title"
+                    style="@style/primaryText"
                     android:text="@string/loading" />
 
                 <TextView
@@ -68,6 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/date"
                     android:layout_marginTop="20dp"
+                    style="@style/primaryText"
                     android:text="@string/loading" />
 
                 <TextView
@@ -75,6 +78,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/description"
+                    style="@style/primaryText"
                     android:hint="@string/loading"
                     android:layout_toRightOf="@+id/meeting_place_label"/>
 
@@ -85,6 +89,7 @@
                     android:text="@string/meeting_place_label"
                     android:textStyle="bold"
                     android:layout_below="@id/description"
+                    style="@style/primaryText"
                     android:layout_alignBaseline="@id/meeting_place" />
 
                 <TextView
@@ -92,6 +97,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/meeting_place"
+                    style="@style/primaryText"
                     android:layout_alignLeft="@id/meeting_place"
                     android:hint="@string/loading" />
 
@@ -100,6 +106,7 @@
                     android:layout_width="130dp"
                     android:layout_height="wrap_content"
                     android:text="@string/fee_label"
+                    style="@style/primaryText"
                     android:textStyle="bold"
                     android:layout_alignBaseline="@id/fee" />
 

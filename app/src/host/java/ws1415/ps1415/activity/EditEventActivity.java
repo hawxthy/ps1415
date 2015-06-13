@@ -78,7 +78,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
     private ImageView icon;
     private ImageView headerImage;
     private EditText title;
-    private TextView date;
+    private EditText date;
     private EditText description;
     private EditText meetingPlace;
     private EditText fee;
@@ -129,7 +129,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
         icon = (ImageView) findViewById(R.id.icon);
         headerImage = (ImageView) findViewById(R.id.headerImage);
         title = (EditText) findViewById(R.id.title);
-        date = (TextView) findViewById(R.id.date);
+        date = (EditText) findViewById(R.id.date);
         description = (EditText) findViewById(R.id.description);
         meetingPlace = (EditText) findViewById(R.id.meeting_place);
         fee = (EditText) findViewById(R.id.fee);

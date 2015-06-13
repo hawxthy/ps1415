@@ -298,8 +298,9 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         }
 
         // Route laden und anzeigen
-        final GoogleMap googleMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.routeFragment)).getMap();
-        if (googleMap != null) {
+        MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.routeFragment));
+        if (mapFragment != null) {
+            final GoogleMap googleMap = mapFragment.getMap();
             googleMap.setMyLocationEnabled(false);
             Route route = eventData.getRoute();
             String encodedPath = route.getRouteData().getValue();

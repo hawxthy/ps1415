@@ -92,7 +92,7 @@ public abstract class EventController {
                     return ServiceProvider.getService().eventEndpoint().getEvent(eventId).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    publishError("Verbindung zum Server konnte nicht hergestellt werden");
+                    publishError("Die gewählte Veranstaltung existiert nicht mehr.");
                 }
                 return null;
             }

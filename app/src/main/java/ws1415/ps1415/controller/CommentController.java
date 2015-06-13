@@ -34,7 +34,7 @@ public class CommentController {
             @Override
             protected CommentData doInBackground(Void... params) {
                 try {
-                    ServiceProvider.getService().commentEndpoint().addComment(containerClass, containerId, comment).execute();
+                    return ServiceProvider.getService().commentEndpoint().addComment(containerClass, containerId, comment).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Kommentar konnte nicht erstellt werden. Zu wenig Rechte?");

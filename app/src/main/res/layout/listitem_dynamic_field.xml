@@ -8,12 +8,14 @@
         android:layout_width="130dp"
         android:layout_height="wrap_content"
         android:text="Label:"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        style="@style/primaryText"/>
 
     <TextView
         android:id="@+id/fieldContent"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Content" />
+        android:text="Content"
+        style="@style/primaryText"/>
 
 </LinearLayout>
