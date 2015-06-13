@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 import ws1415.ps1415.R;
+import ws1415.ps1415.util.DateUtil;
 
 /**
  * @author  Bernd Eissing on 05.06.2015.
@@ -86,17 +87,7 @@ public class NewsBoardAdapter extends BaseAdapter {
             holder = (Holder) convertView.getTag();
         }
 
-        Date date = new Date(getItem(position).getDate().getValue());
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH)+1;
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-        int hours = cal.get(Calendar.HOUR_OF_DAY);
-        int minutes = cal.get(Calendar.MINUTE);
-
-
-        holder.dateView.setText("Am "+month+"."+day+" "+year+" um "+hours+":"+minutes+" Uhr");
+        holder.dateView.setText(DateUtil.getInstance().formatMyDate(getItem(position).getDate().getValue()));
         holder.contentView.setText(getItem(position).getMessage());
 
         return convertView;

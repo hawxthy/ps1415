@@ -11,6 +11,8 @@ import android.widget.TextView;
 import com.skatenight.skatenightAPI.model.Comment;
 
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -32,10 +34,29 @@ public class CommentBoardAdapter  extends BaseAdapter{
     public CommentBoardAdapter(Context context, Long id, List<Comment> comments){
         this.id = id;
         this.context = context;
-        this.comments = comments;
+        this.comments = sortEntries(comments);
         if(context != null){
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
+    }
+
+    // Sortiert die Liste der Einträge nach ihrem Datum
+    private List<Comment> sortEntries(final List<Comment> entries){
+        if(entries != null){
+            Collections.sort(entries, new Comparator<Comment>() {
+                @Override
+                public int compare(Comment boardEntry, Comment t1) {
+                    if (boardEntry.getDate().getValue() < t1.getDate().getValue()) {
+                        return 1;
+                    } else if (boardEntry.getDate().getValue() == t1.getDate().getValue()) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+        }
+        return  entries;
     }
 
     /**

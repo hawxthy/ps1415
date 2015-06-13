@@ -209,9 +209,10 @@ public class GroupMemberListAdapter extends BaseAdapter {
             });
             holder.buttonLeft.setOnClickListener(new View.OnClickListener() {
                 String email = getItem(i).getEmail();
+                String firstName = getItem(i).getFirstName();
                 @Override
                 public void onClick(View view) {
-                    activity.startDistributeRightsToAction(email);
+                    activity.startDistributeRightsToAction(email, firstName);
                 }
             });
         }else if(mContext instanceof DistributeRightsActivity){

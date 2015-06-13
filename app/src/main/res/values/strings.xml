@@ -475,6 +475,7 @@
     <string name="youAreNowInvisible">You are now invisible</string>
     <string name="edit_this_entry">Edit this message?</string>
     <string name="group_already_gone">The Group no longer exists</string>
+    <string name="cant_distribute_rights_to_leader">You can not distribute Rights to the Leader</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="deleteThisEntryQuestion">Delete this Entry?</string>

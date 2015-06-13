@@ -177,7 +177,7 @@ public class CommentBlackBoardActivity extends Activity {
 
                     @Override
                     public void afterTextChanged(Editable editable) {
-                        if (messageEditText.getText().length() < 3) {
+                        if (messageEditText.getText().length() < 2) {
                             failureTextView.setText(R.string.textTooShort);
                             failureTextView.setVisibility(View.VISIBLE);
                             textOkay = false;
