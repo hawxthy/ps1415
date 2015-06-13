@@ -12,7 +12,7 @@
         <property name="javax.jdo.option.RetainValues" value="true"/>
         <property name="datanucleus.appengine.autoCreateDatastoreTxns" value="true"/>
         <property name="datanucleus.appengine.singletonPMFForName" value="true"/>
-        <property name="datanucleus.cache.level2.type" value="none"/>
+        <!--property name="datanucleus.cache.level2.type" value="none"/!-->
 
     </persistence-manager-factory>
 </jdoconfig>

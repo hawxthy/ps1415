@@ -30,6 +30,7 @@
 
     <color name="ColorPrimary">#FF5722</color>
     <color name="ColorPrimaryDark">#E64A19</color>#
+    <color name="ColorPrimaryLight">#FF8A65</color>
     <color name="accent">#607D8B</color>
     <color name="pressed">#B6B6B6</color>
 

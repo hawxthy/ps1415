@@ -264,7 +264,6 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
 
     /**
      * Prüft, ob Standortinformationen eines Benutzers richtig aktualisiert werden.
-     * TODO: GÜLTIGES EVENT ZUWEISEN
      * @throws InterruptedException Wenn der Thread während des Wartens unterbrochen wird
      */
     @SmallTest
@@ -370,7 +369,7 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
     public void testJoinGroupAndEvent() throws InterruptedException, IOException {
         changeAccount(ADMIN_MAIL);
         // Veranstaltung und Nutzergruppe erstellen
-        Event testEvent = createEvent();
+        final Event testEvent = createEvent();
         final UserGroup testUserGroup = createUserGroup();
 
         changeAccount(TEST_MAIL_1);
@@ -382,8 +381,8 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
         UserController.getUserProfile(new ExtendedTaskDelegateAdapter<Void, UserProfile>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserProfile userProfile) {
-                // TODO: Veranstaltungen abfragen
-                assertEquals(testUserGroup.getName(), userProfile.getMyUserGroups().get(0).getName());
+                assertTrue(userProfile.getEventCount() == 1);
+                assertEquals(testUserGroup.getName(), userProfile.getMyUserGroups().get(0));
                 getSignal.countDown();
             }
         }, TEST_MAIL_1);

@@ -11,9 +11,6 @@ import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
 
 import ws1415.SkatenightBackend.gcm.RegistrationManager;
-import ws1415.SkatenightBackend.model.EndUser;
-import ws1415.SkatenightBackend.model.Event;
-import ws1415.SkatenightBackend.model.UserGroup;
 
 /**
  * Stellt Hilfsmethoden bereit, die von allen Endpoints der Skatenight-API benötigt werden.
@@ -25,10 +22,10 @@ import ws1415.SkatenightBackend.model.UserGroup;
         audiences = {Constants.ANDROID_AUDIENCE},
         namespace = @ApiNamespace(ownerDomain = "skatenight.com", ownerName = "skatenight"))
 public abstract class SkatenightServerEndpoint {
-    private PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
+    private static final PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory(
             "transactions-optional");
 
-    protected PersistenceManagerFactory getPersistenceManagerFactory() {
+    protected static PersistenceManagerFactory getPersistenceManagerFactory() {
         return pmf;
     }
 

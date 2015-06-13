@@ -44,7 +44,10 @@ public class BaseActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        if(!GCM_INITIALIZED && ServiceProvider.getEmail() != null) {
+        if(!GCM_INITIALIZED) {
+            if(ServiceProvider.getEmail() == null) {
+                if(!UniversalUtil.checkLogin(this)) return;
+            }
             UniversalUtil.initGCM(this);
             GCM_INITIALIZED = true;
         }

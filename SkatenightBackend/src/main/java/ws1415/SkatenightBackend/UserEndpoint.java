@@ -31,7 +31,6 @@ import ws1415.SkatenightBackend.model.UserLocation;
 import ws1415.SkatenightBackend.model.Visibility;
 import ws1415.SkatenightBackend.transport.ListWrapper;
 import ws1415.SkatenightBackend.transport.StringWrapper;
-import ws1415.SkatenightBackend.transport.UserGroupMetaData;
 import ws1415.SkatenightBackend.transport.UserListData;
 import ws1415.SkatenightBackend.transport.UserLocationInfo;
 import ws1415.SkatenightBackend.transport.UserPrimaryData;
@@ -119,6 +118,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             user = null;
         } finally {
             pm.close();
+
         }
         if (user == null) {
             return new BooleanWrapper(false);
@@ -153,6 +153,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             }
         } finally {
             pm.close();
+
         }
     }
 
@@ -185,16 +186,16 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             return null;
         } finally {
             pm.close();
+
         }
     }
 
     /**
      * Liefert eine Liste von Standortinformationen von Benutzern.
      *
-     * @param user User-Objekt zur Authentifizierung
+     * @param user      User-Objekt zur Authentifizierung
      * @param userMails E-Mail Adressen der Benutzer
      * @return Standortinformationen von Benutzern
-     *
      * @throws OAuthRequestException
      */
     @ApiMethod(path = "user_location_info")
@@ -203,12 +204,13 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             List<UserLocationInfo> locationInfos = new ArrayList<>();
-            for(String userMail : userMails){
+            for (String userMail : userMails) {
                 locationInfos.add(getUserLocationInfo(user, userMail));
             }
             return locationInfos;
         } finally {
             pm.close();
+
         }
     }
 
@@ -227,6 +229,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             return null;
         } finally {
             pm.close();
+
         }
     }
 
@@ -247,27 +250,22 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             List<String> friends = endUser.getMyFriends();
 
-            UserInfo userInfo = pm.detachCopy(endUser.getUserInfo());
-            setUpVisibility(userInfo, user.getEmail(), userMail, friends);
-
+            UserProfile userProfile = new UserProfile();
+            setUpVisibility(userProfile, endUser.getUserInfo(), user.getEmail(), userMail, friends);
             List<String> userGroups = listUserGroupMetaData(user, endUser);
 
-            return new UserProfile(userMail,
-                    endUser.getUserPicture(),
-                    userInfo.getFirstName(),
-                    userInfo.getLastName().getValue(),
-                    userInfo.getGender(),
-                    userInfo.getDateOfBirth().getValue(),
-                    userInfo.getCity().getValue(),
-                    userInfo.getPostalCode().getValue(),
-                    userInfo.getDescription().getValue(),
-                    userGroups,
-                    endUser.getMyEvents().size());
+            userProfile.setEmail(userMail);
+            userProfile.setUserPicture(endUser.getUserPicture());
+            userProfile.setFirstName(endUser.getUserInfo().getFirstName());
+            userProfile.setGender(endUser.getUserInfo().getGender());
+            userProfile.setMyUserGroups(userGroups);
+            userProfile.setEventCount(endUser.getMyEvents().size());
+            return userProfile;
         } finally {
             pm.close();
+
         }
     }
-
 
     /**
      * Gibt die Profilinformationen eines Benutzers mit der angegebenen E-Mail Adresse aus.
@@ -293,6 +291,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
                     endUser.getUserInfo());
         } finally {
             pm.close();
+
         }
     }
 
@@ -311,19 +310,18 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             EndUser endUser = pm.getObjectById(EndUser.class, userMail);
             List<String> friends = endUser.getMyFriends();
 
-            UserInfo userInfo = pm.detachCopy(endUser.getUserInfo());
-            setUpVisibility(userInfo, user.getEmail(), userMail, friends);
+            UserListData userListData = new UserListData();
+            setUpVisibility(userListData, endUser.getUserInfo(), user.getEmail(), userMail, friends);
 
-            return new UserListData(userMail,
-                    endUser.getUserPicture(),
-                    userInfo.getFirstName(),
-                    userInfo.getLastName().getValue(),
-                    userInfo.getCity().getValue(),
-                    userInfo.getDateOfBirth().getValue());
+            userListData.setEmail(userMail);
+            userListData.setUserPicture(endUser.getUserPicture());
+            userListData.setFirstName(endUser.getUserInfo().getFirstName());
+            return userListData;
         } catch (Exception e) {
             return null;
         } finally {
             pm.close();
+
         }
     }
 
@@ -364,6 +362,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             return new ListWrapper(pm.getObjectById(EndUser.class, userMail).getMyFriends());
         } finally {
             pm.close();
+
         }
     }
 
@@ -387,6 +386,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             q.setResult("this.email");
             cache = (List<String>) q.execute(query);
             resultMails.addAll(cache);
+            q.closeAll();
 
             q = pm.newQuery(EndUser.class);
             q.setFilter("fullNameLc.startsWith(inputParam)");
@@ -394,6 +394,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             q.setResult("this.email");
             cache = (List<String>) q.execute(query.toLowerCase());
             resultMails.addAll(cache);
+            q.closeAll();
 
             Set<String> cacheMails = new HashSet<>();
             for (String userMail : resultMails) {
@@ -407,6 +408,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             return new ListWrapper(new ArrayList<>(resultMails));
         } finally {
             pm.close();
+
         }
     }
 
@@ -449,6 +451,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             return new BooleanWrapper(false);
         } finally {
             pm.close();
+
         }
     }
 
@@ -477,6 +480,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             return new BooleanWrapper(false);
         } finally {
             pm.close();
+
         }
     }
 
@@ -526,6 +530,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             pm.makePersistent(endUser);
         } finally {
             pm.close();
+
         }
     }
 
@@ -560,6 +565,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             return new BooleanWrapper(true);
         } finally {
             pm.close();
+
         }
     }
 
@@ -584,6 +590,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             return new BooleanWrapper(endUser.getMyFriends().remove(friendMail));
         } finally {
             pm.close();
+
         }
     }
 
@@ -614,6 +621,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
                 pm.deletePersistent(endUser);
             } finally {
                 pm.close();
+
             }
         }
     }
@@ -621,6 +629,33 @@ public class UserEndpoint extends SkatenightServerEndpoint {
     /**
      * Hilfsmethoden
      */
+
+
+    /**
+     * Setzt die Informationen in UserProfile, falls diese sichtbar für den Aufrufer sind.
+     *
+     * @param userProfile  Informationen die aufgerufen werden
+     * @param mailOfCaller User, der Informationen abrufen will
+     * @param mailOfCalled E-Mail Adresse des Benutzers mit den Informationen
+     * @param friends      E-Mail Adressen der Freunde des Benutzers mit den Informationen
+     */
+    private void setUpVisibility(UserProfile userProfile, UserInfo userInfo, String mailOfCaller, String mailOfCalled, List<String> friends) {
+        if (isVisible(mailOfCaller, mailOfCalled, userInfo.getLastName().getVisibility(), friends)) {
+            userProfile.setLastName(userInfo.getLastName().getValue());
+        }
+        if (isVisible(mailOfCaller, mailOfCalled, userInfo.getCity().getVisibility(), friends)) {
+            userProfile.setCity(userInfo.getCity().getValue());
+        }
+        if (isVisible(mailOfCaller, mailOfCalled, userInfo.getDateOfBirth().getVisibility(), friends)) {
+            userProfile.setDateOfBirth(userInfo.getDateOfBirth().getValue());
+        }
+        if (isVisible(mailOfCaller, mailOfCalled, userInfo.getDescription().getVisibility(), friends)) {
+            userProfile.setDescription(userInfo.getDescription().getValue());
+        }
+        if (isVisible(mailOfCaller, mailOfCalled, userInfo.getPostalCode().getVisibility(), friends)) {
+            userProfile.setPostalCode(userInfo.getPostalCode().getValue());
+        }
+    }
 
     /**
      * Setzt die Informationen der UserInfo auf null, die für den User nicht sichtbar sein sollen.
@@ -648,6 +683,26 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             userInfo.getPostalCode().setValue(null);
         }
         return userInfo;
+    }
+
+    /**
+     * Setzt die Informationen in UserListData, falls diese sichtbar für den Aufrufer sind.
+     *
+     * @param userInfo     Informationen die aufgerufen werden
+     * @param mailOfCaller User, der Informationen abrufen will
+     * @param mailOfCalled E-Mail Adresse des Benutzers mit den Informationen
+     * @param friends      E-Mail Adressen der Freunde des Benutzers mit den Informationen
+     */
+    private void setUpVisibility(UserListData userListData, UserInfo userInfo, String mailOfCaller, String mailOfCalled, List<String> friends) {
+        if (isVisible(mailOfCaller, mailOfCalled, userInfo.getLastName().getVisibility(), friends)) {
+            userListData.setLastName(userInfo.getLastName().getValue());
+        }
+        if (isVisible(mailOfCaller, mailOfCalled, userInfo.getCity().getVisibility(), friends)) {
+            userListData.setCity(userInfo.getCity().getValue());
+        }
+        if (isVisible(mailOfCaller, mailOfCalled, userInfo.getDateOfBirth().getVisibility(), friends)) {
+            userListData.setDateOfBirth(userInfo.getDateOfBirth().getValue());
+        }
     }
 
     /**
@@ -714,6 +769,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             return false;
         } finally {
             pm.close();
+
         }
         return false;
     }
@@ -731,6 +787,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             endUser.addUserGroup(userGroup);
         } finally {
             pm.close();
+
         }
     }
 
@@ -747,6 +804,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             endUser.removeUserGroup(userGroup);
         } finally {
             pm.close();
+
         }
     }
 
@@ -756,7 +814,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
      * @param userMail E-Mail Adresse des Benutzers
      * @return Liste der Veranstaltungen
      */
-    protected List<Long> listEventsFromUser(String userMail){
+    protected List<Long> listEventsFromUser(String userMail) {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             return pm.getObjectById(EndUser.class, userMail).getMyEvents();
@@ -778,6 +836,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             endUser.addEvent(event);
         } finally {
             pm.close();
+
         }
     }
 

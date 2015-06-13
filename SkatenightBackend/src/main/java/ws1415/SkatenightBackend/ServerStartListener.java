@@ -1,6 +1,8 @@
 package ws1415.SkatenightBackend;
 
 
+import java.util.logging.Logger;
+
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.servlet.ServletContextEvent;
@@ -27,7 +29,8 @@ public class ServerStartListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        // shutdown code here
+        JDOHelper.getPersistenceManagerFactory().close();
+        Logger.getLogger(ServerStartListener.class.getName()).info("Context destroyed");
     }
 
 }
