@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.annotations.Embedded;
+import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -18,7 +19,7 @@ import javax.jdo.annotations.PrimaryKey;
 @PersistenceCapable(detachable="true")
 public class EndUser implements javax.jdo.listener.StoreCallback {
     @PrimaryKey
-    @Persistent
+    @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private String email;
     @Persistent
     private GlobalRole globalRole;
