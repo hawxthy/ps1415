@@ -49,9 +49,6 @@ public class PictureMetaDataAdapter extends BaseAdapter {
     private Context context;
     private PictureFilter filter;
     private List<PictureMetaData> pictures = new LinkedList<>();
-    // Speichert die Bitmaps zu den abgerufenen Bildern, damit diese bei einem
-    // Konfigurationswechseln mit gesichert werden können
-    private ArrayList<Bitmap> bitmaps = new ArrayList<>();
 
     private int fetchDistance;
     private Boolean fetching = false;
@@ -61,13 +58,11 @@ public class PictureMetaDataAdapter extends BaseAdapter {
      * Erstellt einen PictureMetaDataAdapter, der die angegebenen Items enthält.
      * @param context             Der aufrufende Context.
      * @param pictureMetaDatas    Die Items, die in den Adapter eingefügt werden sollen.
-     *
      * @param filter              Der Filter, der zum Abrufen weiterer Daten benutzt wird.
      */
-    public PictureMetaDataAdapter(Context context, List<PictureMetaData> pictureMetaDatas, List<Bitmap> bitmaps, PictureFilter filter) {
+    public PictureMetaDataAdapter(Context context, List<PictureMetaData> pictureMetaDatas, PictureFilter filter) {
         this.context = context;
         this.pictures.addAll(pictureMetaDatas);
-        this.bitmaps.addAll(bitmaps);
         this.filter = filter;
         fetchDistance = (int) (filter.getLimit() * 0.4);
         notifyDataSetChanged();
@@ -151,34 +146,16 @@ public class PictureMetaDataAdapter extends BaseAdapter {
             TextView date = (TextView) view.findViewById(R.id.date);
             if (picture.getId() >= 0) {
                 view.findViewById(R.id.notVisibleText).setVisibility(View.INVISIBLE);
-                if (position < bitmaps.size() && bitmaps.get(position) != null) {
-                    thumbnail.setImageBitmap(bitmaps.get(position));
-                } else {
-                    // Das Bild kann erst in der richtigen Größe abgerufen werden, wenn die ImageView
-                    // eine Breite über das Layout erhalten hat. Aus diesem Grund füge ich einen Listener
-                    // hinzu, der zu diesem Zeitpunkt aufgerufen wird und das Bild abruft
-                    thumbnail.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                        @Override
-                        public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                            DiskCacheImageLoader.getInstance().loadScaledImage(thumbnail, picture.getImageBlobKey(), right - left);
-                            final View finalView = view;
-                            thumbnail.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                                @Override
-                                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                                    if (thumbnail.getDrawable() != null) {
-                                        bitmaps.ensureCapacity(position + 1);
-                                        while (position > bitmaps.size()) {
-                                            bitmaps.add(null);
-                                        }
-                                        bitmaps.add(position, ((BitmapDrawable) thumbnail.getDrawable()).getBitmap());
-                                        finalView.removeOnLayoutChangeListener(this);
-                                    }
-                                }
-                            });
-                            thumbnail.removeOnLayoutChangeListener(this);
-                        }
-                    });
-                }
+                // Das Bild kann erst in der richtigen Größe abgerufen werden, wenn die ImageView
+                // eine Breite über das Layout erhalten hat. Aus diesem Grund füge ich einen Listener
+                // hinzu, der zu diesem Zeitpunkt aufgerufen wird und das Bild abruft
+                thumbnail.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                        DiskCacheImageLoader.getInstance().loadScaledImage(thumbnail, picture.getImageBlobKey(), right - left);
+                        thumbnail.removeOnLayoutChangeListener(this);
+                    }
+                });
                 title.setText(picture.getTitle());
                 ((TextView) view.findViewById(R.id.avgSymbol)).setText(Html.fromHtml(view.getResources().getString(R.string.average)));
                 if (picture.getAvgRating() != null) {
@@ -299,9 +276,5 @@ public class PictureMetaDataAdapter extends BaseAdapter {
 
     public List<PictureMetaData> getPictures() {
         return pictures;
-    }
-
-    public ArrayList<Bitmap> getBitmaps() {
-        return bitmaps;
     }
 }

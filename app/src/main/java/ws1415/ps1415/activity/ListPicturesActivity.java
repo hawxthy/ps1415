@@ -23,6 +23,7 @@ import com.skatenight.skatenightAPI.model.PictureFilter;
 import com.skatenight.skatenightAPI.model.PictureMetaData;
 import com.skatenight.skatenightAPI.model.UserGalleryContainer;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,7 +64,6 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
     private static final String MEMBER_GALLERY_POSITION = ListPicturesActivity.class.getSimpleName() + ".GalleryPosition";
     private static final String MEMBER_PICTURE_FILTER = ListPicturesActivity.class.getSimpleName() + ".PictureFilter";
     private static final String MEMBER_PICTURES = ListPicturesActivity.class.getSimpleName() + ".Pictures";
-    private static final String MEMBER_BITMAPS = ListPicturesActivity.class.getSimpleName() + ".Drawables";
 
     private static final int UPLOAD_PICTURE_REQUEST_CODE = 1;
     private static final int EDIT_PICTURE_REQUEST_CODE = 2;
@@ -149,8 +149,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
             for (SerializablePictureMetaData p : (LinkedList<SerializablePictureMetaData>) savedInstanceState.getSerializable(MEMBER_PICTURES)) {
                 pictureMetaDatas.add(p.getPictureMetaData());
             }
-            List<Bitmap> bitmaps = savedInstanceState.getParcelableArrayList(MEMBER_BITMAPS);
-            pictureAdapter = new PictureMetaDataAdapter(this, pictureMetaDatas, bitmaps, filter);
+            pictureAdapter = new PictureMetaDataAdapter(this, pictureMetaDatas, filter);
             pictureFragment.setAdapter(pictureAdapter);
 
             if (savedInstanceState.containsKey(MEMBER_MAIL)) {
@@ -271,7 +270,6 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
                 serializablePictures.add(new SerializablePictureMetaData(p));
             }
             outState.putSerializable(MEMBER_PICTURES, serializablePictures);
-            outState.putParcelableArrayList(MEMBER_BITMAPS, pictureAdapter.getBitmaps());
         }
     }
 
