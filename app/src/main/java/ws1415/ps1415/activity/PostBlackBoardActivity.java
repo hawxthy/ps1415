@@ -31,6 +31,7 @@ import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.GroupImageLoader;
 import ws1415.ps1415.util.ImageUtil;
+import ws1415.ps1415.util.UniversalUtil;
 
 public class PostBlackBoardActivity extends Activity {
     private static final int SELECT_PHOTO = 1;
@@ -59,6 +60,13 @@ public class PostBlackBoardActivity extends Activity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_post_black_board);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
 
         groupName = getIntent().getStringExtra(GroupProfileActivity.EXTRA_GROUP_NAME);
         if(groupName == null){

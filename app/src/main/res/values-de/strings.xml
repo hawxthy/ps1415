@@ -433,7 +433,7 @@
     <string name="title_activity_invite_users_to_group">Neue Benutzer einladen</string>
 
     <!-- MyUserGroupsActivity-->
-    <string name="tooManyVisibleGroups">Sie haben zu viele sichtbare Gruppe</string>
+    <string name="tooManyVisibleGroups">Sie haben zu viele sichtbare Gruppen</string>
     <string name="too_many_visible_groups">Sie können maximal fünf Gruppen sichtbar machen</string>
     <string name="title_activity_my_user_groups">Meine Gruppen</string>
     <string name="info_about_visibility">Hier können Sie ihre Gruppensichtbarkeit einstellen. Sichtbare Gruppen werden auf der Karte angezeigt.</string>
@@ -442,6 +442,7 @@
     <string name="noLongIdSubmitted">Sie müssen die id vom Eintrag im Intent mitliefern</string>
     <string name="titleWriteComment">Schreibe einen Kommentar</string>
     <string name="textTooShort">Nachricht zu kurz</string>
+    <string name="delte_comment_question">Wollen Sie diesen Kommentar entfernen?</string>
     <string name="no_board_entry_found">Es wurde kein Eintrag auf dem Server gefunden</string>
     <string name="title_activity_comment_black_board">Schreibe einen Kommentar</string>
 
@@ -517,6 +518,10 @@
     <string name="youAreNowInvisible">Sie können nun nicht mehr von Mitgliedern gesehen werden</string>
     <string name="edit_this_entry">Wollen Sie diese Nachricht editieren?</string>
     <string name="group_already_gone">The Group no longer exists</string>
+    <string name="cant_distribute_rights_to_leader">Sie können keine Rechte an den Inhaber verteilen</string>
+    <string name="cant_make_security_group_open">Sie können eine gesonderte Gruppe nicht öffentlich machen</string>
+    <string name="your_group_is_open">Ihre Gruppe ist nun öffentlich</string>
+    <string name="your_group_is_private">Ihre Gruppe ist nun privat</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="deleteThisEntryQuestion">Diesen Eintrag löschen?</string>

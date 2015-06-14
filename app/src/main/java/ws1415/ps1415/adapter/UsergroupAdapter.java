@@ -35,7 +35,7 @@ import ws1415.ps1415.util.PrefManager;
  * @author Bernd Eissing
  */
 public class UsergroupAdapter extends BaseAdapter {
-    private final int LOAD_BUFFER = 10;
+    private final int LOAD_BUFFER = 5;
     private List<UserGroupMetaData> groupList;
     private Context context;
     private LayoutInflater inflater;
@@ -43,7 +43,7 @@ public class UsergroupAdapter extends BaseAdapter {
     private boolean fetching = false;
     private boolean moreToFetch = true;
     private UserGroupFilter filter;
-    private int count = 0;
+    private List<String> visibleGroupCount;
     // String zum Suchen von Nutzergruppen
     private String mSearchString;
     private List<String> mSearchGroups;
@@ -65,6 +65,7 @@ public class UsergroupAdapter extends BaseAdapter {
         this.context = context;
         this.filter = filter;
         this.groupList = new ArrayList<>();
+        this.visibleGroupCount = new ArrayList<>();
         if (context != null) {
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
@@ -87,6 +88,7 @@ public class UsergroupAdapter extends BaseAdapter {
         this.mSearchGroups = searchGroups;
         this.context = context;
         this.filter = filter;
+        this.visibleGroupCount = new ArrayList<>();
         this.groupList = new ArrayList<>();
         if (context != null) {
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -198,15 +200,19 @@ public class UsergroupAdapter extends BaseAdapter {
                 holder.hiddenSecurityButton.setVisibility(View.GONE);
             }
         } else if(context instanceof MyUserGroupsActivity){
-            if (count < 6) {
+            if (visibleGroupCount.size() < 6) {
+                String groupName = getItem(position).getName();
                 final MyUserGroupsActivity activity = (MyUserGroupsActivity) context;
-                holder.hiddenCancelButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.remove_icon_in_red));
-                holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_visibility_black_24dp));
+                //Setzen der Icons
+                holder.hiddenCancelButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_eye_off_black_24dp));
+                holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_eye_black_24dp));
                 // Prüfe auf Sichtbarkeit und mache die Buttons dementsprechend sichtbar
-                if (PrefManager.getGroupVisibility(context, getItem(position).getName())) {
+                if (PrefManager.getGroupVisibility(context, groupName)) {
+                    if(!visibleGroupCount.contains(groupName)){
+                        visibleGroupCount.add(groupName);
+                    }
                     holder.hiddenCancelButton.setVisibility(View.VISIBLE);
                     holder.hiddenSecurityButton.setVisibility(View.GONE);
-                    count++;
                 }else{
                     holder.hiddenSecurityButton.setVisibility(View.VISIBLE);
                     holder.hiddenCancelButton.setVisibility(View.GONE);
@@ -218,11 +224,13 @@ public class UsergroupAdapter extends BaseAdapter {
 
                     @Override
                     public void onClick(View view) {
-                        if (!PrefManager.getGroupVisibility(context, groupName) && count < 5) {
+                        if (!PrefManager.getGroupVisibility(context, groupName) && visibleGroupCount.size() < 5) {
                             holder.hiddenCancelButton.setVisibility(View.VISIBLE);
                             holder.hiddenSecurityButton.setVisibility(View.GONE);
                             PrefManager.setGroupVisibility(context, groupName, true);
-                            count++;
+                            if(!visibleGroupCount.contains(groupName)){
+                                visibleGroupCount.add(groupName);
+                            }
                         }else{
                             Toast.makeText(context, R.string.too_many_visible_groups, Toast.LENGTH_LONG).show();
                         }
@@ -237,7 +245,9 @@ public class UsergroupAdapter extends BaseAdapter {
                             holder.hiddenCancelButton.setVisibility(View.GONE);
                             holder.hiddenSecurityButton.setVisibility(View.VISIBLE);
                             PrefManager.setGroupVisibility(context, groupName, false);
-                            count--;
+                            if(visibleGroupCount.contains(groupName)){
+                                visibleGroupCount.remove(groupName);
+                            }
                         }
                     }
                 });

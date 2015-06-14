@@ -17,6 +17,8 @@ import com.skatenight.skatenightAPI.model.BoardEntry;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -40,11 +42,30 @@ public class BlackBoardListAdapter extends BaseAdapter{
 
     public BlackBoardListAdapter(Context context, List<BoardEntry> boardEntries, List<String> rights){
         this.context = context;
-        this.boardEntries = boardEntries;
+        this.boardEntries = sortEntries(boardEntries);
         this.rights = rights;
         if(context != null){
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
+    }
+
+    // Sortiert die Liste der Einträge nach ihrem Datum
+    private List<BoardEntry> sortEntries(final List<BoardEntry> entries){
+        if(entries != null){
+            Collections.sort(entries, new Comparator<BoardEntry>() {
+                @Override
+                public int compare(BoardEntry boardEntry, BoardEntry t1) {
+                    if(boardEntry.getDate().getValue() < t1.getDate().getValue()){
+                        return 1;
+                    }else if(boardEntry.getDate().getValue() == t1.getDate().getValue()){
+                        return 0;
+                    }else{
+                        return -1;
+                    }
+                }
+            });
+        }
+        return  entries;
     }
 
     /**

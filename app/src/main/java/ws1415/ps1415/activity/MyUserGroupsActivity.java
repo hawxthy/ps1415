@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -23,6 +24,7 @@ import ws1415.ps1415.adapter.GroupMemberListAdapter;
 import ws1415.ps1415.adapter.UsergroupAdapter;
 import ws1415.ps1415.model.NavDrawerGroupList;
 import ws1415.ps1415.util.PrefManager;
+import ws1415.ps1415.util.UniversalUtil;
 
 public class MyUserGroupsActivity extends BaseFragmentActivity {
     // maximal Anzahl an gleichzeitig zu ladenen Nutzergruppen
@@ -39,7 +41,17 @@ public class MyUserGroupsActivity extends BaseFragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        super.setContentView(NavDrawerGroupList.items, R.layout.activity_my_user_groups);
+
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        setContentView(R.layout.activity_my_user_groups);
+        setProgressBarIndeterminateVisibility(Boolean.FALSE);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
 
         //TODO refresh Button machen
         mResultListView = (ListView) findViewById(R.id.my_groups_list_view);
@@ -54,6 +66,13 @@ public class MyUserGroupsActivity extends BaseFragmentActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_my_user_groups, menu);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        setUp();
     }
 
     @Override

@@ -24,6 +24,7 @@ import ws1415.ps1415.controller.GroupController;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
+import ws1415.ps1415.util.UniversalUtil;
 
 public class InviteUsersToGroupActivity extends Activity {
     // Viewelemente
@@ -50,6 +51,13 @@ public class InviteUsersToGroupActivity extends Activity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.activity_invite_users_to_group);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
+
+        //Prüft ob der Benutzer eingeloggt ist
+        if (!UniversalUtil.checkLogin(this)) {
+            finish();
+            return;
+        }
+
 
         mActionBar = getActionBar();
 
@@ -93,7 +101,7 @@ public class InviteUsersToGroupActivity extends Activity {
                             setProgressBarIndeterminateVisibility(Boolean.FALSE);
                             if (strings != null && !strings.isEmpty()) {
                                 setAdapter(strings);
-                            }else{
+                            } else {
                                 Toast.makeText(InviteUsersToGroupActivity.this, R.string.nothingFound, Toast.LENGTH_LONG).show();
                             }
                         }
@@ -118,9 +126,11 @@ public class InviteUsersToGroupActivity extends Activity {
         mAcceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(usersToInvite.size() > 0){
+                if (usersToInvite.size() > 0) {
                     setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                    GroupController.getInstance().sendInvitation(new ExtendedTaskDelegateAdapter<Void, Void>(){
+                    mAcceptButton.setVisibility(View.GONE);
+                    mCancelButton.setVisibility(View.GONE);
+                    GroupController.getInstance().sendInvitation(new ExtendedTaskDelegateAdapter<Void, Void>() {
                         @Override
                         public void taskDidFinish(ExtendedTask task, Void aVoid) {
                             setProgressBarIndeterminateVisibility(Boolean.FALSE);
@@ -132,9 +142,11 @@ public class InviteUsersToGroupActivity extends Activity {
                         public void taskFailed(ExtendedTask task, String message) {
                             Toast.makeText(InviteUsersToGroupActivity.this, message, Toast.LENGTH_LONG).show();
                             setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                            mAcceptButton.setVisibility(View.VISIBLE);
+                            mCancelButton.setVisibility(View.VISIBLE);
                         }
-                    },groupName, usersToInvite);
-                }else{
+                    }, groupName, usersToInvite);
+                } else {
                     Toast.makeText(InviteUsersToGroupActivity.this, R.string.noUsersToInvite, Toast.LENGTH_LONG).show();
                 }
             }
@@ -147,7 +159,10 @@ public class InviteUsersToGroupActivity extends Activity {
      * @param mails
      */
     private void setAdapter(List<String> mails){
-        mAdapter = new GroupMemberListAdapter(mails, this, null, groupMembers);
+        ArrayList<String> searchResultAndUsersToInvite = new ArrayList<>();
+        searchResultAndUsersToInvite.addAll(usersToInvite);
+        searchResultAndUsersToInvite.addAll(mails);
+        mAdapter = new GroupMemberListAdapter(this, searchResultAndUsersToInvite, groupMembers, usersToInvite);
         mResultListView.setAdapter(mAdapter);
     }
 

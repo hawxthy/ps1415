@@ -55,7 +55,7 @@ public class Upload extends HttpServlet {
                     e.printStackTrace();
                 }
             }
-        }else if(checkIfBlackBoard.equals("true")){
+        }else if(checkIfBlackBoard != null){
             if (!blobKeys.isEmpty()) {
                 BlobKey blobKey = blobKeys.get(0);
                 try {

@@ -17,6 +17,7 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.Switch;
@@ -471,10 +472,10 @@ public class CreateUserGroupActivity extends BaseActivity {
 
                 // Setze die Beschreibung
                 String description;
-                if (checkGroupDescription) {
+                if (mGroupDescriptionEditText.getText().toString().length() > 0) {
                     description = mGroupDescriptionEditText.getText().toString();
                 } else {
-                    description = getString(R.string.defaultGroupDestription) + mTestName;
+                    description = getString(R.string.defaultGroupDestription) +" "+mTestName;
                 }
 
                 // Setze das Passwort
@@ -485,6 +486,10 @@ public class CreateUserGroupActivity extends BaseActivity {
 
                 // Prüft ob eine Securitygruppe erstellt werden soll
                 setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                mAcceptButton.setVisibility(View.GONE);
+                mCancelButton.setVisibility(View.GONE);
+                mPreviewButton.setVisibility(View.GONE);
+                mUploadButton.setVisibility(View.GONE);
                 GroupController.getInstance().createUserGroup(new ExtendedTaskDelegateAdapter<Void, Void>() {
                     @Override
                     public void taskDidFinish(ExtendedTask task, Void aVoid) {
@@ -495,7 +500,11 @@ public class CreateUserGroupActivity extends BaseActivity {
                     @Override
                     public void taskFailed(ExtendedTask task, String message) {
                         setProgressBarIndeterminateVisibility(Boolean.FALSE);
-
+                        mAcceptButton.setVisibility(View.VISIBLE);
+                        mCancelButton.setVisibility(View.VISIBLE);
+                        mPreviewButton.setVisibility(View.VISIBLE);
+                        mUploadButton.setVisibility(View.VISIBLE);
+                        Toast.makeText(CreateUserGroupActivity.this, message, Toast.LENGTH_LONG).show();
                     }
                 }, mTestName, type, password, privacy, description, mBlobKeyString);
             }
@@ -535,11 +544,17 @@ public class CreateUserGroupActivity extends BaseActivity {
                     }
                     // Bild hochladen
                     setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                    mUploadButton.setVisibility(View.GONE);
+                    mAcceptButton.setVisibility(View.GONE);
+                    mCancelButton.setVisibility(View.GONE);
                     GroupController.getInstance().uploadImageForPreview(new ExtendedTaskDelegateAdapter<Void, BlobKey>() {
                         @Override
                         public void taskDidFinish(ExtendedTask task, BlobKey blobKey) {
                             setProgressBarIndeterminateVisibility(Boolean.FALSE);
                             mPreviewButton.setVisibility(View.VISIBLE);
+                            mUploadButton.setVisibility(View.VISIBLE);
+                            mAcceptButton.setVisibility(View.VISIBLE);
+                            mCancelButton.setVisibility(View.VISIBLE);
                             mCheckImageUploadTextView.setText(R.string.uploadingDone);
                             mGroupPictureBlobKey = blobKey;
                             mBlobKeyString = blobKey.getKeyString();
@@ -551,6 +566,9 @@ public class CreateUserGroupActivity extends BaseActivity {
                             setProgressBarIndeterminateVisibility(Boolean.FALSE);
                             mCheckImageUploadTextView.setText(R.string.uploadingImageFailed);
                             checkGroupImage = false;
+                            mUploadButton.setVisibility(View.VISIBLE);
+                            mAcceptButton.setVisibility(View.VISIBLE);
+                            mCancelButton.setVisibility(View.VISIBLE);
                         }
                     }, ImageUtil.BitmapToInputStream(mBitmap), mBlobKeyString);
                 }
