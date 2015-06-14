@@ -43,7 +43,7 @@ public class MyUserGroupsActivity extends BaseFragmentActivity {
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        super.setContentView(NavDrawerGroupList.items, R.layout.activity_my_user_groups);
+        setContentView(R.layout.activity_my_user_groups);
         setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
         //Prüft ob der Benutzer eingeloggt ist

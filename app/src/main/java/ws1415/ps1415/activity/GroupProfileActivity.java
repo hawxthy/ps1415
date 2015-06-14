@@ -605,82 +605,117 @@ public class GroupProfileActivity extends BaseFragmentActivity {
      * muss dies bestätigen. Das Passwort bleibt dabei erhalten, wird jedoch nicht mehr beachtet.
      */
     public void startChangePrivacyAction() {
-        if (!group.getPrivat()) {
-            // Zeige Dialog mit Passwort um die Gruppe öffentlich zu machen
-            AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
-            LayoutInflater factory = LayoutInflater.from(GroupProfileActivity.this);
-            final View makeGroupPrivateView = factory.inflate(R.layout.make_group_private, null);
-            final EditText passwordEditText = (EditText) makeGroupPrivateView.findViewById(R.id.make_group_private_password);
-            final EditText passwordEditTextAgain = (EditText) makeGroupPrivateView.findViewById(R.id.make_group_private_password_again);
-            final TextView informView = (TextView) makeGroupPrivateView.findViewById(R.id.make_group_private_password_check_text_view);
+        if(!group.getGroupType().equals(UserGroupType.SECURITYGROUP.name())){
+            if (!group.getPrivat()) {
+                // Zeige Dialog mit Passwort um die Gruppe öffentlich zu machen
+                AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
+                LayoutInflater factory = LayoutInflater.from(GroupProfileActivity.this);
+                final View makeGroupPrivateView = factory.inflate(R.layout.make_group_private, null);
+                final EditText passwordEditText = (EditText) makeGroupPrivateView.findViewById(R.id.make_group_private_password);
+                final EditText passwordEditTextAgain = (EditText) makeGroupPrivateView.findViewById(R.id.make_group_private_password_again);
+                final TextView informView = (TextView) makeGroupPrivateView.findViewById(R.id.make_group_private_password_check_text_view);
 
-            checkGroupPassword = false;
-            //set listener for the EditTextViews
-            // EditText für das Passwort
-            passwordEditText.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                checkGroupPassword = false;
+                //set listener for the EditTextViews
+                // EditText für das Passwort
+                passwordEditText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (passwordEditText.getText().toString().equals(passwordEditTextAgain.getText().toString())) {
-                        informView.setText(R.string.checkPasswordPositive);
-                        informView.setTextColor(GroupProfileActivity.this.getResources().getColor(R.color.check_group_name_positive));
-                        checkGroupPassword = true;
-                    } else {
-                        informView.setText(R.string.checkPasswordNegative);
-                        informView.setTextColor(GroupProfileActivity.this.getResources().getColor(R.color.check_group_name_negative));
-                        checkGroupPassword = false;
                     }
-                    informView.setVisibility(View.VISIBLE);
-                }
-            });
 
-            // EditText für das wiederholte Passwort
-            passwordEditTextAgain.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    if (passwordEditText.getText().toString().equals(passwordEditTextAgain.getText().toString())) {
-                        informView.setText(R.string.checkPasswordPositive);
-                        informView.setTextColor(GroupProfileActivity.this.getResources().getColor(R.color.check_group_name_positive));
-                        checkGroupPassword = true;
-                    } else {
-                        informView.setText(R.string.checkPasswordNegative);
-                        informView.setTextColor(GroupProfileActivity.this.getResources().getColor(R.color.check_group_name_negative));
-                        checkGroupPassword = false;
                     }
-                    informView.setVisibility(View.VISIBLE);
-                }
-            });
-            altertadd.setView(makeGroupPrivateView);
-            altertadd.setMessage(R.string.makeGroupPrivateString);
-            altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (!passwordEditText.getText().toString().isEmpty() && checkGroupPassword) {
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        if (passwordEditText.getText().toString().equals(passwordEditTextAgain.getText().toString())) {
+                            informView.setText(R.string.checkPasswordPositive);
+                            informView.setTextColor(GroupProfileActivity.this.getResources().getColor(R.color.check_group_name_positive));
+                            checkGroupPassword = true;
+                        } else {
+                            informView.setText(R.string.checkPasswordNegative);
+                            informView.setTextColor(GroupProfileActivity.this.getResources().getColor(R.color.check_group_name_negative));
+                            checkGroupPassword = false;
+                        }
+                        informView.setVisibility(View.VISIBLE);
+                    }
+                });
+
+                // EditText für das wiederholte Passwort
+                passwordEditTextAgain.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+                        if (passwordEditText.getText().toString().equals(passwordEditTextAgain.getText().toString())) {
+                            informView.setText(R.string.checkPasswordPositive);
+                            informView.setTextColor(GroupProfileActivity.this.getResources().getColor(R.color.check_group_name_positive));
+                            checkGroupPassword = true;
+                        } else {
+                            informView.setText(R.string.checkPasswordNegative);
+                            informView.setTextColor(GroupProfileActivity.this.getResources().getColor(R.color.check_group_name_negative));
+                            checkGroupPassword = false;
+                        }
+                        informView.setVisibility(View.VISIBLE);
+                    }
+                });
+                altertadd.setView(makeGroupPrivateView);
+                altertadd.setMessage(R.string.makeGroupPrivateString);
+                altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (!passwordEditText.getText().toString().isEmpty() && checkGroupPassword) {
+                            setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                            GroupController.getInstance().makeUserGroupPrivat(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
+                                @Override
+                                public void taskDidFinish(ExtendedTask task, BooleanWrapper booleanWrapper) {
+                                    if (booleanWrapper.getValue()) {
+                                        setUpProfile();
+                                        Toast.makeText(GroupProfileActivity.this, R.string.your_group_is_private, Toast.LENGTH_LONG).show();
+                                    }
+                                }
+
+                                @Override
+                                public void taskFailed(ExtendedTask task, String message) {
+                                    Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                                    setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                                }
+                            }, groupName, passwordEditText.getText().toString());
+                            dialog.dismiss();
+                        }
+                    }
+                });
+                altertadd.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                altertadd.show();
+            } else {
+                AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
+                altertadd.setMessage(R.string.makeGroupOpenString);
+                altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
                         setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                        GroupController.getInstance().makeUserGroupPrivat(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
+                        GroupController.getInstance().makeUserGroupOpen(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
                             @Override
                             public void taskDidFinish(ExtendedTask task, BooleanWrapper booleanWrapper) {
                                 if (booleanWrapper.getValue()) {
                                     setUpProfile();
+                                    Toast.makeText(GroupProfileActivity.this, R.string.your_group_is_open, Toast.LENGTH_LONG).show();
                                 }
                             }
 
@@ -689,49 +724,20 @@ public class GroupProfileActivity extends BaseFragmentActivity {
                                 Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
                                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
                             }
-                        }, groupName, passwordEditText.getText().toString());
+                        }, groupName);
                         dialog.dismiss();
                     }
-                }
-            });
-            altertadd.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            altertadd.show();
-        } else {
-            AlertDialog.Builder altertadd = new AlertDialog.Builder(GroupProfileActivity.this);
-            altertadd.setMessage(R.string.makeGroupOpenString);
-            altertadd.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                    GroupController.getInstance().makeUserGroupOpen(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
-                        @Override
-                        public void taskDidFinish(ExtendedTask task, BooleanWrapper booleanWrapper) {
-                            if (booleanWrapper.getValue()) {
-                                setUpProfile();
-                            }
-                        }
-
-                        @Override
-                        public void taskFailed(ExtendedTask task, String message) {
-                            Toast.makeText(GroupProfileActivity.this, message, Toast.LENGTH_LONG).show();
-                            setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                        }
-                    }, groupName);
-                    dialog.dismiss();
-                }
-            });
-            altertadd.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            altertadd.show();
+                });
+                altertadd.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                altertadd.show();
+            }
+        }else{
+            Toast.makeText(this, R.string.cant_make_security_group_open, Toast.LENGTH_LONG).show();
         }
     }
 

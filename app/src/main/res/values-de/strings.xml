@@ -519,6 +519,9 @@
     <string name="edit_this_entry">Wollen Sie diese Nachricht editieren?</string>
     <string name="group_already_gone">The Group no longer exists</string>
     <string name="cant_distribute_rights_to_leader">Sie können keine Rechte an den Inhaber verteilen</string>
+    <string name="cant_make_security_group_open">Sie können eine gesonderte Gruppe nicht öffentlich machen</string>
+    <string name="your_group_is_open">Ihre Gruppe ist nun öffentlich</string>
+    <string name="your_group_is_private">Ihre Gruppe ist nun privat</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="deleteThisEntryQuestion">Diesen Eintrag löschen?</string>

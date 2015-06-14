@@ -477,6 +477,9 @@
     <string name="edit_this_entry">Edit this message?</string>
     <string name="group_already_gone">The Group no longer exists</string>
     <string name="cant_distribute_rights_to_leader">You can not distribute Rights to the Leader</string>
+    <string name="cant_make_security_group_open">You can not make Security groups open</string>
+    <string name="your_group_is_open">Your Group is now open</string>
+    <string name="your_group_is_private">Your Group is now private</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="deleteThisEntryQuestion">Delete this Entry?</string>
