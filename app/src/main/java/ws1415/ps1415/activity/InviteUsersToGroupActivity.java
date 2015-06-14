@@ -2,13 +2,19 @@ package ws1415.ps1415.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gc.materialdesign.views.ButtonFlat;
@@ -43,6 +49,7 @@ public class InviteUsersToGroupActivity extends Activity {
     // Attribute zur Gruppe
     private String groupName;
     private List<String> groupMembers;
+    private boolean textOkay;
 
 
     @Override
@@ -86,6 +93,8 @@ public class InviteUsersToGroupActivity extends Activity {
 
         usersToInvite = new ArrayList<>();
 
+        // Die Einladungsnachricht
+        textOkay = false;
         setButtonListener();
     }
 
@@ -127,25 +136,74 @@ public class InviteUsersToGroupActivity extends Activity {
             @Override
             public void onClick(View view) {
                 if (usersToInvite.size() > 0) {
-                    setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                    mAcceptButton.setVisibility(View.GONE);
-                    mCancelButton.setVisibility(View.GONE);
-                    GroupController.getInstance().sendInvitation(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                    AlertDialog.Builder altertadd = new AlertDialog.Builder(InviteUsersToGroupActivity.this);
+                    LayoutInflater factory = LayoutInflater.from(InviteUsersToGroupActivity.this);
+                    final View invitationMessageView = factory.inflate(R.layout.post_message, null);
+                    final EditText messageEditText = (EditText) invitationMessageView.findViewById(R.id.post_black_board_edit_text);
+                    final TextView failureText = (TextView) invitationMessageView.findViewById(R.id.failure_text_view);
+                    failureText.setText(R.string.textTooShort);
+                    failureText.setVisibility(View.VISIBLE);
+                    textOkay = false;
+
+                    messageEditText.addTextChangedListener(new TextWatcher() {
                         @Override
-                        public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                            setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                            Toast.makeText(InviteUsersToGroupActivity.this, R.string.sendDone, Toast.LENGTH_LONG).show();
-                            finish();
+                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
                         }
 
                         @Override
-                        public void taskFailed(ExtendedTask task, String message) {
-                            Toast.makeText(InviteUsersToGroupActivity.this, message, Toast.LENGTH_LONG).show();
-                            setProgressBarIndeterminateVisibility(Boolean.FALSE);
-                            mAcceptButton.setVisibility(View.VISIBLE);
-                            mCancelButton.setVisibility(View.VISIBLE);
+                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
                         }
-                    }, groupName, usersToInvite);
+
+                        @Override
+                        public void afterTextChanged(Editable editable) {
+                            if(messageEditText.getText().toString().length() < 2){
+                                failureText.setVisibility(View.VISIBLE);
+                                textOkay = false;
+                            }else{
+                                failureText.setVisibility(View.GONE);
+                                textOkay = true;
+                            }
+                        }
+                    });
+
+                    altertadd.setView(invitationMessageView);
+                    altertadd.setTitle(R.string.invitation_title);
+                    altertadd.setPositiveButton(R.string.sendButton, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if(textOkay){
+                                setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                                mAcceptButton.setVisibility(View.GONE);
+                                mCancelButton.setVisibility(View.GONE);
+                                GroupController.getInstance().sendInvitation(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                                    @Override
+                                    public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                                        Toast.makeText(InviteUsersToGroupActivity.this, R.string.sendDone, Toast.LENGTH_LONG).show();
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void taskFailed(ExtendedTask task, String message) {
+                                        Toast.makeText(InviteUsersToGroupActivity.this, message, Toast.LENGTH_LONG).show();
+                                        setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                                        mAcceptButton.setVisibility(View.VISIBLE);
+                                        mCancelButton.setVisibility(View.VISIBLE);
+                                    }
+                                }, groupName, usersToInvite, messageEditText.getText().toString());
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+                    altertadd.setNegativeButton(R.string.cancelButton, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    altertadd.show();
                 } else {
                     Toast.makeText(InviteUsersToGroupActivity.this, R.string.noUsersToInvite, Toast.LENGTH_LONG).show();
                 }

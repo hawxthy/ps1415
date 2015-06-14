@@ -37,7 +37,7 @@ public class UserGroup {
     private UserGroupType groupType;
     private BlobKey blobKey;
     @Index
-    @Load//(unless = {UserGroupBlackBoardTransport.class, UserGroupNewsBoardTransport.class})
+    @Load(unless = {UserGroupBlackBoardTransport.class, UserGroupNewsBoardTransport.class})
     private HashMap<String, ArrayList<String>> memberRights;
     @Load(unless = {UserGroupMetaData.class, UserGroupNewsBoardTransport.class, UserGroupVisibleMembers.class})
     private Ref<Board> blackBoard;

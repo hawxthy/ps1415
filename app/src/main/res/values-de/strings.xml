@@ -431,6 +431,7 @@
     <string name="sendDone">Einladungen wurden versand</string>
     <string name="noUsersToInvite">Sie haben niemanden zum Einladen ausgewählt</string>
     <string name="title_activity_invite_users_to_group">Neue Benutzer einladen</string>
+    <string name="invitation_title">Einladungsnachricht</string>
 
     <!-- MyUserGroupsActivity-->
     <string name="tooManyVisibleGroups">Sie haben zu viele sichtbare Gruppen</string>
@@ -522,6 +523,10 @@
     <string name="cant_make_security_group_open">Sie können eine gesonderte Gruppe nicht öffentlich machen</string>
     <string name="your_group_is_open">Ihre Gruppe ist nun öffentlich</string>
     <string name="your_group_is_private">Ihre Gruppe ist nun privat</string>
+    <string name="change_password_old">Altes Passwort</string>
+    <string name="change_password_new">Neues Passwort</string>
+    <string name="change_password_new_repeat">Passwort wiederholen</string>
+
 
     <!-- GroupBlackBoardFragment-->
     <string name="deleteThisEntryQuestion">Diesen Eintrag löschen?</string>

@@ -204,8 +204,8 @@ public class UsergroupAdapter extends BaseAdapter {
                 String groupName = getItem(position).getName();
                 final MyUserGroupsActivity activity = (MyUserGroupsActivity) context;
                 //Setzen der Icons
-                holder.hiddenCancelButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_eye_off_black_24dp));
-                holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_eye_black_24dp));
+                holder.hiddenCancelButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_eye_black_24dp));
+                holder.hiddenSecurityButton.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_eye_off_black_24dp));
                 // Prüfe auf Sichtbarkeit und mache die Buttons dementsprechend sichtbar
                 if (PrefManager.getGroupVisibility(context, groupName)) {
                     if(!visibleGroupCount.contains(groupName)){

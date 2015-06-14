@@ -412,12 +412,12 @@ public class GroupController {
      * @param groupName die UserGroup zu der die Einladung verschickt wird
      * @param users     Die EndUser, die die Einladung erhalten soll
      */
-    public void sendInvitation(ExtendedTaskDelegate handler, String groupName, final List<String> users) {
+    public void sendInvitation(ExtendedTaskDelegate handler, String groupName, final List<String> users, final String invitationMessage) {
         new ExtendedTask<String, Void, Void>(handler) {
             @Override
             protected Void doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().groupEndpoint().sendInvitation(params[0], new ListWrapper().setStringList(users)).execute();
+                    return ServiceProvider.getService().groupEndpoint().sendInvitation(params[0], invitationMessage, new ListWrapper().setStringList(users)).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Fehler: Die Einladung konnte nicht versendet werden");
