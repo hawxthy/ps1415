@@ -3,8 +3,10 @@ package ws1415.ps1415.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.text.Html;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -96,7 +98,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
 
     @Override
     public PictureMetaData getItem(int position) {
-        if (fetching && position == pictures.size()) {
+        if (position >= pictures.size()) {
             return null;
         }
         return pictures.get(position);
@@ -127,7 +129,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        View view;
+        final View view;
         if (position == pictures.size()) {
             // Ladeanzeige
             if (convertView != null && getItemViewType(position) == LOAD_VIEW_TYPE) {
@@ -136,7 +138,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
                 view = View.inflate(parent.getContext(), R.layout.listitem_fetching, null);
             }
         } else {
-            PictureMetaData picture = getItem(position);
+            final PictureMetaData picture = getItem(position);
             if (convertView != null && getItemViewType(position) == PICTURE_VIEW_TYPE) {
                 view = convertView;
             } else {
@@ -149,27 +151,33 @@ public class PictureMetaDataAdapter extends BaseAdapter {
             TextView date = (TextView) view.findViewById(R.id.date);
             if (picture.getId() >= 0) {
                 view.findViewById(R.id.notVisibleText).setVisibility(View.INVISIBLE);
-                if (thumbnail.getHeight() > 0 && thumbnail.getWidth() > 0) {
-                    // Bild nur abrufen, wenn der Thumbnail-View Größen zugeordnet wurden
-                    if (position < bitmaps.size() && bitmaps.get(position) != null) {
-                        thumbnail.setImageBitmap(bitmaps.get(position));
-                    } else {
-                        DiskCacheImageLoader.getInstance().loadScaledImage(thumbnail, picture.getImageBlobKey(), Math.min(thumbnail.getHeight(), thumbnail.getWidth()));
-                        final View finalView = view;
-                        thumbnail.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                            @Override
-                            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                                if (thumbnail.getDrawable() != null) {
-                                    bitmaps.ensureCapacity(position + 1);
-                                    while (position > bitmaps.size()) {
-                                        bitmaps.add(null);
+                if (position < bitmaps.size() && bitmaps.get(position) != null) {
+                    thumbnail.setImageBitmap(bitmaps.get(position));
+                } else {
+                    // Das Bild kann erst in der richtigen Größe abgerufen werden, wenn die ImageView
+                    // eine Breite über das Layout erhalten hat. Aus diesem Grund füge ich einen Listener
+                    // hinzu, der zu diesem Zeitpunkt aufgerufen wird und das Bild abruft
+                    thumbnail.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                        @Override
+                        public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                            DiskCacheImageLoader.getInstance().loadScaledImage(thumbnail, picture.getImageBlobKey(), right - left);
+                            final View finalView = view;
+                            thumbnail.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                                @Override
+                                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                                    if (thumbnail.getDrawable() != null) {
+                                        bitmaps.ensureCapacity(position + 1);
+                                        while (position > bitmaps.size()) {
+                                            bitmaps.add(null);
+                                        }
+                                        bitmaps.add(position, ((BitmapDrawable) thumbnail.getDrawable()).getBitmap());
+                                        finalView.removeOnLayoutChangeListener(this);
                                     }
-                                    bitmaps.add(position, ((BitmapDrawable) thumbnail.getDrawable()).getBitmap());
-                                    finalView.removeOnLayoutChangeListener(this);
                                 }
-                            }
-                        });
-                    }
+                            });
+                            thumbnail.removeOnLayoutChangeListener(this);
+                        }
+                    });
                 }
                 title.setText(picture.getTitle());
                 ((TextView) view.findViewById(R.id.avgSymbol)).setText(Html.fromHtml(view.getResources().getString(R.string.average)));
@@ -214,7 +222,6 @@ public class PictureMetaDataAdapter extends BaseAdapter {
         }
 
         // Lade-Icon anzeigen lassen
-        fetching = true;
         notifyDataSetChanged();
 
         if (refresh) {

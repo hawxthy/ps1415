@@ -99,7 +99,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
      * dem Bundle wiederhergestellt wurden.
      */
     private boolean firstFetchAfterRestoring;
-    private long restoredGalleryPosition = -1;
+    private long restoredGalleryPosition = -2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +136,12 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
             galleries.setAdapter(galleryAdapter);
             firstFetchAfterRestoring = true;
             restoredGalleryPosition = savedInstanceState.getLong(MEMBER_GALLERY_POSITION);
+            if (restoredGalleryPosition == 0) {
+                // Bei 0 als Position wird der ItemSelectedListener nur einmal aufgerufen
+                // Es muss daher nur die erste Auswahl des Items ignoriert werden, da es sich
+                // dabei schon um den Eintrag handelt, der weitere selektiert bleibt
+                restoredGalleryPosition = -2;
+            }
 
             // PictureAdapter wiederherstellen
             PictureFilter filter = ((SerializablePictureFilter) savedInstanceState.getSerializable(MEMBER_PICTURE_FILTER)).getPictureFilter();
@@ -187,7 +193,7 @@ public class ListPicturesActivity extends Activity implements PictureListFragmen
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == restoredGalleryPosition) {
-                    restoredGalleryPosition = -1;
+                    restoredGalleryPosition = -2;
                     return;
                 }
                 if (!firstFetchAfterRestoring) {
