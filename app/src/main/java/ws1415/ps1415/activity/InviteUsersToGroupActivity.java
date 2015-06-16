@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -99,6 +100,37 @@ public class InviteUsersToGroupActivity extends Activity {
     }
 
     private void setButtonListener(){
+        mSearchUserEditText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                if (i == KeyEvent.KEYCODE_ENTER){
+                    if (mSearchUserEditText.getText().length() > 0) {
+                        setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                        UserController.searchUsers(new ExtendedTaskDelegateAdapter<Void, List<String>>() {
+                            @Override
+                            public void taskDidFinish(ExtendedTask task, List<String> strings) {
+                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                                if (strings != null && !strings.isEmpty()) {
+                                    setAdapter(strings);
+                                } else {
+                                    Toast.makeText(InviteUsersToGroupActivity.this, R.string.nothingFound, Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void taskFailed(ExtendedTask task, String message) {
+                                Toast.makeText(InviteUsersToGroupActivity.this, message, Toast.LENGTH_LONG).show();
+                                setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                            }
+                        }, mSearchUserEditText.getText().toString());
+                    }
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        });
+
         mSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
