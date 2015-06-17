@@ -8,60 +8,60 @@
     </facet>
     <facet type="android" name="Android">
       <configuration>
-        <option name="SELECTED_BUILD_VARIANT" value="userRelease" />
+        <option name="SELECTED_BUILD_VARIANT" value="hostRelease" />
         <option name="SELECTED_TEST_ARTIFACT" value="_android_test_" />
-        <option name="ASSEMBLE_TASK_NAME" value="assembleUserRelease" />
-        <option name="COMPILE_JAVA_TASK_NAME" value="compileUserReleaseSources" />
-        <option name="SOURCE_GEN_TASK_NAME" value="generateUserReleaseSources" />
-        <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleUserReleaseAndroidTest" />
-        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileUserReleaseAndroidTestSources" />
-        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateUserReleaseAndroidTestSources" />
+        <option name="ASSEMBLE_TASK_NAME" value="assembleHostRelease" />
+        <option name="COMPILE_JAVA_TASK_NAME" value="compileHostReleaseSources" />
+        <option name="SOURCE_GEN_TASK_NAME" value="generateHostReleaseSources" />
+        <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleHostReleaseAndroidTest" />
+        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileHostReleaseAndroidTestSources" />
+        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateHostReleaseAndroidTestSources" />
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="MANIFEST_FILE_RELATIVE_PATH" value="/src/main/AndroidManifest.xml" />
         <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
-        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/src/main/res;file://$MODULE_DIR$/src/user/res" />
+        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/src/main/res;file://$MODULE_DIR$/src/host/res" />
         <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/src/main/assets" />
       </configuration>
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/build/intermediates/classes/user/release" />
-    <output-test url="file://$MODULE_DIR$/build/intermediates/classes/androidTest/user/release" />
+    <output url="file://$MODULE_DIR$/build/intermediates/classes/host/release" />
+    <output-test url="file://$MODULE_DIR$/build/intermediates/classes/androidTest/host/release" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/user/release" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/user/release" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/user/release" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/user/release" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/user/release" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/user/release" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/userRelease/res" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/userRelease/resources" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/userRelease/assets" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/userRelease/aidl" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/userRelease/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/userRelease/jni" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/userRelease/rs" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/user/release" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/user/release" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/user/release" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/user/release" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/user/release" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/androidTest/user/release" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/user/res" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/user/resources" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/user/assets" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/user/aidl" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/user/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/user/jni" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/user/rs" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestUser/res" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestUser/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestUser/assets" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestUser/aidl" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestUser/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestUser/jni" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestUser/rs" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/host/release" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/host/release" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/host/release" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/host/release" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/host/release" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/host/release" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/hostRelease/res" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/hostRelease/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/hostRelease/assets" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/hostRelease/aidl" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/hostRelease/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/hostRelease/jni" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/hostRelease/rs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/host/release" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/host/release" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/host/release" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/host/release" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/host/release" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/androidTest/host/release" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/host/res" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/host/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/host/assets" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/host/aidl" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/host/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/host/jni" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/host/rs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestHost/res" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestHost/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestHost/assets" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestHost/aidl" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestHost/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestHost/jni" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestHost/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/release/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/release/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/release/assets" type="java-resource" />
@@ -123,8 +123,8 @@
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="gson-2.2.2" level="project" />
     <orderEntry type="library" exported="" name="eventbus-2.4.0" level="project" />
-    <orderEntry type="library" exported="" name="httpclient-android-4.3.5" level="project" />
     <orderEntry type="library" exported="" name="google-http-client-jackson2-1.20.0" level="project" />
+    <orderEntry type="library" exported="" name="httpclient-android-4.3.5" level="project" />
     <orderEntry type="library" exported="" name="google-api-client-android-1.20.0" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="httpmime-4.3.6" level="project" />
