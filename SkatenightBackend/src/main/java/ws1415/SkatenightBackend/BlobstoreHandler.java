@@ -5,6 +5,7 @@ import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.images.ImagesService;
 import com.google.appengine.api.images.ImagesServiceFactory;
+import com.google.appengine.api.images.ImagesServiceFailureException;
 import com.google.appengine.api.images.ServingUrlOptions;
 
 import java.io.IOException;
@@ -117,18 +118,46 @@ public class BlobstoreHandler extends HttpServlet {
         if (req.getParameter("crop") != null) {
             // Crop
             int imageSize = Integer.parseInt(req.getParameter("crop"));
-            String servingUrl = imagesService.getServingUrl(ServingUrlOptions.Builder.withBlobKey(key).imageSize(imageSize).crop(true));
-            resp.setCharacterEncoding("UTF-8");
-            resp.getWriter().print(servingUrl);
-            resp.getWriter().flush();
-            resp.getWriter().close();
+            int retries = 3;
+            String servingUrl = null;
+            do {
+                try {
+                    servingUrl = imagesService.getServingUrl(ServingUrlOptions.Builder.withBlobKey(key).imageSize(imageSize).crop(true));
+                } catch (ImagesServiceFailureException ex) {
+                    log("Fehler beim Aufrufen des ImagesService.", ex);
+                }
+                retries--;
+            } while (retries > 0 && servingUrl == null);
+            if (servingUrl != null) {
+                resp.setCharacterEncoding("UTF-8");
+                resp.getWriter().print(servingUrl);
+                resp.getWriter().flush();
+                resp.getWriter().close();
+            } else {
+                log("ImageService konnte auch nach mehreren Versuchen nicht erreicht werden. Das Bild wird in Originalgröße zurückgegeben.");
+                blobstoreService.serve(key, resp);
+            }
         } else if (req.getParameter("scale") != null) {
             int size = Integer.parseInt(req.getParameter("scale"));
-            String servingUrl = imagesService.getServingUrl(ServingUrlOptions.Builder.withBlobKey(key).imageSize(size).crop(false));
-            resp.setCharacterEncoding("UTF-8");
-            resp.getWriter().print(servingUrl);
-            resp.getWriter().flush();
-            resp.getWriter().close();
+            int retries = 3;
+            String servingUrl = null;
+            do {
+                try {
+                    servingUrl = imagesService.getServingUrl(ServingUrlOptions.Builder.withBlobKey(key).imageSize(size).crop(false));
+                } catch (ImagesServiceFailureException ex) {
+                    log("Fehler beim Aufrufen des ImagesService.", ex);
+                }
+                retries--;
+            } while (retries > 0 && servingUrl == null);
+            if (servingUrl != null) {
+                resp.setCharacterEncoding("UTF-8");
+                resp.getWriter().print(servingUrl);
+                resp.getWriter().flush();
+                resp.getWriter().close();
+            } else {
+                log("ImageService konnte auch nach mehreren Versuchen nicht erreicht werden. Das Bild wird in Originalgröße zurückgegeben.");
+                blobstoreService.serve(key, resp);
+            }
         } else {
             blobstoreService.serve(key, resp);
         }

@@ -133,15 +133,18 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
     }
 
     private void refreshLocalAnalysisButton() {
-        if (event != null && event.getMemberList().containsKey(ServiceProvider.getEmail())
-                && event.getDate().getValue() < System.currentTimeMillis()) {
+        if (event != null && event.getDate().getValue() < System.currentTimeMillis()) {
             LocalStorageUtil localStorageUtil = new LocalStorageUtil(ShowEventActivity.this);
             if (localStorageUtil.getData(String.valueOf(event.getId())) != null) {
                 showActiveEvent.setText(R.string.show_passed_event);
             } else {
                 showActiveEvent.setText(R.string.show_active_event);
+                if (event.getMemberList().containsKey(ServiceProvider.getEmail())) {
+                    showActiveEvent.setVisibility(View.VISIBLE);
+                } else {
+                    showActiveEvent.setVisibility(View.GONE);
+                }
             }
-            showActiveEvent.setVisibility(View.VISIBLE);
         } else {
             showActiveEvent.setVisibility(View.GONE);
         }
@@ -395,7 +398,9 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
             public void taskDidFinish(ExtendedTask task, EventRole role) {
                 joinLeaveEventItem.setTitle(R.string.leave_event);
                 event.getMemberList().put(ServiceProvider.getEmail(), role.name());
+                eventRoles.put(ServiceProvider.getEmail(), role);
                 event.setParticipationVisibility(visibility.name());
+                LocationTransmitterService.ScheduleService(ShowEventActivity.this, eventId, new Date(event.getDate().getValue()));
                 refreshLocalAnalysisButton();
                 finish();
             }
