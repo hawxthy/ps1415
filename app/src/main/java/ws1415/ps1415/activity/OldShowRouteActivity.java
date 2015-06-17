@@ -486,31 +486,39 @@ public class OldShowRouteActivity extends Activity {
 
         // Ordner und Sanitäter abrufen
         new AsyncTask<Void, Void, Void>() {
+            EventRole[] roles = new EventRole[] {
+                    EventRole.MARSHALL,
+                    EventRole.MEDIC};
+            BitmapDescriptor[] icons = new BitmapDescriptor[]{
+                    BitmapDescriptorFactory.fromResource(R.drawable.ic_security_black_24dp),
+                    BitmapDescriptorFactory.fromResource(R.drawable.ic_plus_circle_outline_black_24dp)};
+            List<UserLocationInfo>[] locations = new List[roles.length];
+
             @Override
             protected Void doInBackground(Void... params) {
-                EventRole[] roles = new EventRole[] {
-                        EventRole.MARSHALL,
-                        EventRole.MEDIC};
-                BitmapDescriptor[] icons = new BitmapDescriptor[]{
-                        BitmapDescriptorFactory.fromResource(R.drawable.ic_security_black_24dp),
-                        BitmapDescriptorFactory.fromResource(R.drawable.ic_plus_circle_outline_black_24dp)};
                 for (int i = 0; i < roles.length; i++) {
                     try {
-                        List<UserLocationInfo> locations = ServiceProvider.getService().eventEndpoint().getEventRolePositions(eventId, roles[i].name()).execute().getItems();
-                        if (locations != null) {
-                            for (UserLocationInfo location : locations) {
-                                groupMarker.add(googleMap.addMarker(new MarkerOptions()
-                                        .title(getResources().getStringArray(R.array.event_roles)[roles[i].ordinal()])
-                                        .icon(icons[i])
-                                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                                        .draggable(false)));
-                            }
-                        }
+                        locations[i] = ServiceProvider.getService().eventEndpoint().getEventRolePositions(eventId, roles[i].name()).execute().getItems();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
                 return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                for (int i = 0; i < roles.length; i++) {
+                    if (locations[i] != null) {
+                        for (UserLocationInfo location : locations[i]) {
+                            groupMarker.add(googleMap.addMarker(new MarkerOptions()
+                                    .title(getResources().getStringArray(R.array.event_roles)[roles[i].ordinal()])
+                                    .icon(icons[i])
+                                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                                    .draggable(false)));
+                        }
+                    }
+                }
             }
         }.execute();
     }
