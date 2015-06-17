@@ -385,8 +385,9 @@ public class MessageDbController {
         // Neue letzte Nachricht setzen
         if (cursor.moveToFirst() && deleteSucceed) {
             Long newLastMessageId = cursor.getLong(cursor.getColumnIndex(MessageDbHelper.KEY_ID_MESSAGE));
+            Conversation conversation = getConversation(userMail);
 
-            if(getConversation(userMail).getLastMessage().get_id() != newLastMessageId) {
+            if(conversation.getLastMessage() == null || getConversation(userMail).getLastMessage().get_id() != newLastMessageId) {
                 ContentValues values = new ContentValues();
                 values.put(MessageDbHelper.FOREIGN_KEY_LAST_MESSAGE, newLastMessageId);
 

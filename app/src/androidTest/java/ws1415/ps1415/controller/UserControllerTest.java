@@ -48,8 +48,8 @@ import ws1415.ps1415.util.ImageUtil;
  * - {@code ADMIN_MAIL}
  * - {@code TEST_MAIL_1}
  * - {@code TEST_MAIL_2}
- * Dazu müssen diese in den Einstellungen des Gerätes mit dem Passwort: "skatenight123" hinzugefügt
- * werden.
+ * Dazu müssen diese in den Einstellungen des Gerätes mit dem Passwort, das in der Dokumenation
+ * zu finden ist, hinzugefügt werden.
  *
  * @author Martin Wrodarczyk
  */
@@ -496,7 +496,6 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
     // Damit beim Abrufen der PrimaryData, der Abruf des Profilbildes getestet werden kann
     private BlobKey uploadUserPicture() throws InterruptedException {
         final Bitmap pictureTest = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.default_picture);
-        final byte[] pictureTestByte = ImageUtil.BitmapToByteArray(pictureTest);
         final BlobKey[] retrievedImageKey = new BlobKey[1];
 
         final CountDownLatch updateSignal = new CountDownLatch(1);

@@ -5,8 +5,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -90,10 +88,6 @@ public class MessagingActivity extends BaseActivity {
                 return true;
             }
         });
-    }
-
-    public void searchButtonClick(View view) {
-
     }
 
     /**
@@ -239,21 +233,5 @@ public class MessagingActivity extends BaseActivity {
                 })
                 .setIcon(R.drawable.ic_action_discard)
                 .show();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_messaging, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }
