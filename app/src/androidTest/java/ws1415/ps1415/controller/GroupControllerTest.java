@@ -58,10 +58,6 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
 
         MY_MAIL = getAccountMail(0);
 
-        if(ServiceProvider.getService().groupEndpoint().getUserGroup(TEST_GROUP_NAME).execute() != null){
-            ServiceProvider.getService().groupEndpoint().deleteUserGroup(TEST_GROUP_NAME).execute();
-        }
-
         // Nutzergruppe erstellen, die bei jedem Test benötigt wird.
         final CountDownLatch signal = new CountDownLatch(1);
 
@@ -148,9 +144,9 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
     public void testPostBlackBoard() {
         final CountDownLatch signal = new CountDownLatch(1);
 
-        GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, BoardEntry>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+            public void taskDidFinish(ExtendedTask task, BoardEntry be) {
                 signal.countDown();
             }
         }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE, null);
@@ -184,9 +180,9 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         }
 
         final CountDownLatch signal3 = new CountDownLatch(1);
-        GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, BoardEntry>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+            public void taskDidFinish(ExtendedTask task, BoardEntry be) {
                 signal3.countDown();
             }
         }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE_2, null);
@@ -221,9 +217,9 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
     @SmallTest
     public void testRemoveBlackBoardMessage() {
         final CountDownLatch signal = new CountDownLatch(1);
-        GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, BoardEntry>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+            public void taskDidFinish(ExtendedTask task, BoardEntry be) {
                 signal.countDown();
             }
         }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE, null);
@@ -787,9 +783,10 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         MY_MAIL = getAccountMail(0);
         MY_SECOND_MAIL = getAccountMail(1);
 
-        GroupController.getInstance().makeUserGroupPrivat(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().makeUserGroupPrivat(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+            public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
+                assertTrue("Die Nutzergruppe sollte privat sein", result.getValue());
                 signal.countDown();
             }
         }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD);
@@ -844,6 +841,7 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         }catch (InterruptedException e){
             e.printStackTrace();
         }
+        changeAccount(0);
     }
 
     @SmallTest
@@ -879,9 +877,18 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
 
         MY_MAIL = getAccountMail(0);
 
-        GroupController.getInstance().changeMyVisibility(new ExtendedTaskDelegateAdapter<Void, Void>(){
+        GroupController.getInstance().changeMyVisibility(new ExtendedTaskDelegateAdapter<Void, UserGroupVisibleMembers>(){
             @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid){
+            public void taskDidFinish(ExtendedTask task, UserGroupVisibleMembers visibleMembers){
+                found = false;
+                if (visibleMembers.getVisibleMembers() != null) {
+                    for (String visibleMember : visibleMembers.getVisibleMembers()) {
+                        if (visibleMember.equals(MY_MAIL)) {
+                            found = true;
+                        }
+                    }
+                }
+                assertFalse("Das Mitglied " + MY_MAIL + "sollte nicht sichtbar sein", found);
                 signal.countDown();
             }
         }, TEST_GROUP_NAME);
@@ -891,46 +898,9 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
             e.printStackTrace();
         }
 
-        final CountDownLatch signal2 = new CountDownLatch(1);
-
-        GroupController.getInstance().getUserGroupVisibleMembers(new ExtendedTaskDelegateAdapter<Void, UserGroupVisibleMembers>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, UserGroupVisibleMembers visibleMembers) {
-                found = false;
-                if (visibleMembers.getVisibleMembers() != null) {
-                    for (String visibleMember : visibleMembers.getVisibleMembers()) {
-                        if (visibleMember.equals(MY_MAIL)) {
-                            found = true;
-                        }
-                    }
-                }
-                assertFalse("Das Mitglied " + MY_MAIL + "sollte nicht mehr sichtbar sein", found);
-                signal2.countDown();
-            }
-        }, TEST_GROUP_NAME);
-        try{
-            assertTrue("getUserGroupVisibleMembers failed", signal2.await(30, TimeUnit.SECONDS));
-        }catch (InterruptedException e){
-            e.printStackTrace();
-        }
-
         final CountDownLatch signal3 = new CountDownLatch(1);
 
-        GroupController.getInstance().changeMyVisibility(new ExtendedTaskDelegateAdapter<Void, Void>(){
-            @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid){
-                signal3.countDown();
-            }
-        }, TEST_GROUP_NAME);
-        try{
-            assertTrue("changeMyVisibility failed", signal3.await(30, TimeUnit.SECONDS));
-        }catch (InterruptedException e){
-            e.printStackTrace();
-        }
-
-        final CountDownLatch signal4 = new CountDownLatch(1);
-
-        GroupController.getInstance().getUserGroupVisibleMembers(new ExtendedTaskDelegateAdapter<Void, UserGroupVisibleMembers>() {
+        GroupController.getInstance().changeMyVisibility(new ExtendedTaskDelegateAdapter<Void, UserGroupVisibleMembers>() {
             @Override
             public void taskDidFinish(ExtendedTask task, UserGroupVisibleMembers visibleMembers) {
                 found = false;
@@ -942,11 +912,11 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
                     }
                 }
                 assertTrue("Das Mitglied " + MY_MAIL + "sollte wieder sichtbar sein", found);
-                signal4.countDown();
+                signal3.countDown();
             }
         }, TEST_GROUP_NAME);
         try{
-            assertTrue("getUserGroupVisibleMembers failed", signal4.await(30, TimeUnit.SECONDS));
+            assertTrue("changeMyVisibility failed", signal3.await(30, TimeUnit.SECONDS));
         }catch (InterruptedException e){
             e.printStackTrace();
         }
@@ -959,9 +929,10 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
         MY_MAIL = getAccountMail(0);
         MY_SECOND_MAIL = getAccountMail(1);
 
-        GroupController.getInstance().makeUserGroupPrivat(new ExtendedTaskDelegateAdapter<Void, Void>() {
+        GroupController.getInstance().makeUserGroupPrivat(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
             @Override
-            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+            public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
+                assertTrue("Die Nutzergruppe sollte nun privat sein", result.getValue());
                 signal.countDown();
             }
         }, TEST_GROUP_NAME, TEST_GROUP_PASSWORD);

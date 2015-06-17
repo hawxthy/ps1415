@@ -819,14 +819,18 @@ public class GroupController {
             protected Bitmap doInBackground(String... params) {
                 try {
                     blobKey = ServiceProvider.getService().groupEndpoint().getUserGroupPicture(params[0]).execute();
-                    HttpClient client = new DefaultHttpClient();
-                    HttpGet get = new HttpGet(Constants.SERVER_URL + "/Bernd/images/serve?key=" + blobKey.getKeyString());
-                    HttpResponse response = client.execute(get);
-                    HttpEntity httpEntity = response.getEntity();
+                    if(blobKey != null){
+                        HttpClient client = new DefaultHttpClient();
+                        HttpGet get = new HttpGet(Constants.SERVER_URL + "/Bernd/images/serve?key=" + blobKey.getKeyString());
+                        HttpResponse response = client.execute(get);
+                        HttpEntity httpEntity = response.getEntity();
 
-                    is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
-                    Bitmap bitmap = BitmapFactory.decodeStream(is);
-                    return bitmap;
+                        is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
+                        Bitmap bitmap = BitmapFactory.decodeStream(is);
+                        return bitmap;
+                    }else{
+                        return null;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Fehler: Das Bild konnte nicht abgerufen werden");
