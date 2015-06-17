@@ -146,6 +146,7 @@ public class GroupController {
      * @return Eine Liste der Metadaten zu den sichtbaren Gruppen.
      */
     public List<UserGroupMetaData> getVisibleUserGroups(final Context context) {
+        // wahrscheinlich nicht nötig
         UserGroupFilter filter = new UserGroupFilter();
         filter.setLimit(1000);
         final List<UserGroupMetaData> visibleGroups = new ArrayList<>();

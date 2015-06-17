@@ -5,8 +5,10 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.skatenight.skatenightAPI.model.BoardEntry;
 import com.skatenight.skatenightAPI.model.BooleanWrapper;
+import com.skatenight.skatenightAPI.model.Comment;
 import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
+import com.skatenight.skatenightAPI.model.UserGroupFilter;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 import com.skatenight.skatenightAPI.model.UserGroupNewsBoardTransport;
 import com.skatenight.skatenightAPI.model.UserGroupVisibleMembers;
@@ -50,6 +52,7 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
     // Variablen zum füllen von wichtigen Attributen, wie BoardEntries
     private boolean found;
     private Long boardEntryId;
+    private long commentId;
 
 
     @Override
@@ -979,21 +982,380 @@ public class GroupControllerTest extends AuthenticatedAndroidTestCase {
 
     @SmallTest
     public void testGetUserGroupPicture(){
-        //TODO testen
         final CountDownLatch signal = new CountDownLatch(1);
 
-        GroupController.getInstance().getUserGroupPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>(){
+        GroupController.getInstance().getUserGroupPicture(new ExtendedTaskDelegateAdapter<Void, Bitmap>() {
             @Override
             public void taskDidFinish(ExtendedTask task, Bitmap bitmap) {
-                if(bitmap !=null){
+                if (bitmap != null) {
                     signal.countDown();
                 }
                 signal.countDown();
             }
-        },TEST_GROUP_NAME);
+        }, TEST_GROUP_NAME);
         try{
             assertTrue("getUserGroupPicture failed", signal.await(30, TimeUnit.SECONDS));
         }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+    }
+
+    @SmallTest
+    public void testCheckGroupName(){
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        GroupController.getInstance().checkGroupName(new ExtendedTaskDelegateAdapter<Void, BooleanWrapper>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, BooleanWrapper result) {
+                assertFalse("Der Name " + TEST_GROUP_NAME + " sollte vergeben sein", result.getValue());
+                signal.countDown();
+            }
+        }, TEST_GROUP_NAME);
+        try{
+            assertTrue("checkGroupName failed", signal.await(30, TimeUnit.SECONDS));
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+    }
+
+    @SmallTest
+    public void testFetchSpecificGroupDatas(){
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        ArrayList<String> groupList = new ArrayList<>();
+        groupList.add(TEST_GROUP_NAME);
+
+        GroupController.getInstance().fetchSpecificGroupDatas(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> userGroupMetaDatas) {
+                found = false;
+                for (UserGroupMetaData metaData : userGroupMetaDatas) {
+                    if (metaData.getName().equals(TEST_GROUP_NAME)) {
+                        found = true;
+                    }
+                }
+                assertTrue("Die Nutzergruppe " + TEST_GROUP_NAME + " sollte gefunden worden sein", found);
+                signal.countDown();
+            }
+        }, groupList);
+        try{
+            assertTrue("fetchSpecificGroupDatas failed", signal.await(30, TimeUnit.SECONDS));
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Kann nur funktionieren, falls der Aufrufer Mitglied in weniger als 100 Nutzergruppen ist.
+     */
+    @SmallTest
+    public void testGetMyUserGroups(){
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        UserGroupFilter filter = new UserGroupFilter();
+        filter.setLimit(100);
+
+        GroupController.getInstance().getMyUserGroups(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> userGroupMetaDatas) {
+                found = false;
+
+                for (UserGroupMetaData metaData : userGroupMetaDatas) {
+                    if (metaData.getName().equals(TEST_GROUP_NAME)) {
+                        found = true;
+                    }
+                }
+                assertTrue("Die Nutzergruppe " + TEST_GROUP_NAME + " sollte enthalten sein", found);
+                signal.countDown();
+            }
+        }, filter);
+        try{
+            assertTrue("getMyUserGroups failed", signal.await(30, TimeUnit.SECONDS));
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Kann nur funktionieren, falls es nicht mehr als 100 Nutzergruppen gibt die mit
+     * Testgruppe1 beginnen.
+     */
+    @SmallTest
+    public void testSearchUserGroups(){
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        UserGroupFilter filter = new UserGroupFilter();
+        filter.setLimit(100);
+
+        GroupController.getInstance().searchUserGroups(new ExtendedTaskDelegateAdapter<Void, List<UserGroupMetaData>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<UserGroupMetaData> userGroupMetaDatas) {
+                found = false;
+
+                for (UserGroupMetaData metaData : userGroupMetaDatas) {
+                    if (metaData.getName().equals(TEST_GROUP_NAME)) {
+                        found = true;
+                    }
+                }
+                assertTrue("Die Nutzergruppe " + TEST_GROUP_NAME + " sollte enthalten sein", found);
+                signal.countDown();
+            }
+        }, TEST_GROUP_NAME, filter);
+        try{
+            assertTrue("searchUserGroups failed", signal.await(30, TimeUnit.SECONDS));
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+    }
+
+    @SmallTest
+    public void testCommentBlackBoard(){
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, BoardEntry>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, BoardEntry be) {
+                boardEntryId = be.getId();
+                signal.countDown();
+            }
+        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE, null);
+        try {
+            assertTrue("postBlackBoard failed", signal.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal2 = new CountDownLatch(1);
+
+        GroupController.getInstance().commentBlackBoard(new ExtendedTaskDelegateAdapter<Void, BoardEntry>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, BoardEntry boardEntry) {
+                found = false;
+                for (Comment comment : boardEntry.getComments()) {
+                    if (comment.getMessage().equals(TEST_BLACK_BOARD_MESSAGE)) {
+                        found = true;
+                    }
+                }
+                assertTrue("Die Nachricht " + TEST_BLACK_BOARD_MESSAGE + " sollte als Kommentar enthalten sein", found);
+                signal2.countDown();
+            }
+        }, boardEntryId, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE);
+        try {
+            assertTrue("commentBlackBoard failed", signal2.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SmallTest
+    public void testDeleteComment(){
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, BoardEntry>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, BoardEntry be) {
+                boardEntryId = be.getId();
+                signal.countDown();
+            }
+        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE, null);
+        try {
+            assertTrue("postBlackBoard failed", signal.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal2 = new CountDownLatch(1);
+
+        GroupController.getInstance().commentBlackBoard(new ExtendedTaskDelegateAdapter<Void, BoardEntry>(){
+            @Override
+            public void taskDidFinish(ExtendedTask task, BoardEntry boardEntry) {
+                found = false;
+                for(Comment comment : boardEntry.getComments()){
+                    if(comment.getMessage().equals(TEST_BLACK_BOARD_MESSAGE)){
+                        found = true;
+                        commentId = comment.getId();
+                    }
+                }
+                assertTrue("Die Nachricht "+TEST_BLACK_BOARD_MESSAGE+" sollte als Kommentar enthalten sein", found);
+                signal2.countDown();
+            }
+        }, boardEntryId, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE);
+        try {
+            assertTrue("commentBlackBoard failed", signal2.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal3 = new CountDownLatch(1);
+
+        GroupController.getInstance().deleteComment(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                signal3.countDown();
+            }
+        }, TEST_GROUP_NAME, boardEntryId, commentId);
+        try {
+            assertTrue("deleteComment failed", signal3.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal4 = new CountDownLatch(1);
+
+        GroupController.getInstance().getBoardEntry(new ExtendedTaskDelegateAdapter<Void, BoardEntry>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, BoardEntry boardEntry) {
+                found = false;
+                if(boardEntry.getComments() != null){
+                    for (Comment comment : boardEntry.getComments()) {
+                        if (comment.getId() == commentId) {
+                            found = true;
+                        }
+                    }
+                }
+                assertFalse("Der Kommentar mit der Id " + commentId + " sollte nicht mehr da sein", found);
+                signal4.countDown();
+            }
+        }, boardEntryId);
+        try {
+            assertTrue("getBoardEntry failed", signal4.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SmallTest
+    public void testEditBoardEntry(){
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, BoardEntry>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, BoardEntry be) {
+                boardEntryId = be.getId();
+                signal.countDown();
+            }
+        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE, null);
+        try {
+            assertTrue("postBlackBoard failed", signal.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal2 = new CountDownLatch(1);
+        GroupController.getInstance().getBlackBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupBlackBoardTransport>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserGroupBlackBoardTransport blackBoard) {
+                assertFalse("Es sollte mindestens ein BoardEntry enthalten sein", blackBoard.getBoardEntries() == null);
+                found = false;
+                for (BoardEntry be : blackBoard.getBoardEntries()) {
+                    assertFalse("Message_3 sollte nicht enthalten sein", be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE_3));
+                    assertFalse("Message_2 sollte nicht enthalten sein", be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE_2));
+                    if (be.getMessage().toString().equals(TEST_BLACK_BOARD_MESSAGE)) {
+                        found = true;
+                        boardEntryId = be.getId();
+                    }
+                }
+                assertTrue("Die erste Blackboard Message ist nicht enthalten", found);
+                signal2.countDown();
+            }
+        }, TEST_GROUP_NAME);
+        try {
+            assertTrue("testBlackBoardMessage check value failed", signal2.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal3 = new CountDownLatch(1);
+
+        GroupController.getInstance().editBoardEntry(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                signal3.countDown();
+            }
+        }, boardEntryId, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE_2);
+        try {
+            assertTrue("editBoardEntry failed", signal3.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal4 = new CountDownLatch(1);
+        GroupController.getInstance().getBlackBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupBlackBoardTransport>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserGroupBlackBoardTransport blackBoard) {
+                assertFalse("Es sollte mindestens ein BoardEntry enthalten sein", blackBoard.getBoardEntries() == null);
+                found = false;
+                for (BoardEntry be : blackBoard.getBoardEntries()) {
+                    assertFalse("Message_3 sollte nicht enthalten sein", be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE_3));
+                    assertFalse("Message_1 sollte nicht enthalten sein", be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE));
+                    if (be.getMessage().toString().equals(TEST_BLACK_BOARD_MESSAGE_2)) {
+                        found = true;
+                        boardEntryId = be.getId();
+                    }
+                }
+                assertTrue("Die zweite Blackboard Message ist nicht enthalten", found);
+                signal4.countDown();
+            }
+        }, TEST_GROUP_NAME);
+        try {
+            assertTrue("testBlackBoardMessage check value failed", signal4.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SmallTest
+    public void testGetBoardEntry(){
+        final CountDownLatch signal = new CountDownLatch(1);
+
+        GroupController.getInstance().postBlackBoard(new ExtendedTaskDelegateAdapter<Void, BoardEntry>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, BoardEntry be) {
+                boardEntryId = be.getId();
+                signal.countDown();
+            }
+        }, TEST_GROUP_NAME, TEST_BLACK_BOARD_MESSAGE, null);
+        try {
+            assertTrue("postBlackBoard failed", signal.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal2 = new CountDownLatch(1);
+        GroupController.getInstance().getBlackBoard(new ExtendedTaskDelegateAdapter<Void, UserGroupBlackBoardTransport>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserGroupBlackBoardTransport blackBoard) {
+                assertFalse("Es sollte mindestens ein BoardEntry enthalten sein", blackBoard.getBoardEntries() == null);
+                found = false;
+                for (BoardEntry be : blackBoard.getBoardEntries()) {
+                    assertFalse("Message_3 sollte nicht enthalten sein", be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE_3));
+                    assertFalse("Message_2 sollte nicht enthalten sein", be.getMessage().equals(TEST_BLACK_BOARD_MESSAGE_2));
+                    if (be.getMessage().toString().equals(TEST_BLACK_BOARD_MESSAGE)) {
+                        found = true;
+                        boardEntryId = be.getId();
+                    }
+                }
+                assertTrue("Die erste Blackboard Message ist nicht enthalten", found);
+                signal2.countDown();
+            }
+        }, TEST_GROUP_NAME);
+        try {
+            assertTrue("testBlackBoardMessage check value failed", signal2.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        final CountDownLatch signal3 = new CountDownLatch(1);
+        GroupController.getInstance().getBoardEntry(new ExtendedTaskDelegateAdapter<Void, BoardEntry>(){
+            @Override
+            public void taskDidFinish(ExtendedTask task, BoardEntry boardEntry) {
+                assertTrue("Der Eintrag mit der Nachricht "+TEST_BLACK_BOARD_MESSAGE+" sollte gefunden worden sein", boardEntry.getId().longValue() == boardEntryId.longValue());
+                signal3.countDown();
+            }
+        }, boardEntryId);
+        try {
+            assertTrue("getBoardEntry failed", signal3.await(30, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
