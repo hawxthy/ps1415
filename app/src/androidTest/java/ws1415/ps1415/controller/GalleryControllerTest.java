@@ -4,6 +4,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.client.util.IOUtils;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Gallery;
+import com.skatenight.skatenightAPI.model.GalleryContainerData;
 import com.skatenight.skatenightAPI.model.GalleryMetaData;
 import com.skatenight.skatenightAPI.model.Picture;
 import com.skatenight.skatenightAPI.model.PictureData;
@@ -12,6 +13,7 @@ import com.skatenight.skatenightAPI.model.PictureMetaData;
 import com.skatenight.skatenightAPI.model.PictureMetaDataList;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.Text;
+import com.skatenight.skatenightAPI.model.UserGalleryContainer;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,6 +22,8 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -119,6 +123,20 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         testGallery = ServiceProvider.getService().galleryEndpoint().createGallery(testGallery).execute();
     }
 
+    public void testGetGalleries() throws InterruptedException {
+        final CountDownLatch signal = new CountDownLatch(1);
+        GalleryController.getGalleries(new ExtendedTaskDelegateAdapter<Void, List<GalleryMetaData>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, List<GalleryMetaData> galleryMetaDatas) {
+                assertNotNull("no galleries fetched", galleryMetaDatas);
+                assertEquals("wrong count", 1, galleryMetaDatas.size());
+                assertEquals("wrong gallery id", testGallery.getId(), galleryMetaDatas.get(0).getId());
+                signal.countDown();
+            }
+        }, Event.class.getSimpleName(), event.getId());
+        assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
+    }
+
     public void testCreateGallery() throws InterruptedException, IOException {
         // Testroute für das Testevent erstellen
         Route route = new Route();
@@ -199,6 +217,36 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
             }
         }, testGallery.getId());
         signal.await(10, TimeUnit.SECONDS);
+    }
+
+    public void testGetGalleryContainerForMail() throws InterruptedException {
+        final CountDownLatch signal = new CountDownLatch(1);
+        GalleryController.getGalleryContainerForMail(new ExtendedTaskDelegateAdapter<Void, UserGalleryContainer>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, UserGalleryContainer userGalleryContainer) {
+                assertNotNull("no UserGalleryContainer fetched", userGalleryContainer);
+                signal.countDown();
+            }
+        }, ServiceProvider.getEmail());
+        assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
+    }
+
+    public void testGetExpandableGalleries() throws InterruptedException {
+        final CountDownLatch signal = new CountDownLatch(1);
+        GalleryController.getExpandableGalleries(new ExtendedTaskDelegateAdapter<Void, Map<GalleryMetaData, String>>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Map<GalleryMetaData, String> galleryMetaDataStringMap) {
+                assertNotNull("no galleries fetched", galleryMetaDataStringMap);
+                for (GalleryMetaData g : galleryMetaDataStringMap.keySet()) {
+                    if (g.getId().equals(testGallery.getId())) {
+                        signal.countDown();
+                        return;
+                    }
+                }
+                fail("test gallery was not fetched");
+            }
+        }, picture1.getId());
+        assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
     }
 
     /**
@@ -448,6 +496,26 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
     }
 
+    public void testEditPicture() throws InterruptedException, IOException {
+        final String EDIT_TITLE = "Editierter Titel";
+        final String EDIT_DESCRIPTION = "Editierte Beschreibung";
+        final PictureVisibility EDIT_VISIBILITY = PictureVisibility.PRIVATE;
+
+        final CountDownLatch signal = new CountDownLatch(1);
+        GalleryController.editPicture(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                signal.countDown();
+            }
+        }, picture1.getId(), EDIT_TITLE, EDIT_DESCRIPTION, EDIT_VISIBILITY);
+        assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
+
+        PictureData editedPicture = ServiceProvider.getService().galleryEndpoint().getPicture(picture1.getId()).execute();
+        assertEquals("title not edited", EDIT_TITLE, editedPicture.getTitle());
+        assertEquals("description not edited", EDIT_DESCRIPTION, editedPicture.getDescription());
+        assertEquals("visibility not edited", EDIT_VISIBILITY.name(), editedPicture.getVisibility());
+    }
+
     public void testGetImage() throws InterruptedException {
         final CountDownLatch signal = new CountDownLatch(1);
         GalleryController.getPicture(new ExtendedTaskDelegateAdapter<Void, PictureData>() {
@@ -582,6 +650,21 @@ public class GalleryControllerTest extends AuthenticatedAndroidTestCase {
         data = ServiceProvider.getService().galleryEndpoint().listPictures(filter).execute();
         assertNotNull("no data fetched", data);
         assertNull("pictures fetched", data.getList());
+    }
+
+    public void testGetGalleryContainer() throws InterruptedException {
+        final CountDownLatch signal = new CountDownLatch(1);
+        GalleryController.getGalleryContainer(new ExtendedTaskDelegateAdapter<Void, GalleryContainerData>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, GalleryContainerData containerData) {
+                assertNotNull("no container fetched", containerData);
+                assertEquals("wrong id", event.getId(), containerData.getContainerId());
+                assertEquals("wrong class", Event.class.getSimpleName(), containerData.getContainerClass());
+                assertEquals("wrong minimal visibility", PictureVisibility.PUBLIC.name(), containerData.getMinPictureVisbility());
+                signal.countDown();
+            }
+        }, Event.class.getSimpleName(), event.getId());
+        assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
     }
 
     public void tearDown() throws Exception {

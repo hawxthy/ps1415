@@ -4,7 +4,7 @@ apply plugin: 'org.robolectric'
 android {
     // Festlegen, welcher Build Type für die Tests genutzt werden soll. Definiert, welche Signing-
     // Configuration für das Testpaket genutzt wird.
-    testBuildType "release"
+    testBuildType "debug"
 
     signingConfigs {
         release {
