@@ -496,7 +496,6 @@ public class UserControllerTest extends AuthenticatedAndroidTestCase {
     // Damit beim Abrufen der PrimaryData, der Abruf des Profilbildes getestet werden kann
     private BlobKey uploadUserPicture() throws InterruptedException {
         final Bitmap pictureTest = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.default_picture);
-        final byte[] pictureTestByte = ImageUtil.BitmapToByteArray(pictureTest);
         final BlobKey[] retrievedImageKey = new BlobKey[1];
 
         final CountDownLatch updateSignal = new CountDownLatch(1);

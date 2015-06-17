@@ -153,7 +153,6 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             }
         } finally {
             pm.close();
-
         }
     }
 

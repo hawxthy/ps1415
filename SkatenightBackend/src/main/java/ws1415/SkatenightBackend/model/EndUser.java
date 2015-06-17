@@ -5,6 +5,7 @@ import com.google.appengine.api.blobstore.BlobKey;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jdo.annotations.Cacheable;
 import javax.jdo.annotations.Embedded;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -28,6 +29,7 @@ public class EndUser implements javax.jdo.listener.StoreCallback {
     @Persistent
     private Visibility showPrivateGroups;
     @Persistent(defaultFetchGroup = "true")
+    @Cacheable("false")
     private BlobKey userPicture;
     @Persistent
     @Embedded
