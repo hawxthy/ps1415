@@ -82,6 +82,7 @@
         </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
         <TextView
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingBottom="16dp"
@@ -90,6 +91,7 @@
             android:textSize="20dp" />
 
         <RelativeLayout
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
