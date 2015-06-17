@@ -1,11 +1,5 @@
 package ws1415.veranstalterapp.adapter;
 
-import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.dialog.ChooseRouteDialog;
-import ws1415.veranstalterapp.activity.EditEventActivity;
-import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
-import ws1415.veranstalterapp.util.ImageUtil;
-
 /**
  * Klasse zum Füllen der ListView in AnnounceInformationFragment.
  * <p/>

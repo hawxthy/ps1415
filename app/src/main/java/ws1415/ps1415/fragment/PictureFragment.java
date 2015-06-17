@@ -2,13 +2,12 @@ package ws1415.ps1415.fragment;
 
 
 import android.app.AlertDialog;
-import android.app.FragmentTransaction;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.text.format.DateFormat;
 import android.view.Display;
 import android.view.LayoutInflater;

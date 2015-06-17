@@ -1,7 +1,6 @@
 package ws1415.ps1415.controller;
 
 
-import com.skatenight.skatenightAPI.model.Comment;
 import com.skatenight.skatenightAPI.model.CommentContainerData;
 import com.skatenight.skatenightAPI.model.CommentData;
 import com.skatenight.skatenightAPI.model.CommentDataList;

@@ -6,11 +6,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import ws1415.common.task.AddHostTask;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.activity.PermissionManagementActivity;
-import ws1415.common.task.AddHostTask;
 
 /**
  * Dialog zum Hinzufügen eines neuen Veranstalters.

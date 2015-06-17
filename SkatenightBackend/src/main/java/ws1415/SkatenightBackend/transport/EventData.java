@@ -11,7 +11,6 @@ import ws1415.SkatenightBackend.model.DynamicField;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.EventParticipationVisibility;
 import ws1415.SkatenightBackend.model.EventRole;
-import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.Privilege;
 import ws1415.SkatenightBackend.model.Route;
 

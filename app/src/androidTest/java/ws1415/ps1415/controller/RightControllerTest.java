@@ -10,7 +10,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.Right;
 import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.task.ExtendedTask;

@@ -26,13 +26,13 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import java.io.File;
 import java.io.IOException;
 
-import ws1415.ps1415.controller.UserController;
-import ws1415.ps1415.gcm.GCMUtil;
-import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.task.ExtendedTask;
-import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.R;
+import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.controller.UserController;
+import ws1415.ps1415.gcm.GCMUtil;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.ImageUtil;
 import ws1415.ps1415.util.LocalGCMUtil;
 import ws1415.ps1415.util.PrefManager;

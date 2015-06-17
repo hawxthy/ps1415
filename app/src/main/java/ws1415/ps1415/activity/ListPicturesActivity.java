@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.DataSetObserver;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +22,6 @@ import com.skatenight.skatenightAPI.model.PictureFilter;
 import com.skatenight.skatenightAPI.model.PictureMetaData;
 import com.skatenight.skatenightAPI.model.UserGalleryContainer;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 

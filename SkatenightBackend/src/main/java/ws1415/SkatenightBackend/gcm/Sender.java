@@ -19,6 +19,27 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import ws1415.SkatenightBackend.SkatenightServerEndpoint;
+import ws1415.SkatenightBackend.gcm.Result.Builder;
+
 import static ws1415.SkatenightBackend.gcm.Constants.GCM_SEND_ENDPOINT;
 import static ws1415.SkatenightBackend.gcm.Constants.JSON_CANONICAL_IDS;
 import static ws1415.SkatenightBackend.gcm.Constants.JSON_ERROR;
@@ -39,28 +60,6 @@ import static ws1415.SkatenightBackend.gcm.Constants.PARAM_TIME_TO_LIVE;
 import static ws1415.SkatenightBackend.gcm.Constants.TOKEN_CANONICAL_REG_ID;
 import static ws1415.SkatenightBackend.gcm.Constants.TOKEN_ERROR;
 import static ws1415.SkatenightBackend.gcm.Constants.TOKEN_MESSAGE_ID;
-
-import ws1415.SkatenightBackend.SkatenightServerEndpoint;
-import ws1415.SkatenightBackend.gcm.Result.Builder;
-
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Helper class to send messages to the GCM service using an API Key.

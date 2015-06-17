@@ -16,10 +16,10 @@ import java.util.List;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.task.QueryEventsTask;
-import ws1415.veranstalterapp.dialog.AddRouteDialog;
-import ws1415.veranstalterapp.adapter.TabsPagerAdapter;
-import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 import ws1415.veranstalterapp.R;
+import ws1415.veranstalterapp.adapter.TabsPagerAdapter;
+import ws1415.veranstalterapp.dialog.AddRouteDialog;
+import ws1415.veranstalterapp.fragment.ShowEventsFragment;
 
 /**
  * Die Activity, welche beim Starten der Veranstalter App ausgeführt wird. Diese Activity

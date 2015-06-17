@@ -2,7 +2,6 @@ package ws1415.ps1415.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,12 +33,12 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ws1415.ps1415.LocationTransmitterService;
+import ws1415.ps1415.R;
 import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.model.EventRole;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
-import ws1415.ps1415.LocationTransmitterService;
-import ws1415.ps1415.R;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.LocalAnalysisData;
 import ws1415.ps1415.util.LocalStorageUtil;

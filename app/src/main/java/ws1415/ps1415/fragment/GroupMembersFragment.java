@@ -1,6 +1,5 @@
 package ws1415.ps1415.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,18 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.skatenight.skatenightAPI.model.UserGroup;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.adapter.GroupMemberListAdapter;
-import ws1415.ps1415.adapter.UserListAdapter;
 
 /**
  * @author Bernd Eissing

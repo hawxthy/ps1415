@@ -2,10 +2,6 @@ package ws1415.SkatenightBackend.transport;
 
 import com.google.appengine.api.blobstore.BlobKey;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-
 /**
  * Created by Bernd Eissing on 02.05.2015.
  */

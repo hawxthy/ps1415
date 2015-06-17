@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import ws1415.SkatenightBackend.transport.PictureMetaData;
-import ws1415.SkatenightBackend.model.PictureVisibility;
 
 /**
  * Speichert die kompletten Bilddaten inklusive Metadaten, Kommentaren und Bewertungen.

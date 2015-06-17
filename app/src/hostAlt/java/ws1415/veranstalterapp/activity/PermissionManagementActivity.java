@@ -15,13 +15,13 @@ import com.skatenight.skatenightAPI.model.Host;
 
 import java.util.List;
 
+import ws1415.common.task.DeleteHostTask;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.common.task.QueryHostsTask;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.adapter.HostCursorAdapter;
 import ws1415.veranstalterapp.dialog.AddHostDialog;
-import ws1415.common.task.DeleteHostTask;
-import ws1415.common.task.QueryHostsTask;
 
 /**
  * Klasse zum Verwalten von Veranstaltern und deren Rechten.

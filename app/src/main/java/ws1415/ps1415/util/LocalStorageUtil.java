@@ -1,11 +1,11 @@
 package ws1415.ps1415.util;
 
-import com.google.gson.Gson;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+
+import com.google.gson.Gson;
 
 /**
  * Created by Daniel on 10.02.2015.

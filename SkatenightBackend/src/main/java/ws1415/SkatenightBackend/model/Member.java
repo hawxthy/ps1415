@@ -2,7 +2,6 @@ package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.datanucleus.annotations.Unowned;
 
-import java.beans.Transient;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;

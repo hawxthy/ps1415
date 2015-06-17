@@ -36,13 +36,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ws1415.ps1415.LocationTransmitterService;
+import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.model.EventRole;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
-import ws1415.ps1415.LocationTransmitterService;
-import ws1415.ps1415.R;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.task.QueryVisibleUsersTask;
 import ws1415.ps1415.util.LocationUtils;

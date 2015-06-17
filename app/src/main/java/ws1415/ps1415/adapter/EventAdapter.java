@@ -2,7 +2,6 @@ package ws1415.ps1415.adapter;
 
 import android.content.Context;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -17,11 +16,10 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.R;
 import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
 import ws1415.ps1415.util.DiskCacheImageLoader;
 
 /**

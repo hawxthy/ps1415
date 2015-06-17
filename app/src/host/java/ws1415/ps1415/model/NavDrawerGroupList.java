@@ -14,7 +14,6 @@ import java.util.List;
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.CreateUserGroupActivity;
-import ws1415.ps1415.activity.DistributeRightsActivity;
 import ws1415.ps1415.activity.FriendsActivity;
 import ws1415.ps1415.activity.GroupProfileActivity;
 import ws1415.ps1415.activity.ListEventsActivity;

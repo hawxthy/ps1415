@@ -14,9 +14,9 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import ws1415.common.net.ServiceProvider;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
+import ws1415.common.task.LoginTask;
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.R;
-import ws1415.common.task.LoginTask;
 
 /**
  * Zeigt einen Login-Bildschirm an, mit dem sich ein Veranstalter einloggen muss, bevor er Zugriff

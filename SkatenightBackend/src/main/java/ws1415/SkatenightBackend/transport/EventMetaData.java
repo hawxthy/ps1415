@@ -1,8 +1,6 @@
 package ws1415.SkatenightBackend.transport;
 
 import com.google.appengine.api.blobstore.BlobKey;
-import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Id;
 
 import java.util.Date;
 

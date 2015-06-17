@@ -18,7 +18,6 @@ import java.util.Map;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.EventParticipantsAdapter;
-import ws1415.ps1415.adapter.UserListAdapter;
 import ws1415.ps1415.model.EventRole;
 
 public class EventParticipantsActivity extends Activity {

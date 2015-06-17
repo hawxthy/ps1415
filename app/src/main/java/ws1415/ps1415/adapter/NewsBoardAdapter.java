@@ -9,9 +9,6 @@ import android.widget.TextView;
 
 import com.skatenight.skatenightAPI.model.BoardEntry;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import ws1415.ps1415.R;

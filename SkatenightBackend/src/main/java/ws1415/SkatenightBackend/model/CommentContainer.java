@@ -2,8 +2,6 @@ package ws1415.SkatenightBackend.model;
 
 import com.google.appengine.api.users.User;
 
-import java.util.List;
-
 /**
  * Kennzeichnet Entitäten, die kommentiert werden können.
  * @author Richard Schulze

@@ -10,22 +10,18 @@ import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupBlackBoardTransport;
 import com.skatenight.skatenightAPI.model.UserGroupFilter;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
-import com.skatenight.skatenightAPI.model.UserGroupNewsBoardTransport;
 import com.skatenight.skatenightAPI.model.UserGroupVisibleMembers;
 
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import ws1415.AuthenticatedAndroidTestCase;
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.Right;
 import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.controller.GroupController;
 
 /**
  * Created by Bernd on 14.05.2015.

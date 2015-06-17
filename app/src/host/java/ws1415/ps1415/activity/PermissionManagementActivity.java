@@ -20,7 +20,6 @@ import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.activity.ProfileActivity;
 import ws1415.ps1415.adapter.UserListAdapter;
 import ws1415.ps1415.controller.RoleController;
 import ws1415.ps1415.model.GlobalRole;

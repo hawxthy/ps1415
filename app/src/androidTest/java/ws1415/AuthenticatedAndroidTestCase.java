@@ -5,8 +5,8 @@ import android.test.AndroidTestCase;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.Constants;
+import ws1415.ps1415.ServiceProvider;
 
 /**
  * Erweitert den normalen AndroidTestCase um Authenifizierung. Es wird dabei automatisch der erste

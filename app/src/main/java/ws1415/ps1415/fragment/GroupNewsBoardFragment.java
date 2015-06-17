@@ -9,13 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.Board;
-import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupNewsBoardTransport;
 
-import java.util.ArrayList;
-
 import ws1415.ps1415.R;
-import ws1415.ps1415.adapter.BlackBoardListAdapter;
 import ws1415.ps1415.adapter.NewsBoardAdapter;
 import ws1415.ps1415.controller.GroupController;
 import ws1415.ps1415.task.ExtendedTask;

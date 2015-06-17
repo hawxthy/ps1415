@@ -1,7 +1,5 @@
 package ws1415.ps1415.controller;
 
-import android.util.Log;
-
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.IOUtils;
 import com.skatenight.skatenightAPI.model.DynamicField;
@@ -9,7 +7,6 @@ import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.EventFilter;
 import com.skatenight.skatenightAPI.model.EventMetaData;
-import com.skatenight.skatenightAPI.model.EventMetaDataList;
 import com.skatenight.skatenightAPI.model.Route;
 import com.skatenight.skatenightAPI.model.RoutePoint;
 import com.skatenight.skatenightAPI.model.ServerWaypoint;
@@ -22,7 +19,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 

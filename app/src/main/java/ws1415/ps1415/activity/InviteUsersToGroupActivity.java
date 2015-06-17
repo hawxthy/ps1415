@@ -19,14 +19,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gc.materialdesign.views.ButtonFlat;
-import com.wrapp.floatlabelededittext.FloatLabeledEditText;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.GroupMemberListAdapter;
-import ws1415.ps1415.adapter.UserListAdapter;
 import ws1415.ps1415.controller.GroupController;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.task.ExtendedTask;

@@ -1,12 +1,10 @@
 package ws1415.ps1415.controller;
 
 import com.google.api.client.util.IOUtils;
-import com.skatenight.skatenightAPI.model.Comment;
 import com.skatenight.skatenightAPI.model.CommentContainerData;
 import com.skatenight.skatenightAPI.model.CommentData;
 import com.skatenight.skatenightAPI.model.CommentDataList;
 import com.skatenight.skatenightAPI.model.CommentFilter;
-import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.Picture;
 
 import java.io.File;

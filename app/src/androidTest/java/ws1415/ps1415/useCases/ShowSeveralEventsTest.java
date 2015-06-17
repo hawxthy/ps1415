@@ -1,18 +1,7 @@
 package ws1415.ps1415.useCases;
 
-import android.app.Instrumentation;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.ViewAsserts;
-import android.test.suitebuilder.annotation.SmallTest;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-
-import ws1415.ps1415.Constants;
-import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.ListEventsActivity;
 
 /**

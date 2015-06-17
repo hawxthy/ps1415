@@ -2,34 +2,25 @@ package ws1415.ps1415.adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gc.materialdesign.views.ButtonFlat;
 import com.skatenight.skatenightAPI.model.BoardEntry;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.GroupProfileActivity;
 import ws1415.ps1415.model.Right;
-import ws1415.ps1415.task.ExtendedTask;
-import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.DateUtil;
 import ws1415.ps1415.util.GroupImageLoader;
-import ws1415.ps1415.util.ImageUtil;
 
 /**
  * @author Bernd Eissing on 05.06.2015.

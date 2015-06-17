@@ -17,19 +17,19 @@ import com.skatenight.skatenightAPI.model.UserPrimaryData;
 import java.util.Date;
 
 import de.greenrobot.event.EventBus;
+import ws1415.ps1415.activity.ConversationActivity;
 import ws1415.ps1415.activity.GroupProfileActivity;
+import ws1415.ps1415.activity.ListEventsActivity;
+import ws1415.ps1415.controller.MessageDbController;
 import ws1415.ps1415.controller.TransferController;
 import ws1415.ps1415.controller.UserController;
+import ws1415.ps1415.event.NewMessageEvent;
 import ws1415.ps1415.gcm.MessageType;
 import ws1415.ps1415.model.Conversation;
 import ws1415.ps1415.model.LocalMessageType;
 import ws1415.ps1415.model.Message;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.activity.ConversationActivity;
-import ws1415.ps1415.activity.ListEventsActivity;
-import ws1415.ps1415.controller.MessageDbController;
-import ws1415.ps1415.event.NewMessageEvent;
 import ws1415.ps1415.util.PrefManager;
 import ws1415.ps1415.util.UniversalUtil;
 

@@ -14,28 +14,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewParent;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
-
-import ws1415.ps1415.ServiceProvider;
-import ws1415.ps1415.adapter.UserListAdapter;
-import ws1415.ps1415.controller.RightController;
-import ws1415.ps1415.controller.UserController;
-import ws1415.ps1415.model.NavDrawerGroupList;
-import ws1415.ps1415.model.Right;
-import ws1415.ps1415.model.UserGroupType;
-import ws1415.ps1415.util.ImageUtil;
-import ws1415.ps1415.util.UniversalUtil;
-import ws1415.ps1415.widget.SlidingTabLayout;
-
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.Switch;
 import com.melnykov.fab.FloatingActionButton;
 import com.skatenight.skatenightAPI.model.BlobKey;
@@ -49,11 +33,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ws1415.ps1415.R;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.adapter.GroupProfileTabsAdapter;
 import ws1415.ps1415.controller.GroupController;
+import ws1415.ps1415.controller.RightController;
+import ws1415.ps1415.model.NavDrawerGroupList;
+import ws1415.ps1415.model.Right;
+import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.GroupImageLoader;
+import ws1415.ps1415.util.ImageUtil;
+import ws1415.ps1415.util.UniversalUtil;
+import ws1415.ps1415.widget.SlidingTabLayout;
 
 public class GroupProfileActivity extends BaseFragmentActivity {
     private static final int SELECT_PHOTO = 1;
