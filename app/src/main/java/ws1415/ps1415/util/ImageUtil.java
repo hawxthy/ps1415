@@ -39,6 +39,10 @@ public abstract class ImageUtil {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(imageFile.getPath(), options);
+        if (options.outHeight * options.outWidth > 52428800 || imageFile.length() > 33554432) {
+            // Bilden dürfen maximal 50 Megapixel und 32MB groß sein
+            throw new IllegalArgumentException("image too large");
+        }
         options.inSampleSize = calculateInSampleSize(options, prefWidth);
         options.inJustDecodeBounds = false;
         view.setImageBitmap(BitmapFactory.decodeFile(imageFile.getPath(), options));

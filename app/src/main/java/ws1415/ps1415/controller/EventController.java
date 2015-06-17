@@ -137,6 +137,10 @@ public abstract class EventController {
                             builder.addBinaryBody("files", headerImage);
                         }
                         if (images != null) {
+                            if (headerImage == null) {
+                                builder.addTextBody("nulls", "1");
+                            }
+
                             for (File f : images) {
                                 builder.addBinaryBody("files", f);
                             }
@@ -162,21 +166,21 @@ public abstract class EventController {
                         BlobKey blobKey = new BlobKey();
                         blobKey.setKeyString(keyStrings[0]);
                         createdEvent.setIcon(blobKey);
-                        if (keyStrings.length > 1) {
+                        if (keyStrings.length > 1 && headerImage != null) {
                             blobKey = new BlobKey();
                             blobKey.setKeyString(keyStrings[1]);
                             createdEvent.setHeaderImage(blobKey);
                         }
-                        if (keyStrings.length > 2) {
+                        if (keyStrings.length > 2 || (keyStrings.length > 1 && headerImage == null)) {
                             createdEvent.setImages(new LinkedList<BlobKey>());
-                            for (int i = 2; i < keyStrings.length; i++) {
+                            for (int i = (headerImage == null ? 1 : 2); i < keyStrings.length; i++) {
                                 blobKey = new BlobKey();
                                 blobKey.setKeyString(keyStrings[i]);
                                 createdEvent.getImages().add(blobKey);
                             }
                         }
                     } catch(IOException ex) {
-                        // Bei Fehlern versuchen das bereits erstellte Picture-Objekt zu löschen
+                        // Bei Fehlern versuchen das bereits erstellte Event-Objekt zu löschen
                         try {
                             ServiceProvider.getService().eventEndpoint().deleteEvent(createdEvent.getId()).execute();
                         } catch (IOException e) {
@@ -304,6 +308,29 @@ public abstract class EventController {
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Verbindung zum Server konnte nicht hergestellt werden");
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    /**
+     * Sendet die Durchsage an die gewählte Rolle in der Veranstaltung mit der angegebenen ID.
+     * @param handler    Der Handler, der über den Status des Task informiert wird.
+     * @param eventId    Die ID des Events, an das die Durchsage gesendet wird.
+     * @param role       Die Rolle, die die Durchsage empfängt.
+     * @param title      Der Titel der Durchsage.
+     * @param content    Die Nachricht der Durchsage.
+     */
+    public static void sendBroadcast(ExtendedTaskDelegate<Void, Void> handler, final long eventId, final EventRole role, final String title, final String content) {
+        new ExtendedTask<Void, Void, Void>(handler) {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ServiceProvider.getService().eventEndpoint().sendBroadcast(eventId, role.name(), title, content).execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    publishError("Die Durchsage konnte nicht gesendet werden");
                 }
                 return null;
             }

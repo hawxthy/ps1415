@@ -72,5 +72,4 @@
     <string name="groupTypeNormal">Normal</string>
     <string name="typeInfoGroup">Info Group Type</string>
     <string name="infoGroupType">Security groups are always private and members of this group will always be visible. That means participants of an Event will always see the memembers of any Securitygroup on their map.</string>
-
 </resources>

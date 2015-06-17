@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.skatenight.skatenightAPI.model.BlobKey;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegate;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 
 /**
@@ -117,6 +119,7 @@ public class DiskCacheImageLoader {
                                 view.setImageBitmap(bitmap);
                             }
                         });
+                        view.forceLayout();
                     } else {
                         // Bild ist nicht im Cache, also abrufen
                         String url = Constants.SERVER_URL + "/images/serve?key=" + key.getBlobKey();

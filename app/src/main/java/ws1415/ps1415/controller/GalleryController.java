@@ -176,8 +176,10 @@ public abstract class GalleryController {
                 try {
                     Map<GalleryMetaData, String> result = new HashMap<>();
                     ExpandableGalleriesWrapper wrapper = ServiceProvider.getService().galleryEndpoint().getExpandableGalleries(pictureId).execute();
-                    for (int i = 0; i < wrapper.getGalleries().size(); i++) {
-                        result.put(wrapper.getGalleries().get(i), wrapper.getAdditionalTitles().get(i));
+                    if (wrapper != null) {
+                        for (int i = 0; i < wrapper.getGalleries().size(); i++) {
+                            result.put(wrapper.getGalleries().get(i), wrapper.getAdditionalTitles().get(i));
+                        }
                     }
                     return result;
                 } catch (IOException e) {
@@ -238,13 +240,14 @@ public abstract class GalleryController {
             @Override
             protected Picture doInBackground(Void... params) {
                 // Picture-Objekt auf dem Server erstellen lassen
-                Picture picture = null;
+                Picture picture;
                 try {
                     picture = ServiceProvider.getService().galleryEndpoint().createPicture(
                             title, description, visibility.name()).set("galleryId", galleryId).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Bild konnte nicht erstellt werden. Zu wenig Rechte?");
+                    return null;
                 }
 
                 // POST-Anfrage für den Upload erstellen

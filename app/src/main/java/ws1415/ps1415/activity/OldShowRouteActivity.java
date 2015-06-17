@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -28,12 +30,15 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.UserLocationInfo;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.controller.EventController;
+import ws1415.ps1415.model.EventRole;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
 import ws1415.ps1415.LocationTransmitterService;
@@ -478,6 +483,36 @@ public class OldShowRouteActivity extends Activity {
 
             }
         }, this).execute();
+
+        // Ordner und Sanitäter abrufen
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                EventRole[] roles = new EventRole[] {
+                        EventRole.MARSHALL,
+                        EventRole.MEDIC};
+                BitmapDescriptor[] icons = new BitmapDescriptor[]{
+                        BitmapDescriptorFactory.fromResource(R.drawable.ic_security_black_24dp),
+                        BitmapDescriptorFactory.fromResource(R.drawable.ic_plus_circle_outline_black_24dp)};
+                for (int i = 0; i < roles.length; i++) {
+                    try {
+                        List<UserLocationInfo> locations = ServiceProvider.getService().eventEndpoint().getEventRolePositions(eventId, roles[i].name()).execute().getItems();
+                        if (locations != null) {
+                            for (UserLocationInfo location : locations) {
+                                groupMarker.add(googleMap.addMarker(new MarkerOptions()
+                                        .title(getResources().getStringArray(R.array.event_roles)[roles[i].ordinal()])
+                                        .icon(icons[i])
+                                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                                        .draggable(false)));
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+        }.execute();
     }
 
     /**

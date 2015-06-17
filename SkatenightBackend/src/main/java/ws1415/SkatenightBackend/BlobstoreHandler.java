@@ -8,8 +8,10 @@ import com.google.appengine.api.images.ImagesServiceFactory;
 import com.google.appengine.api.images.ServingUrlOptions;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -54,6 +56,25 @@ public class BlobstoreHandler extends HttpServlet {
 
         if (!blobKeys.isEmpty()) {
             try {
+                // Null-Werte auslesen, die in die Liste der BlobKeys eingefügt werden müssen
+                String[] nulls = req.getParameterValues("nulls");
+                if (nulls != null && nulls.length > 0) {
+                    int[] indices = new int[nulls.length];
+                    for (int i = 0; i < nulls.length; i++) {
+                        indices[i] = Integer.parseInt(nulls[i]);
+                        if (indices[i] < 0) {
+                            throw new IllegalArgumentException("only positive indices allowed");
+                        }
+                    }
+                    Arrays.sort(indices);
+                    for (int i : indices) {
+                        while (i > blobKeys.size()) {
+                            blobKeys.add(null);
+                        }
+                        blobKeys.add(i, null);
+                    }
+                }
+
                 BlobKeyContainer container = (BlobKeyContainer) ofy().load().kind(containerClass).id(Long.parseLong(containerId)).safe();
                 container.consumeBlobKeys(blobKeys);
                 ofy().save().entity(container).now();

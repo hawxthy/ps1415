@@ -30,6 +30,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import ws1415.ps1415.activity.ShowEventActivity;
 import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.task.ExtendedTask;
@@ -162,6 +163,10 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
 
 
         startForeground(5656565, notification);
+
+        Intent notifyActivitiesIntent = new Intent(ShowEventActivity.REFRESH_LOCAL_ANALYSIS_BUTTON_ACTION);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(notifyActivitiesIntent);
+
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -315,6 +320,9 @@ public class LocationTransmitterService extends Service implements GoogleApiClie
     private void sendCancelUpdate() {
         Intent intent = new Intent(NOTIFICATION_CANCEL);
         broadcastManager.sendBroadcast(intent);
+
+        // Schaltfläche für die lokale Auswertung in der ShowEventActivity aktualisieren
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ShowEventActivity.REFRESH_LOCAL_ANALYSIS_BUTTON_ACTION));
     }
 
     private int[] toPrimitiveInt(List<Integer> list) {

@@ -236,7 +236,7 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
     }
 
     private void addPictureToGallery() {
-        final ExpandableGalleryAdapter galleryAdapter = new ExpandableGalleryAdapter(getActivity(), pictureId);
+        final ExpandableGalleryAdapter galleryAdapter = new ExpandableGalleryAdapter(getActivity().getApplicationContext(), pictureId);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.action_add_to_gallery)
                 .setAdapter(galleryAdapter, new DialogInterface.OnClickListener() {
@@ -245,11 +245,11 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
                         GalleryController.addPictureToGallery(new ExtendedTaskDelegateAdapter<Void, Void>() {
                             @Override
                             public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                                Toast.makeText(getActivity(), R.string.adding_to_gallery_finished, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity().getApplicationContext(), R.string.adding_to_gallery_finished, Toast.LENGTH_LONG).show();
                             }
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
-                                Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity().getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             }
                         }, pictureId, galleryAdapter.getItemId(which));
                     }

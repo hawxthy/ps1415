@@ -9,19 +9,16 @@ import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
-import com.googlecode.objectify.Key;
 import com.googlecode.objectify.cmd.Query;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -41,6 +38,7 @@ import ws1415.SkatenightBackend.transport.EventMetaData;
 import ws1415.SkatenightBackend.transport.EventMetaDataList;
 import ws1415.SkatenightBackend.transport.EventParticipationData;
 import ws1415.SkatenightBackend.transport.StringWrapper;
+import ws1415.SkatenightBackend.transport.UserLocationInfo;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -304,7 +302,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param user     Der aufrufende Benutzer.
      * @param event    Die neuen Daten des Events.
      */
-    public Event editEvent(User user, Event event) throws OAuthRequestException {
+    public Event editEvent(User user, Event event) throws OAuthRequestException, IOException {
         if (event == null) {
             throw new IllegalArgumentException("no event submitted");
         }
@@ -331,6 +329,12 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             RegistrationManager rm = getRegistrationManager(pm);
+            List<String> regIds = new LinkedList<>();
+            for (String s : oldEvent.getMemberList().keySet()) {
+                if (rm.getUserIdByMail(s) != null) {
+                    regIds.add(rm.getUserIdByMail(s));
+                }
+            }
             if (rm.getRegisteredUser() != null) {
                 Sender sender = new Sender(Constants.GCM_API_KEY);
                 Message.Builder mb = new Message.Builder()
@@ -344,11 +348,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
                         .addData("event_id", String.valueOf(event.getId()))
                         .addData("title", "Veranstaltungsdaten aktualisiert!");
                 Message m = mb.build();
-                try {
-                    sender.send(m, new LinkedList<>(rm.getRegisteredUser()), 1);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+                sender.send(m, regIds, 1);
             }
         } finally {
             pm.close();
@@ -397,6 +397,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
      * @param user       Der aufrufende Benutzer, der dem Event hinzugefügt werden soll
      * @param eventId    Die ID des Events, dem beigetreten wird.
      * @param visibility Die Sichtbarkeit, die für die Teilnahme eingetragen wird.
+     * @return Gibt die Rolle zurück, die dem Teilnehmer zugeordnet wurde.
      */
     public StringWrapper joinEvent(User user, @Named("eventId") long eventId, @Named("visibility") EventParticipationVisibility visibility)
             throws OAuthRequestException {
@@ -464,46 +465,70 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         ofy().save().entity(event).now();
     }
 
+    /**
+     * Sendet eine Durchsage per GCM an alle Teilnehmer des Events mit der angegebenen ID, die in der
+     * entsprechenden Rolle angemeldet sind.
+     * @param user       Der aufrufende Benutzer.
+     * @param eventId    Die ID des Events, für das die Durchsage gesendet wird.
+     * @param role       Die Rolle, an die gesendet wird.
+     * @param title      Der Titel der Durchsage.
+     * @param message    Die Nachricht der Durchsage.
+     */
+    public void sendBroadcast(User user, @Named("eventId") long eventId, @Named("role") EventRole role,
+                              @Named("title") String title, @Named("message") String message)
+            throws OAuthRequestException, IOException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
+        PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
+        try {
+            RegistrationManager rm = getRegistrationManager(pm);
+            List<String> regIds = new LinkedList<>();
+            for (String s : event.getMemberList().keySet()) {
+                if (event.getMemberList().get(s) == role && rm.getUserIdByMail(s) != null) {
+                    regIds.add(rm.getUserIdByMail(s));
+                }
+            }
+            if (!regIds.isEmpty()) {
+                Message m = new Message.Builder()
+                        .timeToLive(2419200)
+                        .addData("type", MessageType.NOTIFICATION_MESSAGE.name())
+                        .addData("title", title)
+                        .addData("content", message)
+                        .build();
+                Sender s = new Sender(Constants.GCM_API_KEY);
+                s.send(m, regIds, 1);
+            }
+        } finally {
+            pm.close();
+        }
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    /**
+     * Gibt die Positionen der Teilnehmer einer Veranstaltung zurück, die die angegebene Rolle eingenommen
+     * haben. Der aufrufende Benutzer muss ein Teilnehmer der Veranstaltung sein und kann nur bestimmte
+     * Rollen abrufen.
+     * @param eventId    Die Id der Veranstaltung.
+     * @param role       Die abzurufende Rolle.
+     * @return Eine Liste der Positionen der Teilnehmer, die die angegebene Rolle einnehmen.
+     */
+    public List<UserLocationInfo> getEventRolePositions(User user, @Named("eventId") long eventId, @Named("role") EventRole role) throws OAuthRequestException {
+        if (user == null) {
+            throw new OAuthRequestException("no user submitted");
+        }
+        Event event = ofy().load().group(EventParticipationData.class).type(Event.class).id(eventId).safe();
+        if (!event.getMemberList().containsKey(user.getEmail())) {
+            throw new OAuthRequestException("user has to be participant");
+        }
+        List<String> roleParticipants = new LinkedList<>();
+        for (String s : event.getMemberList().keySet()) {
+            if (event.getMemberList().get(s) == role) {
+                roleParticipants.add(s);
+            }
+        }
+        return new UserEndpoint().listUserLocationInfo(user, roleParticipants);
+    }
 
     // ---------------------------------------------------------------------------------------------
     // |                                  Alte Endpoint-Methoden                                   |

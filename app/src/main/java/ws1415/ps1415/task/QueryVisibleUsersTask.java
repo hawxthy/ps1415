@@ -63,9 +63,6 @@ public class QueryVisibleUsersTask extends ExtendedTask<Void, Void, HashMap<User
                     }catch (IOException e){
                         e.printStackTrace();
                     }
-                    finally {
-                        // damit man übersetzen kann
-                    }
                 }
             }
         }

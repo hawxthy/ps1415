@@ -1,21 +1,21 @@
 package ws1415.ps1415.activity;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -63,17 +63,13 @@ public class EditPictureActivity extends Activity {
 
     private File selectedFile;
 
+    private boolean edited = false;
+    private boolean saving = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_picture);
-
-        // "Zurück"-Button in der Actionbar anzeigen
-        ActionBar mActionBar = getActionBar();
-        if (mActionBar != null) {
-            mActionBar.setHomeButtonEnabled(false);
-            mActionBar.setDisplayHomeAsUpEnabled(true);
-        }
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(MEMBER_GALLERY_ID)) {
@@ -114,23 +110,6 @@ public class EditPictureActivity extends Activity {
 
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         visibility.setAdapter(spinnerAdapter);
-        visibility.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                PictureVisibility v = getSelectedVisibility();
-                if (initialVisibility != null && v.compareTo(initialVisibility) < 0) {
-                    findViewById(R.id.changeVisibilityHint).setVisibility(View.VISIBLE);
-                } else {
-                    findViewById(R.id.changeVisibilityHint).setVisibility(View.GONE);
-                }
-                visibilityHint.setText(getResources().getStringArray(R.array.picture_visibility_hints)[v.ordinal()]);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Sollte nicht vorkommen
-            }
-        });
 
         if (pictureId != null) {
             startLoading();
@@ -148,6 +127,7 @@ public class EditPictureActivity extends Activity {
                     description.setText(pictureData.getDescription());
                     initialVisibility = PictureVisibility.valueOf(pictureData.getVisibility());
                     visibility.setSelection(Math.min(initialVisibility.ordinal(), visibility.getAdapter().getCount() - 1));
+                    setUpListener();
                     finishLoading();
                 }
                 @Override
@@ -155,7 +135,41 @@ public class EditPictureActivity extends Activity {
                     finishLoading();
                 }
             }, pictureId);
+        } else {
+            setUpListener();
         }
+    }
+
+    private void setUpListener() {
+        TextWatcher editingWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override
+            public void afterTextChanged(Editable s) {
+                edited = true;
+            }
+        };
+        title.addTextChangedListener(editingWatcher);
+        description.addTextChangedListener(editingWatcher);
+        visibility.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                PictureVisibility v = getSelectedVisibility();
+                if (initialVisibility != null && v.compareTo(initialVisibility) < 0) {
+                    findViewById(R.id.changeVisibilityHint).setVisibility(View.VISIBLE);
+                } else {
+                    findViewById(R.id.changeVisibilityHint).setVisibility(View.GONE);
+                }
+                visibilityHint.setText(getResources().getStringArray(R.array.picture_visibility_hints)[v.ordinal()]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Sollte nicht vorkommen
+            }
+        });
     }
 
     @Override
@@ -187,6 +201,91 @@ public class EditPictureActivity extends Activity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void finish() {
+        if (!saving && edited) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.save_picture)
+                    .setMessage(R.string.save_picture_message)
+                    .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            savePicture();
+                        }
+                    })
+                    .setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            EditPictureActivity.super.finish();
+                        }
+                    });
+            builder.create().show();
+        } else {
+            super.finish();
+        }
+    }
+
+    /**
+     * Speichert das Bild ab, falls es gültige Metadaten hat.
+     */
+    private void savePicture() {
+        startLoading();
+        if (pictureId != null) {
+            try {
+                GalleryController.editPicture(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                        setResult(0, new Intent().putExtra("position", position));
+                        finishLoading();
+                        EditPictureActivity.super.finish();
+                    }
+
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        Toast.makeText(EditPictureActivity.this, R.string.error_editing_picture, Toast.LENGTH_LONG).show();
+                        finishLoading();
+                    }
+                }, pictureId, title.getText().toString(), description.getText().toString(), getSelectedVisibility());
+            } catch (IllegalArgumentException ex) {
+                finishLoading();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.error_invalid_picture)
+                        .setMessage(R.string.error_invalid_picture_message)
+                        .setPositiveButton(R.string.ok, null);
+                builder.create().show();
+            }
+        } else {
+            try {
+                GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Picture picture) {
+                        finishLoading();
+                        EditPictureActivity.super.finish();
+                    }
+
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        Toast.makeText(EditPictureActivity.this, message, Toast.LENGTH_LONG).show();
+                        finishLoading();
+                    }
+                }, selectedFile, title.getText().toString(), description.getText().toString(), getSelectedVisibility(), galleryId);
+            } catch (IllegalArgumentException ex) {
+                finishLoading();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.error_invalid_picture)
+                        .setMessage(R.string.error_invalid_picture_message)
+                        .setPositiveButton(R.string.ok, null);
+                builder.create().show();
+            }
+        }
     }
 
     /**
@@ -236,16 +335,22 @@ public class EditPictureActivity extends Activity {
                     String tempPath = cursor.getString(column_index);
                     cursor.close();
 
-                    selectedFile = new File(tempPath);
+                    File tmpSelectedFile = new File(tempPath);
                     picture.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                    ImageUtil.loadSubsampledImageInView(selectedFile, picture, picture.getWidth());
+                    try {
+                        ImageUtil.loadSubsampledImageInView(tmpSelectedFile, picture, picture.getWidth());
+                    } catch (IllegalArgumentException ex) {
+                        Toast.makeText(this, R.string.error_image_too_large, Toast.LENGTH_LONG).show();
+                    }
+                    selectedFile = tmpSelectedFile;
+                    edited = true;
                 }
                 break;
         }
     }
 
     public void onCancelClick(View view) {
-        finish();
+        super.finish();
     }
 
     private PictureVisibility getSelectedVisibility() {
@@ -253,54 +358,6 @@ public class EditPictureActivity extends Activity {
     }
 
     public void onSaveClick(View view) {
-        startLoading();
-        if (pictureId != null) {
-            try {
-                GalleryController.editPicture(new ExtendedTaskDelegateAdapter<Void, Void>() {
-                    @Override
-                    public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                        setResult(0, new Intent().putExtra("position", position));
-                        finishLoading();
-                        finish();
-                    }
-                    @Override
-                    public void taskFailed(ExtendedTask task, String message) {
-                        Toast.makeText(EditPictureActivity.this, R.string.error_editing_picture, Toast.LENGTH_LONG).show();
-                        finishLoading();
-                    }
-                }, pictureId, title.getText().toString(), description.getText().toString(), getSelectedVisibility());
-            } catch (IllegalArgumentException ex) {
-                finishLoading();
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.error_invalid_picture)
-                        .setMessage(R.string.error_invalid_picture_message)
-                        .setPositiveButton(R.string.ok, null);
-                builder.create().show();
-            }
-        } else {
-            try {
-                GalleryController.uploadPicture(new ExtendedTaskDelegateAdapter<Void, Picture>() {
-                    @Override
-                    public void taskDidFinish(ExtendedTask task, Picture picture) {
-                        finishLoading();
-                        finish();
-                    }
-
-                    @Override
-                    public void taskFailed(ExtendedTask task, String message) {
-                        Toast.makeText(EditPictureActivity.this, message, Toast.LENGTH_LONG).show();
-                        finishLoading();
-                    }
-                }, selectedFile, title.getText().toString(), description.getText().toString(),
-                        getSelectedVisibility(), galleryId);
-            } catch (IllegalArgumentException ex) {
-                finishLoading();
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.error_invalid_picture)
-                        .setMessage(R.string.error_invalid_picture_message)
-                        .setPositiveButton(R.string.ok, null);
-                builder.create().show();
-            }
-        }
+        finish();
     }
 }
