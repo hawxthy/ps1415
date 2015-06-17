@@ -273,7 +273,7 @@ public class EventEndpoint extends SkatenightServerEndpoint {
         PersistenceManager pm = getPersistenceManagerFactory().getPersistenceManager();
         try {
             RegistrationManager rm = getRegistrationManager(pm);
-            if (rm.getRegisteredUser() != null) {
+            if (rm.getRegisteredUser() != null && !rm.getRegisteredUser().isEmpty()) {
                 Sender sender = new Sender(Constants.GCM_API_KEY);
                 Message.Builder mb = new Message.Builder()
                         // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt

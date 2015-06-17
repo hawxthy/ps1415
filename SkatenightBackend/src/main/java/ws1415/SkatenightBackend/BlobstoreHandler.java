@@ -10,6 +10,7 @@ import com.google.appengine.api.images.ServingUrlOptions;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public class BlobstoreHandler extends HttpServlet {
         }
 
         Map<String, List<BlobKey>> uploads = blobstoreService.getUploads(req);
-        List<BlobKey> blobKeys = uploads.get("files");
+        List<BlobKey> blobKeys = new LinkedList<>(uploads.get("files"));
 
         if (!blobKeys.isEmpty()) {
             try {
@@ -75,6 +76,8 @@ public class BlobstoreHandler extends HttpServlet {
                     }
                 }
 
+                log("blobKeys: " + blobKeys);
+
                 BlobKeyContainer container = (BlobKeyContainer) ofy().load().kind(containerClass).id(Long.parseLong(containerId)).safe();
                 container.consumeBlobKeys(blobKeys);
                 ofy().save().entity(container).now();
@@ -82,9 +85,16 @@ public class BlobstoreHandler extends HttpServlet {
                 // BlobKey zurück an den Client senden
                 resp.setCharacterEncoding("UTF-8");
                 for (BlobKey key : blobKeys.subList(0, blobKeys.size() - 1)) {
-                    resp.getWriter().println(key.getKeyString());
+                    if (key != null) {
+                        resp.getWriter().println(key.getKeyString());
+                    } else {
+                        resp.getWriter().println();
+                    }
                 }
-                resp.getWriter().print(blobKeys.get(blobKeys.size() - 1).getKeyString());
+                BlobKey lastBLobKey = blobKeys.get(blobKeys.size() - 1);
+                if (lastBLobKey != null) {
+                    resp.getWriter().print(lastBLobKey.getKeyString());
+                }
                 resp.getWriter().flush();
                 resp.getWriter().close();
             } catch(Exception ex) {
@@ -117,46 +127,18 @@ public class BlobstoreHandler extends HttpServlet {
         if (req.getParameter("crop") != null) {
             // Crop
             int imageSize = Integer.parseInt(req.getParameter("crop"));
-            int retries = 3;
-            String servingUrl = null;
-            do {
-                try {
-                    servingUrl = imagesService.getServingUrl(ServingUrlOptions.Builder.withBlobKey(key).imageSize(imageSize).crop(true));
-                } catch (ImagesServiceFailureException ex) {
-                    log("Fehler beim Aufrufen des ImagesService.", ex);
-                }
-                retries--;
-            } while (retries > 0 && servingUrl == null);
-            if (servingUrl != null) {
-                resp.setCharacterEncoding("UTF-8");
-                resp.getWriter().print(servingUrl);
-                resp.getWriter().flush();
-                resp.getWriter().close();
-            } else {
-                log("ImageService konnte auch nach mehreren Versuchen nicht erreicht werden. Das Bild wird in Originalgröße zurückgegeben.");
-                blobstoreService.serve(key, resp);
-            }
+            String servingUrl = imagesService.getServingUrl(ServingUrlOptions.Builder.withBlobKey(key).imageSize(imageSize).crop(true));
+            resp.setCharacterEncoding("UTF-8");
+            resp.getWriter().print(servingUrl);
+            resp.getWriter().flush();
+            resp.getWriter().close();
         } else if (req.getParameter("scale") != null) {
             int size = Integer.parseInt(req.getParameter("scale"));
-            int retries = 3;
-            String servingUrl = null;
-            do {
-                try {
-                    servingUrl = imagesService.getServingUrl(ServingUrlOptions.Builder.withBlobKey(key).imageSize(size).crop(false));
-                } catch (ImagesServiceFailureException ex) {
-                    log("Fehler beim Aufrufen des ImagesService.", ex);
-                }
-                retries--;
-            } while (retries > 0 && servingUrl == null);
-            if (servingUrl != null) {
-                resp.setCharacterEncoding("UTF-8");
-                resp.getWriter().print(servingUrl);
-                resp.getWriter().flush();
-                resp.getWriter().close();
-            } else {
-                log("ImageService konnte auch nach mehreren Versuchen nicht erreicht werden. Das Bild wird in Originalgröße zurückgegeben.");
-                blobstoreService.serve(key, resp);
-            }
+            String servingUrl = imagesService.getServingUrl(ServingUrlOptions.Builder.withBlobKey(key).imageSize(size).crop(false));
+            resp.setCharacterEncoding("UTF-8");
+            resp.getWriter().print(servingUrl);
+            resp.getWriter().flush();
+            resp.getWriter().close();
         } else {
             blobstoreService.serve(key, resp);
         }

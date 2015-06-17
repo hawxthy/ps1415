@@ -162,6 +162,7 @@ public class EditPictureActivity extends Activity {
                 } else {
                     findViewById(R.id.changeVisibilityHint).setVisibility(View.GONE);
                 }
+                edited = initialVisibility != getSelectedVisibility();
                 visibilityHint.setText(getResources().getStringArray(R.array.picture_visibility_hints)[v.ordinal()]);
             }
 

@@ -166,17 +166,19 @@ public abstract class EventController {
                         BlobKey blobKey = new BlobKey();
                         blobKey.setKeyString(keyStrings[0]);
                         createdEvent.setIcon(blobKey);
-                        if (keyStrings.length > 1 && headerImage != null) {
+                        if (keyStrings.length > 1 && keyStrings[1] != null && !keyStrings[1].isEmpty()) {
                             blobKey = new BlobKey();
                             blobKey.setKeyString(keyStrings[1]);
                             createdEvent.setHeaderImage(blobKey);
                         }
-                        if (keyStrings.length > 2 || (keyStrings.length > 1 && headerImage == null)) {
+                        if (keyStrings.length > 2) {
                             createdEvent.setImages(new LinkedList<BlobKey>());
-                            for (int i = (headerImage == null ? 1 : 2); i < keyStrings.length; i++) {
-                                blobKey = new BlobKey();
-                                blobKey.setKeyString(keyStrings[i]);
-                                createdEvent.getImages().add(blobKey);
+                            for (int i = 2; i < keyStrings.length; i++) {
+                                if (keyStrings[i] != null && !keyStrings[i].isEmpty()) {
+                                    blobKey = new BlobKey();
+                                    blobKey.setKeyString(keyStrings[i]);
+                                    createdEvent.getImages().add(blobKey);
+                                }
                             }
                         }
                     } catch(IOException ex) {

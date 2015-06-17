@@ -27,6 +27,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="180dp"
                 android:scaleType="center"
+                android:adjustViewBounds="true"
                 android:src="@drawable/template_picture"
                 android:onClick="onChoosePictureClick" />
 

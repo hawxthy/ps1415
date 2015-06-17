@@ -455,6 +455,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
                     File tmpHeaderImageFile = new File(tempPath);
                     try {
                         ImageUtil.loadSubsampledImageInView(tmpHeaderImageFile, headerImage, headerImage.getWidth());
+                        headerImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     } catch (IllegalArgumentException ex) {
                         Toast.makeText(this, R.string.error_image_too_large, Toast.LENGTH_LONG).show();
                     }
