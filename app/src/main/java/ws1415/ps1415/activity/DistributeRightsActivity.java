@@ -254,6 +254,8 @@ public class DistributeRightsActivity extends Activity {
             public void onClick(View view) {
                 if(recieveRightsChangeList.size() > 0){
                     if(rightsGrantedList.size() > 0){
+                        acceptButton.setVisibility(View.GONE);
+                        cancelButton.setVisibility(View.GONE);
                         setProgressBarIndeterminateVisibility(Boolean.TRUE);
                         RightController.getInstance().giveRightsToUsers(new ExtendedTaskDelegateAdapter<Void, Void>(){
                             @Override
@@ -266,10 +268,14 @@ public class DistributeRightsActivity extends Activity {
                             public void taskFailed(ExtendedTask task, String message) {
                                 Toast.makeText(DistributeRightsActivity.this, message, Toast.LENGTH_LONG).show();
                                 setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                                acceptButton.setVisibility(View.VISIBLE);
+                                cancelButton.setVisibility(View.VISIBLE);
                             }
                         },groupName, recieveRightsChangeList, rightsGrantedList);
                     }
                     if(rightsTakenList.size() > 0){
+                        acceptButton.setVisibility(View.GONE);
+                        cancelButton.setVisibility(View.GONE);
                         setProgressBarIndeterminateVisibility(Boolean.TRUE);
                         RightController.getInstance().takeRightsFromUsers(new ExtendedTaskDelegateAdapter<Void, Void>(){
                             @Override
@@ -281,6 +287,9 @@ public class DistributeRightsActivity extends Activity {
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
                                 Toast.makeText(DistributeRightsActivity.this, message, Toast.LENGTH_LONG).show();
+                                setProgressBarIndeterminateVisibility(Boolean.FALSE);
+                                acceptButton.setVisibility(View.VISIBLE);
+                                cancelButton.setVisibility(View.VISIBLE);
                             }
                         }, groupName, recieveRightsChangeList, rightsTakenList);
                     }

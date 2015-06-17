@@ -9,6 +9,7 @@
     <LinearLayout
         android:layout_width="0px"
         android:layout_height="0px"
+        android:layout_toLeftOf="@+id/input_view"
         android:focusable="true"
         android:focusableInTouchMode="true" />
 
@@ -18,32 +19,49 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <com.wrapp.floatlabelededittext.FloatLabeledEditText
-            android:id="@+id/floating_edit_text"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1">
 
-            <EditText
-                android:id="@+id/search_user_edit_text"
+            <com.wrapp.floatlabelededittext.FloatLabeledEditText
+                android:id="@+id/floating_edit_text"
+                android:layout_toLeftOf="@+id/search_user_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/user"
-                android:maxLength="50"
-                android:singleLine="true"
-                android:textSize="16dp" />
-        </com.wrapp.floatlabelededittext.FloatLabeledEditText>
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/search_user_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/user"
+                    android:maxLength="50"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textSize="16dp"
+                    android:imeOptions="actionGo"/>
+            </com.wrapp.floatlabelededittext.FloatLabeledEditText>
+
+        </LinearLayout>
 
 
-        <com.gc.materialdesign.views.ButtonFlat
-            android:id="@+id/search_user_button"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="#1E88E5"
-            android:text="@string/search" />
+            android:layout_height="wrap_content">
 
+            <com.gc.materialdesign.views.ButtonFlat
+                android:id="@+id/search_user_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="16dp"
+                android:background="#1E88E5"
+                android:text="@string/search" />
+
+        </LinearLayout>
     </LinearLayout>
+
 
 
     <ListView

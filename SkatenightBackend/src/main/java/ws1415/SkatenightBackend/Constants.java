@@ -7,15 +7,15 @@ public class Constants {
     /**
      * Die Basisadresse des Backends.
      */
-    public static final String BASE_URL = "https://skatenight-ms-testing.appspot.com";
+    public static final String BASE_URL = "https://skatenight-ms.appspot.com";
     /**
      * Client-ID für die normale App.
      */
-    public static final String ANDROID_USER_CLIENT_ID = "644721617929-pre5qlom1cvr0e071tlsg6kvvcps8ngt.apps.googleusercontent.com";
+    public static final String ANDROID_USER_CLIENT_ID = "37947570052-g006o3ovfotnjqreltom6c7cbktm7dap.apps.googleusercontent.com";
     /**
      * Client-ID für Webaufrufe.
      */
-    public static final String WEB_CLIENT_ID = "644721617929-asqioscun7ejlghnfrj7rpuashjb0tb4.apps.googleusercontent.com";
+    public static final String WEB_CLIENT_ID = "37947570052-dk3rjhgran1s38gscv6va2rmmv2bei8r.apps.googleusercontent.com";
 
     /**
      * Definiert die Webclient-ID als Android Audience, da aus den Apps der Zugriff auf das Back-
@@ -44,7 +44,7 @@ public class Constants {
     /**
      * Der Public API-Key, der in der Developer Console für GCM angelegt wurde.
      */
-    public static final String GCM_API_KEY = "AIzaSyCpwhxda1Lb5E61_fybZq2iSJgViZu3QNM";
+    public static final String GCM_API_KEY = "AIzaSyDO8mosWwYXjjGZ9besu9CZw1LDEEXrFXE";
 
     /**
      * Definiert die Benutzer, der als Administrator beim Start der Servers erstellt werden sollen,

@@ -393,6 +393,7 @@
     <string name="sendDone">Invitations have been send</string>
     <string name="noUsersToInvite">No users to invite Selected</string>
     <string name="title_activity_invite_users_to_group">Invite Users</string>
+    <string name="invitation_title">Invitation message</string>
 
     <!-- MyUserGroupsActivity-->
     <string name="tooManyVisibleGroups">Too many visible Groups</string>
@@ -483,6 +484,9 @@
     <string name="cant_make_security_group_open">You can not make Security groups open</string>
     <string name="your_group_is_open">Your Group is now open</string>
     <string name="your_group_is_private">Your Group is now private</string>
+    <string name="change_password_old">Old Password</string>
+    <string name="change_password_new">New Password</string>
+    <string name="change_password_new_repeat">Repeat Password</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="deleteThisEntryQuestion">Delete this Entry?</string>

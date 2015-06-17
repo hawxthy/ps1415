@@ -146,6 +146,7 @@ public class GroupController {
      * @return Eine Liste der Metadaten zu den sichtbaren Gruppen.
      */
     public List<UserGroupMetaData> getVisibleUserGroups(final Context context) {
+        // wahrscheinlich nicht nötig
         UserGroupFilter filter = new UserGroupFilter();
         filter.setLimit(1000);
         final List<UserGroupMetaData> visibleGroups = new ArrayList<>();
@@ -412,12 +413,12 @@ public class GroupController {
      * @param groupName die UserGroup zu der die Einladung verschickt wird
      * @param users     Die EndUser, die die Einladung erhalten soll
      */
-    public void sendInvitation(ExtendedTaskDelegate handler, String groupName, final List<String> users) {
+    public void sendInvitation(ExtendedTaskDelegate handler, String groupName, final List<String> users, final String invitationMessage) {
         new ExtendedTask<String, Void, Void>(handler) {
             @Override
             protected Void doInBackground(String... params) {
                 try {
-                    return ServiceProvider.getService().groupEndpoint().sendInvitation(params[0], new ListWrapper().setStringList(users)).execute();
+                    return ServiceProvider.getService().groupEndpoint().sendInvitation(params[0], invitationMessage, new ListWrapper().setStringList(users)).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Fehler: Die Einladung konnte nicht versendet werden");
@@ -819,14 +820,18 @@ public class GroupController {
             protected Bitmap doInBackground(String... params) {
                 try {
                     blobKey = ServiceProvider.getService().groupEndpoint().getUserGroupPicture(params[0]).execute();
-                    HttpClient client = new DefaultHttpClient();
-                    HttpGet get = new HttpGet(Constants.SERVER_URL + "/Bernd/images/serve?key=" + blobKey.getKeyString());
-                    HttpResponse response = client.execute(get);
-                    HttpEntity httpEntity = response.getEntity();
+                    if(blobKey != null){
+                        HttpClient client = new DefaultHttpClient();
+                        HttpGet get = new HttpGet(Constants.SERVER_URL + "/Bernd/images/serve?key=" + blobKey.getKeyString());
+                        HttpResponse response = client.execute(get);
+                        HttpEntity httpEntity = response.getEntity();
 
-                    is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
-                    Bitmap bitmap = BitmapFactory.decodeStream(is);
-                    return bitmap;
+                        is = new ByteArrayInputStream(EntityUtils.toByteArray(httpEntity));
+                        Bitmap bitmap = BitmapFactory.decodeStream(is);
+                        return bitmap;
+                    }else{
+                        return null;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Fehler: Das Bild konnte nicht abgerufen werden");

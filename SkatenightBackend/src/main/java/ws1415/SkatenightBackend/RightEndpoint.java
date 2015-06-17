@@ -277,8 +277,6 @@ public class RightEndpoint extends SkatenightServerEndpoint {
         if(hasRights(group, user.getEmail(), Right.FULLRIGHTS.name())){
             EndpointUtil.throwIfUserNotInGroup(group, newLeader);
             group.getMemberRights().get(user.getEmail()).remove(Right.FULLRIGHTS.name());
-            group.getMemberRights().get(user.getEmail()).add(Right.NEWMEMBERRIGHTS.name());
-            group.getMemberRights().get(newLeader).remove(Right.NEWMEMBERRIGHTS.name());
             group.getMemberRights().get(newLeader).add(Right.FULLRIGHTS.name());
         }else{
             EndpointUtil.throwIfNoRights();
