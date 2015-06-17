@@ -48,8 +48,8 @@ import ws1415.ps1415.util.ImageUtil;
  * - {@code ADMIN_MAIL}
  * - {@code TEST_MAIL_1}
  * - {@code TEST_MAIL_2}
- * Dazu müssen diese in den Einstellungen des Gerätes mit dem Passwort: "skatenight123" hinzugefügt
- * werden.
+ * Dazu müssen diese in den Einstellungen des Gerätes mit dem Passwort, das in der Dokumenation
+ * zu finden ist, hinzugefügt werden.
  *
  * @author Martin Wrodarczyk
  */

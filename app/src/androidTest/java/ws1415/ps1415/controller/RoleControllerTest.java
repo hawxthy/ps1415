@@ -20,8 +20,8 @@ import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
  * Folgende E-Mail Accounts müssen auf dem Gerät registriert sein um die Tests auszuführen:
  * - {@code ADMIN_MAIL}
  * - {@code TEST_MAIL}
- * Dazu müssen diese in den Einstellungen des Gerätes mit dem Passwort: "skatenight123" hinzugefügt
- * werden.
+ * Dazu müssen diese in den Einstellungen des Gerätes mit dem Passwort, das in der Dokumenation
+ * zu finden ist, hinzugefügt werden.
  *
  * @author Martin Wrodarczyk
  */

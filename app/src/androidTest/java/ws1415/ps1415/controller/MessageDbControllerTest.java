@@ -18,8 +18,8 @@ import ws1415.ps1415.model.Message;
  *
  * Folgender E-Mail Account muss auf dem Gerät registriert sein um die Tests auszuführen:
  * - {@code USER_MAIL}
- * Dazu muss dieser in den Einstellungen des Gerätes mit dem Passwort: "skatenight123" hinzugefügt
- * werden.
+ * Dazu muss dieser in den Einstellungen des Gerätes mit dem Passwort, das in der Dokumenation
+ * zu finden ist, hinzugefügt werden.
  *
  * @author Martin Wrodarczyk
  */

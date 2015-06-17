@@ -13,7 +13,7 @@ import java.util.Map.Entry;
 /**
  * MemoryCache für Bitmaps, der mit dem LRU-Verfahren arbeitet.
  *
- * Credit: http://androidexample.com/Download_Images_From_Web_And_Lazy_Load_In_ListView_-_Android_Example/index.php?view=article_discription&aid=112&aaid=134
+ * Basiert auf: http://androidexample.com/Download_Images_From_Web_And_Lazy_Load_In_ListView_-_Android_Example/index.php?view=article_discription&aid=112&aaid=134
  * @author Martin Wrodarczyk
  */
 public class MemoryCache {

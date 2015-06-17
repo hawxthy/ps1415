@@ -719,7 +719,7 @@ public class UserEndpoint extends SkatenightServerEndpoint {
             return mailOfCaller.equals(mailOfCalled);
         if (visibility.equals(Visibility.FRIENDS)) {
             if (mailOfCaller.equals(mailOfCalled)) return true;
-            if (friends == null) return false;
+            if (friends == null || friends.isEmpty()) return false;
             for (String friend : friends) {
                 if (friend.equals(mailOfCaller)) return true;
             }
@@ -746,7 +746,11 @@ public class UserEndpoint extends SkatenightServerEndpoint {
         if (showPrivateGroups) {
             return userGroupIds;
         } else {
-            return new GroupEndpoint().getPublicGroups(userGroupIds);
+            if(!userGroupIds.isEmpty()) {
+                return new GroupEndpoint().getPublicGroups(userGroupIds);
+            } else {
+                return userGroupIds;
+            }
         }
     }
 
