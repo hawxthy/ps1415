@@ -62,6 +62,7 @@ public class GcmIntentService extends IntentService {
                 try {
                     type = MessageType.valueOf(extras.getString("type"));
                 } catch (Exception e) {
+                    GcmBroadcastReceiver.completeWakefulIntent(intent);
                     return;
                 }
                 switch (type) {

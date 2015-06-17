@@ -180,7 +180,7 @@ public class ConversationActivity extends Activity {
      * @param event Event mit der Email als Information
      */
     public void onEventMainThread(NewMessageEvent event) {
-        if (mEmail != null) {
+        if (mEmail != null && mEmail.equals(event.getUserMail())) {
             setUpData();
             MessageDbController.getInstance(ConversationActivity.this).resetNewMessages(mEmail);
         }

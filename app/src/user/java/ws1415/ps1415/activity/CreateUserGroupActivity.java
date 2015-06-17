@@ -17,6 +17,7 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gc.materialdesign.views.ButtonFlat;
 import com.gc.materialdesign.views.Switch;
@@ -28,10 +29,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import ws1415.ps1415.R;
 import ws1415.ps1415.controller.GroupController;
-import ws1415.ps1415.model.NavDrawerGroupList;
 import ws1415.ps1415.model.UserGroupType;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
