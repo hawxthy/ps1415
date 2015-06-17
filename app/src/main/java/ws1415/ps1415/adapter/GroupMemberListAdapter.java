@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -242,76 +241,82 @@ public class GroupMemberListAdapter extends BaseAdapter {
         }else if(mContext instanceof DistributeRightsActivity){
             final DistributeRightsActivity activity = (DistributeRightsActivity)mContext;
 
-            // Prüfe, welche Buttons sichtbar sein müssen und welche icons diese haben müssen;
-            if(listOfMembersWhoGetRights.contains(getItem(i).getEmail())){
-                holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
-                holder.buttonLeft.setVisibility(View.VISIBLE);
-            }else{
-                holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
-                holder.buttonLeft.setVisibility(View.GONE);
-            }
+            // Setze die Icons auf die Buttons
+            holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
             holder.buttonLeft.setImageDrawable(activity.getResources().getDrawable(R.drawable.remove_icon_in_red));
 
+            // Prüfe, welche Buttons sichtbar sein müssen und welche icons diese haben müssen;
+            if(listOfMembersWhoGetRights.contains(getItem(i).getEmail())){
+                holder.buttonRight.setVisibility(View.VISIBLE);
+                holder.buttonLeft.setVisibility(View.GONE);
+            }else{
+                holder.buttonRight.setVisibility(View.GONE);
+                holder.buttonLeft.setVisibility(View.VISIBLE);
+            }
+
             // Setze die Listener
-            holder.buttonRight.setOnClickListener(new View.OnClickListener() {
+            holder.buttonLeft.setOnClickListener(new View.OnClickListener() {
                 String email = getItem(i).getEmail();
                 @Override
                 public void onClick(View view) {
                     activity.addMemberToList(email);
-                    holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
-                    holder.buttonLeft.setVisibility(View.VISIBLE);
+                    holder.buttonLeft.setVisibility(View.GONE);
+                    holder.buttonRight.setVisibility(View.VISIBLE);
                     listOfMembersWhoGetRights.add(getItem(i).getEmail());
                 }
             });
-            holder.buttonLeft.setOnClickListener(new View.OnClickListener() {
+            holder.buttonRight.setOnClickListener(new View.OnClickListener() {
                 String email = getItem(i).getEmail();
 
                 @Override
                 public void onClick(View view) {
                     activity.removeMemberFromList(email);
-                    holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
-                    holder.buttonLeft.setVisibility(View.GONE);
+                    holder.buttonLeft.setVisibility(View.VISIBLE);
+                    holder.buttonRight.setVisibility(View.GONE);
                     listOfMembersWhoGetRights.remove(getItem(i).getEmail());
                 }
             });
         }else{
             final InviteUsersToGroupActivity activity = (InviteUsersToGroupActivity)mContext;
 
-            // Prüfe, welche Buttons sichtbar sein müssen und welche icons diese haben müssen;
+            // Setze die Icons auf die Buttons
+            holder.buttonLeft.setImageDrawable(activity.getResources().getDrawable(R.drawable.remove_icon_in_red));
+            holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
+
+            // Prüfe, welche Buttons sichtbar sein müssen
             if(listOfMembersWhoGetRights.contains(getItem(i).getEmail()) || alradyChosenMembers.contains(getItem(i).getEmail())){
-                holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
-                holder.buttonLeft.setVisibility(View.VISIBLE);
+                holder.buttonLeft.setVisibility(View.GONE);
+                holder.buttonRight.setVisibility(View.VISIBLE);
             }else {
                 if (members.contains(getItem(i).getEmail())) {
                     holder.buttonRight.setVisibility(View.GONE);
                     holder.buttonLeft.setVisibility(View.GONE);
                 }else{
-                    holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
-                    holder.buttonLeft.setVisibility(View.GONE);
+                    holder.buttonLeft.setVisibility(View.VISIBLE);
+                    holder.buttonRight.setVisibility(View.GONE);
                 }
             }
-            holder.buttonLeft.setImageDrawable(activity.getResources().getDrawable(R.drawable.remove_icon_in_red));
 
             // Setze die Listener
-            holder.buttonRight.setOnClickListener(new View.OnClickListener() {
-                String email = getItem(i).getEmail();
-
-                @Override
-                public void onClick(View view) {
-                    activity.addMemberToList(email);
-                    holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.green_tick));
-                    holder.buttonLeft.setVisibility(View.VISIBLE);
-                    listOfMembersWhoGetRights.add(getItem(i).getEmail());
-                }
-            });
             holder.buttonLeft.setOnClickListener(new View.OnClickListener() {
                 String email = getItem(i).getEmail();
 
                 @Override
                 public void onClick(View view) {
-                    activity.removeMemberFromList(email);
-                    holder.buttonRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_add_black_24dp));
+                    activity.addMemberToList(email);
                     holder.buttonLeft.setVisibility(View.GONE);
+                    holder.buttonRight.setVisibility(View.VISIBLE);
+                    listOfMembersWhoGetRights.add(getItem(i).getEmail());
+                }
+            });
+            holder.buttonRight.setOnClickListener(new View.OnClickListener() {
+                String email = getItem(i).getEmail();
+
+                @Override
+                public void onClick(View view) {
+                    activity.removeMemberFromList(email);
+                    holder.buttonLeft.setVisibility(View.VISIBLE);
+                    holder.buttonRight.setVisibility(View.GONE);
                     listOfMembersWhoGetRights.remove(getItem(i).getEmail());
                 }
             });

@@ -10,14 +10,11 @@ import android.widget.TextView;
 
 import com.skatenight.skatenightAPI.model.Comment;
 
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.CommentBlackBoardActivity;
 import ws1415.ps1415.util.DateUtil;
 

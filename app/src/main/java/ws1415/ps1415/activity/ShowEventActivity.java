@@ -7,12 +7,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,32 +36,37 @@ import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.Route;
-import com.skatenight.skatenightAPI.model.ServerWaypoint;
 
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import ws1415.ps1415.LocationTransmitterService;
+import ws1415.ps1415.R;
 import ws1415.ps1415.ServiceProvider;
+import ws1415.ps1415.adapter.DynamicFieldsAdapter;
 import ws1415.ps1415.controller.EventController;
 import ws1415.ps1415.model.EventParticipationVisibility;
 import ws1415.ps1415.model.EventRole;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
-import ws1415.ps1415.R;
-import ws1415.ps1415.adapter.DynamicFieldsAdapter;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.DiskCacheImageLoader;
 import ws1415.ps1415.util.FormatterUtil;
+import ws1415.ps1415.util.LocalStorageUtil;
 import ws1415.ps1415.util.LocationUtils;
 import ws1415.ps1415.util.UniversalUtil;
 
 public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<Void,EventData> {
+    /**
+     * Falls diese Activity einen Intent mit der SHOW_LOCAL_ANALYSIS_ACTION erhält, wird die Schalt-
+     * fläche zur Anzeige der lokalen Auswertung aktualisiert.
+     */
+    public static final String REFRESH_LOCAL_ANALYSIS_BUTTON_ACTION = "SHOW_LOCAL_ANALYSIS";
+
     public static final String EXTRA_EVENT_ID = ShowEventActivity.class.getName() + ".EventId";
 
     private static final String MEMBER_EVENT_ID = ShowEventActivity.class.getName() + ".EventId";
@@ -94,6 +98,7 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
             public void onClick(View v) {
                 Intent intent = new Intent(ShowEventActivity.this, ActiveEventActivity.class);
                 intent.putExtra(ActiveEventActivity.EXTRA_KEY_ID, eventId);
+                intent.putExtra(ActiveEventActivity.EXTRA_CAN_SEND_BROADCAST, event.getCanSendBroadcast());
                 startActivity(intent);
             }
         });
@@ -114,6 +119,30 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
             throw new RuntimeException("intent has to have extra " + EXTRA_EVENT_ID);
         }
         EventController.getEvent(this, eventId);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                refreshLocalAnalysisButton();
+            }
+        }, new IntentFilter(REFRESH_LOCAL_ANALYSIS_BUTTON_ACTION));
+    }
+
+    private void refreshLocalAnalysisButton() {
+        if (event != null && event.getDate().getValue() < System.currentTimeMillis()) {
+            LocalStorageUtil localStorageUtil = new LocalStorageUtil(ShowEventActivity.this);
+            if (localStorageUtil.getData(String.valueOf(event.getId())) != null) {
+                showActiveEvent.setText(R.string.show_passed_event);
+            } else {
+                showActiveEvent.setText(R.string.show_active_event);
+                if (event.getMemberList().containsKey(ServiceProvider.getEmail())) {
+                    showActiveEvent.setVisibility(View.VISIBLE);
+                } else {
+                    showActiveEvent.setVisibility(View.GONE);
+                }
+            }
+        } else {
+            showActiveEvent.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -192,7 +221,7 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
                         joinLeaveEventItem.setTitle(R.string.join_event);
                         event.getMemberList().remove(ServiceProvider.getEmail());
                         event.setParticipationVisibility(null);
-                        showActiveEvent.setVisibility(View.GONE);
+                        refreshLocalAnalysisButton();
                         finish();
                     }
                     @Override
@@ -260,11 +289,7 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         title.setText(eventData.getTitle());
         TextView date = (TextView) findViewById(R.id.date);
         Date tmpDate = new Date(eventData.getDate().getValue());
-        if (tmpDate.getTime() < System.currentTimeMillis() && eventData.getMemberList().containsKey(ServiceProvider.getEmail())) {
-            showActiveEvent.setVisibility(View.VISIBLE);
-        } else {
-            showActiveEvent.setVisibility(View.GONE);
-        }
+        refreshLocalAnalysisButton();
         date.setText(DateFormat.getMediumDateFormat(this).format(tmpDate) + " " + DateFormat.getTimeFormat(this).format(tmpDate));
         TextView description = (TextView) findViewById(R.id.description);
         description.setText(eventData.getDescription());
@@ -310,10 +335,9 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
                 final PolylineOptions routePoly = new PolylineOptions()
                         .addAll(line)
                         .color(Color.BLUE);
-
                 googleMap.clear();
                 googleMap.addPolyline(routePoly);
-
+                googleMap.getUiSettings().setAllGesturesEnabled(false);
                 googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
                     @Override
                     public void onMapLoaded() {
@@ -335,14 +359,6 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
             } catch (ParseException e) {
                 Toast.makeText(getApplicationContext(), "Route parsing failed.", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
-            }
-
-            // Wegpunkte laden, falls vorhanden
-            List<ServerWaypoint> waypoints = route.getWaypoints();
-            for (ServerWaypoint wp : waypoints) {
-                RouteEditorActivity.Waypoint tmp = RouteEditorActivity.Waypoint.create(
-                        new LatLng(wp.getLatitude(), wp.getLongitude()), wp.getTitle());
-                googleMap.addMarker(tmp.getMarkerOptions());
             }
         }
 
@@ -377,11 +393,10 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
             public void taskDidFinish(ExtendedTask task, EventRole role) {
                 joinLeaveEventItem.setTitle(R.string.leave_event);
                 event.getMemberList().put(ServiceProvider.getEmail(), role.name());
+                eventRoles.put(ServiceProvider.getEmail(), role);
                 event.setParticipationVisibility(visibility.name());
-                LocationTransmitterService.ScheduleService(ShowEventActivity.this, event.getId(), new Date(event.getDate().getValue()));
-                if (event.getDate().getValue() < System.currentTimeMillis()) {
-                    showActiveEvent.setVisibility(View.VISIBLE);
-                }
+                LocationTransmitterService.ScheduleService(ShowEventActivity.this, eventId, new Date(event.getDate().getValue()));
+                refreshLocalAnalysisButton();
                 finish();
             }
             @Override
@@ -433,27 +448,5 @@ public class ShowEventActivity extends Activity implements ExtendedTaskDelegate<
         intent.putExtra(ListPicturesActivity.EXTRA_CONTAINER_ID, event.getId());
         intent.putExtra(ListPicturesActivity.EXTRA_TITLE, event.getTitle());
         startActivity(intent);
-    }
-
-    /**
-     * Broadcast-Receiver, der Broadcast bezüglich dem Start eines Events empfängt. Falls der Alarm
-     * für das aktuell angezeigt Event zuständig ist, wird der Button für die lokale Auswertung angezeigt.
-     */
-    public class StartServiceReceiver extends BroadcastReceiver {
-        public static final String EXTRA_EVENT_ID = "start_service_receiver_extra_event_id";
-        public static final String EXTRA_ALARM_ID = "start_service_receiver_extra_alarm_id";
-
-        @Override
-        public void onReceive(final Context context, Intent intent) {
-            final long keyId = intent.getLongExtra(EXTRA_EVENT_ID, 0);
-            final int alarmId = intent.getIntExtra(EXTRA_ALARM_ID, 0);
-
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-            final boolean responsible = (prefs.getInt(keyId + "-alarm", 0) == alarmId);
-            final boolean started = prefs.getBoolean(keyId + "-started", false);
-            if (keyId != 0 && alarmId != 0 && responsible && !started) {
-                showActiveEvent.setVisibility(View.VISIBLE);
-            }
-        }
     }
 }

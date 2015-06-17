@@ -14,19 +14,6 @@
         android:layout_height="wrap_content" />
 
 
-    <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/create_user_group_button_my_groups"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_action_new"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
-        fab:fab_colorNormal="@color/colorPrimary"
-        fab:fab_colorPressed="@color/colorPressed"
-        >
-    </com.melnykov.fab.FloatingActionButton>
     <TextView
         android:id="@+id/my_groups"
         android:text="@string/my_groups"
@@ -38,7 +25,7 @@
 
     <TextView
         android:id="@+id/show_info_my_groups"
-        android:layout_below="@+id/create_user_group_button_my_groups"
+        android:layout_below="@+id/my_groups"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/info_about_visibility"/>
@@ -53,7 +40,21 @@
         android:id="@+id/my_groups_list_view"
         android:layout_width="match_parent"
         android:layout_below="@+id/show_info_my_groups"
+        android:paddingBottom="50dp"
+        android:clipToPadding="false"
         android:layout_height="match_parent">
 
     </ListView>
+
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/create_user_group_button_my_groups"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_action_new"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        fab:fab_colorNormal="@color/colorPrimary"
+        fab:fab_colorPressed="@color/colorPressed"
+        >
+    </com.melnykov.fab.FloatingActionButton>
 </RelativeLayout>

@@ -7,10 +7,10 @@ import android.widget.ImageView;
 
 import com.skatenight.skatenightAPI.model.BlobKey;
 
+import ws1415.ps1415.R;
 import ws1415.ps1415.controller.UserController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.R;
 
 /**
  * Der UserImageLoader wird zur Verwaltung der Benutzerbilder im MemoryCache genutzt.

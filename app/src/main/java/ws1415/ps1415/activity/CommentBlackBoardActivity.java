@@ -20,9 +20,6 @@ import android.widget.Toast;
 
 import com.melnykov.fab.FloatingActionButton;
 import com.skatenight.skatenightAPI.model.BoardEntry;
-import com.skatenight.skatenightAPI.model.BooleanWrapper;
-
-import org.w3c.dom.Text;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.adapter.CommentBoardAdapter;

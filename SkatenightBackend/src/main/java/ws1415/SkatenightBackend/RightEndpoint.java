@@ -1,14 +1,11 @@
 package ws1415.SkatenightBackend;
 
-import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 import ws1415.SkatenightBackend.model.Right;
 import ws1415.SkatenightBackend.model.UserGroup;
@@ -277,8 +274,6 @@ public class RightEndpoint extends SkatenightServerEndpoint {
         if(hasRights(group, user.getEmail(), Right.FULLRIGHTS.name())){
             EndpointUtil.throwIfUserNotInGroup(group, newLeader);
             group.getMemberRights().get(user.getEmail()).remove(Right.FULLRIGHTS.name());
-            group.getMemberRights().get(user.getEmail()).add(Right.NEWMEMBERRIGHTS.name());
-            group.getMemberRights().get(newLeader).remove(Right.NEWMEMBERRIGHTS.name());
             group.getMemberRights().get(newLeader).add(Right.FULLRIGHTS.name());
         }else{
             EndpointUtil.throwIfNoRights();

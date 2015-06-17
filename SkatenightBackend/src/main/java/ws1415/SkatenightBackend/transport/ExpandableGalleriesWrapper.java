@@ -1,9 +1,6 @@
 package ws1415.SkatenightBackend.transport;
 
 import java.util.List;
-import java.util.Map;
-
-import ws1415.SkatenightBackend.model.Gallery;
 
 /**
  * Transportklasse, die eine Map von GalleryMetaData-Objekten und dazugehörige Zusatztitel speichert.

@@ -1,104 +1,115 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:orientation="vertical"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="ws1415.ps1415.activity.EditPictureActivity">
+    tools:context="ws1415.ps1415.activity.EditPictureActivity" >
 
     <ProgressBar
         android:id="@+id/pictureUploading"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
         android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/picture"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="180dp"
-        android:scaleType="center"
-        android:src="@drawable/template_picture"
-        android:layout_below="@id/pictureUploading"
-        android:onClick="onChoosePictureClick" />
+        android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/picture"
-        android:paddingTop="16dp"
-        android:maxLength="40"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:hint="@string/title_hint"
-        style="@style/primaryText" />
+        <RelativeLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/title"
-        android:maxLength="500"
-        android:hint="@string/description_hint"
-        style="@style/primaryText" />
+            <ImageView
+                android:id="@+id/picture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="180dp"
+                android:scaleType="center"
+                android:src="@drawable/template_picture"
+                android:onClick="onChoosePictureClick" />
 
-    <TextView
-        android:id="@+id/visibility_label"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/description"
-        android:paddingTop="16dp"
-        android:text="@string/visibility_label"
-        style="@style/primaryText" />
+            <EditText
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/picture"
+                android:paddingTop="16dp"
+                android:maxLength="40"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:hint="@string/title_hint"
+                style="@style/primaryText" />
 
-    <Spinner
-        android:id="@+id/visibility"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignBaseline="@id/visibility_label"
-        android:layout_below="@id/description" />
+            <EditText
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/title"
+                android:maxLength="500"
+                android:hint="@string/description_hint"
+                style="@style/primaryText" />
 
-    <TextView
-        android:id="@+id/visibilityHint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/visibility"
-        android:paddingTop="8dp"
-        android:layout_alignParentRight="true"
-        style="@style/secondaryText" />
+            <TextView
+                android:id="@+id/visibility_label"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/description"
+                android:paddingTop="16dp"
+                android:text="@string/visibility_label"
+                style="@style/primaryText" />
 
-    <TextView
-        android:id="@+id/changeVisibilityHint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/visibilityHint"
-        android:paddingTop="8dp"
-        android:layout_alignParentRight="true"
-        android:text="@string/change_visibility_hint"
-        android:visibility="gone"
-        style="@style/secondaryText" />
+            <Spinner
+                android:id="@+id/visibility"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignBaseline="@id/visibility_label"
+                android:layout_below="@id/description" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/changeVisibilityHint"
-        android:paddingTop="16dp" >
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/cancel"
-            android:onClick="onCancelClick" />
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/save"
-            android:onClick="onSaveClick" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/visibilityHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/visibility"
+                android:paddingTop="8dp"
+                android:layout_alignParentRight="true"
+                style="@style/secondaryText" />
 
-</RelativeLayout>
+            <TextView
+                android:id="@+id/changeVisibilityHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/visibilityHint"
+                android:paddingTop="8dp"
+                android:layout_alignParentRight="true"
+                android:text="@string/change_visibility_hint"
+                android:visibility="gone"
+                style="@style/secondaryText" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_below="@id/changeVisibilityHint"
+                android:paddingTop="16dp" >
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/cancel"
+                    android:onClick="onCancelClick" />
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/save"
+                    android:onClick="onSaveClick" />
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</LinearLayout>

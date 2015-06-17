@@ -5,10 +5,8 @@ import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 
 import java.util.Date;
-import java.util.List;
 
 import ws1415.SkatenightBackend.UserEndpoint;
-import ws1415.SkatenightBackend.model.Gallery;
 import ws1415.SkatenightBackend.model.Picture;
 import ws1415.SkatenightBackend.model.PictureVisibility;
 

@@ -1,12 +1,9 @@
 package ws1415.ps1415.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -19,7 +16,6 @@ import com.skatenight.skatenightAPI.model.PictureData;
 import com.skatenight.skatenightAPI.model.PictureFilter;
 import com.skatenight.skatenightAPI.model.PictureMetaData;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +33,8 @@ import ws1415.ps1415.util.DiskCacheImageLoader;
  * @author Richard Schulze
  */
 public class PictureMetaDataAdapter extends BaseAdapter {
+    private static final Object fetchLock = new Object();
+
     /**
      * View-Type für Picture-Views.
      */
@@ -151,11 +149,12 @@ public class PictureMetaDataAdapter extends BaseAdapter {
                 // hinzu, der zu diesem Zeitpunkt aufgerufen wird und das Bild abruft
                 thumbnail.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
                     @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    public void onLayoutChange(View v, final int left, int top, final int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                         DiskCacheImageLoader.getInstance().loadScaledImage(thumbnail, picture.getImageBlobKey(), right - left);
                         thumbnail.removeOnLayoutChangeListener(this);
                     }
                 });
+                thumbnail.requestLayout();
                 title.setText(picture.getTitle());
                 ((TextView) view.findViewById(R.id.avgSymbol)).setText(Html.fromHtml(view.getResources().getString(R.string.average)));
                 if (picture.getAvgRating() != null) {
@@ -190,47 +189,55 @@ public class PictureMetaDataAdapter extends BaseAdapter {
         if (!keepFetching || fetching) {
             return;
         }
-        synchronized (fetching) {
+        synchronized (fetchLock) {
             if (fetching) {
                 return;
             } else {
                 fetching = true;
             }
-        }
 
-        // Lade-Icon anzeigen lassen
-        notifyDataSetChanged();
+            if (refresh) {
+                filter.setCursorString(null);
+            }
 
-        if (refresh) {
-            filter.setCursorString(null);
-        }
-
-        GalleryController.listPictures(new ExtendedTaskDelegateAdapter<Void, List<PictureMetaData>>() {
-            @Override
-            public void taskDidFinish(ExtendedTask task, List<PictureMetaData> newPictures) {
-                if (newPictures != null) {
-                    pictures.addAll(newPictures);
-                } else {
-                    keepFetching = false;
+            GalleryController.listPictures(new ExtendedTaskDelegateAdapter<Void, List<PictureMetaData>>() {
+                @Override
+                public void taskDidFinish(ExtendedTask task, final List<PictureMetaData> newPictures) {
+                    // Die Bilder auf einem Hintergrund-Thread hinzufügen, da so die Bilder
+                    // bereits aus dem Cache abgerufen werden können.
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            if (newPictures != null) {
+                                pictures.addAll(newPictures);
+                            } else {
+                                keepFetching = false;
+                            }
+                            return null;
+                        }
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            finish();
+                        }
+                    }.execute();
                 }
-                finish();
-            }
 
-            @Override
-            public void taskFailed(ExtendedTask task, String message) {
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-                finish();
-            }
+                @Override
+                public void taskFailed(ExtendedTask task, String message) {
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+                    finish();
+                }
 
-            /**
-             * Beendet das Abrufen der Daten unabhängig davon, ob das Abrufen erfolgreich war oder
-             * fehlgeschlagen ist.
-             */
-            private void finish() {
-                fetching = false;
-                PictureMetaDataAdapter.this.notifyDataSetChanged();
-            }
-        }, filter);
+                /**
+                 * Beendet das Abrufen der Daten unabhängig davon, ob das Abrufen erfolgreich war oder
+                 * fehlgeschlagen ist.
+                 */
+                private void finish() {
+                    fetching = false;
+                    PictureMetaDataAdapter.this.notifyDataSetChanged();
+                }
+            }, filter);
+        }
     }
 
     /**
@@ -239,6 +246,7 @@ public class PictureMetaDataAdapter extends BaseAdapter {
      */
     public void refresh() {
         pictures.clear();
+        notifyDataSetChanged();
         keepFetching = true;
         fetchData(true);
     }

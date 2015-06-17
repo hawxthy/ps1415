@@ -11,7 +11,7 @@ import ws1415.SkatenightBackend.model.DynamicField;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.EventParticipationVisibility;
 import ws1415.SkatenightBackend.model.EventRole;
-import ws1415.SkatenightBackend.model.Gallery;
+import ws1415.SkatenightBackend.model.Privilege;
 import ws1415.SkatenightBackend.model.Route;
 
 /**
@@ -29,6 +29,7 @@ public class EventData {
     private String description;
     private String meetingPlace;
     private int fee;
+    private boolean canSendBroadcast;
 
     private Map<String, EventRole> memberList;
     private EventParticipationVisibility participationVisibility;
@@ -53,6 +54,8 @@ public class EventData {
         images = event.getImages();
         route = event.getRoute();
         dynamicFields = event.getDynamicFields();
+
+        canSendBroadcast = memberList.get(user.getEmail()) != null && memberList.get(user.getEmail()).hasPrivilege(Privilege.SEND_BROADCAST);
     }
 
     public Long getId() {
@@ -125,6 +128,14 @@ public class EventData {
 
     public void setFee(int fee) {
         this.fee = fee;
+    }
+
+    public boolean isCanSendBroadcast() {
+        return canSendBroadcast;
+    }
+
+    public void setCanSendBroadcast(boolean canSendBroadcast) {
+        this.canSendBroadcast = canSendBroadcast;
     }
 
     public Map<String, EventRole> getMemberList() {

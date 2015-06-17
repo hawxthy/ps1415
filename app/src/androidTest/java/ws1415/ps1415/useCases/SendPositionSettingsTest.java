@@ -1,30 +1,8 @@
 package ws1415.ps1415.useCases;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.Instrumentation;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.ViewAsserts;
-import android.test.suitebuilder.annotation.LargeTest;
-import android.test.suitebuilder.annotation.SmallTest;
-import android.widget.Button;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.skatenight.skatenightAPI.model.Event;
-
-
-import ws1415.ps1415.Constants;
-import ws1415.ps1415.LocationTransmitterService;
-import ws1415.ps1415.R;
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.ListEventsActivity;
-import ws1415.ps1415.activity.SettingsActivity;
 
 /**
  * Testet den Use Case "Handhabung der aktuellen Position".

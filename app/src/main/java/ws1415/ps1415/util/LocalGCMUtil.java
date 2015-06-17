@@ -11,8 +11,8 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
 
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.Constants;
+import ws1415.ps1415.ServiceProvider;
 
 /**
  * Created by Martin on 20.05.2015.

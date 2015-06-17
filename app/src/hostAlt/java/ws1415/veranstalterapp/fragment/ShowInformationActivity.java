@@ -1,7 +1,6 @@
 package ws1415.veranstalterapp.fragment;
 
 
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.ListView;
@@ -10,8 +9,8 @@ import com.skatenight.skatenightAPI.model.EventData;
 
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
-import ws1415.veranstalterapp.R;
 import ws1415.common.task.GetEventTask;
+import ws1415.veranstalterapp.R;
 
 /**
  * Activity zum Anzeigen der Metainformationen der erstellten Veranstaltung.

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:xliff="http://schemas.android.com/apk/res/android">
+<resources>
     <!-- ManageEventsActivity -->
     <string name="title_activity_manage_events">Veranstaltung erstellen/bearbeiten</string>
     <array name="manage_events_event_actions">

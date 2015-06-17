@@ -8,7 +8,6 @@ import com.googlecode.objectify.Key;
 import java.util.List;
 import java.util.logging.Logger;
 
-import ws1415.SkatenightBackend.model.BooleanWrapper;
 import ws1415.SkatenightBackend.model.Event;
 import ws1415.SkatenightBackend.model.Route;
 import ws1415.SkatenightBackend.model.RoutePoint;

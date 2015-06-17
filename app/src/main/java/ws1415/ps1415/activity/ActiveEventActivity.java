@@ -1,8 +1,10 @@
 package ws1415.ps1415.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -16,9 +18,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,17 +33,20 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import ws1415.ps1415.controller.EventController;
-import ws1415.ps1415.task.ExtendedTask;
-import ws1415.ps1415.task.ExtendedTaskDelegate;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
+import ws1415.ps1415.controller.EventController;
+import ws1415.ps1415.model.EventRole;
+import ws1415.ps1415.task.ExtendedTask;
+import ws1415.ps1415.task.ExtendedTaskDelegate;
+import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
 import ws1415.ps1415.util.LocalAnalysisData;
 import ws1415.ps1415.util.LocalStorageUtil;
 
 public class ActiveEventActivity extends Activity implements ExtendedTaskDelegate<Void, EventData> {
     public static final String LOG_TAG = ActiveEventActivity.class.getSimpleName();
     public static final String EXTRA_KEY_ID = "active_event_extra_key_id";
+    public static final String EXTRA_CAN_SEND_BROADCAST = "can_send_broadcast";
 
     private static final String MEMBER_KEY_ID = "active_event_member_key_id";
     private static final String MEMBER_START_DATE = "active_event_member_start_date";
@@ -80,6 +88,10 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
             else {
                 Log.e(LOG_TAG, "EventId is required.");
                 finish();
+            }
+
+            if (intent != null && intent.hasExtra(EXTRA_CAN_SEND_BROADCAST)) {
+                findViewById(R.id.sendBroadcast).setVisibility(View.VISIBLE);
             }
 
             encodedWaypoints = "";
@@ -234,7 +246,7 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
 
         long s = Math.abs(current%60);
         current /= 60;
-        long m = Math.abs(current%60);
+        long m = Math.abs(current % 60);
         current /= 60;
         long h = Math.abs(current);
         timerTextView.setText(getString(R.string.active_event_timer_format, sign, h, m, s));
@@ -283,6 +295,53 @@ public class ActiveEventActivity extends Activity implements ExtendedTaskDelegat
     public void taskFailed(ExtendedTask task, String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
         setProgressBarIndeterminateVisibility(false);
+    }
+
+    public void onSendBroadcastClick(View view) {
+        final View dialogView = View.inflate(this, R.layout.dialog_send_broadcast, null);
+        final EditText title = (EditText) dialogView.findViewById(R.id.title);
+        final EditText message = (EditText) dialogView.findViewById(R.id.message);
+        final Spinner roleSpinner = (Spinner) dialogView.findViewById(R.id.roleSpinner);
+        ArrayAdapter roleAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.event_roles));
+        roleSpinner.setAdapter(roleAdapter);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.send_broadcast)
+                .setView(dialogView)
+                .setPositiveButton(R.string.sendButton, null)
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog d = builder.create();
+        d.show();
+        d.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (title.getText().toString().isEmpty() || message.getText().toString().isEmpty()) {
+                    Toast.makeText(ActiveEventActivity.this, R.string.error_no_title_or_message, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                dialogView.findViewById(R.id.loading).setVisibility(View.VISIBLE);
+                EventController.sendBroadcast(new ExtendedTaskDelegateAdapter<Void, Void>() {
+                    @Override
+                    public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                        d.dismiss();
+                        Toast.makeText(ActiveEventActivity.this, R.string.send_broadcast_finished, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void taskFailed(ExtendedTask task, String message) {
+                        if (dialogView.findViewById(R.id.loading) != null) {
+                            dialogView.findViewById(R.id.loading).setVisibility(View.GONE);
+                        }
+                        Toast.makeText(ActiveEventActivity.this, message, Toast.LENGTH_LONG).show();
+                    }
+                }, eventId, EventRole.values()[roleSpinner.getSelectedItemPosition()], title.getText().toString(), message.getText().toString());
+                d.dismiss();
+            }
+        });
     }
 
     private class ClockTimerTask extends TimerTask {

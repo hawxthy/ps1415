@@ -10,13 +10,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.skatenight.skatenightAPI.model.UserGroupFilter;
-import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 
 import java.util.List;
 
 import ws1415.ps1415.R;
 import ws1415.ps1415.activity.GroupProfileActivity;
-import ws1415.ps1415.adapter.ProfileGroupAdapter;
 import ws1415.ps1415.adapter.UsergroupAdapter;
 
 /**

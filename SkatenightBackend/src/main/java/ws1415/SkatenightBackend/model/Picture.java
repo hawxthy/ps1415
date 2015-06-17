@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import ws1415.SkatenightBackend.transport.PictureMetaData;
-import ws1415.SkatenightBackend.model.PictureVisibility;
 
 /**
  * Speichert die kompletten Bilddaten inklusive Metadaten, Kommentaren und Bewertungen.
@@ -130,7 +129,9 @@ public class Picture implements BlobKeyContainer, CommentContainer {
         } else {
             List<Gallery> galleries = new LinkedList<>();
             for (Ref<Gallery> ref : this.galleries) {
-                galleries.add(ref.get());
+                if (ref.get() != null) {
+                    galleries.add(ref.get());
+                }
             }
             return galleries;
         }

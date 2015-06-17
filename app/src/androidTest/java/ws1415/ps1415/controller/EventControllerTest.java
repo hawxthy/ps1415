@@ -1,7 +1,5 @@
 package ws1415.ps1415.controller;
 
-import android.util.Log;
-
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.IOUtils;
 import com.skatenight.skatenightAPI.model.DynamicField;
@@ -9,17 +7,18 @@ import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.EventData;
 import com.skatenight.skatenightAPI.model.EventFilter;
 import com.skatenight.skatenightAPI.model.EventMetaData;
-import com.skatenight.skatenightAPI.model.EventMetaDataList;
 import com.skatenight.skatenightAPI.model.Route;
+import com.skatenight.skatenightAPI.model.RoutePoint;
+import com.skatenight.skatenightAPI.model.ServerWaypoint;
 import com.skatenight.skatenightAPI.model.Text;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -82,20 +81,42 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
             ServiceProvider.getService().roleEndpoint().assignGlobalRole(Role.ADMIN.getId(), getAccountMail(0)).execute();
         }
 
-
         route1 = new Route();
-        route1.setLength("5 km");
-        route1.setName("Route 1");
-        // TODO R: Routenpunkte, Wegpunkte und Routendaten
+        route1.setLength("54 m");
+        route1.setName("Test1");
+        route1.setRouteData(new Text().setValue("cfh|Hy_pm@AJEZMn@CJAJAFAJ?J?L@PF`BFtAJfCF^??JATANCh" +
+                "Bm@B?nA_@RG\\IFAHA??B@B@@@@BDHDLDHxCdM`BdHv@bDT`AfAfGl@dFVlBLXBFDL@HDLLp@F\\@ZANAJ?" +
+                "L?`@Aj@??Gb@ZATAxAGVAvEIzEUj@A`CG~ACvA?|BGdAEXAT?r@EnAIXC^Ap@C~@E|@C\\Av@CfCEJA|AAl" +
+                "@An@@b@AJ?`A@v@FV@??h@U~@yA|@sAn@_A|@uAXc@^_@fAsAPa@Rc@HUL]DKBGDKLa@HUBKDQFSDOFSFSF" +
+                "OBGHQLSBGFIJIZSHEFE\\OZM\\Kd@O^KZId@KxA[ZEZChAET?N?P?P?XBh@FdARFBhATVBRBf@ANAbAOd@G" +
+                "LAPCNALENIv@G^EJCREFANGRKRMRQTY^e@~AwB`@e@NUPQLKJGb@Sb@O`@KTEXCPHf@LXJD@\\L`@Lx@T\\" +
+                "JJ@RBVBJAJ@HANCREPGPGPEBAdAa@rAUTCt@E\\?\\?t@D\\DZHJBXFXLDB^Lf@VbAr@XP`Ap@vB|ApB|AP" +
+                "Ld@^jA`Ab@ZTPj@h@LLt@l@ZV~@r@~@p@x@h@~@r@`At@tAfAf@b@B@v@n@b@\\VR`@Zp@h@~@p@dBpA~Bj" +
+                "BbBpAXTXR`BnA`@Zv@n@HFjA~@`Ar@lA`Ad@^v@n@f@`@fA|@??RNBMBQTeA??R?HDHDFDFBD@B@D?BAHA@" +
+                "?DCJEJCvAg@NGNENCBAXEPAr@LrA^pBr@??_@|BIZa@lBMh@Wz@M^IRELIPMN??c@y@W_@aAsAi@m@m@k@E" +
+                "EWUw@o@EEcBwAQOy@m@_As@a@Y"));
+        route1.setRoutePoints(Arrays.asList(
+                new RoutePoint().setLongitude(7.61148).setLatitude(51.97001),
+                new RoutePoint().setLongitude(7.61136).setLatitude(51.9701),
+                new RoutePoint().setLongitude(7.61118).setLatitude(51.970220000000005),
+                new RoutePoint().setLongitude(7.61095).setLatitude(51.97039)));
+        route1.setWaypoints(Arrays.asList(
+                new ServerWaypoint().setTitle("Wegpunkt 1").setLongitude(7.611478).setLatitude(51.970008),
+                new ServerWaypoint().setTitle("Wegpunkt 2").setLongitude(7.610938999999999).setLatitude(51.970382)));
         route1 = ServiceProvider.getService().routeEndpoint().addRoute(route1).execute();
 
         route2 = new Route();
-        route2.setLength("10 km");
-        route2.setName("Route 2");
-        // TODO R: Routenpunkte, Wegpunkte und Routendaten
+        route2.setLength("9 m");
+        route2.setName("Test2");
+        route2.setRouteData(new Text().setValue("g}b|Hevom@GV"));
+        route2.setRoutePoints(Arrays.asList(
+                new RoutePoint().setLongitude(7.62227).setLatitude(51.95748),
+                new RoutePoint().setLongitude(7.62215).setLatitude(51.957519999999995)));
+        route2.setWaypoints(Arrays.asList(
+                new ServerWaypoint().setTitle("Wegpunkt 1").setLongitude(7.622272).setLatitude(51.957480999999994),
+                new ServerWaypoint().setTitle("Wegpunkt 2").setLongitude(7.622145).setLatitude(51.957513)));
         route2 = ServiceProvider.getService().routeEndpoint().addRoute(route2).execute();
 
-        // TODO R: Testevent um Bilder erweitern
         testevent1 = new Event();
         testevent1.setTitle("Testevent #1");
         // 12.05.2015 17:00 Uhr
@@ -114,8 +135,6 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
             field.setContent("Content " + i);
             testevent1.getDynamicFields().add(field);
         }
-
-
         testevent1 = ServiceProvider.getService().eventEndpoint().createEvent(testevent1).execute();
     }
 
@@ -171,6 +190,7 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
                 }
                 fail("Die Eventmetadaten enthalten das Testevent nicht");
             }
+
             @Override
             public void taskFailed(ExtendedTask task, String message) {
                 fail(message);
@@ -255,13 +275,19 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
         // Event sollte nun nicht mehr abgerufen werden
         changeAccount(0);
         filter = new EventFilter();
-        filter.setLimit(2);
+        filter.setLimit(10);
         filter.setUserId(getAccountMail(1));
         final CountDownLatch signal2 = new CountDownLatch(1);
         EventController.listEvents(new ExtendedTaskDelegateAdapter<Void, List<EventMetaData>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<EventMetaData> eventMetaDatas) {
-                assertNull("events fetched", eventMetaDatas);
+                if (eventMetaDatas != null) {
+                    for (EventMetaData metaData : eventMetaDatas) {
+                        if (metaData.getId() == finalTestevent2.getId()) {
+                            fail("event was fetched");
+                        }
+                    }
+                }
                 signal2.countDown();
             }
         }, filter);
@@ -280,7 +306,13 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
         EventController.listEvents(new ExtendedTaskDelegateAdapter<Void, List<EventMetaData>>() {
             @Override
             public void taskDidFinish(ExtendedTask task, List<EventMetaData> eventMetaDatas) {
-                assertNull("events fetched", eventMetaDatas);
+                if (eventMetaDatas != null) {
+                    for (EventMetaData metaData : eventMetaDatas) {
+                        if (metaData.getId() == finalTestevent2.getId()) {
+                            fail("event was fetched");
+                        }
+                    }
+                }
                 signal3.countDown();
             }
         }, filter);
@@ -319,10 +351,9 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
                 assertEquals("route id", testevent1.getRoute().getId(), event.getRoute().getId());
                 assertEquals("route name", testevent1.getRoute().getName(), event.getRoute().getName());
                 assertEquals("route length", testevent1.getRoute().getLength(), event.getRoute().getLength());
-                // TODO R
-//                assertEquals("route data", testevent1.getRoute().getRouteData().getValue(), event.getRoute().getRouteData().getValue());
-//                assertEquals("route points", testevent1.getRoute().getRoutePoints(), event.getRoute().getRoutePoints());
-//                assertEquals("route waypoints", testevent1.getRoute().getWaypoints(), event.getRoute().getWaypoints());
+                assertEquals("route data", testevent1.getRoute().getRouteData().getValue(), event.getRoute().getRouteData().getValue());
+                assertEquals("route points", testevent1.getRoute().getRoutePoints(), event.getRoute().getRoutePoints());
+                assertEquals("route waypoints", testevent1.getRoute().getWaypoints(), event.getRoute().getWaypoints());
 
                 signal.countDown();
             }
@@ -387,10 +418,9 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
                 assertEquals("route id", neuesEvent.getRoute().getId(), event.getRoute().getId());
                 assertEquals("route name", neuesEvent.getRoute().getName(), event.getRoute().getName());
                 assertEquals("route length", neuesEvent.getRoute().getLength(), event.getRoute().getLength());
-                // TODO R
-//                assertEquals("route data", neuesEvent.getRoute().getRouteData().getValue(), event.getRoute().getRouteData().getValue());
-//                assertEquals("route points", neuesEvent.getRoute().getRoutePoints(), event.getRoute().getRoutePoints());
-//                assertEquals("route waypoints", neuesEvent.getRoute().getWaypoints(), event.getRoute().getWaypoints());
+                assertEquals("route data", neuesEvent.getRoute().getRouteData().getValue(), event.getRoute().getRouteData().getValue());
+                assertEquals("route points", neuesEvent.getRoute().getRoutePoints(), event.getRoute().getRoutePoints());
+                assertEquals("route waypoints", neuesEvent.getRoute().getWaypoints(), event.getRoute().getWaypoints());
 
                 // Dynmische Felder prüfen
                 assertNotNull("dynmic fields", event.getDynamicFields());
@@ -418,7 +448,6 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
 
     public void testEditEvent() throws InterruptedException {
         // Event editieren
-        // TODO R: Testevent um Bilder erweitern
         testevent1.setTitle("Editierter Titel");
         // 12.05.2015 17:00 Uhr
         testevent1.setDate(new DateTime(1441242800000l));
@@ -452,8 +481,6 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
     }
 
     public void testDeleteEvent() throws InterruptedException {
-        // TODO R: Prüfen, ob auch abhängige Galleries gelöscht werden
-
         final CountDownLatch signal = new CountDownLatch(1);
         EventController.deleteEvent(new ExtendedTaskDelegateAdapter<Void, Void>() {
             @Override
@@ -543,6 +570,20 @@ public class EventControllerTest extends AuthenticatedAndroidTestCase {
         }
 
         assertFalse("Teilnehmer hat das Event nicht verlassen", eventData.getMemberList().containsKey(ServiceProvider.getEmail()));
+    }
+
+    public void testChangeParticipationVisibility() throws InterruptedException, IOException {
+        final CountDownLatch signal = new CountDownLatch(1);
+        EventController.changeParticipationVisibility(new ExtendedTaskDelegateAdapter<Void, Void>() {
+            @Override
+            public void taskDidFinish(ExtendedTask task, Void aVoid) {
+                signal.countDown();
+            }
+        }, testevent1.getId(), EventParticipationVisibility.PRIVATE);
+        assertTrue("timeout reached", signal.await(10, TimeUnit.SECONDS));
+        EventData newEvent = ServiceProvider.getService().eventEndpoint().getEvent(testevent1.getId()).execute();
+        assertEquals("new visibility not assigned", EventParticipationVisibility.PRIVATE.name(),
+                newEvent.getParticipationVisibility());
     }
 
     @Override

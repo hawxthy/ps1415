@@ -87,7 +87,6 @@
             </intent-filter>
         </receiver>
         <receiver android:name=".LocationTransmitterService$StartServiceReceiver" />
-        <receiver android:name=".activity.ShowEventActivity$StartServiceReceiver" />
         <receiver android:name=".LocationTransmitterService$CancelServiceReceiver" />
 
         <service android:name=".GcmIntentService" />

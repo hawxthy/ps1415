@@ -2,8 +2,6 @@ package ws1415.SkatenightBackend.transport;
 
 import java.util.List;
 
-import ws1415.SkatenightBackend.model.UserGroup;
-
 /**
  * @author  Bernd Eissing on 07.06.2015.
  */

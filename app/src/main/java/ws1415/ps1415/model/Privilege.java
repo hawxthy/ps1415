@@ -12,5 +12,6 @@ public enum Privilege {
     EDIT_GALLERY,
     REMOVE_GALLERY,
     ADD_PICTURE,
-    REMOVE_PICTURES
+    REMOVE_PICTURES,
+    SEND_BROADCAST
 }

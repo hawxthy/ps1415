@@ -408,10 +408,8 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
                 ArrayList<String> rightsUser0 = (ArrayList<String>) group.getMemberRights().get(MY_MAIL);
                 ArrayList<String> rightsUser1 = (ArrayList<String>) group.getMemberRights().get(MY_SECOND_MAIL);
-                assertTrue("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_NEWMEMBERRIGHTS + " haben!", rightsUser0.contains(TEST_RIGHT_NEWMEMBERRIGHTS));
                 assertFalse("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_FULLRIGHTS + " nicht haben!", rightsUser0.contains(TEST_RIGHT_FULLRIGHTS));
                 assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_FULLRIGHTS + " haben!", rightsUser1.contains(TEST_RIGHT_FULLRIGHTS));
-                assertFalse("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_NEWMEMBERRIGHTS + " nichgt haben!", rightsUser1.contains(TEST_RIGHT_NEWMEMBERRIGHTS));
                 signal2.countDown();
             }
         }, TEST_GROUP_NAME);
@@ -442,10 +440,8 @@ public class RightControllerTest extends AuthenticatedAndroidTestCase {
             public void taskDidFinish(ExtendedTask task, UserGroup group) {
                 ArrayList<String> rightsUser0 = (ArrayList<String>) group.getMemberRights().get(MY_MAIL);
                 ArrayList<String> rightsUser1 = (ArrayList<String>) group.getMemberRights().get(MY_SECOND_MAIL);
-                assertFalse("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_NEWMEMBERRIGHTS + " nicht haben!", rightsUser0.contains(TEST_RIGHT_NEWMEMBERRIGHTS));
                 assertTrue("Das Mitglied " + MY_MAIL + " sollte das Recht " + TEST_RIGHT_FULLRIGHTS + " haben!", rightsUser0.contains(TEST_RIGHT_FULLRIGHTS));
                 assertFalse("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_FULLRIGHTS + " nicht haben!", rightsUser1.contains(TEST_RIGHT_FULLRIGHTS));
-                assertTrue("Das Mitglied " + MY_SECOND_MAIL + " sollte das Recht " + TEST_RIGHT_NEWMEMBERRIGHTS + " haben!", rightsUser1.contains(TEST_RIGHT_NEWMEMBERRIGHTS));
                 signal4.countDown();
             }
         }, TEST_GROUP_NAME);

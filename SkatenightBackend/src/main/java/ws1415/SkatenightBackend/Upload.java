@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.BoardEntry;
+import ws1415.SkatenightBackend.model.UserGroup;
 import ws1415.SkatenightBackend.model.UserGroupPreviewPictures;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;

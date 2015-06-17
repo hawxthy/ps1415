@@ -1,18 +1,10 @@
 package ws1415.ps1415.controller;
 
-import android.util.Log;
-
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.google.api.client.json.Json;
-import com.google.gson.Gson;
-import com.google.gson.JsonDeserializer;
 import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.ExpandableGalleriesWrapper;
 import com.skatenight.skatenightAPI.model.Gallery;
 import com.skatenight.skatenightAPI.model.GalleryContainerData;
 import com.skatenight.skatenightAPI.model.GalleryMetaData;
-import com.skatenight.skatenightAPI.model.JsonMap;
 import com.skatenight.skatenightAPI.model.Picture;
 import com.skatenight.skatenightAPI.model.PictureData;
 import com.skatenight.skatenightAPI.model.PictureFilter;
@@ -32,13 +24,11 @@ import org.apache.http.util.EntityUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.model.PictureVisibility;
-import ws1415.ps1415.model.Privilege;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegate;
 
@@ -176,8 +166,10 @@ public abstract class GalleryController {
                 try {
                     Map<GalleryMetaData, String> result = new HashMap<>();
                     ExpandableGalleriesWrapper wrapper = ServiceProvider.getService().galleryEndpoint().getExpandableGalleries(pictureId).execute();
-                    for (int i = 0; i < wrapper.getGalleries().size(); i++) {
-                        result.put(wrapper.getGalleries().get(i), wrapper.getAdditionalTitles().get(i));
+                    if (wrapper != null) {
+                        for (int i = 0; i < wrapper.getGalleries().size(); i++) {
+                            result.put(wrapper.getGalleries().get(i), wrapper.getAdditionalTitles().get(i));
+                        }
                     }
                     return result;
                 } catch (IOException e) {
@@ -238,13 +230,14 @@ public abstract class GalleryController {
             @Override
             protected Picture doInBackground(Void... params) {
                 // Picture-Objekt auf dem Server erstellen lassen
-                Picture picture = null;
+                Picture picture;
                 try {
                     picture = ServiceProvider.getService().galleryEndpoint().createPicture(
                             title, description, visibility.name()).set("galleryId", galleryId).execute();
                 } catch (IOException e) {
                     e.printStackTrace();
                     publishError("Bild konnte nicht erstellt werden. Zu wenig Rechte?");
+                    return null;
                 }
 
                 // POST-Anfrage für den Upload erstellen

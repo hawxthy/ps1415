@@ -1,6 +1,5 @@
 package ws1415.SkatenightBackend.transport;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**

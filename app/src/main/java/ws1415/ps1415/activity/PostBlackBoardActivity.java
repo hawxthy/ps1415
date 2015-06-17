@@ -12,14 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gc.materialdesign.views.ButtonFlat;
-import com.skatenight.skatenightAPI.model.BlobKey;
 import com.skatenight.skatenightAPI.model.BoardEntry;
 
 import java.io.File;
@@ -29,7 +27,6 @@ import ws1415.ps1415.R;
 import ws1415.ps1415.controller.GroupController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;
-import ws1415.ps1415.util.GroupImageLoader;
 import ws1415.ps1415.util.ImageUtil;
 import ws1415.ps1415.util.UniversalUtil;
 

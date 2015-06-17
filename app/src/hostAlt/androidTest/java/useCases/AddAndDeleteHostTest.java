@@ -15,11 +15,11 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.skatenight.skatenightAPI.model.Host;
 
 import ws1415.common.net.ServiceProvider;
+import ws1415.common.task.DeleteHostTask;
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.R;
-import ws1415.veranstalterapp.dialog.AddHostDialog;
 import ws1415.veranstalterapp.activity.PermissionManagementActivity;
-import ws1415.common.task.DeleteHostTask;
+import ws1415.veranstalterapp.dialog.AddHostDialog;
 
 /**
  * Testet das Hinzufügen und Löschen eines neuen Veranstalters.

@@ -1,6 +1,5 @@
 package ws1415.ps1415.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,22 +7,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 
-import com.gc.materialdesign.views.ButtonFlat;
 import com.melnykov.fab.FloatingActionButton;
-import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupFilter;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 
 import java.util.List;
 
 import ws1415.ps1415.R;
-import ws1415.ps1415.adapter.GroupMemberListAdapter;
 import ws1415.ps1415.adapter.UsergroupAdapter;
-import ws1415.ps1415.model.NavDrawerGroupList;
-import ws1415.ps1415.util.PrefManager;
 import ws1415.ps1415.util.UniversalUtil;
 
 public class MyUserGroupsActivity extends BaseFragmentActivity {

@@ -938,20 +938,22 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             }
 
             // Notification senden
-            Sender sender = new Sender(Constants.GCM_API_KEY);
-            Message.Builder mb = new Message.Builder()
-                    // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
-                    .delayWhileIdle(false)
-                    .collapseKey("group_" + group.getName() + "_deleted")
-                            // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
-                    .addData("type", MessageType.GLOBAL_GROUP_MESSAGE.name())
-                    .addData("content", globalMessage)
-                    .addData("title", group.getName());
-            Message m = mb.build();
-            try {
-                sender.send(m, new LinkedList<>(regids), 1);
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            if (!regids.isEmpty()) {
+                Sender sender = new Sender(Constants.GCM_API_KEY);
+                Message.Builder mb = new Message.Builder()
+                        // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
+                        .delayWhileIdle(false)
+                        .collapseKey("group_" + group.getName() + "_deleted")
+                                // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
+                        .addData("type", MessageType.GLOBAL_GROUP_MESSAGE.name())
+                        .addData("content", globalMessage)
+                        .addData("title", group.getName());
+                Message m = mb.build();
+                try {
+                    sender.send(m, new LinkedList<>(regids), 1);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         } finally {
             pm.close();
@@ -968,7 +970,7 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
      * @param users     Die Benutzer, die in die Gruppe eingeladen werden sollen.
      * @throws OAuthRequestException Wird geschmissen, falls der Aufrufer nicht registriert ist
      */
-    public void sendInvitation(User user, @Named("groupName") String groupName, ListWrapper users) throws OAuthRequestException {
+    public void sendInvitation(User user, @Named("groupName") String groupName, ListWrapper users, @Named("invitationMessage") String invitationMessage) throws OAuthRequestException {
         EndpointUtil.throwIfNoUser(user);
         EndpointUtil.throwIfUserGroupNameWasntSubmitted(groupName);
         if (users == null) {
@@ -988,21 +990,23 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             }
 
             // Notification senden
-            Sender sender = new Sender(Constants.GCM_API_KEY);
-            Message.Builder mb = new Message.Builder()
-                    // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
-                    .delayWhileIdle(false)
-                    .timeToLive(6000)
-                    .collapseKey("group_" + groupName + "_deleted")
-                            // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
-                    .addData("type", MessageType.INVITATION_TO_GROUP_MESSAGE.name())
-                    .addData("content", "Sie haben eine Einladung von " + user.getEmail() + " in die Nutzergruppe " + groupName + " erhalten.")
-                    .addData("title", groupName);
-            Message m = mb.build();
-            try {
-                sender.send(m, new LinkedList<>(regids), 1);
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            if (!regids.isEmpty()) {
+                Sender sender = new Sender(Constants.GCM_API_KEY);
+                Message.Builder mb = new Message.Builder()
+                        // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
+                        .delayWhileIdle(false)
+                        .timeToLive(6000)
+                        .collapseKey("group_" + groupName + "_deleted")
+                                // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
+                        .addData("type", MessageType.INVITATION_TO_GROUP_MESSAGE.name())
+                        .addData("content", invitationMessage)
+                        .addData("title", "Sie haben eine Einladung von " + user.getEmail() + " in die Nutzergruppe " + groupName + " erhalten.");
+                Message m = mb.build();
+                try {
+                    sender.send(m, new LinkedList<>(regids), 1);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         } finally {
             pm.close();
@@ -1124,20 +1128,22 @@ public class GroupEndpoint extends SkatenightServerEndpoint {
             }
 
             // Notification senden
-            Sender sender = new Sender(Constants.GCM_API_KEY);
-            Message.Builder mb = new Message.Builder()
-                    // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
-                    .delayWhileIdle(false)
-                    .collapseKey("group_" + group.getName() + "_deleted")
-                            // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
-                    .addData("type", MessageType.GROUP_DELETED_NOTIFICATION_MESSAGE.name())
-                    .addData("content", group.getName())
-                    .addData("title", "Eine Gruppe wurde geloescht");
-            Message m = mb.build();
-            try {
-                sender.send(m, new LinkedList<>(regids), 1);
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            if (!regids.isEmpty()) {
+                Sender sender = new Sender(Constants.GCM_API_KEY);
+                Message.Builder mb = new Message.Builder()
+                        // Nachricht erst anzeigen, wenn der Benutzer sein Handy benutzt
+                        .delayWhileIdle(false)
+                        .collapseKey("group_" + group.getName() + "_deleted")
+                                // Nachricht verfallen lassen, wenn Benutzer erst nach Event online geht
+                        .addData("type", MessageType.GROUP_DELETED_NOTIFICATION_MESSAGE.name())
+                        .addData("content", group.getName())
+                        .addData("title", "Eine Gruppe wurde geloescht");
+                Message m = mb.build();
+                try {
+                    sender.send(m, new LinkedList<>(regids), 1);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         } finally {
             pm.close();

@@ -51,6 +51,7 @@
     <string name="active_event_altitude_format_meters"><xliff:g id="altitude">%1$.1f</xliff:g> m</string>
     <string name="active_event_distance_format_meters"><xliff:g id="distance">%1$.1f</xliff:g> m</string>
     <string name="active_event_speed_format"><xliff:g id="speed">%1$.1f</xliff:g> kph</string>
+    <string name="send_broadcast">Send Broadcast</string>
 
     <!-- Strings zu activity settings -->
     <string name="title_activity_settings">Settings</string>
@@ -299,6 +300,8 @@
     <string name="error_invalid_picture">Invalid Picture</string>
     <string name="error_invalid_picture_message">The data submitted for the picture is invalid. Please make sure to select an image and specify title, description and visibility.</string>
     <string name="change_visibility_hint">If you lower the visibility of the picture it will be removed out of all galleries that require a higher visibility setting.</string>
+    <string name="save_picture">Save picture?</string>
+    <string name="save_picture_message">Do you want to save this picture?</string>
 
     <!-- PictureFragment -->
     <string name="comments_label">Comments</string>
@@ -390,6 +393,7 @@
     <string name="sendDone">Invitations have been send</string>
     <string name="noUsersToInvite">No users to invite Selected</string>
     <string name="title_activity_invite_users_to_group">Invite Users</string>
+    <string name="invitation_title">Invitation message</string>
 
     <!-- MyUserGroupsActivity-->
     <string name="tooManyVisibleGroups">Too many visible Groups</string>
@@ -480,6 +484,9 @@
     <string name="cant_make_security_group_open">You can not make Security groups open</string>
     <string name="your_group_is_open">Your Group is now open</string>
     <string name="your_group_is_private">Your Group is now private</string>
+    <string name="change_password_old">Old Password</string>
+    <string name="change_password_new">New Password</string>
+    <string name="change_password_new_repeat">Repeat Password</string>
 
     <!-- GroupBlackBoardFragment-->
     <string name="deleteThisEntryQuestion">Delete this Entry?</string>
@@ -493,4 +500,15 @@
 
     <!-- GroupMembersFragment-->
     <string name="title_fragment_group_members">Member</string>
+
+
+    <!-- dialog_send_broadcast.xml -->
+    <string name="title">Title:</string>
+    <string name="message">Message:</string>
+    <string name="error_no_title_or_message">Please enter a title and a message!</string>
+    <string name="role">Role:</string>
+    <string name="send_broadcast_finished">Broadcast send</string>
+
+    <!-- ImagePicker -->
+    <string name="error_image_too_large">Selected image is too large!</string>
 </resources>

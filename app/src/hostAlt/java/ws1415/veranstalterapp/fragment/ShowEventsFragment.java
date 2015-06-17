@@ -16,13 +16,13 @@ import com.skatenight.skatenightAPI.model.Event;
 
 import java.util.List;
 
+import ws1415.common.task.DeleteEventTask;
 import ws1415.common.task.ExtendedTask;
 import ws1415.common.task.ExtendedTaskDelegateAdapter;
 import ws1415.common.task.QueryEventsTask;
-import ws1415.veranstalterapp.adapter.EventsCursorAdapter;
-import ws1415.veranstalterapp.activity.EditEventActivity;
 import ws1415.veranstalterapp.R;
-import ws1415.common.task.DeleteEventTask;
+import ws1415.veranstalterapp.activity.EditEventActivity;
+import ws1415.veranstalterapp.adapter.EventsCursorAdapter;
 
 /**
  * Dieses Fragment wird dazu genutzt, eine Liste von Veranstaltungen anzuzeigen.

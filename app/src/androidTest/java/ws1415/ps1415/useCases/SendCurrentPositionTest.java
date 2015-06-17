@@ -18,13 +18,13 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.skatenight.skatenightAPI.model.Event;
 import com.skatenight.skatenightAPI.model.UserLocation;
 
-import ws1415.ps1415.controller.UserController;
-import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.Constants;
 import ws1415.ps1415.LocationTransmitterService;
 import ws1415.ps1415.R;
-import ws1415.ps1415.activity.SettingsActivity;
+import ws1415.ps1415.ServiceProvider;
 import ws1415.ps1415.activity.ListEventsActivity;
+import ws1415.ps1415.activity.SettingsActivity;
+import ws1415.ps1415.controller.UserController;
 
 /**
  * Testet den User Case "Übertragung der aktuellen Position an den Server".

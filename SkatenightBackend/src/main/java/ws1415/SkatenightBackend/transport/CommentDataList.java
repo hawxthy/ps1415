@@ -2,8 +2,6 @@ package ws1415.SkatenightBackend.transport;
 
 import java.util.List;
 
-import ws1415.SkatenightBackend.model.Comment;
-
 /**
  * Erweitert eine Liste um den Cursorstring, der durch das Abrufen der Liste aus dem Datastore entstanden ist.
  * @author Richard Schulze

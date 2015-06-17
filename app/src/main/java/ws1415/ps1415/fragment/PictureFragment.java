@@ -2,13 +2,12 @@ package ws1415.ps1415.fragment;
 
 
 import android.app.AlertDialog;
-import android.app.FragmentTransaction;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.text.format.DateFormat;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -236,7 +235,7 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
     }
 
     private void addPictureToGallery() {
-        final ExpandableGalleryAdapter galleryAdapter = new ExpandableGalleryAdapter(getActivity(), pictureId);
+        final ExpandableGalleryAdapter galleryAdapter = new ExpandableGalleryAdapter(getActivity().getApplicationContext(), pictureId);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.action_add_to_gallery)
                 .setAdapter(galleryAdapter, new DialogInterface.OnClickListener() {
@@ -245,11 +244,11 @@ public class PictureFragment extends Fragment implements RatingBar.OnRatingBarCh
                         GalleryController.addPictureToGallery(new ExtendedTaskDelegateAdapter<Void, Void>() {
                             @Override
                             public void taskDidFinish(ExtendedTask task, Void aVoid) {
-                                Toast.makeText(getActivity(), R.string.adding_to_gallery_finished, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity().getApplicationContext(), R.string.adding_to_gallery_finished, Toast.LENGTH_LONG).show();
                             }
                             @Override
                             public void taskFailed(ExtendedTask task, String message) {
-                                Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity().getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             }
                         }, pictureId, galleryAdapter.getItemId(which));
                     }

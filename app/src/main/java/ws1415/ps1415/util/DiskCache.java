@@ -4,14 +4,10 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
-
-import com.google.api.client.googleapis.util.Utils;
-import com.google.api.client.util.StringUtils;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -180,8 +176,6 @@ public class DiskCache {
     public Bitmap getBitmapFromDiskCache(DiskKey key) {
         final String keyString = key.getHashForDisk();
         Bitmap bitmap = null;
-
-        Log.d("DISK_CACHE_KEY", key.getManipulation() + " " + key.getBlobKey());
 
         synchronized (mDiskCacheLock) {
             while (mDiskCacheStarting) {

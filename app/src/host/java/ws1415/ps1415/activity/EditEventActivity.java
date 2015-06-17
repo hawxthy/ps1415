@@ -25,7 +25,6 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -88,6 +87,9 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
     private HorizontalScrollView imagesScroller;
 
     private boolean edited = false;
+    // Gibt an, ob das Event gerade gepsichert wird. Falls true, wird beim zurück gehen kein neuer
+    // Dialog zum Speichern des Events angezeigt
+    private boolean saving = false;
 
     private Route[] routes;
     private String[] routeNames;
@@ -219,7 +221,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
      */
     @Override
     public void finish() {
-        if (edited || (dynamicFieldsAdapter != null && dynamicFieldsAdapter.isEdited())) {
+        if (!saving && (edited || (dynamicFieldsAdapter != null && dynamicFieldsAdapter.isEdited()))) {
             if (!FormatterUtil.isCurrencyString(fee.getText().toString())) {
                 Toast.makeText(this, R.string.error_wrong_currency_format, Toast.LENGTH_LONG).show();
                 return;
@@ -262,6 +264,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
                                             findViewById(R.id.eventLoading).setVisibility(View.GONE);
                                         }
                                     }, event);
+                                    saving = true;
                                 } catch(IllegalArgumentException e) {
                                     // Event ist ungültig
                                     finishLoading();
@@ -286,6 +289,7 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
                                             findViewById(R.id.eventLoading).setVisibility(View.GONE);
                                         }
                                     }, event, iconFile, headerImageFile, imageFiles);
+                                    saving = true;
                                 } catch(IllegalArgumentException e) {
                                     // Event ist ungültig
                                     finishLoading();
@@ -448,15 +452,25 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
         switch (requestCode) {
             case SELECT_HEADER_IMAGE_REQUEST_CODE:
                 if (tempPath != null && selectedImageUri != null) {
-                    headerImageFile = new File(tempPath);
-                    ImageUtil.loadSubsampledImageInView(headerImageFile, headerImage, headerImage.getWidth());
+                    File tmpHeaderImageFile = new File(tempPath);
+                    try {
+                        ImageUtil.loadSubsampledImageInView(tmpHeaderImageFile, headerImage, headerImage.getWidth());
+                    } catch (IllegalArgumentException ex) {
+                        Toast.makeText(this, R.string.error_image_too_large, Toast.LENGTH_LONG).show();
+                    }
+                    headerImageFile = tmpHeaderImageFile;
                     edited = true;
                 }
                 break;
             case SELECT_ICON_IMAGE_REQUEST_CODE:
                 if (tempPath != null && selectedImageUri != null) {
-                    iconFile = new File(tempPath);
-                    icon.setImageURI(selectedImageUri);
+                    File tmpIconFile = new File(tempPath);
+                    try {
+                        ImageUtil.loadSubsampledImageInView(tmpIconFile, icon, icon.getWidth());
+                    } catch (IllegalArgumentException ex) {
+                        Toast.makeText(this, R.string.error_image_too_large, Toast.LENGTH_LONG).show();
+                    }
+                    iconFile = tmpIconFile;
                     edited = true;
                 }
                 break;
@@ -469,7 +483,12 @@ public class EditEventActivity extends Activity implements ExtendedTaskDelegate<
                     params.gravity = Gravity.CENTER_VERTICAL;
                     v.setLayoutParams(params);
                     v.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                    ImageUtil.loadSubsampledImageInView(f, v, imagesScroller.getWidth() - 20);
+                    try {
+                        ImageUtil.loadSubsampledImageInView(f, v, imagesScroller.getWidth() - 20);
+                    } catch (IllegalArgumentException ex) {
+                        Toast.makeText(this, R.string.error_image_too_large, Toast.LENGTH_LONG).show();
+                        imageFiles.remove(f);
+                    }
                     v.setOnLongClickListener(new View.OnLongClickListener() {
                         @Override
                         public boolean onLongClick(final View v) {

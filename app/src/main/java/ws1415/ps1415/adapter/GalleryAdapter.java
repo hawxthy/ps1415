@@ -1,11 +1,9 @@
 package ws1415.ps1415.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,11 +11,8 @@ import com.skatenight.skatenightAPI.model.GalleryMetaData;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import ws1415.ps1415.R;
-import ws1415.ps1415.activity.GroupProfileActivity;
-import ws1415.ps1415.activity.ShowRouteActivity;
 import ws1415.ps1415.controller.GalleryController;
 import ws1415.ps1415.task.ExtendedTask;
 import ws1415.ps1415.task.ExtendedTaskDelegateAdapter;

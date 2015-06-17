@@ -53,7 +53,9 @@ public class Gallery {
         }
         List<Picture> resolvedPictures = new LinkedList<>();
         for (Ref<Picture> p : pictures) {
-            resolvedPictures.add(p.get());
+            if (p.get() != null) {
+                resolvedPictures.add(p.get());
+            }
         }
         return resolvedPictures;
     }

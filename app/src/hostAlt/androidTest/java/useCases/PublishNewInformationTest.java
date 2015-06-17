@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import ws1415.common.net.ServiceProvider;
+import ws1415.common.task.AddRouteTask;
 import ws1415.veranstalterapp.Constants;
 import ws1415.veranstalterapp.R;
 import ws1415.veranstalterapp.activity.EditEventActivity;
@@ -34,7 +35,6 @@ import ws1415.veranstalterapp.activity.HoldTabsActivity;
 import ws1415.veranstalterapp.adapter.EventsCursorAdapter;
 import ws1415.veranstalterapp.fragment.AnnounceInformationFragment;
 import ws1415.veranstalterapp.fragment.ShowEventsFragment;
-import ws1415.common.task.AddRouteTask;
 
 
 /**

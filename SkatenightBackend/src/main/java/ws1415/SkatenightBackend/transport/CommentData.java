@@ -1,8 +1,5 @@
 package ws1415.SkatenightBackend.transport;
 
-import com.google.appengine.api.users.User;
-import com.googlecode.objectify.annotation.Index;
-
 import java.util.Date;
 
 import ws1415.SkatenightBackend.model.Comment;

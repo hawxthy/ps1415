@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:xliff="http://schemas.android.com/apk/res/android">
+<resources>
     <!-- ManageEventsActivity -->
     <string name="title_activity_manage_events">Create/Edit Events</string>
     <array name="manage_events_event_actions">
@@ -72,5 +72,4 @@
     <string name="groupTypeNormal">Normal</string>
     <string name="typeInfoGroup">Info Group Type</string>
     <string name="infoGroupType">Security groups are always private and members of this group will always be visible. That means participants of an Event will always see the memembers of any Securitygroup on their map.</string>
-
 </resources>

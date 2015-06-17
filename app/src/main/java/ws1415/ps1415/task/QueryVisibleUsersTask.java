@@ -2,7 +2,6 @@ package ws1415.ps1415.task;
 
 import android.content.Context;
 
-import com.skatenight.skatenightAPI.model.UserGroup;
 import com.skatenight.skatenightAPI.model.UserGroupFilter;
 import com.skatenight.skatenightAPI.model.UserGroupMetaData;
 import com.skatenight.skatenightAPI.model.UserLocationInfo;
@@ -62,9 +61,6 @@ public class QueryVisibleUsersTask extends ExtendedTask<Void, Void, HashMap<User
                         }
                     }catch (IOException e){
                         e.printStackTrace();
-                    }
-                    finally {
-                        // damit man übersetzen kann
                     }
                 }
             }

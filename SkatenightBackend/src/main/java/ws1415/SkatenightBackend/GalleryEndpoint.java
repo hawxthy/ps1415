@@ -295,15 +295,15 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
         PictureVisibility minVisibility;
         if (filter.getGalleryId() != null) {
             Gallery gallery = ofy().load().type(Gallery.class).id(filter.getGalleryId()).safe();
-            if (gallery.getContainerClass().equals(UserGalleryContainer.class.getSimpleName())) {
-                // Der Benutzer ruft eine Benutzergallerie ab. Hier muss für jedes Bild geprüft werden,
-                // in welcher Beziehung der aufrufende Benutzer und der Uploader stehen
-                minVisibility = null;
-            } else {
-                // Es wird eine öffentliche Gallery (z.B. von einem Event) abgerufen
-                // Da einer öffentlichen Gallery nur öffentliche Bilder hinzugefügt werden können,
-                // muss hier nicht in gesonderter Form auf die Sichtabrkeit geachtet werden.
+            GalleryContainer container = (GalleryContainer) ofy().load().kind(gallery.getContainerClass()).id(gallery.getContainerId()).safe();
+
+            if (container.getMinPictureVisibility() == PictureVisibility.PUBLIC) {
+                // Es wird eine Galerie abgerufen, die nur öffentliche Bilder enthält. In diesem Fall
+                // müssen die Sichtbarkeiten beim Abrufen der Bilder nicht beachtet werden.
                 minVisibility = PictureVisibility.PUBLIC;
+            } else {
+                // Sonst muss für jedes Bild einzeln entschieden werden, ob es abgerufen werden kann
+                minVisibility = null;
             }
         } else {
             if (user.getEmail().equals(filter.getUserId())) {
