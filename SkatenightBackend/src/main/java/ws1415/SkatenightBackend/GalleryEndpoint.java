@@ -20,6 +20,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -173,9 +174,7 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
 
             // Die Gallery aus allen Bildern entfernen, die die Gallery referenzieren
             for (Picture p : gallery.getPictures()) {
-                if (p != null) {
-                    p.removeGallery(gallery);
-                }
+                p.removeGallery(gallery);
             }
             ofy().save().entities(gallery.getPictures()).now();
 
@@ -475,9 +474,7 @@ public class GalleryEndpoint extends SkatenightServerEndpoint {
 
             // Das Bild aus allen Gallerien entfernen, in denen es referenziert wird
             for (Gallery gallery : picture.getGalleries()) {
-                if (gallery != null) {
-                    gallery.removePicture(picture);
-                }
+                gallery.removePicture(picture);
             }
             ofy().save().entities(picture.getGalleries()).now();
 
