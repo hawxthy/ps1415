@@ -41,7 +41,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             debuggable true
-            testCoverageEnabled true
+            // testCoverageEnabled true
         }
         debug {
             signingConfig signingConfigs.debug
@@ -62,7 +62,7 @@ android {
         }
     }
     lintOptions {
-        checkReleaseBuilds false
+        // checkReleaseBuilds false
         abortOnError false
     }
 
@@ -128,12 +128,9 @@ dependencies {
     androidTestCompile 'junit:junit:4.12'
 }
 
-// Jacoco config
 apply plugin: 'jacoco'
 
 jacoco {
-    // Use this version for upper ones are broken (with Gradle)
-    // https://github.com/jacoco/jacoco/issues/288
     toolVersion = "0.7.1.201405082137"
 }
 
