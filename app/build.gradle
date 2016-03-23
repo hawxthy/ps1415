@@ -113,7 +113,7 @@ dependencies {
     compile 'com.jayway.android.robotium:robotium-solo:5.2.1'
 
     // Espresso
-    compile 'com.android.support.test.espresso:espresso-core:2.2'
+    // compile 'com.android.support.test.espresso:espresso-core:2.2'
 
     // UI Automator
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.1'
