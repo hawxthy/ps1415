@@ -51,5 +51,5 @@ public class Constants {
      * falls diese nicht bereits existiert.
      */
     public static final String[] INITIAL_ADMINS = {"skatenight.host@gmail.com", "martin.wrod@googlemail.com",
-            "Bernd.Eissing@gmail.com", "richard-schulze@online.de"};
+            "Bernd.Eissing@gmail.com", "richard-schulze@online.de", "tristan.rust@googlemail.com"};
 }
