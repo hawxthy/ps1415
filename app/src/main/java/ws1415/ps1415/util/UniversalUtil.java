@@ -33,6 +33,12 @@ public abstract class UniversalUtil {
         Context context = activity.getApplicationContext();
         GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(context, "server:client_id:" + Constants.WEB_CLIENT_ID);
 
+        // BACHELORARBEIT: EVALUATION VON TESTFRAMEWORKS FÜR ANDROID-APPS UND IHRE INTEGRATION ZU EINER TESTINFRASTRUKTUR //
+        // Direktes setzen des Testnutzers für die Bachelorarbeit "Evaluation von Testframeworks für Android-Apps und ihre
+        // Integration zu einer Testinfrastruktur". Hierdurch entfällt der Login Dialog, der die meisten Testframeworks behindert.
+        // Für die UI Autoamtor Tests die nachstehende Zeile auskommentieren.
+        // PrefManager.setSelectedUserMail(context, "tristan.rust@googlemail.com");
+
         if (PrefManager.getSelectedUserMail(context).equals("")) {
             Intent intent = new Intent(context, RegisterActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
