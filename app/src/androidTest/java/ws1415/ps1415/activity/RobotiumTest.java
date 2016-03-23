@@ -11,7 +11,8 @@ import ws1415.ps1415.R;
  * Beispiel Robotium Test für die Bachelorarbeit "Evaluation von Test Frameworks
  * für Android-Apps und ihre Integration zu einer Test-Infrastruktur".
  * Dies ist ein Beispiel für einen UI Test, welcher mit Hilfe des Robotium Test
- * Frameworks realisiert wird.
+ * Frameworks realisiert wird. Die Klasse hat mit Absicht den Namen "RobotiumTest" und nicht
+ * den eines Testsfalls, da diese nur exemplarisch für die Bachelorarbeit dient.
  *
  * @author Tristan Rust
  */
@@ -44,12 +45,13 @@ public class RobotiumTest extends ActivityInstrumentationTestCase2<ListEventsAct
      * lässt.
      */
     public void testEditText() throws Exception {
-
+        // Wechseln von der EventsActivity auf die ProfilEditActivity
         solo.clickOnText("Veranstaltungen");
         solo.clickOnText("Mein Profil");
         View editButton = solo.getView("ws1415.ps1415:id/action_edit_profile");
         solo.clickOnView(editButton);
 
+        // Abrufzeit der Daten vom Server
         Thread.sleep(2000);
 
         // Textfeld holen
