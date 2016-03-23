@@ -10,7 +10,7 @@ import static junit.framework.Assert.assertEquals;
  * Beispiel JUnit Test für die Bachelorarbeit "Evaluation von Test Frameworks
  * für Android-Apps und ihre Integration zu einer Test-Infrastruktur".
  * Hier wird getestet, ob DateUtil das Datum richtig formatiert.
- * Dies ist ein Beispiel für einen lokalen Unit Test
+ * Dies ist ein Beispiel für einen lokalen Unit Test mit JUnit.
  *
  * @author Tristan Rust
  */
